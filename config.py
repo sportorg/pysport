@@ -7,6 +7,6 @@ CONFIG_INI = DATA_DIR + 'config.ini'
 
 IMG_DIR = 'img/'
 ICON_DIR = IMG_DIR + 'icon/'
-ICON = ICON_DIR + 'stopwatch.ico'
+ICON = ICON_DIR + 'sportorg.ico'
 
 LOCALE_DIR = 'languages/'

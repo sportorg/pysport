@@ -1,11 +1,11 @@
-#SportOrg
+# SportOrg
 
-build
-`pyinstaller.exe --onefile -windowed --icon=img/icon/stopwatch.ico SportOrg.pyw`
+### Build
+`pyinstaller.exe --onefile -windowed --icon=img/icon/sportorg.ico SportOrg.pyw`
 
 Для билда нужно установить пакет `pyinstaller`
 
-###Packages
+### Packages
 
 - sireader
 - peewee
@@ -17,6 +17,16 @@ pip install package-name
 pip install sireader
 ```
 
+### Структура
+
+```
+data/
+docs/
+img/icon/
+languages/<lang>/LC_MESSAGES/sportorg.po
+```
+
+! Для работы требуется все папки
 
 ### Проект
 
