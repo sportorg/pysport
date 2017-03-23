@@ -26,7 +26,7 @@ img/icon/
 languages/<lang>/LC_MESSAGES/sportorg.po
 ```
 
-! Для работы требуется все папки
+! Для работы требуются все папки
 
 ### Проект
 
