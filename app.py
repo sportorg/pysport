@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import ttk
 import configparser
 
+from model import *
 from bar import StatusBar, ToolBar
 from appabout import About
 import appframe
@@ -12,21 +13,27 @@ from apptime import Clock
 
 
 class App(Frame):
-    def __init__(self, master=None):
+    def __init__(self, master=None, file=None):
         super().__init__(master)
         self.conf = configparser.ConfigParser()
+        self.file = file
+
         self.pack()
         self._widget()
         self._menu()
         self._toolbar()
         self._status_bar()
-        self.si_read = sportident.SIRead(self.status)
-        self._nb()
+        self._main_frame()
+
+        self.si_read = sportident.SIRead(self)
 
     def mainloop(self, **kwargs):
         super().mainloop(**kwargs)
 
     def _widget(self):
+        """
+        Конфигурация главного окна
+        """
         self.conf.read(config.CONFIG_INI)
         geometry = self.conf.get('geometry', 'geometry', fallback='500x380+0+0')
 
@@ -83,7 +90,7 @@ class App(Frame):
         # clock = Clock(clock_toolbar)
         # clock.start()
 
-    def _nb(self):
+    def _main_frame(self):
         # self.main_frame = Frame(self.master)
         # self.main_frame.pack(fill=X)
 
@@ -99,6 +106,9 @@ class App(Frame):
         self.nb.add(appframe.Live(self), text=_("Live"))
 
     def _status_bar(self):
+        """
+        Инициализация статус бара
+        """
         self.status = StatusBar(self.master)
         self.status.set("%s", _("Working"))
 
@@ -131,3 +141,24 @@ class App(Frame):
         else:
             self.siread_button['bg'] = 'green'
             self.si_read.is_running = True
+
+    def create_db(self):
+        pass
+        # db.connect()
+        # db.create_tables([
+        #     Event,
+        #     Person,
+        #     Extensions,
+        #     ControlCard,
+        #     CourseControl,
+        #     Course,
+        #     EventStatus,
+        #     ResultStatus,
+        #     Country,
+        #     Contact,
+        #     Address,
+        #     PersonName,
+        #     Start,
+        #     SplitTime,
+        #     Result
+        # ], safe=True)

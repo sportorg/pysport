@@ -1,32 +1,15 @@
 from tkinter import Tk
+import sys
 
 from app import App
-from model import *
 
 
-def main():
-    db.connect()
-    db.create_tables([
-        Event,
-        Person,
-        Extensions,
-        ControlCard,
-        CourseControl,
-        Course,
-        EventStatus,
-        ResultStatus,
-        Country,
-        Contact,
-        Address,
-        PersonName,
-        Start,
-        SplitTime,
-        Result
-    ], safe=True)
+def main(argv):
+    file = argv[2] if 2 in argv else None
     root = Tk()
-    app = App(master=root)
+    app = App(master=root, file=file)
     app.mainloop()
 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv)
