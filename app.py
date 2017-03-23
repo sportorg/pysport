@@ -1,5 +1,7 @@
 from tkinter import *
 from tkinter import ttk
+from tkinter import filedialog
+
 import configparser
 
 from model import *
@@ -47,7 +49,7 @@ class App(Frame):
 
         filemenu = Menu(menubar, tearoff=0)
         filemenu.add_command(label=_("New"))
-        filemenu.add_command(label=_("Save"))
+        filemenu.add_command(label=_("Save"), command=self.save)
         filemenu.add_command(label=_("Save As"))
         filemenu.add_separator()
         filemenu.add_command(label=_("Exit"), command=self.close)
@@ -127,6 +129,14 @@ class App(Frame):
             self.conf.set('locale', 'current', locale)
         except configparser.Error:
             self.master.quit()
+
+    def save(self):
+        f = filedialog.asksaveasfile(mode='w', defaultextension=".txt")
+        if f is None:
+            return
+        text2save = "Text"
+        f.write(text2save)
+        f.close()
 
     @staticmethod
     def about():
