@@ -1,5 +1,6 @@
 from tkinter import *
 import applist
+import model
 
 
 class Sportident(Frame):

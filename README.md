@@ -20,10 +20,16 @@ pip install sireader
 ### Структура
 
 ```
-data/
-docs/
-img/icon/
-languages/<lang>/LC_MESSAGES/sportorg.po
+sportorg/
+    data/
+    docs/
+    img/
+        icon/
+    languages/
+        <lang>/
+            LC_MESSAGES/
+                sportorg.mo
+                sportorg.po
 ```
 
 ! Для работы требуются все папки

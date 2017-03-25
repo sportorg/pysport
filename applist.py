@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import ttk
+import model
 
 
 import table
@@ -23,10 +24,11 @@ class Person:
         self.parent = parent
 
     def list(self):
-        person_header = ['Name', 'Team', 'Bib', 'Start', 'Result']
+        person_header = ['id', 'Family', 'Given']
+        persons = model.PersonName.select()
         person_list = []
-        for i in range(100):
-            person_list.append(['Ахтаров' + str(i), 'Абрис', i, '12:00:' + str(i), i + 5])
+        for person in persons:
+            person_list.append([person.id, person.family, person.given])
         table.ListBox(self.parent, person_header, person_list)
 
 

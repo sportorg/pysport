@@ -5,7 +5,10 @@ from app import App
 
 
 def main(argv):
-    file = argv[2] if 2 in argv else None
+    try:
+        file = argv[1]
+    except IndexError:
+        file = None
     root = Tk()
     app = App(master=root, file=file)
     app.mainloop()

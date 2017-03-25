@@ -3,28 +3,37 @@ from tkinter import ttk
 from tkinter import filedialog
 
 import configparser
+import os
 
-from model import *
+import model
 from bar import StatusBar, ToolBar
 from appabout import About
 import appframe
 import config
-from languages import _, get_languages, locale_current
+from language import _, get_languages, locale_current
 import sportident
 from apptime import Clock
 
 
 class App(Frame):
     def __init__(self, master=None, file=None):
+        """
+        :param master:
+        :type master: Tk
+        :param file: Путь к файлу
+        :type file: str
+        """
         super().__init__(master)
         self.conf = configparser.ConfigParser()
+        self.db = model.database_proxy
         self.file = file
-
+        self.create_db()
         self.pack()
         self._widget()
         self._menu()
-        self._toolbar()
+
         self._status_bar()
+        self._toolbar()
         self._main_frame()
 
         self.si_read = sportident.SIRead(self)
@@ -39,18 +48,33 @@ class App(Frame):
         self.conf.read(config.CONFIG_INI)
         geometry = self.conf.get('geometry', 'geometry', fallback='500x380+0+0')
 
-        self.master.title(_(config.NAME))
+        self.set_title(self.file)
         self.master.geometry(geometry)
         self.master.protocol('WM_DELETE_WINDOW', self.close)
         self.master.iconbitmap(config.ICON)
+
+    def set_title(self, text=None):
+        app_name = _(config.NAME)
+        if text is None:
+            self.master.title(app_name + ' ' + config.__version__)
+            return
+        self.master.title("{} - {} {}".format(text, app_name, config.__version__))
 
     def _menu(self):
         menubar = Menu(self.master)
 
         filemenu = Menu(menubar, tearoff=0)
-        filemenu.add_command(label=_("New"))
-        filemenu.add_command(label=_("Save"), command=self.save)
-        filemenu.add_command(label=_("Save As"))
+        filemenu.add_command(label=_("New") + "...", command=self.new_file)
+        filemenu.add_command(label=_("New Event") + "...", command=self.new_event)
+        filemenu.add_command(label=_("Open") + "...", command=self.open)
+        filemenu.add_command(label=_("Save As") + "..", command=self.save_as)
+        filemenu.add_command(label=_("Open Recent"))
+        filemenu.add_separator()
+        filemenu.add_command(label=_("Settings") + "...")
+        filemenu.add_command(label=_("Settings Event") + "...")
+        filemenu.add_separator()
+        filemenu.add_command(label=_("Import"))
+        filemenu.add_command(label=_("Export"))
         filemenu.add_separator()
         filemenu.add_command(label=_("Exit"), command=self.close)
         menubar.add_cascade(label=_("File"), menu=filemenu)
@@ -85,10 +109,10 @@ class App(Frame):
         self.master.config(menu=menubar)
 
     def _toolbar(self):
-        toolbar = ToolBar(self.master)
-        toolbar.set_button(text="<", relief=FLAT, command=self.close)
-        self.siread_button = toolbar.set_button(text="si", relief=FLAT, bg='red', command=self.si_read_run)
-        clock_toolbar = toolbar.set_label(side=RIGHT)
+        self.toolbar = ToolBar(self.master)
+        self.toolbar.set_button(text="<", relief=FLAT, command=self.close)
+        self.siread_button = self.toolbar.set_button(text="si", relief=FLAT, bg='red', command=self.si_read_run)
+        clock_toolbar = self.toolbar.set_label(side=RIGHT)
         # clock = Clock(clock_toolbar)
         # clock.start()
 
@@ -130,13 +154,27 @@ class App(Frame):
         except configparser.Error:
             self.master.quit()
 
-    def save(self):
-        f = filedialog.asksaveasfile(mode='w', defaultextension=".txt")
-        if f is None:
-            return
-        text2save = "Text"
-        f.write(text2save)
-        f.close()
+    def _set_file(self, file):
+        if not len(file):
+            return False
+        self.set_title(file)
+        self.file = file
+        self.create_db()
+        return True
+
+    def new_file(self):
+        file = filedialog.asksaveasfile()
+        return self._set_file(file)
+
+    def new_event(self):
+        pass
+
+    def open(self):
+        file = filedialog.askopenfilename()
+        return self._set_file(file)
+
+    def save_as(self):
+        pass
 
     @staticmethod
     def about():
@@ -152,23 +190,34 @@ class App(Frame):
             self.siread_button['bg'] = 'green'
             self.si_read.is_running = True
 
+    def create_file(self):
+        file = filedialog.asksaveasfilename(defaultextension=".sportorg")
+        if not len(file):
+            return False
+        self.file = file
+        return True
+
     def create_db(self):
-        pass
-        # db.connect()
-        # db.create_tables([
-        #     Event,
-        #     Person,
-        #     Extensions,
-        #     ControlCard,
-        #     CourseControl,
-        #     Course,
-        #     EventStatus,
-        #     ResultStatus,
-        #     Country,
-        #     Contact,
-        #     Address,
-        #     PersonName,
-        #     Start,
-        #     SplitTime,
-        #     Result
-        # ], safe=True)
+        if self.file is None:
+            database = model.SqliteDatabase(":memory:")
+        else:
+            database = model.SqliteDatabase(self.file)
+        self.db.initialize(database)
+        self.db.connect()
+        self.db.create_tables([
+            model.Event,
+            model.Person,
+            model.Extensions,
+            model.ControlCard,
+            model.CourseControl,
+            model.Course,
+            model.EventStatus,
+            model.ResultStatus,
+            model.Country,
+            model.Contact,
+            model.Address,
+            model.PersonName,
+            model.Start,
+            model.SplitTime,
+            model.Result
+        ], safe=True)

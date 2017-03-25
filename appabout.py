@@ -1,6 +1,6 @@
 from tkinter import *
 import config
-from languages import _
+from language import _
 
 
 class About(Frame):

@@ -1,11 +1,12 @@
+from playhouse.migrate import *
 from peewee import *
 
-db = SqliteDatabase('data/database.sqlite')
+database_proxy = Proxy()
 
 
 class BaseModel(Model):
     class Meta:
-        database = db
+        database = database_proxy
 
 
 class Extensions(BaseModel):
@@ -110,7 +111,7 @@ class Person(BaseModel):
     nationality = ForeignKeyField(Country)
     address = ForeignKeyField(Address)
     contact = ForeignKeyField(Contact)
-    
+
 
 class Start(BaseModel):
     event = ForeignKeyField(Event)

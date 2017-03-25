@@ -4,8 +4,7 @@ build
 dist
 test/
 
-*.log
-
 data/*
 SportOrg.exe
 SportOrg.spec
+SportOrg.bat
