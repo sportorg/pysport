@@ -1,9 +1,17 @@
 import os
+import sys
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-BASE_DIR = os.path.join(BASE_DIR, 'sportorg')
-# BASE_DIR = os.getcwd()
-# BASE_DIR = 'C:\\Users\\Danil\\PycharmProjects\\sportorg'
+
+def module_path():
+    if hasattr(sys, "frozen"):
+        return os.path.dirname(
+            sys.executable
+        )
+    return os.path.dirname(__file__)
+
+
+BASE_DIR = module_path()
+
 NAME = 'SportOrg'
 AUTHOR = 'Akhtarov Danil'
 __version__ = '1.0.0'
