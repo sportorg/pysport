@@ -3,7 +3,6 @@ from tkinter import ttk
 from tkinter import filedialog
 
 import configparser
-import os
 
 import model
 from bar import StatusBar, ToolBar
@@ -27,16 +26,19 @@ class App(Frame):
         self.conf = configparser.ConfigParser()
         self.db = model.database_proxy
         self.file = file
+        self.menubar = None
+        self.toolbar = None
         self.nb = None
+        self.status = None
 
         self.create_db()
         self.pack()
         self._widget()
         self._menu()
-
         self._status_bar()
         self._toolbar()
         self._main_frame()
+        self.set_bind()
 
         self.si_read = sportident.SIRead(self)
 
@@ -63,9 +65,9 @@ class App(Frame):
         self.master.title("{} - {} {}".format(text, app_name, config.__version__))
 
     def _menu(self):
-        menubar = Menu(self.master)
+        self.menubar = Menu(self.master)
 
-        filemenu = Menu(menubar, tearoff=0)
+        filemenu = Menu(self.menubar, tearoff=0)
         filemenu.add_command(label=_("New") + "...", command=self.new_file)
         filemenu.add_command(label=_("New Event") + "...", command=self.new_event)
         filemenu.add_command(label=_("Open") + "...", command=self.open)
@@ -79,36 +81,36 @@ class App(Frame):
         filemenu.add_command(label=_("Export"))
         filemenu.add_separator()
         filemenu.add_command(label=_("Exit"), command=self.close)
-        menubar.add_cascade(label=_("File"), menu=filemenu)
+        self.menubar.add_cascade(label=_("File"), menu=filemenu)
 
-        editmenu = Menu(menubar, tearoff=0)
+        editmenu = Menu(self.menubar, tearoff=0)
         editmenu.add_command(label=_("Undo"))
         editmenu.add_command(label=_("Redo"))
-        menubar.add_cascade(label=_("Edit"), menu=editmenu)
+        self.menubar.add_cascade(label=_("Edit"), menu=editmenu)
 
-        viewmenu = Menu(menubar, tearoff=0)
+        viewmenu = Menu(self.menubar, tearoff=0)
         viewmenu.add_command(label=_("Start list"))
-        menubar.add_cascade(label=_("View"), menu=viewmenu)
+        self.menubar.add_cascade(label=_("View"), menu=viewmenu)
 
-        toolsmenu = Menu(menubar, tearoff=0)
-        menubar.add_cascade(label=_("Tools"), menu=toolsmenu)
+        toolsmenu = Menu(self.menubar, tearoff=0)
+        self.menubar.add_cascade(label=_("Tools"), menu=toolsmenu)
 
-        servicesmenu = Menu(menubar, tearoff=0)
-        menubar.add_cascade(label=_("Service"), menu=servicesmenu)
+        servicesmenu = Menu(self.menubar, tearoff=0)
+        self.menubar.add_cascade(label=_("Service"), menu=servicesmenu)
 
-        optionsmenu = Menu(menubar, tearoff=0)
-        lang_menu = Menu(menubar, tearoff=0)
+        optionsmenu = Menu(self.menubar, tearoff=0)
+        lang_menu = Menu(self.menubar, tearoff=0)
         for lang in get_languages():
             lang_menu.add_command(label=_(lang), command=lambda l=lang: self.set_locale(l))
         optionsmenu.add_cascade(label=_("Languages"), menu=lang_menu)
-        menubar.add_cascade(label=_("Options"), menu=optionsmenu)
+        self.menubar.add_cascade(label=_("Options"), menu=optionsmenu)
 
-        helpmenu = Menu(menubar, tearoff=0)
+        helpmenu = Menu(self.menubar, tearoff=0)
         helpmenu.add_command(label=_("Help"))
         helpmenu.add_command(label=_("About"), command=self.about)
-        menubar.add_cascade(label=_("Help"), menu=helpmenu)
+        self.menubar.add_cascade(label=_("Help"), menu=helpmenu)
 
-        self.master.config(menu=menubar)
+        self.master.config(menu=self.menubar)
 
     def _toolbar(self):
         self.toolbar = ToolBar(self.master)
@@ -133,6 +135,7 @@ class App(Frame):
         self.nb.add(appframe.Start(self), text=_("Start list"))
         self.nb.add(appframe.Finish(self), text=_("Finish list"))
         self.nb.add(appframe.Live(self), text=_("Live"))
+        self.nb.select(3)
 
     def _status_bar(self):
         """
@@ -140,6 +143,14 @@ class App(Frame):
         """
         self.status = StatusBar(self.master)
         self.status.set("%s", _("Working"))
+
+    def set_bind(self):
+        self.master.bind('<Control-n>', self.new_file)
+        self.master.bind('<Control-o>', self.open)
+        self.master.bind('<<NotebookTabChanged>>', self.set_tab)
+
+    def set_tab(self, event=None):
+        print(self.nb.index(self.nb.select()))
 
     def close(self):
         try:
@@ -165,16 +176,17 @@ class App(Frame):
         self.set_title(file)
         self.file = file
         self.create_db()
+        self.refresh()
         return True
 
-    def new_file(self):
+    def new_file(self, event=None):
         file = filedialog.asksaveasfilename()
         return self._set_file(file)
 
     def new_event(self):
         pass
 
-    def open(self):
+    def open(self, event=None):
         file = filedialog.askopenfilename()
         return self._set_file(file)
 
