@@ -27,6 +27,8 @@ class App(Frame):
         self.conf = configparser.ConfigParser()
         self.db = model.database_proxy
         self.file = file
+        self.nb = None
+
         self.create_db()
         self.pack()
         self._widget()
@@ -112,6 +114,7 @@ class App(Frame):
         self.toolbar = ToolBar(self.master)
         self.toolbar.set_button(text="<", relief=FLAT, command=self.close)
         self.siread_button = self.toolbar.set_button(text="si", relief=FLAT, bg='red', command=self.si_read_run)
+        self.refresh_button = self.toolbar.set_button(text='update', command=self.refresh)
         clock_toolbar = self.toolbar.set_label(side=RIGHT)
         # clock = Clock(clock_toolbar)
         # clock.start()
@@ -155,6 +158,8 @@ class App(Frame):
             self.master.quit()
 
     def _set_file(self, file):
+        if file is None:
+            return False
         if not len(file):
             return False
         self.set_title(file)
@@ -163,7 +168,7 @@ class App(Frame):
         return True
 
     def new_file(self):
-        file = filedialog.asksaveasfile()
+        file = filedialog.asksaveasfilename()
         return self._set_file(file)
 
     def new_event(self):
@@ -189,6 +194,12 @@ class App(Frame):
         else:
             self.siread_button['bg'] = 'green'
             self.si_read.is_running = True
+
+    def refresh(self):
+        if self.nb is None:
+            return
+        self.nb.destroy()
+        self._main_frame()
 
     def create_file(self):
         file = filedialog.asksaveasfilename(defaultextension=".sportorg")
