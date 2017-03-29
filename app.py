@@ -29,6 +29,7 @@ class App(Frame):
         self.menubar = None
         self.toolbar = None
         self.nb = None
+        self.current_tab = 0
         self.status = None
 
         self.create_db()
@@ -135,7 +136,7 @@ class App(Frame):
         self.nb.add(appframe.Start(self), text=_("Start list"))
         self.nb.add(appframe.Finish(self), text=_("Finish list"))
         self.nb.add(appframe.Live(self), text=_("Live"))
-        self.nb.select(3)
+        self.nb.select(self.current_tab)
 
     def _status_bar(self):
         """
@@ -150,7 +151,7 @@ class App(Frame):
         self.master.bind('<<NotebookTabChanged>>', self.set_tab)
 
     def set_tab(self, event=None):
-        print(self.nb.index(self.nb.select()))
+        self.current_tab = self.nb.index(self.nb.select())
 
     def close(self):
         try:
