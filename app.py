@@ -14,7 +14,7 @@ import sportident
 from apptime import Clock
 
 
-class App(Frame):
+class App(ttk.Frame):
     def __init__(self, master=None, file=None):
         """
         :param master:
@@ -240,7 +240,6 @@ class App(Frame):
             model.Country,
             model.Contact,
             model.Address,
-            model.PersonName,
             model.Start,
             model.SplitTime,
             model.Result

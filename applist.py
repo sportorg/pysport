@@ -23,16 +23,19 @@ class Person:
     def __init__(self, parent):
         super().__init__()
         self.parent = parent
+        person_header = ['id', 'name', 'surname']
+        self.t = table.Table(self.parent, person_header, ysb=True, popup=True)
 
     def list(self):
-        person_header = ['id', 'Family', 'Given']
-        persons = model.PersonName.select()
-        person_list = []
+        persons = model.Person.select()
+        self.t.pack(fill=BOTH, expand=True)
         for person in persons:
-            person_list.append([person.id, person.family, person.given])
-        # table.ListBox(self.parent, person_header, person_list)
-        pt = Table(self.parent, rows=5, cols=5)
-        pt.show()
+            self.t.create_row({'id': person.id, 'name': person.name, 'surname': person.surname})
+        self.t.register_popup('add', command=self.add)
+
+    def add(self):
+        per = model.Person.create(name="name", surname='surname')
+        self.t.create_row({'id': per.id, 'name': per.name, 'surname': per.surname})
 
 
 class Event:

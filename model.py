@@ -94,23 +94,19 @@ class Event(BaseModel):
     information = TextField()
 
 
-class PersonName(BaseModel):
-    family = TextField()
-    given = TextField()
-
-
 class Team(BaseModel):
     name = TextField()
     address = ForeignKeyField(Address)
 
 
 class Person(BaseModel):
-    name = ForeignKeyField(PersonName)
-    birth_date = DateField()
-    team = ForeignKeyField(Team)
-    nationality = ForeignKeyField(Country)
-    address = ForeignKeyField(Address)
-    contact = ForeignKeyField(Contact)
+    name = TextField()
+    surname = TextField()
+    birth_date = DateField(null=True)
+    team = ForeignKeyField(Team, null=True)
+    nationality = ForeignKeyField(Country, null=True)
+    address = ForeignKeyField(Address, null=True)
+    contact = ForeignKeyField(Contact, null=True)
 
 
 class Start(BaseModel):
