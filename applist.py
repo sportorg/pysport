@@ -1,6 +1,5 @@
-from tkinter import *
+from tkinter import Label, BOTH
 from tkinter import ttk
-from pandastable import Table
 import model
 
 

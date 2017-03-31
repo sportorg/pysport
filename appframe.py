@@ -1,9 +1,10 @@
-from tkinter import *
+from tkinter import Label
+from tkinter import ttk
 import applist
 import model
 
 
-class Sportident(Frame):
+class Sportident(ttk.Frame):
     def __init__(self, parent=None):
         super().__init__(parent.master)
         self.pack()
@@ -11,7 +12,7 @@ class Sportident(Frame):
         text.pack()
 
 
-class Event(Frame):
+class Event(ttk.Frame):
     def __init__(self, parent=None):
         super().__init__(parent.master)
         self.pack()
@@ -19,7 +20,7 @@ class Event(Frame):
         text.pack()
 
 
-class Course(Frame):
+class Course(ttk.Frame):
     def __init__(self, parent=None):
         super().__init__(parent.master)
         self.pack()
@@ -27,7 +28,7 @@ class Course(Frame):
         text.pack()
 
 
-class Person(Frame):
+class Person(ttk.Frame):
     def __init__(self, parent=None):
         super().__init__(parent.master)
         self.pack()
@@ -38,7 +39,7 @@ class Person(Frame):
         text.list()
 
 
-class Start(Frame):
+class Start(ttk.Frame):
     def __init__(self, parent=None):
         super().__init__(parent.master)
         self.pack()
@@ -46,7 +47,7 @@ class Start(Frame):
         text.pack()
 
 
-class Finish(Frame):
+class Finish(ttk.Frame):
     def __init__(self, parent=None):
         super().__init__(parent.master)
         self.pack()
@@ -54,7 +55,7 @@ class Finish(Frame):
         text.pack()
 
 
-class Live(Frame):
+class Live(ttk.Frame):
     def __init__(self, parent=None):
         super().__init__(parent.master)
         self.pack()

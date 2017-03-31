@@ -1,12 +1,13 @@
 from tkinter import *
+from tkinter import ttk
 
 
-class StatusBar(Frame):
+class StatusBar(ttk.Frame):
 
     def __init__(self, master):
         Frame.__init__(self, master)
         self.pack(side=BOTTOM, fill=X)
-        self.label = Label(self, bd=1, relief=SUNKEN, anchor=W)
+        self.label = ttk.Label(self, relief=SUNKEN, anchor=W)
         self.label.pack(fill=X)
 
     def set(self, format, *args):
