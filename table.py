@@ -319,3 +319,6 @@ class Table(ttk.Frame):
             error_str = '%s is not a table option. Please choose from the following: -%s' % \
                         (key, ' -'.join(self._table_options))
             raise KeyError(error_str)
+        
+    def getTree(self):
+        return self._tree
