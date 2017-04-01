@@ -1,13 +1,13 @@
 from tkinter import *
 from tkinter import ttk
-from tkinter import filedialog
+from tkinter import filedialog, messagebox, simpledialog
 
 import configparser
 
 import model
 from bar import StatusBar, ToolBar
-from appabout import About
 import appframe
+from appabout import AboutDialog
 import config
 from language import _, get_languages, locale_current
 import sportident
@@ -90,7 +90,6 @@ class App(ttk.Frame):
         self.menubar.add_cascade(label=_("Edit"), menu=editmenu)
 
         viewmenu = Menu(self.menubar, tearoff=0)
-        viewmenu.add_command(label=_("Start list"))
         self.menubar.add_cascade(label=_("View"), menu=viewmenu)
 
         toolsmenu = Menu(self.menubar, tearoff=0)
@@ -115,9 +114,7 @@ class App(ttk.Frame):
 
     def _toolbar(self):
         self.toolbar = ToolBar(self.master)
-        self.toolbar.set_button(text="<", relief=FLAT, command=self.close)
         self.siread_button = self.toolbar.set_button(text="si", relief=FLAT, bg='red', command=self.si_read_run)
-        self.refresh_button = self.toolbar.set_button(text='update', command=self.refresh)
         clock_toolbar = self.toolbar.set_label(side=RIGHT)
         # clock = Clock(clock_toolbar)
         # clock.start()
@@ -181,24 +178,25 @@ class App(ttk.Frame):
         return True
 
     def new_file(self, event=None):
-        file = filedialog.asksaveasfilename()
+        ftypes = [(config.NAME + ' files', '*.sportorg'), ('SQLITE', '*.sqlite'), ('All files', '*')]
+        file = filedialog.asksaveasfilename(filetypes=ftypes)
         return self._set_file(file)
 
     def new_event(self):
         pass
 
     def open(self, event=None):
-        file = filedialog.askopenfilename()
+        ftypes = [(config.NAME + ' files', '*.sportorg'), ('SQLITE', '*.sqlite'), ('All files', '*')]
+        file = filedialog.askopenfilename(filetypes=ftypes)
         return self._set_file(file)
 
     def save_as(self):
         pass
 
-    @staticmethod
-    def about():
-        root = Tk()
-        about = About(root)
-        about.mainloop()
+    def about(self):
+        # messagebox.showinfo("About", "Akhtarov Danil\nDevelop in 2017 (с)")
+        about = AboutDialog(self.master)
+        about.show()
 
     def si_read_run(self):
         if self.si_read.is_running:

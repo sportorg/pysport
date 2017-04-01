@@ -5,7 +5,7 @@ from tkinter import ttk
 class StatusBar(ttk.Frame):
 
     def __init__(self, master):
-        Frame.__init__(self, master)
+        ttk.Frame.__init__(self, master)
         self.pack(side=BOTTOM, fill=X)
         self.label = ttk.Label(self, relief=SUNKEN, anchor=W)
         self.label.pack(fill=X)

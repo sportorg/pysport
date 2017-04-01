@@ -3,16 +3,16 @@ import config
 from language import _
 
 
-class About(Frame):
-    def __init__(self, master=None):
-        super().__init__(master)
+class AboutDialog:
+    def __init__(self, master):
+        self.master = master
+        self.root = Toplevel()
 
-    def mainloop(self, **kwargs):
-        self.pack()
-        self.create_widgets()
-        super().mainloop(**kwargs)
-
-    def create_widgets(self):
-        self.master.title(_("About"))
-        self.master.geometry('300x200+600+200')
-        self.master.iconbitmap(config.ICON)
+    def show(self):
+        self.root.title(_("About"))
+        self.root.geometry('300x200+600+200')
+        self.root.iconbitmap(config.ICON)
+        self.root.transient()
+        self.root.grab_set()
+        self.root.focus_set()
+        self.master.wait_window(self.root)
