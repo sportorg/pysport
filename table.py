@@ -354,3 +354,9 @@ class Table(ttk.Frame):
                 self._tree.move(item[1], '', ix)
             # switch the heading so that it will sort in the opposite direction
             self._tree.heading(col, command=lambda col=col: self.sort_by(col, int(not descending)))
+
+    def bind_open(self, func=None, add=None):
+        self._tree.bind("<<TreeviewOpen>>", func, add)
+
+    def bind_select(self, func=None, add=None):
+        self._tree.bind("<<TreeviewSelect>>", func, add)
