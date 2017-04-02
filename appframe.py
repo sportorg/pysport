@@ -1,7 +1,8 @@
-from tkinter import Label, BOTH, Entry, W, Toplevel
+from tkinter import Label, BOTH, BOTTOM, Entry, W, Toplevel
 from tkinter import ttk
 import table
 import model
+import dialog
 from language import _
 import config
 
@@ -52,34 +53,50 @@ class Person(ttk.Frame):
         self.t.register_popup(_("Copy and insert"))
 
     def get_id(self, item):
-        return self.t.getTree().item(item)['values'][0]
+        return self.t.get_tree().item(item)['values'][0]
 
     def add(self):
         per = model.Person.create(name="", surname='')
         self.t.create_row({'id': per.id, 'name': per.name, 'surname': per.surname})
 
     def delete(self):
-        item = self.t.getTree().focus()
+        item = self.t.get_tree().focus()
         if item:
             id = self.get_id(item)
             person = model.Person.get(model.Person.id == id)
             person.delete_instance()
-            self.t.getTree().delete(item)
+            self.t.get_tree().delete(item)
 
     def edit(self):
-        item = self.t.getTree().focus()
+        item = self.t.get_tree().focus()
         if item:
             id = self.get_id(item)
             self.edit_modal(id)
 
     def edit_modal(self, person_id):
-        root = Toplevel()
+        root = dialog.Dialog(self)
         root.title(_("Edit person ") + str(person_id))
-        root.geometry('500x300+600+200')
-        root.iconbitmap(config.ICON)
-        root.transient()
-        root.grab_set()
-        root.focus_set()
+        ttk.Label(root, text=_("Name")).grid(row=0)
+        ttk.Label(root, text=_("Surname")).grid(row=1)
+
+        name = ttk.Entry(root)
+        surname = ttk.Entry(root)
+
+        name.insert(0, 'лол')
+        surname.insert(0, name.get())
+
+        name.grid(row=0, column=1, padx=5, pady=5)
+        surname.grid(row=1, column=1, padx=5, pady=5)
+
+        def ok():
+            print('Save ' + str(person_id))
+            root.destroy()
+
+        ok_button = ttk.Button(root, text="ok", command=ok)
+        ok_button.grid(row=7, column=2)
+        cancel_button = ttk.Button(root, text="cancel", command=root.destroy)
+        cancel_button.grid(row=7, column=3)
+
         self.wait_window(root)
 
 

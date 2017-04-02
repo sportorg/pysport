@@ -7,7 +7,7 @@ import configparser
 import model
 from bar import StatusBar, ToolBar
 import appframe
-from appabout import AboutDialog
+import dialog
 import config
 from language import _, get_languages, locale_current
 import sportident
@@ -153,7 +153,12 @@ class App(ttk.Frame):
     def close(self):
         try:
             self.conf['geometry'] = {}
-            self.conf.set('geometry', 'geometry', self.master.winfo_geometry())
+            self.conf.set('geometry', 'geometry', "{}x{}+{}+{}".format(
+                self.master.winfo_width(),
+                self.master.winfo_height()+20,
+                self.master.winfo_x(),
+                self.master.winfo_y(),
+            ))
             with open(config.CONFIG_INI, 'w') as configfile:
                 self.conf.write(configfile)
         finally:
@@ -195,8 +200,10 @@ class App(ttk.Frame):
 
     def about(self):
         # messagebox.showinfo("About", "Akhtarov Danil\nDevelop in 2017 (с)")
-        about = AboutDialog(self.master)
-        about.show()
+        about = dialog.Dialog()
+        about.title(_("About"))
+        about.geometry("300x200+600+200")
+        self.wait_window(about)
 
     def si_read_run(self):
         if self.si_read.is_running:

@@ -261,7 +261,7 @@ class Table(ttk.Frame):
 
         for column_label, column, width in zip(column_labels, self.columns, self._table_options['column_widths']):
             self._tree.column(column, width=width, anchor=W, minwidth=10)
-            self._tree.heading(column, text=column_label, command=lambda c=column: self.sortby(c, 0))
+            self._tree.heading(column, text=column_label, command=lambda c=column: self.sort_by(c, 0))
 
     def _initial_configuration(self):
 
@@ -320,38 +320,37 @@ class Table(ttk.Frame):
                         (key, ' -'.join(self._table_options))
             raise KeyError(error_str)
 
-    def getTree(self):
+    def get_tree(self):
         return self._tree
 
-    def isnumeric(self, s):
+    def is_numeric(self, s):
         """test if a string is numeric"""
+        numeric = False
         for c in s:
             if c in "1234567890-.":
                 numeric = True
-            else:
-                return False
         return numeric
 
     def change_numeric(self, data):
         """if the data to be sorted is numeric change to float"""
         new_data = []
-        if self.isnumeric(data[0][0]):
+        if self.is_numeric(data[0][0]):
             # change child to a float
             for child, col in data:
                 new_data.append((float(child), col))
             return new_data
         return data
 
-    def sortby(self, col, descending):
+    def sort_by(self, col, descending):
         """sort tree contents when a column header is clicked on"""
         # grab values to sort
         data = [(self._tree.set(child, col), child) for child in self._tree.get_children('')]
-        # if the data to be sorted is numeric change to float
-        data = self.change_numeric(data)
-        # now sort the data in place
-        data.sort(reverse=descending)
-        for ix, item in enumerate(data):
-            self._tree.move(item[1], '', ix)
-        # switch the heading so that it will sort in the opposite direction
-        self._tree.heading(col,
-            command=lambda col=col: self.sortby(col, int(not descending)))
+        if data:
+            # if the data to be sorted is numeric change to float
+            data = self.change_numeric(data)
+            # now sort the data in place
+            data.sort(reverse=descending)
+            for ix, item in enumerate(data):
+                self._tree.move(item[1], '', ix)
+            # switch the heading so that it will sort in the opposite direction
+            self._tree.heading(col, command=lambda col=col: self.sort_by(col, int(not descending)))
