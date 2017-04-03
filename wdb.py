@@ -824,6 +824,7 @@ class WDBAdventure:
         self.scores_cart_mode = 0
         self.correct_minutes = 0
 
+
     def parse_bytes(self, byte_array):
         """
         Read object from the byte array
