@@ -51,9 +51,9 @@ class Person(ttk.Frame):
         for person in persons:
             self.t.create_row({'id': person.id, 'name': person.name, 'surname': person.surname})
         self.t.register_popup(_("Add") + " Ctrl+i", command=self.add)
-        self.t.register_popup(_("Delete") + " Ctrl+I", command=self.delete)
         self.t.register_popup(_("Edit person"), command=self.edit)
         self.t.register_popup(_("Copy and insert"))
+        self.t.register_popup(_("Delete") + " Del", command=self.delete)
 
     def get_id(self, item):
         return self.t.get_tree().item(item)['values'][0]
