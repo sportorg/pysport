@@ -73,6 +73,7 @@ class App(ttk.Frame):
         filemenu.add_command(label=_("New") + "...", command=self.new_file)
         filemenu.add_command(label=_("New Event") + "...", command=self.new_event)
         filemenu.add_command(label=_("Open") + "...", command=self.open)
+        filemenu.add_command(label=_("Save"), command=self.save)
         filemenu.add_command(label=_("Save As") + "..", command=self.save_as)
         filemenu.add_command(label=_("Open Recent"))
         filemenu.add_separator()
@@ -86,8 +87,6 @@ class App(ttk.Frame):
         self.menubar.add_cascade(label=_("File"), menu=filemenu)
 
         editmenu = Menu(self.menubar, tearoff=0)
-        editmenu.add_command(label=_("Undo"))
-        editmenu.add_command(label=_("Redo"))
         self.menubar.add_cascade(label=_("Edit"), menu=editmenu)
 
         viewmenu = Menu(self.menubar, tearoff=0)
@@ -185,8 +184,8 @@ class App(ttk.Frame):
         return True
 
     def new_file(self):
-        ftypes = [(config.NAME + ' files', '*.sportorg'), ('SQLITE', '*.sqlite'), ('All files', '*')]
-        file = filedialog.asksaveasfilename(filetypes=ftypes)
+        ftypes = [(config.NAME + ' files', '*.sportorg'), ('SQLITE', '*.sqlite')]
+        file = filedialog.asksaveasfilename(defaultextension=".sportorg", filetypes=ftypes)
         return self._set_file(file)
 
     def new_event(self):
@@ -196,6 +195,14 @@ class App(ttk.Frame):
         ftypes = [(config.NAME + ' files', '*.sportorg'), ('SQLITE', '*.sqlite'), ('All files', '*')]
         file = filedialog.askopenfilename(filetypes=ftypes)
         return self._set_file(file)
+
+    def save(self):
+        if self.file is not None:
+            messagebox.showinfo(_("Info"), _("Don`t worry, file already exist"))
+            return
+        is_create = self.create_file()
+        if is_create:
+            pass
 
     def save_as(self):
         pass
@@ -223,7 +230,8 @@ class App(ttk.Frame):
         self._main_frame()
 
     def create_file(self):
-        file = filedialog.asksaveasfilename(defaultextension=".sportorg")
+        ftypes = [(config.NAME + ' files', '*.sportorg'), ('SQLITE', '*.sqlite')]
+        file = filedialog.asksaveasfilename(defaultextension=".sportorg", filetypes=ftypes)
         if not len(file):
             return False
         self.file = file
