@@ -3,24 +3,24 @@
 ### Build
 `pyinstaller.exe --onefile -windowed --icon=img/icon/sportorg.ico SportOrg.pyw`
 
-Для билда нужно установить пакет `pyinstaller`
+For build, you need `pyinstaller`
 
 ### Packages
 
 - [sireader](https://pypi.python.org/pypi/sireader/1.0.1)
 - [peewee](http://docs.peewee-orm.com/en/latest/peewee/quickstart.html)
 
-Установка
+Install packages
 ```
 pip install package-name
 
 pip install sireader
 ```
 
-### Структура
+### Struct
 
 ```
-sportorg/
+<sportorg>/
     data/
     docs/
     img/
@@ -32,12 +32,12 @@ sportorg/
                 sportorg.po
 ```
 
-! Для работы требуются все папки
+! For work need all folders
 
-### Проект
+### Project
 
 ```
-SportOrg.pyw - точка входа в программу
-app.py - основной класс
-appframe.py - окна вкладок в программе
+SportOrg.pyw - point of entry;
+app.py - main class;
+appframe.py - tabs.
 ```

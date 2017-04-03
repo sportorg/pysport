@@ -1,20 +1,19 @@
 from tkinter import *
 from tkinter import ttk
-from tkinter import filedialog
+from tkinter import filedialog, messagebox, simpledialog
 
 import configparser
 
 import model
 from bar import StatusBar, ToolBar
-from appabout import About
 import appframe
+import dialog
 import config
-from language import _, get_languages, locale_current
+from language import _, get_languages, locale_current, locale
 import sportident
-from apptime import Clock
 
 
-class App(Frame):
+class App(ttk.Frame):
     def __init__(self, master=None, file=None):
         """
         :param master:
@@ -29,6 +28,7 @@ class App(Frame):
         self.menubar = None
         self.toolbar = None
         self.nb = None
+        self.current_tab = 3
         self.status = None
 
         self.create_db()
@@ -65,6 +65,8 @@ class App(Frame):
         self.master.title("{} - {} {}".format(text, app_name, config.__version__))
 
     def _menu(self):
+        if self.menubar is not None:
+            self.menubar.destroy()
         self.menubar = Menu(self.master)
 
         filemenu = Menu(self.menubar, tearoff=0)
@@ -89,7 +91,6 @@ class App(Frame):
         self.menubar.add_cascade(label=_("Edit"), menu=editmenu)
 
         viewmenu = Menu(self.menubar, tearoff=0)
-        viewmenu.add_command(label=_("Start list"))
         self.menubar.add_cascade(label=_("View"), menu=viewmenu)
 
         toolsmenu = Menu(self.menubar, tearoff=0)
@@ -113,18 +114,17 @@ class App(Frame):
         self.master.config(menu=self.menubar)
 
     def _toolbar(self):
+        if self.toolbar is not None:
+            self.toolbar.destroy()
         self.toolbar = ToolBar(self.master)
-        self.toolbar.set_button(text="<", relief=FLAT, command=self.close)
         self.siread_button = self.toolbar.set_button(text="si", relief=FLAT, bg='red', command=self.si_read_run)
-        self.refresh_button = self.toolbar.set_button(text='update', command=self.refresh)
         clock_toolbar = self.toolbar.set_label(side=RIGHT)
         # clock = Clock(clock_toolbar)
         # clock.start()
 
     def _main_frame(self):
-        # self.main_frame = Frame(self.master)
-        # self.main_frame.pack(fill=X)
-
+        if self.nb is not None:
+            self.nb.destroy()
         self.nb = ttk.Notebook(self.master)
         self.nb.pack(fill='both', expand=True)
 
@@ -135,36 +135,41 @@ class App(Frame):
         self.nb.add(appframe.Start(self), text=_("Start list"))
         self.nb.add(appframe.Finish(self), text=_("Finish list"))
         self.nb.add(appframe.Live(self), text=_("Live"))
-        self.nb.select(3)
+        self.nb.select(self.current_tab)
 
     def _status_bar(self):
-        """
-        Инициализация статус бара
-        """
+        if self.status is not None:
+            self.status.destroy()
         self.status = StatusBar(self.master)
         self.status.set("%s", _("Working"))
 
     def set_bind(self):
-        self.master.bind('<Control-n>', self.new_file)
-        self.master.bind('<Control-o>', self.open)
-        self.master.bind('<<NotebookTabChanged>>', self.set_tab)
+        self.master.bind('<Control-n>', lambda event: self.new_file())
+        self.master.bind('<Control-o>', lambda event: self.open())
+        self.master.bind('<<NotebookTabChanged>>', lambda event: self.set_tab())
 
-    def set_tab(self, event=None):
-        print(self.nb.index(self.nb.select()))
+    def set_tab(self):
+        self.current_tab = self.nb.index(self.nb.select())
 
     def close(self):
         try:
             self.conf['geometry'] = {}
-            self.conf.set('geometry', 'geometry', self.master.winfo_geometry())
+            self.conf.set('geometry', 'geometry', "{}x{}+{}+{}".format(
+                self.master.winfo_width(),
+                self.master.winfo_height()+20,
+                self.master.winfo_x(),
+                self.master.winfo_y(),
+            ))
             with open(config.CONFIG_INI, 'w') as configfile:
                 self.conf.write(configfile)
         finally:
             self.master.quit()
 
-    def set_locale(self, locale):
+    def set_locale(self, loc):
         try:
             self.conf['locale'] = {}
-            self.conf.set('locale', 'current', locale)
+            self.conf.set('locale', 'current', loc)
+            self.status.set("%s", _("Do refresh"))
         except configparser.Error:
             self.master.quit()
 
@@ -179,25 +184,28 @@ class App(Frame):
         self.refresh()
         return True
 
-    def new_file(self, event=None):
-        file = filedialog.asksaveasfilename()
+    def new_file(self):
+        ftypes = [(config.NAME + ' files', '*.sportorg'), ('SQLITE', '*.sqlite'), ('All files', '*')]
+        file = filedialog.asksaveasfilename(filetypes=ftypes)
         return self._set_file(file)
 
     def new_event(self):
         pass
 
-    def open(self, event=None):
-        file = filedialog.askopenfilename()
+    def open(self):
+        ftypes = [(config.NAME + ' files', '*.sportorg'), ('SQLITE', '*.sqlite'), ('All files', '*')]
+        file = filedialog.askopenfilename(filetypes=ftypes)
         return self._set_file(file)
 
     def save_as(self):
         pass
 
-    @staticmethod
-    def about():
-        root = Tk()
-        about = About(root)
-        about.mainloop()
+    def about(self):
+        # messagebox.showinfo("About", "Akhtarov Danil\nDevelop in 2017 (с)")
+        about = dialog.Dialog()
+        about.title(_("About"))
+        about.geometry("300x200+600+200")
+        self.wait_window(about)
 
     def si_read_run(self):
         if self.si_read.is_running:
@@ -208,9 +216,10 @@ class App(Frame):
             self.si_read.is_running = True
 
     def refresh(self):
-        if self.nb is None:
-            return
-        self.nb.destroy()
+        print('refresh')
+        self._menu()
+        self._toolbar()
+        self._status_bar()
         self._main_frame()
 
     def create_file(self):
@@ -230,7 +239,6 @@ class App(Frame):
         self.db.create_tables([
             model.Event,
             model.Person,
-            model.Extensions,
             model.ControlCard,
             model.CourseControl,
             model.Course,
@@ -239,8 +247,6 @@ class App(Frame):
             model.Country,
             model.Contact,
             model.Address,
-            model.PersonName,
             model.Start,
-            model.SplitTime,
             model.Result
         ], safe=True)

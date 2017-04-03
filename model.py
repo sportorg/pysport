@@ -9,31 +9,25 @@ class BaseModel(Model):
         database = database_proxy
 
 
-class Extensions(BaseModel):
-    name = TextField()
+class Settings(BaseModel):
+    name = CharField()
     value = TextField()
-
-
-class ControlCard(BaseModel):
-    name = TextField()
-    value = TextField()
-
-
-class CourseControl(BaseModel):
-    control = TextField()
-    map_text = TextField()
-    leg_length = DoubleField()
-    score = DoubleField()
 
 
 class Course(BaseModel):
     name = TextField()
-    course_family = TextField()
-    length = DoubleField()
-    climb = DoubleField()
-    course_control = ForeignKeyField(CourseControl)
-    map_id = IntegerField()
-    number_of_controls = DoubleField()
+    course_family = TextField(null=True)
+    length = DoubleField(null=True)
+    climb = DoubleField(null=True)
+    number_of_controls = DoubleField(null=True)
+
+
+class CourseControl(BaseModel):
+    course = ForeignKeyField(Course)
+    control = TextField()
+    map_text = TextField(null=True)
+    leg_length = DoubleField(null=True)
+    score = DoubleField()
 
 
 class EventStatus(BaseModel):
@@ -44,7 +38,7 @@ class EventStatus(BaseModel):
     value: Canceled
     value: Rescheduled
     """
-    value = TextField()
+    value = CharField()
 
 
 class ResultStatus(BaseModel):
@@ -65,15 +59,20 @@ class ResultStatus(BaseModel):
     value: DidNotEnter
     value: Cancelled
     """
-    value = TextField()
+    value = CharField()
 
 
 class Country(BaseModel):
-    pass
+    name = CharField()
+    code2 = CharField(max_length=2)
+    code3 = CharField(max_length=3)
+    digital_code = CharField()
+    code = CharField()
 
 
 class Contact(BaseModel):
-    pass
+    name = CharField()
+    value = TextField()
 
 
 class Address(BaseModel):
@@ -90,45 +89,42 @@ class Event(BaseModel):
     start_time = DateTimeField()
     end_time = DateTimeField()
     status = ForeignKeyField(EventStatus)
-    url = TextField()
-    information = TextField()
-
-
-class PersonName(BaseModel):
-    family = TextField()
-    given = TextField()
+    url = TextField(null=True)
+    information = TextField(null=True)
 
 
 class Team(BaseModel):
     name = TextField()
-    address = ForeignKeyField(Address)
+    address = ForeignKeyField(Address, null=True)
 
 
 class Person(BaseModel):
-    name = ForeignKeyField(PersonName)
-    birth_date = DateField()
-    team = ForeignKeyField(Team)
-    nationality = ForeignKeyField(Country)
-    address = ForeignKeyField(Address)
-    contact = ForeignKeyField(Contact)
+    name = TextField()
+    surname = TextField(null=True)
+    birth_date = DateField(null=True)
+    team = ForeignKeyField(Team, null=True)
+    nationality = ForeignKeyField(Country, null=True)
+    address = ForeignKeyField(Address, null=True)
+    contact = ForeignKeyField(Contact, null=True)
+
+
+class ControlCard(BaseModel):
+    person = ForeignKeyField(Person)
+    name = CharField()
+    value = TextField()
 
 
 class Start(BaseModel):
     event = ForeignKeyField(Event)
     person = ForeignKeyField(Person)
     course = ForeignKeyField(Course)
-    bib_number = TextField()
+    bib_number = CharField()
     start_time = DateTimeField()
-
-
-class SplitTime(BaseModel):
-    control_code = TextField()
-    time = DoubleField()
 
 
 class Result(BaseModel):
     start = ForeignKeyField(Start)
     finish_time = DateTimeField()
     status = ForeignKeyField(ResultStatus)
-    split_time = ForeignKeyField(SplitTime)
+    split_time = TextField(null=True)
     control_card = ForeignKeyField(ControlCard)
