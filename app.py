@@ -40,8 +40,6 @@ class App(ttk.Frame):
         self._main_frame()
         self.set_bind()
 
-        self.si_read = sportident.SIRead(self)
-
     def mainloop(self, **kwargs):
         super().mainloop(**kwargs)
 
@@ -116,10 +114,16 @@ class App(ttk.Frame):
         if self.toolbar is not None:
             self.toolbar.destroy()
         self.toolbar = ToolBar(self.master)
-        self.siread_button = self.toolbar.set_button(text="si", relief=FLAT, bg='red', command=self.si_read_run)
-        clock_toolbar = self.toolbar.set_label(side=RIGHT)
-        # clock = Clock(clock_toolbar)
-        # clock.start()
+        self.toolbar.set_image(PhotoImage(file=config.ICON_DIR + "/file.png"), command=self.new_file)
+        self.toolbar.set_image(PhotoImage(file=config.ICON_DIR + "/save.png"), command=self.save)
+        self.toolbar.set_image(PhotoImage(file=config.ICON_DIR + "/folder.png"), command=self.open)
+        self.toolbar.set_image(PhotoImage(file=config.ICON_DIR + "/print.png"))
+        self.toolbar.set_image(PhotoImage(file=config.ICON_DIR + "/csv.png"))
+        self.toolbar.set_image(PhotoImage(file=config.ICON_DIR + "/doc.png"))
+        self.toolbar.set_image(PhotoImage(file=config.ICON_DIR + "/html.png"))
+        self.toolbar.set_image(PhotoImage(file=config.ICON_DIR + "/pdf.png"))
+        self.toolbar.set_image(PhotoImage(file=config.ICON_DIR + "/sportident.png"))
+        self.toolbar.set_image(PhotoImage(file=config.ICON_DIR + "/refresh.png"), command=self.refresh)
 
     def _main_frame(self):
         if self.nb is not None:
@@ -213,14 +217,6 @@ class App(ttk.Frame):
         about.title(_("About"))
         about.geometry("300x200+600+200")
         self.wait_window(about)
-
-    def si_read_run(self):
-        if self.si_read.is_running:
-            self.siread_button['bg'] = 'red'
-            self.si_read.is_running = False
-        else:
-            self.siread_button['bg'] = 'green'
-            self.si_read.is_running = True
 
     def refresh(self):
         print('refresh')

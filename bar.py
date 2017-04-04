@@ -31,7 +31,14 @@ class ToolBar(Frame):
         return button
 
     def set_label(self, side=LEFT, **kw):
-        button = Label(self, kw)
+        label = Label(self, kw)
+        label.pack(side=side, padx=2, pady=2)
+
+        return label
+
+    def set_image(self, image, side=LEFT, command=None):
+        button = Button(self, image=image, command=command)
+        button.image = image
         button.pack(side=side, padx=2, pady=2)
 
         return button
