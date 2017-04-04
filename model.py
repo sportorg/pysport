@@ -106,6 +106,8 @@ class Person(BaseModel):
     nationality = ForeignKeyField(Country, null=True)
     address = ForeignKeyField(Address, null=True)
     contact = ForeignKeyField(Contact, null=True)
+    world_code = TextField() # WRE ID for orienteering and the same
+    national_code = TextField()
 
 
 class ControlCard(BaseModel):
@@ -117,6 +119,7 @@ class ControlCard(BaseModel):
 class Start(BaseModel):
     race = ForeignKeyField(Race)
     person = ForeignKeyField(Person)
+    # TODO: control_card = ForeignKeyField(Person)
     course = ForeignKeyField(Course)
     bib_number = CharField()
     start_time = DateTimeField()
