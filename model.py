@@ -30,7 +30,7 @@ class CourseControl(BaseModel):
     score = DoubleField()
 
 
-class EventStatus(BaseModel):
+class RaceStatus(BaseModel):
     """
     value: Applied
     value: Proposed
@@ -84,11 +84,11 @@ class Address(BaseModel):
     country = ForeignKeyField(Country)
 
 
-class Event(BaseModel):
+class Race(BaseModel):
     name = TextField()
     start_time = DateTimeField()
     end_time = DateTimeField()
-    status = ForeignKeyField(EventStatus)
+    status = ForeignKeyField(RaceStatus)
     url = TextField(null=True)
     information = TextField(null=True)
 
@@ -115,7 +115,7 @@ class ControlCard(BaseModel):
 
 
 class Start(BaseModel):
-    event = ForeignKeyField(Event)
+    race = ForeignKeyField(Race)
     person = ForeignKeyField(Person)
     course = ForeignKeyField(Course)
     bib_number = CharField()
