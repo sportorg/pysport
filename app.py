@@ -69,7 +69,7 @@ class App(ttk.Frame):
 
         filemenu = Menu(self.menubar, tearoff=0)
         filemenu.add_command(label=_("New") + "...", command=self.new_file)
-        filemenu.add_command(label=_("New Event") + "...", command=self.new_event)
+        filemenu.add_command(label=_("New Race") + "...", command=self.new_event)
         filemenu.add_command(label=_("Open") + "...", command=self.open)
         filemenu.add_command(label=_("Save"), command=self.save)
         filemenu.add_command(label=_("Save As") + "..", command=self.save_as)
@@ -241,12 +241,12 @@ class App(ttk.Frame):
         self.db.initialize(database)
         self.db.connect()
         self.db.create_tables([
-            model.Event,
+            model.Race,
             model.Person,
             model.ControlCard,
             model.CourseControl,
             model.Course,
-            model.EventStatus,
+            model.RaceStatus,
             model.ResultStatus,
             model.Country,
             model.Contact,
