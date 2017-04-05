@@ -13,6 +13,42 @@ class Settings(BaseModel):
     value = TextField()
 
 
+class Qualification(BaseModel):
+    pass
+
+
+class Fee(BaseModel):
+    pass
+
+
+class Entry(BaseModel):
+    pass
+
+
+class RelayTeam(BaseModel):
+    pass
+
+
+class RaceStatus(BaseModel):
+    """
+    value: Applied
+    value: Proposed
+    value: Sanctioned
+    value: Canceled
+    value: Rescheduled
+    """
+    value = CharField()
+
+
+class Race(BaseModel):
+    name = TextField()
+    start_time = DateTimeField()  # full date, including the day e.g. 2017-03-07 11:00:00
+    end_time = DateTimeField()
+    status = ForeignKeyField(RaceStatus)
+    url = TextField(null=True)
+    information = TextField(null=True)
+
+
 class Course(BaseModel):
     name = TextField()
     course_family = TextField(null=True)
@@ -29,19 +65,8 @@ class CourseControl(BaseModel):
     map_text = TextField(null=True)
     leg_length = DoubleField(null=True)
     score = DoubleField()
-    is_radio = TextField()  # specify if the control is used as radio/TV control
+    is_radio = BooleanField()  # specify if the control is used as radio/TV control
     status = TextField()  # enabled / disabled - e.g. was stolen, broken
-
-
-class RaceStatus(BaseModel):
-    """
-    value: Applied
-    value: Proposed
-    value: Sanctioned
-    value: Canceled
-    value: Rescheduled
-    """
-    value = CharField()
 
 
 class ResultStatus(BaseModel):
@@ -87,15 +112,6 @@ class Address(BaseModel):
     country = ForeignKeyField(Country)
 
 
-class Race(BaseModel):
-    name = TextField()
-    start_time = DateTimeField()  # full date, including the day e.g. 2017-03-07 11:00:00
-    end_time = DateTimeField()
-    status = ForeignKeyField(RaceStatus)
-    url = TextField(null=True)
-    information = TextField(null=True)
-
-
 class Team(BaseModel):
     name = TextField()
     address = ForeignKeyField(Address, null=True)
@@ -122,6 +138,26 @@ class ControlCard(BaseModel):
     value = TextField()
     is_rented = BooleanField()  # either card is own or should be returned
     is_returned = BooleanField()  # used to control the returning of rented cards
+
+
+class Group(BaseModel):
+    """
+    Should have name 'Class' according to IOF spec, but this word is reserved in Python
+    """
+    name = TextField()  # short name, max 5-6 chars e.g. M17
+    long_name = TextField()  # to print in official results e.g. 'Juniors before 17 years"
+    course = ForeignKeyField(Course)
+
+    sex = TextField()  # limitation for entry
+    min_age = IntegerField()
+    max_age = IntegerField()
+
+    fee = ForeignKeyField(Fee)
+    max_time = IntegerField()  # max time for disqualification
+    qual_assign_text = TextField()  # JSON with rules for Qualification calculation (1:MS, 2-6:KMS etc.) - Russia only
+    start_interval = IntegerField()
+    start_corridor = IntegerField()  # number of start corridor
+    order_in_corridor = IntegerField()  # order in start corridor for automatic start time/bib calculation in all groups
 
 
 class Start(BaseModel):
@@ -152,39 +188,3 @@ class Result(BaseModel):
     place = IntegerField()  # it's better to store calculated place and update it after each readout / disqualification
     penalty_time = DecimalField()  # time of penalties (marked route, false start)
     penalty_laps = IntegerField()  # count of penalty legs (marked route)
-
-
-class Group(BaseModel):
-    """
-    Should have name 'Class' according to IOF spec, but this word is reserved in Python
-    """
-    name = TextField()  # short name, max 5-6 chars e.g. M17
-    long_name = TextField()  # to print in official results e.g. 'Juniors before 17 years"
-    course = ForeignKeyField(Course)
-
-    sex = TextField()  # limitation for entry
-    min_age = IntegerField()
-    max_age = IntegerField()
-
-    fee = ForeignKeyField(Fee)
-    max_time = IntegerField()  # max time for disqualification
-    qual_assign_text = TextField()  # JSON with rules for Qualification calculation (1:MS, 2-6:KMS etc.) - Russia only
-    start_interval = IntegerField()
-    start_corridor = IntegerField()  # number of start corridor
-    order_in_corridor = IntegerField()  # order in start corridor for automatic start time/bib calculation in all groups
-
-
-class Fee(BaseModel):
-    pass
-
-
-class Entry(BaseModel):
-    pass
-
-
-class RelayTeam(BaseModel):
-    pass
-
-
-class Qualification(BaseModel):
-    pass

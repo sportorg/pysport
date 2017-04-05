@@ -1,6 +1,6 @@
 from tkinter import *
 from tkinter import ttk
-from tkinter import filedialog, messagebox, simpledialog
+from tkinter import filedialog, messagebox
 
 import configparser
 
@@ -9,8 +9,7 @@ from bar import StatusBar, ToolBar
 import appframe
 import dialog
 import config
-from language import _, get_languages, locale_current, locale
-import sportident
+from language import _, get_languages
 
 
 class App(ttk.Frame):
@@ -252,5 +251,8 @@ class App(ttk.Frame):
             model.Contact,
             model.Address,
             model.Start,
-            model.Result
+            model.Result,
+            model.Group,
+            model.Fee,
+            model.Entry
         ], safe=True)
