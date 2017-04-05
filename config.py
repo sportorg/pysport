@@ -24,3 +24,15 @@ ICON_DIR = os.path.join(IMG_DIR, 'icon')
 ICON = os.path.join(ICON_DIR, 'sportorg.ico')
 
 LOCALE_DIR = os.path.join(BASE_DIR, 'languages')
+
+
+def base_dir(paths):
+    return os.path.join(BASE_DIR, paths)
+
+
+def img_dir(paths):
+    return os.path.join(IMG_DIR, paths)
+
+
+def icon_dir(paths):
+    return os.path.join(ICON_DIR, paths)

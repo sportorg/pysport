@@ -44,9 +44,6 @@ class App(ttk.Frame):
         super().mainloop(**kwargs)
 
     def _widget(self):
-        """
-        Конфигурация главного окна
-        """
         self.conf.read(config.CONFIG_INI)
         geometry = self.conf.get('geometry', 'geometry', fallback='500x380+0+0')
 
@@ -68,9 +65,9 @@ class App(ttk.Frame):
         self.menubar = Menu(self.master)
 
         filemenu = Menu(self.menubar, tearoff=0)
-        filemenu.add_command(label=_("New") + "...", command=self.new_file)
+        filemenu.add_command(label=_("New") + "...", command=self.new_file, accelerator="Ctrl+N")
         filemenu.add_command(label=_("New Race") + "...", command=self.new_event)
-        filemenu.add_command(label=_("Open") + "...", command=self.open)
+        filemenu.add_command(label=_("Open") + "...", command=self.open, accelerator="Ctrl+O")
         filemenu.add_command(label=_("Save"), command=self.save)
         filemenu.add_command(label=_("Save As") + "..", command=self.save_as)
         filemenu.add_command(label=_("Open Recent"))
@@ -105,7 +102,7 @@ class App(ttk.Frame):
 
         helpmenu = Menu(self.menubar, tearoff=0)
         helpmenu.add_command(label=_("Help"))
-        helpmenu.add_command(label=_("About"), command=self.about)
+        helpmenu.add_command(label=_("About"), command=self.about, accelerator="F2")
         self.menubar.add_cascade(label=_("Help"), menu=helpmenu)
 
         self.master.config(menu=self.menubar)
@@ -114,16 +111,16 @@ class App(ttk.Frame):
         if self.toolbar is not None:
             self.toolbar.destroy()
         self.toolbar = ToolBar(self.master)
-        self.toolbar.set_image(PhotoImage(file=config.ICON_DIR + "/file.png"), command=self.new_file)
-        self.toolbar.set_image(PhotoImage(file=config.ICON_DIR + "/save.png"), command=self.save)
-        self.toolbar.set_image(PhotoImage(file=config.ICON_DIR + "/folder.png"), command=self.open)
-        self.toolbar.set_image(PhotoImage(file=config.ICON_DIR + "/print.png"))
-        self.toolbar.set_image(PhotoImage(file=config.ICON_DIR + "/csv.png"))
-        self.toolbar.set_image(PhotoImage(file=config.ICON_DIR + "/doc.png"))
-        self.toolbar.set_image(PhotoImage(file=config.ICON_DIR + "/html.png"))
-        self.toolbar.set_image(PhotoImage(file=config.ICON_DIR + "/pdf.png"))
-        self.toolbar.set_image(PhotoImage(file=config.ICON_DIR + "/sportident.png"))
-        self.toolbar.set_image(PhotoImage(file=config.ICON_DIR + "/refresh.png"), command=self.refresh)
+        self.toolbar.set_image(PhotoImage(file=config.icon_dir("file.png")), command=self.new_file)
+        self.toolbar.set_image(PhotoImage(file=config.icon_dir("save.png")), command=self.save)
+        self.toolbar.set_image(PhotoImage(file=config.icon_dir("folder.png")), command=self.open)
+        self.toolbar.set_image(PhotoImage(file=config.icon_dir("print.png")))
+        self.toolbar.set_image(PhotoImage(file=config.icon_dir("csv.png")))
+        self.toolbar.set_image(PhotoImage(file=config.icon_dir("doc.png")))
+        self.toolbar.set_image(PhotoImage(file=config.icon_dir("html.png")))
+        self.toolbar.set_image(PhotoImage(file=config.icon_dir("pdf.png")))
+        self.toolbar.set_image(PhotoImage(file=config.icon_dir("sportident.png")))
+        self.toolbar.set_image(PhotoImage(file=config.icon_dir("refresh.png")), command=self.refresh)
 
     def _main_frame(self):
         if self.nb is not None:
@@ -150,6 +147,7 @@ class App(ttk.Frame):
         self.master.bind('<Control-n>', lambda event: self.new_file())
         self.master.bind('<Control-o>', lambda event: self.open())
         self.master.bind('<<NotebookTabChanged>>', lambda event: self.set_tab())
+        self.master.bind('<F2>', lambda event: self.about())
 
     def set_tab(self):
         self.current_tab = self.nb.index(self.nb.select())
@@ -207,9 +205,13 @@ class App(ttk.Frame):
 
     def about(self):
         about = dialog.Dialog()
+        about.overrideredirect(1)
         about.title(_("About"))
         about.geometry("500x300+600+200")
         about.center()
+        close = Button(about, text=_("Ok"), command=lambda: about.destroy(), border=1, pady=2)
+        close.pack(side=BOTTOM, fill=X)
+        about.show()
         self.wait_window(about)
 
     def refresh(self):

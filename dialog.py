@@ -6,7 +6,8 @@ import config
 class Dialog(Toplevel):
     def __init__(self, master=None, cnf={}, **kw):
         super().__init__(master, cnf, **kw)
-        self.resizable(False, False)
+
+    def show(self):
         self.transient()
         self.grab_set()
         self.focus_set()

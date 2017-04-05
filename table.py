@@ -208,14 +208,14 @@ class Table(ttk.Frame):
             if all(str(kwargs[key]) == row_dict[key] for key in kwargs):
                 self._tree.delete(row)
 
-    def register_popup(self, label, command=None):
+    def register_popup(self, label, command=None, accelerator=None):
         """
         Adds an item to the popup menu in the table.
         :param label:  Text to use in popup menu
         :param command:  Callback function to run on click
         :return: None
         """
-        self._popup.add_command(label=label, command=command)
+        self._popup.add_command(label=label, command=command, accelerator=accelerator)
 
     def configure(self, **kwargs):
         """

@@ -50,7 +50,7 @@ class Person(ttk.Frame):
         self.t.pack(fill=BOTH, expand=True)
         for person in persons:
             self.t.create_row({'id': person.id, 'name': person.name, 'surname': person.surname})
-        self.t.register_popup(_("Add") + " Ctrl+i", command=self.add)
+        self.t.register_popup(_("Add"), command=self.add, accelerator="Ctrl+I")
         self.t.register_popup(_("Edit person"), command=self.edit)
         self.t.register_popup(_("Copy and insert"))
         self.t.register_popup(_("Delete") + " Del", command=self.delete)
@@ -127,7 +127,9 @@ class Person(ttk.Frame):
         cancel_button = ttk.Button(root, text="cancel", command=root.destroy)
         cancel_button.grid(row=7, column=3)
 
+        root.resizable(False, False)
         root.center()
+        root.show()
         # root.bind("<Enter>", ok)
 
         self.wait_window(root)
