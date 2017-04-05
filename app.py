@@ -257,8 +257,7 @@ class App(ttk.Frame):
             model.Country,
             model.Contact,
             model.Address,
-            model.Start,
-            model.Result,
+            model.Participation,
             model.Group,
             model.Fee,
             model.Entry

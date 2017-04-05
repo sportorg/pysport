@@ -21,11 +21,6 @@ class Fee(BaseModel):
     name = CharField()
     amount = DecimalField()
 
-class Entry(BaseModel):
-    entry_date = DateTimeField()
-    entry_author = ForeignKeyField(Person, null=True)
-    entry_team = ForeignKeyField(Organization, null=True)
-
 
 class RelayTeam(BaseModel):
     name = CharField()  # description of team
@@ -138,12 +133,17 @@ class Person(BaseModel):
     qual = ForeignKeyField(Qualification, null=True)  # qualification, used in Russia only
 
 
+class Entry(BaseModel):
+    entry_date = DateTimeField()
+    entry_author = ForeignKeyField(Person, null=True)
+    entry_team = ForeignKeyField(Organization, null=True)
+
+
 class ControlCard(BaseModel):
     name = CharField()
     value = CharField()
     is_rented = BooleanField(null=True)  # either card is own or should be returned
     is_returned = BooleanField(null=True)  # used to control the returning of rented cards
-    split_time = TextField(null=True)  # punches
 
 
 class Group(BaseModel):
@@ -181,3 +181,4 @@ class Participation(BaseModel):
     penalty_time = TimeField(null=True)  # time of penalties (marked route, false start)
     penalty_laps = IntegerField(null=True)  # count of penalty legs (marked route)
     status = ForeignKeyField(ResultStatus)
+    split_time = TextField(null=True)  # punches
