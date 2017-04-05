@@ -120,24 +120,25 @@ class Team(BaseModel):
 class Person(BaseModel):
     name = TextField()
     surname = TextField(null=True)
-    year = SmallIntegerField()  # sometime we have only year of birth
+    sex = CharField(null=True, max_length=1)
+    year = SmallIntegerField(null=True)  # sometime we have only year of birth
     birth_date = DateField(null=True)
     team = ForeignKeyField(Team, null=True)
     nationality = ForeignKeyField(Country, null=True)
     address = ForeignKeyField(Address, null=True)
     contact = ForeignKeyField(Contact, null=True)
-    world_code = TextField()  # WRE ID for orienteering and the same
-    national_code = TextField()
-    rank = DecimalField()  # position/scores in word ranking
+    world_code = TextField(null=True)  # WRE ID for orienteering and the same
+    national_code = TextField(null=True)
+    rank = DecimalField(null=True)  # position/scores in word ranking
     qual = ForeignKeyField(Qualification)  # qualification, used in Russia only
 
 
 class ControlCard(BaseModel):
-    person = ForeignKeyField(Person)
+    person = ForeignKeyField(Person, null=True)
     name = CharField()
     value = TextField()
-    is_rented = BooleanField()  # either card is own or should be returned
-    is_returned = BooleanField()  # used to control the returning of rented cards
+    is_rented = BooleanField(null=True)  # either card is own or should be returned
+    is_returned = BooleanField(null=True)  # used to control the returning of rented cards
 
 
 class Group(BaseModel):
@@ -148,16 +149,16 @@ class Group(BaseModel):
     long_name = TextField()  # to print in official results e.g. 'Juniors before 17 years"
     course = ForeignKeyField(Course)
 
-    sex = TextField()  # limitation for entry
-    min_age = IntegerField()
-    max_age = IntegerField()
+    sex = TextField(null=True)  # limitation for entry
+    min_age = IntegerField(null=True)
+    max_age = IntegerField(null=True)
 
-    fee = ForeignKeyField(Fee)
-    max_time = IntegerField()  # max time for disqualification
-    qual_assign_text = TextField()  # JSON with rules for Qualification calculation (1:MS, 2-6:KMS etc.) - Russia only
-    start_interval = IntegerField()
-    start_corridor = IntegerField()  # number of start corridor
-    order_in_corridor = IntegerField()  # order in start corridor for automatic start time/bib calculation in all groups
+    fee = ForeignKeyField(Fee, null=True)
+    max_time = IntegerField(null=True)  # max time for disqualification
+    qual_assign_text = TextField(null=True)  # JSON with rules for Qualification calculation (1:MS, 2-6:KMS etc.)
+    start_interval = IntegerField(null=True)
+    start_corridor = IntegerField(null=True)  # number of start corridor
+    order_in_corridor = IntegerField(null=True)  # order in start corridor for automatic start time/bib calculation
 
 
 class Start(BaseModel):
@@ -166,25 +167,23 @@ class Start(BaseModel):
     # TODO: control_card = ForeignKeyField(Person)
     course = ForeignKeyField(Course)
     bib_number = CharField()
-    start_time = DateTimeField()
-    comment = TextField()  # comment (taken from the entry or entered manually)
-    competing_status = TextField()  # can de a dictionary?
+    start_time = DateTimeField(null=True)
+    comment = TextField(null=True)  # comment (taken from the entry or entered manually)
+    competing_status = TextField(null=True)  # can de a dictionary?
     # usual
     # not_ranked - out of team, not to give scores (e.g. team consist of 6 persons, 7th and 8th are not ranked)
     # not_qualified - won't be in official results
-    entry = ForeignKeyField(Entry)  # connection with the Entry object
-    relay_team = ForeignKeyField(RelayTeam)  # conection with relay team.
-    relay_leg = IntegerField()  # relay leg. Possible to calculate it from the bib number
-    start_group = IntegerField()  # used in drawing, to specify red/ping and other start groups
+    entry = ForeignKeyField(Entry, null=True)  # connection with the Entry object
+    relay_team = ForeignKeyField(RelayTeam, null=True)  # conection with relay team.
+    relay_leg = IntegerField(null=True)  # relay leg. Possible to calculate it from the bib number
+    start_group = IntegerField(null=True)  # used in drawing, to specify red/ping and other start groups
+    penalty_time = DecimalField(null=True)  # time of penalties (marked route, false start)
+    penalty_laps = IntegerField(null=True)  # count of penalty legs (marked route)
 
 
 class Result(BaseModel):
     start = ForeignKeyField(Start)
-    finish_time = DateTimeField()
+    finish_time = DateTimeField(null=True)
     status = ForeignKeyField(ResultStatus)
     split_time = TextField(null=True)
     control_card = ForeignKeyField(ControlCard)
-    result = TextField()  # it's better to store calculated result to do fast return in case of mass requests
-    place = IntegerField()  # it's better to store calculated place and update it after each readout / disqualification
-    penalty_time = DecimalField()  # time of penalties (marked route, false start)
-    penalty_laps = IntegerField()  # count of penalty legs (marked route)
