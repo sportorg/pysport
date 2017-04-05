@@ -37,8 +37,10 @@ class ToolBar(Frame):
         return label
 
     def set_image(self, image, side=LEFT, command=None):
-        button = Button(self, image=image, command=command)
+        button = Button(self, image=image, command=command, border=0)
         button.image = image
         button.pack(side=side, padx=2, pady=2)
+        button.bind("<Enter>", lambda event: button.configure(bg="azure"))
+        button.bind("<Leave>", lambda event: button.configure(bg="SystemButtonFace"))
 
         return button
