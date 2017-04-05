@@ -142,6 +142,7 @@ class Entry(BaseModel):
 class ControlCard(BaseModel):
     name = CharField()
     value = CharField()
+    person = ForeignKeyField(Person)
     is_rented = BooleanField(null=True)  # either card is own or should be returned
     is_returned = BooleanField(null=True)  # used to control the returning of rented cards
 
