@@ -6,10 +6,11 @@ import config
 class Dialog(Toplevel):
     def __init__(self, master=None, cnf={}, **kw):
         super().__init__(master, cnf, **kw)
-        self.iconbitmap(config.ICON)
+        self.resizable(False, False)
         self.transient()
         self.grab_set()
         self.focus_set()
+        self.iconbitmap(config.ICON)
 
     def center(self):
         self.update_idletasks()

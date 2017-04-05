@@ -30,6 +30,7 @@ class App(ttk.Frame):
         self.current_tab = 3
         self.status = None
 
+        self.initialize_db()
         self.create_db()
         self.pack()
         self._widget()
@@ -175,29 +176,23 @@ class App(ttk.Frame):
         except configparser.Error:
             self.master.quit()
 
-    def _set_file(self, file):
-        if file is None:
-            return False
-        if not len(file):
-            return False
-        self.set_title(file)
-        self.file = file
-        self.create_db()
-        self.refresh()
-        return True
-
     def new_file(self):
-        ftypes = [(config.NAME + ' files', '*.sportorg'), ('SQLITE', '*.sqlite')]
-        file = filedialog.asksaveasfilename(defaultextension=".sportorg", filetypes=ftypes)
-        return self._set_file(file)
+        is_create = self.create_file()
+        if is_create:
+            self.set_title(self.file)
+            self.initialize_db()
+            self.create_db()
+            self.refresh()
 
     def new_event(self):
         pass
 
     def open(self):
-        ftypes = [(config.NAME + ' files', '*.sportorg'), ('SQLITE', '*.sqlite'), ('All files', '*')]
-        file = filedialog.askopenfilename(filetypes=ftypes)
-        return self._set_file(file)
+        is_open = self.open_file()
+        if is_open:
+            self.set_title(self.file)
+            self.initialize_db()
+            self.refresh()
 
     def save(self):
         if self.file is not None:
@@ -211,10 +206,10 @@ class App(ttk.Frame):
         pass
 
     def about(self):
-        # messagebox.showinfo("About", "Akhtarov Danil\nDevelop in 2017 (с)")
         about = dialog.Dialog()
         about.title(_("About"))
-        about.geometry("300x200+600+200")
+        about.geometry("500x300+600+200")
+        about.center()
         self.wait_window(about)
 
     def refresh(self):
@@ -232,13 +227,23 @@ class App(ttk.Frame):
         self.file = file
         return True
 
-    def create_db(self):
+    def open_file(self):
+        ftypes = [(config.NAME + ' files', '*.sportorg'), ('SQLITE', '*.sqlite'), ('All files', '*')]
+        file = filedialog.askopenfilename(filetypes=ftypes)
+        if not len(file):
+            return False
+        self.file = file
+        return True
+
+    def initialize_db(self):
         if self.file is None:
             database = model.SqliteDatabase(":memory:")
         else:
             database = model.SqliteDatabase(self.file)
         self.db.initialize(database)
         self.db.connect()
+
+    def create_db(self):
         self.db.create_tables([
             model.Race,
             model.Person,
