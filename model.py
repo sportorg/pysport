@@ -10,23 +10,25 @@ class BaseModel(Model):
 
 class Settings(BaseModel):
     name = CharField()
-    value = TextField()
+    value = CharField()
 
 
 class Qualification(BaseModel):
-    pass
+    name = CharField()
 
 
 class Fee(BaseModel):
-    pass
-
+    name = CharField()
+    amount = DecimalField()
 
 class Entry(BaseModel):
-    pass
+    entry_date = DateTimeField()
+    entry_author = ForeignKeyField(Person, null=True)
+    entry_team = ForeignKeyField(Organization, null=True)
 
 
 class RelayTeam(BaseModel):
-    pass
+    name = CharField()  # description of team
 
 
 class RaceStatus(BaseModel):
@@ -41,32 +43,33 @@ class RaceStatus(BaseModel):
 
 
 class Race(BaseModel):
-    name = TextField()
+    name = CharField()
+    discipline = CharField()  # dictionary of race types
     start_time = DateTimeField()  # full date, including the day e.g. 2017-03-07 11:00:00
     end_time = DateTimeField()
     status = ForeignKeyField(RaceStatus)
-    url = TextField(null=True)
-    information = TextField(null=True)
+    url = CharField(null=True)
+    information = CharField(null=True)
 
 
 class Course(BaseModel):
-    name = TextField()
-    course_family = TextField(null=True)
+    name = CharField()
+    course_family = CharField(null=True)
     length = DoubleField(null=True)
     climb = DoubleField(null=True)
     number_of_controls = DoubleField(null=True)
     race = ForeignKeyField(Race)  # connection to the race
-    controls_text = TextField()  # JSON with legs and controls. If you have 500 courses for relay, it will be faster
+    controls_text = CharField()  # JSON with legs and controls. If you have 500 courses for relay, it will be faster
 
 
 class CourseControl(BaseModel):
     course = ForeignKeyField(Course)
-    control = TextField()
-    map_text = TextField(null=True)
+    control = CharField()
+    map_text = CharField(null=True)
     leg_length = DoubleField(null=True)
     score = DoubleField()
     is_radio = BooleanField()  # specify if the control is used as radio/TV control
-    status = TextField()  # enabled / disabled - e.g. was stolen, broken
+    status = CharField()  # enabled / disabled - e.g. was stolen, broken
 
 
 class ResultStatus(BaseModel):
@@ -100,56 +103,58 @@ class Country(BaseModel):
 
 class Contact(BaseModel):
     name = CharField()
-    value = TextField()
+    value = CharField()
 
 
 class Address(BaseModel):
-    care_of = TextField()
-    street = TextField()
-    zip_code = TextField()
-    city = TextField()
-    state = TextField()
+    care_of = CharField()
+    street = CharField()
+    zip_code = CharField()
+    city = CharField()
+    state = CharField()
     country = ForeignKeyField(Country)
 
 
-class Team(BaseModel):
-    name = TextField()
+class Organization(BaseModel):
+    name = CharField()
     address = ForeignKeyField(Address, null=True)
+    contact = ForeignKeyField(Contact, null=True)
+    country = ForeignKeyField(Country, null=True)
 
 
 class Person(BaseModel):
-    name = TextField()
-    surname = TextField(null=True)
+    name = CharField()
+    surname = CharField(null=True)
     sex = CharField(null=True, max_length=1)
     year = SmallIntegerField(null=True)  # sometime we have only year of birth
     birth_date = DateField(null=True)
-    team = ForeignKeyField(Team, null=True)
+    team = ForeignKeyField(Organization, null=True)
     nationality = ForeignKeyField(Country, null=True)
     address = ForeignKeyField(Address, null=True)
     contact = ForeignKeyField(Contact, null=True)
-    world_code = TextField(null=True)  # WRE ID for orienteering and the same
-    national_code = TextField(null=True)
+    world_code = CharField(null=True)  # WRE ID for orienteering and the same
+    national_code = CharField(null=True)
     rank = DecimalField(null=True)  # position/scores in word ranking
-    qual = ForeignKeyField(Qualification)  # qualification, used in Russia only
+    qual = ForeignKeyField(Qualification, null=True)  # qualification, used in Russia only
 
 
 class ControlCard(BaseModel):
-    person = ForeignKeyField(Person, null=True)
     name = CharField()
-    value = TextField()
+    value = CharField()
     is_rented = BooleanField(null=True)  # either card is own or should be returned
     is_returned = BooleanField(null=True)  # used to control the returning of rented cards
+    split_time = TextField(null=True)  # punches
 
 
 class Group(BaseModel):
     """
     Should have name 'Class' according to IOF spec, but this word is reserved in Python
     """
-    name = TextField()  # short name, max 5-6 chars e.g. M17
-    long_name = TextField()  # to print in official results e.g. 'Juniors before 17 years"
+    name = CharField()  # short name, max 5-6 chars e.g. M17
+    long_name = CharField()  # to print in official results e.g. 'Juniors before 17 years"
     course = ForeignKeyField(Course)
 
-    sex = TextField(null=True)  # limitation for entry
+    sex = CharField(null=True, max_length=1)  # limitation for entry
     min_age = IntegerField(null=True)
     max_age = IntegerField(null=True)
 
@@ -161,29 +166,18 @@ class Group(BaseModel):
     order_in_corridor = IntegerField(null=True)  # order in start corridor for automatic start time/bib calculation
 
 
-class Start(BaseModel):
+class Participation(BaseModel):
     group = ForeignKeyField(Group)  # changed from course by SK
     person = ForeignKeyField(Person)
-    # TODO: control_card = ForeignKeyField(Person)
-    course = ForeignKeyField(Course)
-    bib_number = CharField()
+    control_card = ForeignKeyField(ControlCard)
+    bib_number = IntegerField()
     start_time = DateTimeField(null=True)
-    comment = TextField(null=True)  # comment (taken from the entry or entered manually)
-    competing_status = TextField(null=True)  # can de a dictionary?
-    # usual
-    # not_ranked - out of team, not to give scores (e.g. team consist of 6 persons, 7th and 8th are not ranked)
-    # not_qualified - won't be in official results
+    finish_time = DateTimeField(null=True)
+    comment = CharField(null=True)  # comment (taken from the entry or entered manually)
     entry = ForeignKeyField(Entry, null=True)  # connection with the Entry object
-    relay_team = ForeignKeyField(RelayTeam, null=True)  # conection with relay team.
+    relay_team = ForeignKeyField(RelayTeam, null=True)  # connection with relay team.
     relay_leg = IntegerField(null=True)  # relay leg. Possible to calculate it from the bib number
     start_group = IntegerField(null=True)  # used in drawing, to specify red/ping and other start groups
-    penalty_time = DecimalField(null=True)  # time of penalties (marked route, false start)
+    penalty_time = TimeField(null=True)  # time of penalties (marked route, false start)
     penalty_laps = IntegerField(null=True)  # count of penalty legs (marked route)
-
-
-class Result(BaseModel):
-    start = ForeignKeyField(Start)
-    finish_time = DateTimeField(null=True)
     status = ForeignKeyField(ResultStatus)
-    split_time = TextField(null=True)
-    control_card = ForeignKeyField(ControlCard)
