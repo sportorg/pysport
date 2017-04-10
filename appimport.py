@@ -119,7 +119,8 @@ class WinOrientCSV:
             'qual': row['qual'],
         } for row in self.data]
         with model.database_proxy.atomic():
-            model.Person.insert_many(data_person).execute()
+            for idx in range(0, len(data_person), 100):
+                model.Person.insert_many(data_person[idx:idx + 100]).execute()
 
         self._is_complete = True
         # TODO: from data to sql
