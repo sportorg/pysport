@@ -35,7 +35,7 @@ class Person(ttk.Frame):
         super().__init__(parent.master)
         self.pack()
         self.parent = parent
-        person_header = ['id', 'name', 'surname']
+        person_header = ["id", "name", "surname", "team", "year", "qual"]
         self.t = table.Table(self, person_header, ysb=True, popup=True)
         self._main()
 
@@ -49,7 +49,14 @@ class Person(ttk.Frame):
         persons = model.Person.select()
         self.t.pack(fill=BOTH, expand=True)
         for person in persons:
-            self.t.create_row({'id': person.id, 'name': person.name, 'surname': person.surname})
+            self.t.create_row({
+                'id': person.id,
+                'name': person.name,
+                'surname': person.surname,
+                'team': person.team.name if person.team is not None else '',
+                'year': person.year,
+                'qual': person.qual
+            })
         self.t.register_popup(_("Add"), command=self.add, accelerator="Ctrl+I")
         self.t.register_popup(_("Edit person"), command=self.edit)
         self.t.register_popup(_("Copy and insert"))
@@ -107,7 +114,7 @@ class Person(ttk.Frame):
             name.insert(0, per.name)
             surname.insert(0, per.surname)
 
-        def ok(event=None):
+        def ok():
             if person_id is None:
                 person = model.Person.create(name=name.get(), surname=surname.get())
                 self.t.create_row({'id': person.id, 'name': person.name, 'surname': person.surname})
