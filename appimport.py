@@ -116,8 +116,8 @@ class WinOrientCSV:
             'year': row['year'],
             'qual': row['qual'],
         } for row in self.data]
-        for data_dict in data_person:
-            model.Person.create(**data_dict)
+        with model.database_proxy.atomic():
+            model.Person.insert_many(data_person).execute()
 
         self._is_complete = True
         # TODO: from data to sql
