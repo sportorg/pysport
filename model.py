@@ -52,18 +52,30 @@ class Course(BaseModel):
     course_family = CharField(null=True)
     length = DoubleField(null=True)
     climb = DoubleField(null=True)
-    number_of_controls = DoubleField(null=True)
+    number_of_controls = IntegerField(null=True)
     race = ForeignKeyField(Race)  # connection to the race
+
+
+class CoursePart(BaseModel):
     controls_text = CharField()  # JSON with legs and controls. If you have 500 courses for relay, it will be faster
+    code = CharField()
+    order = IntegerField()
+    variant = CharField()
+    length = DoubleField(null=True)
+    climb = DoubleField(null=True)
+    number_of_controls = IntegerField(null=True)
+    type = CharField()
+    course = ForeignKeyField(Course)
 
 
 class CourseControl(BaseModel):
     course = ForeignKeyField(Course)
     control = CharField()
+    order = IntegerField()
     map_text = CharField(null=True)
     leg_length = DoubleField(null=True)
     score = DoubleField()
-    is_radio = BooleanField()  # specify if the control is used as radio/TV control
+    is_online = BooleanField()  # specify if the control is used as radio/TV control
     status = CharField()  # enabled / disabled - e.g. was stolen, broken
 
 
@@ -172,14 +184,34 @@ class Participation(BaseModel):
     person = ForeignKeyField(Person)
     control_card = ForeignKeyField(ControlCard)
     bib_number = IntegerField()
-    start_time = DateTimeField(null=True)
-    finish_time = DateTimeField(null=True)
     comment = CharField(null=True)  # comment (taken from the entry or entered manually)
     entry = ForeignKeyField(Entry, null=True)  # connection with the Entry object
-    relay_team = ForeignKeyField(RelayTeam, null=True)  # connection with relay team.
-    relay_leg = IntegerField(null=True)  # relay leg. Possible to calculate it from the bib number
     start_group = IntegerField(null=True)  # used in drawing, to specify red/ping and other start groups
+    status = ForeignKeyField(ResultStatus)
+
+
+class Result(BaseModel):
+    participation = ForeignKeyField(Participation)
+    start_time = DateTimeField(null=True)
+    finish_time = DateTimeField(null=True)
     penalty_time = TimeField(null=True)  # time of penalties (marked route, false start)
     penalty_laps = IntegerField(null=True)  # count of penalty legs (marked route)
-    status = ForeignKeyField(ResultStatus)
     split_time = TextField(null=True)  # punches
+
+
+class RelayTeamLeg(BaseModel):
+    relay_team = ForeignKeyField(RelayTeam)
+    participation = ForeignKeyField(Participation)
+    leg_number = IntegerField()
+
+
+class LegCoursePart(BaseModel):
+    course_part = ForeignKeyField(CoursePart)
+    relay_ream_leg = ForeignKeyField(RelayTeamLeg)
+
+
+class OnlineControlTime(BaseModel):
+    control = ForeignKeyField(CourseControl)  # control point, including start (#22), finish (#23)
+    participation = ForeignKeyField(Participation)  # link to the bib
+    time = DateTimeField()  # time
+    source = CharField(null=True)  # source: radio, SI Live, SRR USB, RS232 with autosend, manual, readout

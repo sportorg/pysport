@@ -247,18 +247,26 @@ class App(ttk.Frame):
 
     def create_db(self):
         self.db.create_tables([
-            model.Race,
-            model.Person,
-            model.ControlCard,
-            model.CourseControl,
-            model.Course,
+            model.Qualification,
+            model.Fee,
+            model.RelayTeam,
             model.RaceStatus,
+            model.Race,
+            model.Course,
+            model.CoursePart,
+            model.CourseControl,
             model.ResultStatus,
             model.Country,
             model.Contact,
             model.Address,
-            model.Participation,
+            model.Organization,
+            model.Person,
+            model.Entry,
+            model.ControlCard,
             model.Group,
-            model.Fee,
-            model.Entry
+            model.Participation,
+            model.Result,
+            model.RelayTeamLeg,
+            model.LegCoursePart,
+            model.OnlineControlTime
         ], safe=True)
