@@ -11,6 +11,8 @@ import dialog
 import config
 from language import _, get_languages
 
+import appimport
+
 
 class App(ttk.Frame):
     def __init__(self, master=None, file=None):
@@ -75,7 +77,9 @@ class App(ttk.Frame):
         filemenu.add_command(label=_("Settings") + "...")
         filemenu.add_command(label=_("Settings Event") + "...")
         filemenu.add_separator()
-        filemenu.add_command(label=_("Import"))
+        import_menu = Menu(self.menubar, tearoff=0)
+        import_menu.add_command(label=_("WinOrient CSV"), command=self.importCSV)
+        filemenu.add_cascade(label=_("Import"), menu=import_menu)
         filemenu.add_command(label=_("Export"))
         filemenu.add_separator()
         filemenu.add_command(label=_("Exit"), command=self.close)
@@ -236,6 +240,14 @@ class App(ttk.Frame):
             return False
         self.file = file
         return True
+
+    def importCSV(self):
+        ftypes = [('Winorient csv file', '*.csv'), ('All files', '*')]
+        file = filedialog.askopenfilename(filetypes=ftypes)
+        if not len(file):
+            return
+        wo_csv = appimport.WinOrientCSV(file)
+        wo_csv.run()
 
     def initialize_db(self):
         if self.file is None:
