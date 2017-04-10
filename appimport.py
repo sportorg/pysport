@@ -99,15 +99,17 @@ class WinOrientCSV:
 
         data_group = [{'name': group, 'long_name': group} for group in self.groups]
         model_group = {}
-        for data_dict in data_group:
-            org = model.Group.create(**data_dict)
-            model_group[org.name] = org.id
+        with model.database_proxy.atomic():
+            for data_dict in data_group:
+                org = model.Group.create(**data_dict)
+                model_group[org.name] = org.id
 
         data_team = [{'name': team} for team in self.teams]
         model_team = {}
-        for data_dict in data_team:
-            org = model.Organization.create(**data_dict)
-            model_team[org.name] = org.id
+        with model.database_proxy.atomic():
+            for data_dict in data_team:
+                org = model.Organization.create(**data_dict)
+                model_team[org.name] = org.id
 
         data_person = [{
             'name': row['name'],
@@ -116,8 +118,8 @@ class WinOrientCSV:
             'year': row['year'],
             'qual': row['qual'],
         } for row in self.data]
-        for data_dict in data_person:
-            model.Person.create(**data_dict)
+        with model.database_proxy.atomic():
+            model.Person.insert_many(data_person).execute()
 
         self._is_complete = True
         # TODO: from data to sql
