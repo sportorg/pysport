@@ -142,7 +142,7 @@ class Person(BaseModel):
     world_code = CharField(null=True)  # WRE ID for orienteering and the same
     national_code = CharField(null=True)
     rank = DecimalField(null=True)  # position/scores in word ranking
-    qual = ForeignKeyField(Qualification, null=True)  # qualification, used in Russia only
+    qual = CharField(null=True)  # qualification, used in Russia only
 
 
 class Entry(BaseModel):
@@ -165,7 +165,7 @@ class Group(BaseModel):
     """
     name = CharField()  # short name, max 5-6 chars e.g. M17
     long_name = CharField()  # to print in official results e.g. 'Juniors before 17 years"
-    course = ForeignKeyField(Course)
+    course = ForeignKeyField(Course, null=True)
 
     sex = CharField(null=True, max_length=1)  # limitation for entry
     min_age = IntegerField(null=True)

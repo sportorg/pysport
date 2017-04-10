@@ -78,7 +78,7 @@ class App(ttk.Frame):
         filemenu.add_command(label=_("Settings Event") + "...")
         filemenu.add_separator()
         import_menu = Menu(self.menubar, tearoff=0)
-        import_menu.add_command(label=_("WinOrient CSV"), command=self.importCSV)
+        import_menu.add_command(label=_("WinOrient CSV"), command=self.import_csv)
         filemenu.add_cascade(label=_("Import"), menu=import_menu)
         filemenu.add_command(label=_("Export"))
         filemenu.add_separator()
@@ -241,13 +241,15 @@ class App(ttk.Frame):
         self.file = file
         return True
 
-    def importCSV(self):
+    def import_csv(self):
         ftypes = [('Winorient csv file', '*.csv'), ('All files', '*')]
         file = filedialog.askopenfilename(filetypes=ftypes)
         if not len(file):
             return
-        wo_csv = appimport.WinOrientCSV(file)
+        wo_csv = appimport.WinOrientCSV(file=file)
         wo_csv.run()
+        if wo_csv.is_complete:
+            self.refresh()
 
     def initialize_db(self):
         if self.file is None:
