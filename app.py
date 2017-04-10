@@ -12,6 +12,7 @@ import config
 from language import _, get_languages
 
 import appimport
+from wdb_appimport import WinOrientBinary
 
 
 class App(ttk.Frame):
@@ -79,6 +80,7 @@ class App(ttk.Frame):
         filemenu.add_separator()
         import_menu = Menu(self.menubar, tearoff=0)
         import_menu.add_command(label=_("WinOrient CSV"), command=self.import_csv)
+        import_menu.add_command(label=_("WinOrient WDB"), command=self.import_wdb)
         filemenu.add_cascade(label=_("Import"), menu=import_menu)
         filemenu.add_command(label=_("Export"))
         filemenu.add_separator()
@@ -249,6 +251,16 @@ class App(ttk.Frame):
         wo_csv = appimport.WinOrientCSV(file=file)
         wo_csv.run()
         if wo_csv.is_complete:
+            self.refresh()
+
+    def import_wdb(self):
+        ftypes = [('Winorient file', '*.wdb'), ('All files', '*')]
+        file = filedialog.askopenfilename(filetypes=ftypes)
+        if not len(file):
+            return
+        wo_bin_import = WinOrientBinary(file=file)
+        wo_bin_import.run()
+        if wo_bin_import.is_complete:
             self.refresh()
 
     def initialize_db(self):
