@@ -1,5 +1,5 @@
-import csv
 import model
+from model import RaceStatus
 from wdb import WDB
 
 
@@ -29,7 +29,6 @@ class WinOrientBinary:
     def is_complete(self):
         return self._is_complete
 
-
     def _read_file(self):
         try:
             with open(self._file, 'rb') as wdb_file:
@@ -40,6 +39,9 @@ class WinOrientBinary:
             pass
 
     def run(self):
+
+        self.create_race(self.wdb_object)
+        self.create_organizations(self.wdb_object)
 
         data_group = [{'name': group.name, 'long_name': group.name} for group in self.wdb_object.group]
         model_group = {}
@@ -68,3 +70,57 @@ class WinOrientBinary:
 
         self._is_complete = True
 
+    def create_race(self, wdb):
+
+        assert isinstance(wdb, WDB)
+
+        name = 'wdb imported race'
+        discipline = wdb.info.type
+        start_time = wdb.info.date_str
+        end_time = wdb.info.date_str
+        status_text = 'Applied'
+        status = RaceStatus(model.RaceStatus.get_or_create(value=status_text))
+        url = ''
+        information = wdb.info.title
+
+        data = {
+            'name': name,
+            'discipline': discipline,
+            'start_time': start_time,
+            'end_time': end_time,
+            'status': status,
+            'url': url,
+            'information': information,
+        }
+
+        model.Race.create(
+                          name=name,
+                          discipline=discipline,
+                          start_time=start_time,
+                          end_time=end_time,
+                          # status = status, TODO: write foreign key of status
+                          url=url,
+                          information=information
+                          )
+
+    def create_organizations(self, wdb):
+
+        assert isinstance(wdb, WDB)
+
+        for team in wdb.team:
+
+            name = team.name
+            address = None
+            contact = None
+            if len(team.refferent) > 0:
+                contact = model.Contact.get_or_create({'name': 'team contact', 'value': team.refferent})
+            country = None  # TODO: decode from WDB byte
+
+            data = {
+                'name': name,
+                'address': address,
+                'contact': contact,
+                'country': country,
+            }
+
+            model.Organization.create(**data)

@@ -42,7 +42,7 @@ class Race(BaseModel):
     discipline = CharField()  # dictionary of race types
     start_time = DateTimeField()  # full date, including the day e.g. 2017-03-07 11:00:00
     end_time = DateTimeField()
-    status = ForeignKeyField(RaceStatus)
+    status = ForeignKeyField(RaceStatus, null=True)
     url = CharField(null=True)
     information = CharField(null=True)
 
