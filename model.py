@@ -178,6 +178,9 @@ class Group(BaseModel):
     start_corridor = IntegerField(null=True)  # number of start corridor
     order_in_corridor = IntegerField(null=True)  # order in start corridor for automatic start time/bib calculation
 
+    class Meta:
+        db_table = 'class'
+
 
 class Participation(BaseModel):
     group = ForeignKeyField(Group)  # changed from course by SK

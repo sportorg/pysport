@@ -79,7 +79,8 @@ class WinOrientBinary:
         start_time = wdb.info.date_str
         end_time = wdb.info.date_str
         status_text = 'Applied'
-        status = RaceStatus(model.RaceStatus.get_or_create(value=status_text))
+        status_obj = model.RaceStatus.get_or_create(value=status_text)[0]
+        status = status_obj.id
         url = ''
         information = wdb.info.title
 
@@ -98,7 +99,7 @@ class WinOrientBinary:
                           discipline=discipline,
                           start_time=start_time,
                           end_time=end_time,
-                          # status = status, TODO: write foreign key of status
+                          status = status, # TODO: write foreign key of status
                           url=url,
                           information=information
                           )
