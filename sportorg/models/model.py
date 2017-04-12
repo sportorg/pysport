@@ -185,12 +185,12 @@ class Group(BaseModel):
 class Participation(BaseModel):
     group = ForeignKeyField(Group)  # changed from course by SK
     person = ForeignKeyField(Person)
-    control_card = ForeignKeyField(ControlCard)
-    bib_number = IntegerField()
+    control_card = ForeignKeyField(ControlCard, null=True)
+    bib_number = IntegerField(null=True)
     comment = CharField(null=True)  # comment (taken from the entry or entered manually)
     entry = ForeignKeyField(Entry, null=True)  # connection with the Entry object
     start_group = IntegerField(null=True)  # used in drawing, to specify red/ping and other start groups
-    status = ForeignKeyField(ResultStatus)
+    status = ForeignKeyField(ResultStatus, null=True)
 
 
 class Result(BaseModel):

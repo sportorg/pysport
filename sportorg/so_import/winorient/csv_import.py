@@ -1,5 +1,6 @@
 import csv
 from sportorg.models import model
+import time
 
 
 class WinOrientCSV:
@@ -93,16 +94,14 @@ class WinOrientCSV:
             pass
 
     def run(self):
-        print(self.groups)
-        print(self.teams)
-        print(self.data)
+        diff = time.time()
 
         data_group = [{'name': group, 'long_name': group} for group in self.groups]
         model_group = {}
         with model.database_proxy.atomic():
             for data_dict in data_group:
-                org = model.Group.create(**data_dict)
-                model_group[org.name] = org.id
+                group = model.Group.create(**data_dict)
+                model_group[group.name] = group.id
 
         data_team = [{'name': team} for team in self.teams]
         model_team = {}
@@ -111,16 +110,23 @@ class WinOrientCSV:
                 org = model.Organization.create(**data_dict)
                 model_team[org.name] = org.id
 
-        data_person = [{
-            'name': row['name'],
-            'surname': row['surname'],
-            'team': model_team[row['team']],
-            'year': row['year'],
-            'qual': row['qual'],
-        } for row in self.data]
+        data_person = []
+        for p in self.data:
+            p['group'] = model_group[p['group']]
+            p['team'] = model_team[p['team']]
+            data_person.append(p)
         with model.database_proxy.atomic():
-            for idx in range(0, len(data_person), 100):
-                model.Person.insert_many(data_person[idx:idx + 100]).execute()
+            for data_dict in data_person:
+                person = model.Person.create(**data_dict)
+                participation = {
+                    "person": person,
+                    "group": data_dict['group']
+                }
+                if data_dict['card']:
+                    participation['control_card'] = model.ControlCard.create(name="SPORTIDENT", value=data_dict['card'], person=person)
+
+                model.Participation.create(**participation)
+
+        print(time.time()-diff)
 
         self._is_complete = True
-        # TODO: from data to sql
