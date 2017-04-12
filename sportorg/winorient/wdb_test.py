@@ -2,7 +2,7 @@ import struct
 import unittest
 
 
-from winorient.wdb import WDBPunch, WDBFinish, WDBChip, WDBTeam, WDBDistance, WDBGroup, WDBMan, WDB
+from sportorg.winorient.wdb import WDBPunch, WDBFinish, WDBChip, WDBTeam, WDBDistance, WDBGroup, WDBMan, WDB
 
 
 class TestStringMethods(unittest.TestCase):
