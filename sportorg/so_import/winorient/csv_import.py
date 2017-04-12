@@ -1,5 +1,5 @@
 import csv
-from models import model
+from sportorg.models import model
 
 
 class WinOrientCSV:

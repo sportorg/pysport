@@ -1,9 +1,9 @@
 from tkinter import Label, BOTH
 from tkinter import ttk
-from so_gui import table
-from models import model
-from so_widget import dialog
-from language import _
+from sportorg.ttk import table
+from sportorg.models import model
+from sportorg.widget import dialog
+from sportorg.language import _
 
 
 class Sportident(ttk.Frame):

@@ -4,15 +4,15 @@ from tkinter import filedialog, messagebox
 
 import configparser
 
-from models import model
-from so_gui.bar import StatusBar, ToolBar
-from so_widget import frame
-from so_widget import dialog
+from sportorg.models import model
+from sportorg.ttk.bar import StatusBar, ToolBar
+from sportorg.widget import frame
+from sportorg.widget import dialog
 import config
-from language import _, get_languages
+from sportorg.language import _, get_languages
 
-from so_import.winorient.csv_import import WinOrientCSV
-from so_import.winorient.wdb_import import WinOrientBinary
+from sportorg.so_import.winorient.csv_import import WinOrientCSV
+from sportorg.so_import.winorient.wdb_import import WinOrientBinary
 
 
 class App(ttk.Frame):
