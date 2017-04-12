@@ -18,9 +18,7 @@ from so_import.winorient.wdb_import import WinOrientBinary
 class App(ttk.Frame):
     def __init__(self, master=None, file=None):
         """
-        :param master:
         :type master: Tk
-        :param file: Путь к файлу
         :type file: str
         """
         super().__init__(master)
@@ -33,6 +31,7 @@ class App(ttk.Frame):
         self.current_tab = 3
         self.status = None
 
+    def mainloop(self, **kwargs):
         self.initialize_db()
         self.create_db()
         self.pack()
@@ -42,8 +41,6 @@ class App(ttk.Frame):
         self._toolbar()
         self._main_frame()
         self.set_bind()
-
-    def mainloop(self, **kwargs):
         super().mainloop(**kwargs)
 
     def _widget(self):
