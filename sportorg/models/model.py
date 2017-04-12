@@ -146,9 +146,9 @@ class Person(BaseModel):
 
 
 class Entry(BaseModel):
-    entry_date = DateTimeField()
-    entry_author = ForeignKeyField(Person, null=True)
-    entry_team = ForeignKeyField(Organization, null=True)
+    date = DateTimeField()
+    author = ForeignKeyField(Person, null=True)
+    team = ForeignKeyField(Organization, null=True)
 
 
 class ControlCard(BaseModel):
