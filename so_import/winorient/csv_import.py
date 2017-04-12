@@ -1,5 +1,5 @@
 import csv
-import model
+from models import model
 
 
 class WinOrientCSV:

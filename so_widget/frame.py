@@ -1,8 +1,8 @@
 from tkinter import Label, BOTH
 from tkinter import ttk
-import table
-import model
-import dialog
+from so_gui import table
+from models import model
+from so_widget import dialog
 from language import _
 
 

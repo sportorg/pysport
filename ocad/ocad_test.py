@@ -1,5 +1,5 @@
 import unittest
-from ocad import *
+from ocad import ocad
 
 
 class TestStringMethods(unittest.TestCase):

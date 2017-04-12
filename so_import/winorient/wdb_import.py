@@ -1,6 +1,6 @@
-import model
-from model import RaceStatus
-from wdb import WDB
+from models import model
+from models.model import RaceStatus
+from winorient.wdb import WDB
 
 
 class WinOrientBinary:

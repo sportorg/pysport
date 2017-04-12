@@ -4,15 +4,15 @@ from tkinter import filedialog, messagebox
 
 import configparser
 
-import model
-from bar import StatusBar, ToolBar
-import appframe
-import dialog
+from models import model
+from so_gui.bar import StatusBar, ToolBar
+from so_widget import frame
+from so_widget import dialog
 import config
 from language import _, get_languages
 
-import appimport
-from wdb_appimport import WinOrientBinary
+from so_import.winorient.csv_import import WinOrientCSV
+from so_import.winorient.wdb_import import WinOrientBinary
 
 
 class App(ttk.Frame):
@@ -134,13 +134,13 @@ class App(ttk.Frame):
         self.nb = ttk.Notebook(self.master)
         self.nb.pack(fill='both', expand=True)
 
-        self.nb.add(appframe.Sportident(self), text=_("Sportident"))
-        self.nb.add(appframe.Event(self), text=_("Event"))
-        self.nb.add(appframe.Course(self), text=_("Course"))
-        self.nb.add(appframe.Person(self), text=_("Person"))
-        self.nb.add(appframe.Start(self), text=_("Start list"))
-        self.nb.add(appframe.Finish(self), text=_("Finish list"))
-        self.nb.add(appframe.Live(self), text=_("Live"))
+        self.nb.add(frame.Sportident(self), text=_("Sportident"))
+        self.nb.add(frame.Event(self), text=_("Event"))
+        self.nb.add(frame.Course(self), text=_("Course"))
+        self.nb.add(frame.Person(self), text=_("Person"))
+        self.nb.add(frame.Start(self), text=_("Start list"))
+        self.nb.add(frame.Finish(self), text=_("Finish list"))
+        self.nb.add(frame.Live(self), text=_("Live"))
         self.nb.select(self.current_tab)
 
     def _status_bar(self):
@@ -248,7 +248,7 @@ class App(ttk.Frame):
         file = filedialog.askopenfilename(filetypes=ftypes)
         if not len(file):
             return
-        wo_csv = appimport.WinOrientCSV(file=file)
+        wo_csv = WinOrientCSV(file=file)
         wo_csv.run()
         if wo_csv.is_complete:
             self.refresh()
@@ -272,27 +272,28 @@ class App(ttk.Frame):
         self.db.connect()
 
     def create_db(self):
-        self.db.create_tables([
-            model.Qualification,
-            model.Fee,
-            model.RelayTeam,
-            model.RaceStatus,
-            model.Race,
-            model.Course,
-            model.CoursePart,
-            model.CourseControl,
-            model.ResultStatus,
-            model.Country,
-            model.Contact,
-            model.Address,
-            model.Organization,
-            model.Person,
-            model.Entry,
-            model.ControlCard,
-            model.Group,
-            model.Participation,
-            model.Result,
-            model.RelayTeamLeg,
-            model.LegCoursePart,
-            model.OnlineControlTime
-        ], safe=True)
+        with self.db.atomic():
+            self.db.create_tables([
+                model.Qualification,
+                model.Fee,
+                model.RelayTeam,
+                model.RaceStatus,
+                model.Race,
+                model.Course,
+                model.CoursePart,
+                model.CourseControl,
+                model.ResultStatus,
+                model.Country,
+                model.Contact,
+                model.Address,
+                model.Organization,
+                model.Person,
+                model.Entry,
+                model.ControlCard,
+                model.Group,
+                model.Participation,
+                model.Result,
+                model.RelayTeamLeg,
+                model.LegCoursePart,
+                model.OnlineControlTime
+            ], safe=True)

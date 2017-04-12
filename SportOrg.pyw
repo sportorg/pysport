@@ -1,7 +1,7 @@
 from tkinter import Tk
 import sys
 
-from app import App
+from so_widget.app import App
 
 
 def main(argv):

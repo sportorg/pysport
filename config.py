@@ -36,6 +36,3 @@ def img_dir(*paths):
 
 def icon_dir(*paths):
     return os.path.join(ICON_DIR, *paths)
-
-
-QUAL = ('б/р', 'IIIю', 'IIю', 'Iю', 'III', 'II', 'I', 'КМС', 'МС', 'МСМК', 'ЗМС',)
