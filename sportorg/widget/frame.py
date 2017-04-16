@@ -36,7 +36,7 @@ class Person(ttk.Frame):
         self.pack()
         self.parent = parent
         person_header = ["id", "name", "surname", "team", "year", "qual"]
-        self.t = table.Table(self, person_header, ysb=True, popup=True)
+        self.t = table.Table(self, person_header, ysb=True, xsb=True, popup=True)
         self._main()
 
     def _main(self):

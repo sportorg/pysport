@@ -237,6 +237,13 @@ class Table(ttk.Frame):
         if not self._table_options['ysb']:
             self._ysb.grid_forget()
 
+    def _configure_xsb(self):
+
+        self._xsb.grid(row=1, column=0, sticky=EW)
+        self._tree.configure(xscroll=self._xsb.set)
+        if not self._table_options['xsb']:
+            self._xsb.grid_forget()
+
     def _configure_popup(self):
 
         self._tree.bind('<Button-3>', self._display_popup)
@@ -272,6 +279,7 @@ class Table(ttk.Frame):
         self._configure_frame()
         self._configure_popup()
         self._configure_ysb()
+        self._configure_xsb()
 
     def _display_popup(self, event):
 
@@ -306,6 +314,8 @@ class Table(ttk.Frame):
 
             if key == 'ysb':
                 self._configure_ysb()
+            elif key == 'xsb':
+                self._configure_xsb()
             elif key == 'popup':
                 self._configure_popup()
             elif key == 'padding':
