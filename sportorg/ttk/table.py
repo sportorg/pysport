@@ -133,6 +133,8 @@ class Table(ttk.Frame):
         values = []
         for column in self.columns:
             value = row.get(column)
+            if value is None:
+                value = ''
             values.append(value)
         self._tree.insert('', END, values=values)
 
@@ -333,7 +335,8 @@ class Table(ttk.Frame):
     def get_tree(self):
         return self._tree
 
-    def is_numeric(self, s):
+    @staticmethod
+    def is_numeric(s):
         """test if a string is numeric"""
         numeric = False
         for c in s:
@@ -347,7 +350,11 @@ class Table(ttk.Frame):
         if self.is_numeric(data[0][0]):
             # change child to a float
             for child, col in data:
-                new_data.append((float(child), col))
+                if child is '':
+                    new_data.append((0, col))
+                else:
+                    new_data.append((float(child), col))
+
             return new_data
         return data
 
