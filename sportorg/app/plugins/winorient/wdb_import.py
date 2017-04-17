@@ -1,6 +1,6 @@
-from sportorg.models import model
-from sportorg.models.model import RaceStatus
-from sportorg.winorient.wdb import WDB
+from sportorg.app.models import model
+from sportorg.app.models.model import RaceStatus
+from sportorg.lib.winorient.wdb import WDB
 
 
 class WinOrientBinary:

@@ -1,5 +1,5 @@
 import csv
-from sportorg.models import model
+from sportorg.app.models import model
 import time
 
 

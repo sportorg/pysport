@@ -1,3 +1,4 @@
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtCore import QSize
 import configparser
@@ -20,6 +21,7 @@ class MainWindow(QMainWindow):
     def init_ui(self):
         self.setMinimumSize(QSize(480, 320))
         self.setGeometry(480, 320, 480, 320)
+        self.setWindowIcon(QIcon(config.ICON))
         self.setWindowTitle("SportOrg")
 
     def closeEvent(self, *args, **kwargs):

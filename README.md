@@ -1,12 +1,13 @@
 # SportOrg
 
 ### Build
-`pyinstaller.exe --onefile -windowed --icon=img/icon/sportorg.ico SportOrg.pyw`
+`python setup.py build`
 
-For build, you need `pyinstaller`
+For build, you need `cx_Freeze`
 
 ### Packages
 
+- PyQt5
 - [sireader](https://pypi.python.org/pypi/sireader/1.0.1)
 - [peewee](http://docs.peewee-orm.com/en/latest/peewee/quickstart.html)
 
@@ -30,14 +31,12 @@ pip install sireader
             LC_MESSAGES/
                 sportorg.mo
                 sportorg.po
+    sportorg/
+        app/
+            controller/
+            models/
+            view/
+            plugin/
+        lib/
 ```
 
-! For work need all folders
-
-### Project
-
-```
-SportOrg.pyw - point of entry;
-app.py - main class;
-appframe.py - tabs.
-```
