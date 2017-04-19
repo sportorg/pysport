@@ -1,14 +1,14 @@
 import sys
 
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWidgets import QApplication, QMainWindow
 
 from sportorg.app.controller.main import MainWindow
 
 
 def main(argv):
     app = QApplication(argv)
-    mw = MainWindow()
-    mw.show()
+    main_window = MainWindow(argv)
+    main_window.show()
     sys.exit(app.exec())
 
 
