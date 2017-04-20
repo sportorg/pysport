@@ -1,5 +1,8 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow
+
+from sportorg.app.controller.tabs import start_preparation, groups, teams, race_results, courses
+
 import configparser
 
 import config
@@ -15,6 +18,7 @@ class MainWindow(object):
         self.setup_ui()
         self.setup_menu()
         self.setup_toolbar()
+        self.setup_tab()
         self.setup_statusbar()
         self.mainwindow.show()
 
@@ -168,3 +172,18 @@ class MainWindow(object):
         self.statusbar = QtWidgets.QStatusBar()
         self.mainwindow.setStatusBar(self.statusbar)
         self.statusbar.showMessage(_("it works!"), 5000)
+
+    def setup_tab(self):
+        self.centralwidget = QtWidgets.QWidget(self.mainwindow)
+        layout = QtWidgets.QVBoxLayout(self.centralwidget)
+        self.tabwidget = QtWidgets.QTabWidget(self.centralwidget)
+        layout.addWidget(self.tabwidget)
+        self.mainwindow.setCentralWidget(self.centralwidget)
+
+        self.tabwidget.addTab(start_preparation.Widget(), _("Start Preparation"))
+        self.tabwidget.addTab(race_results.Widget(), _("Race Results"))
+        self.tabwidget.addTab(groups.Widget(), _("Groups"))
+        self.tabwidget.addTab(courses.Widget(), _("Courses"))
+        self.tabwidget.addTab(teams.Widget(), _("Teams"))
+
+
