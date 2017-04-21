@@ -1,0 +1,396 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>start_preparation_dialog</class>
+ <widget class="QDialog" name="start_preparation_dialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>639</width>
+    <height>317</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <widget class="QDialogButtonBox" name="button_box">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>280</y>
+     <width>341</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+   </property>
+  </widget>
+  <widget class="QGroupBox" name="reserve_group_box">
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>0</y>
+     <width>311</width>
+     <height>121</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Reserves insert</string>
+   </property>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>19</x>
+      <y>20</y>
+      <width>254</width>
+      <height>97</height>
+     </rect>
+    </property>
+    <layout class="QFormLayout" name="reserve_layout">
+     <item row="1" column="0">
+      <widget class="QLabel" name="reserve_prefix_label">
+       <property name="text">
+        <string>Reserve prefix</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLineEdit" name="lineEdit">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>Reserve</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="reserve_group_count_label">
+       <property name="text">
+        <string>Reserves per group, ps</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QSpinBox" name="reserve_group_count_spin_box">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="reserve_group_percent_label">
+       <property name="text">
+        <string>Reserves per group, %</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QSpinBox" name="reserve_group_percent_spin_box">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="maximum">
+        <number>100</number>
+       </property>
+       <property name="singleStep">
+        <number>5</number>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0" colspan="2">
+      <widget class="QCheckBox" name="reserve_check_box">
+       <property name="text">
+        <string>Insert reserves</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QProgressBar" name="progress_bar">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>250</y>
+     <width>621</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="value">
+    <number>24</number>
+   </property>
+  </widget>
+  <widget class="QGroupBox" name="draw_group_box">
+   <property name="geometry">
+    <rect>
+     <x>323</x>
+     <y>0</y>
+     <width>311</width>
+     <height>121</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Draw</string>
+   </property>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>16</y>
+      <width>128</width>
+      <height>88</height>
+     </rect>
+    </property>
+    <layout class="QFormLayout" name="draw_layout">
+     <item row="0" column="0">
+      <widget class="QCheckBox" name="draw_check_box">
+       <property name="text">
+        <string>Draw</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QCheckBox" name="draw_groups_check_box">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>Split by start groups</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QCheckBox" name="draw_teams_check_box">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>Split by teams</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QCheckBox" name="draw_regions_check_box">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>Split by regions</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="start_group_box">
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>120</y>
+     <width>311</width>
+     <height>121</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Start time</string>
+   </property>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>18</x>
+      <y>16</y>
+      <width>210</width>
+      <height>94</height>
+     </rect>
+    </property>
+    <layout class="QFormLayout" name="start_layout">
+     <item row="0" column="0" colspan="2">
+      <widget class="QCheckBox" name="start_check_box">
+       <property name="text">
+        <string>Change start time</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="start_first_label">
+       <property name="text">
+        <string>First start in corridor</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QTimeEdit" name="start_first_time_edit">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QRadioButton" name="start_interval_radio_button">
+       <property name="text">
+        <string>Fixed start interval</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QTimeEdit" name="start_interval_time_edit">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0" colspan="2">
+      <widget class="QRadioButton" name="start_group_settings_radion_button">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>Take start interval from group settings</string>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="numbers_group_box">
+   <property name="geometry">
+    <rect>
+     <x>322</x>
+     <y>120</y>
+     <width>311</width>
+     <height>121</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Start numbers</string>
+   </property>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>19</x>
+      <y>17</y>
+      <width>218</width>
+      <height>70</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="numbers_vert_layout">
+     <item>
+      <widget class="QCheckBox" name="numbers_check_box">
+       <property name="text">
+        <string>Change start numbers</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="numbers_interval_hor_layout">
+       <item>
+        <widget class="QRadioButton" name="numbers_interval_radio_button">
+         <property name="text">
+          <string>First number </string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QSpinBox" name="numbers_first_spin_box">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="numbers_interval_label">
+         <property name="text">
+          <string>interval</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QSpinBox" name="numbers_interval_spin_box">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="numbers_minute_radio_button">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>Number = corridor + minute</string>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <zorder>layoutWidget</zorder>
+   <zorder>numbers_minute_radio_button</zorder>
+   <zorder>numbers_interval_radio_button</zorder>
+   <zorder>numbers_first_spin_box</zorder>
+   <zorder>numbers_interval_label</zorder>
+   <zorder>numbers_interval_spin_box</zorder>
+   <zorder>numbers_interval_radio_button</zorder>
+  </widget>
+  <zorder>button_box</zorder>
+  <zorder>reserve_group_box</zorder>
+  <zorder>progress_bar</zorder>
+  <zorder>draw_group_box</zorder>
+  <zorder>radioButton_2</zorder>
+  <zorder>start_group_box</zorder>
+  <zorder>numbers_group_box</zorder>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>button_box</sender>
+   <signal>accepted()</signal>
+   <receiver>start_preparation_dialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>button_box</sender>
+   <signal>rejected()</signal>
+   <receiver>start_preparation_dialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
