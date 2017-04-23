@@ -1,5 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow
+import sireader
 
 from sportorg.app.controller.tabs import start_preparation, groups, teams, race_results, courses
 
@@ -7,12 +8,18 @@ import configparser
 
 import config
 from sportorg.language import _, get_languages
+from sportorg.app.models import model
 
 
 class MainWindow(object):
     def __init__(self, argv=None):
+        try:
+            self.file = argv[1]
+        except IndexError:
+            self.file = None
         self.mainwindow = QMainWindow()
         self.conf = configparser.ConfigParser()
+        self.db = model.database_proxy
 
     def show(self):
         self.setup_ui()
@@ -20,6 +27,8 @@ class MainWindow(object):
         self.setup_toolbar()
         self.setup_tab()
         self.setup_statusbar()
+        self.initialize_db()
+        self.create_db()
         self.mainwindow.show()
 
     def setup_ui(self):
@@ -152,7 +161,7 @@ class MainWindow(object):
         self.action_iof__xml_v3.setText(_("IOF XML v3"))
         self.action_cvs.setText(_("CVS "))
         self.action_help.setText(_("Help"))
-        self.action_about_us.setText(_("About us"))
+        self.action_about_us.setText(_("About"))
 
     def setup_toolbar(self):
         layout = QtWidgets.QVBoxLayout()
@@ -185,5 +194,40 @@ class MainWindow(object):
         self.tabwidget.addTab(groups.Widget(), _("Groups"))
         self.tabwidget.addTab(courses.Widget(), _("Courses"))
         self.tabwidget.addTab(teams.Widget(), _("Teams"))
+
+    def initialize_db(self):
+        if self.file is None:
+            database = model.SqliteDatabase(":memory:")
+        else:
+            database = model.SqliteDatabase(self.file)
+        self.db.initialize(database)
+        self.db.connect()
+
+    def create_db(self):
+        with self.db.atomic():
+            self.db.create_tables([
+                model.Qualification,
+                model.Fee,
+                model.RelayTeam,
+                model.RaceStatus,
+                model.Race,
+                model.Course,
+                model.CoursePart,
+                model.CourseControl,
+                model.ResultStatus,
+                model.Country,
+                model.Contact,
+                model.Address,
+                model.Organization,
+                model.Person,
+                model.Entry,
+                model.ControlCard,
+                model.Group,
+                model.Participation,
+                model.Result,
+                model.RelayTeamLeg,
+                model.LegCoursePart,
+                model.OnlineControlTime
+            ], safe=True)
 
 
