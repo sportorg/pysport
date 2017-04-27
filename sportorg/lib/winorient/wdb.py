@@ -50,6 +50,10 @@ def bytes_compare(obj1, obj2):
     :param obj1:
     :param obj2:
     """
+    release = 0
+    if release == 1:
+        return False
+
     if len(obj1) != len(obj2):
         print('COMPARE: different length: %d and %d' % (len(obj1), len(obj2)))
 
@@ -824,7 +828,6 @@ class WDBAdventure:
         self.scores_cart_mode = 0
         self.correct_minutes = 0
 
-
     def parse_bytes(self, byte_array):
         """
         Read object from the byte array
@@ -1087,3 +1090,12 @@ class WDB:
             ret.append(0)
 
         return ret
+
+
+def parse_wdb(file_path):
+    wdb_file = open(file_path, 'rb')
+    byte_array = wdb_file.read()
+    wdb_object = WDB()
+    wdb_object.parse_bytes(byte_array)
+
+    return wdb_object

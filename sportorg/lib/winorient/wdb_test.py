@@ -2,7 +2,7 @@ import struct
 import unittest
 
 
-from sportorg.lib.winorient.wdb import WDBPunch, WDBFinish, WDBChip, WDBTeam, WDBDistance, WDBGroup, WDBMan, WDB
+from sportorg.lib.winorient.wdb import WDBPunch, WDBFinish, WDBChip, WDBTeam, WDBDistance, WDBGroup, WDBMan, parse_wdb
 
 
 class TestStringMethods(unittest.TestCase):
@@ -109,16 +109,14 @@ class TestStringMethods(unittest.TestCase):
 
     def test_WDB_read_file(self):
         file_path = 'C:\\tmp\\test.wdb'
-        wdb_file = open(file_path, 'rb')
-        byte_array = wdb_file.read()
-        wdb_object = WDB()
-        wdb_object.parse_bytes(byte_array)
+        wdb_object = parse_wdb(file_path)
 
         file_path_out = file_path.replace('.wdb', '_out.wdb')
         wdb_file_out = open(file_path_out, 'wb')
         test_out = wdb_object.get_bytes()
         wdb_file_out.write(test_out)
         wdb_file_out.close()
-        byte_array_out = (open(file_path_out, 'rb')).read()
+        byte_array_in = open(file_path, 'rb').read()
+        byte_array_out = open(file_path_out, 'rb').read()
 
-        self.assertEqual(byte_array, byte_array_out)
+        self.assertEqual(byte_array_in, byte_array_out)
