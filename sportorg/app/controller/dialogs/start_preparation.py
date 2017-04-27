@@ -1,30 +1,26 @@
+# -*- coding: utf-8 -*-
+
+# Form implementation generated from reading ui file 'dialog_start_preparation.ui'
+#
+# Created by: PyQt5 UI code generator 5.8.2
+#
+# WARNING! All changes made in this file will be lost!
+
 import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QApplication, QDialog
-
-from sportorg.language import _
-import config
+from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog
 
 
-class StartPreparationDialog(object):
-    def __init__(self):
-        self.dialog = QDialog()
-
-    def show(self):
-        self.setup_ui()
-        self.dialog.show()
-
-    def setup_ui(self):
-        self.dialog.setObjectName("dialog")
-        self.dialog.setWindowIcon(QtGui.QIcon(config.ICON))
-        self.dialog.resize(639, 317)
-        self.dialog.setFixedSize(self.dialog.size())
-        self.button_box = QtWidgets.QDialogButtonBox(self.dialog)
+class Ui_start_preparation_dialog(object):
+    def setupUi(self, start_preparation_dialog):
+        start_preparation_dialog.setObjectName("start_preparation_dialog")
+        start_preparation_dialog.resize(639, 317)
+        self.button_box = QtWidgets.QDialogButtonBox(start_preparation_dialog)
         self.button_box.setGeometry(QtCore.QRect(40, 280, 341, 32))
         self.button_box.setOrientation(QtCore.Qt.Horizontal)
         self.button_box.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
         self.button_box.setObjectName("button_box")
-        self.reserve_group_box = QtWidgets.QGroupBox(self.dialog)
+        self.reserve_group_box = QtWidgets.QGroupBox(start_preparation_dialog)
         self.reserve_group_box.setGeometry(QtCore.QRect(8, 0, 311, 121))
         self.reserve_group_box.setObjectName("reserve_group_box")
         self.widget = QtWidgets.QWidget(self.reserve_group_box)
@@ -59,11 +55,11 @@ class StartPreparationDialog(object):
         self.reserve_check_box = QtWidgets.QCheckBox(self.widget)
         self.reserve_check_box.setObjectName("reserve_check_box")
         self.reserve_layout.setWidget(0, QtWidgets.QFormLayout.SpanningRole, self.reserve_check_box)
-        self.progress_bar = QtWidgets.QProgressBar(self.dialog)
+        self.progress_bar = QtWidgets.QProgressBar(start_preparation_dialog)
         self.progress_bar.setGeometry(QtCore.QRect(10, 250, 621, 23))
         self.progress_bar.setProperty("value", 24)
         self.progress_bar.setObjectName("progress_bar")
-        self.draw_group_box = QtWidgets.QGroupBox(self.dialog)
+        self.draw_group_box = QtWidgets.QGroupBox(start_preparation_dialog)
         self.draw_group_box.setGeometry(QtCore.QRect(323, 0, 311, 121))
         self.draw_group_box.setObjectName("draw_group_box")
         self.widget1 = QtWidgets.QWidget(self.draw_group_box)
@@ -87,7 +83,7 @@ class StartPreparationDialog(object):
         self.draw_regions_check_box.setEnabled(False)
         self.draw_regions_check_box.setObjectName("draw_regions_check_box")
         self.draw_layout.setWidget(3, QtWidgets.QFormLayout.LabelRole, self.draw_regions_check_box)
-        self.start_group_box = QtWidgets.QGroupBox(self.dialog)
+        self.start_group_box = QtWidgets.QGroupBox(start_preparation_dialog)
         self.start_group_box.setGeometry(QtCore.QRect(8, 120, 311, 121))
         self.start_group_box.setObjectName("start_group_box")
         self.widget2 = QtWidgets.QWidget(self.start_group_box)
@@ -119,7 +115,7 @@ class StartPreparationDialog(object):
         self.start_group_settings_radion_button.setChecked(False)
         self.start_group_settings_radion_button.setObjectName("start_group_settings_radion_button")
         self.start_layout.setWidget(3, QtWidgets.QFormLayout.SpanningRole, self.start_group_settings_radion_button)
-        self.numbers_group_box = QtWidgets.QGroupBox(self.dialog)
+        self.numbers_group_box = QtWidgets.QGroupBox(start_preparation_dialog)
         self.numbers_group_box.setGeometry(QtCore.QRect(322, 120, 311, 121))
         self.numbers_group_box.setObjectName("numbers_group_box")
         self.widget3 = QtWidgets.QWidget(self.numbers_group_box)
@@ -167,42 +163,44 @@ class StartPreparationDialog(object):
         self.start_group_box.raise_()
         self.numbers_group_box.raise_()
 
-        self.retranslateUi()
-        self.button_box.accepted.connect(self.dialog.accept)
-        self.button_box.rejected.connect(self.dialog.reject)
-        QtCore.QMetaObject.connectSlotsByName(self.dialog)
+        self.retranslateUi(start_preparation_dialog)
+        self.button_box.accepted.connect(start_preparation_dialog.accept)
+        self.button_box.rejected.connect(start_preparation_dialog.reject)
+        QtCore.QMetaObject.connectSlotsByName(start_preparation_dialog)
 
-    def retranslateUi(self):
+    def retranslateUi(self, start_preparation_dialog):
         _translate = QtCore.QCoreApplication.translate
-        self.dialog.setWindowTitle(_("Dialog"))
-        self.reserve_group_box.setTitle(_("Reserves insert"))
-        self.reserve_prefix_label.setText(_("Reserve prefix"))
-        self.lineEdit.setText(_("Reserve"))
-        self.reserve_group_count_label.setText(_("Reserves per group, ps"))
-        self.reserve_group_percent_label.setText(_("Reserves per group, %"))
-        self.reserve_check_box.setText(_("Insert reserves"))
-        self.draw_group_box.setTitle(_("Draw"))
-        self.draw_check_box.setText(_("Draw"))
-        self.draw_groups_check_box.setText(_("Split by start groups"))
-        self.draw_teams_check_box.setText(_("Split by teams"))
-        self.draw_regions_check_box.setText(_("Split by regions"))
-        self.start_group_box.setTitle(_("Start time"))
-        self.start_check_box.setText(_("Change start time"))
-        self.start_first_label.setText(_("First start in corridor"))
-        self.start_interval_radio_button.setText(_("Fixed start interval"))
-        self.start_group_settings_radion_button.setText(_("Take start interval from group settings"))
-        self.numbers_group_box.setTitle(_("Start numbers"))
-        self.numbers_check_box.setText(_("Change start numbers"))
-        self.numbers_interval_radio_button.setText(_("First number"))
-        self.numbers_interval_label.setText(_("interval"))
-        self.numbers_minute_radio_button.setText(_("Number = corridor + minute"))
-
+        start_preparation_dialog.setWindowTitle(_translate("start_preparation_dialog", "Dialog"))
+        self.reserve_group_box.setTitle(_translate("start_preparation_dialog", "Reserves insert"))
+        self.reserve_prefix_label.setText(_translate("start_preparation_dialog", "Reserve prefix"))
+        self.lineEdit.setText(_translate("start_preparation_dialog", "Reserve"))
+        self.reserve_group_count_label.setText(_translate("start_preparation_dialog", "Reserves per group, ps"))
+        self.reserve_group_percent_label.setText(_translate("start_preparation_dialog", "Reserves per group, %"))
+        self.reserve_check_box.setText(_translate("start_preparation_dialog", "Insert reserves"))
+        self.draw_group_box.setTitle(_translate("start_preparation_dialog", "Draw"))
+        self.draw_check_box.setText(_translate("start_preparation_dialog", "Draw"))
+        self.draw_groups_check_box.setText(_translate("start_preparation_dialog", "Split by start groups"))
+        self.draw_teams_check_box.setText(_translate("start_preparation_dialog", "Split by teams"))
+        self.draw_regions_check_box.setText(_translate("start_preparation_dialog", "Split by regions"))
+        self.start_group_box.setTitle(_translate("start_preparation_dialog", "Start time"))
+        self.start_check_box.setText(_translate("start_preparation_dialog", "Change start time"))
+        self.start_first_label.setText(_translate("start_preparation_dialog", "First start in corridor"))
+        self.start_interval_radio_button.setText(_translate("start_preparation_dialog", "Fixed start interval"))
+        self.start_group_settings_radion_button.setText(_translate("start_preparation_dialog", "Take start interval from group settings"))
+        self.numbers_group_box.setTitle(_translate("start_preparation_dialog", "Start numbers"))
+        self.numbers_check_box.setText(_translate("start_preparation_dialog", "Change start numbers"))
+        self.numbers_interval_radio_button.setText(_translate("start_preparation_dialog", "First number "))
+        self.numbers_interval_label.setText(_translate("start_preparation_dialog", "interval"))
+        self.numbers_minute_radio_button.setText(_translate("start_preparation_dialog", "Number = corridor + minute"))
 
 def main(argv):
     app = QApplication(argv)
-    mw = StartPreparationDialog()
+    mw = QDialog()
+    obj = Ui_start_preparation_dialog()
+    obj.setupUi(mw)
     mw.show()
     sys.exit(app.exec())
+
 
 if __name__ == '__main__':
     main(sys.argv)
