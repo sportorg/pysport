@@ -1,4 +1,5 @@
 from typing import IO
+from xml.etree import ElementTree
 
 
 class ClassesV8:
@@ -35,6 +36,8 @@ class ClassesV8:
             content = file.readlines()
         self._data = [x.strip() for x in content]
         self.clear()
+
+        return self
 
     @property
     def data(self):
@@ -105,3 +108,14 @@ class CoursesText:
 
     def __init__(self, file):
         self.file = file
+
+
+class IofXMLv3:
+    def __init__(self, tree=None):
+        assert tree, ElementTree
+        self._tree = tree
+
+    def parse(self, source):
+        self._tree = ElementTree.parse(source)
+
+        return self
