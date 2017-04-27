@@ -1,4 +1,5 @@
 from typing import IO
+from xml.etree import ElementTree
 
 
 class ClassesV8:
@@ -22,7 +23,7 @@ class ClassesV8:
         self._courses = []
         self._groups = set()
 
-    def read_file(self, file):
+    def parse(self, file):
         if not isinstance(file, str) and not isinstance(file, IO):
             raise TypeError("file is not str or IO")
         if isinstance(file, str):
@@ -35,6 +36,8 @@ class ClassesV8:
             content = file.readlines()
         self._data = [x.strip() for x in content]
         self.clear()
+
+        return self
 
     @property
     def data(self):
@@ -95,6 +98,12 @@ class ClassesV8:
         return course
 
 
+def parse_txt_v8(source):
+    classes_v8 = ClassesV8()
+
+    return classes_v8.parse(source)
+
+
 class CoursesText:
     """
     Example:
@@ -105,3 +114,20 @@ class CoursesText:
 
     def __init__(self, file):
         self.file = file
+
+
+class IofXMLv3:
+    def __init__(self, tree=None):
+        assert tree, ElementTree
+        self._tree = tree
+
+    def parse(self, source):
+        self._tree = ElementTree.parse(source)
+
+        return self
+
+
+def parse_xml_v3(source):
+    iof_xml_v3 = IofXMLv3()
+
+    return iof_xml_v3.parse(source)
