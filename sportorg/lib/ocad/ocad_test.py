@@ -5,13 +5,12 @@ from sportorg.lib.ocad import ocad
 class TestStringMethods(unittest.TestCase):
 
     def setUp(self):
-        self.classes_v8 = ocad.ClassesV8()
         file = ""
-        self.classes_v8.read_file(file)
+        self.classes_v8 = ocad.parse_txt_v8(file)
 
-    # def test_v8_read_file(self):
+    # def test_v8_parse(self):
     #     file = ""
-    #     self.classes_v8.read_file(file)
+    #     self.classes_v8.parse(file)
 
     def test_courses(self):
         print(self.classes_v8.courses)
