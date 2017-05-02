@@ -11,9 +11,10 @@ class AbstractSportOrgTableModel (QAbstractTableModel):
     """
     Used to specify common table behavior
     """
+    pass
 
-class PersonTableModel (AbstractSportOrgTableModel):
 
+class PersonTableModel(AbstractSportOrgTableModel):
     def __init__(self):
         super().__init__()
         self.model = None
@@ -32,7 +33,6 @@ class PersonTableModel (AbstractSportOrgTableModel):
         count = 30
         return count
 
-
     def columnCount(self, parent=None, *args, **kwargs):
         return 4
 
@@ -47,7 +47,6 @@ class PersonTableModel (AbstractSportOrgTableModel):
             return QVariant(answer);
 
         return QVariant();
-
 
     def getPersonData(self, position):
         ret = list()
