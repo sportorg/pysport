@@ -1,14 +1,16 @@
+import time
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow
-import sireader
 
 from sportorg.app.controller.tabs import start_preparation, groups, teams, race_results, courses
 
 import configparser
 
 import config
-from sportorg.language import _, get_languages
+from sportorg.language import _
 from sportorg.app.models import model
+
+from sportorg.app.plugins.winorient import winorient
 
 
 class MainWindow(object):
@@ -36,7 +38,6 @@ class MainWindow(object):
         self.mainwindow.setGeometry(480, 320, 480, 320)
         self.mainwindow.setWindowIcon(QtGui.QIcon(config.ICON))
         self.mainwindow.setWindowTitle(_(config.NAME))
-        self.mainwindow.setObjectName("MainWindow")
         self.mainwindow.resize(880, 474)
         self.mainwindow.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.mainwindow.setDockNestingEnabled(False)
@@ -47,67 +48,42 @@ class MainWindow(object):
     def setup_menu(self):
         self.menubar = QtWidgets.QMenuBar(self.mainwindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 880, 21))
-        self.menubar.setObjectName("menubar")
         self.menu_file = QtWidgets.QMenu(self.menubar)
-        self.menu_file.setObjectName("menuFile")
         self.menu_import = QtWidgets.QMenu(self.menu_file)
-        self.menu_import.setObjectName("menuImport")
         self.menu_start_preparation = QtWidgets.QMenu(self.menubar)
-        self.menu_start_preparation.setObjectName("menuStart_preparation")
         self.menu_race = QtWidgets.QMenu(self.menubar)
-        self.menu_race.setObjectName("menuRace")
         self.menu_help = QtWidgets.QMenu(self.menubar)
-        self.menu_help.setObjectName("menuHelp")
         self.menu_results = QtWidgets.QMenu(self.menubar)
-        self.menu_results.setObjectName("menuResults")
         self.menu_edit = QtWidgets.QMenu(self.menubar)
-        self.menu_edit.setObjectName("menuEdit")
         self.menu_tools = QtWidgets.QMenu(self.menubar)
-        self.menu_tools.setObjectName("menuTools")
         self.menu_service = QtWidgets.QMenu(self.menubar)
-        self.menu_service.setObjectName("menuService")
         self.menu_options = QtWidgets.QMenu(self.menubar)
-        self.menu_options.setObjectName("menuOptions")
         self.mainwindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(self.mainwindow)
-        self.statusbar.setObjectName("statusbar")
         self.mainwindow.setStatusBar(self.statusbar)
         self.action_save = QtWidgets.QAction(self.mainwindow)
-        self.action_save.setObjectName("actionSave")
         self.action_open = QtWidgets.QAction(self.mainwindow)
-        self.action_open.setObjectName("actionOpen")
         self.action_quit = QtWidgets.QAction(self.mainwindow)
-        self.action_quit.setObjectName("actionQuit")
         self.action_new = QtWidgets.QAction(self.mainwindow)
-        self.action_new.setObjectName("actionNew")
         self.action_new__race = QtWidgets.QAction(self.mainwindow)
-        self.action_new__race.setObjectName("actionNew_Race")
         self.action_save_as = QtWidgets.QAction(self.mainwindow)
-        self.action_save_as.setObjectName("actionSave_as")
         self.action_open__resent = QtWidgets.QAction(self.mainwindow)
-        self.action_open__resent.setObjectName("actionOpen_Resent")
         self.action_settings = QtWidgets.QAction(self.mainwindow)
-        self.action_settings.setObjectName("actionSettings")
         self.action_event__settings = QtWidgets.QAction(self.mainwindow)
-        self.action_event__settings.setObjectName("actionEvent_Settings")
         self.action_export = QtWidgets.QAction(self.mainwindow)
-        self.action_export.setObjectName("actionExport")
         self.action_csv__winorient = QtWidgets.QAction(self.mainwindow)
-        self.action_csv__winorient.setObjectName("actionCSV_Winorient")
         self.action_wdb__winorient = QtWidgets.QAction(self.mainwindow)
-        self.action_wdb__winorient.setObjectName("actionWDB_Winorient")
         self.action_iof__xml_v3 = QtWidgets.QAction(self.mainwindow)
-        self.action_iof__xml_v3.setObjectName("actionIOF_XML_v3")
         self.action_cvs = QtWidgets.QAction(self.mainwindow)
-        self.action_cvs.setObjectName("actionCVS")
+        self.action_ocad_classesv8 = QtWidgets.QAction(self.mainwindow)
         self.action_help = QtWidgets.QAction(self.mainwindow)
-        self.action_help.setObjectName("actionHelp")
         self.action_about_us = QtWidgets.QAction(self.mainwindow)
-        self.action_about_us.setObjectName("actionAbout_us")
         self.menu_import.addAction(self.action_cvs)
         self.menu_import.addAction(self.action_csv__winorient)
         self.menu_import.addAction(self.action_wdb__winorient)
         self.menu_import.addAction(self.action_iof__xml_v3)
+        self.menu_import.addSeparator()
+        self.menu_import.addAction(self.action_ocad_classesv8)
         self.menu_file.addAction(self.action_new)
         self.menu_file.addAction(self.action_new__race)
         self.menu_file.addAction(self.action_save)
@@ -134,32 +110,49 @@ class MainWindow(object):
         self.menubar.addAction(self.menu_options.menuAction())
         self.menubar.addAction(self.menu_help.menuAction())
         self.menu_file.setTitle(_("File"))
-        self.menu_import.setTitle(_("Import"))
-        self.menu_start_preparation.setTitle(_("Start preparation"))
-        self.menu_race.setTitle(_("Race"))
-        self.menu_help.setTitle(_("Help"))
-        self.menu_results.setTitle(_("Results"))
-        self.menu_edit.setTitle(_("Edit"))
-        self.menu_tools.setTitle(_("Tools"))
-        self.menu_service.setTitle(_("Service"))
-        self.menu_options.setTitle(_("Options"))
+        self.action_new.setText(_("New"))
+        self.action_new.setIcon(QtGui.QIcon(config.icon_dir("file.png")))
+        self.action_new.triggered.connect(self.create_file)
         self.action_save.setText(_("Save"))
         self.action_save.setShortcut("Ctrl+S")
+        self.action_save.setIcon(QtGui.QIcon(config.icon_dir("save.png")))
         self.action_open.setText(_("Open"))
         self.action_open.setShortcut("Ctrl+O")
-        self.action_quit.setText(_("Exit"))
-        self.action_new.setText(_("New"))
+        self.action_open.triggered.connect(self.open_file)
+        self.action_open.setIcon(QtGui.QIcon(config.icon_dir("folder.png")))
         self.action_new.setShortcut("Ctrl+N")
         self.action_new__race.setText(_("New Race"))
         self.action_save_as.setText(_("Save as"))
         self.action_open__resent.setText(_("Open Recent"))
         self.action_settings.setText(_("Settings"))
         self.action_event__settings.setText(_("Event Settings"))
-        self.action_export.setText(_("Export"))
+        self.menu_import.setTitle(_("Import"))
+        self.action_cvs.setText(_("CVS "))
+        self.action_cvs.setIcon(QtGui.QIcon(config.icon_dir("csv.png")))
         self.action_csv__winorient.setText(_("CSV Winorient"))
+        self.action_csv__winorient.setIcon(QtGui.QIcon(config.icon_dir("csv.png")))
+        self.action_csv__winorient.triggered.connect(self.import_wo_csv)
         self.action_wdb__winorient.setText(_("WDB Winorient"))
         self.action_iof__xml_v3.setText(_("IOF XML v3"))
-        self.action_cvs.setText(_("CVS "))
+        self.action_ocad_classesv8.setText(_("Ocad txt v8"))
+        self.action_export.setText(_("Export"))
+        self.action_quit.setText(_("Exit"))
+
+        self.menu_edit.setTitle(_("Edit"))
+
+        self.menu_start_preparation.setTitle(_("Start preparation"))
+
+        self.menu_race.setTitle(_("Race"))
+
+        self.menu_results.setTitle(_("Results"))
+
+        self.menu_tools.setTitle(_("Tools"))
+
+        self.menu_service.setTitle(_("Service"))
+
+        self.menu_options.setTitle(_("Options"))
+
+        self.menu_help.setTitle(_("Help"))
         self.action_help.setText(_("Help"))
         self.action_about_us.setText(_("About"))
 
@@ -168,9 +161,11 @@ class MainWindow(object):
         self.toolbar = self.mainwindow.addToolBar("File")
 
         new = QtWidgets.QAction(QtGui.QIcon(config.icon_dir("file.png")), "new", self.mainwindow)
+        new.triggered.connect(self.create_file)
         self.toolbar.addAction(new)
 
         open = QtWidgets.QAction(QtGui.QIcon(config.icon_dir("folder.png")), "open", self.mainwindow)
+        open.triggered.connect(self.open_file)
         self.toolbar.addAction(open)
         save = QtWidgets.QAction(QtGui.QIcon(config.icon_dir("save.png")), "save", self.mainwindow)
         self.toolbar.addAction(save)
@@ -230,4 +225,28 @@ class MainWindow(object):
                 model.OnlineControlTime
             ], safe=True)
 
+    def create_file(self):
+        file_name = QtWidgets.QFileDialog.getSaveFileName(self.mainwindow,'Create SportOrg file',
+                                            '/' + str(time.strftime("%Y%m%d")), "SportOrg file (*.sportorg)")[0]
+        if file_name is not '':
+            self.mainwindow.setWindowTitle(file_name)
+            self.file = file_name
+            self.initialize_db()
+            self.create_db()
 
+    def save_file(self):
+        pass
+
+    def open_file(self):
+        file_name = QtWidgets.QFileDialog.getOpenFileName(self.mainwindow, 'Open SportOrg file',
+                                                          '/',
+                                                          "SportOrg file (*.sportorg)")[0]
+        if file_name is not '':
+            self.mainwindow.setWindowTitle(file_name)
+            self.file = file_name
+            self.initialize_db()
+
+    def import_wo_csv(self):
+        file_name = QtWidgets.QFileDialog.getOpenFileName(self.mainwindow, 'Open CSV Winorient file',
+                                            '', "CSV Winorient (*.csv)")[0]
+        winorient.import_csv(file_name)

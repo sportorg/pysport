@@ -32,6 +32,8 @@ class CSVReader:
         except FileNotFoundError:
             raise FileNotFoundError("Not fount " + source)
 
+        return self
+
     @property
     def data(self):
         return self._data
