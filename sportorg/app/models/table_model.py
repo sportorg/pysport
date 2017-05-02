@@ -44,9 +44,9 @@ class PersonTableModel(AbstractSportOrgTableModel):
             except:
                 print(sys.exc_info())
 
-            return QVariant(answer);
+            return QVariant(answer)
 
-        return QVariant();
+        return QVariant()
 
     def getPersonData(self, position):
         ret = list()
@@ -55,4 +55,5 @@ class PersonTableModel(AbstractSportOrgTableModel):
         ret.append(person.surname)
         ret.append(person.year)
         ret.append(person.qual)
+
         return ret
