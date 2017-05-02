@@ -51,6 +51,9 @@ class CSVReader:
         if len(str(person[1]).split(' ')) == 2:
             person_dict['name'] = str(person[1]).split(' ')[1]
             person_dict['surname'] = str(person[1]).split(' ')[0]
+        elif len(str(person[1]).split(' ')) > 2:
+            person_dict['name'] = str(person[1]).split(' ', 1)[1]
+            person_dict['surname'] = str(person[1]).split(' ', 1)[0]
         else:
             person_dict['name'] = person[1]
             person_dict['surname'] = ''
