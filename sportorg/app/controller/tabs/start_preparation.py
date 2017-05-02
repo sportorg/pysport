@@ -149,3 +149,6 @@ class Widget(QtWidgets.QWidget):
         # item = QtWidgets.QTableWidgetItem()
         # self.EntryTable.setHorizontalHeaderItem(14, item)
         self.entry_layout.addWidget(self.EntrySplitter)
+
+    def get_table(self):
+        return self.EntryTable

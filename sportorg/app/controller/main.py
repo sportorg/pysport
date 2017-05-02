@@ -1,5 +1,8 @@
 import time
+
+import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import QPoint, QSortFilterProxyModel
 from PyQt5.QtWidgets import QMainWindow
 
 from sportorg.app.controller.tabs import start_preparation, groups, teams, race_results, courses
@@ -7,6 +10,7 @@ from sportorg.app.controller.tabs import start_preparation, groups, teams, race_
 import configparser
 
 import config
+from sportorg.app.models.table_model import PersonTableModel
 from sportorg.language import _
 from sportorg.app.models import model
 
@@ -253,6 +257,12 @@ class MainWindow(object):
                                             '', "CSV Winorient (*.csv)")[0]
         if file_name is not '':
             winorient.import_csv(file_name)
+            # self.tabwidget.update(start_preparation.Widget())
+            try:
+                table = self.tabwidget.findChild(QtWidgets.QTableView, 'EntryTable')
+                table.model().setSourceModel(PersonTableModel())
+            except:
+                print (sys.exc_info())
 
     def import_ocad_txt_v8(self):
         file_name = QtWidgets.QFileDialog.getOpenFileName(self.mainwindow, 'Open Ocad txt v8 file',
