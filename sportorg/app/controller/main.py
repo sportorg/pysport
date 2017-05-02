@@ -25,13 +25,13 @@ class MainWindow(object):
         self.db = model.database_proxy
 
     def show(self):
+        self.initialize_db()
+        self.create_db()
         self.setup_ui()
         self.setup_menu()
         self.setup_toolbar()
         self.setup_tab()
         self.setup_statusbar()
-        self.initialize_db()
-        self.create_db()
         self.mainwindow.show()
 
     def setup_ui(self):
