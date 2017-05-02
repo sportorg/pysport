@@ -2,6 +2,29 @@ from typing import IO
 from xml.etree import ElementTree
 
 
+class CourseControl:
+    order = ''
+    code = ''
+    length = ''
+
+    def __init__(self, **kwargs):
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+
+class Course:
+    group = ''
+    type = ''
+    bib = ''
+    climb = 0
+    length = 0
+    controls = []
+
+    def __init__(self, **kwargs):
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+
 class ClassesV8:
     """
     Example:
@@ -59,7 +82,7 @@ class ClassesV8:
     def groups(self):
         if not len(self._groups):
             for course in self.courses:
-                self._groups.add(course['group'])
+                self._groups.add(course.group)
 
         return self._groups
 
@@ -69,13 +92,13 @@ class ClassesV8:
             raise TypeError("item is not string or list")
         if isinstance(item, str):
             item = str(item).split(';')
-        courses = {}
+        courses = []
         courses_split = item[5:]
         courses_split.insert(0, '0')
         limit = len(courses_split)
         i = 0
         while (2*i + 1) < limit:
-            courses[i] = {"code": courses_split[2*i + 1], "length": courses_split[2*i]}
+            courses.append(CourseControl(**{"order": i, "code": courses_split[2*i + 1], "length": courses_split[2*i]}))
             i += 1
 
         return courses
@@ -91,11 +114,11 @@ class ClassesV8:
             "type": item[1],
             "bib": item[2],
             "length": item[3],
-            "height": item[4],
-            "course": ClassesV8.get_courses(item)
+            "climb": item[4],
+            "controls": ClassesV8.get_courses(item)
         }
 
-        return course
+        return Course(**course)
 
 
 def parse_txt_v8(source):

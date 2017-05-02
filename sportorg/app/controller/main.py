@@ -11,6 +11,7 @@ from sportorg.language import _
 from sportorg.app.models import model
 
 from sportorg.app.plugins.winorient import winorient
+from sportorg.app.plugins.ocad import ocad
 
 
 class MainWindow(object):
@@ -75,7 +76,7 @@ class MainWindow(object):
         self.action_wdb__winorient = QtWidgets.QAction(self.mainwindow)
         self.action_iof__xml_v3 = QtWidgets.QAction(self.mainwindow)
         self.action_cvs = QtWidgets.QAction(self.mainwindow)
-        self.action_ocad_classesv8 = QtWidgets.QAction(self.mainwindow)
+        self.action_ocad_txt_v8 = QtWidgets.QAction(self.mainwindow)
         self.action_help = QtWidgets.QAction(self.mainwindow)
         self.action_about_us = QtWidgets.QAction(self.mainwindow)
         self.menu_import.addAction(self.action_cvs)
@@ -83,7 +84,7 @@ class MainWindow(object):
         self.menu_import.addAction(self.action_wdb__winorient)
         self.menu_import.addAction(self.action_iof__xml_v3)
         self.menu_import.addSeparator()
-        self.menu_import.addAction(self.action_ocad_classesv8)
+        self.menu_import.addAction(self.action_ocad_txt_v8)
         self.menu_file.addAction(self.action_new)
         self.menu_file.addAction(self.action_new__race)
         self.menu_file.addAction(self.action_save)
@@ -134,7 +135,8 @@ class MainWindow(object):
         self.action_csv__winorient.triggered.connect(self.import_wo_csv)
         self.action_wdb__winorient.setText(_("WDB Winorient"))
         self.action_iof__xml_v3.setText(_("IOF XML v3"))
-        self.action_ocad_classesv8.setText(_("Ocad txt v8"))
+        self.action_ocad_txt_v8.setText(_("Ocad txt v8"))
+        self.action_ocad_txt_v8.triggered.connect(self.import_ocad_txt_v8)
         self.action_export.setText(_("Export"))
         self.action_quit.setText(_("Exit"))
 
@@ -249,4 +251,11 @@ class MainWindow(object):
     def import_wo_csv(self):
         file_name = QtWidgets.QFileDialog.getOpenFileName(self.mainwindow, 'Open CSV Winorient file',
                                             '', "CSV Winorient (*.csv)")[0]
-        winorient.import_csv(file_name)
+        if file_name is not '':
+            winorient.import_csv(file_name)
+
+    def import_ocad_txt_v8(self):
+        file_name = QtWidgets.QFileDialog.getOpenFileName(self.mainwindow, 'Open Ocad txt v8 file',
+                                                          '', "Ocad classes v8 (*.txt)")[0]
+        if file_name is not '':
+            ocad.import_txt_v8(file_name)

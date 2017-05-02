@@ -74,9 +74,9 @@ class CourseControl(BaseModel):
     order = IntegerField()
     map_text = CharField(null=True)
     leg_length = DoubleField(null=True)
-    score = DoubleField()
-    is_online = BooleanField()  # specify if the control is used as radio/TV control
-    status = CharField()  # enabled / disabled - e.g. was stolen, broken
+    score = DoubleField(null=True)
+    is_online = BooleanField(default=False)  # specify if the control is used as radio/TV control
+    status = CharField(default="enabled")  # enabled / disabled - e.g. was stolen, broken
 
 
 class ResultStatus(BaseModel):
