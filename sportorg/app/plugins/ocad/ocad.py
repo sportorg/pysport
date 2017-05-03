@@ -8,7 +8,7 @@ import config
 def import_txt_v8(source):
     classes_v8 = ocad.parse_txt_v8(source)
     diff = time.time()
-    logging.basicConfig(**config.LOG_KWARGS, level=logging.DEBUG if config.DEBUG else logging.WARNING)
+    logging.basicConfig(**config.LOG_CONFIG, level=logging.DEBUG if config.DEBUG else logging.WARNING)
     logging.info("Start")
 
     for course in classes_v8.courses:

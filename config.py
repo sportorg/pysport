@@ -60,4 +60,4 @@ LOCALE_DIR = base_dir('languages')
 
 FORMAT = '%(asctime)-15s - %(filename)s - %(levelname)s - %(message)s'
 
-LOG_KWARGS = dict(filename=log_dir(NAME.lower() + str(time.strftime("%Y%m%d")) + '.log'), format=FORMAT)
+LOG_CONFIG = dict(filename=log_dir(NAME.lower() + str(time.strftime("%Y%m%d")) + '.log'), format=FORMAT)
