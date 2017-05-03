@@ -16,6 +16,9 @@ from sportorg.app.models import model
 
 from sportorg.app.plugins.winorient import winorient
 from sportorg.app.plugins.ocad import ocad
+import logging
+
+logging.basicConfig(**config.LOG_CONFIG, level=logging.DEBUG if config.DEBUG else logging.WARNING)
 
 
 class MainWindow(object):

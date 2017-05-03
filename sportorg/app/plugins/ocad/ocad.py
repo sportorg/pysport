@@ -1,14 +1,12 @@
 from sportorg.lib.ocad import ocad
 from sportorg.app.models import model
-import time
 import logging
-import config
+import time
 
 
 def import_txt_v8(source):
     classes_v8 = ocad.parse_txt_v8(source)
     diff = time.time()
-    logging.basicConfig(**config.LOG_CONFIG, level=logging.DEBUG if config.DEBUG else logging.WARNING)
     logging.info("Start")
 
     for course in classes_v8.courses:
