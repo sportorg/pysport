@@ -1,28 +1,52 @@
 from typing import IO
 from xml.etree import ElementTree
+from abc import ABCMeta
 
 
-class CourseControl:
+class Item:
+    __metaclass__ = ABCMeta
+
+    def __init__(self, **kwargs):
+        self.init(**kwargs)
+
+    def init(self, **kwargs):
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+
+
+class CourseControl(Item):
     order = ''
     code = ''
     length = ''
 
     def __init__(self, **kwargs):
-        for key, value in kwargs.items():
-            setattr(self, key, value)
+        super().__init__(**kwargs)
 
 
-class Course:
+class CourseControlDict(dict):
+    def __len__(self) -> int:
+        return len(self.keys())-1 if len(self.keys())-1 >= 0 else len(self.keys())
+
+
+class Course(Item):
     group = ''
     type = ''
     bib = ''
     climb = 0
     length = 0
-    controls = []
+    controls = CourseControlDict()
 
     def __init__(self, **kwargs):
-        for key, value in kwargs.items():
-            setattr(self, key, value)
+        super().__init__(**kwargs)
+
+
+class CourseList(list):
+    def append(self, course: Course) -> None:
+        super().append(course)
+
+    def __getitem__(self, i: int) -> Course:
+        return super().__getitem__(i)
 
 
 class ClassesV8:
@@ -39,11 +63,11 @@ class ClassesV8:
         if data is None:
             data = []
         self._data = data
-        self._courses = []
+        self._courses = CourseList()
         self._groups = set()
 
     def clear(self):
-        self._courses = []
+        self._courses = CourseList()
         self._groups = set()
 
     def parse(self, file):
@@ -70,9 +94,9 @@ class ClassesV8:
         return self._data
 
     @property
-    def courses(self):
+    def courses(self) -> CourseList:
         if not len(self._courses):
-            self._courses = []
+            self._courses = CourseList()
             for item in self.data:
                 self._courses.append(self.get_course(item))
 
@@ -92,13 +116,13 @@ class ClassesV8:
             raise TypeError("item is not string or list")
         if isinstance(item, str):
             item = str(item).split(';')
-        courses = []
+        courses = CourseControlDict()
         courses_split = item[5:]
         courses_split.insert(0, '0')
         limit = len(courses_split)
         i = 0
         while (2*i + 1) < limit:
-            courses.append(CourseControl(**{"order": i, "code": courses_split[2*i + 1], "length": courses_split[2*i]}))
+            courses[i] = CourseControl(**{"order": i, "code": courses_split[2*i + 1], "length": courses_split[2*i]})
             i += 1
 
         return courses

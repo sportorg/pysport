@@ -17,7 +17,7 @@ def import_txt_v8(source):
             race=1
         )
         with model.database_proxy.atomic():
-            for control in course.controls:
+            for order, control in course.controls.items():
                 model.CourseControl.create(
                     course=c.id,
                     control=control.code,

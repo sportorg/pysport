@@ -20,7 +20,10 @@ class TestStringMethods(unittest.TestCase):
 
     def test_get_item(self):
         print(ocad.ClassesV8.get_courses("M16;Normal Course;0;5.700;130;S1;0.216;47;0.216;120;0.280;115;0.229;F1"))
-        print(ocad.ClassesV8.get_course("M16;Normal Course;0;5.700;130;S1;0.216;47;0.216;120;0.229;F1".split(";")))
+        print(len(ocad.ClassesV8.get_courses("M16;Normal Course;0;5.700;130;S1;0.216;47;0.216;120;0.280;115;0.229;F1")))
+        course = ocad.ClassesV8.get_course("M16;Normal Course;0;5.700;130;S1;0.216;47;0.216;120;0.229;F1".split(";"))
+        for order, c in course.controls.items():
+            print(c.code)
         with self.assertRaises(TypeError):
             ocad.ClassesV8.get_courses({})
         with self.assertRaises(TypeError):
