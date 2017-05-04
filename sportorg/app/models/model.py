@@ -187,6 +187,7 @@ class Participation(BaseModel):
     person = ForeignKeyField(Person)
     control_card = ForeignKeyField(ControlCard, null=True)
     bib_number = IntegerField(null=True)
+    start_time = DateTimeField(null=True)  # formal start time
     comment = CharField(null=True)  # comment (taken from the entry or entered manually)
     entry = ForeignKeyField(Entry, null=True)  # connection with the Entry object
     start_group = IntegerField(null=True)  # used in drawing, to specify red/ping and other start groups
