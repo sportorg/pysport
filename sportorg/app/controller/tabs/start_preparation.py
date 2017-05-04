@@ -1,7 +1,11 @@
+import logging
+
+import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QSortFilterProxyModel
-from PyQt5.QtWidgets import QAbstractItemView
+from PyQt5.QtWidgets import QAbstractItemView, QHeaderView, QListView, QTableView
 
+from sportorg.app.controller.dialogs.entry_edit import EntryEditDialog
 from sportorg.app.models.table_model import PersonTableModel
 from sportorg.language import _, get_languages
 
@@ -99,56 +103,34 @@ class Widget(QtWidgets.QWidget):
         proxy_model.setSourceModel(PersonTableModel())
         self.EntryTable.setModel(proxy_model)
         self.EntryTable.setSortingEnabled(True)
-        self.EntryTable.horizontalHeader().setSectionsMovable(True)
         self.EntryTable.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.EntryTable.horizontalHeader().setDropIndicatorShown(True)
+
+        hor_reader = self.EntryTable.horizontalHeader()
+        assert (isinstance(hor_reader, QHeaderView))
+        hor_reader.setSectionsMovable(True)
+        hor_reader.setDropIndicatorShown(True)
+        hor_reader.setSectionResizeMode(QHeaderView.ResizeToContents)
+
+        def show_edit_dialog(self, index):
+            EntryEditDialog()
+
+        def entry_double_clicked(index):
+            print('clicked on ' + str(index.row()))
+            logging.info('clicked on ' + str(index.row()))
+            # show_edit_dialog(index)
+            try:
+                dialog = EntryEditDialog(self.EntryTable, index)
+            except:
+                print (sys.exc_info())
+
+            dialog.exec()
 
 
-        # self.EntryTable.setColumnCount(15)
-        # self.EntryTable.setRowCount(6)
-        # item = QtWidgets.QTableWidgetItem()
-        # self.EntryTable.setVerticalHeaderItem(0, item)
-        # item = QtWidgets.QTableWidgetItem()
-        # self.EntryTable.setVerticalHeaderItem(1, item)
-        # item = QtWidgets.QTableWidgetItem()
-        # self.EntryTable.setVerticalHeaderItem(2, item)
-        # item = QtWidgets.QTableWidgetItem()
-        # self.EntryTable.setVerticalHeaderItem(3, item)
-        # item = QtWidgets.QTableWidgetItem()
-        # self.EntryTable.setVerticalHeaderItem(4, item)
-        # item = QtWidgets.QTableWidgetItem()
-        # self.EntryTable.setVerticalHeaderItem(5, item)
-        # item = QtWidgets.QTableWidgetItem()
-        # self.EntryTable.setHorizontalHeaderItem(0, item)
-        # item = QtWidgets.QTableWidgetItem()
-        # self.EntryTable.setHorizontalHeaderItem(1, item)
-        # item = QtWidgets.QTableWidgetItem()
-        # self.EntryTable.setHorizontalHeaderItem(2, item)
-        # item = QtWidgets.QTableWidgetItem()
-        # self.EntryTable.setHorizontalHeaderItem(3, item)
-        # item = QtWidgets.QTableWidgetItem()
-        # self.EntryTable.setHorizontalHeaderItem(4, item)
-        # item = QtWidgets.QTableWidgetItem()
-        # self.EntryTable.setHorizontalHeaderItem(5, item)
-        # item = QtWidgets.QTableWidgetItem()
-        # self.EntryTable.setHorizontalHeaderItem(6, item)
-        # item = QtWidgets.QTableWidgetItem()
-        # self.EntryTable.setHorizontalHeaderItem(7, item)
-        # item = QtWidgets.QTableWidgetItem()
-        # self.EntryTable.setHorizontalHeaderItem(8, item)
-        # item = QtWidgets.QTableWidgetItem()
-        # self.EntryTable.setHorizontalHeaderItem(9, item)
-        # item = QtWidgets.QTableWidgetItem()
-        # self.EntryTable.setHorizontalHeaderItem(10, item)
-        # item = QtWidgets.QTableWidgetItem()
-        # self.EntryTable.setHorizontalHeaderItem(11, item)
-        # item = QtWidgets.QTableWidgetItem()
-        # self.EntryTable.setHorizontalHeaderItem(12, item)
-        # item = QtWidgets.QTableWidgetItem()
-        # self.EntryTable.setHorizontalHeaderItem(13, item)
-        # item = QtWidgets.QTableWidgetItem()
-        # self.EntryTable.setHorizontalHeaderItem(14, item)
+
+
+        self.EntryTable.doubleClicked.connect(entry_double_clicked)
         self.entry_layout.addWidget(self.EntrySplitter)
 
     def get_table(self):
         return self.EntryTable
+
