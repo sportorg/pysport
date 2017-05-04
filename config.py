@@ -61,3 +61,15 @@ LOCALE_DIR = base_dir('languages')
 FORMAT = '%(asctime)-15s - %(filename)s - %(levelname)s - %(message)s'
 
 LOG_CONFIG = dict(filename=log_dir(NAME.lower() + str(time.strftime("%Y%m%d")) + '.log'), format=FORMAT)
+
+DIRS = [
+    IMG_DIR,
+    ICON_DIR,
+    DATA_DIR,
+    LOCALE_DIR,
+    LOG_DIR
+]
+
+for DIR in DIRS:
+    if not os.path.exists(DIR):
+        os.makedirs(DIR)
