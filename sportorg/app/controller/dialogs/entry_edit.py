@@ -2,7 +2,7 @@ import sys
 from mailbox import _ProxyFile
 
 from PyQt5 import QtCore
-from PyQt5.QtCore import QSortFilterProxyModel, QModelIndex
+from PyQt5.QtCore import QSortFilterProxyModel, QModelIndex, QTime
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QWidget, QFormLayout, QLabel, \
     QLineEdit, QComboBox, QCompleter, QSpinBox, QApplication, QTimeEdit, QTextEdit, QCheckBox, QTableView, QDialog, \
@@ -13,7 +13,8 @@ from future.backports.urllib.robotparser import Entry
 from peewee import Proxy
 
 from sportorg.app.models import model
-from sportorg.app.models.model import Group, Organization, Participation
+from sportorg.app.models.model import Group, Organization, Participation, ControlCard
+from sportorg.app.models.table_model import PersonTableModel
 
 
 def get_groups():
@@ -281,7 +282,6 @@ class EntryEditDialog(QDialog):
         def apply_changes():
             try:
                 self.apply_changes_impl()
-
             except:
                 print(sys.exc_info())
             self.close()
@@ -315,6 +315,7 @@ class EntryEditDialog(QDialog):
             widget.setValue(new_year)
 
     def set_values_from_table(self, table, index):
+        self.table = table
         assert (isinstance(table, QTableView))
         model = table.model()
         assert (isinstance(model, QSortFilterProxyModel))
@@ -338,6 +339,8 @@ class EntryEditDialog(QDialog):
             self.item_qual.setCurrentText(current_object.person.qual)
         if current_object.bib_number is not None:
             self.item_bib.setValue(current_object.bib_number)
+        if current_object.start_time is not None:
+            self.item_start.setTime(QTime.fromString(current_object.start_time, 'HH:mm:ss'))
 
         if current_object.control_card is not None:
             self.item_card.setValue(int(current_object.control_card.value))
@@ -352,9 +355,37 @@ class EntryEditDialog(QDialog):
         if object.person.surname != self.item_surname.text():
             object.person.surname = self.item_surname.text()
             changed = True
+        if object.group.name != self.item_group.currentText():
+            object.group = Group.select().where(Group.name == self.item_group.currentText())[0]
+            changed = True
+        if object.person.team.name != self.item_team.currentText():
+            object.person.team = Organization.select().where(Organization.name == self.item_team.currentText())[0]
+            changed = True
+        if object.person.year != str(self.item_year.value()):
+            object.person.year = str(self.item_year.value())
+            changed = True
+        if object.person.qual != self.item_qual.currentText():
+            object.person.qual = self.item_qual.currentText()
+            changed = True
+        if object.bib_number != self.item_bib.text():
+            object.bib_number = self.item_bib.text()
+            changed = True
+        if object.start_time != self.item_start.text():
+            object.start_time = self.item_start.text()
+            changed = True
+        if object.control_card is None or object.control_card.value != self.item_card.text():
+            card = ControlCard(name='SPORTIDENT', value=self.item_card.text()).     get_or_create()[0]
+            object.control_card = card # TODO remove previous card?
+            changed = True
+
         if changed :
-            object.person.update()
-            object.update()
+            object.person.save()
+            object.save()
+
+            # TODO do local row update, not to recreate whole table
+            self.table.model().setSourceModel(PersonTableModel())
+
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
