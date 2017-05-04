@@ -1,18 +1,14 @@
 import sys
-from mailbox import _ProxyFile
 
 from PyQt5 import QtCore
 from PyQt5.QtCore import QSortFilterProxyModel, QModelIndex, QTime
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QWidget, QFormLayout, QLabel, \
+from PyQt5.QtWidgets import QFormLayout, QLabel, \
     QLineEdit, QComboBox, QCompleter, QSpinBox, QApplication, QTimeEdit, QTextEdit, QCheckBox, QTableView, QDialog, \
     QPushButton
 from datetime import date
 
-from future.backports.urllib.robotparser import Entry
-from peewee import Proxy
 
-from sportorg.app.models import model
 from sportorg.app.models.model import Group, Organization, Participation, ControlCard
 from sportorg.app.models.table_model import PersonTableModel
 
@@ -37,6 +33,7 @@ def get_teams():
         return ret
     except:
         return ['', 'Тюменская обл.', 'Курганская обл.', 'Челябинская обл.', 'Республика Коми', 'г.Москва', 'ХМАО-Югра']
+
 
 def get_names():
     names = [
@@ -192,7 +189,6 @@ class AdvComboBox(QComboBox):
         self.lineEdit().textEdited.connect(filter_function)
         self.completer.activated.connect(self.on_completer_activated)
 
-
     # on selection of an item from the completer, select the corresponding item from combobox
     def on_completer_activated(self, text):
         if text:
@@ -213,7 +209,7 @@ class EntryEditDialog(QDialog):
     def init_ui(self):
         self.setWindowTitle('Entry properties')
         self.setWindowIcon(QIcon('sportorg.ico'))
-        self.setGeometry(100,100,350,500)
+        self.setGeometry(100, 100, 350, 500)
         self.setToolTip('Main Window')
 
         self.layout = QFormLayout(self)
@@ -307,7 +303,7 @@ class EntryEditDialog(QDialog):
         widget = self.sender()
         assert isinstance(widget, QSpinBox)
         year = int(widget.value())
-        if  0 < year < 100:
+        if 0 < year < 100:
             cur_year = date.today().year
             new_year = cur_year - cur_year % 100 + year
             if new_year > cur_year:
@@ -324,8 +320,8 @@ class EntryEditDialog(QDialog):
         orig_index_int = orig_index.row()
 
         query = Participation.select()
-        current_object = query [orig_index_int]
-        assert (isinstance(current_object, Participation))
+        current_object = query[orig_index_int]
+        assert(isinstance(current_object, Participation))
         self.current_object = current_object
         self.item_surname.setText(current_object.person.surname)
         self.item_name.setCurrentText(current_object.person.name)
@@ -347,48 +343,50 @@ class EntryEditDialog(QDialog):
 
     def apply_changes_impl(self):
         changed = False
-        object = self.current_object
-        assert (isinstance(object, Participation))
-        if  object.person.name != self.item_name.currentText():
-            object.person.name = self.item_name.currentText()
+        part = self.current_object
+        assert (isinstance(part, Participation))
+        if part.person.name != self.item_name.currentText():
+            part.person.name = self.item_name.currentText()
             changed = True
-        if object.person.surname != self.item_surname.text():
-            object.person.surname = self.item_surname.text()
+        if part.person.surname != self.item_surname.text():
+            part.person.surname = self.item_surname.text()
             changed = True
-        if object.group.name != self.item_group.currentText():
-            object.group = Group.select().where(Group.name == self.item_group.currentText())[0]
+        if part.group.name != self.item_group.currentText():
+            part.group = Group.select().where(Group.name == self.item_group.currentText())[0]
             changed = True
-        if object.person.team.name != self.item_team.currentText():
-            object.person.team = Organization.select().where(Organization.name == self.item_team.currentText())[0]
+        if part.person.team.name != self.item_team.currentText():
+            part.person.team = Organization.select().where(Organization.name == self.item_team.currentText())[0]
             changed = True
-        if object.person.year != str(self.item_year.value()):
-            object.person.year = str(self.item_year.value())
+        if part.person.year != str(self.item_year.value()):
+            part.person.year = str(self.item_year.value())
             changed = True
-        if object.person.qual != self.item_qual.currentText():
-            object.person.qual = self.item_qual.currentText()
+        if part.person.qual != self.item_qual.currentText():
+            part.person.qual = self.item_qual.currentText()
             changed = True
-        if object.bib_number != self.item_bib.text():
-            object.bib_number = self.item_bib.text()
+        if part.bib_number != self.item_bib.text():
+            part.bib_number = self.item_bib.text()
             changed = True
-        if object.start_time != self.item_start.text():
-            object.start_time = self.item_start.text()
+        if part.start_time != self.item_start.text():
+            part.start_time = self.item_start.text()
             changed = True
-        if object.control_card is None or object.control_card.value != self.item_card.text():
-            card = ControlCard(name='SPORTIDENT', value=self.item_card.text()).     get_or_create()[0]
-            object.control_card = card # TODO remove previous card?
+        if part.control_card is None or part.control_card.value != self.item_card.text():
+            card = ControlCard()
+            card.name = 'SPORTIDENT'
+            card.value = self.item_card.text()
+            card.person = part.person
+            card.save()
+            part.control_card = card  # TODO remove previous card?
             changed = True
 
-        if changed :
-            object.person.save()
-            object.save()
+        if changed:
+            part.person.save()
+            part.save()
 
             # TODO do local row update, not to recreate whole table
             self.table.model().setSourceModel(PersonTableModel())
-
 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = EntryEditDialog()
     sys.exit(app.exec_())
-
