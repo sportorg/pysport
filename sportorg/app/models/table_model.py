@@ -1,7 +1,12 @@
 import sys
+
+import logging
+
+import time
 from PyQt5 import QtCore
 
 from PyQt5.QtCore import QVariant, QAbstractTableModel
+from peewee import prefetch
 
 from sportorg.app.models import model
 from sportorg.app.models.model import Person, Participation, Group, Organization, ControlCard
@@ -67,7 +72,31 @@ class PersonTableModel(AbstractSportOrgTableModel):
 
         # create data only at first call - do only 1 select
         if self.data is None:
-            participation = Participation.select()
+            start = time.time()
+            # participation = Participation.select()
+            #
+            # query = (
+            #     Participation
+            #     .select(Participation, Person, Organization, Group, ControlCard)
+            #     .join(Person)
+            #     .join(Organization, JOIN_LEFT_OUTER)
+            #     .switch(Participation)
+            #     .join(Group, JOIN_LEFT_OUTER)
+            #     .switch(Participation)
+            #     .join(ControlCard, JOIN_LEFT_OUTER)
+            #     .aggregate_rows()
+            # )
+
+            query = prefetch(
+                Participation.select(),
+                Person.select(),
+                Organization.select(),
+                Group.select(),
+                ControlCard.select()
+            )
+
+            participation = query
+
             self.data = []
             for i in participation:
                 assert (isinstance(i, Participation))
@@ -91,7 +120,6 @@ class PersonTableModel(AbstractSportOrgTableModel):
                     card.is_rented = card.is_rented
                 assert (isinstance(person, Person))
 
-
                 self.data.append([
                     person.surname,
                     person.name,
@@ -107,6 +135,8 @@ class PersonTableModel(AbstractSportOrgTableModel):
                     person.world_code,
                     person.national_code
                 ])
+            end = time.time()
+            logging.info('Entry structure was created in ' + str(end - start) + ' s')
 
         ret = self.data[position]
         return ret
