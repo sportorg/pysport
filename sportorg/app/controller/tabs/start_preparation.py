@@ -1,13 +1,12 @@
 import logging
 
 import sys
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import QSortFilterProxyModel
-from PyQt5.QtWidgets import QAbstractItemView, QHeaderView, QListView, QTableView
+from PyQt5.QtWidgets import QAbstractItemView, QHeaderView
 
 from sportorg.app.controller.dialogs.entry_edit import EntryEditDialog
 from sportorg.app.models.table_model import PersonTableModel
-from sportorg.language import _, get_languages
 
 
 class Widget(QtWidgets.QWidget):
@@ -105,11 +104,11 @@ class Widget(QtWidgets.QWidget):
         self.EntryTable.setSortingEnabled(True)
         self.EntryTable.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        hor_reader = self.EntryTable.horizontalHeader()
-        assert (isinstance(hor_reader, QHeaderView))
-        hor_reader.setSectionsMovable(True)
-        hor_reader.setDropIndicatorShown(True)
-        hor_reader.setSectionResizeMode(QHeaderView.ResizeToContents)
+        hor_header = self.EntryTable.horizontalHeader()
+        assert (isinstance(hor_header, QHeaderView))
+        hor_header.setSectionsMovable(True)
+        hor_header.setDropIndicatorShown(True)
+        hor_header.setSectionResizeMode(QHeaderView.ResizeToContents)
 
         def show_edit_dialog(self, index):
             EntryEditDialog()
@@ -121,16 +120,12 @@ class Widget(QtWidgets.QWidget):
             try:
                 dialog = EntryEditDialog(self.EntryTable, index)
             except:
-                print (sys.exc_info())
+                print(sys.exc_info())
 
             dialog.exec()
-
-
-
 
         self.EntryTable.doubleClicked.connect(entry_double_clicked)
         self.entry_layout.addWidget(self.EntrySplitter)
 
     def get_table(self):
         return self.EntryTable
-

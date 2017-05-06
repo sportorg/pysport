@@ -46,9 +46,10 @@ class PersonTableModel(AbstractSportOrgTableModel):
 
     def data(self, index, role=None):
         if role == QtCore.Qt.DisplayRole:
-            answer = str(index.row()) + " " + str(index.column())
+            answer = str(index.row()) + ' ' + str(index.column())
+
             try:
-                answer = self.get_participation_data(index.row())[index.column()]
+                answer = self.get_participation_data(index.row()-1)[index.column()]
             except:
                 print(sys.exc_info())
 

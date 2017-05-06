@@ -2,9 +2,9 @@ import time
 
 import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import QPoint, QSortFilterProxyModel
 from PyQt5.QtWidgets import QMainWindow
 
+from sportorg.app.controller.dialogs.entry_filter import DialogFilter
 from sportorg.app.controller.tabs import start_preparation, groups, teams, race_results, courses
 
 import configparser
@@ -106,6 +106,8 @@ class MainWindow(object):
         self.menu_file.addAction(self.action_export)
         self.menu_file.addSeparator()
         self.menu_file.addAction(self.action_quit)
+        self.action_filter = QtWidgets.QAction(self.mainwindow)
+        self.menu_start_preparation.addAction(self.action_filter)
         self.menu_help.addAction(self.action_help)
         self.menu_help.addAction(self.action_about_us)
         self.menubar.addAction(self.menu_file.menuAction())
@@ -146,6 +148,9 @@ class MainWindow(object):
         self.action_ocad_txt_v8.triggered.connect(self.import_ocad_txt_v8)
         self.action_export.setText(_("Export"))
         self.action_quit.setText(_("Exit"))
+        self.action_filter.setText(_("Filter"))
+        self.action_filter.triggered.connect(self.filter_dialog)
+        self.action_filter.setShortcut("F2")
 
         self.menu_edit.setTitle(_("Edit"))
 
@@ -265,10 +270,18 @@ class MainWindow(object):
                 table = self.tabwidget.findChild(QtWidgets.QTableView, 'EntryTable')
                 table.model().setSourceModel(PersonTableModel())
             except:
-                print (sys.exc_info())
+                print(sys.exc_info())
 
     def import_ocad_txt_v8(self):
         file_name = QtWidgets.QFileDialog.getOpenFileName(self.mainwindow, 'Open Ocad txt v8 file',
                                                           '', "Ocad classes v8 (*.txt)")[0]
         if file_name is not '':
             ocad.import_txt_v8(file_name)
+
+    def filter_dialog(self):
+        try:
+            table = self.tabwidget.findChild(QtWidgets.QTableView, 'EntryTable')
+            ex = DialogFilter(table)
+            ex.exec()
+        except:
+            print(sys.exc_info())
