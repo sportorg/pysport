@@ -154,9 +154,9 @@ class Entry(BaseModel):
 class ControlCard(BaseModel):
     name = CharField()
     value = CharField()
-    person = ForeignKeyField(Person)
-    is_rented = BooleanField(null=True)  # either card is own or should be returned
-    is_returned = BooleanField(null=True)  # used to control the returning of rented cards
+    person = ForeignKeyField(Person, null=True)
+    is_rented = BooleanField(default=False)  # either card is own or should be returned
+    is_returned = BooleanField(null=True, default=False)  # used to control the returning of rented cards
 
 
 class Group(BaseModel):
@@ -195,7 +195,8 @@ class Participation(BaseModel):
 
 
 class Result(BaseModel):
-    participation = ForeignKeyField(Participation)
+    participation = ForeignKeyField(Participation, null=True)
+    control_card = ForeignKeyField(ControlCard, null=True)
     start_time = DateTimeField(null=True)
     finish_time = DateTimeField(null=True)
     penalty_time = TimeField(null=True)  # time of penalties (marked route, false start)

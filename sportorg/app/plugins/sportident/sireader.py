@@ -1,6 +1,8 @@
 import time
+import json
 import threading
 from sportorg.lib.sportident import sireader
+from sportorg.app.models import model
 
 
 class SIReaderThread(threading.Thread):
@@ -22,6 +24,22 @@ class SIReaderThread(threading.Thread):
                 print(card_number)
                 print(card_type)
                 print(card_data)
+                control_cards = model.ControlCard.select().where(
+                    model.ControlCard.name == 'SPORTIDENT',
+                    model.ControlCard.value == card_number
+                )
+                if len(control_cards) == 0:
+                    card = model.ControlCard.create(
+                        name='SPORTIDENT',
+                        value=card_number
+                    )
+                    model.Result.create(
+                        control_card=card,
+                        start_time=card_data['start'],
+                        finish_time=card_data['finish'],
+                        split_time=json.JSONEncoder().encode(card_data['punches'])
+                    )
+
                 # beep
                 si.ack_sicard()
                 if card_number == 1633208:
