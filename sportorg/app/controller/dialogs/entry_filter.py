@@ -7,10 +7,10 @@
 # WARNING! All changes made in this file will be lost!
 import sys
 from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtCore import QSortFilterProxyModel
 from PyQt5.QtWidgets import QApplication, QDialog, QTableView
 
 from sportorg.app.controller.dialogs import entry_edit
+from sportorg.app.models.table_model import PersonProxyModel
 
 
 class DialogFilter(QDialog):
@@ -70,14 +70,12 @@ class DialogFilter(QDialog):
         # apply filter here
         if self.table is not None:
             assert (isinstance(self.table, QTableView))
-            model = self.table.model()
-            assert (isinstance(model, QSortFilterProxyModel))
-            if len(self.group_combo.currentText()) > 0:
-                model.setFilterKeyColumn(4)
-                model.setFilterRegExp(self.group_combo.currentText())
-            if len(self.team_combo.currentText()) > 0:
-                model.setFilterKeyColumn(5)
-                model.setFilterRegExp(self.team_combo.currentText())
+            proxy_model = self.table.model()
+            assert (isinstance(proxy_model, PersonProxyModel))
+
+            proxy_model.clear_filter()
+            proxy_model.set_filter_for_column(4, self.group_combo.currentText())
+            proxy_model.set_filter_for_column(5, self.team_combo.currentText())
 
         self.close_dialog()
 

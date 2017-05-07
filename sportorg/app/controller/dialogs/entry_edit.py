@@ -8,9 +8,7 @@ from PyQt5.QtWidgets import QFormLayout, QLabel, \
     QPushButton
 from datetime import date
 
-
 from sportorg.app.models.model import Group, Organization, Participation, ControlCard
-from sportorg.app.models.table_model import PersonTableModel
 
 
 def get_groups():
@@ -312,6 +310,7 @@ class EntryEditDialog(QDialog):
 
     def set_values_from_table(self, table, index):
         self.table = table
+        self.current_index = index
         assert (isinstance(table, QTableView))
         model = table.model()
         assert (isinstance(model, QSortFilterProxyModel))
@@ -363,13 +362,14 @@ class EntryEditDialog(QDialog):
         if part.person.qual != self.item_qual.currentText():
             part.person.qual = self.item_qual.currentText()
             changed = True
-        if part.bib_number != self.item_bib.text():
+        if part.bib_number != self.item_bib.text() and self.item_bib.text() != '0':
             part.bib_number = self.item_bib.text()
             changed = True
         if part.start_time != self.item_start.text():
             part.start_time = self.item_start.text()
             changed = True
-        if part.control_card is None or part.control_card.value != self.item_card.text():
+        if (part.control_card is None or part.control_card.value != self.item_card.text()) \
+                and self.item_card.text() != '0':
             card = ControlCard()
             card.name = 'SPORTIDENT'
             card.value = self.item_card.text()
@@ -382,9 +382,8 @@ class EntryEditDialog(QDialog):
             part.person.save()
             part.save()
 
-            # TODO do local row update, not to recreate whole table
-            self.table.model().setSourceModel(PersonTableModel())
-
+            table = self.table
+            table.model().sourceModel().update_one_object(part, table.model().mapToSource(self.current_index).row())
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

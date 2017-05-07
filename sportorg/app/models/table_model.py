@@ -3,9 +3,8 @@ import sys
 import logging
 
 import time
-from PyQt5 import QtCore
 
-from PyQt5.QtCore import QVariant, QAbstractTableModel
+from PyQt5.QtCore import QVariant, QAbstractTableModel, Qt, QSortFilterProxyModel
 from peewee import prefetch
 
 from sportorg.app.models import model
@@ -21,8 +20,7 @@ class AbstractSportOrgTableModel (QAbstractTableModel):
 class PersonTableModel(AbstractSportOrgTableModel):
     def __init__(self):
         super().__init__()
-        self.model = None
-        self.data = None
+        self.values = None
         self.count = None
 
     def rowCount(self, parent=None, *args, **kwargs):
@@ -45,34 +43,34 @@ class PersonTableModel(AbstractSportOrgTableModel):
         return 13
 
     def data(self, index, role=None):
-        if role == QtCore.Qt.DisplayRole:
-            answer = str(index.row()) + ' ' + str(index.column())
-
+        if role == Qt.DisplayRole:
+            # start = time.time()
+            # answer = str(index.row()) + ' ' + str(index.column())
+            answer = ''
             try:
-                answer = self.get_participation_data(index.row()-1)[index.column()]
+                answer = self.get_participation_data(index.row())[index.column()]
             except:
                 print(sys.exc_info())
 
+            # end = time.time()
+            # logging.info('Data() ' + str(index.row()) + ' ' + str(index.column()) + ': ' + str(end - start) + ' s')
             return QVariant(answer)
 
         return QVariant()
 
-    def get_person_data(self, position):
+    def headerData(self, index, orientation, role=None):
 
-        # create data only at first call - do only 1 select
-        if self.data is None:
-            person = Person.select()
-            self.data = []
-            for i in person:
-                self.data.append([i.name, i.surname, i.year, i.qual, ])
-
-        current_person = self.data[position]
-        return current_person
+        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
+            columns = ['Surname', 'Name', 'Sex', 'Qualification', 'Group', 'Team', 'Year', 'Bib', 'Card', 'Rented card',
+                       'Comment', 'World code', 'National code']
+            return columns[index]
+            # _translate = QtCore.QCoreApplication.translate
+            # return _translate(columns[index]) TODO: add translation
 
     def get_participation_data(self, position):
 
         # create data only at first call - do only 1 select
-        if self.data is None:
+        if self.values is None:
             start = time.time()
             # participation = Participation.select()
             #
@@ -98,46 +96,89 @@ class PersonTableModel(AbstractSportOrgTableModel):
 
             participation = query
 
-            self.data = []
+            self.values = list()
             for i in participation:
-                assert (isinstance(i, Participation))
-                person = i.person
-                group = i.group
-                group_name = ''
-                if group is not None:
-                    assert (isinstance(group, Group))
-                    group_name = group.name
-                team = person.team
-                team_name = ''
-                if team is not None:
-                    assert (isinstance(team, Organization))
-                    team_name = team.name
-                card = i.control_card
-                card_value = ''
-                card_is_rented = ''
-                if card is not None:
-                    assert (isinstance(card, ControlCard))
-                    card_value = card.value
-                    card.is_rented = card.is_rented
-                assert (isinstance(person, Person))
-
-                self.data.append([
-                    person.surname,
-                    person.name,
-                    person.sex,
-                    person.qual,
-                    group_name,
-                    team_name,
-                    person.year,
-                    i.bib_number,
-                    card_value,
-                    card_is_rented,
-                    i.comment,
-                    person.world_code,
-                    person.national_code
-                ])
+                self.values.append(self.get_values_from_object(i))
             end = time.time()
             logging.info('Entry structure was created in ' + str(end - start) + ' s')
 
-        ret = self.data[position]
+        ret = self.values[position]
         return ret
+
+    def get_values_from_object(self, part):
+        i = part
+        assert (isinstance(i, Participation))
+        person = i.person
+        group = i.group
+        group_name = ''
+        if group is not None:
+            assert (isinstance(group, Group))
+            group_name = group.name
+        team = person.team
+        team_name = ''
+        if team is not None:
+            assert (isinstance(team, Organization))
+            team_name = team.name
+        card = i.control_card
+        card_value = ''
+        card_is_rented = ''
+        if card is not None:
+            assert (isinstance(card, ControlCard))
+            card_value = card.value
+            card.is_rented = card.is_rented
+        assert (isinstance(person, Person))
+
+        return list([
+            person.surname,
+            person.name,
+            person.sex,
+            person.qual,
+            group_name,
+            team_name,
+            person.year,
+            i.bib_number,
+            card_value,
+            card_is_rented,
+            i.comment,
+            person.world_code,
+            person.national_code])
+
+    def update_one_object(self, part, index):
+        self.values[index] = self.get_values_from_object(part)
+
+
+class PersonProxyModel(QSortFilterProxyModel):
+
+    def __init__(self, parent):
+        super(PersonProxyModel, self).__init__(parent)
+        self.filter_map = None
+        self.filter_applied = False
+
+    def clear_filter(self):
+        self.filter_map = list()
+        for i in range(self.sourceModel().columnCount()):
+            self.filter_map.append('')
+        self.filter_applied = False
+
+    def set_filter_for_column(self, column, filter_string):
+        if self.filter_map is None:
+            self.clear_filter()
+        self.filter_map[column] = filter_string
+        self.invalidateFilter()
+        self.filter_applied = True
+
+    def filterAcceptsRow(self, row, index):
+        if not self.filter_applied:
+            return True
+        try:
+            source_model = self.sourceModel()
+            size = source_model.columnCount()
+            for i in range(size):
+                if self.filter_map is not None and self.filter_map[i] is not None and self.filter_map[i] != '':
+                    filter_string = self.filter_map[i]
+                    cell = source_model.data(source_model.index(row, i), Qt.DisplayRole)
+                    if str(cell.value()).find(filter_string) == -1:
+                        return False
+        except:
+            print(sys.exc_info())
+        return True

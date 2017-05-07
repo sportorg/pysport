@@ -2,11 +2,10 @@ import logging
 
 import sys
 from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtCore import QSortFilterProxyModel
 from PyQt5.QtWidgets import QAbstractItemView, QHeaderView
 
 from sportorg.app.controller.dialogs.entry_edit import EntryEditDialog
-from sportorg.app.models.table_model import PersonTableModel
+from sportorg.app.models.table_model import PersonTableModel, PersonProxyModel
 
 
 class Widget(QtWidgets.QWidget):
@@ -98,7 +97,8 @@ class Widget(QtWidgets.QWidget):
 
         self.EntryTable = QtWidgets.QTableView(self.EntrySplitter)
         self.EntryTable.setObjectName("EntryTable")
-        proxy_model = QSortFilterProxyModel(self)
+        # proxy_model = QSortFilterProxyModel(self)
+        proxy_model = PersonProxyModel(self)
         proxy_model.setSourceModel(PersonTableModel())
         self.EntryTable.setModel(proxy_model)
         self.EntryTable.setSortingEnabled(True)
@@ -109,9 +109,6 @@ class Widget(QtWidgets.QWidget):
         hor_header.setSectionsMovable(True)
         hor_header.setDropIndicatorShown(True)
         hor_header.setSectionResizeMode(QHeaderView.ResizeToContents)
-
-        def show_edit_dialog(self, index):
-            EntryEditDialog()
 
         def entry_double_clicked(index):
             print('clicked on ' + str(index.row()))
