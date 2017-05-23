@@ -1,6 +1,8 @@
 import logging
 
 import sys
+import traceback
+
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QAbstractItemView, QHeaderView
 
@@ -118,6 +120,7 @@ class Widget(QtWidgets.QWidget):
                 dialog = EntryEditDialog(self.EntryTable, index)
             except:
                 print(sys.exc_info())
+                traceback.print_stack()
 
             dialog.exec()
 

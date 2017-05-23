@@ -1,6 +1,8 @@
 import time
 
 import sys
+import traceback
+
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow
 
@@ -10,13 +12,16 @@ from sportorg.app.controller.tabs import start_preparation, groups, teams, race_
 import configparser
 
 import config
-from sportorg.app.models.table_model import PersonTableModel
+from sportorg.app.models.table_model import PersonTableModel, ResultTableModel
+from sportorg.app.plugins.winorient.wdb import WinOrientBinary
 from sportorg.language import _
 from sportorg.app.models import model
 
 from sportorg.app.plugins.winorient import winorient
 from sportorg.app.plugins.ocad import ocad
 import logging
+
+from sportorg.lib.winorient.wdb import parse_wdb
 
 logging.basicConfig(**config.LOG_CONFIG, level=logging.DEBUG if config.DEBUG else logging.WARNING)
 
@@ -143,6 +148,7 @@ class MainWindow(object):
         self.action_csv__winorient.setIcon(QtGui.QIcon(config.icon_dir("csv.png")))
         self.action_csv__winorient.triggered.connect(self.import_wo_csv)
         self.action_wdb__winorient.setText(_("WDB Winorient"))
+        self.action_wdb__winorient.triggered.connect(self.import_wo_wdb)
         self.action_iof__xml_v3.setText(_("IOF XML v3"))
         self.action_ocad_txt_v8.setText(_("Ocad txt v8"))
         self.action_ocad_txt_v8.triggered.connect(self.import_ocad_txt_v8)
@@ -272,6 +278,21 @@ class MainWindow(object):
             except:
                 print(sys.exc_info())
 
+    def import_wo_wdb(self):
+        file_name = QtWidgets.QFileDialog.getOpenFileName(self.mainwindow, 'Open WDB Winorient file',
+                                            '', "WDB Winorient (*.wdb)")[0]
+        if file_name is not '':
+            try:
+                wb = WinOrientBinary(file=file_name)
+                wb.run()
+                table = self.tabwidget.findChild(QtWidgets.QTableView, 'EntryTable')
+                table.model().setSourceModel(PersonTableModel())
+                table = self.tabwidget.findChild(QtWidgets.QTableView, 'ResultTable')
+                table.model().setSourceModel(ResultTableModel())
+            except:
+                print(sys.exc_info())
+                traceback.print_stack()
+
     def import_ocad_txt_v8(self):
         file_name = QtWidgets.QFileDialog.getOpenFileName(self.mainwindow, 'Open Ocad txt v8 file',
                                                           '', "Ocad classes v8 (*.txt)")[0]
@@ -285,3 +306,4 @@ class MainWindow(object):
             ex.exec()
         except:
             print(sys.exc_info())
+            traceback.print_stack()

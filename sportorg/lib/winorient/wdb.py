@@ -371,7 +371,7 @@ class WDBGroup:
 
 
 class WDBMan:
-    def __init__(self):
+    def __init__(self, wdb):
         self.name = '_'
         self.comment = '_'
         self.year = 0
@@ -393,6 +393,7 @@ class WDBMan:
         self.unknown1 = 0
         self.unknown2 = 0
         self.unknown3 = 0
+        self.wdb = wdb
 
     def parse_bytes(self, byte_array):
         """
@@ -467,6 +468,18 @@ class WDBMan:
         ret[156:160] = self.round.to_bytes(4, byteorder)
 
         return ret
+
+    def get_group(self):
+        if self.wdb is not None:
+            assert (isinstance(self.wdb, WDB))
+            return self.wdb.find_group_by_id(self.group)
+        return None
+
+    def get_finish(self):
+        if self.wdb is not None:
+            assert (isinstance(self.wdb, WDB))
+            return self.wdb.find_finish_by_number(self.number)
+        return None
 
 
 class WDBInfo:
@@ -914,7 +927,7 @@ class WDB:
         for i in range(qty):
             start_pos = initial_start + i * object_size
             end_pos = initial_start + (i + 1) * object_size
-            new_object = WDBMan()
+            new_object = WDBMan(self)
             new_object.parse_bytes(byte_array[start_pos:end_pos])
             self.man.append(new_object)
 
@@ -1090,6 +1103,20 @@ class WDB:
             ret.append(0)
 
         return ret
+
+    def find_group_by_id(self, idx):
+        for group in self.group:
+            assert (isinstance(group, WDBGroup))
+            if group.id == idx:
+                return group
+        return None
+
+    def find_finish_by_number(self, number):
+        for finish in self.fin:
+            assert (isinstance(finish, WDBFinish))
+            if finish.number == number:
+                return finish
+        return None
 
 
 def parse_wdb(file_path):

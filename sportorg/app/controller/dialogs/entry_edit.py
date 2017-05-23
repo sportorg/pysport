@@ -1,4 +1,5 @@
 import sys
+import traceback
 
 from PyQt5 import QtCore
 from PyQt5.QtCore import QSortFilterProxyModel, QModelIndex, QTime
@@ -278,6 +279,7 @@ class EntryEditDialog(QDialog):
                 self.apply_changes_impl()
             except:
                 print(sys.exc_info())
+                traceback.print_stack()
             self.close()
 
         self.button_ok = QPushButton('OK')

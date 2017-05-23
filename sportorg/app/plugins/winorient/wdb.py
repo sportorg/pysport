@@ -1,6 +1,7 @@
+import datetime
+
 from sportorg.app.models import model
-from sportorg.app.models.model import RaceStatus
-from sportorg.lib.winorient.wdb import WDB
+from sportorg.lib.winorient.wdb import WDB, WDBMan
 
 
 class WinOrientBinary:
@@ -57,16 +58,48 @@ class WinOrientBinary:
                 org = model.Organization.create(**data_dict)
                 model_team[org.name] = org.id
 
-        data_person = [{
-                           'name': str.split(man.name, ' ')[0],
-                           'surname': str.split(man.name, ' ')[-1],
-                           'team': man.team,
-                           'year': man.year,
-                           'qual': self.qual[str(man.qualification)],
-                       } for man in self.wdb_object.man]
         with model.database_proxy.atomic():
-            for idx in range(0, len(data_person), 100):
-                model.Person.insert_many(data_person[idx:idx + 100]).execute()
+            for man in self.wdb_object.man:
+                assert (isinstance(man, WDBMan))
+                data_person = {
+                    'name': str.split(man.name, ' ')[0],
+                    'surname': str.split(man.name, ' ')[-1],
+                    'team': man.team,
+                    'year': man.year,
+                    'qual': self.qual[str(man.qualification)]
+                }
+                person = model.Person.create(**data_person)
+
+                card = None
+                if man.si_card != 0:
+                    card = model.ControlCard.create(
+                        name="SPORTIDENT",
+                        value=str(man.si_card),
+                        person=person
+                    )
+
+                data_participation = {
+                    'group': model_group[str(man.get_group().name)],
+                    'person': person,
+                    'bib_number': int(man.number),
+                    'comment': man.comment,
+                    'start_time': self.int_to_time(man.start),
+                    'control_card': card
+                }
+                participation = model.Participation.create(**data_participation)
+
+                finish = man.get_finish()
+
+                if finish is not None:
+                    finish_time = finish.time
+
+                    data_result = {
+                        'participation': participation,
+                        'control_card': card,
+                        'start_time': self.int_to_time(man.start),
+                        'finish_time': self.int_to_time(finish_time)
+                    }
+                    model.Result.create(**data_result)
 
         self._is_complete = True
 
@@ -84,22 +117,12 @@ class WinOrientBinary:
         url = ''
         information = wdb.info.title
 
-        data = {
-            'name': name,
-            'discipline': discipline,
-            'start_time': start_time,
-            'end_time': end_time,
-            'status': status,
-            'url': url,
-            'information': information,
-        }
-
         model.Race.create(
                           name=name,
                           discipline=discipline,
                           start_time=start_time,
                           end_time=end_time,
-                          status = status, # TODO: write foreign key of status
+                          status=status,  # TODO: write foreign key of status
                           url=url,
                           information=information
                           )
@@ -114,7 +137,8 @@ class WinOrientBinary:
             address = None
             contact = None
             if len(team.refferent) > 0:
-                contact = model.Contact.get_or_create({'name': 'team contact', 'value': team.refferent})
+                params = {'name': 'team contact', 'value': team.refferent}
+                contact = model.Contact.get_or_create(**params)[0]
             country = None  # TODO: decode from WDB byte
 
             data = {
@@ -125,3 +149,11 @@ class WinOrientBinary:
             }
 
             model.Organization.create(**data)
+
+    def int_to_time(self, value):
+        """ convert value from 1/100 s to time """
+        # ret = datetime(1970, 1, 1) + timedelta(seconds= value/100, milliseconds=value*10%1000)
+        # ret = datetime.datetime.fromtimestamp(int(value)/100.0)
+        # TODO Find more simple solution!!!
+        ret = datetime.time(value // 360000, (value % 360000) // 6000, (value % 6000) // 100, (value % 100) * 10000)
+        return ret

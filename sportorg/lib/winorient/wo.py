@@ -30,7 +30,7 @@ class CSVReader:
                 for row in spam_reader:
                     self.append(row)
         except FileNotFoundError:
-            raise FileNotFoundError("Not fount " + source)
+            raise FileNotFoundError("Not found " + source)
 
         return self
 

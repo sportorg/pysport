@@ -2,7 +2,8 @@ import struct
 import unittest
 
 
-from sportorg.lib.winorient.wdb import WDBPunch, WDBFinish, WDBChip, WDBTeam, WDBDistance, WDBGroup, WDBMan, parse_wdb
+from sportorg.lib.winorient.wdb import WDBPunch, WDBFinish, WDBChip, WDBTeam, WDBDistance, WDBGroup, WDBMan, \
+    parse_wdb, WDB
 
 
 class TestStringMethods(unittest.TestCase):
@@ -94,13 +95,13 @@ class TestStringMethods(unittest.TestCase):
         self.assertEqual(len(byte_array), 36)
 
     def test_WDBMan_parsing(self):
-        obj1 = WDBMan()
+        obj1 = WDBMan(WDB())
         obj1.name = 'Ахтаров Данил'
         obj1.round = 4
         obj1.is_finished = True
 
         byte_array = obj1.get_bytes()
-        obj2 = WDBMan()
+        obj2 = WDBMan(WDB())
         obj2.parse_bytes(byte_array)
         self.assertEqual(obj1.name, obj2.name)
         self.assertEqual(obj1.round, obj2.round)
