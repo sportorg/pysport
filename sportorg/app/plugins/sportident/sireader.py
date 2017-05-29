@@ -1,63 +1,73 @@
-import time
-import json
 import threading
+import time
+import serial
 from sportorg.lib.sportident import sireader
-from sportorg.app.models import model
 
 
 class SIReaderThread(threading.Thread):
-    def __init__(self):
+    def __init__(self, port, func=lambda card_data: card_data):
         super().__init__()
-        print("init")
+        self.port = port
+        self.func = func
+        self.reading = True
 
     def run(self):
-        print("run")
-        si = sireader.SIReaderReadout(port='COM3')
+        si = sireader.SIReaderReadout(port=self.port)
         while True:
             try:
                 while not si.poll_sicard():
-                    time.sleep(1)
-                card_number = si.sicard
-                card_type = si.cardtype
+                    time.sleep(0.5)
+                    if not self.reading:
+                        si.disconnect()
+                        return
+                # card_number = si.sicard
+                # card_type = si.cardtype
 
                 card_data = si.read_sicard()
-                print(card_number)
-                print(card_type)
-                print(card_data)
-                control_cards = model.ControlCard.select().where(
-                    model.ControlCard.name == 'SPORTIDENT',
-                    model.ControlCard.value == card_number
-                )
-                if len(control_cards) == 0:
-                    card = model.ControlCard.create(
-                        name='SPORTIDENT',
-                        value=card_number
-                    )
-                    model.Result.create(
-                        control_card=card,
-                        start_time=card_data['start'],
-                        finish_time=card_data['finish'],
-                        split_time=json.JSONEncoder().encode(card_data['punches'])
-                    )
+
+                self.func(card_data)
 
                 # beep
                 si.ack_sicard()
-                if card_number == 1633208:
-                    si.disconnect()
-                    print("Exit")
-                    break
             except sireader.SIReaderException as e:
                 print(str(e))
             except sireader.SIReaderCardChanged as e:
                 print(str(e))
-            si.reconnect()
 
-            time.sleep(0.5)
+
+def get_ports():
+    ports = []
+    for i in range(32):
+        try:
+            p = 'COM' + str(i)
+            com = serial.Serial(p, 38400, timeout=5)
+            com.close()
+            ports.append(p)
+        except serial.SerialException:
+            continue
+
+    return ports
+
+
+def choose_port():
+    ports = get_ports()
+    if len(ports):
+        print("Доступные порты:")
+        for i, p in enumerate(ports):
+            print("{} - {}".format(i, p))
+        port = ports[0]
+        return port
+    else:
+        print("Нет доступных портов")
+        return None
+
+
+port_runner = []
 
 
 if __name__ == '__main__':
-    reader = SIReaderThread()
-    reader.start()
-    print(reader.getName())
-
-    print("end")
+    port = choose_port()
+    if port is not None:
+        reader = SIReaderThread(port)
+        reader.start()
+        port_runner.append(reader)
