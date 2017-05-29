@@ -214,8 +214,10 @@ def find(iterable: list, obj, **kwargs):
                 results.append(item)
             else:
                 return item
-
-    return None
+    if len(results):
+        return results
+    else:
+        return None
 
 event = [create(Race)]
 
