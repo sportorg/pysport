@@ -59,12 +59,7 @@ class Organization(object):
 
 
 class OrganizationList(list):
-    def find(self, name):
-        for org in self:
-            assert (isinstance(org, Organization))
-            if org.name == name:
-                return org
-        return None
+    pass
 
 
 class CourseControl(object):
@@ -109,13 +104,7 @@ class Group(object):
 
 
 class GroupList(list):
-    def find(self, name):
-        for group in self:
-            assert (isinstance(group, Group))
-            if group.name == name:
-                return group
-        return None
-
+    pass
 
 class Result(object):
     card_number = None
@@ -125,6 +114,8 @@ class Result(object):
     penalty_time = 0  # time of penalties (marked route, false start)
     penalty_laps = 0  # count of penalty legs (marked route)
     status = None
+
+    person = None # reverse link to person
 
     def __eq__(self, other):
         eq = self.card_number == other.card_number

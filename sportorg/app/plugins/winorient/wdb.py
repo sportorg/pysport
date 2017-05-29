@@ -1,7 +1,7 @@
 import datetime
 
 from sportorg.app.models import model
-from sportorg.app.models.memory import event, Race, Organization, Group, Person, Result, race
+from sportorg.app.models.memory import event, Race, Organization, Group, Person, Result, race, find
 from sportorg.lib.winorient.wdb import WDB, WDBMan, WDBTeam, WDBGroup
 
 
@@ -156,7 +156,12 @@ class WinOrientBinary:
         # ret = datetime(1970, 1, 1) + timedelta(seconds= value/100, milliseconds=value*10%1000)
         # ret = datetime.datetime.fromtimestamp(int(value)/100.0)
         # TODO Find more simple solution!!!
-        ret = datetime.time(value // 360000, (value % 360000) // 6000, (value % 6000) // 100, (value % 100) * 10000)
+        # ret = datetime.time(value // 360000, (value % 360000) // 6000, (value % 6000) // 100, (value % 100) * 10000)
+        today = datetime.datetime.now()
+        assert (isinstance(today, datetime.datetime))
+        ret = datetime.datetime(today.year, today.month, today.day, value // 360000, (value % 360000) // 6000,
+                                (value % 6000) // 100, (value % 100) * 10000)
+
         return ret
 
     def create_objects(self):
@@ -186,17 +191,22 @@ class WinOrientBinary:
             new_person.year = man.year
             new_person.card_number = man.si_card
             group_name = man.get_group().name
-            new_person.group = my_race.groups.find(group_name)
+            new_person.group = find(race().groups, name=group_name)
             team_name = man.get_team().name
-            new_person.organization = event.organizations.find(team_name)
+            new_person.organization = find(race().organizations, name=team_name)
+
+            my_race.persons.append(new_person)
 
             # result
             fin = man.get_finish()
             if fin is not None:
                 result = Result()
+                result.person = new_person
                 result.card_number = man.si_card
-                result.start_time = man.start
-                result.finish_time = fin.time
+                result.start_time = self.int_to_time(man.start)
+                result.finish_time = self.int_to_time(fin.time)
+
+                my_race.results.append(result)
 
                 #punches
                 chip = man.get_chip()

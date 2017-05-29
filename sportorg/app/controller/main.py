@@ -12,6 +12,7 @@ from sportorg.app.controller.tabs import start_preparation, groups, teams, race_
 import configparser
 
 import config
+from sportorg.app.models.memory_model import PersonMemoryModel, ResultMemoryModel
 from sportorg.app.models.table_model import PersonTableModel, ResultTableModel
 from sportorg.app.plugins.winorient.wdb import WinOrientBinary
 from sportorg.language import _
@@ -285,11 +286,12 @@ class MainWindow(object):
         if file_name is not '':
             try:
                 wb = WinOrientBinary(file=file_name)
-                wb.run()
+                # wb.run()
+                wb.create_objects()
                 table = self.tabwidget.findChild(QtWidgets.QTableView, 'EntryTable')
-                table.model().setSourceModel(PersonTableModel())
+                table.model().setSourceModel(PersonMemoryModel())
                 table = self.tabwidget.findChild(QtWidgets.QTableView, 'ResultTable')
-                table.model().setSourceModel(ResultTableModel())
+                table.model().setSourceModel(ResultMemoryModel())
             except:
                 print(sys.exc_info())
                 traceback.print_stack()

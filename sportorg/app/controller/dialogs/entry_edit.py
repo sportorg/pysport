@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import QFormLayout, QLabel, \
     QPushButton
 from datetime import date
 
+from sportorg.app.models.memory import race, Person, find
 from sportorg.app.models.model import Group, Organization, Participation, ControlCard
 
 
@@ -16,14 +17,25 @@ def get_groups():
     gr = Group
     ret = list()
     try:
-        for i in gr.select():
+        for i in race().groups:
             ret.append(i.name)
         return ret
     except:
         return ['', 'M12', 'M14', 'M16', 'M21', 'D12', 'D14', 'M16', 'D21']
 
-
 def get_teams():
+    ret = list()
+    ret.append('')
+    try:
+        for i in race().organizations:
+            ret.append(i.name)
+        return ret
+    except:
+        return ['', 'Тюменская обл.', 'Курганская обл.', 'Челябинская обл.', 'Республика Коми', 'г.Москва',
+                'ХМАО-Югра']
+
+#Deprecated
+def get_teams_db():
     team = Organization
     ret = list()
     try:
@@ -320,6 +332,76 @@ class EntryEditDialog(QDialog):
         assert (isinstance(orig_index, QModelIndex))
         orig_index_int = orig_index.row()
 
+        current_object = race().persons[orig_index_int]
+        assert (isinstance(current_object, Person))
+        self.current_object = current_object
+        self.item_surname.setText(current_object.surname)
+        self.item_name.setCurrentText(current_object.name)
+        if current_object.group is not None:
+            self.item_group.setCurrentText(current_object.group.name)
+        if current_object.organization is not None:
+            self.item_team.setCurrentText(current_object.organization.name)
+        if current_object.year is not None:
+            self.item_year.setValue(int(current_object.year))
+        if current_object.qual is not None:
+            self.item_qual.setCurrentText(str(current_object.qual))
+        if current_object.bib is not None:
+            self.item_bib.setValue(int(current_object.bib))
+        if current_object.result is not None:
+            self.item_start.setTime(QTime.fromString(current_object.result.start_time, 'HH:mm:ss'))
+
+        if current_object.card_number is not None:
+            self.item_card.setValue(int(current_object.card_number))
+
+    def apply_changes_impl(self):
+        changed = False
+        person = self.current_object
+        assert (isinstance(person, Person))
+        if person.name != self.item_name.currentText():
+            person.name = self.item_name.currentText()
+            changed = True
+        if person.surname != self.item_surname.text():
+            person.surname = self.item_surname.text()
+            changed = True
+        if person.group.name != self.item_group.currentText():
+            person.group = find(race().groups, name=self.item_group.currentText())
+            changed = True
+        if person.organization.name != self.item_team.currentText():
+            person.organization = find(race().organizations, name=self.item_team.currentText())
+            changed = True
+        if person.year != str(self.item_year.value()):
+            person.year = str(self.item_year.value())
+            changed = True
+        if person.qual != self.item_qual.currentText():
+            person.qual = self.item_qual.currentText()
+            changed = True
+        if person.bib != self.item_bib.text() and self.item_bib.text() != '0':
+            person.bib = self.item_bib.text()
+            changed = True
+        if person.result.start_time != self.item_start.text():
+            person.result.start_time = self.item_start.text()
+            changed = True
+        if (person.card_number is None or person.card_number != self.item_card.text()) \
+                and self.item_card.text() != '0':
+            person.card_number = self.item_card.text()
+            changed = True
+
+        if changed:
+            table = self.table
+            #table.model().sourceModel().update_one_object(part, table.model().mapToSource(self.current_index).row())
+
+
+    # Deprecated
+    def set_values_from_table_db(self, table, index):
+        self.table = table
+        self.current_index = index
+        assert (isinstance(table, QTableView))
+        model = table.model()
+        assert (isinstance(model, QSortFilterProxyModel))
+        orig_index = model.mapToSource(index)
+        assert (isinstance(orig_index, QModelIndex))
+        orig_index_int = orig_index.row()
+
         query = Participation.select()
         current_object = query[orig_index_int]
         assert(isinstance(current_object, Participation))
@@ -342,7 +424,8 @@ class EntryEditDialog(QDialog):
         if current_object.control_card is not None:
             self.item_card.setValue(int(current_object.control_card.value))
 
-    def apply_changes_impl(self):
+    # Deprecated
+    def apply_changes_impl_db(self):
         changed = False
         part = self.current_object
         assert (isinstance(part, Participation))
