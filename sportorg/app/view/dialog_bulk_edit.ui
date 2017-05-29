@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>bulk_edit</class>
+ <widget class="QDialog" name="bulk_edit">
+  <property name="windowModality">
+   <enum>Qt::WindowModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>288</width>
+    <height>327</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <property name="sizeGripEnabled">
+   <bool>false</bool>
+  </property>
+  <property name="modal">
+   <bool>true</bool>
+  </property>
+  <widget class="QDialogButtonBox" name="button_box">
+   <property name="geometry">
+    <rect>
+     <x>-100</x>
+     <y>290</y>
+     <width>318</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+   </property>
+  </widget>
+  <widget class="QGroupBox" name="participants_grou_box">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>0</y>
+     <width>141</width>
+     <height>75</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Participants to modify</string>
+   </property>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>23</y>
+      <width>89</width>
+      <height>42</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="participants_layout">
+     <item>
+      <widget class="QRadioButton" name="all_radio_button">
+       <property name="text">
+        <string>All filtered</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="selected_radio_button">
+       <property name="text">
+        <string>Selected only</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>80</y>
+     <width>248</width>
+     <height>197</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="properties_layout">
+    <item row="0" column="0">
+     <widget class="QCheckBox" name="group_check_box">
+      <property name="text">
+       <string>Change group</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1" colspan="3">
+     <widget class="QComboBox" name="group_combo_box"/>
+    </item>
+    <item row="1" column="0">
+     <widget class="QCheckBox" name="team_check_box">
+      <property name="text">
+       <string>Change team</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1" colspan="3">
+     <widget class="QComboBox" name="team_combo_box"/>
+    </item>
+    <item row="2" column="0" colspan="2">
+     <widget class="QCheckBox" name="start_check_box">
+      <property name="text">
+       <string>change start time</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="2" colspan="2">
+     <widget class="QTimeEdit" name="start_time_edit">
+      <property name="displayFormat">
+       <string>HH:mm:ss</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0" colspan="3">
+     <widget class="QCheckBox" name="start_group_check_box">
+      <property name="text">
+       <string>change start group</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="3">
+     <widget class="QSpinBox" name="start_group_spin_box"/>
+    </item>
+    <item row="4" column="0" colspan="2">
+     <widget class="QCheckBox" name="comment_check_box">
+      <property name="text">
+       <string>change comment</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="2" colspan="2">
+     <widget class="QLineEdit" name="comment_edit"/>
+    </item>
+    <item row="5" column="0">
+     <widget class="QCheckBox" name="status_check_box">
+      <property name="text">
+       <string>change status</string>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="1" colspan="3">
+     <layout class="QVBoxLayout" name="status_layout">
+      <item>
+       <widget class="QCheckBox" name="not_classified_check_box">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>not classified</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="without_team_check_box">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>without a team</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="chip_rented_check_box">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>chip rented</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>button_box</sender>
+   <signal>accepted()</signal>
+   <receiver>bulk_edit</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>button_box</sender>
+   <signal>rejected()</signal>
+   <receiver>bulk_edit</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

@@ -1,17 +1,16 @@
-from tkinter import Tk
 import sys
 
-from sportorg.widget.app import App
+from PyQt5.QtWidgets import QApplication, QMainWindow
+
+from sportorg.app.controller.main import MainWindow
 
 
 def main(argv):
-    try:
-        file = argv[1]
-    except IndexError:
-        file = None
-    root = Tk()
-    app = App(master=root, file=file)
-    app.mainloop()
+    app = QApplication(argv)
+    main_window = MainWindow(argv)
+    main_window.show()
+    sys.exit(app.exec())
+
 
 
 if __name__ == '__main__':
