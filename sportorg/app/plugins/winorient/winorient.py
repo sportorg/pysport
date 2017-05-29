@@ -60,7 +60,7 @@ def import_csv(source):
         person = memory.create(
             memory.Person,
             **person_dict,
-            group=memory.find(race.groups, memory.Group, name=person_dict['group_name']),
-            organization=memory.find(race.organizations, memory.Organization, name=person_dict['team_name'])
+            group=memory.find(race.groups, name=person_dict['group_name']),
+            organization=memory.find(race.organizations, name=person_dict['team_name'])
         )
         race.persons.append(person)

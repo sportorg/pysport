@@ -26,7 +26,7 @@ class CourseControl(Item):
 
 class CourseControlDict(dict):
     def __len__(self) -> int:
-        return len(self.keys())-1 if len(self.keys())-1 >= 0 else len(self.keys())
+        return len(self.keys()) - 1 if len(self.keys()) - 1 >= 0 else len(self.keys())
 
 
 class Course(Item):
@@ -121,14 +121,22 @@ class ClassesV8:
         courses_split.insert(0, '0')
         limit = len(courses_split)
         i = 0
-        while (2*i + 1) < limit:
-            courses[i] = CourseControl(**{"order": i, "code": courses_split[2*i + 1], "length": courses_split[2*i]})
+        while (2 * i + 1) < limit:
+            courses[i] = CourseControl(**{"order": i, "code": courses_split[2 * i + 1],
+                                          "length": float(courses_split[2 * i]) if len(item[4]) else 0.0})
             i += 1
 
         return courses
 
     @staticmethod
     def get_course(item):
+        def ifempty(o, default=None):
+            if len(o):
+                return 0
+            if default is not None:
+                return default
+            return None
+
         if not isinstance(item, str) and not isinstance(item, list):
             raise TypeError("item is not string or list")
         if isinstance(item, str):
@@ -137,8 +145,8 @@ class ClassesV8:
             "group": item[0],
             "type": item[1],
             "bib": item[2],
-            "length": item[3],
-            "climb": item[4],
+            "length": float(item[3]) if len(item[3]) else 0.0,
+            "climb": float(item[4]) if len(item[4]) else 0.0,
             "controls": ClassesV8.get_courses(item)
         }
 

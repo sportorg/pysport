@@ -197,16 +197,14 @@ def update(obj, **kwargs):
             setattr(obj, key, value)
 
 
-def find(iterable: list, obj, **kwargs):
+def find(iterable: list, **kwargs):
     if len(kwargs.items()) == 0:
         return None
     return_all = kwargs.pop('return_all', False)
     results = []
     for item in iterable:
-        assert (isinstance(item, obj))
         f = True
         for key, value in kwargs.items():
-            assert (hasattr(obj, key))
             if getattr(item, key) != value:
                 f = False
         if f:

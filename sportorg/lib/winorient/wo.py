@@ -51,7 +51,7 @@ class CSVReader:
             'team_name': person[2],
             'qual': self.qual[person[3]],
             'bib': ifempty(person[4]),
-            'year': ifempty(person[5], int(person[5])),
+            'year': int(person[5]) if len(person[5]) else None,
             'card_number': ifempty(person[6]),
             'comment': person[7]
         }
