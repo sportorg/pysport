@@ -16,6 +16,7 @@ from sportorg.app.models.table_model import PersonTableModel, ResultTableModel
 from sportorg.app.plugins.winorient.wdb import WinOrientBinary
 from sportorg.language import _
 from sportorg.app.models import model
+from sportorg.app.models import memory
 
 from sportorg.app.plugins.winorient import winorient
 from sportorg.app.plugins.ocad import ocad
@@ -272,11 +273,11 @@ class MainWindow(object):
         if file_name is not '':
             winorient.import_csv(file_name)
             # self.tabwidget.update(start_preparation.Widget())
-            try:
-                table = self.tabwidget.findChild(QtWidgets.QTableView, 'EntryTable')
-                table.model().setSourceModel(PersonTableModel())
-            except:
-                print(sys.exc_info())
+            # try:
+            #     table = self.tabwidget.findChild(QtWidgets.QTableView, 'EntryTable')
+            #     table.model().setSourceModel(PersonTableModel())
+            # except:
+            #     print(sys.exc_info())
 
     def import_wo_wdb(self):
         file_name = QtWidgets.QFileDialog.getOpenFileName(self.mainwindow, 'Open WDB Winorient file',

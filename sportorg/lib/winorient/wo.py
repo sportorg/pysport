@@ -21,7 +21,7 @@ class CSVReader:
 
         self._groups = set()
         self._teams = set()
-        self._card = set()
+        self._cards = set()
 
     def parse(self, source):
         try:
@@ -39,13 +39,20 @@ class CSVReader:
         return self._data
 
     def append(self, person):
+        def ifempty(o, default=None):
+            if len(o):
+                return 0
+            if default is not None:
+                return default
+            return None
+
         person_dict = {
-            'group': person[0],
-            'team': person[2],
+            'group_name': person[0],
+            'team_name': person[2],
             'qual': self.qual[person[3]],
-            'bib': person[4],
-            'year': person[5],
-            'card': person[6],
+            'bib': ifempty(person[4]),
+            'year': ifempty(person[5], int(person[5])),
+            'card_number': ifempty(person[6]),
             'comment': person[7]
         }
         if len(str(person[1]).split(' ')) == 2:
@@ -63,23 +70,23 @@ class CSVReader:
     def groups(self):
         if not len(self._groups):
             for row in self.data:
-                self._groups.add(row['group'])
+                self._groups.add(row['group_name'])
 
         return self._groups
 
     @property
     def cards(self):
-        if not len(self._card):
+        if not len(self._cards):
             for row in self.data:
-                self._card.add(row['card'])
+                self._cards.add(row['card_number'])
 
-        return self._card
+        return self._cards
 
     @property
     def teams(self):
         if not len(self._teams):
             for row in self.data:
-                self._teams.add(row['team'])
+                self._teams.add(row['team_name'])
 
         return self._teams
 

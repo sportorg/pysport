@@ -207,7 +207,7 @@ def find(iterable: list, obj, **kwargs):
         f = True
         for key, value in kwargs.items():
             assert (hasattr(obj, key))
-            if getattr(obj, key) != value:
+            if getattr(item, key) != value:
                 f = False
         if f:
             if return_all:
