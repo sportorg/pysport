@@ -177,7 +177,6 @@ class Race(object):
     courses = CourseList()
     groups = GroupList()
     persons = PersonList()
-    cards = set()
     results = ResultList()
     organizations = OrganizationList()
     settings = Settings()
@@ -197,6 +196,21 @@ def update(obj, **kwargs):
         if hasattr(obj, key):
             setattr(obj, key, value)
 
+
+def find(iterable: list, obj, **kwargs):
+    if len(kwargs.items()) == 0:
+        return None
+    for item in iterable:
+        assert (isinstance(item, obj))
+        f = True
+        for key, value in kwargs.items():
+            assert (hasattr(obj, key))
+            if getattr(obj, key) != value:
+                f = False
+        if f:
+            return item
+
+    return None
 
 event = [create(Race)]
 
