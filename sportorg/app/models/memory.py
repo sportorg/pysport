@@ -1,5 +1,3 @@
-
-
 class Country(object):
     name = ''
     code2 = ''
@@ -60,6 +58,15 @@ class Organization(object):
     country = Country()
 
 
+class OrganizationList(list):
+    def find(self, name):
+        for org in self:
+            assert (isinstance(org, Organization))
+            if org.name == name:
+                return org
+        return None
+
+
 class CourseControl(object):
     code = ''
     length = 0
@@ -102,7 +109,12 @@ class Group(object):
 
 
 class GroupList(list):
-    pass
+    def find(self, name):
+        for group in self:
+            assert (isinstance(group, Group))
+            if group.name == name:
+                return group
+        return None
 
 
 class Result(object):
@@ -137,7 +149,8 @@ class Person(object):
 
     year = None  # sometime we have only year of birth
     birth_date = None  # datetime
-    organization = Organization()
+    organization = None
+    group = None
     nationality = Country()
     address = Address()
     contact = [Contact()]
@@ -153,7 +166,7 @@ class PersonList(list):
 
 class RaceData(object):
     name = ''
-    organisation = Organization()
+    organisation = None
     start_time = None
     end_time = None
     live_url = None
@@ -166,6 +179,7 @@ class Race(object):
     persons = PersonList()
     cards = set()
     results = ResultList()
+    organizations = OrganizationList()
     settings = Settings()
 
 

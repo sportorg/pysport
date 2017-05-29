@@ -481,6 +481,17 @@ class WDBMan:
             return self.wdb.find_finish_by_number(self.number)
         return None
 
+    def get_team(self):
+        if self.wdb is not None:
+            assert (isinstance(self.wdb, WDB))
+            return self.wdb.find_team_by_id(self.team)
+        return None
+
+    def get_chip(self):
+        if self.wdb is not None:
+            assert (isinstance(self.wdb, WDB))
+            return self.wdb.find_chip_by_id(self.team)
+        return None
 
 class WDBInfo:
     def __init__(self):
@@ -1116,6 +1127,20 @@ class WDB:
             assert (isinstance(finish, WDBFinish))
             if finish.number == number:
                 return finish
+        return None
+
+    def find_team_by_id(self, id):
+        for team in self.team:
+            assert (isinstance(team, WDBTeam))
+            if team.id == id:
+                return team
+        return None
+
+    def find_chip_by_id(self, id):
+        for chip in self.chip:
+            assert (isinstance(chip, WDBChip))
+            if chip.id == id:
+                return chip
         return None
 
 

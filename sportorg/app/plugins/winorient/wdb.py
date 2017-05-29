@@ -1,7 +1,8 @@
 import datetime
 
 from sportorg.app.models import model
-from sportorg.lib.winorient.wdb import WDB, WDBMan
+from sportorg.app.models.memory import event, Race, Organization, Group, Person, Result, race
+from sportorg.lib.winorient.wdb import WDB, WDBMan, WDBTeam, WDBGroup
 
 
 class WinOrientBinary:
@@ -157,3 +158,49 @@ class WinOrientBinary:
         # TODO Find more simple solution!!!
         ret = datetime.time(value // 360000, (value % 360000) // 6000, (value % 6000) // 100, (value % 100) * 10000)
         return ret
+
+    def create_objects(self):
+        """Create objects in memory, according to model"""
+        my_race = race()
+        assert(isinstance(my_race, Race))
+
+        for team in self.wdb_object.team:
+            assert (isinstance(team, WDBTeam))
+            new_team = Organization()
+            new_team.name = team.name
+            my_race.organizations.append(new_team)
+
+        for group in self.wdb_object.group:
+            assert (isinstance(group, WDBGroup))
+            new_group = Group()
+            new_group.name = group.name
+            my_race.groups.append(new_group)
+
+        for man in self.wdb_object.man:
+            assert (isinstance(man, WDBMan))
+            new_person = Person()
+            new_person.surname = man.name.split(" ")[0]
+            new_person.name = man.name.split(" ")[-1]
+            new_person.bib = man.number
+            new_person.qual = man.qualification
+            new_person.year = man.year
+            new_person.card_number = man.si_card
+            group_name = man.get_group().name
+            new_person.group = my_race.groups.find(group_name)
+            team_name = man.get_team().name
+            new_person.organization = event.organizations.find(team_name)
+
+            # result
+            fin = man.get_finish()
+            if fin is not None:
+                result = Result()
+                result.card_number = man.si_card
+                result.start_time = man.start
+                result.finish_time = fin.time
+
+                #punches
+                chip = man.get_chip()
+                if chip is not None:
+                    pass
+
+
