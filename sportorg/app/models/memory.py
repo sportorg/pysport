@@ -200,7 +200,7 @@ def update(obj, **kwargs):
 def find(iterable: list, obj, **kwargs):
     if len(kwargs.items()) == 0:
         return None
-    return_all = kwargs.get('return_all', False)
+    return_all = kwargs.pop('return_all', False)
     results = []
     for item in iterable:
         assert (isinstance(item, obj))
