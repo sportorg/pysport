@@ -2,12 +2,12 @@ import sys
 import traceback
 
 from PyQt5 import QtCore
-from PyQt5.QtCore import QSortFilterProxyModel, QModelIndex, QTime
+from PyQt5.QtCore import QSortFilterProxyModel, QModelIndex, QTime, QDateTime
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QLabel, \
     QLineEdit, QComboBox, QCompleter, QSpinBox, QApplication, QTimeEdit, QTextEdit, QCheckBox, QTableView, QDialog, \
     QPushButton
-from datetime import date
+from datetime import date, datetime
 
 from sportorg.app.models.memory import race, Person, find
 from sportorg.app.models.model import Group, Organization, Participation, ControlCard
@@ -348,7 +348,11 @@ class EntryEditDialog(QDialog):
         if current_object.bib is not None:
             self.item_bib.setValue(int(current_object.bib))
         if current_object.result is not None:
-            self.item_start.setTime(QTime.fromString(current_object.result.start_time, 'HH:mm:ss'))
+            t = current_object.result.start_time
+            assert(isinstance(t, datetime))
+            time = QTime()
+            time.setHMS(t.hour, t.minute, t.second, t.microsecond)
+            self.item_start.setTime(time)
 
         if current_object.card_number is not None:
             self.item_card.setValue(int(current_object.card_number))
@@ -378,9 +382,15 @@ class EntryEditDialog(QDialog):
         if person.bib != self.item_bib.text() and self.item_bib.text() != '0':
             person.bib = self.item_bib.text()
             changed = True
-        if person.result.start_time != self.item_start.text():
-            person.result.start_time = self.item_start.text()
+
+        t = self.item_start.time()
+        now = datetime.now()
+        assert(isinstance(t, QTime))
+        new_time = datetime(now.year, now.month, now.day, t.hour(), t.minute(), t.second(), t.msec())
+        if person.result.start_time != new_time:
+            person.result.start_time = new_time
             changed = True
+
         if (person.card_number is None or person.card_number != self.item_card.text()) \
                 and self.item_card.text() != '0':
             person.card_number = self.item_card.text()

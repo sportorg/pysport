@@ -2,7 +2,9 @@ import sys
 
 
 import traceback
+from datetime import timedelta
 
+import time
 from PyQt5.QtCore import QVariant, QAbstractTableModel, Qt, QSortFilterProxyModel
 
 from sportorg.app.models.memory import race, Result
@@ -131,7 +133,8 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
         assert (isinstance(i, Result))
         person = result.person
 
-        result_time = i.finish_time - i.start_time
+        result_time = (i.finish_time - i.start_time)
+        assert (isinstance(result_time, timedelta))
 
         return list([
             person.surname,
@@ -139,9 +142,9 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
             person.group.name,
             person.organization.name,
             person.bib,
-            i.start_time,
-            i.finish_time,
-            result_time,
+            i.start_time.strftime('%H:%M:%S'),
+            i.finish_time.strftime('%H:%M:%S'),
+            str(result_time),
             i.status,
             i.penalty_time,
             'place'])

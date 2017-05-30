@@ -202,6 +202,8 @@ class WinOrientBinary:
             if fin is not None:
                 result = Result()
                 result.person = new_person
+                new_person.result = result
+
                 result.card_number = man.si_card
                 result.start_time = self.int_to_time(man.start)
                 result.finish_time = self.int_to_time(fin.time)
