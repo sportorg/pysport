@@ -1,14 +1,13 @@
 import sys
 
-
+from sportorg.language import _
 import traceback
 from datetime import timedelta
 
 import time
 from PyQt5.QtCore import QVariant, QAbstractTableModel, Qt, QSortFilterProxyModel
 
-from sportorg.app.models.memory import race, Result
-
+from sportorg.app.models.memory import race, Result, Group, Course, Organization
 
 
 class AbstractSportOrgMemoryModel (QAbstractTableModel):
@@ -50,9 +49,7 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
             columns = ['Surname', 'Name', 'Sex', 'Qualification', 'Group', 'Team', 'Year', 'Bib', 'Card', 'Rented card',
                        'Comment', 'World code', 'National code']
-            return columns[index]
-            # _translate = QtCore.QCoreApplication.translate
-            # return _translate(columns[index]) TODO: add translation
+            return _(columns[index])
 
     def get_participation_data(self, position):
         return self.get_value_from_object(race().persons[position])
@@ -120,9 +117,7 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
             columns = ['Surname', 'Name', 'Group', 'Team', 'Bib', 'Start', 'Finish', 'Result', 'Status', 'Penalty',\
                        'Place']
-            return columns[index]
-            # _translate = QtCore.QCoreApplication.translate
-            # return _translate(columns[index]) TODO: add translation
+            return _(columns[index])
 
     def get_participation_data(self, position):
         ret = self.get_values_from_object(race().results[position])
@@ -148,6 +143,168 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
             i.status,
             i.penalty_time,
             'place'])
+
+    def update_one_object(self, part, index):
+        self.values[index] = self.get_values_from_object(part)
+
+
+class GroupMemoryModel(AbstractSportOrgMemoryModel):
+    def __init__(self):
+        super().__init__()
+
+    def rowCount(self, parent=None, *args, **kwargs):
+        return len(race().groups)
+
+    def columnCount(self, parent=None, *args, **kwargs):
+        return 13
+
+    def data(self, index, role=None):
+        if role == Qt.DisplayRole:
+            answer = ''
+            try:
+                answer = self.get_data(index.row())[index.column()]
+            except:
+                print(sys.exc_info())
+                traceback.print_stack()
+
+            return QVariant(answer)
+
+        return QVariant()
+
+    def headerData(self, index, orientation, role=None):
+
+        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
+            columns = ['Name', 'Full name', 'Course name', 'Course type', 'Length', 'Point count', 'Climb', 'Sex', 'Min age', 'Max age',\
+                       'Start interval', 'Start corridor', 'Order in corridor']
+            return _(columns[index])
+
+    def get_data(self, position):
+        ret = self.get_values_from_object(race().groups[position])
+        return ret
+
+    def get_values_from_object(self, group):
+        assert (isinstance(group, Group))
+        course = group.course
+        assert (isinstance(course, Course))
+        if course is None:
+            course = Course()
+
+        return list([
+            group.name,
+            group.long_name,
+            course.name,
+            course.type,
+            course.length,
+            len(course.controls),
+            course.climb,
+            group.sex,
+            group.min_age,
+            group.max_age,
+            group.start_interval,
+            group.start_corridor,
+            group.order_in_corridor,
+        ])
+
+    def update_one_object(self, part, index):
+        self.values[index] = self.get_values_from_object(part)
+
+
+class CourseMemoryModel(AbstractSportOrgMemoryModel):
+    def __init__(self):
+        super().__init__()
+
+    def rowCount(self, parent=None, *args, **kwargs):
+        return len(race().courses)
+
+    def columnCount(self, parent=None, *args, **kwargs):
+        return 6
+
+    def data(self, index, role=None):
+        if role == Qt.DisplayRole:
+            answer = ''
+            try:
+                answer = self.get_data(index.row())[index.column()]
+            except:
+                print(sys.exc_info())
+                traceback.print_stack()
+
+            return QVariant(answer)
+
+        return QVariant()
+
+    def headerData(self, index, orientation, role=None):
+
+        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
+            columns = ['Name', 'Course type', 'Length', 'Point count', 'Climb', 'Controls']
+            return _(columns[index])
+
+
+    def get_data(self, position):
+        ret = self.get_values_from_object(race().courses[position])
+        return ret
+
+    def get_values_from_object(self, course):
+        assert (isinstance(course, Course))
+        if course is None:
+            course = Course()
+
+        return list([
+            course.name,
+            course.type,
+            course.length,
+            len(course.controls),
+            course.climb,
+            ' '.join(course.get_code_list())
+        ])
+
+    def update_one_object(self, part, index):
+        self.values[index] = self.get_values_from_object(part)
+
+
+class TeamMemoryModel(AbstractSportOrgMemoryModel):
+    def __init__(self):
+        super().__init__()
+
+    def rowCount(self, parent=None, *args, **kwargs):
+        return len(race().organizations)
+
+    def columnCount(self, parent=None, *args, **kwargs):
+        return 4
+
+    def data(self, index, role=None):
+        if role == Qt.DisplayRole:
+            answer = ''
+            try:
+                answer = self.get_data(index.row())[index.column()]
+            except:
+                print(sys.exc_info())
+                traceback.print_stack()
+
+            return QVariant(answer)
+
+        return QVariant()
+
+    def headerData(self, index, orientation, role=None):
+
+        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
+            columns = ['Name', 'Address', 'Country', 'Contact']
+            return _(columns[index])
+
+    def get_data(self, position):
+        ret = self.get_values_from_object(race().organizations[position])
+        return ret
+
+    def get_values_from_object(self, team):
+        assert (isinstance(team, Organization))
+        if team is None:
+            team = Organization()
+
+        return list([
+            team.name,
+            team.address,
+            team.country,
+            team.contact
+        ])
 
     def update_one_object(self, part, index):
         self.values[index] = self.get_values_from_object(part)

@@ -68,9 +68,8 @@ class CourseControl(object):
     order = None
 
 
-class CourseControlDict(dict):
-    def __len__(self) -> int:
-        return len(self.keys()) - 1 if len(self.keys()) - 1 >= 0 else len(self.keys())
+class CourseControlList(list):
+    pass
 
 
 class Course(object):
@@ -79,8 +78,14 @@ class Course(object):
     bib = ''
     length = 0
     climb = 0
-    controls = CourseControlDict()
+    controls = None
 
+    def get_code_list(self):
+        ret = list()
+        for i in self.controls:
+            assert isinstance(i, CourseControl)
+            ret.append(str(i.code))
+        return ret
 
 class CourseList(list):
     pass

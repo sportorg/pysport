@@ -325,6 +325,7 @@ class WDBGroup:
         self.owner_cost = 0
         self.owner_discount_cost = 0
         self.unused1 = 0
+        self.wdb = None
 
     def parse_bytes(self, byte_array):
         """
@@ -369,6 +370,11 @@ class WDBGroup:
 
         return ret
 
+    def get_course(self):
+        if self.wdb is not None:
+            assert (isinstance(self.wdb, WDB))
+            return self.wdb.find_course_by_id(self.distance_id)
+        return None
 
 class WDBMan:
     def __init__(self, wdb):
@@ -971,6 +977,7 @@ class WDB:
             start_pos = initial_start + i * object_size
             end_pos = initial_start + (i + 1) * object_size
             new_object = WDBGroup()
+            new_object.wdb = self
             new_object.parse_bytes(byte_array[start_pos:end_pos])
             self.group.append(new_object)
 
@@ -1143,6 +1150,12 @@ class WDB:
                 return chip
         return None
 
+    def find_course_by_id(self, id):
+        for course in self.dist:
+            assert (isinstance(course, WDBDistance))
+            if course.id == id:
+                return course
+        return None
 
 def parse_wdb(file_path):
     wdb_file = open(file_path, 'rb')

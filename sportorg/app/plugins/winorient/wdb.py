@@ -1,8 +1,9 @@
 import datetime
 
 from sportorg.app.models import model
-from sportorg.app.models.memory import event, Race, Organization, Group, Person, Result, race, find
-from sportorg.lib.winorient.wdb import WDB, WDBMan, WDBTeam, WDBGroup
+from sportorg.app.models.memory import event, Race, Organization, Group, Person, Result, race, find, Course, \
+    CourseControl, CourseControlList
+from sportorg.lib.winorient.wdb import WDB, WDBMan, WDBTeam, WDBGroup, WDBDistance
 
 
 class WinOrientBinary:
@@ -175,10 +176,33 @@ class WinOrientBinary:
             new_team.name = team.name
             my_race.organizations.append(new_team)
 
+        for course in self.wdb_object.dist:
+            assert (isinstance(course, WDBDistance))
+            new_course = Course()
+            new_course.controls = CourseControlList()
+            new_course.name = course.name
+            new_course.climb = course.elevation
+            new_course.length = course.length
+            new_course.type = self.wdb_object.info.type  # TODO parse type
+
+            # controls
+            for i in range(course.point_quantity):
+                control = CourseControl()
+                control.code = course.point[i]
+                if i > len(course.leg):
+                    control.length = course.leg[i]
+                new_course.controls.append(control)
+
+            my_race.courses.append(new_course)
+
         for group in self.wdb_object.group:
             assert (isinstance(group, WDBGroup))
             new_group = Group()
             new_group.name = group.name
+            new_group.price = group.owner_cost
+            course = group.get_course()
+            if course is not None:
+                new_group.course = find(race().courses, name=course.name)
             my_race.groups.append(new_group)
 
         for man in self.wdb_object.man:
@@ -187,7 +211,7 @@ class WinOrientBinary:
             new_person.surname = man.name.split(" ")[0]
             new_person.name = man.name.split(" ")[-1]
             new_person.bib = man.number
-            new_person.qual = man.qualification
+            new_person.qual = self.qual[str(man.qualification)]
             new_person.year = man.year
             new_person.card_number = man.si_card
             group_name = man.get_group().name

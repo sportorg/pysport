@@ -12,12 +12,13 @@ from sportorg.app.controller.tabs import start_preparation, groups, teams, race_
 import configparser
 
 import config
-from sportorg.app.models.memory_model import PersonMemoryModel, ResultMemoryModel
+from sportorg.app.models.memory_model import PersonMemoryModel, ResultMemoryModel, GroupMemoryModel, CourseMemoryModel, \
+    TeamMemoryModel
 from sportorg.app.models.table_model import PersonTableModel, ResultTableModel
 from sportorg.app.plugins.winorient.wdb import WinOrientBinary
 from sportorg.language import _
 from sportorg.app.models import model
-from sportorg.app.models import memory
+
 
 from sportorg.app.plugins.winorient import winorient
 from sportorg.app.plugins.ocad import ocad
@@ -292,6 +293,12 @@ class MainWindow(object):
                 table.model().setSourceModel(PersonMemoryModel())
                 table = self.tabwidget.findChild(QtWidgets.QTableView, 'ResultTable')
                 table.model().setSourceModel(ResultMemoryModel())
+                table = self.tabwidget.findChild(QtWidgets.QTableView, 'GroupTable')
+                table.model().setSourceModel(GroupMemoryModel())
+                table = self.tabwidget.findChild(QtWidgets.QTableView, 'CourseTable')
+                table.model().setSourceModel(CourseMemoryModel())
+                table = self.tabwidget.findChild(QtWidgets.QTableView, 'TeamTable')
+                table.model().setSourceModel(TeamMemoryModel())
             except:
                 print(sys.exc_info())
                 traceback.print_stack()
