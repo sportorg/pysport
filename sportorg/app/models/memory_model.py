@@ -4,7 +4,6 @@ from sportorg.language import _
 import traceback
 from datetime import timedelta
 
-import time
 from PyQt5.QtCore import QVariant, QAbstractTableModel, Qt, QSortFilterProxyModel
 
 from sportorg.app.models.memory import race, Result, Group, Course, Organization
@@ -237,7 +236,6 @@ class CourseMemoryModel(AbstractSportOrgMemoryModel):
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
             columns = ['Name', 'Course type', 'Length', 'Point count', 'Climb', 'Controls']
             return _(columns[index])
-
 
     def get_data(self, position):
         ret = self.get_values_from_object(race().courses[position])

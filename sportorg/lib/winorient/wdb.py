@@ -398,7 +398,7 @@ class WDBMan:
         self.unknown0 = 0
         self.unknown1 = 0
         self.unknown2 = 0
-        self.unknown3 = 0
+        self.status = 0
         self.wdb = wdb
 
     def parse_bytes(self, byte_array):
@@ -433,7 +433,7 @@ class WDBMan:
 
         self.unknown2 = int.from_bytes(byte_array[104:105], byteorder)
 
-        self.unknown3 = int.from_bytes(byte_array[108:109], byteorder)
+        self.status = int.from_bytes(byte_array[108:109], byteorder)
 
         self.round = int.from_bytes(byte_array[156:160], byteorder)
 
@@ -469,7 +469,7 @@ class WDBMan:
 
         ret[104:105] = self.unknown2.to_bytes(1, byteorder)
 
-        ret[108:109] = self.unknown3.to_bytes(1, byteorder)
+        ret[108:109] = self.status.to_bytes(1, byteorder)
 
         ret[156:160] = self.round.to_bytes(4, byteorder)
 
@@ -496,7 +496,7 @@ class WDBMan:
     def get_chip(self):
         if self.wdb is not None:
             assert (isinstance(self.wdb, WDB))
-            return self.wdb.find_chip_by_id(self.team)
+            return self.wdb.find_chip_by_id(self.si_card)
         return None
 
 class WDBInfo:

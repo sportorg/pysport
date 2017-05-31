@@ -3,7 +3,7 @@ import datetime
 from sportorg.app.models import model
 from sportorg.app.models.memory import event, Race, Organization, Group, Person, Result, race, find, Course, \
     CourseControl, CourseControlList
-from sportorg.lib.winorient.wdb import WDB, WDBMan, WDBTeam, WDBGroup, WDBDistance
+from sportorg.lib.winorient.wdb import WDB, WDBMan, WDBTeam, WDBGroup, WDBDistance, WDBPunch
 
 
 class WinOrientBinary:
@@ -160,7 +160,7 @@ class WinOrientBinary:
         # ret = datetime.time(value // 360000, (value % 360000) // 6000, (value % 6000) // 100, (value % 100) * 10000)
         today = datetime.datetime.now()
         assert (isinstance(today, datetime.datetime))
-        ret = datetime.datetime(today.year, today.month, today.day, value // 360000, (value % 360000) // 6000,
+        ret = datetime.datetime(today.year, today.month, today.day, value // 360000 % 24, (value % 360000) // 6000,
                                 (value % 6000) // 100, (value % 100) * 10000)
 
         return ret
@@ -231,12 +231,19 @@ class WinOrientBinary:
                 result.card_number = man.si_card
                 result.start_time = self.int_to_time(man.start)
                 result.finish_time = self.int_to_time(fin.time)
+                result.status = man.status
 
                 my_race.results.append(result)
 
-                #punches
+                # punches
                 chip = man.get_chip()
                 if chip is not None:
-                    pass
-
-
+                    result.punches = list()
+                    for i in range(chip.quantity):
+                        p = chip.punch[i]
+                        assert isinstance(p, WDBPunch)
+                        code = p.code
+                        time = self.int_to_time(p.time)
+                        punch = (code, time)
+                        if code > 0:
+                            result.punches.append(punch)
