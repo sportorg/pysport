@@ -37,11 +37,8 @@ class MainWindow(object):
             self.file = None
         self.mainwindow = QMainWindow()
         self.conf = configparser.ConfigParser()
-        self.db = model.database_proxy
 
     def show(self):
-        self.initialize_db()
-        self.create_db()
         self.setup_ui()
         self.setup_menu()
         self.setup_toolbar()
@@ -213,49 +210,12 @@ class MainWindow(object):
         self.tabwidget.addTab(courses.Widget(), _("Courses"))
         self.tabwidget.addTab(teams.Widget(), _("Teams"))
 
-    def initialize_db(self):
-        if self.file is None:
-            database = model.SqliteDatabase(":memory:")
-        else:
-            database = model.SqliteDatabase(self.file)
-        self.db.initialize(database)
-        self.db.connect()
-
-    def create_db(self):
-        with self.db.atomic():
-            self.db.create_tables([
-                model.Qualification,
-                model.Fee,
-                model.RelayTeam,
-                model.RaceStatus,
-                model.Race,
-                model.Course,
-                model.CoursePart,
-                model.CourseControl,
-                model.ResultStatus,
-                model.Country,
-                model.Contact,
-                model.Address,
-                model.Organization,
-                model.Person,
-                model.Entry,
-                model.ControlCard,
-                model.Group,
-                model.Participation,
-                model.Result,
-                model.RelayTeamLeg,
-                model.LegCoursePart,
-                model.OnlineControlTime
-            ], safe=True)
-
     def create_file(self):
         file_name = QtWidgets.QFileDialog.getSaveFileName(self.mainwindow,'Create SportOrg file',
                                             '/' + str(time.strftime("%Y%m%d")), "SportOrg file (*.sportorg)")[0]
         if file_name is not '':
             self.mainwindow.setWindowTitle(file_name)
             self.file = file_name
-            self.initialize_db()
-            self.create_db()
 
     def save_file(self):
         pass
@@ -267,7 +227,6 @@ class MainWindow(object):
         if file_name is not '':
             self.mainwindow.setWindowTitle(file_name)
             self.file = file_name
-            self.initialize_db()
 
     def import_wo_csv(self):
         file_name = QtWidgets.QFileDialog.getOpenFileName(self.mainwindow, 'Open CSV Winorient file',

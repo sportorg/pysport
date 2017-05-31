@@ -87,6 +87,7 @@ class Course(object):
             ret.append(str(i.code))
         return ret
 
+
 class CourseList(list):
     pass
 
@@ -111,6 +112,7 @@ class Group(object):
 class GroupList(list):
     pass
 
+
 class Result(object):
     card_number = None
     start_time = None
@@ -120,7 +122,7 @@ class Result(object):
     penalty_laps = 0  # count of penalty legs (marked route)
     status = None
 
-    person = None # reverse link to person
+    person = None  # reverse link to person
 
     def __eq__(self, other):
         eq = self.card_number == other.card_number

@@ -5,7 +5,7 @@ import time
 
 NAME = 'SportOrg'
 AUTHOR = 'Akhtarov Danil'
-__version__ = '1.0.0'
+VERSION = '1.0.0'
 DEBUG = True
 
 

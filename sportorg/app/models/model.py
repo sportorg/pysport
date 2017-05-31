@@ -1,4 +1,6 @@
 from peewee import *
+from sportorg.app.models import memory
+from config import VERSION
 
 database_proxy = Proxy()
 
@@ -222,41 +224,46 @@ class OnlineControlTime(BaseModel):
     source = CharField(null=True)  # source: radio, SI Live, SRR USB, RS232 with autosend, manual, readout
 
 
-def new_race():
-    pass
+def initialize(source):
+    database = SqliteDatabase(source)
+    database_proxy.initialize(database)
+    database_proxy.connect()
 
 
-def add_person(name, surname=None):
-    return Person.create(name=name, surname=surname)
+def create_db():
+    with database_proxy.atomic():
+        database_proxy.create_tables([
+            Qualification,
+            Fee,
+            RelayTeam,
+            RaceStatus,
+            Race,
+            Course,
+            CoursePart,
+            CourseControl,
+            ResultStatus,
+            Country,
+            Contact,
+            Address,
+            Organization,
+            Person,
+            Entry,
+            ControlCard,
+            Group,
+            Participation,
+            Result,
+            RelayTeamLeg,
+            LegCoursePart,
+            OnlineControlTime
+        ], safe=True)
 
 
-def get_person(id):
-    return Person.get(Person.id == id)
+def dump(source):
+    initialize(source)
+    create_db()
+    # TODO
 
 
-def add_group():
-    pass
-
-
-def get_group():
-    pass
-
-
-def add_result():
-    pass
-
-
-def get_result():
-    pass
-
-
-def add_participation():
-    pass
-
-
-def add_course():
-    pass
-
-
-def get_course():
-    pass
+def load(source):
+    initialize(source)
+    # TODO
