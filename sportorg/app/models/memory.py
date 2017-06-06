@@ -56,6 +56,8 @@ class Organization(object):
     address = Address()
     contact = Contact()
     country = Country()
+    city = ''
+    region = ''
 
 
 class OrganizationList(list):

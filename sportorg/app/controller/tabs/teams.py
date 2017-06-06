@@ -1,7 +1,12 @@
 import logging
+
+import sys
+import traceback
+
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QAbstractItemView, QHeaderView
 
+from sportorg.app.controller.dialogs.organization_edit import OrganizationEditDialog
 from sportorg.app.models.memory_model import PersonProxyModel, TeamMemoryModel
 
 
@@ -33,8 +38,15 @@ class Widget(QtWidgets.QWidget):
         hor_header.setSectionResizeMode(QHeaderView.ResizeToContents)
 
         def team_double_clicked(index):
-            print('clicked on ' + str(index.row()))
-            logging.info('clicked on ' + str(index.row()))
+            print('Team: clicked on ' + str(index.row()))
+            try:
+                dialog = OrganizationEditDialog(self.TeamTable, index)
+                dialog.exec()
+            except:
+                print(sys.exc_info())
+                traceback.print_stack()
+
+            logging.info('Team: clicked on ' + str(index.row()))
 
         self.TeamTable.doubleClicked.connect(team_double_clicked)
         self.team_layout.addWidget(self.TeamTable)

@@ -266,8 +266,11 @@ class TeamMemoryModel(AbstractSportOrgMemoryModel):
     def rowCount(self, parent=None, *args, **kwargs):
         return len(race().organizations)
 
+    def get_headers(self):
+        return ['Name', 'Address', 'Country', 'Region', 'City', 'Contact']
+
     def columnCount(self, parent=None, *args, **kwargs):
-        return 4
+        return len(self.get_headers())
 
     def data(self, index, role=None):
         if role == Qt.DisplayRole:
@@ -285,7 +288,7 @@ class TeamMemoryModel(AbstractSportOrgMemoryModel):
     def headerData(self, index, orientation, role=None):
 
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
-            columns = ['Name', 'Address', 'Country', 'Contact']
+            columns = self.get_headers()
             return _(columns[index])
 
     def get_data(self, position):
@@ -299,9 +302,11 @@ class TeamMemoryModel(AbstractSportOrgMemoryModel):
 
         return list([
             team.name,
-            team.address,
-            team.country,
-            team.contact
+            team.address.street,
+            team.country.name,
+            team.region,
+            team.city,
+            team.contact.name
         ])
 
     def update_one_object(self, part, index):

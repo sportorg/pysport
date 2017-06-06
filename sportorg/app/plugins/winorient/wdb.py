@@ -2,7 +2,7 @@ import datetime
 
 from sportorg.app.models import model
 from sportorg.app.models.memory import event, Race, Organization, Group, Person, Result, race, find, Course, \
-    CourseControl, CourseControlList
+    CourseControl, CourseControlList, Country, Contact, Address
 from sportorg.lib.winorient.wdb import WDB, WDBMan, WDBTeam, WDBGroup, WDBDistance, WDBPunch
 
 
@@ -174,6 +174,11 @@ class WinOrientBinary:
             assert (isinstance(team, WDBTeam))
             new_team = Organization()
             new_team.name = team.name
+            new_team.region = str(team.region)
+            new_team.country = Country()
+            new_team.address = Address()
+            new_team.contact = Contact()
+            new_team.country.name = str(team.country)
             my_race.organizations.append(new_team)
 
         for course in self.wdb_object.dist:
