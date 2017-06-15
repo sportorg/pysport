@@ -1,6 +1,4 @@
 from peewee import *
-from sportorg.app.models import memory
-from config import VERSION
 
 database_proxy = Proxy()
 
@@ -256,14 +254,3 @@ def create_db():
             LegCoursePart,
             OnlineControlTime
         ], safe=True)
-
-
-def dump(source):
-    initialize(source)
-    create_db()
-    # TODO
-
-
-def load(source):
-    initialize(source)
-    # TODO
