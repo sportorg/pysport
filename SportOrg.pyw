@@ -2,7 +2,7 @@ import sys
 
 from PyQt5.QtWidgets import QApplication, QMainWindow
 
-from sportorg.app.controller.main import MainWindow
+from sportorg.app.controllers.main import MainWindow
 
 
 def main(argv):

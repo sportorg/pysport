@@ -6,7 +6,7 @@ import traceback
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QAbstractItemView, QHeaderView
 
-from sportorg.app.controller.dialogs.organization_edit import OrganizationEditDialog
+from sportorg.app.controllers.dialogs.organization_edit import OrganizationEditDialog
 from sportorg.app.models.memory_model import PersonProxyModel, TeamMemoryModel
 
 

@@ -6,8 +6,8 @@ import traceback
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow
 
-from sportorg.app.controller.dialogs.entry_filter import DialogFilter
-from sportorg.app.controller.tabs import start_preparation, groups, teams, race_results, courses
+from sportorg.app.controllers.dialogs.entry_filter import DialogFilter
+from sportorg.app.controllers.tabs import start_preparation, groups, teams, race_results, courses
 
 import configparser
 

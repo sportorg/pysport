@@ -9,7 +9,7 @@ import sys
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QApplication, QDialog, QTableView
 
-from sportorg.app.controller.dialogs import entry_edit
+from sportorg.app.controllers.dialogs import entry_edit
 from sportorg.app.models.table_model import PersonProxyModel
 
 
