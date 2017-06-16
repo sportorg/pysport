@@ -1,4 +1,28 @@
-class Country(object):
+class Model(object):
+    @classmethod
+    def create(cls, **kwargs):
+        o = cls()
+        for key, value in kwargs.items():
+            if hasattr(o, key):
+                setattr(o, key, value)
+
+        return o
+
+    @classmethod
+    def update(cls, **kwargs):
+        for key, value in kwargs.items():
+            if hasattr(cls, key):
+                setattr(cls, key, value)
+
+    def __getitem__(self, key):
+        return getattr(self, key)
+
+    def __setitem__(self, key, val):
+        if hasattr(self, key):
+            setattr(self, key, val)
+
+
+class Country(Model):
     name = ''
     code2 = ''
     code3 = ''
@@ -24,20 +48,20 @@ class ResultStatus(object):
     CANCELLED = "Cancelled"
 
 
-class CompetitionType:
+class CompetitionType(object):
     PREDETERMINED = 'Predetermined'
     SELECTION = 'Selection'
     MARKING = 'Marking'
 
 
-class Settings:
+class Settings(object):
     competition_type = CompetitionType.PREDETERMINED
     append_exist_person = False
     print_person_result = False
     check_punches = True
 
 
-class Address(object):
+class Address(Model):
     care_of = ''
     street = ''
     zip_code = ''
@@ -46,12 +70,12 @@ class Address(object):
     country = Country()
 
 
-class Contact(object):
+class Contact(Model):
     name = ''
     value = ''
 
 
-class Organization(object):
+class Organization(Model):
     name = ''
     address = Address()
     contact = Contact()
@@ -64,7 +88,7 @@ class OrganizationList(list):
     pass
 
 
-class CourseControl(object):
+class CourseControl(Model):
     code = ''
     length = 0
     order = None
@@ -74,7 +98,7 @@ class CourseControlList(list):
     pass
 
 
-class Course(object):
+class Course(Model):
     name = ''
     type = ''
     bib = ''
@@ -94,7 +118,7 @@ class CourseList(list):
     pass
 
 
-class Group(object):
+class Group(Model):
     name = ''
     course = Course()
     price = 0
@@ -115,7 +139,7 @@ class GroupList(list):
     pass
 
 
-class Result(object):
+class Result(Model):
     card_number = None
     start_time = None
     finish_time = None
@@ -138,7 +162,7 @@ class ResultList(list):
     pass
 
 
-class Person(object):
+class Person(Model):
     name = ''
     surname = ''
     sex = ''
@@ -164,7 +188,7 @@ class PersonList(list):
     pass
 
 
-class RaceData(object):
+class RaceData(Model):
     name = ''
     organisation = None
     start_time = None
@@ -172,7 +196,7 @@ class RaceData(object):
     live_url = None
 
 
-class Race(object):
+class Race(Model):
     data = RaceData()
     courses = CourseList()
     groups = GroupList()
