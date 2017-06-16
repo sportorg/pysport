@@ -33,10 +33,10 @@ pip install sireader
                 sportorg.po
     sportorg/
         app/
-            controller/
+            controllers/
             models/
             view/
-            plugin/
+            plugins/
         lib/
 ```
 
