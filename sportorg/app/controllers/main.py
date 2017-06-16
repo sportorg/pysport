@@ -243,6 +243,7 @@ class MainWindow(object):
                                             '', "CSV Winorient (*.csv)")[0]
         if file_name is not '':
             winorient.import_csv(file_name)
+            self.refresh()
             # self.tabwidget.update(start_preparation.Widget())
             # try:
             #     table = self.tabwidget.findChild(QtWidgets.QTableView, 'EntryTable')
@@ -258,16 +259,7 @@ class MainWindow(object):
                 wb = WinOrientBinary(file=file_name)
                 # wb.run()
                 wb.create_objects()
-                table = self.tabwidget.findChild(QtWidgets.QTableView, 'EntryTable')
-                table.model().setSourceModel(PersonMemoryModel())
-                table = self.tabwidget.findChild(QtWidgets.QTableView, 'ResultTable')
-                table.model().setSourceModel(ResultMemoryModel())
-                table = self.tabwidget.findChild(QtWidgets.QTableView, 'GroupTable')
-                table.model().setSourceModel(GroupMemoryModel())
-                table = self.tabwidget.findChild(QtWidgets.QTableView, 'CourseTable')
-                table.model().setSourceModel(CourseMemoryModel())
-                table = self.tabwidget.findChild(QtWidgets.QTableView, 'TeamTable')
-                table.model().setSourceModel(TeamMemoryModel())
+                self.refresh()
             except:
                 print(sys.exc_info())
                 traceback.print_exc()
@@ -276,7 +268,12 @@ class MainWindow(object):
         file_name = QtWidgets.QFileDialog.getOpenFileName(self.mainwindow, 'Open Ocad txt v8 file',
                                                           '', "Ocad classes v8 (*.txt)")[0]
         if file_name is not '':
-            ocad.import_txt_v8(file_name)
+            try:
+                ocad.import_txt_v8(file_name)
+            except:
+                traceback.print_exc()
+
+            self.refresh()
 
     def filter_dialog(self):
         try:
@@ -285,4 +282,19 @@ class MainWindow(object):
             ex.exec()
         except:
             print(sys.exc_info())
+            traceback.print_exc()
+
+    def refresh(self):
+        try:
+            table = self.tabwidget.findChild(QtWidgets.QTableView, 'EntryTable')
+            table.model().setSourceModel(PersonMemoryModel())
+            table = self.tabwidget.findChild(QtWidgets.QTableView, 'ResultTable')
+            table.model().setSourceModel(ResultMemoryModel())
+            table = self.tabwidget.findChild(QtWidgets.QTableView, 'GroupTable')
+            table.model().setSourceModel(GroupMemoryModel())
+            table = self.tabwidget.findChild(QtWidgets.QTableView, 'CourseTable')
+            table.model().setSourceModel(CourseMemoryModel())
+            table = self.tabwidget.findChild(QtWidgets.QTableView, 'TeamTable')
+            table.model().setSourceModel(TeamMemoryModel())
+        except:
             traceback.print_exc()
