@@ -137,7 +137,10 @@ class MainWindow(object):
         self.action_open.setIcon(QtGui.QIcon(config.icon_dir("folder.png")))
         self.action_new.setShortcut("Ctrl+N")
         self.action_new__race.setText(_("New Race"))
-        self.action_save_as.setText(_("Save as"))
+        self.action_save_as.setText(_("Save As"))
+        self.action_save_as.setShortcut("Ctrl+Shift+S")
+        self.action_save_as.setIcon(QtGui.QIcon(config.icon_dir("save.png")))
+        self.action_save_as.triggered.connect(self.save_file_as)
         self.action_open__resent.setText(_("Open Recent"))
         self.action_settings.setText(_("Settings"))
         self.action_event__settings.setText(_("Event Settings"))
@@ -212,6 +215,13 @@ class MainWindow(object):
 
     def create_file(self):
         file_name = QtWidgets.QFileDialog.getSaveFileName(self.mainwindow,'Create SportOrg file',
+                                            '/' + str(time.strftime("%Y%m%d")), "SportOrg file (*.sportorg)")[0]
+        if file_name is not '':
+            self.mainwindow.setWindowTitle(file_name)
+            self.file = file_name
+
+    def save_file_as(self):
+        file_name = QtWidgets.QFileDialog.getSaveFileName(self.mainwindow,'Save As SportOrg file',
                                             '/' + str(time.strftime("%Y%m%d")), "SportOrg file (*.sportorg)")[0]
         if file_name is not '':
             self.mainwindow.setWindowTitle(file_name)

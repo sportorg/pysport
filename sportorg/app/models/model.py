@@ -135,7 +135,7 @@ class Person(BaseModel):
     sex = CharField(null=True, max_length=1)
     year = SmallIntegerField(null=True)  # sometime we have only year of birth
     birth_date = DateField(null=True)
-    team = ForeignKeyField(Organization, null=True)
+    organization = ForeignKeyField(Organization, null=True)
     nationality = ForeignKeyField(Country, null=True)
     address = ForeignKeyField(Address, null=True)
     contact = ForeignKeyField(Contact, null=True)
