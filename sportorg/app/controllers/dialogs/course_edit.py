@@ -6,19 +6,13 @@ from PyQt5.QtCore import QSortFilterProxyModel, QModelIndex
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QLabel, \
     QLineEdit, QComboBox, QCompleter, QApplication, QTableView, QDialog, \
-    QPushButton
+    QPushButton, QSpinBox, QTextEdit
+
+from sportorg.app.models.memory import race, Organization, Course, CourseControl
 
 
-from sportorg.app.models.memory import race, Organization
-
-
-def get_countries():
-    return ['Russia', 'Finland', 'Norway', 'Germany', 'France', 'Austria', 'Kazakhstan', 'Ukraine', 'Poland', 'Estonia']
-
-
-def get_regions():
-    return ['Тюменская обл.', 'Курганская обл.', 'Свердловская обл.', 'Челябинская обл.', 'Республика Коми', 'г.Москва',
-            'ХМАО-Югра']
+def get_course_types():
+    return ['order', 'free', 'marked route']
 
 
 class AdvComboBox(QComboBox):
@@ -60,7 +54,7 @@ class AdvComboBox(QComboBox):
             self.setCurrentIndex(index)
 
 
-class OrganizationEditDialog(QDialog):
+class CourseEditDialog(QDialog):
     def __init__(self, table=None, index=None):
         super().__init__()
         self.init_ui()
@@ -71,10 +65,10 @@ class OrganizationEditDialog(QDialog):
         self.close()
 
     def init_ui(self):
-        self.setWindowTitle('Team properties')
+        self.setWindowTitle('Course properties')
         self.setWindowIcon(QIcon('sportorg.ico'))
         self.setGeometry(100, 100, 350, 500)
-        self.setToolTip('Team Edit Window')
+        self.setToolTip('Course Edit Window')
 
         self.layout = QFormLayout(self)
 
@@ -82,23 +76,32 @@ class OrganizationEditDialog(QDialog):
         self.item_name = QLineEdit()
         self.layout.addRow(self.label_name, self.item_name)
 
-        self.label_country = QLabel('Country')
-        self.item_country = AdvComboBox()
-        self.item_country.addItems(get_countries())
-        self.layout.addRow(self.label_country, self.item_country)
+        self.label_type = QLabel('Type')
+        self.item_type = AdvComboBox()
+        self.item_type.addItems(get_course_types())
+        self.layout.addRow(self.label_type, self.item_type)
 
-        self.label_region = QLabel('Region')
-        self.item_region = AdvComboBox()
-        self.item_region.addItems(get_regions())
-        self.layout.addRow(self.label_region, self.item_region)
+        self.label_length = QLabel('Length')
+        self.item_length = QSpinBox()
+        self.item_length.setMaximum(100000)
+        self.item_length.setSingleStep(100)
+        self.item_length.setValue(0)
+        self.layout.addRow(self.label_length, self.item_length)
 
-        self.label_contact = QLabel('Contact')
-        self.item_contact = QLineEdit()
-        self.layout.addRow(self.label_contact, self.item_contact)
+        self.label_climb = QLabel('Climb')
+        self.item_climb = QSpinBox()
+        self.item_climb.setValue(0)
+        self.item_climb.setMaximum(10000)
+        self.item_climb.setSingleStep(10)
+        self.layout.addRow(self.label_climb, self.item_climb)
 
-        self.label_address = QLabel('Address')
-        self.item_address = QLineEdit()
-        self.layout.addRow(self.label_address, self.item_address)
+        self.label_control_qty = QLabel('Control count')
+        self.item_control_qty = QSpinBox()
+        self.layout.addRow(self.label_control_qty, self.item_control_qty)
+
+        self.label_controls = QLabel('Controls')
+        self.item_controls = QTextEdit()
+        self.layout.addRow(self.label_controls, self.item_controls)
 
         def cancel_changes():
             self.close()
@@ -129,45 +132,52 @@ class OrganizationEditDialog(QDialog):
         assert (isinstance(orig_index, QModelIndex))
         orig_index_int = orig_index.row()
 
-        current_object = race().organizations[orig_index_int]
-        assert (isinstance(current_object, Organization))
+        current_object = race().courses[orig_index_int]
+        assert (isinstance(current_object, Course))
         self.current_object = current_object
 
         self.item_name.setText(current_object.name)
 
-        if current_object.country is not None:
-            self.item_country.setCurrentText(current_object.country.name)
-        if current_object.region is not None:
-            self.item_region.setCurrentText(current_object.region)
-        if current_object.contact is not None:
-            self.item_contact.setText(current_object.contact.name)
-        if current_object.address is not None:
-            self.item_address.setText(current_object.address.street)
+        if current_object.type is not None:
+            self.item_type.setCurrentText(str(current_object.type))
+        if current_object.length is not None:
+            self.item_length.setValue(current_object.length)
+        if current_object.climb is not None:
+            self.item_climb.setValue(current_object.climb)
+        if current_object.controls is not None:
+            self.item_control_qty.setValue(len(current_object.controls))
+        for i in current_object.controls:
+            assert isinstance(i, CourseControl)
+            self.item_controls.append(str(i.code) + ' ' + str(i.length))
 
     def apply_changes_impl(self):
         changed = False
-        org = self.current_object
-        assert (isinstance(org, Organization))
+        course = self.current_object
+        assert (isinstance(course, Course))
 
-        if org.name != self.item_name.text():
-            org.name = self.item_name.text()
+        if course.name != self.item_name.text():
+            course.name = self.item_name.text()
             changed = True
 
-        if org.country.name != self.item_country.currentText():
-            org.country.name = self.item_country.currentText()
+        if str(course.type) != self.item_type.currentText():
+            course.type = self.item_type.currentText()
             changed = True
 
-        if org.region != self.item_region.currentText():
-            org.region = self.item_region.currentText()
+        if course.length != self.item_length.value():
+            course.length = self.item_length.value()
             changed = True
 
-        if org.contact != self.item_contact.text():
-            org.contact.name = self.item_contact.text()
+        if course.climb != self.item_climb.value():
+            course.climb = self.item_climb.value()
             changed = True
 
-        if org.address != self.item_address.text():
-            org.address.street = self.item_address.text()
-            changed = True
+        text = self.item_controls.toPlainText()
+        course.controls.clear()
+        for i in text.split('\n'):
+            control = CourseControl()
+            control.code = i.split()[0]
+            control.length = i.split()[1]
+            course.controls.append(control)
 
         if changed:
             table = self.table
@@ -175,5 +185,5 @@ class OrganizationEditDialog(QDialog):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    ex = OrganizationEditDialog()
+    ex = CourseEditDialog()
     sys.exit(app.exec_())

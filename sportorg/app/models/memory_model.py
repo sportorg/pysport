@@ -35,7 +35,7 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
                 answer = self.get_participation_data(index.row())[index.column()]
             except:
                 print(sys.exc_info())
-                traceback.print_stack()
+                traceback.print_exc()
 
             # end = time.time()
             # logging.info('Data() ' + str(index.row()) + ' ' + str(index.column()) + ': ' + str(end - start) + ' s')
@@ -103,7 +103,7 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
                 answer = self.get_participation_data(index.row())[index.column()]
             except:
                 print(sys.exc_info())
-                traceback.print_stack()
+                traceback.print_exc()
 
             # end = time.time()
             # logging.info('Data() ' + str(index.row()) + ' ' + str(index.column()) + ': ' + str(end - start) + ' s')
@@ -164,7 +164,7 @@ class GroupMemoryModel(AbstractSportOrgMemoryModel):
                 answer = self.get_data(index.row())[index.column()]
             except:
                 print(sys.exc_info())
-                traceback.print_stack()
+                traceback.print_exc()
 
             return QVariant(answer)
 
@@ -188,13 +188,17 @@ class GroupMemoryModel(AbstractSportOrgMemoryModel):
         if course is None:
             course = Course()
 
+        control_count = 0
+        if course.controls is not None:
+            control_count = len (course.controls)
+
         return list([
             group.name,
             group.long_name,
             course.name,
             course.type,
             course.length,
-            len(course.controls),
+            control_count,
             course.climb,
             group.sex,
             group.min_age,
@@ -225,7 +229,7 @@ class CourseMemoryModel(AbstractSportOrgMemoryModel):
                 answer = self.get_data(index.row())[index.column()]
             except:
                 print(sys.exc_info())
-                traceback.print_stack()
+                traceback.print_exc()
 
             return QVariant(answer)
 
@@ -279,7 +283,7 @@ class TeamMemoryModel(AbstractSportOrgMemoryModel):
                 answer = self.get_data(index.row())[index.column()]
             except:
                 print(sys.exc_info())
-                traceback.print_stack()
+                traceback.print_exc()
 
             return QVariant(answer)
 
@@ -347,5 +351,5 @@ class PersonProxyModel(QSortFilterProxyModel):
                         return False
         except:
             print(sys.exc_info())
-            traceback.print_stack()
+            traceback.print_exc()
         return True
