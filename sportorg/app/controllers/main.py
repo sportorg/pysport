@@ -26,6 +26,8 @@ import logging
 
 from sportorg.lib.winorient.wdb import parse_wdb
 
+from sportorg.app.plugins.export import result as export_result
+
 logging.basicConfig(**config.LOG_CONFIG, level=logging.DEBUG if config.DEBUG else logging.WARNING)
 
 
@@ -37,6 +39,7 @@ class MainWindow(object):
             self.file = None
         self.mainwindow = QMainWindow()
         self.conf = configparser.ConfigParser()
+        # self.print_result()
 
     def show(self):
         self.setup_ui()
@@ -298,3 +301,20 @@ class MainWindow(object):
             table.model().setSourceModel(TeamMemoryModel())
         except:
             traceback.print_exc()
+
+    def print_result(self):
+        with open(config.base_dir('log', "result.html"), 'w') as f:
+            f.write(export_result.get_text(
+                title="Competition 2017",
+                table_titles=['name', 'result'],
+                data={
+                    "M21": [
+                        ['Danil', '00:25:45'],
+                        ['Serega', '00:25:46'],
+                    ],
+                    "M35": [
+                        ['Max', '00:28:45'],
+                        ['Ivan', '00:28:46'],
+                    ],
+                }
+            ))
