@@ -10,6 +10,7 @@ For build, you need `cx_Freeze`
 - PyQt5
 - [sireader](https://pypi.python.org/pypi/sireader/1.0.1)
 - [peewee](http://docs.peewee-orm.com/en/latest/peewee/quickstart.html)
+- jinja2
 
 Install packages
 ```
