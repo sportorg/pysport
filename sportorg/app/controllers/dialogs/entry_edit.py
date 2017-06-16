@@ -291,7 +291,7 @@ class EntryEditDialog(QDialog):
                 self.apply_changes_impl()
             except:
                 print(sys.exc_info())
-                traceback.print_stack()
+                traceback.print_exc()
             self.close()
 
         self.button_ok = QPushButton('OK')
@@ -348,11 +348,13 @@ class EntryEditDialog(QDialog):
         if current_object.bib is not None:
             self.item_bib.setValue(int(current_object.bib))
         if current_object.result is not None:
+
             t = current_object.result.start_time
-            assert(isinstance(t, datetime))
-            time = QTime()
-            time.setHMS(t.hour, t.minute, t.second, t.microsecond)
-            self.item_start.setTime(time)
+            if t is not None:
+                assert(isinstance(t, datetime))
+                time = QTime()
+                time.setHMS(t.hour, t.minute, t.second, t.microsecond)
+                self.item_start.setTime(time)
 
         if current_object.card_number is not None:
             self.item_card.setValue(int(current_object.card_number))
@@ -399,86 +401,6 @@ class EntryEditDialog(QDialog):
         if changed:
             table = self.table
             #table.model().sourceModel().update_one_object(part, table.model().mapToSource(self.current_index).row())
-
-
-    # Deprecated
-    def set_values_from_table_db(self, table, index):
-        self.table = table
-        self.current_index = index
-        assert (isinstance(table, QTableView))
-        model = table.model()
-        assert (isinstance(model, QSortFilterProxyModel))
-        orig_index = model.mapToSource(index)
-        assert (isinstance(orig_index, QModelIndex))
-        orig_index_int = orig_index.row()
-
-        query = Participation.select()
-        current_object = query[orig_index_int]
-        assert(isinstance(current_object, Participation))
-        self.current_object = current_object
-        self.item_surname.setText(current_object.person.surname)
-        self.item_name.setCurrentText(current_object.person.name)
-        if current_object.group is not None:
-            self.item_group.setCurrentText(current_object.group.name)
-        if current_object.person.team is not None:
-            self.item_team.setCurrentText(current_object.person.team.name)
-        if current_object.person.year is not None:
-            self.item_year.setValue(current_object.person.year)
-        if current_object.person.qual is not None:
-            self.item_qual.setCurrentText(current_object.person.qual)
-        if current_object.bib_number is not None:
-            self.item_bib.setValue(current_object.bib_number)
-        if current_object.start_time is not None:
-            self.item_start.setTime(QTime.fromString(current_object.start_time, 'HH:mm:ss'))
-
-        if current_object.control_card is not None:
-            self.item_card.setValue(int(current_object.control_card.value))
-
-    # Deprecated
-    def apply_changes_impl_db(self):
-        changed = False
-        part = self.current_object
-        assert (isinstance(part, Participation))
-        if part.person.name != self.item_name.currentText():
-            part.person.name = self.item_name.currentText()
-            changed = True
-        if part.person.surname != self.item_surname.text():
-            part.person.surname = self.item_surname.text()
-            changed = True
-        if part.group.name != self.item_group.currentText():
-            part.group = Group.select().where(Group.name == self.item_group.currentText())[0]
-            changed = True
-        if part.person.team.name != self.item_team.currentText():
-            part.person.team = Organization.select().where(Organization.name == self.item_team.currentText())[0]
-            changed = True
-        if part.person.year != str(self.item_year.value()):
-            part.person.year = str(self.item_year.value())
-            changed = True
-        if part.person.qual != self.item_qual.currentText():
-            part.person.qual = self.item_qual.currentText()
-            changed = True
-        if part.bib_number != self.item_bib.text() and self.item_bib.text() != '0':
-            part.bib_number = self.item_bib.text()
-            changed = True
-        if part.start_time != self.item_start.text():
-            part.start_time = self.item_start.text()
-            changed = True
-        if (part.control_card is None or part.control_card.value != self.item_card.text()) \
-                and self.item_card.text() != '0':
-            card = ControlCard()
-            card.name = 'SPORTIDENT'
-            card.value = self.item_card.text()
-            card.person = part.person
-            card.save()
-            part.control_card = card  # TODO remove previous card?
-            changed = True
-
-        if changed:
-            part.person.save()
-            part.save()
-
-            table = self.table
-            table.model().sourceModel().update_one_object(part, table.model().mapToSource(self.current_index).row())
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

@@ -6,11 +6,13 @@
 #
 # WARNING! All changes made in this file will be lost!
 import sys
+import traceback
+
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QApplication, QDialog, QTableView
 
 from sportorg.app.controllers.dialogs import entry_edit
-from sportorg.app.models.table_model import PersonProxyModel
+from sportorg.app.models.memory_model import PersonProxyModel
 
 
 class DialogFilter(QDialog):
@@ -67,15 +69,19 @@ class DialogFilter(QDialog):
         self.show()
 
     def accept(self):
-        # apply filter here
-        if self.table is not None:
-            assert (isinstance(self.table, QTableView))
-            proxy_model = self.table.model()
-            assert (isinstance(proxy_model, PersonProxyModel))
 
-            proxy_model.clear_filter()
-            proxy_model.set_filter_for_column(4, self.group_combo.currentText())
-            proxy_model.set_filter_for_column(5, self.team_combo.currentText())
+        try:
+            # apply filter here
+            if self.table is not None:
+                assert (isinstance(self.table, QTableView))
+                proxy_model = self.table.model()
+                assert (isinstance(proxy_model, PersonProxyModel))
+
+                proxy_model.clear_filter()
+                proxy_model.set_filter_for_column(4, self.group_combo.currentText())
+                proxy_model.set_filter_for_column(5, self.team_combo.currentText())
+        except:
+            traceback.print_exc()
 
         self.close_dialog()
 

@@ -103,7 +103,7 @@ class Widget(QtWidgets.QWidget):
                 self.show_punches(index)
             except:
                 print(sys.exc_info())
-                traceback.print_stack()
+                traceback.print_exc()
 
             print('finish single result clicked on ' + str(index.row()))
             logging.info('finish single result clicked on ' + str(index.row()))
@@ -165,10 +165,11 @@ class Widget(QtWidgets.QWidget):
         index = 1
         course = result.person.group.course
         assert isinstance(course, Course)
-        for i in course.controls:
-            assert isinstance(i, CourseControl)
-            s = str(index) + " " + str(i.code) + " " + str(i.length)
-            self.ResultCourseDetails.append(s)
-            index += 1
+        if course.controls is not None:
+            for i in course.controls:
+                assert isinstance(i, CourseControl)
+                s = str(index) + " " + str(i.code) + " " + str(i.length)
+                self.ResultCourseDetails.append(s)
+                index += 1
         self.ResultCourseNameEdit.setText(course.name)
         self.ResultCourseLengthEdit.setText(str(course.length))

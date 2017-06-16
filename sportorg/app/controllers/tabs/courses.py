@@ -1,7 +1,11 @@
 import logging
+import traceback
+
+import sys
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QAbstractItemView, QHeaderView
 
+from sportorg.app.controllers.dialogs.course_edit import CourseEditDialog
 from sportorg.app.models.memory_model import PersonProxyModel, CourseMemoryModel
 
 
@@ -33,8 +37,14 @@ class Widget(QtWidgets.QWidget):
         hor_header.setSectionResizeMode(QHeaderView.ResizeToContents)
 
         def course_double_clicked(index):
-            print('clicked on ' + str(index.row()))
-            logging.info('clicked on ' + str(index.row()))
+            print('Courses - clicked on ' + str(index.row()))
+            logging.info('Courses - clicked on ' + str(index.row()))
+            try:
+                dialog = CourseEditDialog(self.CourseTable, index)
+                dialog.exec()
+            except:
+                print(sys.exc_info())
+                traceback.print_exc()
 
         self.CourseTable.doubleClicked.connect(course_double_clicked)
         self.course_layout.addWidget(self.CourseTable)

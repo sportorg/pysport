@@ -44,7 +44,7 @@ class Widget(QtWidgets.QWidget):
                 dialog.exec()
             except:
                 print(sys.exc_info())
-                traceback.print_stack()
+                traceback.print_exc()
 
             logging.info('Team: clicked on ' + str(index.row()))
 

@@ -45,7 +45,7 @@ class Widget(QtWidgets.QWidget):
                 dialog = EntryEditDialog(self.EntryTable, index)
             except:
                 print(sys.exc_info())
-                traceback.print_stack()
+                traceback.print_exc()
 
             dialog.exec()
 

@@ -260,7 +260,7 @@ class MainWindow(object):
                 table.model().setSourceModel(TeamMemoryModel())
             except:
                 print(sys.exc_info())
-                traceback.print_stack()
+                traceback.print_exc()
 
     def import_ocad_txt_v8(self):
         file_name = QtWidgets.QFileDialog.getOpenFileName(self.mainwindow, 'Open Ocad txt v8 file',
@@ -275,4 +275,4 @@ class MainWindow(object):
             ex.exec()
         except:
             print(sys.exc_info())
-            traceback.print_stack()
+            traceback.print_exc()
