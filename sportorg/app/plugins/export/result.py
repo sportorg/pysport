@@ -1,5 +1,5 @@
-from ..jinja2 import template
 import config
+from sportorg.lib.jinja2 import template
 
 
 def get_text(**kwargs):

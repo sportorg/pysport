@@ -115,6 +115,7 @@ class Ui_bulk_edit(object):
         self.without_team_check_box.setText(_translate("bulk_edit", "without a team"))
         self.chip_rented_check_box.setText(_translate("bulk_edit", "chip rented"))
 
+
 def main(argv):
     app = QApplication(argv)
     mw = QDialog()

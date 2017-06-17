@@ -204,5 +204,6 @@ def main(argv):
     mw.show()
     sys.exit(app.exec())
 
+
 if __name__ == '__main__':
     main(sys.argv)

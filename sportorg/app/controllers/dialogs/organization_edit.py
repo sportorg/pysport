@@ -173,6 +173,7 @@ class OrganizationEditDialog(QDialog):
             table = self.table
             # table.model().sourceModel().update_one_object(part, table.model().mapToSource(self.current_index).row())
 
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = OrganizationEditDialog()

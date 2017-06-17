@@ -77,6 +77,7 @@ class Ui_number_change(object):
         self.remove_radio_button.setText(_translate("number_change", "Remove source"))
         self.replace_radio_button.setText(_translate("number_change", "Replace source with reserve"))
 
+
 def main(argv):
     app = QApplication(argv)
     mw = QDialog()

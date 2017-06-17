@@ -5,7 +5,6 @@ import logging
 import time
 import traceback
 
-import datetime
 from PyQt5.QtCore import QVariant, QAbstractTableModel, Qt, QSortFilterProxyModel
 from peewee import prefetch
 

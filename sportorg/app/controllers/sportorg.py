@@ -727,6 +727,7 @@ class Ui_MainWindow(object):
         self.actionHelp.setText(_translate("MainWindow", "Help"))
         self.actionAbout_us.setText(_translate("MainWindow", "About us"))
 
+
 def main(argv):
     app = QApplication(argv)
     mw = QMainWindow()

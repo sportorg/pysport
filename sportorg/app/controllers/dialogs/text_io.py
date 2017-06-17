@@ -142,6 +142,7 @@ class Ui_text_io(object):
 "Akhtarov Danil 12:10:00\n"
 ""))
 
+
 def main(argv):
     app = QApplication(argv)
     mw = QDialog()

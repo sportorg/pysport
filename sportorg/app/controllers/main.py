@@ -14,17 +14,13 @@ import configparser
 import config
 from sportorg.app.models.memory_model import PersonMemoryModel, ResultMemoryModel, GroupMemoryModel, CourseMemoryModel, \
     TeamMemoryModel
-from sportorg.app.models.table_model import PersonTableModel, ResultTableModel
 from sportorg.app.plugins.winorient.wdb import WinOrientBinary
 from sportorg.language import _
-from sportorg.app.models import model
 
 
 from sportorg.app.plugins.winorient import winorient
 from sportorg.app.plugins.ocad import ocad
 import logging
-
-from sportorg.lib.winorient.wdb import parse_wdb
 
 from sportorg.app.plugins.export import result as export_result
 
@@ -39,7 +35,7 @@ class MainWindow(object):
             self.file = None
         self.mainwindow = QMainWindow()
         self.conf = configparser.ConfigParser()
-        # self.print_result()
+        self.print_result()
 
     def show(self):
         self.setup_ui()
