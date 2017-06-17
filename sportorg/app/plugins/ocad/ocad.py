@@ -42,14 +42,14 @@ def import_txt_v8(source):
             length=course.length,
             climb=course.climb
         )
-        controls = memory.CourseControlDict()
+        controls = memory.CourseControlList()
         for order, control in course.controls.items():
-            controls[order] = memory.create(
+            controls.append(memory.create(
                 memory.CourseControl,
                 code=control.code,
                 order=control.order,
                 length=control.length
-            )
+            ))
         c.controls = controls
         memory.race().courses.append(c)
 
