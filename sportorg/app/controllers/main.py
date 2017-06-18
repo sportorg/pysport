@@ -42,6 +42,16 @@ class MainWindow(object):
         self.setup_statusbar()
         self.mainwindow.show()
 
+    def close(self):
+        print('exit', self.mainwindow.geometry())
+
+    def conf_read(self):
+        self.conf.read(config.CONFIG_INI)
+
+    def conf_write(self):
+        with open(config.CONFIG_INI, 'w') as configfile:
+            self.conf.write(configfile)
+
     def setup_ui(self):
         self.mainwindow.setMinimumSize(QtCore.QSize(480, 320))
         self.mainwindow.setGeometry(480, 320, 480, 320)

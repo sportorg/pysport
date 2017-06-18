@@ -52,6 +52,13 @@ def data_dir(*paths):
     return os.path.join(DATA_DIR, *paths)
 
 
+TEMPLATE_DIR = base_dir('templates')
+
+
+def template_dir(*paths):
+    return os.path.join(TEMPLATE_DIR, *paths)
+
+
 ICON = icon_dir('sportorg.ico')
 
 CONFIG_INI = data_dir('config.ini')
@@ -67,7 +74,8 @@ DIRS = [
     ICON_DIR,
     DATA_DIR,
     LOCALE_DIR,
-    LOG_DIR
+    LOG_DIR,
+    TEMPLATE_DIR
 ]
 
 for DIR in DIRS:
