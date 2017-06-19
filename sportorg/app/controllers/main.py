@@ -20,6 +20,7 @@ from sportorg.language import _
 
 from sportorg.app.plugins.winorient import winorient
 from sportorg.app.plugins.ocad import ocad
+from sportorg.app.plugins.backup import backup
 import logging
 
 logging.basicConfig(**config.LOG_CONFIG, level=logging.DEBUG if config.DEBUG else logging.WARNING)
@@ -232,6 +233,8 @@ class MainWindow(object):
         if file_name is not '':
             self.mainwindow.setWindowTitle(file_name)
             self.file = file_name
+            with open(file_name, 'wb') as file:
+                backup.dump(file)
 
     def save_file(self):
         pass
@@ -243,6 +246,12 @@ class MainWindow(object):
         if file_name is not '':
             self.mainwindow.setWindowTitle(file_name)
             self.file = file_name
+            try:
+                with open(file_name, 'rb') as file:
+                    backup.load(file)
+            except:
+                traceback.print_exc()
+            self.refresh()
 
     def import_wo_csv(self):
         file_name = QtWidgets.QFileDialog.getOpenFileName(self.mainwindow, 'Open CSV Winorient file',

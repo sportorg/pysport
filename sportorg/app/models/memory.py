@@ -215,18 +215,11 @@ class Race(Model):
 
 
 def create(obj, **kwargs):
-    o = obj()
-    for key, value in kwargs.items():
-        if hasattr(o, key):
-            setattr(o, key, value)
-
-    return o
+    return obj.create(**kwargs)
 
 
 def update(obj, **kwargs):
-    for key, value in kwargs.items():
-        if hasattr(obj, key):
-            setattr(obj, key, value)
+    obj.update(**kwargs)
 
 
 def find(iterable: list, **kwargs):
