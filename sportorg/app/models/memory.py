@@ -147,6 +147,8 @@ class Result(Model):
     penalty_time = 0  # time of penalties (marked route, false start)
     penalty_laps = 0  # count of penalty legs (marked route)
     status = None
+    result = 0
+    place = None
 
     person = None  # reverse link to person
 
@@ -156,6 +158,12 @@ class Result(Model):
         eq = eq and self.finish_time == other.finish_time
         eq = eq and self.punches == other.punches
         return eq
+
+    def __gt__(self, other):
+        if self.status is not None and other.status is not None:
+            if self.status == ResultStatus.OK and other.status != ResultStatus.OK:
+                return True
+        return self.result > other.result
 
 
 class ResultList(list):

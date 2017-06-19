@@ -250,12 +250,6 @@ class MainWindow(object):
         if file_name is not '':
             winorient.import_csv(file_name)
             self.refresh()
-            # self.tabwidget.update(start_preparation.Widget())
-            # try:
-            #     table = self.tabwidget.findChild(QtWidgets.QTableView, 'EntryTable')
-            #     table.model().setSourceModel(PersonTableModel())
-            # except:
-            #     print(sys.exc_info())
 
     def import_wo_wdb(self):
         file_name = QtWidgets.QFileDialog.getOpenFileName(self.mainwindow, 'Open WDB Winorient file',
