@@ -63,7 +63,8 @@ class ReportDialog(QDialog):
     def init_ui(self):
         self.setWindowTitle('Report creating')
         self.setWindowIcon(QIcon('sportorg.ico'))
-        self.setGeometry(100, 100, 350, 500)
+        self.setSizeGripEnabled(False)
+        self.setModal(True)
         self.setToolTip('Creating of report')
 
         self.layout = QFormLayout(self)

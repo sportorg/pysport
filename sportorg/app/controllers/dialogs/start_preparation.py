@@ -17,6 +17,8 @@ class StartPreparationDialog(object):
     def setup_ui(self):
         self.dialog.setObjectName("dialog")
         self.dialog.setWindowIcon(QtGui.QIcon(config.ICON))
+        self.dialog.setSizeGripEnabled(False)
+        self.dialog.setModal(True)
         self.dialog.resize(639, 317)
         self.dialog.setFixedSize(self.dialog.size())
         self.button_box = QtWidgets.QDialogButtonBox(self.dialog)

@@ -67,7 +67,8 @@ class CourseEditDialog(QDialog):
     def init_ui(self):
         self.setWindowTitle('Course properties')
         self.setWindowIcon(QIcon('sportorg.ico'))
-        self.setGeometry(100, 100, 350, 500)
+        self.setSizeGripEnabled(False)
+        self.setModal(True)
         self.setToolTip('Course Edit Window')
 
         self.layout = QFormLayout(self)

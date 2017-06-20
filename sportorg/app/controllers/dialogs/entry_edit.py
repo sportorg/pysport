@@ -220,7 +220,8 @@ class EntryEditDialog(QDialog):
     def init_ui(self):
         self.setWindowTitle('Entry properties')
         self.setWindowIcon(QIcon('sportorg.ico'))
-        self.setGeometry(100, 100, 350, 500)
+        self.setSizeGripEnabled(False)
+        self.setModal(True)
         self.setToolTip('Main Window')
 
         self.layout = QFormLayout(self)
