@@ -54,7 +54,7 @@ class CompetitionType(object):
     MARKING = 'Marking'
 
 
-class Settings(object):
+class Settings(Model):
     competition_type = CompetitionType.PREDETERMINED
     append_exist_person = False
     print_person_result = False
@@ -93,6 +93,9 @@ class CourseControl(Model):
     length = 0
     order = None
 
+    def __eq__(self, other):
+        return self.code == other.code
+
 
 class CourseControlList(list):
     pass
@@ -112,6 +115,15 @@ class Course(Model):
             assert isinstance(i, CourseControl)
             ret.append(str(i.code))
         return ret
+
+    def __eq__(self, other):
+        if len(self.controls) != len(other.controls):
+            return False
+        for i in range(len(self.controls)):
+            if self.controls[i] != other.controls[i]:
+                return False
+
+        return True
 
 
 class CourseList(list):
@@ -169,6 +181,7 @@ class Result(Model):
         if self.status != 0 and self.status != ResultStatus.OK:
             return ''
         return str(self.finish_time - self.start_time)
+
 
 class ResultList(list):
     pass
