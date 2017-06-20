@@ -7,6 +7,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow
 
 from sportorg.app.controllers.dialogs.entry_filter import DialogFilter
+from sportorg.app.controllers.dialogs.report_dialog import ReportDialog
 from sportorg.app.controllers.tabs import start_preparation, groups, teams, race_results, courses
 
 import configparser
@@ -81,6 +82,7 @@ class MainWindow(object):
         self.mainwindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(self.mainwindow)
         self.mainwindow.setStatusBar(self.statusbar)
+
         self.action_save = QtWidgets.QAction(self.mainwindow)
         self.action_open = QtWidgets.QAction(self.mainwindow)
         self.action_quit = QtWidgets.QAction(self.mainwindow)
@@ -98,6 +100,9 @@ class MainWindow(object):
         self.action_ocad_txt_v8 = QtWidgets.QAction(self.mainwindow)
         self.action_help = QtWidgets.QAction(self.mainwindow)
         self.action_about_us = QtWidgets.QAction(self.mainwindow)
+        self.action_report = QtWidgets.QAction(self.mainwindow)
+        self.action_filter = QtWidgets.QAction(self.mainwindow)
+
         self.menu_import.addAction(self.action_cvs)
         self.menu_import.addAction(self.action_csv__winorient)
         self.menu_import.addAction(self.action_wdb__winorient)
@@ -118,8 +123,8 @@ class MainWindow(object):
         self.menu_file.addAction(self.action_export)
         self.menu_file.addSeparator()
         self.menu_file.addAction(self.action_quit)
-        self.action_filter = QtWidgets.QAction(self.mainwindow)
         self.menu_start_preparation.addAction(self.action_filter)
+        self.menu_results.addAction(self.action_report)
         self.menu_help.addAction(self.action_help)
         self.menu_help.addAction(self.action_about_us)
         self.menubar.addAction(self.menu_file.menuAction())
@@ -132,6 +137,7 @@ class MainWindow(object):
         self.menubar.addAction(self.menu_options.menuAction())
         self.menubar.addAction(self.menu_help.menuAction())
         self.menu_file.setTitle(_("File"))
+
         self.action_new.setText(_("New"))
         self.action_new.setIcon(QtGui.QIcon(config.icon_dir("file.png")))
         self.action_new.triggered.connect(self.create_file)
@@ -167,6 +173,9 @@ class MainWindow(object):
         self.action_filter.setText(_("Filter"))
         self.action_filter.triggered.connect(self.filter_dialog)
         self.action_filter.setShortcut("F2")
+        self.action_report.setText(_("Create report"))
+        self.action_report.triggered.connect(self.report_dialog)
+        self.action_report.setShortcut("Ctrl+P")
 
         self.menu_edit.setTitle(_("Edit"))
 
@@ -288,6 +297,14 @@ class MainWindow(object):
         try:
             table = self.tabwidget.findChild(QtWidgets.QTableView, 'EntryTable')
             ex = DialogFilter(table)
+            ex.exec()
+        except:
+            print(sys.exc_info())
+            traceback.print_exc()
+
+    def report_dialog(self):
+        try:
+            ex = ReportDialog()
             ex.exec()
         except:
             print(sys.exc_info())

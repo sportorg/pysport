@@ -165,6 +165,10 @@ class Result(Model):
                 return True
         return self.result > other.result
 
+    def get_result(self):
+        if self.status != 0 and self.status != ResultStatus.OK:
+            return ''
+        return str(self.finish_time - self.start_time)
 
 class ResultList(list):
     pass

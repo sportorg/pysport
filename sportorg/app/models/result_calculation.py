@@ -15,15 +15,16 @@ class ResultCalculation(object):
             assert isinstance(person, Person)
             if person.group == group:
                 ret.append(i)
+        ret.sort()
         return ret
 
     def set_places(self, array):
          assert isinstance(array, list)
-         array.sort()
          for i in range(len(array)):
             res = array[i]
             assert isinstance(res, Result)
 
+            res.place = ''
             if res.status == ResultStatus.OK or res.status == 0:
                 # give place only if status = OK
                 res.place = i+1
