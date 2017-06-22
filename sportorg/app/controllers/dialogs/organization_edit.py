@@ -73,7 +73,8 @@ class OrganizationEditDialog(QDialog):
     def init_ui(self):
         self.setWindowTitle('Team properties')
         self.setWindowIcon(QIcon('sportorg.ico'))
-        self.setGeometry(100, 100, 350, 500)
+        self.setSizeGripEnabled(False)
+        self.setModal(True)
         self.setToolTip('Team Edit Window')
 
         self.layout = QFormLayout(self)

@@ -141,7 +141,7 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
             str(result_time),
             i.status,
             i.penalty_time,
-            'place'])
+            i.place])
 
     def update_one_object(self, part, index):
         self.values[index] = self.get_values_from_object(part)

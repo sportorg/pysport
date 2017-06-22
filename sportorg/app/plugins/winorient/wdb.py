@@ -1,8 +1,9 @@
 import datetime
 
 from sportorg.app.models import model
-from sportorg.app.models.memory import event, Race, Organization, Group, Person, Result, race, find, Course, \
+from sportorg.app.models.memory import Race, Organization, Group, Person, Result, race, find, Course, \
     CourseControl, CourseControlList, Country, Contact, Address
+from sportorg.app.models.result_calculation import ResultCalculation
 from sportorg.lib.winorient.wdb import WDB, WDBMan, WDBTeam, WDBGroup, WDBDistance, WDBPunch
 
 
@@ -237,6 +238,7 @@ class WinOrientBinary:
                 result.start_time = self.int_to_time(man.start)
                 result.finish_time = self.int_to_time(fin.time)
                 result.status = man.status
+                result.result = man.result
 
                 my_race.results.append(result)
 
@@ -252,3 +254,5 @@ class WinOrientBinary:
                         punch = (code, time)
                         if code > 0:
                             result.punches.append(punch)
+
+        ResultCalculation().process_results()

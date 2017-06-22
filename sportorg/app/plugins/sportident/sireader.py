@@ -9,6 +9,7 @@ class SIReaderThread(threading.Thread):
         super().__init__()
         self.port = port
         self.func = func
+        self.cards = list()
         self.reading = True
 
     def run(self):
@@ -26,6 +27,7 @@ class SIReaderThread(threading.Thread):
                 card_data = si.read_sicard()
 
                 self.func(card_data)
+                self.cards.append(card_data)
 
                 # beep
                 si.ack_sicard()
@@ -62,12 +64,8 @@ def choose_port():
         return None
 
 
-port_runner = []
-
-
 if __name__ == '__main__':
     port = choose_port()
     if port is not None:
         reader = SIReaderThread(port)
         reader.start()
-        port_runner.append(reader)

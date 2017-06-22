@@ -738,8 +738,12 @@ pre {
 <article class="markdown-body">
     <h2>{{ title }}</h2>
  
+    {% macro view_groups() -%}{% for group in data %}<a href="#{{group}}">{{group}}</a> {% endfor %}{%- endmacro %}
+
     {% for group in data %}
     <br>
+    {{ view_groups() }}
+
     <h2 id="{{group}}">{{group}}</h2>
     <table>
         <tr>

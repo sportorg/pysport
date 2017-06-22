@@ -54,7 +54,7 @@ class CompetitionType(object):
     MARKING = 'Marking'
 
 
-class Settings(object):
+class Settings(Model):
     competition_type = CompetitionType.PREDETERMINED
     append_exist_person = False
     print_person_result = False
@@ -93,6 +93,9 @@ class CourseControl(Model):
     length = 0
     order = None
 
+    def __eq__(self, other):
+        return self.code == other.code
+
 
 class CourseControlList(list):
     pass
@@ -112,6 +115,15 @@ class Course(Model):
             assert isinstance(i, CourseControl)
             ret.append(str(i.code))
         return ret
+
+    def __eq__(self, other):
+        if len(self.controls) != len(other.controls):
+            return False
+        for i in range(len(self.controls)):
+            if self.controls[i] != other.controls[i]:
+                return False
+
+        return True
 
 
 class CourseList(list):
@@ -147,6 +159,8 @@ class Result(Model):
     penalty_time = 0  # time of penalties (marked route, false start)
     penalty_laps = 0  # count of penalty legs (marked route)
     status = None
+    result = 0
+    place = None
 
     person = None  # reverse link to person
 
@@ -156,6 +170,17 @@ class Result(Model):
         eq = eq and self.finish_time == other.finish_time
         eq = eq and self.punches == other.punches
         return eq
+
+    def __gt__(self, other):
+        if self.status is not None and other.status is not None:
+            if self.status == ResultStatus.OK and other.status != ResultStatus.OK:
+                return True
+        return self.result > other.result
+
+    def get_result(self):
+        if self.status != 0 and self.status != ResultStatus.OK:
+            return ''
+        return str(self.finish_time - self.start_time)
 
 
 class ResultList(list):
@@ -207,18 +232,11 @@ class Race(Model):
 
 
 def create(obj, **kwargs):
-    o = obj()
-    for key, value in kwargs.items():
-        if hasattr(o, key):
-            setattr(o, key, value)
-
-    return o
+    return obj.create(**kwargs)
 
 
 def update(obj, **kwargs):
-    for key, value in kwargs.items():
-        if hasattr(obj, key):
-            setattr(obj, key, value)
+    obj.update(**kwargs)
 
 
 def find(iterable: list, **kwargs):
