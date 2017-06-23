@@ -13,6 +13,11 @@ class AbstractSportOrgMemoryModel (QAbstractTableModel):
     """
     Used to specify common table behavior
     """
+    def columnCount(self, parent=None, *args, **kwargs):
+        return len(self.get_headers())
+
+    def get_headers(self):
+        pass
 
 
 class PersonMemoryModel(AbstractSportOrgMemoryModel):
@@ -23,8 +28,9 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
         ret = len(race().persons)
         return ret
 
-    def columnCount(self, parent=None, *args, **kwargs):
-        return 13
+    def get_headers(self):
+        return ['Surname', 'Name', 'Sex', 'Qualification', 'Group', 'Team', 'Year', 'Bib', 'Card', 'Rented card',
+                'Comment', 'World code', 'National code', 'Out of competition']
 
     def data(self, index, role=None):
         if role == Qt.DisplayRole:
@@ -34,7 +40,6 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
             try:
                 answer = self.get_participation_data(index.row())[index.column()]
             except:
-                print(sys.exc_info())
                 traceback.print_exc()
 
             # end = time.time()
@@ -44,10 +49,8 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
         return QVariant()
 
     def headerData(self, index, orientation, role=None):
-
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
-            columns = ['Surname', 'Name', 'Sex', 'Qualification', 'Group', 'Team', 'Year', 'Bib', 'Card', 'Rented card',
-                       'Comment', 'World code', 'National code']
+            columns = self.get_headers()
             return _(columns[index])
 
     def get_participation_data(self, position):
@@ -73,9 +76,16 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
         ret.append(person.bib)
         ret.append(person.card_number)
         ret.append('rented stub')
-        ret.append('comment stub')
+        ret.append(person.comment)
         ret.append(person.world_code)
         ret.append(person.national_code)
+
+        out_of_comp_status = ''
+        if person.is_out_of_competition:
+            out_of_comp_status = 'o/c'
+        ret.append(out_of_comp_status)
+
+
         return ret
 
     def update_one_object(self, part, index):
@@ -91,8 +101,8 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
     def rowCount(self, parent=None, *args, **kwargs):
         return len(race().results)
 
-    def columnCount(self, parent=None, *args, **kwargs):
-        return 11
+    def get_headers(self):
+        return ['Surname', 'Name', 'Group', 'Team', 'Bib', 'Start', 'Finish', 'Result', 'Status', 'Penalty', 'Place']
 
     def data(self, index, role=None):
         if role == Qt.DisplayRole:
@@ -112,10 +122,8 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
         return QVariant()
 
     def headerData(self, index, orientation, role=None):
-
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
-            columns = ['Surname', 'Name', 'Group', 'Team', 'Bib', 'Start', 'Finish', 'Result', 'Status', 'Penalty',\
-                       'Place']
+            columns = self.get_headers()
             return _(columns[index])
 
     def get_participation_data(self, position):
@@ -125,10 +133,7 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
     def get_values_from_object(self, result):
         i = result
         assert (isinstance(i, Result))
-        person = result.person
-
-        result_time = (i.finish_time - i.start_time)
-        assert (isinstance(result_time, timedelta))
+        person = i.person
 
         return list([
             person.surname,
@@ -138,7 +143,7 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
             person.bib,
             i.start_time.strftime('%H:%M:%S'),
             i.finish_time.strftime('%H:%M:%S'),
-            str(result_time),
+            i.get_result(),
             i.status,
             i.penalty_time,
             i.place])
@@ -154,27 +159,26 @@ class GroupMemoryModel(AbstractSportOrgMemoryModel):
     def rowCount(self, parent=None, *args, **kwargs):
         return len(race().groups)
 
-    def columnCount(self, parent=None, *args, **kwargs):
-        return 13
-
     def data(self, index, role=None):
         if role == Qt.DisplayRole:
             answer = ''
             try:
                 answer = self.get_data(index.row())[index.column()]
             except:
-                print(sys.exc_info())
                 traceback.print_exc()
 
             return QVariant(answer)
 
         return QVariant()
 
+    def get_headers(self):
+        return ['Name', 'Full name', 'Course name', 'Course type', 'Length', 'Point count', 'Climb', 'Sex', 'Min age', 'Max age',\
+                'Start interval', 'Start corridor', 'Order in corridor']
+
     def headerData(self, index, orientation, role=None):
 
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
-            columns = ['Name', 'Full name', 'Course name', 'Course type', 'Length', 'Point count', 'Climb', 'Sex', 'Min age', 'Max age',\
-                       'Start interval', 'Start corridor', 'Order in corridor']
+            columns = self.get_headers()
             return _(columns[index])
 
     def get_data(self, position):
@@ -219,8 +223,8 @@ class CourseMemoryModel(AbstractSportOrgMemoryModel):
     def rowCount(self, parent=None, *args, **kwargs):
         return len(race().courses)
 
-    def columnCount(self, parent=None, *args, **kwargs):
-        return 6
+    def get_headers(self):
+        return ['Name', 'Course type', 'Length', 'Point count', 'Climb', 'Controls']
 
     def data(self, index, role=None):
         if role == Qt.DisplayRole:
@@ -228,7 +232,6 @@ class CourseMemoryModel(AbstractSportOrgMemoryModel):
             try:
                 answer = self.get_data(index.row())[index.column()]
             except:
-                print(sys.exc_info())
                 traceback.print_exc()
 
             return QVariant(answer)
@@ -238,7 +241,7 @@ class CourseMemoryModel(AbstractSportOrgMemoryModel):
     def headerData(self, index, orientation, role=None):
 
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
-            columns = ['Name', 'Course type', 'Length', 'Point count', 'Climb', 'Controls']
+            columns = self.get_headers()
             return _(columns[index])
 
     def get_data(self, position):
@@ -273,16 +276,12 @@ class TeamMemoryModel(AbstractSportOrgMemoryModel):
     def get_headers(self):
         return ['Name', 'Address', 'Country', 'Region', 'City', 'Contact']
 
-    def columnCount(self, parent=None, *args, **kwargs):
-        return len(self.get_headers())
-
     def data(self, index, role=None):
         if role == Qt.DisplayRole:
             answer = ''
             try:
                 answer = self.get_data(index.row())[index.column()]
             except:
-                print(sys.exc_info())
                 traceback.print_exc()
 
             return QVariant(answer)

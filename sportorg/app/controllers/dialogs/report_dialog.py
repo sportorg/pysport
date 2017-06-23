@@ -3,6 +3,8 @@ import sys
 import traceback
 
 import time
+import webbrowser
+
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import QSortFilterProxyModel
 from PyQt5.QtGui import QIcon
@@ -74,6 +76,16 @@ class ReportDialog(QDialog):
         self.item_template.addItems(get_templates())
         self.layout.addRow(self.label_template, self.item_template)
 
+        self.item_custom_path = QPushButton('...')
+
+        def select_custom_path():
+            file_name = QtWidgets.QFileDialog.getOpenFileName(self, 'Open HTML template', '',
+                                                              "HTML file (*.html)")[0]
+            self.item_template.setCurrentText(file_name)
+
+        self.item_custom_path.clicked.connect(select_custom_path)
+        self.layout.addRow(self.item_custom_path)
+
         def cancel_changes():
             self.close()
 
@@ -103,6 +115,8 @@ class ReportDialog(QDialog):
             file.write(template)
             file.close()
 
+        # Open file in your browser
+        webbrowser.open('file://' + file_name, new=2)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

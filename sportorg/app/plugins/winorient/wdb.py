@@ -220,6 +220,8 @@ class WinOrientBinary:
             new_person.qual = self.qual[str(man.qualification)]
             new_person.year = man.year
             new_person.card_number = man.si_card
+            new_person.is_out_of_competition = man.is_not_qualified
+            new_person.comment = man.comment
             group_name = man.get_group().name
             new_person.group = find(race().groups, name=group_name)
             team_name = man.get_team().name

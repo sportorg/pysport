@@ -11,6 +11,7 @@ from datetime import date, datetime
 
 from sportorg.app.models.memory import race, Person, find
 from sportorg.app.models.model import Group, Organization, Participation, ControlCard
+from sportorg.app.models.result_calculation import ResultCalculation
 
 
 def get_groups():
@@ -23,6 +24,7 @@ def get_groups():
     except:
         return ['', 'M12', 'M14', 'M16', 'M21', 'D12', 'D14', 'M16', 'D21']
 
+
 def get_teams():
     ret = list()
     ret.append('')
@@ -34,7 +36,8 @@ def get_teams():
         return ['', 'Тюменская обл.', 'Курганская обл.', 'Челябинская обл.', 'Республика Коми', 'г.Москва',
                 'ХМАО-Югра']
 
-#Deprecated
+
+# Deprecated
 def get_teams_db():
     team = Organization
     ret = list()
@@ -275,10 +278,10 @@ class EntryEditDialog(QDialog):
 
         self.item_rented = QCheckBox('rented card')
         self.item_paid = QCheckBox('is paid')
-        self.item_classified = QCheckBox('is classified')
+        self.item_out_of_competition = QCheckBox('out of competition')
         self.item_personal = QCheckBox('personal participation')
-        self.layout.addRow(self.item_rented, self.item_paid)
-        self.layout.addRow(self.item_classified, self.item_personal)
+        self.layout.addRow(self.item_rented, self.item_out_of_competition)
+        self.layout.addRow(self.item_paid, self.item_personal)
 
         self.label_comment = QLabel('Comment')
         self.item_comment = QTextEdit()
@@ -291,7 +294,6 @@ class EntryEditDialog(QDialog):
             try:
                 self.apply_changes_impl()
             except:
-                print(sys.exc_info())
                 traceback.print_exc()
             self.close()
 
@@ -349,7 +351,6 @@ class EntryEditDialog(QDialog):
         if current_object.bib is not None:
             self.item_bib.setValue(int(current_object.bib))
         if current_object.result is not None:
-
             t = current_object.result.start_time
             if t is not None:
                 assert(isinstance(t, datetime))
@@ -359,6 +360,10 @@ class EntryEditDialog(QDialog):
 
         if current_object.card_number is not None:
             self.item_card.setValue(int(current_object.card_number))
+
+        self.item_out_of_competition.setChecked(current_object.is_out_of_competition)
+
+        self.item_comment.setText(current_object.comment)
 
     def apply_changes_impl(self):
         changed = False
@@ -399,7 +404,16 @@ class EntryEditDialog(QDialog):
             person.card_number = self.item_card.text()
             changed = True
 
+        if person.is_out_of_competition != self.item_out_of_competition.isChecked():
+            person.is_out_of_competition = self.item_out_of_competition.isChecked()
+            changed = True
+
+        if person.comment != self.item_comment.toPlainText():
+            person.comment = self.item_comment.toPlainText()
+            changed = True
+
         if changed:
+            ResultCalculation().process_results()
             table = self.table
             #table.model().sourceModel().update_one_object(part, table.model().mapToSource(self.current_index).row())
 

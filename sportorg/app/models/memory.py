@@ -207,6 +207,8 @@ class Person(Model):
     national_code = ''
     rank = ''  # position/scores in word ranking
     qual = ''  # qualification, used in Russia only
+    is_out_of_competition = False  # e.g. 20-years old person, running in M12
+    comment = ''
 
 
 class PersonList(list):

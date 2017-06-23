@@ -177,7 +177,8 @@ class CourseEditDialog(QDialog):
         for i in text.split('\n'):
             control = CourseControl()
             control.code = i.split()[0]
-            control.length = i.split()[1]
+            if len(i.split()) > 1:
+                control.length = i.split()[1]
             course.controls.append(control)
 
         if changed:
