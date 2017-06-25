@@ -144,6 +144,7 @@ class MainWindow(object):
         self.action_save.setText(_("Save"))
         self.action_save.setShortcut("Ctrl+S")
         self.action_save.setIcon(QtGui.QIcon(config.icon_dir("save.png")))
+        self.action_save.triggered.connect(self.save_file)
         self.action_open.setText(_("Open"))
         self.action_open.setShortcut("Ctrl+O")
         self.action_open.triggered.connect(self.open_file)
@@ -207,6 +208,7 @@ class MainWindow(object):
         open.triggered.connect(self.open_file)
         self.toolbar.addAction(open)
         save = QtWidgets.QAction(QtGui.QIcon(config.icon_dir("save.png")), "save", self.mainwindow)
+        save.triggered.connect(self.save_file)
         self.toolbar.addAction(save)
 
         self.mainwindow.setLayout(layout)
@@ -229,6 +231,10 @@ class MainWindow(object):
         self.tabwidget.addTab(courses.Widget(), _("Courses"))
         self.tabwidget.addTab(teams.Widget(), _("Teams"))
 
+    def backup(self, func, mode='wb'):
+        with open(self.file, mode) as file:
+            func(file)
+
     def create_file(self):
         file_name = QtWidgets.QFileDialog.getSaveFileName(self.mainwindow,'Create SportOrg file',
                                             '/' + str(time.strftime("%Y%m%d")), "SportOrg file (*.sportorg)")[0]
@@ -237,16 +243,15 @@ class MainWindow(object):
             self.file = file_name
 
     def save_file_as(self):
-        file_name = QtWidgets.QFileDialog.getSaveFileName(self.mainwindow,'Save As SportOrg file',
-                                            '/' + str(time.strftime("%Y%m%d")), "SportOrg file (*.sportorg)")[0]
-        if file_name is not '':
-            self.mainwindow.setWindowTitle(file_name)
-            self.file = file_name
-            with open(file_name, 'wb') as file:
-                backup.dump(file)
+        self.create_file()
+        if self.file is not None:
+            self.backup(backup.dump)
 
     def save_file(self):
-        pass
+        if self.file is not None:
+            self.backup(backup.dump)
+        else:
+            self.save_file_as()
 
     def open_file(self):
         file_name = QtWidgets.QFileDialog.getOpenFileName(self.mainwindow, 'Open SportOrg file',
@@ -256,8 +261,7 @@ class MainWindow(object):
             self.mainwindow.setWindowTitle(file_name)
             self.file = file_name
             try:
-                with open(file_name, 'rb') as file:
-                    backup.load(file)
+                self.backup(backup.load, 'rb')
             except:
                 traceback.print_exc()
             self.refresh()
