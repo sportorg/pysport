@@ -23,11 +23,11 @@ class Model(object):
 
 
 class Country(Model):
-    name = ''
-    code2 = ''
-    code3 = ''
-    digital_code = ''
-    code = ''
+    name = None
+    code2 = None
+    code3 = None
+    digital_code = None
+    code = None
 
 
 class ResultStatus(object):
@@ -62,26 +62,26 @@ class Settings(Model):
 
 
 class Address(Model):
-    care_of = ''
-    street = ''
-    zip_code = ''
-    city = ''
-    state = ''
+    care_of = None
+    street = None
+    zip_code = None
+    city = None
+    state = None
     country = Country()
 
 
 class Contact(Model):
-    name = ''
-    value = ''
+    name = None
+    value = None
 
 
 class Organization(Model):
-    name = ''
+    name = None
     address = Address()
     contact = Contact()
     country = Country()
-    city = ''
-    region = ''
+    city = None
+    region = None
 
 
 class OrganizationList(list):
@@ -89,8 +89,8 @@ class OrganizationList(list):
 
 
 class CourseControl(Model):
-    code = ''
-    length = 0
+    code = None
+    length = None
     order = None
 
     def __eq__(self, other):
@@ -102,12 +102,12 @@ class CourseControlList(list):
 
 
 class Course(Model):
-    name = ''
-    type = ''
-    bib = ''
-    length = 0
-    climb = 0
-    controls = None
+    name = None
+    type = None
+    bib = None
+    length = None
+    climb = None
+    controls = CourseControlList()
 
     def get_code_list(self):
         ret = list()
@@ -131,20 +131,20 @@ class CourseList(list):
 
 
 class Group(Model):
-    name = ''
+    name = None
     course = Course()
-    price = 0
-    long_name = ''
-    sex = ''
+    price = None
+    long_name = None
+    sex = None
 
-    min_age = 0
-    max_age = 0
+    min_age = None
+    max_age = None
 
     max_time = None  # datetime
-    qual_assign_text = ''
-    start_interval = 0
-    start_corridor = 0
-    order_in_corridor = 0
+    qual_assign_text = None
+    start_interval = None
+    start_corridor = None
+    order_in_corridor = None
 
 
 class GroupList(list):
@@ -156,10 +156,10 @@ class Result(Model):
     start_time = None
     finish_time = None
     punches = list()
-    penalty_time = 0  # time of penalties (marked route, false start)
-    penalty_laps = 0  # count of penalty legs (marked route)
+    penalty_time = None  # time of penalties (marked route, false start)
+    penalty_laps = None  # count of penalty legs (marked route)
     status = None
-    result = 0
+    result = None
     place = None
 
     person = None  # reverse link to person
@@ -179,7 +179,7 @@ class Result(Model):
 
     def get_result(self):
         if self.status != 0 and self.status != ResultStatus.OK:
-            return ''
+            return None
         return str(self.finish_time - self.start_time)
 
 
@@ -188,9 +188,9 @@ class ResultList(list):
 
 
 class Person(Model):
-    name = ''
-    surname = ''
-    sex = ''
+    name = None
+    surname = None
+    sex = None
 
     card_number = None
     bib = None
@@ -203,12 +203,12 @@ class Person(Model):
     nationality = Country()
     address = Address()
     contact = [Contact()]
-    world_code = ''  # WRE ID for orienteering and the same
-    national_code = ''
-    rank = ''  # position/scores in word ranking
-    qual = ''  # qualification, used in Russia only
+    world_code = None  # WRE ID for orienteering and the same
+    national_code = None
+    rank = None  # position/scores in word ranking
+    qual = None  # qualification, used in Russia only
     is_out_of_competition = False  # e.g. 20-years old person, running in M12
-    comment = ''
+    comment = None
 
 
 class PersonList(list):
@@ -216,7 +216,7 @@ class PersonList(list):
 
 
 class RaceData(Model):
-    name = ''
+    name = None
     organisation = None
     start_time = None
     end_time = None
