@@ -24,6 +24,8 @@ from sportorg.app.plugins.ocad import ocad
 from sportorg.app.plugins.backup import backup
 import logging
 
+from sportorg.app.plugins.sportident import card_reader
+
 logging.basicConfig(**config.LOG_CONFIG, level=logging.DEBUG if config.DEBUG else logging.WARNING)
 
 
@@ -35,6 +37,7 @@ class MainWindow(object):
             self.file = None
         self.mainwindow = QMainWindow()
         self.conf = configparser.ConfigParser()
+        self.reader = None
 
     def show(self):
         self.setup_ui()
@@ -211,7 +214,25 @@ class MainWindow(object):
         save.triggered.connect(self.save_file)
         self.toolbar.addAction(save)
 
+        si = QtWidgets.QAction(QtGui.QIcon(config.icon_dir("sportident.png")), "save", self.mainwindow)
+        si.triggered.connect(self.sportident)
+        self.toolbar.addAction(si)
+
         self.mainwindow.setLayout(layout)
+
+    def sportident(self):
+        if self.reader is None:
+            self.reader = card_reader.start(card_reader.PersonPredetermined)
+            if self.reader is not None:
+                self.statusbar.showMessage(_('Open port ' + self.reader.port), 5000)
+            else:
+                self.statusbar.showMessage(_('Port not open'), 5000)
+        else:
+            card_reader.stop(self.reader)
+            if self.reader.reading is False:
+                port = self.reader.port
+                self.reader = None
+                self.statusbar.showMessage(_('Close port ' + port), 5000)
 
     def setup_statusbar(self):
         self.statusbar = QtWidgets.QStatusBar()

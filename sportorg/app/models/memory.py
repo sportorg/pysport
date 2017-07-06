@@ -54,11 +54,8 @@ class CompetitionType(object):
     MARKING = 'Marking'
 
 
-class Settings(Model):
-    competition_type = CompetitionType.PREDETERMINED
-    append_exist_person = False
-    print_person_result = False
-    check_punches = True
+class SettingsDict(dict):
+    pass
 
 
 class Address(Model):
@@ -230,7 +227,7 @@ class Race(Model):
     persons = PersonList()
     results = ResultList()
     organizations = OrganizationList()
-    settings = Settings()
+    settings = SettingsDict()
 
 
 def create(obj, **kwargs):
@@ -275,3 +272,5 @@ def race(day=None):
         return event[day]
     else:
         return Race()
+
+race().persons.append(Person.create(card_number=str(1633208)))

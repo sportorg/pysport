@@ -1,4 +1,5 @@
 from . import sireader
+from . import settings
 from sportorg.app.models import memory
 
 
@@ -13,6 +14,7 @@ def start(cls):
 
 
 def stop(reader: sireader.SIReaderThread):
+    print('close', reader)
     reader.reading = False
 
 
@@ -23,7 +25,7 @@ class PersonCardData:
 
     @classmethod
     def card_reading(cls, card_data):
-        pass
+        print(card_data)
 
     @property
     def person(self):
@@ -37,7 +39,7 @@ class PersonCardData:
         self._person = person
 
     def get_person_by_card(self):
-        return memory.find(memory.race().persons, card_number=self.card_data['card_number'])
+        return memory.find(memory.race().persons, card_number=str(self.card_data['card_number']))
 
     def check_punches(self):
         if self.person is None:
@@ -82,7 +84,8 @@ class PersonPredetermined(PersonCardData):
         if person_card.person is None:
             print('Not person')
             # person_card.person =
-        if not person_card.check_punches():
-            person_card.set_status(memory.ResultStatus.DISQUALIFIED)
+            return
+        # if not person_card.check_punches():
+        #     person_card.set_status(memory.ResultStatus.DISQUALIFIED)
 
         person_card.set_result()
