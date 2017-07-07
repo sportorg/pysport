@@ -272,5 +272,3 @@ def race(day=None):
         return event[day]
     else:
         return Race()
-
-race().persons.append(Person.create(card_number=str(1633208)))
