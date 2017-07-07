@@ -57,8 +57,8 @@ def choose_port():
         print("Доступные порты:")
         for i, p in enumerate(ports):
             print("{} - {}".format(i, p))
-        port = ports[0]
-        return port
+
+        return ports[0]
     else:
         print("Нет доступных портов")
         return None

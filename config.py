@@ -4,7 +4,6 @@ import sys
 import time
 
 NAME = 'SportOrg'
-AUTHOR = 'Akhtarov Danil'
 VERSION = '1.0.0'
 DEBUG = True
 

@@ -4,4 +4,5 @@ default = {
 
 
 def check_settings(settings):
+    # TODO
     return settings

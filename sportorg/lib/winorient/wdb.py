@@ -376,6 +376,7 @@ class WDBGroup:
             return self.wdb.find_course_by_id(self.distance_id)
         return None
 
+
 class WDBMan:
     def __init__(self, wdb):
         self.name = '_'
@@ -1156,6 +1157,7 @@ class WDB:
             if course.id == id:
                 return course
         return None
+
 
 def parse_wdb(file_path):
     wdb_file = open(file_path, 'rb')

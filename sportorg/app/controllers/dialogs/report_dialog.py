@@ -118,6 +118,7 @@ class ReportDialog(QDialog):
         # Open file in your browser
         webbrowser.open('file://' + file_name, new=2)
 
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = ReportDialog()

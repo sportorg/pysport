@@ -1,5 +1,4 @@
 from . import sireader
-from . import settings
 from sportorg.app.models import memory
 
 

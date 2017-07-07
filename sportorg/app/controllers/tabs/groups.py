@@ -2,7 +2,6 @@ import logging
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QAbstractItemView, QHeaderView
 
-
 from sportorg.app.models.memory_model import PersonProxyModel, GroupMemoryModel
 
 
