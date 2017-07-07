@@ -2,10 +2,14 @@ from . import sireader
 from sportorg.app.models import memory
 
 
-def start(cls):
+def read():
+    return start(PersonPredetermined.card_reading)
+
+
+def start(card_reader=lambda card_data: card_data):
     port = sireader.choose_port()
     if port is not None:
-        reader = sireader.SIReaderThread(port, func=cls.card_reading)
+        reader = sireader.SIReaderThread(port, func=card_reader)
         reader.start()
         return reader
 
@@ -14,7 +18,7 @@ def start(cls):
 
 def stop(reader: sireader.SIReaderThread):
     print('close', reader)
-    reader.reading = False
+    reader.stop()
 
 
 class PersonCardData:
@@ -24,7 +28,7 @@ class PersonCardData:
 
     @classmethod
     def card_reading(cls, card_data):
-        print(card_data)
+        pass
 
     @property
     def person(self):
@@ -45,6 +49,8 @@ class PersonCardData:
             return False
         i = 0
         controls = self.person.group.course.controls
+        if len(controls) == 0:
+            return False
         for punch in self.card_data['punches']:
             if punch[0] == controls[i].code:
                 i += 1
@@ -75,16 +81,33 @@ class PersonCardData:
 
         return self
 
+    def get_text_result(self):
+        # use templates
+        pass
+
+    def print_result(self, printer):
+        pass
+
+    def get_person_by_user_input(self):
+        card_number = self.card_data['card_number']
+
+        return memory.Person()
+
+    def persons_dialog(self):
+        pass
+
 
 class PersonPredetermined(PersonCardData):
     @classmethod
     def card_reading(cls, card_data):
+        print('from card_reader.py PersonPredetermined', card_data)
         person_card = cls(card_data)
         if person_card.person is None:
             print('Not person')
-            # person_card.person =
+            # person_card.person = person_card.get_person_by_user_input()
+            # if person_card.person is None:
             return
-        # if not person_card.check_punches():
-        #     person_card.set_status(memory.ResultStatus.DISQUALIFIED)
-
         person_card.set_result()
+
+        if not person_card.check_punches():
+            person_card.set_status(memory.ResultStatus.DISQUALIFIED)

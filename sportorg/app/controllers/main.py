@@ -220,20 +220,6 @@ class MainWindow(object):
 
         self.mainwindow.setLayout(layout)
 
-    def sportident(self):
-        if self.reader is None:
-            self.reader = card_reader.start(card_reader.PersonPredetermined)
-            if self.reader is not None:
-                self.statusbar.showMessage(_('Open port ' + self.reader.port), 5000)
-            else:
-                self.statusbar.showMessage(_('Port not open'), 5000)
-        else:
-            card_reader.stop(self.reader)
-            if self.reader.reading is False:
-                port = self.reader.port
-                self.reader = None
-                self.statusbar.showMessage(_('Close port ' + port), 5000)
-
     def setup_statusbar(self):
         self.statusbar = QtWidgets.QStatusBar()
         self.mainwindow.setStatusBar(self.statusbar)
@@ -349,3 +335,22 @@ class MainWindow(object):
             table.model().setSourceModel(TeamMemoryModel())
         except:
             traceback.print_exc()
+
+    def sportident(self):
+        if self.reader is None:
+            self.reader = card_reader.read()
+            if self.reader is not None:
+                self.statusbar.showMessage(_('Open port ' + self.reader.port), 5000)
+                f_id = self.reader.append_reader(lambda data: print('from main.py', data))
+                # self.reader.delete_func(f_id)
+            else:
+                self.statusbar.showMessage(_('Port not open'), 5000)
+        elif not self.reader.reading:
+            self.reader = None
+            self.sportident()
+        else:
+            card_reader.stop(self.reader)
+            if not self.reader.reading:
+                port = self.reader.port
+                self.reader = None
+                self.statusbar.showMessage(_('Close port ' + port), 5000)

@@ -8,9 +8,18 @@ class SIReaderThread(threading.Thread):
     def __init__(self, port, func=lambda card_data: card_data):
         super().__init__()
         self.port = port
-        self.func = func
+        self.readers = [func]
         self.cards = list()
-        self.reading = True
+        self._reading = True
+
+    @property
+    def reading(self):
+        return self._reading
+
+    def add_card_data(self, card_data):
+        for f in self.readers:
+            f(card_data)
+        self.cards.append(card_data)
 
     def run(self):
         si = sireader.SIReaderReadout(port=self.port)
@@ -25,9 +34,7 @@ class SIReaderThread(threading.Thread):
                 # card_type = si.cardtype
 
                 card_data = si.read_sicard()
-
-                self.func(card_data)
-                self.cards.append(card_data)
+                self.add_card_data(card_data)
 
                 # beep
                 si.ack_sicard()
@@ -35,6 +42,20 @@ class SIReaderThread(threading.Thread):
                 print(str(e))
             except sireader.SIReaderCardChanged as e:
                 print(str(e))
+            except serial.serialutil.SerialException:
+                self.stop()
+                return
+
+    def stop(self):
+        self._reading = False
+
+    def append_reader(self, f):
+        self.readers.append(f)
+
+        return len(self.readers)
+
+    def delete_reader(self, func_id):
+        del self.readers[func_id-1]
 
 
 def get_ports():
