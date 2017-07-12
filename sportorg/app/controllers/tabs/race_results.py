@@ -14,9 +14,10 @@ from sportorg.language import _
 
 
 class Widget(QtWidgets.QWidget):
-    def __init__(self):
+    def __init__(self, parent=None):
         super().__init__()
         self.setup_ui()
+        self.parent = parent
 
     def setup_ui(self):
         self.gridLayout = QtWidgets.QGridLayout(self)
@@ -173,3 +174,6 @@ class Widget(QtWidgets.QWidget):
                 index += 1
         self.ResultCourseNameEdit.setText(course.name)
         self.ResultCourseLengthEdit.setText(str(course.length))
+
+    def get_parent_window(self):
+        return self.parent

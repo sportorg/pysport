@@ -10,9 +10,10 @@ from sportorg.app.models.memory_model import PersonProxyModel, CourseMemoryModel
 
 
 class Widget(QtWidgets.QWidget):
-    def __init__(self):
+    def __init__(self, parent=None):
         super().__init__()
         self.setup_ui()
+        self.parent = parent
 
     def setup_ui(self):
         self.setAcceptDrops(False)
@@ -40,7 +41,7 @@ class Widget(QtWidgets.QWidget):
             print('Courses - clicked on ' + str(index.row()))
             logging.info('Courses - clicked on ' + str(index.row()))
             try:
-                dialog = CourseEditDialog(self.CourseTable, index)
+                dialog = CourseEditDialog(self.CourseTable, index, self.get_parent_window())
                 dialog.exec()
             except:
                 print(sys.exc_info())
@@ -51,3 +52,6 @@ class Widget(QtWidgets.QWidget):
 
     def get_table(self):
         return self.CourseTable
+
+    def get_parent_window(self):
+        return self.parent

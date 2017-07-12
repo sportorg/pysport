@@ -29,26 +29,28 @@ from sportorg.app.plugins.sportident import card_reader
 logging.basicConfig(**config.LOG_CONFIG, level=logging.DEBUG if config.DEBUG else logging.WARNING)
 
 
-class MainWindow(object):
+class MainWindow(QMainWindow):
+
     def __init__(self, argv=None):
+        super().__init__()
         try:
             self.file = argv[1]
         except IndexError:
             self.file = None
-        self.mainwindow = QMainWindow()
         self.conf = configparser.ConfigParser()
         self.reader = None
 
-    def show(self):
+
+    def show_window(self):
         self.setup_ui()
         self.setup_menu()
         self.setup_toolbar()
         self.setup_tab()
         self.setup_statusbar()
-        self.mainwindow.show()
+        self.show()
 
     def close(self):
-        print('exit', self.mainwindow.geometry())
+        print('exit', self.geometry())
 
     def conf_read(self):
         self.conf.read(config.CONFIG_INI)
@@ -58,19 +60,19 @@ class MainWindow(object):
             self.conf.write(configfile)
 
     def setup_ui(self):
-        self.mainwindow.setMinimumSize(QtCore.QSize(480, 320))
-        self.mainwindow.setGeometry(480, 320, 480, 320)
-        self.mainwindow.setWindowIcon(QtGui.QIcon(config.ICON))
-        self.mainwindow.setWindowTitle(_(config.NAME))
-        self.mainwindow.resize(880, 474)
-        self.mainwindow.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.mainwindow.setDockNestingEnabled(False)
-        self.mainwindow.setDockOptions(QtWidgets.QMainWindow.AllowTabbedDocks
+        self.setMinimumSize(QtCore.QSize(480, 320))
+        self.setGeometry(480, 320, 480, 320)
+        self.setWindowIcon(QtGui.QIcon(config.ICON))
+        self.setWindowTitle(_(config.NAME))
+        self.resize(880, 474)
+        self.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.setDockNestingEnabled(False)
+        self.setDockOptions(QtWidgets.QMainWindow.AllowTabbedDocks
                                        | QtWidgets.QMainWindow.AnimatedDocks
                                        | QtWidgets.QMainWindow.ForceTabbedDocks)
 
     def setup_menu(self):
-        self.menubar = QtWidgets.QMenuBar(self.mainwindow)
+        self.menubar = QtWidgets.QMenuBar(self)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 880, 21))
         self.menu_file = QtWidgets.QMenu(self.menubar)
         self.menu_import = QtWidgets.QMenu(self.menu_file)
@@ -82,29 +84,29 @@ class MainWindow(object):
         self.menu_tools = QtWidgets.QMenu(self.menubar)
         self.menu_service = QtWidgets.QMenu(self.menubar)
         self.menu_options = QtWidgets.QMenu(self.menubar)
-        self.mainwindow.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(self.mainwindow)
-        self.mainwindow.setStatusBar(self.statusbar)
+        self.setMenuBar(self.menubar)
+        self.statusbar = QtWidgets.QStatusBar(self)
+        self.setStatusBar(self.statusbar)
 
-        self.action_save = QtWidgets.QAction(self.mainwindow)
-        self.action_open = QtWidgets.QAction(self.mainwindow)
-        self.action_quit = QtWidgets.QAction(self.mainwindow)
-        self.action_new = QtWidgets.QAction(self.mainwindow)
-        self.action_new__race = QtWidgets.QAction(self.mainwindow)
-        self.action_save_as = QtWidgets.QAction(self.mainwindow)
-        self.action_open__resent = QtWidgets.QAction(self.mainwindow)
-        self.action_settings = QtWidgets.QAction(self.mainwindow)
-        self.action_event__settings = QtWidgets.QAction(self.mainwindow)
-        self.action_export = QtWidgets.QAction(self.mainwindow)
-        self.action_csv__winorient = QtWidgets.QAction(self.mainwindow)
-        self.action_wdb__winorient = QtWidgets.QAction(self.mainwindow)
-        self.action_iof__xml_v3 = QtWidgets.QAction(self.mainwindow)
-        self.action_cvs = QtWidgets.QAction(self.mainwindow)
-        self.action_ocad_txt_v8 = QtWidgets.QAction(self.mainwindow)
-        self.action_help = QtWidgets.QAction(self.mainwindow)
-        self.action_about_us = QtWidgets.QAction(self.mainwindow)
-        self.action_report = QtWidgets.QAction(self.mainwindow)
-        self.action_filter = QtWidgets.QAction(self.mainwindow)
+        self.action_save = QtWidgets.QAction(self)
+        self.action_open = QtWidgets.QAction(self)
+        self.action_quit = QtWidgets.QAction(self)
+        self.action_new = QtWidgets.QAction(self)
+        self.action_new__race = QtWidgets.QAction(self)
+        self.action_save_as = QtWidgets.QAction(self)
+        self.action_open__resent = QtWidgets.QAction(self)
+        self.action_settings = QtWidgets.QAction(self)
+        self.action_event__settings = QtWidgets.QAction(self)
+        self.action_export = QtWidgets.QAction(self)
+        self.action_csv__winorient = QtWidgets.QAction(self)
+        self.action_wdb__winorient = QtWidgets.QAction(self)
+        self.action_iof__xml_v3 = QtWidgets.QAction(self)
+        self.action_cvs = QtWidgets.QAction(self)
+        self.action_ocad_txt_v8 = QtWidgets.QAction(self)
+        self.action_help = QtWidgets.QAction(self)
+        self.action_about_us = QtWidgets.QAction(self)
+        self.action_report = QtWidgets.QAction(self)
+        self.action_filter = QtWidgets.QAction(self)
 
         self.menu_import.addAction(self.action_cvs)
         self.menu_import.addAction(self.action_csv__winorient)
@@ -201,52 +203,52 @@ class MainWindow(object):
 
     def setup_toolbar(self):
         layout = QtWidgets.QVBoxLayout()
-        self.toolbar = self.mainwindow.addToolBar("File")
+        self.toolbar = self.addToolBar("File")
 
-        new = QtWidgets.QAction(QtGui.QIcon(config.icon_dir("file.png")), "new", self.mainwindow)
+        new = QtWidgets.QAction(QtGui.QIcon(config.icon_dir("file.png")), "new", self)
         new.triggered.connect(self.create_file)
         self.toolbar.addAction(new)
 
-        open = QtWidgets.QAction(QtGui.QIcon(config.icon_dir("folder.png")), "open", self.mainwindow)
+        open = QtWidgets.QAction(QtGui.QIcon(config.icon_dir("folder.png")), "open", self)
         open.triggered.connect(self.open_file)
         self.toolbar.addAction(open)
-        save = QtWidgets.QAction(QtGui.QIcon(config.icon_dir("save.png")), "save", self.mainwindow)
+        save = QtWidgets.QAction(QtGui.QIcon(config.icon_dir("save.png")), "save", self)
         save.triggered.connect(self.save_file)
         self.toolbar.addAction(save)
 
-        si = QtWidgets.QAction(QtGui.QIcon(config.icon_dir("sportident.png")), "save", self.mainwindow)
+        si = QtWidgets.QAction(QtGui.QIcon(config.icon_dir("sportident.png")), "save", self)
         si.triggered.connect(self.sportident)
         self.toolbar.addAction(si)
 
-        self.mainwindow.setLayout(layout)
+        self.setLayout(layout)
 
     def setup_statusbar(self):
         self.statusbar = QtWidgets.QStatusBar()
-        self.mainwindow.setStatusBar(self.statusbar)
+        self.setStatusBar(self.statusbar)
         self.statusbar.showMessage(_("it works!"), 5000)
 
     def setup_tab(self):
-        self.centralwidget = QtWidgets.QWidget(self.mainwindow)
+        self.centralwidget = QtWidgets.QWidget(self)
         layout = QtWidgets.QVBoxLayout(self.centralwidget)
         self.tabwidget = QtWidgets.QTabWidget(self.centralwidget)
         layout.addWidget(self.tabwidget)
-        self.mainwindow.setCentralWidget(self.centralwidget)
+        self.setCentralWidget(self.centralwidget)
 
-        self.tabwidget.addTab(start_preparation.Widget(), _("Start Preparation"))
-        self.tabwidget.addTab(race_results.Widget(), _("Race Results"))
-        self.tabwidget.addTab(groups.Widget(), _("Groups"))
-        self.tabwidget.addTab(courses.Widget(), _("Courses"))
-        self.tabwidget.addTab(teams.Widget(), _("Teams"))
+        self.tabwidget.addTab(start_preparation.Widget(self), _("Start Preparation"))
+        self.tabwidget.addTab(race_results.Widget(self), _("Race Results"))
+        self.tabwidget.addTab(groups.Widget(self), _("Groups"))
+        self.tabwidget.addTab(courses.Widget(self), _("Courses"))
+        self.tabwidget.addTab(teams.Widget(self), _("Teams"))
 
     def backup(self, func, mode='wb'):
         with open(self.file, mode) as file:
             func(file)
 
     def create_file(self):
-        file_name = QtWidgets.QFileDialog.getSaveFileName(self.mainwindow,'Create SportOrg file',
+        file_name = QtWidgets.QFileDialog.getSaveFileName(self,'Create SportOrg file',
                                             '/' + str(time.strftime("%Y%m%d")), "SportOrg file (*.sportorg)")[0]
         if file_name is not '':
-            self.mainwindow.setWindowTitle(file_name)
+            self.setWindowTitle(file_name)
             self.file = file_name
 
     def save_file_as(self):
@@ -261,40 +263,40 @@ class MainWindow(object):
             self.save_file_as()
 
     def open_file(self):
-        file_name = QtWidgets.QFileDialog.getOpenFileName(self.mainwindow, 'Open SportOrg file',
+        file_name = QtWidgets.QFileDialog.getOpenFileName(self, 'Open SportOrg file',
                                                           '/',
                                                           "SportOrg file (*.sportorg)")[0]
         if file_name is not '':
-            self.mainwindow.setWindowTitle(file_name)
+            self.setWindowTitle(file_name)
             self.file = file_name
             try:
                 self.backup(backup.load, 'rb')
             except:
                 traceback.print_exc()
-            self.refresh()
+            self.init_model()
 
     def import_wo_csv(self):
-        file_name = QtWidgets.QFileDialog.getOpenFileName(self.mainwindow, 'Open CSV Winorient file',
+        file_name = QtWidgets.QFileDialog.getOpenFileName(self, 'Open CSV Winorient file',
                                             '', "CSV Winorient (*.csv)")[0]
         if file_name is not '':
             winorient.import_csv(file_name)
-            self.refresh()
+            self.init_model()
 
     def import_wo_wdb(self):
-        file_name = QtWidgets.QFileDialog.getOpenFileName(self.mainwindow, 'Open WDB Winorient file',
+        file_name = QtWidgets.QFileDialog.getOpenFileName(self, 'Open WDB Winorient file',
                                             '', "WDB Winorient (*.wdb)")[0]
         if file_name is not '':
             try:
                 wb = WinOrientBinary(file=file_name)
                 # wb.run()
                 wb.create_objects()
-                self.refresh()
+                self.init_model()
             except:
                 print(sys.exc_info())
                 traceback.print_exc()
 
     def import_ocad_txt_v8(self):
-        file_name = QtWidgets.QFileDialog.getOpenFileName(self.mainwindow, 'Open Ocad txt v8 file',
+        file_name = QtWidgets.QFileDialog.getOpenFileName(self, 'Open Ocad txt v8 file',
                                                           '', "Ocad classes v8 (*.txt)")[0]
         if file_name is not '':
             try:
@@ -302,7 +304,7 @@ class MainWindow(object):
             except:
                 traceback.print_exc()
 
-            self.refresh()
+            self.init_model()
 
     def filter_dialog(self):
         try:
@@ -321,7 +323,7 @@ class MainWindow(object):
             print(sys.exc_info())
             traceback.print_exc()
 
-    def refresh(self):
+    def init_model(self):
         try:
             table = self.tabwidget.findChild(QtWidgets.QTableView, 'EntryTable')
             table.model().setSourceModel(PersonMemoryModel())
@@ -333,6 +335,22 @@ class MainWindow(object):
             table.model().setSourceModel(CourseMemoryModel())
             table = self.tabwidget.findChild(QtWidgets.QTableView, 'TeamTable')
             table.model().setSourceModel(TeamMemoryModel())
+
+        except:
+            traceback.print_exc()
+
+    def refresh(self):
+        try:
+            table = self.tabwidget.findChild(QtWidgets.QTableView, 'EntryTable')
+            table.model().sourceModel().init_cache()
+            table = self.tabwidget.findChild(QtWidgets.QTableView, 'ResultTable')
+            table.model().sourceModel().init_cache()
+            table = self.tabwidget.findChild(QtWidgets.QTableView, 'GroupTable')
+            table.model().sourceModel().init_cache()
+            table = self.tabwidget.findChild(QtWidgets.QTableView, 'CourseTable')
+            table.model().sourceModel().init_cache()
+            table = self.tabwidget.findChild(QtWidgets.QTableView, 'TeamTable')
+            table.model().sourceModel().init_cache()
         except:
             traceback.print_exc()
 

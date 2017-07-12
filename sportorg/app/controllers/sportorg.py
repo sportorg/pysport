@@ -733,7 +733,7 @@ def main(argv):
     mw = QMainWindow()
     obj = Ui_MainWindow()
     obj.setupUi(mw)
-    mw.show()
+    mw.show_window()
     sys.exit(app.exec())
 
 

@@ -2,7 +2,7 @@ import sys
 import traceback
 
 from PyQt5 import QtCore
-from PyQt5.QtCore import QSortFilterProxyModel, QModelIndex, QTime, QDateTime
+from PyQt5.QtCore import QSortFilterProxyModel, QModelIndex, QTime
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QLabel, \
     QLineEdit, QComboBox, QCompleter, QSpinBox, QApplication, QTimeEdit, QTextEdit, QCheckBox, QTableView, QDialog, \
@@ -10,12 +10,11 @@ from PyQt5.QtWidgets import QFormLayout, QLabel, \
 from datetime import date, datetime
 
 from sportorg.app.models.memory import race, Person, find
-from sportorg.app.models.model import Group, Organization, Participation, ControlCard
+from sportorg.app.models.model import Organization
 from sportorg.app.models.result_calculation import ResultCalculation
 
 
 def get_groups():
-    gr = Group
     ret = list()
     try:
         for i in race().groups:
@@ -211,11 +210,12 @@ class AdvComboBox(QComboBox):
 
 
 class EntryEditDialog(QDialog):
-    def __init__(self, table=None, index=None):
+    def __init__(self, table=None, index=None, parent=None):
         super().__init__()
         self.init_ui()
         if table is not None:
             self.set_values_from_table(table, index)
+        self.parent = parent
 
     def close_dialog(self):
         self.close()
@@ -414,8 +414,11 @@ class EntryEditDialog(QDialog):
 
         if changed:
             ResultCalculation().process_results()
-            table = self.table
+            self.get_parent_window().refresh()
             #table.model().sourceModel().update_one_object(part, table.model().mapToSource(self.current_index).row())
+
+    def get_parent_window(self):
+        return self.parent
 
 
 if __name__ == '__main__':

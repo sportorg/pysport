@@ -8,7 +8,8 @@ from PyQt5.QtWidgets import QFormLayout, QLabel, \
     QLineEdit, QComboBox, QCompleter, QApplication, QTableView, QDialog, \
     QPushButton, QSpinBox, QTextEdit
 
-from sportorg.app.models.memory import race, Organization, Course, CourseControl
+
+from sportorg.app.models.memory import race, Course, CourseControl
 
 
 def get_course_types():
@@ -55,11 +56,12 @@ class AdvComboBox(QComboBox):
 
 
 class CourseEditDialog(QDialog):
-    def __init__(self, table=None, index=None):
+    def __init__(self, table=None, index=None, parent=None):
         super().__init__()
         self.init_ui()
         if table is not None:
             self.set_values_from_table(table, index)
+        self.parent = parent
 
     def close_dialog(self):
         self.close()
@@ -182,9 +184,12 @@ class CourseEditDialog(QDialog):
             course.controls.append(control)
 
         if changed:
-            table = self.table
+            win = self.get_main_window()
+            win.refresh()
             # table.model().sourceModel().update_one_object(part, table.model().mapToSource(self.current_index).row())
 
+    def get_main_window(self):
+        return self.parent
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

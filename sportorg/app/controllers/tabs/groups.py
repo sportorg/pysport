@@ -6,9 +6,10 @@ from sportorg.app.models.memory_model import PersonProxyModel, GroupMemoryModel
 
 
 class Widget(QtWidgets.QWidget):
-    def __init__(self):
+    def __init__(self, parent=None):
         super().__init__()
         self.setup_ui()
+        self.parent = parent
 
     def setup_ui(self):
         self.setAcceptDrops(False)
@@ -50,3 +51,6 @@ class Widget(QtWidgets.QWidget):
 
     def get_table(self):
         return self.GroupTable
+
+    def get_parent_window(self):
+        return self.parent

@@ -8,7 +8,7 @@ from sportorg.app.controllers.main import MainWindow
 def main(argv):
     app = QApplication(argv)
     main_window = MainWindow(argv)
-    main_window.show()
+    main_window.show_window()
     sys.exit(app.exec())
 
 
