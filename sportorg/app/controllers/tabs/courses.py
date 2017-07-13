@@ -44,7 +44,6 @@ class Widget(QtWidgets.QWidget):
                 dialog = CourseEditDialog(self.CourseTable, index, self.get_parent_window())
                 dialog.exec()
             except:
-                print(sys.exc_info())
                 traceback.print_exc()
 
         self.CourseTable.doubleClicked.connect(course_double_clicked)

@@ -143,6 +143,9 @@ class Group(Model):
     start_corridor = None
     order_in_corridor = None
 
+    first_number = None
+    count_person = 0
+
 
 class GroupList(list):
     pass

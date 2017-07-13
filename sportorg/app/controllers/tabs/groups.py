@@ -1,7 +1,10 @@
 import logging
+import traceback
+
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QAbstractItemView, QHeaderView
 
+from sportorg.app.controllers.dialogs.group_edit import GroupEditDialog
 from sportorg.app.models.memory_model import PersonProxyModel, GroupMemoryModel
 
 
@@ -37,14 +40,12 @@ class Widget(QtWidgets.QWidget):
         def group_double_clicked(index):
             print('clicked on ' + str(index.row()))
             logging.info('clicked on ' + str(index.row()))
-            # show_edit_dialog(index)
-            # try:
-            #      dialog = GroupEditDialog(self.GroupTable, index)
-            # except:
-            #     print(sys.exc_info())
-            #     traceback.print_stack()
 
-            #dialog.exec()
+            try:
+                 dialog = GroupEditDialog(self.GroupTable, index, self.get_parent_window())
+                 dialog.exec()
+            except:
+                traceback.print_exc()
 
         self.GroupTable.doubleClicked.connect(group_double_clicked)
         self.group_layout.addWidget(self.GroupTable)

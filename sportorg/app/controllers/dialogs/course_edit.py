@@ -186,7 +186,6 @@ class CourseEditDialog(QDialog):
         if changed:
             win = self.get_main_window()
             win.refresh()
-            # table.model().sourceModel().update_one_object(part, table.model().mapToSource(self.current_index).row())
 
     def get_main_window(self):
         return self.parent
