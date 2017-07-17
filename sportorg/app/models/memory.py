@@ -224,14 +224,14 @@ class RaceData(Model):
 
 
 class Race(Model):
-    data = RaceData()
-    courses = CourseList()
-    groups = GroupList()
-    persons = PersonList()
-    results = ResultList()
-    organizations = OrganizationList()
-    settings = SettingsDict()
-
+    def __init__(self):
+        self.data = RaceData()
+        self.courses = CourseList()
+        self.groups = GroupList()
+        self.persons = PersonList()
+        self.results = ResultList()
+        self.organizations = OrganizationList()
+        self.settings = SettingsDict()
 
 def create(obj, **kwargs):
     return obj.create(**kwargs)
@@ -271,7 +271,7 @@ def race(day=None):
     else:
         day = day - 1
 
-    if day in event:
+    if day in range(len(event)):
         return event[day]
     else:
         return Race()

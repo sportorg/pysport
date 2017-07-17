@@ -15,6 +15,7 @@ from sportorg.app.controllers.tabs import start_preparation, groups, teams, race
 import configparser
 
 import config
+from sportorg.app.models.memory import race, Race, event
 from sportorg.app.models.memory_model import PersonMemoryModel, ResultMemoryModel, GroupMemoryModel, CourseMemoryModel, \
     TeamMemoryModel
 from sportorg.app.plugins.winorient.wdb import WinOrientBinary
@@ -248,11 +249,18 @@ class MainWindow(QMainWindow):
             func(file)
 
     def create_file(self):
+
+        # TODO: save changes in current file
+
         file_name = QtWidgets.QFileDialog.getSaveFileName(self,'Create SportOrg file',
                                             '/' + str(time.strftime("%Y%m%d")), "SportOrg file (*.sportorg)")[0]
         if file_name is not '':
             self.setWindowTitle(file_name)
             self.file = file_name
+
+        # remove data
+        event[0] = Race()
+        self.refresh()
 
     def save_file_as(self):
         self.create_file()
