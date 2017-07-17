@@ -6,8 +6,10 @@ import traceback
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow
 
+from sportorg.app.controllers import global_access
 from sportorg.app.controllers.dialogs.entry_filter import DialogFilter
 from sportorg.app.controllers.dialogs.report_dialog import ReportDialog
+from sportorg.app.controllers.global_access import GlobalAccess
 from sportorg.app.controllers.tabs import start_preparation, groups, teams, race_results, courses
 
 import configparser
@@ -39,6 +41,7 @@ class MainWindow(QMainWindow):
             self.file = None
         self.conf = configparser.ConfigParser()
         self.reader = None
+        GlobalAccess().set_main_window(self)
 
 
     def show_window(self):
@@ -234,11 +237,11 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.tabwidget)
         self.setCentralWidget(self.centralwidget)
 
-        self.tabwidget.addTab(start_preparation.Widget(self), _("Start Preparation"))
-        self.tabwidget.addTab(race_results.Widget(self), _("Race Results"))
-        self.tabwidget.addTab(groups.Widget(self), _("Groups"))
-        self.tabwidget.addTab(courses.Widget(self), _("Courses"))
-        self.tabwidget.addTab(teams.Widget(self), _("Teams"))
+        self.tabwidget.addTab(start_preparation.Widget(), _("Start Preparation"))
+        self.tabwidget.addTab(race_results.Widget(), _("Race Results"))
+        self.tabwidget.addTab(groups.Widget(), _("Groups"))
+        self.tabwidget.addTab(courses.Widget(), _("Courses"))
+        self.tabwidget.addTab(teams.Widget(), _("Teams"))
 
     def backup(self, func, mode='wb'):
         with open(self.file, mode) as file:

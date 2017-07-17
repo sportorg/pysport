@@ -11,10 +11,9 @@ from sportorg.app.models.memory_model import PersonMemoryModel, PersonProxyModel
 
 
 class Widget(QtWidgets.QWidget):
-    def __init__(self, parent=None):
+    def __init__(self):
         super().__init__()
         self.setup_ui()
-        self.parent = parent
 
     def setup_ui(self):
         self.setAcceptDrops(False)
@@ -43,7 +42,7 @@ class Widget(QtWidgets.QWidget):
             logging.info('clicked on ' + str(index.row()))
             # show_edit_dialog(index)
             try:
-                dialog = EntryEditDialog(self.EntryTable, index, self.get_parent_window())
+                dialog = EntryEditDialog(self.EntryTable, index)
             except:
                 print(sys.exc_info())
                 traceback.print_exc()

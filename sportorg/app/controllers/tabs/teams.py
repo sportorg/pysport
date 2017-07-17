@@ -11,10 +11,9 @@ from sportorg.app.models.memory_model import PersonProxyModel, TeamMemoryModel
 
 
 class Widget(QtWidgets.QWidget):
-    def __init__(self, parent=None):
+    def __init__(self):
         super().__init__()
         self.setup_ui()
-        self.parent = parent
 
     def setup_ui(self):
         self.setAcceptDrops(False)
@@ -41,7 +40,7 @@ class Widget(QtWidgets.QWidget):
         def team_double_clicked(index):
             print('Team: clicked on ' + str(index.row()))
             try:
-                dialog = OrganizationEditDialog(self.TeamTable, index, self.get_parent_window())
+                dialog = OrganizationEditDialog(self.TeamTable, index)
                 dialog.exec()
             except:
                 print(sys.exc_info())
@@ -54,6 +53,3 @@ class Widget(QtWidgets.QWidget):
 
     def get_table(self):
         return self.TeamTable()
-
-    def get_parent_window(self):
-        return self.parent

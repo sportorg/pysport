@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QFormLayout, QLabel, \
     QLineEdit, QComboBox, QCompleter, QApplication, QTableView, QDialog, \
     QPushButton
 
-
+from sportorg.app.controllers.global_access import GlobalAccess
 from sportorg.app.models.memory import race, Organization
 
 
@@ -61,12 +61,11 @@ class AdvComboBox(QComboBox):
 
 
 class OrganizationEditDialog(QDialog):
-    def __init__(self, table=None, index=None, parent=None):
+    def __init__(self, table=None, index=None):
         super().__init__()
         self.init_ui()
         if table is not None:
             self.set_values_from_table(table, index)
-        self.parent = parent
 
     def close_dialog(self):
         self.close()
@@ -176,7 +175,7 @@ class OrganizationEditDialog(QDialog):
             # table.model().sourceModel().update_one_object(part, table.model().mapToSource(self.current_index).row())
 
     def get_parent_window(self):
-        return self.parent
+        return GlobalAccess().get_main_window()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

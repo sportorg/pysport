@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import QFormLayout, QLabel, \
     QLineEdit, QComboBox, QCompleter, QApplication, QTableView, QDialog, \
     QPushButton, QSpinBox, QTimeEdit
 
+from sportorg.app.controllers.global_access import GlobalAccess
 from sportorg.app.models.memory import race, Group, find
 
 
@@ -65,12 +66,11 @@ class AdvComboBox(QComboBox):
 
 
 class GroupEditDialog(QDialog):
-    def __init__(self, table=None, index=None, parent=None):
+    def __init__(self, table=None, index=None):
         super().__init__()
         self.init_ui()
         if table is not None:
             self.set_values_from_table(table, index)
-        self.parent = parent
 
     def close_dialog(self):
         self.close()
@@ -246,7 +246,7 @@ class GroupEditDialog(QDialog):
             self.get_parent_window().refresh()
 
     def get_parent_window(self):
-        return self.parent
+        return GlobalAccess().get_main_window()
 
 
 if __name__ == '__main__':
