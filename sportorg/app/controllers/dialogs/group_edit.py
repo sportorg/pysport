@@ -11,6 +11,7 @@ from PyQt5.QtWidgets import QFormLayout, QLabel, \
 from sportorg.app.controllers.global_access import GlobalAccess
 from sportorg.app.models.memory import race, Group, find
 
+from sportorg.language import _
 
 def get_courses():
     ret = list()
@@ -76,63 +77,63 @@ class GroupEditDialog(QDialog):
         self.close()
 
     def init_ui(self):
-        self.setWindowTitle('Group properties')
+        self.setWindowTitle(_('Group properties'))
         self.setWindowIcon(QIcon('sportorg.ico'))
         self.setSizeGripEnabled(False)
         self.setModal(True)
-        self.setToolTip('Group Edit Window')
+        self.setToolTip(_('Group Edit Window'))
 
         self.layout = QFormLayout(self)
 
-        self.label_name = QLabel('Name')
+        self.label_name = QLabel(_('Name'))
         self.item_name = QLineEdit()
         self.layout.addRow(self.label_name, self.item_name)
 
-        self.label_full_name = QLabel('Full name')
+        self.label_full_name = QLabel(_('Full name'))
         self.item_full_name = QLineEdit()
         self.layout.addRow(self.label_full_name, self.item_full_name)
 
-        self.label_course = QLabel('Course')
+        self.label_course = QLabel(_('Course'))
         self.item_course = AdvComboBox()
         self.item_course.addItems(get_courses())
         self.layout.addRow(self.label_course, self.item_course)
 
-        self.label_sex = QLabel('Sex')
+        self.label_sex = QLabel(_('Sex'))
         self.item_sex = AdvComboBox()
         self.item_sex.addItems(get_sexes())
         self.layout.addRow(self.label_sex, self.item_sex)
 
-        self.label_age_min = QLabel('Min age')
+        self.label_age_min = QLabel(_('Min age'))
         self.item_age_min = QSpinBox()
         self.layout.addRow(self.label_age_min, self.item_age_min)
 
-        self.label_age_max = QLabel('Max age')
+        self.label_age_max = QLabel(_('Max age'))
         self.item_age_max = QSpinBox()
         self.layout.addRow(self.label_age_max, self.item_age_max)
 
-        self.label_max_time = QLabel('Max time')
+        self.label_max_time = QLabel(_('Max time'))
         self.item_max_time = QTimeEdit()
         self.item_max_time.setDisplayFormat("hh:mm:ss")
         self.layout.addRow(self.label_max_time, self.item_max_time)
 
-        self.label_corridor = QLabel('Start corridor')
+        self.label_corridor = QLabel(_('Start corridor'))
         self.item_corridor = QSpinBox()
         self.layout.addRow(self.label_corridor, self.item_corridor)
 
-        self.label_corridor_order = QLabel('Order in corridor')
+        self.label_corridor_order = QLabel(_('Order in corridor'))
         self.item_corridor_order = QSpinBox()
         self.layout.addRow(self.label_corridor_order, self.item_corridor_order)
 
-        self.label_start_interval = QLabel('Start interval')
+        self.label_start_interval = QLabel(_('Start interval'))
         self.item_start_interval = QTimeEdit()
         self.layout.addRow(self.label_start_interval, self.item_start_interval)
 
-        self.label_first_number = QLabel('First number')
+        self.label_first_number = QLabel(_('First number'))
         self.item_first_number = QSpinBox()
         self.item_first_number.setMaximum(1000000)
         self.layout.addRow(self.label_first_number, self.item_first_number)
 
-        self.label_price = QLabel('Price')
+        self.label_price = QLabel(_('Start fee'))
         self.item_price = QSpinBox()
         self.item_price.setSingleStep(50)
         self.item_price.setMaximum(100000000)
@@ -149,9 +150,9 @@ class GroupEditDialog(QDialog):
                 traceback.print_exc()
             self.close()
 
-        self.button_ok = QPushButton('OK')
+        self.button_ok = QPushButton(_('OK'))
         self.button_ok.clicked.connect(apply_changes)
-        self.button_cancel = QPushButton('Cancel')
+        self.button_cancel = QPushButton(_('Cancel'))
         self.button_cancel.clicked.connect(cancel_changes)
         self.layout.addRow(self.button_ok, self.button_cancel)
 

@@ -111,6 +111,8 @@ class MainWindow(QMainWindow):
         self.action_about_us = QtWidgets.QAction(self)
         self.action_report = QtWidgets.QAction(self)
         self.action_filter = QtWidgets.QAction(self)
+        self.action_new_row = QtWidgets.QAction(self)
+        self.action_delete = QtWidgets.QAction(self)
 
         self.menu_import.addAction(self.action_cvs)
         self.menu_import.addAction(self.action_csv__winorient)
@@ -118,6 +120,7 @@ class MainWindow(QMainWindow):
         self.menu_import.addAction(self.action_iof__xml_v3)
         self.menu_import.addSeparator()
         self.menu_import.addAction(self.action_ocad_txt_v8)
+
         self.menu_file.addAction(self.action_new)
         self.menu_file.addAction(self.action_new__race)
         self.menu_file.addAction(self.action_save)
@@ -132,10 +135,17 @@ class MainWindow(QMainWindow):
         self.menu_file.addAction(self.action_export)
         self.menu_file.addSeparator()
         self.menu_file.addAction(self.action_quit)
+
+        self.menu_edit.addAction(self.action_new_row)
+        self.menu_edit.addAction(self.action_delete)
+
         self.menu_start_preparation.addAction(self.action_filter)
+
         self.menu_results.addAction(self.action_report)
+
         self.menu_help.addAction(self.action_help)
         self.menu_help.addAction(self.action_about_us)
+
         self.menubar.addAction(self.menu_file.menuAction())
         self.menubar.addAction(self.menu_edit.menuAction())
         self.menubar.addAction(self.menu_start_preparation.menuAction())
@@ -145,6 +155,7 @@ class MainWindow(QMainWindow):
         self.menubar.addAction(self.menu_service.menuAction())
         self.menubar.addAction(self.menu_options.menuAction())
         self.menubar.addAction(self.menu_help.menuAction())
+
         self.menu_file.setTitle(_("File"))
 
         self.action_new.setText(_("New"))
@@ -187,9 +198,14 @@ class MainWindow(QMainWindow):
         self.action_report.triggered.connect(self.report_dialog)
         self.action_report.setShortcut("Ctrl+P")
 
+        self.action_new_row.setText(_("Add object"))
+        self.action_report.triggered.connect(self.create_object)
+        self.action_delete.setText(_("Delete"))
+        self.action_report.triggered.connect(self.delete_object)
+
         self.menu_edit.setTitle(_("Edit"))
 
-        self.menu_start_preparation.setTitle(_("Start preparation"))
+        self.menu_start_preparation.setTitle(_("Start Preparation"))
 
         self.menu_race.setTitle(_("Race"))
 
@@ -209,18 +225,18 @@ class MainWindow(QMainWindow):
         layout = QtWidgets.QVBoxLayout()
         self.toolbar = self.addToolBar("File")
 
-        new = QtWidgets.QAction(QtGui.QIcon(config.icon_dir("file.png")), "new", self)
+        new = QtWidgets.QAction(QtGui.QIcon(config.icon_dir("file.png")), _("New"), self)
         new.triggered.connect(self.create_file)
         self.toolbar.addAction(new)
 
-        open = QtWidgets.QAction(QtGui.QIcon(config.icon_dir("folder.png")), "open", self)
+        open = QtWidgets.QAction(QtGui.QIcon(config.icon_dir("folder.png")), _("Open"), self)
         open.triggered.connect(self.open_file)
         self.toolbar.addAction(open)
-        save = QtWidgets.QAction(QtGui.QIcon(config.icon_dir("save.png")), "save", self)
+        save = QtWidgets.QAction(QtGui.QIcon(config.icon_dir("save.png")), _("Save"), self)
         save.triggered.connect(self.save_file)
         self.toolbar.addAction(save)
 
-        si = QtWidgets.QAction(QtGui.QIcon(config.icon_dir("sportident.png")), "save", self)
+        si = QtWidgets.QAction(QtGui.QIcon(config.icon_dir("sportident.png")), _("SPORTident readout"), self)
         si.triggered.connect(self.sportident)
         self.toolbar.addAction(si)
 
@@ -319,7 +335,7 @@ class MainWindow(QMainWindow):
 
     def filter_dialog(self):
         try:
-            table = self.tabwidget.findChild(QtWidgets.QTableView, 'EntryTable')
+            table = GlobalAccess().get_current_table()
             ex = DialogFilter(table)
             ex.exec()
         except:
@@ -334,17 +350,23 @@ class MainWindow(QMainWindow):
             print(sys.exc_info())
             traceback.print_exc()
 
+    def create_object(self):
+        pass
+
+    def delete_object(self):
+        pass
+
     def init_model(self):
         try:
-            table = self.tabwidget.findChild(QtWidgets.QTableView, 'EntryTable')
+            table = GlobalAccess().get_person_table()
             table.model().setSourceModel(PersonMemoryModel())
-            table = self.tabwidget.findChild(QtWidgets.QTableView, 'ResultTable')
+            table = GlobalAccess().get_result_table()
             table.model().setSourceModel(ResultMemoryModel())
-            table = self.tabwidget.findChild(QtWidgets.QTableView, 'GroupTable')
+            table = GlobalAccess().get_group_table()
             table.model().setSourceModel(GroupMemoryModel())
-            table = self.tabwidget.findChild(QtWidgets.QTableView, 'CourseTable')
+            table = GlobalAccess().get_course_table()
             table.model().setSourceModel(CourseMemoryModel())
-            table = self.tabwidget.findChild(QtWidgets.QTableView, 'TeamTable')
+            table = GlobalAccess().get_organization_table()
             table.model().setSourceModel(TeamMemoryModel())
 
         except:
@@ -352,15 +374,15 @@ class MainWindow(QMainWindow):
 
     def refresh(self):
         try:
-            table = self.tabwidget.findChild(QtWidgets.QTableView, 'EntryTable')
+            table = GlobalAccess().get_person_table()
             table.model().sourceModel().init_cache()
-            table = self.tabwidget.findChild(QtWidgets.QTableView, 'ResultTable')
+            table = GlobalAccess().get_result_table()
             table.model().sourceModel().init_cache()
-            table = self.tabwidget.findChild(QtWidgets.QTableView, 'GroupTable')
+            table = GlobalAccess().get_group_table()
             table.model().sourceModel().init_cache()
-            table = self.tabwidget.findChild(QtWidgets.QTableView, 'CourseTable')
+            table = GlobalAccess().get_course_table()
             table.model().sourceModel().init_cache()
-            table = self.tabwidget.findChild(QtWidgets.QTableView, 'TeamTable')
+            table = GlobalAccess().get_organization_table()
             table.model().sourceModel().init_cache()
         except:
             traceback.print_exc()

@@ -11,6 +11,7 @@ from PyQt5.QtWidgets import QFormLayout, QLabel, \
 from sportorg.app.controllers.global_access import  GlobalAccess
 from sportorg.app.models.memory import race, Course, CourseControl
 
+from sportorg.language import _
 
 def get_course_types():
     return ['order', 'free', 'marked route']
@@ -66,42 +67,42 @@ class CourseEditDialog(QDialog):
         self.close()
 
     def init_ui(self):
-        self.setWindowTitle('Course properties')
+        self.setWindowTitle(_('Course properties'))
         self.setWindowIcon(QIcon('sportorg.ico'))
         self.setSizeGripEnabled(False)
         self.setModal(True)
-        self.setToolTip('Course Edit Window')
+        self.setToolTip(_('Course Edit Window'))
 
         self.layout = QFormLayout(self)
 
-        self.label_name = QLabel('Name')
+        self.label_name = QLabel(_('Name'))
         self.item_name = QLineEdit()
         self.layout.addRow(self.label_name, self.item_name)
 
-        self.label_type = QLabel('Type')
+        self.label_type = QLabel(_('Type'))
         self.item_type = AdvComboBox()
         self.item_type.addItems(get_course_types())
         self.layout.addRow(self.label_type, self.item_type)
 
-        self.label_length = QLabel('Length')
+        self.label_length = QLabel(_('Length'))
         self.item_length = QSpinBox()
         self.item_length.setMaximum(100000)
         self.item_length.setSingleStep(100)
         self.item_length.setValue(0)
         self.layout.addRow(self.label_length, self.item_length)
 
-        self.label_climb = QLabel('Climb')
+        self.label_climb = QLabel(_('Climb'))
         self.item_climb = QSpinBox()
         self.item_climb.setValue(0)
         self.item_climb.setMaximum(10000)
         self.item_climb.setSingleStep(10)
         self.layout.addRow(self.label_climb, self.item_climb)
 
-        self.label_control_qty = QLabel('Control count')
+        self.label_control_qty = QLabel(_('Point count'))
         self.item_control_qty = QSpinBox()
         self.layout.addRow(self.label_control_qty, self.item_control_qty)
 
-        self.label_controls = QLabel('Controls')
+        self.label_controls = QLabel(_('Controls'))
         self.item_controls = QTextEdit()
         self.layout.addRow(self.label_controls, self.item_controls)
 
@@ -116,9 +117,9 @@ class CourseEditDialog(QDialog):
                 traceback.print_exc()
             self.close()
 
-        self.button_ok = QPushButton('OK')
+        self.button_ok = QPushButton(_('OK'))
         self.button_ok.clicked.connect(apply_changes)
-        self.button_cancel = QPushButton('Cancel')
+        self.button_cancel = QPushButton(_('Cancel'))
         self.button_cancel.clicked.connect(cancel_changes)
         self.layout.addRow(self.button_ok, self.button_cancel)
 

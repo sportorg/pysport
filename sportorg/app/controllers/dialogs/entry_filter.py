@@ -14,6 +14,7 @@ from PyQt5.QtWidgets import QApplication, QDialog, QTableView
 from sportorg.app.controllers.dialogs import entry_edit
 from sportorg.app.models.memory_model import PersonProxyModel
 
+from sportorg.language import _
 
 class DialogFilter(QDialog):
 
@@ -89,11 +90,9 @@ class DialogFilter(QDialog):
         self.close_dialog()
 
     def retranslate_ui(self):
-        _translate = QtCore.QCoreApplication.translate
-
-        self.setWindowTitle(_translate("filter_dialog", "Filter Dialog"))
-        self.group_label.setText(_translate("filter_dialog", "Group"))
-        self.team_label.setText(_translate("filter_dialog", "Team"))
+        self.setWindowTitle(_("Filter Dialog"))
+        self.group_label.setText(_("Group"))
+        self.team_label.setText(_("Team"))
 
 
 def main(argv):

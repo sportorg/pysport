@@ -14,6 +14,7 @@ from PyQt5.QtWidgets import QFormLayout, QLabel, \
 
 from sportorg.app.plugins.template.template import get_templates, get_text_from_file, get_result_data
 
+from sportorg.language import _
 
 class AdvComboBox(QComboBox):
     """
@@ -63,15 +64,15 @@ class ReportDialog(QDialog):
         self.close()
 
     def init_ui(self):
-        self.setWindowTitle('Report creating')
+        self.setWindowTitle(_('Report creating'))
         self.setWindowIcon(QIcon('sportorg.ico'))
         self.setSizeGripEnabled(False)
         self.setModal(True)
-        self.setToolTip('Creating of report')
+        self.setToolTip(_('Creating of report'))
 
         self.layout = QFormLayout(self)
 
-        self.label_template = QLabel('Template')
+        self.label_template = QLabel(_('Template'))
         self.item_template = AdvComboBox()
         self.item_template.addItems(get_templates())
         self.layout.addRow(self.label_template, self.item_template)
@@ -79,8 +80,8 @@ class ReportDialog(QDialog):
         self.item_custom_path = QPushButton('...')
 
         def select_custom_path():
-            file_name = QtWidgets.QFileDialog.getOpenFileName(self, 'Open HTML template', '',
-                                                              "HTML file (*.html)")[0]
+            file_name = QtWidgets.QFileDialog.getOpenFileName(self, _('Open HTML template'), '',
+                                                              _("HTML file (*.html)"))[0]
             self.item_template.setCurrentText(file_name)
 
         self.item_custom_path.clicked.connect(select_custom_path)
@@ -97,9 +98,9 @@ class ReportDialog(QDialog):
                 traceback.print_exc()
             self.close()
 
-        self.button_ok = QPushButton('OK')
+        self.button_ok = QPushButton(_('OK'))
         self.button_ok.clicked.connect(apply_changes)
-        self.button_cancel = QPushButton('Cancel')
+        self.button_cancel = QPushButton(_('Cancel'))
         self.button_cancel.clicked.connect(cancel_changes)
         self.layout.addRow(self.button_ok, self.button_cancel)
 
@@ -108,9 +109,9 @@ class ReportDialog(QDialog):
     def apply_changes_impl(self):
         template_path = self.item_template.currentText()
         template = get_text_from_file(template_path, **get_result_data())
-        file_name = QtWidgets.QFileDialog.getSaveFileName(self, 'Save As HTML file',
+        file_name = QtWidgets.QFileDialog.getSaveFileName(self, _('Save As HTML file'),
                                                           '/report_' + str(time.strftime("%Y%m%d")),
-                                                          "HTML file (*.html)")[0]
+                                                          _("HTML file (*.html)"))[0]
         with codecs.open(file_name, 'w', 'utf-8') as file:
             file.write(template)
             file.close()

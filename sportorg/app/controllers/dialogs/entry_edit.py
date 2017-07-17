@@ -14,6 +14,8 @@ from sportorg.app.models.memory import race, Person, find
 from sportorg.app.models.model import Organization
 from sportorg.app.models.result_calculation import ResultCalculation
 
+from sportorg.language import _
+
 
 def get_groups():
     ret = list()
@@ -221,69 +223,69 @@ class EntryEditDialog(QDialog):
         self.close()
 
     def init_ui(self):
-        self.setWindowTitle('Entry properties')
+        self.setWindowTitle(_('Entry properties'))
         self.setWindowIcon(QIcon('sportorg.ico'))
         self.setSizeGripEnabled(False)
         self.setModal(True)
-        self.setToolTip('Main Window')
+        self.setToolTip(_('Entry properties Window'))
 
         self.layout = QFormLayout(self)
-        self.label_surname = QLabel('Last name')
+        self.label_surname = QLabel(_('Last name'))
         self.item_surname = QLineEdit()
         self.layout.addRow(self.label_surname, self.item_surname)
 
-        self.label_name = QLabel('Name')
+        self.label_name = QLabel(_('First Name'))
         self.item_name = AdvComboBox()
         self.item_name.addItems(get_names())
         self.layout.addRow(self.label_name, self.item_name)
 
-        self.label_group = QLabel('Group')
+        self.label_group = QLabel(_('Group'))
         self.item_group = AdvComboBox()
         self.item_group.addItems(get_groups())
         self.layout.addRow(self.label_group, self.item_group)
 
-        self.label_team = QLabel('Team')
+        self.label_team = QLabel(_('Team'))
         self.item_team = AdvComboBox()
         self.item_team.addItems(get_teams())
         self.layout.addRow(self.label_team, self.item_team)
 
-        self.label_year = QLabel('Year of birth')
+        self.label_year = QLabel(_('Year of birth'))
         self.item_year = QSpinBox()
         self.item_year.setMinimum(0)
         self.item_year.setMaximum(date.today().year)
         self.item_year.editingFinished.connect(self.year_change)
         self.layout.addRow(self.label_year, self.item_year)
 
-        self.label_qual = QLabel('Qualification')
+        self.label_qual = QLabel(_('Qualification'))
         self.item_qual = AdvComboBox()
         self.item_qual.addItems(['б/р', '1ю', '2ю', '3ю', '1', '2', '3', 'КМС', 'МС', 'МСМК', 'ЗМС'])
         self.layout.addRow(self.label_qual, self.item_qual)
 
-        self.label_bib = QLabel('Bib')
+        self.label_bib = QLabel(_('Bib'))
         self.item_bib = QSpinBox()
         self.item_bib.setMinimum(0)
         self.item_bib.setMaximum(100000)
         self.layout.addRow(self.label_bib, self.item_bib)
 
-        self.label_start = QLabel('Start time')
+        self.label_start = QLabel(_('Start time'))
         self.item_start = QTimeEdit()
         self.item_start.setDisplayFormat('hh:mm:ss')
         self.layout.addRow(self.label_start, self.item_start)
 
-        self.label_card = QLabel('Punch card #')
+        self.label_card = QLabel(_('Punch card #'))
         self.item_card = QSpinBox()
         self.item_card.setMinimum(0)
         self.item_card.setMaximum(9999999)
         self.layout.addRow(self.label_card, self.item_card)
 
-        self.item_rented = QCheckBox('rented card')
-        self.item_paid = QCheckBox('is paid')
-        self.item_out_of_competition = QCheckBox('out of competition')
-        self.item_personal = QCheckBox('personal participation')
+        self.item_rented = QCheckBox(_('rented card'))
+        self.item_paid = QCheckBox(_('is paid'))
+        self.item_out_of_competition = QCheckBox(_('out of competition'))
+        self.item_personal = QCheckBox(_('personal participation'))
         self.layout.addRow(self.item_rented, self.item_out_of_competition)
         self.layout.addRow(self.item_paid, self.item_personal)
 
-        self.label_comment = QLabel('Comment')
+        self.label_comment = QLabel(_('Comment'))
         self.item_comment = QTextEdit()
         self.layout.addRow(self.label_comment, self.item_comment)
 
@@ -297,9 +299,9 @@ class EntryEditDialog(QDialog):
                 traceback.print_exc()
             self.close()
 
-        self.button_ok = QPushButton('OK')
+        self.button_ok = QPushButton(_('OK'))
         self.button_ok.clicked.connect(apply_changes)
-        self.button_cancel = QPushButton('Cancel')
+        self.button_cancel = QPushButton(_('Cancel'))
         self.button_cancel.clicked.connect(cancel_changes)
         self.layout.addRow(self.button_ok, self.button_cancel)
 

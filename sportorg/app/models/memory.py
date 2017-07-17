@@ -271,7 +271,7 @@ def race(day=None):
     else:
         day = day - 1
 
-    if day in range(len(event)):
+    if day < len(event):
         return event[day]
     else:
         return Race()

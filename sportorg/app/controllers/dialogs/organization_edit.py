@@ -11,6 +11,7 @@ from PyQt5.QtWidgets import QFormLayout, QLabel, \
 from sportorg.app.controllers.global_access import GlobalAccess
 from sportorg.app.models.memory import race, Organization
 
+from sportorg.language import _
 
 def get_countries():
     return ['Russia', 'Finland', 'Norway', 'Germany', 'France', 'Austria', 'Kazakhstan', 'Ukraine', 'Poland', 'Estonia']
@@ -71,33 +72,33 @@ class OrganizationEditDialog(QDialog):
         self.close()
 
     def init_ui(self):
-        self.setWindowTitle('Team properties')
+        self.setWindowTitle(_('Team properties'))
         self.setWindowIcon(QIcon('sportorg.ico'))
         self.setSizeGripEnabled(False)
         self.setModal(True)
-        self.setToolTip('Team Edit Window')
+        self.setToolTip(_('Team Edit Window'))
 
         self.layout = QFormLayout(self)
 
-        self.label_name = QLabel('Name')
+        self.label_name = QLabel(_('Name'))
         self.item_name = QLineEdit()
         self.layout.addRow(self.label_name, self.item_name)
 
-        self.label_country = QLabel('Country')
+        self.label_country = QLabel(_('Country'))
         self.item_country = AdvComboBox()
         self.item_country.addItems(get_countries())
         self.layout.addRow(self.label_country, self.item_country)
 
-        self.label_region = QLabel('Region')
+        self.label_region = QLabel(_('Region'))
         self.item_region = AdvComboBox()
         self.item_region.addItems(get_regions())
         self.layout.addRow(self.label_region, self.item_region)
 
-        self.label_contact = QLabel('Contact')
+        self.label_contact = QLabel(_('Contact'))
         self.item_contact = QLineEdit()
         self.layout.addRow(self.label_contact, self.item_contact)
 
-        self.label_address = QLabel('Address')
+        self.label_address = QLabel(_('Address'))
         self.item_address = QLineEdit()
         self.layout.addRow(self.label_address, self.item_address)
 
@@ -112,9 +113,9 @@ class OrganizationEditDialog(QDialog):
                 traceback.print_exc()
             self.close()
 
-        self.button_ok = QPushButton('OK')
+        self.button_ok = QPushButton(_('OK'))
         self.button_ok.clicked.connect(apply_changes)
-        self.button_cancel = QPushButton('Cancel')
+        self.button_cancel = QPushButton(_('Cancel'))
         self.button_cancel.clicked.connect(cancel_changes)
         self.layout.addRow(self.button_ok, self.button_cancel)
 
