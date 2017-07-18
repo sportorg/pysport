@@ -229,6 +229,8 @@ class WinOrientBinary:
 
             my_race.persons.append(new_person)
 
+            new_person.start_time = self.int_to_time(man.start)
+
             # result
             fin = man.get_finish()
             if fin is not None:

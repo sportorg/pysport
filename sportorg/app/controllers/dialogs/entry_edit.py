@@ -352,13 +352,12 @@ class EntryEditDialog(QDialog):
             self.item_qual.setCurrentText(str(current_object.qual))
         if current_object.bib is not None:
             self.item_bib.setValue(int(current_object.bib))
-        if current_object.result is not None:
-            t = current_object.result.start_time
-            if t is not None:
-                assert(isinstance(t, datetime))
-                time = QTime()
-                time.setHMS(t.hour, t.minute, t.second, t.microsecond)
-                self.item_start.setTime(time)
+        if current_object.start_time is not None:
+            t = current_object.start_time
+            assert(isinstance(t, datetime))
+            time = QTime()
+            time.setHMS(t.hour, t.minute, t.second, t.microsecond)
+            self.item_start.setTime(time)
 
         if current_object.card_number is not None:
             self.item_card.setValue(int(current_object.card_number))
@@ -399,8 +398,8 @@ class EntryEditDialog(QDialog):
         now = datetime.now()
         assert(isinstance(t, QTime))
         new_time = datetime(now.year, now.month, now.day, t.hour(), t.minute(), t.second(), t.msec())
-        if person.result.start_time != new_time:
-            person.result.start_time = new_time
+        if person.start_time != new_time:
+            person.start_time = new_time
             changed = True
 
         if (person.card_number is None or person.card_number != self.item_card.text()) \

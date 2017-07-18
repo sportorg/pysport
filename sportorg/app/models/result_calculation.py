@@ -6,9 +6,18 @@ from sportorg.language import locale
 
 class ResultCalculation(object):
     def process_results(self):
+        self.set_times()
         for i in race().groups:
             array = self.get_group_finishes(i)
             self.set_places(array)
+
+    def set_times(self):
+        for i in race().results:
+            assert isinstance(i, Result)
+            person = i.person
+            i.start_time = person.start_time
+            i.result = i.get_result_for_sort()
+
 
     def get_group_finishes(self, group):
         ret = list()

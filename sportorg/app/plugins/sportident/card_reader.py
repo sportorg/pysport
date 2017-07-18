@@ -1,3 +1,6 @@
+from sportorg.app.controllers.global_access import GlobalAccess
+from sportorg.app.models.memory import race
+from sportorg.app.models.result_calculation import ResultCalculation
 from . import sireader
 from sportorg.app.models import memory
 
@@ -77,7 +80,15 @@ class PersonCardData:
         for punch in data['punches']:
             result.punches.append(list(punch))
 
+        race().results.append(result) # add new object to the list
+        if self.person.result is not None:
+            race().results.remove(self.person.result)
+
         self.person.result = result
+        result.person = self.person
+
+        ResultCalculation().process_results()
+        GlobalAccess().get_main_window().refresh()
 
         return self
 

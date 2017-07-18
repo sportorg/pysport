@@ -1,3 +1,8 @@
+from datetime import timedelta
+
+import datetime
+
+
 class Model(object):
     @classmethod
     def create(cls, **kwargs):
@@ -159,7 +164,7 @@ class Result(Model):
     penalty_time = None  # time of penalties (marked route, false start)
     penalty_laps = None  # count of penalty legs (marked route)
     status = None
-    result = None
+    result = None  # time in seconds * 100 (int)
     place = None
 
     person = None  # reverse link to person
@@ -181,6 +186,15 @@ class Result(Model):
         if self.status != 0 and self.status != ResultStatus.OK:
             return None
         return str(self.finish_time - self.start_time)
+
+    def get_result_for_sort(self):
+        ret = 0;
+        if self.status != 0 and self.status != ResultStatus.OK:
+            ret += 24*3600*100
+
+        delta = self.finish_time - self.start_time
+        ret += delta.seconds * 100
+        return ret
 
 
 class ResultList(list):
@@ -210,6 +224,7 @@ class Person(Model):
     is_out_of_competition = False  # e.g. 20-years old person, running in M12
     comment = None
 
+    start_time = None
 
 class PersonList(list):
     pass
