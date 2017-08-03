@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import QMainWindow
 
 from sportorg.app.controllers import global_access
 from sportorg.app.controllers.dialogs.entry_filter import DialogFilter
+from sportorg.app.controllers.dialogs.event_properties import EventPropertiesDialog
 from sportorg.app.controllers.dialogs.report_dialog import ReportDialog
 from sportorg.app.controllers.global_access import GlobalAccess
 from sportorg.app.controllers.tabs import start_preparation, groups, teams, race_results, courses
@@ -178,6 +179,7 @@ class MainWindow(QMainWindow):
         self.action_open__resent.setText(_("Open Recent"))
         self.action_settings.setText(_("Settings"))
         self.action_event__settings.setText(_("Event Settings"))
+        self.action_event__settings.triggered.connect(self.event_settings_dialog)
         self.menu_import.setTitle(_("Import"))
         self.action_cvs.setText(_("CVS "))
         self.action_cvs.setIcon(QtGui.QIcon(config.icon_dir("csv.png")))
@@ -345,6 +347,14 @@ class MainWindow(QMainWindow):
     def report_dialog(self):
         try:
             ex = ReportDialog()
+            ex.exec()
+        except:
+            print(sys.exc_info())
+            traceback.print_exc()
+
+    def event_settings_dialog(self):
+        try:
+            ex = EventPropertiesDialog()
             ex.exec()
         except:
             print(sys.exc_info())

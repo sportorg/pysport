@@ -1,4 +1,5 @@
 import datetime
+from _operator import concat
 
 from sportorg.app.models import model
 from sportorg.app.models.memory import Race, Organization, Group, Person, Result, race, find, Course, \
@@ -170,6 +171,10 @@ class WinOrientBinary:
         """Create objects in memory, according to model"""
         my_race = race()
         assert(isinstance(my_race, Race))
+
+        my_race.set_setting('sub_title', '\n'.join(self.wdb_object.info.title))
+        my_race.set_setting('location', self.wdb_object.info.place)
+
 
         for team in self.wdb_object.team:
             assert (isinstance(team, WDBTeam))

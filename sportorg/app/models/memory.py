@@ -248,6 +248,15 @@ class Race(Model):
         self.organizations = OrganizationList()
         self.settings = SettingsDict()
 
+    def set_setting(self, setting, value):
+        self.settings[setting] = value
+
+    def get_setting(self, setting):
+        if setting in self.settings:
+            return self.settings[setting]
+        else:
+            return ''
+
 def create(obj, **kwargs):
     return obj.create(**kwargs)
 
