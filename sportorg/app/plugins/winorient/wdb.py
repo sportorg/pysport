@@ -1,5 +1,4 @@
 import datetime
-from _operator import concat
 
 from sportorg.app.models import model
 from sportorg.app.models.memory import Race, Organization, Group, Person, Result, race, find, Course, \
@@ -174,6 +173,8 @@ class WinOrientBinary:
 
         my_race.set_setting('sub_title', '\n'.join(self.wdb_object.info.title))
         my_race.set_setting('location', self.wdb_object.info.place)
+        my_race.set_setting('chief_referee', self.wdb_object.info.referee)
+        my_race.set_setting('secretary', self.wdb_object.info.secretary)
 
 
         for team in self.wdb_object.team:

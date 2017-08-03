@@ -6,7 +6,6 @@ import traceback
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow
 
-from sportorg.app.controllers import global_access
 from sportorg.app.controllers.dialogs.entry_filter import DialogFilter
 from sportorg.app.controllers.dialogs.event_properties import EventPropertiesDialog
 from sportorg.app.controllers.dialogs.report_dialog import ReportDialog
@@ -16,7 +15,7 @@ from sportorg.app.controllers.tabs import start_preparation, groups, teams, race
 import configparser
 
 import config
-from sportorg.app.models.memory import race, Race, event
+from sportorg.app.models.memory import Race, event
 from sportorg.app.models.memory_model import PersonMemoryModel, ResultMemoryModel, GroupMemoryModel, CourseMemoryModel, \
     TeamMemoryModel
 from sportorg.app.plugins.winorient.wdb import WinOrientBinary
@@ -201,9 +200,11 @@ class MainWindow(QMainWindow):
         self.action_report.setShortcut("Ctrl+P")
 
         self.action_new_row.setText(_("Add object"))
-        self.action_report.triggered.connect(self.create_object)
+        self.action_new_row.triggered.connect(self.create_object)
         self.action_delete.setText(_("Delete"))
-        self.action_report.triggered.connect(self.delete_object)
+        self.action_delete.setShortcut("Del")
+        self.action_delete.triggered.connect(self.delete_object)
+
 
         self.menu_edit.setTitle(_("Edit"))
 
@@ -364,7 +365,7 @@ class MainWindow(QMainWindow):
         pass
 
     def delete_object(self):
-        pass
+        GlobalAccess().delete_object()
 
     def init_model(self):
         try:

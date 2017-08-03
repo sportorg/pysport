@@ -1,13 +1,12 @@
 import sys
 import traceback
-from _operator import concat
 
 from PyQt5 import QtCore
-from PyQt5.QtCore import QSortFilterProxyModel, QModelIndex
+from PyQt5.QtCore import QSortFilterProxyModel
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QLabel, \
-    QLineEdit, QComboBox, QCompleter, QApplication, QTableView, QDialog, \
-    QPushButton, QSpinBox, QTextEdit, QDateEdit, QCalendarWidget
+    QLineEdit, QComboBox, QCompleter, QApplication, QDialog, \
+    QPushButton, QTextEdit, QDateEdit
 
 from sportorg.app.controllers.global_access import GlobalAccess
 from sportorg.app.models.memory import race
@@ -78,6 +77,7 @@ class EventPropertiesDialog(QDialog):
         self.close()
 
     def init_ui(self):
+        self.setFixedWidth(500)
         self.setWindowTitle(_('Event properties'))
         self.setWindowIcon(QIcon('sportorg.ico'))
         self.setSizeGripEnabled(False)
@@ -152,30 +152,19 @@ class EventPropertiesDialog(QDialog):
         self.item_main_title.setText(str(obj.get_setting('main_title')))
         self.item_sub_title.setText(str(obj.get_setting('sub_title')))
         self.item_location.setText(str(obj.get_setting('location')))
+        self.item_refery.setText(str(obj.get_setting('chief_referee')))
+        self.item_secretary.setText(str(obj.get_setting('secretary')))
 
 
     def apply_changes_impl(self):
         changed = False
-        course = self.current_object
+        obj = race()
 
-        if course.name != self.item_name.text():
-            course.name = self.item_name.text()
-            changed = True
-
-        if str(course.type) != self.item_type.currentText():
-            course.type = self.item_type.currentText()
-            changed = True
-
-        if course.length != self.item_length.value():
-            course.length = self.item_length.value()
-            changed = True
-
-        if course.climb != self.item_climb.value():
-            course.climb = self.item_climb.value()
-            changed = True
-
-        text = self.item_controls.toPlainText()
-        course.controls.clear()
+        obj.set_setting('main_title', self.item_main_title.text())
+        obj.set_setting('sub_title', self.item_sub_title.toPlainText())
+        obj.set_setting('location', self.item_location.text())
+        obj.set_setting('chief_referee', self.item_refery.text())
+        obj.set_setting('secretary', self.item_secretary.text())
 
         if changed:
             win = self.get_main_window()

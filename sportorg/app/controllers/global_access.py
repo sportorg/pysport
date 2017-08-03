@@ -1,7 +1,10 @@
 from PyQt5 import QtWidgets
+from PyQt5.QtCore import QItemSelectionModel, QModelIndex, QSortFilterProxyModel
 
-from PyQt5.QtWidgets import QMainWindow
+from PyQt5.QtWidgets import QTableView, QMessageBox
 
+from sportorg.app.models.memory import race
+from sportorg.app.models.memory_model import PersonMemoryModel
 
 
 class GlobalAccess(object):
@@ -46,3 +49,42 @@ class GlobalAccess(object):
         idx = self.get_current_tab_index()
         if idx < len(map_):
             return self.get_table_by_name(map_[idx])
+
+    def get_selected_rows(self):
+        table = self.get_current_table()
+        assert isinstance(table, QTableView)
+        sel_model = table.selectionModel()
+        assert isinstance(sel_model, QItemSelectionModel)
+        indexes = sel_model.selectedRows()
+        model = table.model()
+        assert (isinstance(model, QSortFilterProxyModel))
+        ret = list()
+        for i in indexes:
+            assert isinstance(i, QModelIndex)
+            orig_index = model.mapToSource(i)
+            assert isinstance(orig_index, QModelIndex)
+            orig_index_int = orig_index.row()
+            ret.append(orig_index_int)
+        return ret
+
+    def delete_object(self):
+        confirm = QMessageBox.question(self.get_main_window(), 'Question', 'Please confirm', QMessageBox.Yes|QMessageBox.No)
+        if confirm == QMessageBox.No:
+            return
+        tab = self.get_current_tab_index()
+        indexes = self.get_selected_rows()
+        if tab == 0:
+            race().delete_persons(indexes, self.get_person_table())
+            self.get_main_window().refresh()
+
+            # TODO realise model update instead of full reinit
+            self.get_person_table().model().setSourceModel(PersonMemoryModel())
+
+        if tab == 1:
+            race().delete_results(indexes)
+        if tab == 2:
+            race().delete_groups(indexes)
+        if tab == 3:
+            race().delete_courses(indexes)
+        if tab == 4:
+            race().delete_organizations(indexes)

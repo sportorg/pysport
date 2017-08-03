@@ -1,6 +1,4 @@
-from datetime import timedelta
-
-import datetime
+import traceback
 
 
 class Model(object):
@@ -256,6 +254,20 @@ class Race(Model):
             return self.settings[setting]
         else:
             return ''
+
+    def delete_persons(self, indexes, table):
+        #  first check constraints TODO
+        try:
+            indexes = sorted(indexes, reverse=True)
+            model = table.model().sourceModel()
+
+            for i in indexes:
+                # del self.persons[i]
+                self.persons.remove(self.persons[i])
+
+
+        except:
+            traceback.print_exc()
 
 def create(obj, **kwargs):
     return obj.create(**kwargs)
