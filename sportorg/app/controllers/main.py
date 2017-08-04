@@ -44,7 +44,6 @@ class MainWindow(QMainWindow):
         self.reader = None
         GlobalAccess().set_main_window(self)
 
-
     def show_window(self):
         self.setup_ui()
         self.setup_menu()
@@ -55,6 +54,10 @@ class MainWindow(QMainWindow):
 
     def close(self):
         print('exit', self.geometry())
+
+    def closeEvent(self, e):
+        self.close()
+        e.accept()
 
     def conf_read(self):
         self.conf.read(config.CONFIG_INI)
