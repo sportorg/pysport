@@ -58,7 +58,7 @@ class GlobalAccess(object):
         indexes = sel_model.selectedRows()
         model = table.model()
         assert (isinstance(model, QSortFilterProxyModel))
-        ret = list()
+        ret = []
         for i in indexes:
             assert isinstance(i, QModelIndex)
             orig_index = model.mapToSource(i)

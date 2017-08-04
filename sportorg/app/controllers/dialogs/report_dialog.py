@@ -16,6 +16,7 @@ from sportorg.app.plugins.template.template import get_templates, get_text_from_
 
 from sportorg.language import _
 
+
 class AdvComboBox(QComboBox):
     """
     Combo with autocomplete

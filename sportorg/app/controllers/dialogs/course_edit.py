@@ -13,6 +13,7 @@ from sportorg.app.models.memory import race, Course, CourseControl
 
 from sportorg.language import _
 
+
 def get_course_types():
     return ['order', 'free', 'marked route']
 

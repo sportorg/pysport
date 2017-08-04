@@ -135,7 +135,7 @@ class WDBChip:
         self.finish = WDBPunch()
         self.check = WDBPunch()
         self.clear = WDBPunch()
-        self.punch = list()
+        self.punch = []
 
     def parse_bytes(self, byte_array, is_new_format=True):
         """
@@ -233,8 +233,8 @@ class WDBDistance:
         self.id = 0
         self.name = '_'
         self.biathlon_columns = ''
-        self.point = list()
-        self.leg = list()
+        self.point = []
+        self.leg = []
         self.length = 0
         self.corridor = 0
         self.point_quantity = 0
@@ -500,16 +500,17 @@ class WDBMan:
             return self.wdb.find_chip_by_id(self.si_card)
         return None
 
+
 class WDBInfo:
     def __init__(self):
-        self.title = list()  # Name of competition, sponsors, organizers. 8 lines * 100 chars
+        self.title = []  # Name of competition, sponsors, organizers. 8 lines * 100 chars
         self.place = ''  # Competition venue, 25 chars
         self.referee = ''  # Name of responsible referee - senior event adviser
         self.secretary = ''  # Name of secretary
         self.date_str = ''  # Date of competition, as string
         self.type = 0  # Type of competition
         self.relay_type = 0  # Type of relay
-        self.distance_service = list()  # Course setters, advisers
+        self.distance_service = []  # Course setters, advisers
         self.team_filer = 0  # Team, selected in filter dialog. 0 if no filter applied
         self.group_filter = 0  # Group, selected in filter dialog. 0 if no filter applied
         self.filter_selection = 0  # Selecton for filter - any/yes/no
@@ -584,17 +585,17 @@ class WDBInfo:
         self.group_time = 0
         self.person_time = 0
         self.point_penalty = 0
-        self.multi_day = list()
+        self.multi_day = []
         self.is_print_relay_number_dashed = False  # 123-1 for relay number
         self.is_si_usb = True  # Baudrate for BSM-7/8: 0 - COM, 1 - USB
         self.is_get_scores_personally = False
-        self.dsq_reason = list()
-        self.dsq_text = list()
+        self.dsq_reason = []
+        self.dsq_text = []
         self.note = ''
         self.is_print_note = False
         self.is_print_event_code = False
         self.is_print_comment = False
-        self.reserve = list()  # Reserve block, not used
+        self.reserve = []  # Reserve block, not used
         self.online_url = ''  # URL of online sending. Up to 59 chars
         self.server_name = ''  # Name of server for client-server mode. Up to 14 chars
         self.server_sending_mode = 0  # Mode of client-server work: background, si reading, manual
@@ -918,13 +919,13 @@ class WDBAdventure:
 class WDB:
     def __init__(self):
         self.version = 0
-        self.man = list()
-        self.group = list()
-        self.team = list()
-        self.dist = list()
-        self.fin = list()
-        self.chip = list()
-        self.adv = list()
+        self.man = []
+        self.group = []
+        self.team = []
+        self.dist = []
+        self.fin = []
+        self.chip = []
+        self.adv = []
         self.info = WDBInfo()
 
     def parse_bytes(self, byte_array):

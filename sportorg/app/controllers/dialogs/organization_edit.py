@@ -13,6 +13,7 @@ from sportorg.app.models.memory import race, Organization
 
 from sportorg.language import _
 
+
 def get_countries():
     return ['Russia', 'Finland', 'Norway', 'Germany', 'France', 'Austria', 'Kazakhstan', 'Ukraine', 'Poland', 'Estonia']
 

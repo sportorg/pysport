@@ -110,7 +110,7 @@ class Course(Model):
     controls = CourseControlList()
 
     def get_code_list(self):
-        ret = list()
+        ret = []
         for i in self.controls:
             assert isinstance(i, CourseControl)
             ret.append(str(i.code))
@@ -158,7 +158,7 @@ class Result(Model):
     card_number = None
     start_time = None
     finish_time = None
-    punches = list()
+    punches = []
     penalty_time = None  # time of penalties (marked route, false start)
     penalty_laps = None  # count of penalty legs (marked route)
     status = None
@@ -186,7 +186,7 @@ class Result(Model):
         return str(self.finish_time - self.start_time)
 
     def get_result_for_sort(self):
-        ret = 0;
+        ret = 0
         if self.status != 0 and self.status != ResultStatus.OK:
             ret += 24*3600*100
 
@@ -224,6 +224,7 @@ class Person(Model):
 
     start_time = None
 
+
 class PersonList(list):
     pass
 
@@ -239,12 +240,12 @@ class RaceData(Model):
 class Race(Model):
     def __init__(self):
         self.data = RaceData()
-        self.courses = CourseList()
-        self.groups = GroupList()
-        self.persons = PersonList()
-        self.results = ResultList()
-        self.organizations = OrganizationList()
-        self.settings = SettingsDict()
+        self.courses = []
+        self.groups = []
+        self.persons = []
+        self.results = []
+        self.organizations = []
+        self.settings = {}
 
     def set_setting(self, setting, value):
         self.settings[setting] = value
@@ -264,10 +265,9 @@ class Race(Model):
             for i in indexes:
                 # del self.persons[i]
                 self.persons.remove(self.persons[i])
-
-
         except:
             traceback.print_exc()
+
 
 def create(obj, **kwargs):
     return obj.create(**kwargs)

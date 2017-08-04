@@ -98,7 +98,7 @@ class PersonTableModel(AbstractSportOrgTableModel):
 
             participation = query
 
-            self.values = list()
+            self.values = []
             for i in participation:
                 self.values.append(self.get_values_from_object(i))
             end = time.time()
@@ -216,7 +216,7 @@ class ResultTableModel(AbstractSportOrgTableModel):
 
             result = query
 
-            self.values = list()
+            self.values = []
             for i in result:
                 self.values.append(self.get_values_from_object(i))
             end = time.time()
@@ -276,7 +276,7 @@ class PersonProxyModel(QSortFilterProxyModel):
         self.filter_applied = False
 
     def clear_filter(self):
-        self.filter_map = list()
+        self.filter_map = []
         for i in range(self.sourceModel().columnCount()):
             self.filter_map.append('')
         self.filter_applied = False

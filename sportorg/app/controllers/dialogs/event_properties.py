@@ -13,6 +13,7 @@ from sportorg.app.models.memory import race
 
 from sportorg.language import _
 
+
 class AdvComboBox(QComboBox):
     """
     Combo with autocomplete
@@ -51,22 +52,16 @@ class AdvComboBox(QComboBox):
             index = self.findText(str(text))
             self.setCurrentIndex(index)
 
+
 def get_sport_kinds():
-    ret = list()
-    ret.append(_('orienteering'))
-    ret.append(_('running'))
-    ret.append(_('cross country'))
+    ret = [_('orienteering'), _('running'), _('cross country')]
     return ret
 
+
 def get_types():
-    ret = list()
-    ret.append(_('individual'))
-    ret.append(_('free order'))
-    ret.append(_('pursuit'))
-    ret.append(_('mass start'))
-    ret.append(_('one-man-relay'))
-    ret.append(_('relay'))
+    ret = [_('individual'), _('free order'), _('pursuit'), _('mass start'), _('one-man-relay'), _('relay')]
     return ret
+
 
 class EventPropertiesDialog(QDialog):
     def __init__(self, table=None, index=None):
@@ -155,7 +150,6 @@ class EventPropertiesDialog(QDialog):
         self.item_refery.setText(str(obj.get_setting('chief_referee')))
         self.item_secretary.setText(str(obj.get_setting('secretary')))
 
-
     def apply_changes_impl(self):
         changed = False
         obj = race()
@@ -171,6 +165,7 @@ class EventPropertiesDialog(QDialog):
 
     def get_main_window(self):
         return GlobalAccess().get_main_window()
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

@@ -18,9 +18,8 @@ class ResultCalculation(object):
             i.start_time = person.start_time
             i.result = i.get_result_for_sort()
 
-
     def get_group_finishes(self, group):
-        ret = list()
+        ret = []
         for i in race().results:
             assert isinstance(i, Result)
             person = i.person

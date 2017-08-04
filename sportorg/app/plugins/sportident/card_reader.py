@@ -75,7 +75,7 @@ class PersonCardData:
             card_number=data['card_number'],
             start_time=data['start'],
             finish_time=data['finish'],
-            punches=list()
+            punches=[]
         )
         for punch in data['punches']:
             result.punches.append(list(punch))

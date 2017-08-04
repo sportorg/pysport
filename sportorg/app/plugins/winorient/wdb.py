@@ -255,7 +255,7 @@ class WinOrientBinary:
                 # punches
                 chip = man.get_chip()
                 if chip is not None:
-                    result.punches = list()
+                    result.punches = []
                     for i in range(chip.quantity):
                         p = chip.punch[i]
                         assert isinstance(p, WDBPunch)

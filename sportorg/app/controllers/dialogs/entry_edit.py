@@ -18,7 +18,7 @@ from sportorg.language import _
 
 
 def get_groups():
-    ret = list()
+    ret = []
     try:
         for i in race().groups:
             ret.append(i.name)
@@ -28,7 +28,7 @@ def get_groups():
 
 
 def get_teams():
-    ret = list()
+    ret = []
     ret.append('')
     try:
         for i in race().organizations:
@@ -42,7 +42,7 @@ def get_teams():
 # Deprecated
 def get_teams_db():
     team = Organization
-    ret = list()
+    ret = []
     try:
         for i in team.select():
             ret.append(i.name)

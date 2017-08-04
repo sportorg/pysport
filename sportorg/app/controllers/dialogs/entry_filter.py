@@ -16,6 +16,7 @@ from sportorg.app.models.memory_model import PersonProxyModel
 
 from sportorg.language import _
 
+
 class DialogFilter(QDialog):
 
     def __init__(self, table=None):

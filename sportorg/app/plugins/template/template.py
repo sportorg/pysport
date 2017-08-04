@@ -9,7 +9,7 @@ import config
 def get_templates(path=None):
     if path is None:
         path = config.TEMPLATE_DIR
-    files = list()
+    files = []
     for p in os.listdir(path):
         full_path = os.path.join(path, p)
         if os.path.isdir(full_path):

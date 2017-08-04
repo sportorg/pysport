@@ -63,7 +63,7 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
             return _(columns[index])
 
     def init_cache(self):
-        self.cache = list()
+        self.cache = []
         for i in range(len(race().persons)):
             self.cache.append(self.get_participation_data(i))
 
@@ -71,7 +71,7 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
         return self.get_value_from_object(race().persons[position])
 
     def get_value_from_object(self, object):
-        ret = list()
+        ret = []
         person = object
 
         ret.append(person.surname)
@@ -119,7 +119,7 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
         return ['Surname', 'Name', 'Group', 'Team', 'Bib', 'Start', 'Finish', 'Result', 'Status', 'Penalty', 'Place']
 
     def init_cache(self):
-        self.cache = list()
+        self.cache = []
         for i in range(len(race().results)):
             self.cache.append(self.get_participation_data(i))
 
@@ -172,7 +172,7 @@ class GroupMemoryModel(AbstractSportOrgMemoryModel):
             return _(columns[index])
 
     def init_cache(self):
-        self.cache = list()
+        self.cache = []
         for i in range(len(race().groups)):
             self.cache.append(self.get_data(i))
 
@@ -228,7 +228,7 @@ class CourseMemoryModel(AbstractSportOrgMemoryModel):
             return _(columns[index])
 
     def init_cache(self):
-        self.cache = list()
+        self.cache = []
         for i in range(len(race().courses)):
             self.cache.append(self.get_data(i))
 
@@ -271,7 +271,7 @@ class TeamMemoryModel(AbstractSportOrgMemoryModel):
             return _(columns[index])
 
     def init_cache(self):
-        self.cache = list()
+        self.cache = []
         for i in range(len(race().organizations)):
             self.cache.append(self.get_data(i))
 
@@ -305,7 +305,7 @@ class PersonProxyModel(QSortFilterProxyModel):
         self.filter_applied = False
 
     def clear_filter(self):
-        self.filter_map = list()
+        self.filter_map = []
         for i in range(self.sourceModel().columnCount()):
             self.filter_map.append('')
         self.filter_applied = False

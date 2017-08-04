@@ -21,7 +21,6 @@ class Widget(QtWidgets.QWidget):
         self.group_layout = QtWidgets.QGridLayout(self)
         self.group_layout.setObjectName("group_layout")
 
-
         self.GroupTable = QtWidgets.QTableView(self)
         self.GroupTable.setObjectName("GroupTable")
         proxy_model = PersonProxyModel(self)

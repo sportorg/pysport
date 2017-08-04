@@ -9,7 +9,7 @@ class SIReaderThread(threading.Thread):
         super().__init__()
         self.port = port
         self.readers = [func]
-        self.cards = list()
+        self.cards = []
         self._reading = True
 
     @property

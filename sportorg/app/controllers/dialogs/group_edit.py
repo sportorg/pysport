@@ -13,8 +13,9 @@ from sportorg.app.models.memory import race, Group, find
 
 from sportorg.language import _
 
+
 def get_courses():
-    ret = list()
+    ret = []
     try:
         for i in race().courses:
             ret.append(i.name)
