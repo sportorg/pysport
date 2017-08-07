@@ -4,7 +4,7 @@ from PyQt5.QtCore import QItemSelectionModel, QModelIndex, QSortFilterProxyModel
 from PyQt5.QtWidgets import QTableView, QMessageBox
 
 from sportorg.app.models.memory import race
-from sportorg.app.models.memory_model import PersonMemoryModel
+from sportorg.language import _
 
 
 class GlobalAccess(object):
@@ -45,7 +45,7 @@ class GlobalAccess(object):
         return self.get_table_by_name('TeamTable')
 
     def get_current_table(self):
-        map_= ['EntryTable', 'ResultTable', 'GroupTable', 'CourseTable', 'TeamTable']
+        map_ = ['EntryTable', 'ResultTable', 'GroupTable', 'CourseTable', 'TeamTable']
         idx = self.get_current_tab_index()
         if idx < len(map_):
             return self.get_table_by_name(map_[idx])
@@ -68,20 +68,24 @@ class GlobalAccess(object):
         return ret
 
     def delete_object(self):
-        confirm = QMessageBox.question(self.get_main_window(), 'Question', 'Please confirm', QMessageBox.Yes|QMessageBox.No)
+        confirm = QMessageBox.question(self.get_main_window(),
+                                       _('Question'),
+                                       _('Please confirm'),
+                                       QMessageBox.Yes | QMessageBox.No)
         if confirm == QMessageBox.No:
             return
         tab = self.get_current_tab_index()
         indexes = self.get_selected_rows()
         if tab == 0:
             race().delete_persons(indexes, self.get_person_table())
-            self.get_main_window().refresh()
-
         if tab == 1:
-            race().delete_results(indexes)
+            race().delete_results(indexes, self.get_result_table())
+            # TODO recalculate places
+            # ResultCalculation().process_results()
+            # self.get_main_window().refresh()
         if tab == 2:
-            race().delete_groups(indexes)
+            race().delete_groups(indexes, self.get_group_table())
         if tab == 3:
-            race().delete_courses(indexes)
+            race().delete_courses(indexes, self.get_course_table())
         if tab == 4:
-            race().delete_organizations(indexes)
+            race().delete_organizations(indexes, self.get_organization_table())

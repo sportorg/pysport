@@ -1,5 +1,8 @@
 import traceback
 
+from PyQt5.QtWidgets import QMessageBox
+from sportorg.language import _
+
 
 class Model(object):
     @classmethod
@@ -83,6 +86,8 @@ class Organization(Model):
     city = None
     region = None
 
+    count_person = 0
+
 
 class OrganizationList(list):
     pass
@@ -108,6 +113,7 @@ class Course(Model):
     length = None
     climb = None
     controls = CourseControlList()
+    count_person = 0
 
     def get_code_list(self):
         ret = []
@@ -257,7 +263,6 @@ class Race(Model):
             return ''
 
     def delete_persons(self, indexes, table):
-        #  first check constraints TODO
         try:
             indexes = sorted(indexes, reverse=True)
             model = table.model().sourceModel()
@@ -267,6 +272,114 @@ class Race(Model):
                 model.removeRows(i)
         except:
             traceback.print_exc()
+
+    def delete_results(self, indexes, table):
+        try:
+            indexes = sorted(indexes, reverse=True)
+            model = table.model().sourceModel()
+
+            for i in indexes:
+                self.results.remove(self.results[i])
+                model.removeRows(i)
+
+        except:
+            traceback.print_exc()
+
+    def delete_groups(self, indexes, table):
+        try:
+            race().update_counters()
+            for i in indexes:
+                group = self.groups[i]
+                if group.count_person > 0:
+                    QMessageBox.question(table,
+                                         _('Abort'),
+                                         _('Cannot remove group') + ' ' + group.name)
+                    return False
+
+            indexes = sorted(indexes, reverse=True)
+            model = table.model().sourceModel()
+
+            for i in indexes:
+                self.groups.remove(self.groups[i])
+                model.removeRows(i)
+
+        except:
+            traceback.print_exc()
+            return False
+        return True
+
+    def delete_courses(self, indexes, table):
+        try:
+            race().update_counters()
+            for i in indexes:
+                course = self.courses[i]
+                if course.count_person > 0:
+                    QMessageBox.question(table,
+                                         _('Abort'),
+                                         _('Cannot remove course') + ' ' + course.name)
+                    return False
+
+            indexes = sorted(indexes, reverse=True)
+            model = table.model().sourceModel()
+
+            for i in indexes:
+                self.courses.remove(self.courses[i])
+                model.removeRows(i)
+
+        except:
+            traceback.print_exc()
+            return False
+        return True
+
+    def delete_organizations(self, indexes, table):
+        try:
+            race().update_counters()
+            for i in indexes:
+                organization = self.organizations[i]
+                if organization.count_person > 0:
+                    QMessageBox.question(table,
+                                         _('Abort'),
+                                         _('Cannot remove organization') + ' ' + organization.name)
+                    return False
+            indexes = sorted(indexes, reverse=True)
+            model = table.model().sourceModel()
+
+            for i in indexes:
+                self.organizations.remove(self.organizations[i])
+                model.removeRows(i)
+
+        except:
+            traceback.print_exc()
+            return False
+        return True
+
+    def update_counters(self):
+        # recalculate group counters
+        for i in self.groups:
+            i.count_person = 0
+
+        for i in self.persons:
+            assert isinstance(i, Person)
+            if i.group is not None:
+                i.group.count_person += 1
+
+        # recalculate course counters
+        for i in self.courses:
+            i.count_person = 0
+
+        for i in self.groups:
+            assert isinstance(i, Group)
+            if i.course is not None:
+                i.course.count_person += 1
+
+        # recalculate team counters
+        for i in self.organizations:
+            i.count_person = 0
+
+        for i in self.persons:
+            assert isinstance(i, Person)
+            if i.organization is not None:
+                i.organization.count_person += 1
 
 
 def create(obj, **kwargs):
