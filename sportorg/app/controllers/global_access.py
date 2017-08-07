@@ -77,9 +77,6 @@ class GlobalAccess(object):
             race().delete_persons(indexes, self.get_person_table())
             self.get_main_window().refresh()
 
-            # TODO realise model update instead of full reinit
-            self.get_person_table().model().setSourceModel(PersonMemoryModel())
-
         if tab == 1:
             race().delete_results(indexes)
         if tab == 2:

@@ -263,8 +263,8 @@ class Race(Model):
             model = table.model().sourceModel()
 
             for i in indexes:
-                # del self.persons[i]
                 self.persons.remove(self.persons[i])
+                model.removeRows(i)
         except:
             traceback.print_exc()
 
@@ -305,7 +305,7 @@ def race(day=None):
         # TODO: from settings
         day = 0
     else:
-        day = day - 1
+        day -= 1
 
     if day < len(event):
         return event[day]

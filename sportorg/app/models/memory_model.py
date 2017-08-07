@@ -3,7 +3,7 @@ import sys
 from sportorg.language import _
 import traceback
 
-from PyQt5.QtCore import QVariant, QAbstractTableModel, Qt, QSortFilterProxyModel
+from PyQt5.QtCore import QVariant, QAbstractTableModel, Qt, QSortFilterProxyModel, QModelIndex
 
 from sportorg.app.models.memory import race, Result, Group, Course, Organization
 
@@ -14,6 +14,7 @@ class AbstractSportOrgMemoryModel (QAbstractTableModel):
     """
     def __init__(self):
         super().__init__()
+        self.cache = []
         self.init_cache()
 
     def columnCount(self, parent=None, *args, **kwargs):
@@ -42,11 +43,19 @@ class AbstractSportOrgMemoryModel (QAbstractTableModel):
 
         return QVariant()
 
+    def removeRows(self, row, rows=1, index=QModelIndex()):
+        print("Removing at row: %s"%row)
+        self.beginRemoveRows(QModelIndex(), row, row + rows - 1)
+
+        self.cache = self.cache[:row] + self.cache[row + rows:]
+
+        self.endRemoveRows()
+        return True
+
 
 class PersonMemoryModel(AbstractSportOrgMemoryModel):
     def __init__(self):
         super().__init__()
-        self.cache = None
         self.init_cache()
 
     def rowCount(self, parent=None, *args, **kwargs):
@@ -119,7 +128,6 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
         return ['Surname', 'Name', 'Group', 'Team', 'Bib', 'Start', 'Finish', 'Result', 'Status', 'Penalty', 'Place']
 
     def init_cache(self):
-        self.cache = []
         for i in range(len(race().results)):
             self.cache.append(self.get_participation_data(i))
 
@@ -172,7 +180,6 @@ class GroupMemoryModel(AbstractSportOrgMemoryModel):
             return _(columns[index])
 
     def init_cache(self):
-        self.cache = []
         for i in range(len(race().groups)):
             self.cache.append(self.get_data(i))
 
@@ -228,7 +235,6 @@ class CourseMemoryModel(AbstractSportOrgMemoryModel):
             return _(columns[index])
 
     def init_cache(self):
-        self.cache = []
         for i in range(len(race().courses)):
             self.cache.append(self.get_data(i))
 
@@ -271,7 +277,6 @@ class TeamMemoryModel(AbstractSportOrgMemoryModel):
             return _(columns[index])
 
     def init_cache(self):
-        self.cache = []
         for i in range(len(race().organizations)):
             self.cache.append(self.get_data(i))
 
