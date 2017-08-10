@@ -2,8 +2,6 @@ import sys
 
 from PyQt5.QtWidgets import QApplication
 
-from sportorg import config
-
 from sportorg.app.controllers.main import MainWindow
 
 
