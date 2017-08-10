@@ -1,7 +1,7 @@
 import pickle
 
 from sportorg.app.models import memory
-import config
+from sportorg import config
 
 
 def dump(file):

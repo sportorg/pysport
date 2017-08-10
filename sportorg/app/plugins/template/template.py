@@ -3,7 +3,7 @@ import os
 from sportorg.app.models.memory import race, Result, Person
 from sportorg.app.models.result_calculation import ResultCalculation
 from sportorg.lib.template import template
-import config
+from sportorg import config
 
 
 def get_templates(path=None):

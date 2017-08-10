@@ -1,7 +1,7 @@
 import configparser
 import gettext
 import os
-import config
+from sportorg import config
 
 conf = configparser.ConfigParser()
 conf.read(config.CONFIG_INI)

@@ -14,7 +14,7 @@ from sportorg.app.controllers.tabs import start_preparation, groups, teams, race
 
 import configparser
 
-import config
+from sportorg import config
 from sportorg.app.models.memory import Race, event
 from sportorg.app.models.memory_model import PersonMemoryModel, ResultMemoryModel, GroupMemoryModel, CourseMemoryModel, \
     TeamMemoryModel

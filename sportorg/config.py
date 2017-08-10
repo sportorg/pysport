@@ -4,7 +4,7 @@ import sys
 import time
 
 NAME = 'SportOrg'
-VERSION = '1.0.0'
+VERSION = '1.0'
 DEBUG = True
 
 
@@ -13,7 +13,8 @@ def module_path():
         return os.path.dirname(
             sys.executable
         )
-    return os.path.dirname(__file__)
+
+    return os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
 
 
 BASE_DIR = module_path()

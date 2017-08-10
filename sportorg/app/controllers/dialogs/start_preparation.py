@@ -3,7 +3,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QApplication, QDialog
 
 from sportorg.language import _
-import config
+from sportorg import config
 
 
 class StartPreparationDialog(object):
