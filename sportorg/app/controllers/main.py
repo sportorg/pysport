@@ -28,6 +28,7 @@ from sportorg.app.plugins.backup import backup
 import logging
 
 from sportorg.app.plugins.sportident import card_reader
+from sportorg.core import plugin
 
 logging.basicConfig(**config.LOG_CONFIG, level=logging.DEBUG if config.DEBUG else logging.WARNING)
 
@@ -45,6 +46,7 @@ class MainWindow(QMainWindow):
         GlobalAccess().set_main_window(self)
 
     def show_window(self):
+        plugin.run_plugins()
         self.setup_ui()
         self.setup_menu()
         self.setup_toolbar()

@@ -64,3 +64,5 @@ def import_csv(source):
             organization=memory.find(race.organizations, name=person_dict['team_name'])
         )
         race.persons.append(person)
+
+print('winorient plugin')

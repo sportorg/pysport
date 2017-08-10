@@ -75,3 +75,5 @@ def get_person_result_data(res):
     ret.append(res.get_result())
     ret.append(res.place)
     return ret
+
+print('template plugin')

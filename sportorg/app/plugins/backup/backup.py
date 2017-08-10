@@ -19,3 +19,5 @@ def get_default_format(file_format):
         file_format = formats.BIN
 
     return file_format
+
+print('backup plugin')
