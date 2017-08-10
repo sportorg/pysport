@@ -34,6 +34,7 @@ pip install sireader
                 sportorg.mo
                 sportorg.po
     sportorg/
+        core/
         app/
             controllers/
             models/
