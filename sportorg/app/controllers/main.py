@@ -29,6 +29,7 @@ import logging
 
 from sportorg.app.plugins.sportident import card_reader
 from sportorg.core import plugin
+from sportorg.core import event
 
 logging.basicConfig(**config.LOG_CONFIG, level=logging.DEBUG if config.DEBUG else logging.WARNING)
 
@@ -195,6 +196,17 @@ class MainWindow(QMainWindow):
         self.action_iof__xml_v3.setText(_("IOF XML v3"))
         self.action_ocad_txt_v8.setText(_("Ocad txt v8"))
         self.action_ocad_txt_v8.triggered.connect(self.import_ocad_txt_v8)
+
+        menu_file_import = event.event('menu_file_import')
+        """
+        :event: menu_file_import [[name, func],...]
+        """
+        for menu_import in menu_file_import:
+            action_import = QtWidgets.QAction(self)
+            self.menu_import.addAction(action_import)
+            action_import.setText(menu_import[0])
+            action_import.triggered.connect(menu_import[1])
+
         self.action_export.setText(_("Export"))
         self.action_quit.setText(_("Exit"))
         self.action_filter.setText(_("Filter"))
