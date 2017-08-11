@@ -201,11 +201,12 @@ class MainWindow(QMainWindow):
         """
         :event: menu_file_import [[name, func],...]
         """
-        for menu_import in menu_file_import:
-            action_import = QtWidgets.QAction(self)
-            self.menu_import.addAction(action_import)
-            action_import.setText(menu_import[0])
-            action_import.triggered.connect(menu_import[1])
+        if menu_file_import is not None:
+            for menu_import in menu_file_import:
+                action_import = QtWidgets.QAction(self)
+                self.menu_import.addAction(action_import)
+                action_import.setText(menu_import[0])
+                action_import.triggered.connect(menu_import[1])
 
         self.action_export.setText(_("Export"))
         self.action_quit.setText(_("Exit"))
