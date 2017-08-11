@@ -27,7 +27,6 @@ from sportorg.app.plugins.ocad import ocad
 from sportorg.app.plugins.backup import backup
 import logging
 
-from sportorg.app.plugins.sportident import card_reader
 from sportorg.core import plugin
 from sportorg.core import event
 
@@ -43,7 +42,6 @@ class MainWindow(QMainWindow):
         except IndexError:
             self.file = None
         self.conf = configparser.ConfigParser()
-        self.reader = None
         GlobalAccess().set_main_window(self)
 
     def show_window(self):
@@ -223,7 +221,6 @@ class MainWindow(QMainWindow):
         self.action_delete.setShortcut("Del")
         self.action_delete.triggered.connect(self.delete_object)
 
-
         self.menu_edit.setTitle(_("Edit"))
 
         self.menu_start_preparation.setTitle(_("Start Preparation"))
@@ -257,9 +254,15 @@ class MainWindow(QMainWindow):
         save.triggered.connect(self.save_file)
         self.toolbar.addAction(save)
 
-        si = QtWidgets.QAction(QtGui.QIcon(config.icon_dir("sportident.png")), _("SPORTident readout"), self)
-        si.triggered.connect(self.sportident)
-        self.toolbar.addAction(si)
+        toolbar_event = event.event('toolbar')
+        """
+        :event: toolbar [[icon, title, func],...]
+        """
+        if toolbar_event is not None:
+            for tb in toolbar_event:
+                tb_action = QtWidgets.QAction(QtGui.QIcon(tb[0]), tb[1], self)
+                tb_action.triggered.connect(tb[2])
+                self.toolbar.addAction(tb_action)
 
         self.setLayout(layout)
 
@@ -415,22 +418,3 @@ class MainWindow(QMainWindow):
             table.model().sourceModel().init_cache()
         except:
             traceback.print_exc()
-
-    def sportident(self):
-        if self.reader is None:
-            self.reader = card_reader.read()
-            if self.reader is not None:
-                self.statusbar.showMessage(_('Open port ' + self.reader.port), 5000)
-                f_id = self.reader.append_reader(lambda data: print('from main.py', data))
-                # self.reader.delete_func(f_id)
-            else:
-                self.statusbar.showMessage(_('Port not open'), 5000)
-        elif not self.reader.reading:
-            self.reader = None
-            self.sportident()
-        else:
-            card_reader.stop(self.reader)
-            if not self.reader.reading:
-                port = self.reader.port
-                self.reader = None
-                self.statusbar.showMessage(_('Close port ' + port), 5000)
