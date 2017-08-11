@@ -367,7 +367,7 @@ class MainWindow(QMainWindow):
             traceback.print_exc()
 
     def create_object(self):
-        pass
+        GlobalAccess().add_object()
 
     def delete_object(self):
         GlobalAccess().delete_object()

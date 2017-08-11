@@ -114,6 +114,7 @@ class Course(Model):
     climb = None
     controls = CourseControlList()
     count_person = 0
+    count_group = 0
 
     def get_code_list(self):
         ret = []
@@ -313,7 +314,7 @@ class Race(Model):
             race().update_counters()
             for i in indexes:
                 course = self.courses[i]
-                if course.count_person > 0:
+                if course.count_group > 0:
                     QMessageBox.question(table,
                                          _('Abort'),
                                          _('Cannot remove course') + ' ' + course.name)
@@ -353,6 +354,26 @@ class Race(Model):
             return False
         return True
 
+    def add_new_person(self):
+        new_person = Person()
+        new_person.name = '_new'
+        race().persons.insert(0, new_person)
+
+    def add_new_group(self):
+        new_group = Group()
+        new_group.name = '_new'
+        race().groups.insert(0, new_group)
+
+    def add_new_course(self):
+        new_course = Course()
+        new_course.name = '_new'
+        race().courses.insert(0, new_course)
+
+    def add_new_organization(self):
+        new_organization = Organization()
+        new_organization.name = '_new'
+        race().organizations.insert(0, new_organization)
+
     def update_counters(self):
         # recalculate group counters
         for i in self.groups:
@@ -366,11 +387,13 @@ class Race(Model):
         # recalculate course counters
         for i in self.courses:
             i.count_person = 0
+            i.count_group = 0
 
         for i in self.groups:
             assert isinstance(i, Group)
             if i.course is not None:
-                i.course.count_person += 1
+                i.course.count_person += i.count_person
+                i.course.count_group += 1
 
         # recalculate team counters
         for i in self.organizations:

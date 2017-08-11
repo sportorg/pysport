@@ -41,7 +41,7 @@ class ResultCalculation(object):
             if res.status == ResultStatus.OK or res.status == 0:
                 # skip if out of competition
                 if res.person.is_out_of_competition:
-                    res.place = _('o/c')  # TODO:translate
+                    res.place = _('o/c')
                     continue
 
                 # the same place processing

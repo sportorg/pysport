@@ -1,3 +1,5 @@
+import traceback
+
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import QItemSelectionModel, QModelIndex, QSortFilterProxyModel
 
@@ -89,3 +91,24 @@ class GlobalAccess(object):
             race().delete_courses(indexes, self.get_course_table())
         if tab == 4:
             race().delete_organizations(indexes, self.get_organization_table())
+
+    def add_object(self):
+        try:
+            tab = self.get_current_tab_index()
+            if tab == 0:
+                race().add_new_person()
+                self.get_person_table().model().sourceModel().init_cache()
+                # self.get_person_table().model().sourceModel().layoutChanged()
+            if tab == 1:
+                pass
+            if tab == 2:
+                race().add_new_group()
+                self.get_person_table().model().sourceModel().init_cache()
+            if tab == 3:
+                race().add_new_course()
+                self.get_course_table().model().sourceModel().init_cache()
+            if tab == 4:
+                race().add_new_organization()
+                self.get_organization_table().model().sourceModel().init_cache()
+        except:
+            traceback.print_exc()

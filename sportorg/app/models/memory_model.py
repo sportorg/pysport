@@ -20,8 +20,17 @@ class AbstractSportOrgMemoryModel (QAbstractTableModel):
     def columnCount(self, parent=None, *args, **kwargs):
         return len(self.get_headers())
 
+    def rowCount(self, parent=None, *args, **kwargs):
+        ret = len(self.cache)
+        return ret
+
     def get_headers(self):
         pass
+
+    def headerData(self, index, orientation, role=None):
+        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
+            columns = self.get_headers()
+            return _(columns[index])
 
     def init_cache(self):
         pass
@@ -52,24 +61,14 @@ class AbstractSportOrgMemoryModel (QAbstractTableModel):
         self.endRemoveRows()
         return True
 
-
 class PersonMemoryModel(AbstractSportOrgMemoryModel):
     def __init__(self):
         super().__init__()
         self.init_cache()
 
-    def rowCount(self, parent=None, *args, **kwargs):
-        ret = len(race().persons)
-        return ret
-
     def get_headers(self):
         return ['Surname', 'Name', 'Sex', 'Qualification', 'Group', 'Team', 'Year', 'Bib', 'Card', 'Rented card',
                 'Comment', 'World code', 'National code', 'Out of competition']
-
-    def headerData(self, index, orientation, role=None):
-        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
-            columns = self.get_headers()
-            return _(columns[index])
 
     def init_cache(self):
         self.cache = []
@@ -105,9 +104,8 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
 
         out_of_comp_status = ''
         if person.is_out_of_competition:
-            out_of_comp_status = 'o/c'
+            out_of_comp_status = _('o/c')
         ret.append(out_of_comp_status)
-
 
         return ret
 
@@ -121,20 +119,12 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
         self.values = None
         self.count = None
 
-    def rowCount(self, parent=None, *args, **kwargs):
-        return len(race().results)
-
     def get_headers(self):
         return ['Surname', 'Name', 'Group', 'Team', 'Bib', 'Start', 'Finish', 'Result', 'Status', 'Penalty', 'Place']
 
     def init_cache(self):
         for i in range(len(race().results)):
             self.cache.append(self.get_participation_data(i))
-
-    def headerData(self, index, orientation, role=None):
-        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
-            columns = self.get_headers()
-            return _(columns[index])
 
     def get_participation_data(self, position):
         ret = self.get_values_from_object(race().results[position])
@@ -166,18 +156,9 @@ class GroupMemoryModel(AbstractSportOrgMemoryModel):
     def __init__(self):
         super().__init__()
 
-    def rowCount(self, parent=None, *args, **kwargs):
-        return len(race().groups)
-
     def get_headers(self):
         return ['Name', 'Full name', 'Course name', 'Course type', 'Length', 'Point count', 'Climb', 'Sex', 'Min age', 'Max age',\
                 'Start interval', 'Start corridor', 'Order in corridor']
-
-    def headerData(self, index, orientation, role=None):
-
-        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
-            columns = self.get_headers()
-            return _(columns[index])
 
     def init_cache(self):
         for i in range(len(race().groups)):
@@ -222,17 +203,8 @@ class CourseMemoryModel(AbstractSportOrgMemoryModel):
     def __init__(self):
         super().__init__()
 
-    def rowCount(self, parent=None, *args, **kwargs):
-        return len(race().courses)
-
     def get_headers(self):
         return ['Name', 'Course type', 'Length', 'Point count', 'Climb', 'Controls']
-
-    def headerData(self, index, orientation, role=None):
-
-        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
-            columns = self.get_headers()
-            return _(columns[index])
 
     def init_cache(self):
         for i in range(len(race().courses)):
@@ -264,17 +236,8 @@ class TeamMemoryModel(AbstractSportOrgMemoryModel):
     def __init__(self):
         super().__init__()
 
-    def rowCount(self, parent=None, *args, **kwargs):
-        return len(race().organizations)
-
     def get_headers(self):
         return ['Name', 'Address', 'Country', 'Region', 'City', 'Contact']
-
-    def headerData(self, index, orientation, role=None):
-
-        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
-            columns = self.get_headers()
-            return _(columns[index])
 
     def init_cache(self):
         for i in range(len(race().organizations)):
