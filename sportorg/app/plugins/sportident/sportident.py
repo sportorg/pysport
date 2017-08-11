@@ -33,5 +33,5 @@ def start_reader():
 def toolbar():
     return [config.plugin_dir('sportident', 'img', 'sportident.png'), _("SPORTident readout"), start_reader]
 
-event.add_event('toolbar', toolbar)
 
+event.add_event('toolbar', toolbar)

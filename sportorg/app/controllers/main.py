@@ -15,7 +15,7 @@ from sportorg.app.controllers.tabs import start_preparation, groups, teams, race
 import configparser
 
 from sportorg import config
-from sportorg.app.models.memory import Race, event
+from sportorg.app.models.memory import Race, event as e
 from sportorg.app.models.memory_model import PersonMemoryModel, ResultMemoryModel, GroupMemoryModel, CourseMemoryModel, \
     TeamMemoryModel
 from sportorg.app.plugins.winorient.wdb import WinOrientBinary
@@ -297,9 +297,9 @@ class MainWindow(QMainWindow):
         if file_name is not '':
             self.setWindowTitle(file_name)
             self.file = file_name
+            # remove data
 
-        # remove data
-        event[0] = Race()
+        e[0] = Race()
         self.refresh()
 
     def save_file_as(self):
