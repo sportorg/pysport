@@ -23,7 +23,6 @@ from sportorg.language import _
 
 
 from sportorg.app.plugins.winorient import winorient
-from sportorg.app.plugins.ocad import ocad
 from sportorg.app.plugins.backup import backup
 import logging
 
@@ -46,6 +45,7 @@ class MainWindow(QMainWindow):
 
     def show_window(self):
         plugin.run_plugins()
+        event.add_event('init_model', (self, 'init_model'))
         self.setup_ui()
         self.setup_menu()
         self.setup_toolbar()
@@ -55,10 +55,11 @@ class MainWindow(QMainWindow):
 
     def close(self):
         print('exit', self.geometry())
+        event.event('close')
 
-    def closeEvent(self, e):
+    def closeEvent(self, _event):
         self.close()
-        e.accept()
+        _event.accept()
 
     def conf_read(self):
         self.conf.read(config.CONFIG_INI)
@@ -82,6 +83,7 @@ class MainWindow(QMainWindow):
     def setup_menu(self):
         self.menubar = QtWidgets.QMenuBar(self)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 880, 21))
+
         self.menu_file = QtWidgets.QMenu(self.menubar)
         self.menu_import = QtWidgets.QMenu(self.menu_file)
         self.menu_start_preparation = QtWidgets.QMenu(self.menubar)
@@ -92,6 +94,7 @@ class MainWindow(QMainWindow):
         self.menu_tools = QtWidgets.QMenu(self.menubar)
         self.menu_service = QtWidgets.QMenu(self.menubar)
         self.menu_options = QtWidgets.QMenu(self.menubar)
+
         self.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(self)
         self.setStatusBar(self.statusbar)
@@ -110,7 +113,6 @@ class MainWindow(QMainWindow):
         self.action_wdb__winorient = QtWidgets.QAction(self)
         self.action_iof__xml_v3 = QtWidgets.QAction(self)
         self.action_cvs = QtWidgets.QAction(self)
-        self.action_ocad_txt_v8 = QtWidgets.QAction(self)
         self.action_help = QtWidgets.QAction(self)
         self.action_about_us = QtWidgets.QAction(self)
         self.action_report = QtWidgets.QAction(self)
@@ -123,7 +125,6 @@ class MainWindow(QMainWindow):
         self.menu_import.addAction(self.action_wdb__winorient)
         self.menu_import.addAction(self.action_iof__xml_v3)
         self.menu_import.addSeparator()
-        self.menu_import.addAction(self.action_ocad_txt_v8)
 
         self.menu_file.addAction(self.action_new)
         self.menu_file.addAction(self.action_new__race)
@@ -192,12 +193,10 @@ class MainWindow(QMainWindow):
         self.action_wdb__winorient.setText(_("WDB Winorient"))
         self.action_wdb__winorient.triggered.connect(self.import_wo_wdb)
         self.action_iof__xml_v3.setText(_("IOF XML v3"))
-        self.action_ocad_txt_v8.setText(_("Ocad txt v8"))
-        self.action_ocad_txt_v8.triggered.connect(self.import_ocad_txt_v8)
 
         menu_file_import = event.event('menu_file_import')
         """
-        :event: menu_file_import [[name, func],...]
+        :event: menu_file_import [[name, func, icon?],...]
         """
         if menu_file_import is not None:
             for menu_import in menu_file_import:
@@ -205,6 +204,8 @@ class MainWindow(QMainWindow):
                 self.menu_import.addAction(action_import)
                 action_import.setText(menu_import[0])
                 action_import.triggered.connect(menu_import[1])
+                if 2 in menu_import:
+                    action_import.triggered.setIcon(QtGui.QIcon(menu_import[2]))
 
         self.action_export.setText(_("Export"))
         self.action_quit.setText(_("Exit"))
@@ -270,6 +271,7 @@ class MainWindow(QMainWindow):
         self.statusbar = QtWidgets.QStatusBar()
         self.setStatusBar(self.statusbar)
         self.statusbar.showMessage(_("it works!"), 5000)
+        event.event('statusbar', self.statusbar)
 
     def setup_tab(self):
         self.centralwidget = QtWidgets.QWidget(self)
@@ -297,6 +299,7 @@ class MainWindow(QMainWindow):
         if file_name is not '':
             self.setWindowTitle(file_name)
             self.file = file_name
+            event.event('create_file', file_name)
             # remove data
 
         e[0] = Race()
@@ -306,10 +309,12 @@ class MainWindow(QMainWindow):
         self.create_file()
         if self.file is not None:
             self.backup(backup.dump)
+            event.event('save_file_as', self.file)
 
     def save_file(self):
         if self.file is not None:
             self.backup(backup.dump)
+            event.event('save_file', self.file)
         else:
             self.save_file_as()
 
@@ -325,6 +330,7 @@ class MainWindow(QMainWindow):
             except:
                 traceback.print_exc()
             self.init_model()
+            event.event('open_file', file_name)
 
     def import_wo_csv(self):
         file_name = QtWidgets.QFileDialog.getOpenFileName(self, 'Open CSV Winorient file',
@@ -345,17 +351,6 @@ class MainWindow(QMainWindow):
             except:
                 print(sys.exc_info())
                 traceback.print_exc()
-
-    def import_ocad_txt_v8(self):
-        file_name = QtWidgets.QFileDialog.getOpenFileName(self, 'Open Ocad txt v8 file',
-                                                          '', "Ocad classes v8 (*.txt)")[0]
-        if file_name is not '':
-            try:
-                ocad.import_txt_v8(file_name)
-            except:
-                traceback.print_exc()
-
-            self.init_model()
 
     def filter_dialog(self):
         try:
@@ -416,5 +411,6 @@ class MainWindow(QMainWindow):
             table.model().sourceModel().init_cache()
             table = GlobalAccess().get_organization_table()
             table.model().sourceModel().init_cache()
+            event.event('refresh_window')
         except:
             traceback.print_exc()

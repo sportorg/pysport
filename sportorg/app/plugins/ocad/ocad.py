@@ -1,8 +1,30 @@
+import time
+import logging
 from sportorg.lib.ocad import ocad
 from sportorg.app.models import model
 from sportorg.app.models import memory
-import logging
-import time
+from sportorg.core import event
+from sportorg.language import _
+
+import traceback
+from PyQt5 import QtWidgets
+
+
+def import_action():
+    file_name = QtWidgets.QFileDialog.getOpenFileName(None, 'Open Ocad txt v8 file',
+                                                      '', "Ocad classes v8 (*.txt)")[0]
+    if file_name is not '':
+        try:
+            import_txt_v8(file_name)
+        except:
+            traceback.print_exc()
+        event.event('init_model')
+
+
+def menu():
+    return [_("Ocad txt v8"), import_action]
+
+event.add_event('menu_file_import', menu)
 
 
 def import_txt_v8_to_model(source):
