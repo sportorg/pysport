@@ -49,6 +49,9 @@ class MainWindow(QMainWindow):
 
     def close(self):
         print('exit', self.geometry())
+        """
+        :event: close
+        """
         event.event('close')
 
     def closeEvent(self, _event):
