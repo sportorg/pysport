@@ -1,33 +1,27 @@
-import time
-
+import configparser
+import logging
 import sys
+import time
 import traceback
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow
 
+from sportorg import config
 from sportorg.app.controllers.dialogs.entry_filter import DialogFilter
 from sportorg.app.controllers.dialogs.event_properties import EventPropertiesDialog
 from sportorg.app.controllers.dialogs.report_dialog import ReportDialog
 from sportorg.app.controllers.global_access import GlobalAccess
 from sportorg.app.controllers.tabs import start_preparation, groups, teams, race_results, courses
-
-import configparser
-
-from sportorg import config
 from sportorg.app.models.memory import Race, event as e
 from sportorg.app.models.memory_model import PersonMemoryModel, ResultMemoryModel, GroupMemoryModel, CourseMemoryModel, \
     TeamMemoryModel
-from sportorg.app.plugins.winorient.wdb import WinOrientBinary
-from sportorg.language import _
-
-
 from sportorg.app.plugins.winorient import winorient
-from sportorg.app.plugins.backup import backup
-import logging
-
-from sportorg.core import plugin
+from sportorg.app.plugins.winorient.wdb import WinOrientBinary
 from sportorg.core import event
+from sportorg.core import plugin
+from sportorg.core.backup import backup
+from sportorg.language import _
 
 logging.basicConfig(**config.LOG_CONFIG, level=logging.DEBUG if config.DEBUG else logging.WARNING)
 

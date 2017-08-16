@@ -1,5 +1,5 @@
-from . import formats
 from . import bin
+from . import formats
 
 
 def dump(file, file_format=None):
