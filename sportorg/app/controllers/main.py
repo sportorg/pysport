@@ -16,11 +16,11 @@ from sportorg.app.controllers.tabs import start_preparation, groups, teams, race
 from sportorg.app.models.memory import Race, event as e
 from sportorg.app.models.memory_model import PersonMemoryModel, ResultMemoryModel, GroupMemoryModel, CourseMemoryModel, \
     TeamMemoryModel
+from sportorg.app.plugins.backup import backup
 from sportorg.app.plugins.winorient import winorient
 from sportorg.app.plugins.winorient.wdb import WinOrientBinary
 from sportorg.core import event
 from sportorg.core import plugin
-from sportorg.core.backup import backup
 from sportorg.language import _
 
 logging.basicConfig(**config.LOG_CONFIG, level=logging.DEBUG if config.DEBUG else logging.WARNING)
