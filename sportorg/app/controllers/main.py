@@ -103,6 +103,7 @@ class MainWindow(QMainWindow):
         self.action_settings = QtWidgets.QAction(self)
         self.action_event__settings = QtWidgets.QAction(self)
         self.action_export = QtWidgets.QAction(self)
+        # TODO: using event
         self.action_csv__winorient = QtWidgets.QAction(self)
         self.action_wdb__winorient = QtWidgets.QAction(self)
         self.action_iof__xml_v3 = QtWidgets.QAction(self)
@@ -115,6 +116,7 @@ class MainWindow(QMainWindow):
         self.action_delete = QtWidgets.QAction(self)
 
         self.menu_import.addAction(self.action_cvs)
+        # TODO: using event
         self.menu_import.addAction(self.action_csv__winorient)
         self.menu_import.addAction(self.action_wdb__winorient)
         self.menu_import.addAction(self.action_iof__xml_v3)
@@ -180,6 +182,7 @@ class MainWindow(QMainWindow):
         self.action_event__settings.triggered.connect(self.event_settings_dialog)
         self.menu_import.setTitle(_("Import"))
         self.action_cvs.setText(_("CVS "))
+        # TODO: using event
         self.action_cvs.setIcon(QtGui.QIcon(config.icon_dir("csv.png")))
         self.action_csv__winorient.setText(_("CSV Winorient"))
         self.action_csv__winorient.setIcon(QtGui.QIcon(config.icon_dir("csv.png")))
@@ -326,6 +329,7 @@ class MainWindow(QMainWindow):
             self.init_model()
             event.event('open_file', file_name)
 
+    # TODO: using event
     def import_wo_csv(self):
         file_name = QtWidgets.QFileDialog.getOpenFileName(self, 'Open CSV Winorient file',
                                             '', "CSV Winorient (*.csv)")[0]
@@ -333,6 +337,7 @@ class MainWindow(QMainWindow):
             winorient.import_csv(file_name)
             self.init_model()
 
+    # TODO: using event
     def import_wo_wdb(self):
         file_name = QtWidgets.QFileDialog.getOpenFileName(self, 'Open WDB Winorient file',
                                             '', "WDB Winorient (*.wdb)")[0]
