@@ -12,7 +12,8 @@ from PyQt5.QtWidgets import QFormLayout, QLabel, \
     QComboBox, QCompleter, QApplication, QDialog, \
     QPushButton
 
-from sportorg.app.plugins.template.template import get_templates, get_text_from_file, get_result_data
+from sportorg.core.template import get_templates, get_text_from_file
+from sportorg.app.models.result_calculation import get_result_data
 
 from sportorg.language import _
 

@@ -52,3 +52,50 @@ class ResultCalculation(object):
 
                 res.place = last_place
                 current_place += 1
+
+
+def get_start_list_data():
+    pass
+
+
+def get_result_data():
+    ret = {}
+    data = {}
+    for group in race().groups:
+        array = ResultCalculation().get_group_finishes(group)
+        group_data = []
+        for res in array:
+            assert isinstance(res, Result)
+            person_data = get_person_result_data(res)
+            group_data.append(person_data)
+        data[group.name] = group_data
+    ret['data'] = data
+    ret['title'] = 'Competition title'
+    ret['table_titles'] = ['name', 'team', 'qual', 'year', 'result', 'place']
+
+    return ret
+
+
+def get_splits_data():
+    pass
+
+
+def get_entry_statistics_data():
+    pass
+
+
+def get_team_statistics_data():
+    pass
+
+
+def get_person_result_data(res):
+    ret = []
+    person = res.person
+    assert isinstance(person, Person)
+    ret.append(person.surname + ' ' + person.name)
+    ret.append(person.organization.name)
+    ret.append(person.qual)
+    ret.append(person.year)
+    ret.append(res.get_result())
+    ret.append(res.place)
+    return ret
