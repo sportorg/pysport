@@ -16,17 +16,16 @@ from sportorg.app.controllers.tabs import start_preparation, groups, teams, race
 from sportorg.app.models.memory import Race, event as e
 from sportorg.app.models.memory_model import PersonMemoryModel, ResultMemoryModel, GroupMemoryModel, CourseMemoryModel, \
     TeamMemoryModel
-from sportorg.app.plugins.backup import backup
 from sportorg.app.plugins.winorient import winorient
 from sportorg.app.plugins.winorient.wdb import WinOrientBinary
 from sportorg.core import event
-from sportorg.core import plugin
+from sportorg.core import plugin, app
 from sportorg.language import _
 
 logging.basicConfig(**config.LOG_CONFIG, level=logging.DEBUG if config.DEBUG else logging.WARNING)
 
 
-class MainWindow(QMainWindow):
+class MainWindow(QMainWindow, app.App):
 
     def __init__(self, argv=None):
         super().__init__()
@@ -286,55 +285,41 @@ class MainWindow(QMainWindow):
         self.tabwidget.addTab(courses.Widget(), _("Courses"))
         self.tabwidget.addTab(teams.Widget(), _("Teams"))
 
-    def backup(self, func, mode='wb'):
-        with open(self.file, mode) as file:
-            func(file)
-
-    def create_file(self):
+    def create_file(self, file_name=None):
 
         # TODO: save changes in current file
 
-        file_name = QtWidgets.QFileDialog.getSaveFileName(self,'Create SportOrg file',
+        file_name = QtWidgets.QFileDialog.getSaveFileName(None, 'Create SportOrg file',
                                             '/' + str(time.strftime("%Y%m%d")), "SportOrg file (*.sportorg)")[0]
         if file_name is not '':
             self.setWindowTitle(file_name)
-            self.file = file_name
-            event.event('create_file', file_name)
+            super().create_file(file_name)
             # remove data
-
-        e[0] = Race()
-        self.refresh()
+            e[0] = Race()
+            self.refresh()
 
     def save_file_as(self):
         self.create_file()
-        if self.file is not None:
-            self.backup(backup.dump)
-            event.event('save_file_as', self.file)
+        self.save_file()
 
     def save_file(self):
         if self.file is not None:
-            self.backup(backup.dump)
-            event.event('save_file', self.file)
+            super().save_file()
         else:
             self.save_file_as()
 
-    def open_file(self):
-        file_name = QtWidgets.QFileDialog.getOpenFileName(self, 'Open SportOrg file',
+    def open_file(self, file_name=None):
+        file_name = QtWidgets.QFileDialog.getOpenFileName(None, 'Open SportOrg file',
                                                           '/',
                                                           "SportOrg file (*.sportorg)")[0]
         if file_name is not '':
             self.setWindowTitle(file_name)
-            self.file = file_name
-            try:
-                self.backup(backup.load, 'rb')
-            except:
-                traceback.print_exc()
+            super().open_file(file_name)
             self.init_model()
-            event.event('open_file', file_name)
 
     # TODO: using event
     def import_wo_csv(self):
-        file_name = QtWidgets.QFileDialog.getOpenFileName(self, 'Open CSV Winorient file',
+        file_name = QtWidgets.QFileDialog.getOpenFileName(None, 'Open CSV Winorient file',
                                             '', "CSV Winorient (*.csv)")[0]
         if file_name is not '':
             winorient.import_csv(file_name)
@@ -342,7 +327,7 @@ class MainWindow(QMainWindow):
 
     # TODO: using event
     def import_wo_wdb(self):
-        file_name = QtWidgets.QFileDialog.getOpenFileName(self, 'Open WDB Winorient file',
+        file_name = QtWidgets.QFileDialog.getOpenFileName(None, 'Open WDB Winorient file',
                                             '', "WDB Winorient (*.wdb)")[0]
         if file_name is not '':
             try:

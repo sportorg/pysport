@@ -1,5 +1,6 @@
 from . import bin
 from . import formats
+from sportorg.core.event import add_event
 
 
 def dump(file, file_format=None):
@@ -20,4 +21,20 @@ def get_default_format(file_format):
 
     return file_format
 
+
+def backup(file, func, mode='wb'):
+    with open(file, mode) as f:
+        func(f)
+
+
+def event_dump(file):
+    backup(file, bin.dump)
+
+
+def event_load(file):
+    backup(file, bin.load, 'rb')
+
+
+add_event('dump', event_dump)
+add_event('load', event_load)
 print('backup plugin')
