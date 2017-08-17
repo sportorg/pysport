@@ -16,8 +16,6 @@ from sportorg.app.controllers.tabs import start_preparation, groups, teams, race
 from sportorg.app.models.memory import Race, event as e
 from sportorg.app.models.memory_model import PersonMemoryModel, ResultMemoryModel, GroupMemoryModel, CourseMemoryModel, \
     TeamMemoryModel
-from sportorg.app.plugins.winorient import winorient
-from sportorg.app.plugins.winorient.wdb import WinOrientBinary
 from sportorg.core import event
 from sportorg.core import plugin, app
 from sportorg.language import _
@@ -38,6 +36,7 @@ class MainWindow(QMainWindow, app.App):
 
     def show_window(self):
         plugin.run_plugins()
+        event.event('mainwindow', self)
         event.add_event('init_model', (self, 'init_model'))
         self.setup_ui()
         self.setup_menu()
@@ -105,11 +104,6 @@ class MainWindow(QMainWindow, app.App):
         self.action_settings = QtWidgets.QAction(self)
         self.action_event__settings = QtWidgets.QAction(self)
         self.action_export = QtWidgets.QAction(self)
-        # TODO: using event
-        self.action_csv__winorient = QtWidgets.QAction(self)
-        self.action_wdb__winorient = QtWidgets.QAction(self)
-        self.action_iof__xml_v3 = QtWidgets.QAction(self)
-        self.action_cvs = QtWidgets.QAction(self)
         self.action_help = QtWidgets.QAction(self)
         self.action_about_us = QtWidgets.QAction(self)
         self.action_report = QtWidgets.QAction(self)
@@ -117,11 +111,6 @@ class MainWindow(QMainWindow, app.App):
         self.action_new_row = QtWidgets.QAction(self)
         self.action_delete = QtWidgets.QAction(self)
 
-        self.menu_import.addAction(self.action_cvs)
-        # TODO: using event
-        self.menu_import.addAction(self.action_csv__winorient)
-        self.menu_import.addAction(self.action_wdb__winorient)
-        self.menu_import.addAction(self.action_iof__xml_v3)
         self.menu_import.addSeparator()
 
         self.menu_file.addAction(self.action_new)
@@ -183,15 +172,6 @@ class MainWindow(QMainWindow, app.App):
         self.action_event__settings.setText(_("Event Settings"))
         self.action_event__settings.triggered.connect(self.event_settings_dialog)
         self.menu_import.setTitle(_("Import"))
-        self.action_cvs.setText(_("CVS "))
-        # TODO: using event
-        self.action_cvs.setIcon(QtGui.QIcon(config.icon_dir("csv.png")))
-        self.action_csv__winorient.setText(_("CSV Winorient"))
-        self.action_csv__winorient.setIcon(QtGui.QIcon(config.icon_dir("csv.png")))
-        self.action_csv__winorient.triggered.connect(self.import_wo_csv)
-        self.action_wdb__winorient.setText(_("WDB Winorient"))
-        self.action_wdb__winorient.triggered.connect(self.import_wo_wdb)
-        self.action_iof__xml_v3.setText(_("IOF XML v3"))
 
         menu_file_import = event.event('menu_file_import')
         """
@@ -203,8 +183,8 @@ class MainWindow(QMainWindow, app.App):
                 self.menu_import.addAction(action_import)
                 action_import.setText(menu_import[0])
                 action_import.triggered.connect(menu_import[1])
-                if 2 in menu_import:
-                    action_import.triggered.setIcon(QtGui.QIcon(menu_import[2]))
+                if len(menu_import) == 3:
+                    action_import.setIcon(QtGui.QIcon(menu_import[2]))
 
         self.action_export.setText(_("Export"))
         self.action_quit.setText(_("Exit"))
@@ -316,28 +296,6 @@ class MainWindow(QMainWindow, app.App):
             self.setWindowTitle(file_name)
             super().open_file(file_name)
             self.init_model()
-
-    # TODO: using event
-    def import_wo_csv(self):
-        file_name = QtWidgets.QFileDialog.getOpenFileName(None, 'Open CSV Winorient file',
-                                            '', "CSV Winorient (*.csv)")[0]
-        if file_name is not '':
-            winorient.import_csv(file_name)
-            self.init_model()
-
-    # TODO: using event
-    def import_wo_wdb(self):
-        file_name = QtWidgets.QFileDialog.getOpenFileName(None, 'Open WDB Winorient file',
-                                            '', "WDB Winorient (*.wdb)")[0]
-        if file_name is not '':
-            try:
-                wb = WinOrientBinary(file=file_name)
-                # wb.run()
-                wb.create_objects()
-                self.init_model()
-            except:
-                print(sys.exc_info())
-                traceback.print_exc()
 
     def filter_dialog(self):
         try:

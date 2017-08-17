@@ -1,6 +1,14 @@
+import sys
+import traceback
+
+from sportorg.core import event
+from sportorg import config
+from sportorg.language import _
 from sportorg.app.models import model
 from sportorg.app.models import memory
+from .wdb import WinOrientBinary
 from sportorg.lib.winorient import wo
+from PyQt5 import QtWidgets
 
 
 def import_csv_to_model(source):
@@ -66,3 +74,44 @@ def import_csv(source):
         race.persons.append(person)
 
 print('winorient plugin')
+
+app_window = None
+
+
+def import_wo_csv():
+    file_name = QtWidgets.QFileDialog.getOpenFileName(None, 'Open CSV Winorient file',
+                                        '', "CSV Winorient (*.csv)")[0]
+    if file_name is not '':
+        import_csv(file_name)
+        app_window.init_model()
+
+
+def import_wo_wdb():
+    file_name = QtWidgets.QFileDialog.getOpenFileName(None, 'Open WDB Winorient file',
+                                        '', "WDB Winorient (*.wdb)")[0]
+    if file_name is not '':
+        try:
+            wb = WinOrientBinary(file=file_name)
+            # wb.run()
+            wb.create_objects()
+            app_window.init_model()
+        except:
+            print(sys.exc_info())
+            traceback.print_exc()
+
+
+def menu_inport_csv():
+    return [_("CSV Winorient"), import_wo_csv, config.icon_dir("csv.png")]
+
+
+def menu_inport_wdb():
+    return [_("WDB Winorient"), import_wo_wdb]
+
+
+def set_app(app):
+    global app_window
+    app_window = app
+
+event.add_event('menu_file_import', menu_inport_csv)
+event.add_event('menu_file_import', menu_inport_wdb)
+event.add_event('mainwindow', set_app)
