@@ -345,6 +345,8 @@ class MainWindow(QMainWindow, app.App):
             traceback.print_exc()
 
     def refresh(self):
+
+        print("refreshing interface")
         try:
             table = GlobalAccess().get_person_table()
             table.model().sourceModel().init_cache()

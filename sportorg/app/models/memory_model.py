@@ -71,7 +71,7 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
                 'Comment', 'World code', 'National code', 'Out of competition']
 
     def init_cache(self):
-        self.cache = []
+        self.cache.clear()
         for i in range(len(race().persons)):
             self.cache.append(self.get_participation_data(i))
 
@@ -123,6 +123,7 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
         return ['Surname', 'Name', 'Group', 'Team', 'Bib', 'Start', 'Finish', 'Result', 'Status', 'Penalty', 'Place']
 
     def init_cache(self):
+        self.cache.clear()
         for i in range(len(race().results)):
             self.cache.append(self.get_participation_data(i))
 
@@ -161,6 +162,7 @@ class GroupMemoryModel(AbstractSportOrgMemoryModel):
                 'Start interval', 'Start corridor', 'Order in corridor']
 
     def init_cache(self):
+        self.cache.clear()
         for i in range(len(race().groups)):
             self.cache.append(self.get_data(i))
 
@@ -207,6 +209,7 @@ class CourseMemoryModel(AbstractSportOrgMemoryModel):
         return ['Name', 'Course type', 'Length', 'Point count', 'Climb', 'Controls']
 
     def init_cache(self):
+        self.cache.clear()
         for i in range(len(race().courses)):
             self.cache.append(self.get_data(i))
 
@@ -240,6 +243,7 @@ class TeamMemoryModel(AbstractSportOrgMemoryModel):
         return ['Name', 'Address', 'Country', 'Region', 'City', 'Contact']
 
     def init_cache(self):
+        self.cache.clear()
         for i in range(len(race().organizations)):
             self.cache.append(self.get_data(i))
 
