@@ -350,14 +350,24 @@ class MainWindow(QMainWindow, app.App):
         try:
             table = GlobalAccess().get_person_table()
             table.model().sourceModel().init_cache()
+            table.model().invalidate()
+
             table = GlobalAccess().get_result_table()
             table.model().sourceModel().init_cache()
+            table.model().invalidate()
+
             table = GlobalAccess().get_group_table()
             table.model().sourceModel().init_cache()
+            table.model().invalidate()
+
             table = GlobalAccess().get_course_table()
             table.model().sourceModel().init_cache()
+            table.model().invalidate()
+
             table = GlobalAccess().get_organization_table()
             table.model().sourceModel().init_cache()
+            table.model().invalidate()
+
             event.event('refresh_window')
         except:
             traceback.print_exc()

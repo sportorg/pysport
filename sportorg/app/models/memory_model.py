@@ -42,7 +42,9 @@ class AbstractSportOrgMemoryModel (QAbstractTableModel):
             answer = ''
             try:
                 # answer = self.get_participation_data(index.row())[index.column()]
-                answer = self.cache[index.row()][index.column()]
+                row = index.row()
+                column = index.column()
+                answer = self.cache[row][column]
             except:
                 traceback.print_exc()
 

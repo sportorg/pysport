@@ -6,6 +6,7 @@ from PyQt5.QtCore import QItemSelectionModel, QModelIndex, QSortFilterProxyModel
 from PyQt5.QtWidgets import QTableView, QMessageBox
 
 from sportorg.app.models.memory import race
+from sportorg.app.models.result_calculation import ResultCalculation
 from sportorg.language import _
 
 
@@ -80,17 +81,23 @@ class GlobalAccess(object):
         indexes = self.get_selected_rows()
         if tab == 0:
             race().delete_persons(indexes, self.get_person_table())
+            # recalculate places
+            ResultCalculation().process_results()
+            self.get_main_window().refresh()
         if tab == 1:
             race().delete_results(indexes, self.get_result_table())
-            # TODO recalculate places
-            # ResultCalculation().process_results()
-            # self.get_main_window().refresh()
+            # recalculate places
+            ResultCalculation().process_results()
+            self.get_main_window().refresh()
         if tab == 2:
             race().delete_groups(indexes, self.get_group_table())
+            self.get_main_window().refresh()
         if tab == 3:
             race().delete_courses(indexes, self.get_course_table())
+            self.get_main_window().refresh()
         if tab == 4:
             race().delete_organizations(indexes, self.get_organization_table())
+            self.get_main_window().refresh()
 
     def add_object(self):
         try:
@@ -98,17 +105,20 @@ class GlobalAccess(object):
             if tab == 0:
                 race().add_new_person()
                 self.get_person_table().model().sourceModel().init_cache()
-                # self.get_person_table().model().sourceModel().layoutChanged()
+                self.get_main_window().refresh()
             if tab == 1:
                 pass
             if tab == 2:
                 race().add_new_group()
                 self.get_person_table().model().sourceModel().init_cache()
+                self.get_main_window().refresh()
             if tab == 3:
                 race().add_new_course()
                 self.get_course_table().model().sourceModel().init_cache()
+                self.get_main_window().refresh()
             if tab == 4:
                 race().add_new_organization()
                 self.get_organization_table().model().sourceModel().init_cache()
+                self.get_main_window().refresh()
         except:
             traceback.print_exc()

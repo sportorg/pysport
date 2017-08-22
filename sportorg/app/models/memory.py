@@ -1,6 +1,7 @@
 import traceback
 
 from PyQt5.QtWidgets import QMessageBox
+
 from sportorg.language import _
 from sportorg.core.model import Model
 
@@ -239,22 +240,16 @@ class Race(Model):
     def delete_persons(self, indexes, table):
         try:
             indexes = sorted(indexes, reverse=True)
-            model = table.model().sourceModel()
-
             for i in indexes:
-                self.persons.remove(self.persons[i])
-                model.removeRows(i)
+                self.persons.pop(i)
         except:
             traceback.print_exc()
 
     def delete_results(self, indexes, table):
         try:
             indexes = sorted(indexes, reverse=True)
-            model = table.model().sourceModel()
-
             for i in indexes:
                 self.results.remove(self.results[i])
-                model.removeRows(i)
 
         except:
             traceback.print_exc()
@@ -271,11 +266,8 @@ class Race(Model):
                     return False
 
             indexes = sorted(indexes, reverse=True)
-            model = table.model().sourceModel()
-
             for i in indexes:
                 self.groups.remove(self.groups[i])
-                model.removeRows(i)
 
         except:
             traceback.print_exc()
@@ -294,11 +286,9 @@ class Race(Model):
                     return False
 
             indexes = sorted(indexes, reverse=True)
-            model = table.model().sourceModel()
 
             for i in indexes:
                 self.courses.remove(self.courses[i])
-                model.removeRows(i)
 
         except:
             traceback.print_exc()
@@ -316,11 +306,9 @@ class Race(Model):
                                          _('Cannot remove organization') + ' ' + organization.name)
                     return False
             indexes = sorted(indexes, reverse=True)
-            model = table.model().sourceModel()
 
             for i in indexes:
                 self.organizations.remove(self.organizations[i])
-                model.removeRows(i)
 
         except:
             traceback.print_exc()
