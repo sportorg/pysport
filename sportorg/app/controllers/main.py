@@ -40,6 +40,7 @@ class MainWindow(QMainWindow, app.App):
         plugin.run_plugins()
         event.event('mainwindow', self)
         event.add_event('init_model', (self, 'init_model'))
+        self.conf_read()
         self.setup_ui()
         self.setup_menu()
         self.setup_toolbar()
@@ -48,7 +49,15 @@ class MainWindow(QMainWindow, app.App):
         self.show()
 
     def close(self):
-        print('exit', self.geometry())
+        print('close', self.geometry())
+        self.conf['geometry'] = {
+            'x': self.x() + 8,
+            'y': self.y() + 30,
+            'width': self.width(),
+            'height': self.height(),
+        }
+        self.conf_write()
+
         """
         :event: close
         """
@@ -66,11 +75,17 @@ class MainWindow(QMainWindow, app.App):
             self.conf.write(configfile)
 
     def setup_ui(self):
+        geometry = 'geometry'
+        x = self.conf.getint('%s' % geometry, 'x', fallback=480)
+        y = self.conf.getint(geometry, 'y', fallback=320)
+        width = self.conf.getint(geometry, 'width', fallback=880)
+        height = self.conf.getint(geometry, 'height', fallback=474)
+
         self.setMinimumSize(QtCore.QSize(480, 320))
-        self.setGeometry(480, 320, 480, 320)
+        self.setGeometry(x, y, 480, 320)
         self.setWindowIcon(QtGui.QIcon(config.ICON))
         self.setWindowTitle(_(config.NAME))
-        self.resize(880, 474)
+        self.resize(width, height)
         self.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.setDockNestingEnabled(False)
         self.setDockOptions(QtWidgets.QMainWindow.AllowTabbedDocks
