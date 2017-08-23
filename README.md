@@ -43,3 +43,6 @@ pip install sireader
         lib/
 ```
 
+![Mainwindow sportorg](img/mainwindow.png)
+
+![Dialogedit sportorg](img/dialogedit.png)
