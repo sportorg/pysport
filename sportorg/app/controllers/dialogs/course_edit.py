@@ -179,6 +179,8 @@ class CourseEditDialog(QDialog):
         course.controls.clear()
         for i in text.split('\n'):
             control = CourseControl()
+            if i is None or len(i) == 0:
+                continue
             control.code = i.split()[0]
             if len(i.split()) > 1:
                 control.length = i.split()[1]
