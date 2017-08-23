@@ -7,7 +7,7 @@ from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QAbstractItemView, QHeaderView
 
 from sportorg.app.controllers.dialogs.organization_edit import OrganizationEditDialog
-from sportorg.app.models.memory_model import PersonProxyModel, TeamMemoryModel
+from sportorg.app.models.memory_model import TeamMemoryModel
 
 
 class Widget(QtWidgets.QWidget):
@@ -25,9 +25,8 @@ class Widget(QtWidgets.QWidget):
 
         self.TeamTable = QtWidgets.QTableView(self)
         self.TeamTable.setObjectName("TeamTable")
-        proxy_model = PersonProxyModel(self)
-        proxy_model.setSourceModel(TeamMemoryModel())
-        self.TeamTable.setModel(proxy_model)
+
+        self.TeamTable.setModel(TeamMemoryModel())
         self.TeamTable.setSortingEnabled(True)
         self.TeamTable.setSelectionBehavior(QAbstractItemView.SelectRows)
 

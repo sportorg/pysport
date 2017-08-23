@@ -162,12 +162,9 @@ class GroupEditDialog(QDialog):
     def set_values_from_table(self, table, index):
         self.table = table
         self.current_index = index
-        assert (isinstance(table, QTableView))
-        model = table.model()
-        assert (isinstance(model, QSortFilterProxyModel))
-        orig_index = model.mapToSource(index)
-        assert (isinstance(orig_index, QModelIndex))
-        orig_index_int = orig_index.row()
+
+        assert (isinstance(index, QModelIndex))
+        orig_index_int = index.row()
 
         current_object = race().groups[orig_index_int]
         assert (isinstance(current_object, Group))

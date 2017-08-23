@@ -59,14 +59,11 @@ class GlobalAccess(object):
         sel_model = table.selectionModel()
         assert isinstance(sel_model, QItemSelectionModel)
         indexes = sel_model.selectedRows()
-        model = table.model()
-        assert (isinstance(model, QSortFilterProxyModel))
+
         ret = []
         for i in indexes:
             assert isinstance(i, QModelIndex)
-            orig_index = model.mapToSource(i)
-            assert isinstance(orig_index, QModelIndex)
-            orig_index_int = orig_index.row()
+            orig_index_int = i.row()
             ret.append(orig_index_int)
         return ret
 
@@ -104,21 +101,21 @@ class GlobalAccess(object):
             tab = self.get_current_tab_index()
             if tab == 0:
                 race().add_new_person()
-                self.get_person_table().model().sourceModel().init_cache()
+                self.get_person_table().model().init_cache()
                 self.get_main_window().refresh()
             if tab == 1:
                 pass
             if tab == 2:
                 race().add_new_group()
-                self.get_person_table().model().sourceModel().init_cache()
+                self.get_person_table().model().init_cache()
                 self.get_main_window().refresh()
             if tab == 3:
                 race().add_new_course()
-                self.get_course_table().model().sourceModel().init_cache()
+                self.get_course_table().model().init_cache()
                 self.get_main_window().refresh()
             if tab == 4:
                 race().add_new_organization()
-                self.get_organization_table().model().sourceModel().init_cache()
+                self.get_organization_table().model().init_cache()
                 self.get_main_window().refresh()
         except:
             traceback.print_exc()

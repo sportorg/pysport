@@ -9,7 +9,7 @@ from PyQt5.QtCore import QSortFilterProxyModel, QModelIndex
 from PyQt5.QtWidgets import QAbstractItemView
 
 from sportorg.app.models.memory import race, Result, Course, CourseControl
-from sportorg.app.models.memory_model import PersonProxyModel, ResultMemoryModel
+from sportorg.app.models.memory_model import ResultMemoryModel
 from sportorg.language import _
 
 
@@ -88,9 +88,7 @@ class Widget(QtWidgets.QWidget):
         self.ResultTable = QtWidgets.QTableView(self.ResultSplitter)
         self.ResultTable.setObjectName("ResultTable")
 
-        proxy_model = PersonProxyModel(self)
-        proxy_model.setSourceModel(ResultMemoryModel())
-        self.ResultTable.setModel(proxy_model)
+        self.ResultTable.setModel(ResultMemoryModel())
         self.ResultTable.setSortingEnabled(True)
         self.ResultTable.setSelectionBehavior(QAbstractItemView.SelectRows)
 
@@ -142,11 +140,9 @@ class Widget(QtWidgets.QWidget):
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:9pt; font-weight:600; color:#000000;\"><br /></p></body></html>"))
 
     def show_punches(self, index):
-        model = self.ResultTable.model()
-        assert (isinstance(model, QSortFilterProxyModel))
-        orig_index = model.mapToSource(index)
-        assert (isinstance(orig_index, QModelIndex))
-        orig_index_int = orig_index.row()
+
+        assert (isinstance(index, QModelIndex))
+        orig_index_int = index.row()
 
         result = race().results[orig_index_int]
         assert isinstance(result, Result)

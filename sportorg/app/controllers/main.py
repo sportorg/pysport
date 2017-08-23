@@ -363,20 +363,23 @@ class MainWindow(QMainWindow, app.App):
         GlobalAccess().add_object()
 
     def delete_object(self):
-        GlobalAccess().delete_object()
+        try:
+            GlobalAccess().delete_object()
+        except:
+            traceback.print_exc()
 
     def init_model(self):
         try:
             table = GlobalAccess().get_person_table()
-            table.model().setSourceModel(PersonMemoryModel())
+            table.setModel(PersonMemoryModel())
             table = GlobalAccess().get_result_table()
-            table.model().setSourceModel(ResultMemoryModel())
+            table.setModel(ResultMemoryModel())
             table = GlobalAccess().get_group_table()
-            table.model().setSourceModel(GroupMemoryModel())
+            table.setModel(GroupMemoryModel())
             table = GlobalAccess().get_course_table()
-            table.model().setSourceModel(CourseMemoryModel())
+            table.setModel(CourseMemoryModel())
             table = GlobalAccess().get_organization_table()
-            table.model().setSourceModel(TeamMemoryModel())
+            table.setModel(TeamMemoryModel())
 
         except:
             traceback.print_exc()
@@ -386,24 +389,19 @@ class MainWindow(QMainWindow, app.App):
         print("refreshing interface")
         try:
             table = GlobalAccess().get_person_table()
-            table.model().sourceModel().init_cache()
-            table.model().invalidate()
+            table.model().init_cache()
 
             table = GlobalAccess().get_result_table()
-            table.model().sourceModel().init_cache()
-            table.model().invalidate()
+            table.model().init_cache()
 
             table = GlobalAccess().get_group_table()
-            table.model().sourceModel().init_cache()
-            table.model().invalidate()
+            table.model().init_cache()
 
             table = GlobalAccess().get_course_table()
-            table.model().sourceModel().init_cache()
-            table.model().invalidate()
+            table.model().init_cache()
 
             table = GlobalAccess().get_organization_table()
-            table.model().sourceModel().init_cache()
-            table.model().invalidate()
+            table.model().init_cache()
 
             event.event('refresh_window')
         except:

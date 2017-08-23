@@ -5,7 +5,7 @@ from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QAbstractItemView, QHeaderView
 
 from sportorg.app.controllers.dialogs.group_edit import GroupEditDialog
-from sportorg.app.models.memory_model import PersonProxyModel, GroupMemoryModel
+from sportorg.app.models.memory_model import GroupMemoryModel
 
 
 class Widget(QtWidgets.QWidget):
@@ -23,9 +23,7 @@ class Widget(QtWidgets.QWidget):
 
         self.GroupTable = QtWidgets.QTableView(self)
         self.GroupTable.setObjectName("GroupTable")
-        proxy_model = PersonProxyModel(self)
-        proxy_model.setSourceModel(GroupMemoryModel())
-        self.GroupTable.setModel(proxy_model)
+        self.GroupTable.setModel(GroupMemoryModel())
         self.GroupTable.setSortingEnabled(True)
         self.GroupTable.setSelectionBehavior(QAbstractItemView.SelectRows)
 

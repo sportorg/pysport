@@ -6,7 +6,7 @@ from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QAbstractItemView, QHeaderView
 
 from sportorg.app.controllers.dialogs.course_edit import CourseEditDialog
-from sportorg.app.models.memory_model import PersonProxyModel, CourseMemoryModel
+from sportorg.app.models.memory_model import CourseMemoryModel
 
 
 class Widget(QtWidgets.QWidget):
@@ -24,9 +24,7 @@ class Widget(QtWidgets.QWidget):
 
         self.CourseTable = QtWidgets.QTableView(self)
         self.CourseTable.setObjectName("CourseTable")
-        proxy_model = PersonProxyModel(self)
-        proxy_model.setSourceModel(CourseMemoryModel())
-        self.CourseTable.setModel(proxy_model)
+        self.CourseTable.setModel(CourseMemoryModel())
         self.CourseTable.setSortingEnabled(True)
         self.CourseTable.setSelectionBehavior(QAbstractItemView.SelectRows)
 

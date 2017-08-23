@@ -5,7 +5,7 @@ from PyQt5 import QtCore
 from PyQt5.QtCore import QSortFilterProxyModel, QModelIndex, QTime
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QLabel, \
-    QLineEdit, QComboBox, QCompleter, QSpinBox, QApplication, QTimeEdit, QTextEdit, QCheckBox, QTableView, QDialog, \
+    QLineEdit, QComboBox, QCompleter, QSpinBox, QApplication, QTimeEdit, QTextEdit, QCheckBox, QDialog, \
     QPushButton
 from datetime import date, datetime
 
@@ -331,12 +331,9 @@ class EntryEditDialog(QDialog):
     def set_values_from_table(self, table, index):
         self.table = table
         self.current_index = index
-        assert (isinstance(table, QTableView))
-        model = table.model()
-        assert (isinstance(model, QSortFilterProxyModel))
-        orig_index = model.mapToSource(index)
-        assert (isinstance(orig_index, QModelIndex))
-        orig_index_int = orig_index.row()
+
+        assert (isinstance(index, QModelIndex))
+        orig_index_int = index.row()
 
         current_object = race().persons[orig_index_int]
         assert (isinstance(current_object, Person))

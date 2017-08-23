@@ -12,7 +12,6 @@ from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QApplication, QDialog, QTableView
 
 from sportorg.app.controllers.dialogs import entry_edit
-from sportorg.app.models.memory_model import PersonProxyModel
 
 from sportorg.language import _
 
@@ -77,7 +76,7 @@ class DialogFilter(QDialog):
             if self.table is not None:
                 assert (isinstance(self.table, QTableView))
                 proxy_model = self.table.model()
-                assert (isinstance(proxy_model, PersonProxyModel))
+                # assert (isinstance(proxy_model, PersonProxyModel))
 
                 proxy_model.clear_filter()
                 proxy_model.set_filter_for_column(4, self.group_combo.currentText())
