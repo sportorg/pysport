@@ -365,6 +365,8 @@ class Race(Model):
             if i.organization is not None:
                 i.organization.count_person += 1
 
+    def get_persons_by_group(self, group):
+        return find(self.persons, group=group, return_all=True)
 
 def create(obj, **kwargs):
     return obj.create(**kwargs)

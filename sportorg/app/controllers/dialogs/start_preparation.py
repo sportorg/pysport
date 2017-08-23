@@ -1,9 +1,11 @@
 import sys
+import traceback
 from time import sleep
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QApplication, QDialog
 
+from sportorg.app.controllers.global_access import GlobalAccess
 from sportorg.app.models.start_preparation import StartNumberManager, DrawManager, ReserveManager, StartTimeManager
 from sportorg.language import _
 from sportorg import config
@@ -240,47 +242,51 @@ class StartPreparationDialog(QDialog):
         self.draw_teams_check_box.setEnabled(status)
 
     def accept(self):
-        if self.reserve_check_box.isChecked():
-            reserve_prefix = self.reserve_prefix.text()
-            reserve_count = self.reserve_group_count_spin_box.value()
-            reserve_percent = self.reserve_group_percent_spin_box.value()
+        try:
+            if self.reserve_check_box.isChecked():
+                reserve_prefix = self.reserve_prefix.text()
+                reserve_count = self.reserve_group_count_spin_box.value()
+                reserve_percent = self.reserve_group_percent_spin_box.value()
 
-            ReserveManager().process(reserve_prefix, reserve_count, reserve_percent)
-        self.progress_bar.setValue(25)
-        sleep(1)
+                ReserveManager().process(reserve_prefix, reserve_count, reserve_percent)
+            self.progress_bar.setValue(25)
+            sleep(1)
 
-        if self.start_check_box.isChecked():
-            corridor_first_start = self.start_first_time_edit.time()
-            if(self.start_interval_radio_button.isChecked()):
-                fixed_start_interval = self.start_interval_time_edit.time()
-                StartTimeManager().process(corridor_first_start, False, fixed_start_interval)
+            if self.start_check_box.isChecked():
+                corridor_first_start = self.start_first_time_edit.time()
+                if(self.start_interval_radio_button.isChecked()):
+                    fixed_start_interval = self.start_interval_time_edit.time()
+                    StartTimeManager().process(corridor_first_start, False, fixed_start_interval)
 
-            if (self.start_group_settings_radion_button.isChecked()):
-                StartTimeManager().process(corridor_first_start, True, None)
+                if (self.start_group_settings_radion_button.isChecked()):
+                    StartTimeManager().process(corridor_first_start, True, None)
 
-        self.progress_bar.setValue(50)
-        sleep(1)
+            self.progress_bar.setValue(50)
+            sleep(1)
 
-        if self.draw_check_box.isChecked():
-            split_start_groups = self.draw_groups_check_box.isChecked()
-            split_teams = self.draw_teams_check_box.isChecked()
-            split_regions = self.draw_regions_check_box.isChecked()
-            DrawManager().process(split_start_groups, split_teams, split_regions)
+            if self.draw_check_box.isChecked():
+                split_start_groups = self.draw_groups_check_box.isChecked()
+                split_teams = self.draw_teams_check_box.isChecked()
+                split_regions = self.draw_regions_check_box.isChecked()
+                DrawManager().process(split_start_groups, split_teams, split_regions)
 
-        self.progress_bar.setValue(75)
-        sleep(1)
+            self.progress_bar.setValue(75)
+            sleep(1)
 
-        if self.numbers_check_box.isChecked():
-            if self.numbers_minute_radio_button.isChecked():
-                a = 1
-                StartNumberManager().process(False)
-            if self.numbers_interval_radio_button.isChecked():
-                first_number = self.numbers_first_spin_box.value()
-                interval = self.numbers_interval_spin_box.value()
-                StartNumberManager().process(True, first_number, interval)
+            if self.numbers_check_box.isChecked():
+                if self.numbers_minute_radio_button.isChecked():
+                    a = 1
+                    StartNumberManager().process(False)
+                if self.numbers_interval_radio_button.isChecked():
+                    first_number = self.numbers_first_spin_box.value()
+                    interval = self.numbers_interval_spin_box.value()
+                    StartNumberManager().process(True, first_number, interval)
 
-        self.progress_bar.setValue(100)
-        sleep(1)
+            self.progress_bar.setValue(100)
+            sleep(1)
+            GlobalAccess().get_main_window().refresh()
+        except:
+            traceback.print_exc()
 
 def main(argv):
     app = QApplication(argv)
