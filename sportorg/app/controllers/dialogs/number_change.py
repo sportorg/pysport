@@ -10,19 +10,24 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QDialog, QApplication
 
 
-class Ui_number_change(object):
-    def setupUi(self, number_change):
-        number_change.setObjectName("number_change")
-        number_change.setWindowModality(QtCore.Qt.WindowModal)
-        number_change.resize(319, 167)
-        number_change.setSizeGripEnabled(False)
-        number_change.setModal(True)
-        self.button_box = QtWidgets.QDialogButtonBox(number_change)
+class NumberChangeDialog(QDialog):
+
+    def __init__(self):
+        super().__init__()
+        self.setupUi()
+
+    def setupUi(self):
+        self.setObjectName("number_change")
+        self.setWindowModality(QtCore.Qt.WindowModal)
+        self.resize(319, 167)
+        self.setSizeGripEnabled(False)
+        self.setModal(True)
+        self.button_box = QtWidgets.QDialogButtonBox(self)
         self.button_box.setGeometry(QtCore.QRect(70, 120, 161, 32))
         self.button_box.setOrientation(QtCore.Qt.Horizontal)
         self.button_box.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
         self.button_box.setObjectName("button_box")
-        self.layoutWidget = QtWidgets.QWidget(number_change)
+        self.layoutWidget = QtWidgets.QWidget(self)
         self.layoutWidget.setGeometry(QtCore.QRect(14, 10, 290, 48))
         self.layoutWidget.setObjectName("layoutWidget")
         self.number_grid_layout = QtWidgets.QGridLayout(self.layoutWidget)
@@ -48,7 +53,7 @@ class Ui_number_change(object):
         self.target_info_label = QtWidgets.QLabel(self.layoutWidget)
         self.target_info_label.setObjectName("target_info_label")
         self.number_grid_layout.addWidget(self.target_info_label, 1, 2, 1, 1)
-        self.layoutWidget1 = QtWidgets.QWidget(number_change)
+        self.layoutWidget1 = QtWidgets.QWidget(self)
         self.layoutWidget1.setGeometry(QtCore.QRect(14, 70, 161, 42))
         self.layoutWidget1.setObjectName("layoutWidget1")
         self.options_vert_layout = QtWidgets.QVBoxLayout(self.layoutWidget1)
@@ -62,14 +67,14 @@ class Ui_number_change(object):
         self.replace_radio_button.setObjectName("replace_radio_button")
         self.options_vert_layout.addWidget(self.replace_radio_button)
 
-        self.retranslateUi(number_change)
-        self.button_box.accepted.connect(number_change.accept)
-        self.button_box.rejected.connect(number_change.reject)
-        QtCore.QMetaObject.connectSlotsByName(number_change)
+        self.retranslateUi()
+        self.button_box.accepted.connect(self.accept)
+        self.button_box.rejected.connect(self.reject)
+        QtCore.QMetaObject.connectSlotsByName(self)
 
-    def retranslateUi(self, number_change):
+    def retranslateUi(self):
         _translate = QtCore.QCoreApplication.translate
-        number_change.setWindowTitle(_translate("number_change", "Dialog"))
+        self.setWindowTitle(_translate("number_change", "Dialog"))
         self.source_num_label.setText(_translate("number_change", "Source number"))
         self.source_info_label.setText(_translate("number_change", "Ivan Churakoff M21 11:09:00"))
         self.target_num_label.setText(_translate("number_change", "Target number"))
@@ -79,11 +84,10 @@ class Ui_number_change(object):
 
 
 def main(argv):
+
+    NumberChangeDialog().show()
+
     app = QApplication(argv)
-    mw = QDialog()
-    obj = Ui_number_change()
-    obj.setupUi(mw)
-    mw.show()
     sys.exit(app.exec())
 
 
