@@ -125,7 +125,7 @@ class Group(Model):
     qual_assign_text = None
     start_interval = None
     start_corridor = None
-    order_in_corridor = None
+    order_in_corridor = 0
 
     first_number = None
     count_person = 0

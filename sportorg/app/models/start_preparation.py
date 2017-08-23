@@ -1,6 +1,8 @@
 import math
 import random
 
+from PyQt5.QtCore import QTime
+
 from sportorg.app.models.memory import race, Group, Person
 
 
@@ -86,14 +88,69 @@ class DrawManager(object):
 
 
 class StartNumberManager(object):
+    """
+        Assign new start numbers
+
+    """
     def process(self, is_interval, first_number=None, interval=None):
         pass
 
 
 class StartTimeManager(object):
-    def process(self, corridor_first_start, is_start_interval, fixed_start_interval=None):
-        pass
+    """
+        Set new start time for athletes
 
+    """
+    def process(self, corridor_first_start, is_start_interval, fixed_start_interval=None):
+        current_race = race()
+        current_race.update_counters()
+
+        corridors = self.get_corridors()
+        for cur_corridor in corridors:
+            cur_start = corridor_first_start
+            groups = self.get_groups_by_corridor(cur_corridor)
+            for cur_group in groups:
+                assert isinstance(cur_group, Group)
+                start_interval = fixed_start_interval
+                if  not is_start_interval:
+                    if cur_group.start_interval is not None:
+                        start_interval = cur_group.start_interval
+                self.process_group(cur_group, cur_start, start_interval)
+
+                # TODO cur_start += start_interval * cur_group.count_person
+                for i in range (cur_group.count_person):
+                    cur_start.addMSecs(start_interval.msec())
+
+
+    def get_corridors(self):
+        current_race = race()
+        ret = []
+        for current_group in current_race.groups:
+            assert isinstance(current_group, Group)
+            cur_corridor = current_group.start_corridor
+            if cur_corridor not in ret:
+                ret.append(cur_corridor)
+        return sorted(ret)
+
+    def get_groups_by_corridor(self, corridor):
+        current_race = race()
+        ret = []
+        for current_group in current_race.groups:
+            assert isinstance(current_group, Group)
+            cur_corridor = current_group.start_corridor
+            if cur_corridor == corridor:
+                ret.append(current_group)
+        return sorted(ret, key=lambda item: item.order_in_corridor)
+
+    def process_group(self, group, first_start, start_interval):
+        current_race = race()
+        persons = current_race.get_persons_by_group(group)
+        if persons is not None:
+            current_start = first_start
+            for current_person in persons:
+                current_person.start_time = current_start
+                assert isinstance(current_start, QTime)
+                current_start.addMSecs(start_interval.msec())
 
 def get_selected_list():
     pass
