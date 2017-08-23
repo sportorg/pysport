@@ -49,7 +49,6 @@ class MainWindow(QMainWindow, app.App):
         self.show()
 
     def close(self):
-        print('close', self.geometry())
         self.conf['geometry'] = {
             'x': self.x() + 8,
             'y': self.y() + 30,
