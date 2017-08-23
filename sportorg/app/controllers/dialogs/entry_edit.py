@@ -234,7 +234,7 @@ class EntryEditDialog(QDialog):
         self.item_surname = QLineEdit()
         self.layout.addRow(self.label_surname, self.item_surname)
 
-        self.label_name = QLabel(_('First Name'))
+        self.label_name = QLabel(_('First name'))
         self.item_name = AdvComboBox()
         self.item_name.addItems(get_names())
         self.layout.addRow(self.label_name, self.item_name)
