@@ -6,7 +6,9 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QApplication, QDialog
 
 from sportorg.app.controllers.global_access import GlobalAccess
+from sportorg.app.models.memory import race
 from sportorg.app.models.start_preparation import StartNumberManager, DrawManager, ReserveManager, StartTimeManager
+from sportorg.app.plugins.utils.utils import qtime2datetime
 from sportorg.language import _
 from sportorg import config
 
@@ -112,6 +114,7 @@ class StartPreparationDialog(QDialog):
         self.start_first_time_edit = QtWidgets.QTimeEdit(self.widget2)
         self.start_first_time_edit.setEnabled(False)
         self.start_first_time_edit.setObjectName("start_first_time_edit")
+        self.start_first_time_edit.setDisplayFormat("HH:mm:ss")
         self.start_layout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.start_first_time_edit)
         self.start_interval_radio_button = QtWidgets.QRadioButton(self.widget2)
         self.start_interval_radio_button.setChecked(True)
@@ -120,6 +123,7 @@ class StartPreparationDialog(QDialog):
         self.start_interval_time_edit = QtWidgets.QTimeEdit(self.widget2)
         self.start_interval_time_edit.setEnabled(False)
         self.start_interval_time_edit.setObjectName("start_interval_time_edit")
+        self.start_interval_time_edit.setDisplayFormat("mm:ss")
         self.start_layout.setWidget(2, QtWidgets.QFormLayout.FieldRole, self.start_interval_time_edit)
         self.start_group_settings_radion_button = QtWidgets.QRadioButton(self.widget2)
         self.start_group_settings_radion_button.setEnabled(False)
@@ -243,6 +247,7 @@ class StartPreparationDialog(QDialog):
 
     def accept(self):
         try:
+            race().update_counters()
             if self.reserve_check_box.isChecked():
                 reserve_prefix = self.reserve_prefix.text()
                 reserve_count = self.reserve_group_count_spin_box.value()
@@ -253,13 +258,13 @@ class StartPreparationDialog(QDialog):
             sleep(1)
 
             if self.start_check_box.isChecked():
-                corridor_first_start = self.start_first_time_edit.time()
-                if(self.start_interval_radio_button.isChecked()):
-                    fixed_start_interval = self.start_interval_time_edit.time()
+                corridor_first_start = qtime2datetime(self.start_first_time_edit.time())
+                if self.start_interval_radio_button.isChecked():
+                    fixed_start_interval = qtime2datetime(self.start_interval_time_edit.time())
                     StartTimeManager().process(corridor_first_start, False, fixed_start_interval)
 
-                if (self.start_group_settings_radion_button.isChecked()):
-                    StartTimeManager().process(corridor_first_start, True, None)
+                if self.start_group_settings_radion_button.isChecked():
+                    StartTimeManager().process(corridor_first_start.toPyTime(), True, None)
 
             self.progress_bar.setValue(50)
             sleep(1)
@@ -275,7 +280,6 @@ class StartPreparationDialog(QDialog):
 
             if self.numbers_check_box.isChecked():
                 if self.numbers_minute_radio_button.isChecked():
-                    a = 1
                     StartNumberManager().process(False)
                 if self.numbers_interval_radio_button.isChecked():
                     first_number = self.numbers_first_spin_box.value()
@@ -287,6 +291,7 @@ class StartPreparationDialog(QDialog):
             GlobalAccess().get_main_window().refresh()
         except:
             traceback.print_exc()
+
 
 def main(argv):
     app = QApplication(argv)

@@ -63,14 +63,15 @@ class AbstractSportOrgMemoryModel (QAbstractTableModel):
         self.endRemoveRows()
         return True
 
+
 class PersonMemoryModel(AbstractSportOrgMemoryModel):
     def __init__(self):
         super().__init__()
         self.init_cache()
 
     def get_headers(self):
-        return ['Last name', 'First name', 'Sex', 'Qualification', 'Group', 'Team', 'Year', 'Bib', 'Card', 'Rented card',
-                'Comment', 'World code', 'National code', 'Out of competition']
+        return ['Last name', 'First name', 'Sex', 'Qualification', 'Group', 'Team', 'Year', 'Bib', 'Card',
+                'Rented card', 'Comment', 'World code', 'National code', 'Out of competition']
 
     def init_cache(self):
         self.cache.clear()
@@ -122,7 +123,8 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
         self.count = None
 
     def get_headers(self):
-        return ['Last name', 'First name', 'Group', 'Team', 'Bib', 'Start', 'Finish', 'Result', 'Status', 'Penalty', 'Place']
+        return ['Last name', 'First name', 'Group', 'Team', 'Bib', 'Start', 'Finish', 'Result',
+                'Status', 'Penalty', 'Place']
 
     def init_cache(self):
         self.cache.clear()
@@ -175,13 +177,12 @@ class GroupMemoryModel(AbstractSportOrgMemoryModel):
     def get_values_from_object(self, group):
         assert (isinstance(group, Group))
         course = group.course
-        assert (isinstance(course, Course))
         if course is None:
             course = Course()
 
         control_count = 0
         if course.controls is not None:
-            control_count = len (course.controls)
+            control_count = len(course.controls)
 
         return list([
             group.name,

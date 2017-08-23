@@ -13,6 +13,7 @@ from sportorg.app.controllers.global_access import GlobalAccess
 from sportorg.app.models.memory import race, Person, find
 from sportorg.app.models.model import Organization
 from sportorg.app.models.result_calculation import ResultCalculation
+from sportorg.app.plugins.utils.utils import qtime2datetime
 
 from sportorg.language import _
 
@@ -394,10 +395,7 @@ class EntryEditDialog(QDialog):
             person.bib = self.item_bib.text()
             changed = True
 
-        t = self.item_start.time()
-        now = datetime.now()
-        assert(isinstance(t, QTime))
-        new_time = datetime(now.year, now.month, now.day, t.hour(), t.minute(), t.second(), t.msec())
+        new_time = qtime2datetime(self.item_start.time())
         if person.start_time != new_time:
             person.start_time = new_time
             changed = True
