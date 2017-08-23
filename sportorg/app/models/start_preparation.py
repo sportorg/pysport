@@ -1,4 +1,5 @@
 import math
+import random
 
 from sportorg.app.models.memory import race, Group, Person
 
@@ -9,7 +10,7 @@ class ReserveManager(object):
         You can specify minimum quantity of person or percentage to add in each group
         Reserve record is marked with prefix, that can be specified by user
 
-        Now effect on each group, but in future we'll possible implement working with selected groups only
+        Now effect on all groups, but in future we'll possible implement working with selected groups only
     """
     def process(self, reserve_prefix, reserve_count, reserve_percent):
         current_race = race()
@@ -40,8 +41,48 @@ class ReserveManager(object):
 
 
 class DrawManager(object):
+    """
+        Execute draw in each group
+        Now effect on all groups, but in future we'll possible implement working with filtered persons
+    """
     def process(self, split_start_groups, split_teams, split_regions):
-        pass
+        current_race = race()
+        current_race.update_counters()
+
+        # create temporary array
+        person_array = []
+
+        for i in range(len(current_race.persons)):
+            current_person = current_race.persons[i]
+            assert isinstance(current_person, Person)
+            index = i
+            group = current_person.group.name
+            start_group = current_person.start_group
+            team = ''
+            region = ''
+            if current_person.organization is not None:
+                team = current_person.organization.name
+                region = current_person.organization.region
+
+            person_array.append([index, group, start_group, team, region])
+
+        # shuffle
+        random.shuffle(person_array)
+        random.shuffle(person_array)
+
+        # sort array by group and start_group
+        if split_start_groups:
+            person_array = sorted(person_array, key=lambda item: str(item[1]) + str(item[2]))
+        else:
+            person_array = sorted(person_array, key=lambda item: str(item[1]))
+
+        # TODO process team and region conflicts in each start group
+
+        # apply to model
+        index_array = []
+        for i in person_array:
+            index_array.append(i[0])
+        current_race.persons = [current_race.persons[x] for x in index_array]
 
 
 class StartNumberManager(object):

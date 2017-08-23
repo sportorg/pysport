@@ -204,7 +204,7 @@ class Person(Model):
     comment = None
 
     start_time = None
-
+    start_group = 0
 
 class PersonList(list):
     pass
