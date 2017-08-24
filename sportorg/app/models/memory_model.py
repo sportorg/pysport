@@ -54,14 +54,14 @@ class AbstractSportOrgMemoryModel (QAbstractTableModel):
 
         return QVariant()
 
-    def removeRows(self, row, rows=1, index=QModelIndex()):
-        print("Removing at row: %s"%row)
-        self.beginRemoveRows(QModelIndex(), row, row + rows - 1)
-
-        self.cache = self.cache[:row] + self.cache[row + rows:]
-
-        self.endRemoveRows()
-        return True
+    # def removeRows(self, row, rows=1, index=QModelIndex()):
+    #     print("Removing at row: %s"%row)
+    #     self.beginRemoveRows(QModelIndex(), row, row + rows - 1)
+    #
+    #     self.cache = self.cache[:row] + self.cache[row + rows:]
+    #
+    #     self.endRemoveRows()
+    #     return True
 
     def sort(self, Ncol, order):
         """Sort table by given column number.
@@ -69,7 +69,7 @@ class AbstractSportOrgMemoryModel (QAbstractTableModel):
         try:
             self.layoutAboutToBeChanged.emit()
             if len(self.cache):
-                self.cache = sorted(self.cache, key=lambda item : item[Ncol])
+                self.cache = sorted(self.cache, key=lambda item: str(item[Ncol]))
                 if order == Qt.DescendingOrder:
                     self.cache = self.cache[::-1]
             self.layoutChanged.emit()

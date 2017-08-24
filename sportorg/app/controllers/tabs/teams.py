@@ -51,4 +51,4 @@ class Widget(QtWidgets.QWidget):
         self.team_layout.addWidget(self.TeamTable)
 
     def get_table(self):
-        return self.TeamTable()
+        return self.TeamTable
