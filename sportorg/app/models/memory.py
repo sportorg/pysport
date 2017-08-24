@@ -153,7 +153,7 @@ class Result(Model):
     def get_result_for_sort(self):
         ret = 0
         if self.status != 0 and self.status != ResultStatus.OK:
-            ret += 24*3600*100
+            ret += 24 * 3600 * 100
 
         delta = self.finish_time - self.start_time
         ret += delta.seconds * 100
@@ -235,7 +235,7 @@ class Race(Model):
         try:
             race().update_counters()
             for i in indexes:
-                group = self.groups[i]
+                group = self.groups[i]  # type: Group
                 if group.count_person > 0:
                     QMessageBox.question(table,
                                          _('Abort'),
@@ -255,7 +255,7 @@ class Race(Model):
         try:
             race().update_counters()
             for i in indexes:
-                course = self.courses[i]
+                course = self.courses[i]  # type: Course
                 if course.count_group > 0:
                     QMessageBox.question(table,
                                          _('Abort'),
@@ -276,7 +276,7 @@ class Race(Model):
         try:
             race().update_counters()
             for i in indexes:
-                organization = self.organizations[i]
+                organization = self.organizations[i]  # type: Organization
                 if organization.count_person > 0:
                     QMessageBox.question(table,
                                          _('Abort'),
@@ -373,6 +373,7 @@ def find(iterable: list, **kwargs):
         return results
     else:
         return None
+
 
 event = [create(Race)]
 

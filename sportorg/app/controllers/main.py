@@ -169,7 +169,7 @@ class MainWindow(QMainWindow, app.App):
         self.menubar.addAction(self.menu_help.menuAction())
 
         self.menu_file.setTitle(_("File"))
-
+        # method connect of PyQt5.QtCore.pyqtBoundSignal object
         self.action_new.setText(_("New"))
         self.action_new.setIcon(QtGui.QIcon(config.icon_dir("file.png")))
         self.action_new.triggered.connect(self.create_file)

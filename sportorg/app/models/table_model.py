@@ -250,7 +250,6 @@ class ResultTableModel(AbstractSportOrgTableModel):
         # finish = datetime.strptime(i.finish_time, '%H:%M:%S')
         # result_time = finish - start
 
-
         return list([
             person.surname,
             person.name,
