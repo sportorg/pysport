@@ -63,6 +63,19 @@ class AbstractSportOrgMemoryModel (QAbstractTableModel):
         self.endRemoveRows()
         return True
 
+    def sort(self, Ncol, order):
+        """Sort table by given column number.
+        """
+        try:
+            self.layoutAboutToBeChanged.emit()
+            if len(self.cache):
+                self.cache = sorted(self.cache, key=lambda item : item[Ncol])
+                if order == Qt.DescendingOrder:
+                    self.cache = self.cache[::-1]
+            self.layoutChanged.emit()
+        except:
+            traceback.print_exc()
+
 
 class PersonMemoryModel(AbstractSportOrgMemoryModel):
     def __init__(self):
