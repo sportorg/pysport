@@ -180,3 +180,4 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = OrganizationEditDialog()
     sys.exit(app.exec_())
+

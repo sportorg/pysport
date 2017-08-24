@@ -184,7 +184,6 @@ class CourseEditDialog(QDialog):
             course.controls.append(control)
 
         if changed:
-            GlobalAccess().get_course_table().model().init_cache()
             self.get_main_window().refresh()
 
     def get_main_window(self):

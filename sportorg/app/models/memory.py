@@ -228,7 +228,7 @@ class Race(Model):
         try:
             indexes = sorted(indexes, reverse=True)
             for i in indexes:
-                self.persons.pop(i)
+                del self.persons[i]
         except:
             traceback.print_exc()
 
@@ -236,7 +236,7 @@ class Race(Model):
         try:
             indexes = sorted(indexes, reverse=True)
             for i in indexes:
-                self.results.remove(self.results[i])
+                del self.results[i]
 
         except:
             traceback.print_exc()
@@ -254,7 +254,7 @@ class Race(Model):
 
             indexes = sorted(indexes, reverse=True)
             for i in indexes:
-                self.groups.remove(self.groups[i])
+                del self.groups[i]
 
         except:
             traceback.print_exc()
@@ -275,7 +275,7 @@ class Race(Model):
             indexes = sorted(indexes, reverse=True)
 
             for i in indexes:
-                self.courses.remove(self.courses[i])
+                del self.courses[i]
 
         except:
             traceback.print_exc()
@@ -295,7 +295,7 @@ class Race(Model):
             indexes = sorted(indexes, reverse=True)
 
             for i in indexes:
-                self.organizations.remove(self.organizations[i])
+                del self.organizations[i]
 
         except:
             traceback.print_exc()
