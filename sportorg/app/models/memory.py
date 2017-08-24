@@ -63,10 +63,6 @@ class Organization(Model):
     count_person = 0
 
 
-class OrganizationList(list):
-    pass
-
-
 class CourseControl(Model):
     code = None
     length = None
@@ -76,17 +72,13 @@ class CourseControl(Model):
         return self.code == other.code
 
 
-class CourseControlList(list):
-    pass
-
-
 class Course(Model):
     name = None
     type = None
     bib = None
     length = None
     climb = None
-    controls = CourseControlList()
+    controls = []
     count_person = 0
     count_group = 0
 
@@ -107,10 +99,6 @@ class Course(Model):
         return True
 
 
-class CourseList(list):
-    pass
-
-
 class Group(Model):
     name = None
     course = Course()
@@ -129,10 +117,6 @@ class Group(Model):
 
     first_number = None
     count_person = 0
-
-
-class GroupList(list):
-    pass
 
 
 class Result(Model):
@@ -176,10 +160,6 @@ class Result(Model):
         return ret
 
 
-class ResultList(list):
-    pass
-
-
 class Person(Model):
     name = None
     surname = None
@@ -205,9 +185,6 @@ class Person(Model):
 
     start_time = None
     start_group = 0
-
-class PersonList(list):
-    pass
 
 
 class RaceData(Model):
@@ -367,6 +344,7 @@ class Race(Model):
 
     def get_persons_by_group(self, group):
         return find(self.persons, group=group, return_all=True)
+
 
 def create(obj, **kwargs):
     return obj.create(**kwargs)

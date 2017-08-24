@@ -64,7 +64,7 @@ def import_txt_v8(source):
             length=course.length,
             climb=course.climb
         )
-        controls = memory.CourseControlList()
+        controls = []
         for order, control in course.controls.items():
             controls.append(memory.create(
                 memory.CourseControl,
