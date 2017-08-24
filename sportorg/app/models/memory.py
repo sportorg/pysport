@@ -130,7 +130,16 @@ class Result(Model):
     result = None  # time in seconds * 100 (int)
     place = None
 
-    person = None  # reverse link to person
+    person = None  # type: Person reverse link to person
+
+    def __repr__(self):
+        return """
+Card number: {}
+Start: {}
+Finish: {}
+Person: {}
+Punches: {}
+""".format(self.card_number, self.start_time, self.finish_time, self.person, self.punches)
 
     def __eq__(self, other):
         eq = self.card_number == other.card_number
@@ -167,15 +176,16 @@ class Person(Model):
 
     card_number = None
     bib = None
-    result = Result()
+    result = None  # type: Result
+    results = {}  # type: Dict[str, Result]
 
     year = None  # sometime we have only year of birth
     birth_date = None  # datetime
     organization = None
     group = None
-    nationality = Country()
-    address = Address()
-    contact = [Contact()]
+    nationality = None  # type: Country
+    address = None  # type: Address
+    contact = []  # type: List[Contact]
     world_code = None  # WRE ID for orienteering and the same
     national_code = None
     rank = None  # position/scores in word ranking
@@ -198,11 +208,11 @@ class RaceData(Model):
 class Race(Model):
     def __init__(self):
         self.data = RaceData()
-        self.courses = []
-        self.groups = []
-        self.persons = []
-        self.results = []
-        self.organizations = []
+        self.courses = []  # type: List[Course]
+        self.groups = []  # type: List[Group]
+        self.persons = []  # type: List[Person]
+        self.results = []  # type: List[Result]
+        self.organizations = []  # type: List[Organization]
         self.settings = {}
 
     def set_setting(self, setting, value):

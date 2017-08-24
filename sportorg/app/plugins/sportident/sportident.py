@@ -49,3 +49,4 @@ def message(msg):
 
 event.add_event('toolbar', toolbar)
 event.add_event('statusbar', set_statusbar)
+event.add_event('finish', lambda _id, result: print(_id, result))
