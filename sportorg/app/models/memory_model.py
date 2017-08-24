@@ -69,7 +69,7 @@ class AbstractSportOrgMemoryModel (QAbstractTableModel):
         try:
             self.layoutAboutToBeChanged.emit()
             if len(self.cache):
-                self.cache = sorted(self.cache, key=lambda item: str(item[Ncol]))
+                self.cache = sorted(self.cache, key=lambda x: (x[Ncol] is None, x[Ncol]))
                 if order == Qt.DescendingOrder:
                     self.cache = self.cache[::-1]
             self.layoutChanged.emit()
