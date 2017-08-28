@@ -16,6 +16,7 @@ from sportorg.app.controllers.dialogs.start_preparation import StartPreparationD
 from sportorg.app.controllers.global_access import GlobalAccess
 from sportorg.app.controllers.tabs import start_preparation, groups, teams, race_results, courses
 from sportorg.app.models.memory import Race, event as e
+from sportorg.app.models import result
 from sportorg.app.models.memory_model import PersonMemoryModel, ResultMemoryModel, GroupMemoryModel, CourseMemoryModel, \
     TeamMemoryModel
 from sportorg.core import event
@@ -40,6 +41,7 @@ class MainWindow(QMainWindow, app.App):
         plugin.run_plugins()
         event.event('mainwindow', self)
         event.add_event('init_model', (self, 'init_model'))
+        event.add_event('finish', result.add_result)
         self.conf_read()
         self.setup_ui()
         self.setup_menu()

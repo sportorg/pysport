@@ -26,4 +26,3 @@ def get_text(**kwargs):
 
 def get_text_from_file(path, **kwargs):
     return template.get_text_from_file(path, **kwargs)
-
