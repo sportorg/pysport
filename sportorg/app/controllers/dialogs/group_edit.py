@@ -5,7 +5,7 @@ from PyQt5 import QtCore
 from PyQt5.QtCore import QSortFilterProxyModel, QModelIndex
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QLabel, \
-    QLineEdit, QComboBox, QCompleter, QApplication, QTableView, QDialog, \
+    QLineEdit, QComboBox, QCompleter, QApplication, QDialog, \
     QPushButton, QSpinBox, QTimeEdit
 
 from sportorg.app.controllers.global_access import GlobalAccess
@@ -239,6 +239,14 @@ class GroupEditDialog(QDialog):
 
         if org.first_number != self.item_first_number.value():
             org.first_number = self.item_first_number.value()
+            changed = True
+
+        if org.start_interval != self.item_start_interval.time():
+            org.start_interval = self.item_start_interval.time()
+            changed = True
+
+        if org.max_time != self.item_max_time.time():
+            org.max_time = self.item_max_time.time()
             changed = True
 
         if changed:

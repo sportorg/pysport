@@ -2,18 +2,18 @@ import sys
 import traceback
 
 from PyQt5 import QtCore
-from PyQt5.QtCore import QSortFilterProxyModel, QModelIndex, QTime
+from PyQt5.QtCore import QSortFilterProxyModel, QModelIndex
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QLabel, \
     QLineEdit, QComboBox, QCompleter, QSpinBox, QApplication, QTimeEdit, QTextEdit, QCheckBox, QDialog, \
     QPushButton
-from datetime import date, datetime
+from datetime import date
 
 from sportorg.app.controllers.global_access import GlobalAccess
 from sportorg.app.models.memory import race, Person, find
 from sportorg.app.models.model import Organization
 from sportorg.app.models.result_calculation import ResultCalculation
-from sportorg.app.plugins.utils.utils import qtime2datetime
+from sportorg.app.plugins.utils.utils import qtime2datetime, datetime2qtime
 
 from sportorg.language import _
 
@@ -351,10 +351,7 @@ class EntryEditDialog(QDialog):
         if current_object.bib is not None:
             self.item_bib.setValue(int(current_object.bib))
         if current_object.start_time is not None:
-            t = current_object.start_time
-            assert(isinstance(t, datetime))
-            time = QTime()
-            time.setHMS(t.hour, t.minute, t.second, t.microsecond)
+            time = datetime2qtime(current_object.start_time)
             self.item_start.setTime(time)
 
         if current_object.card_number is not None:

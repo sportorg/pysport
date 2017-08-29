@@ -5,9 +5,10 @@ import traceback
 from datetime import datetime
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import QSortFilterProxyModel, QModelIndex
+from PyQt5.QtCore import QModelIndex
 from PyQt5.QtWidgets import QAbstractItemView
 
+from sportorg.app.controllers.dialogs.results_edit import ResultEditDialog
 from sportorg.app.models.memory import race, Result, Course, CourseControl
 from sportorg.app.models.memory_model import ResultMemoryModel
 from sportorg.language import _
@@ -108,6 +109,19 @@ class Widget(QtWidgets.QWidget):
 
         self.ResultTable.clicked.connect(entry_single_clicked)
 
+        def double_clicked(index):
+            print('clicked on ' + str(index.row()))
+            logging.info('clicked on ' + str(index.row()))
+
+            try:
+                 dialog = ResultEditDialog(self.ResultTable, index)
+                 dialog.exec()
+            except:
+                traceback.print_exc()
+
+        self.ResultTable.doubleClicked.connect(double_clicked)
+
+
         self.gridLayout.addWidget(self.ResultSplitter)
         self.ResultCourseGroupBox.setTitle(_("Course"))
         self.ResultCourseNameLabel.setText(_("Name"))
@@ -169,4 +183,3 @@ class Widget(QtWidgets.QWidget):
                 index += 1
         self.ResultCourseNameEdit.setText(course.name)
         self.ResultCourseLengthEdit.setText(str(course.length))
-
