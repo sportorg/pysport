@@ -201,7 +201,7 @@ class WinOrientBinary:
             for i in range(course.point_quantity):
                 control = CourseControl()
                 control.code = course.point[i]
-                if i > len(course.leg):
+                if i < len(course.leg):
                     control.length = course.leg[i]
                 new_course.controls.append(control)
 
