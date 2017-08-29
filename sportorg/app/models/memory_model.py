@@ -3,7 +3,7 @@ import sys
 from sportorg.language import _
 import traceback
 
-from PyQt5.QtCore import QVariant, QAbstractTableModel, Qt, QSortFilterProxyModel, QModelIndex
+from PyQt5.QtCore import QVariant, QAbstractTableModel, Qt, QSortFilterProxyModel
 
 from sportorg.app.models.memory import race, Result, Group, Course, Organization
 
@@ -16,6 +16,11 @@ class AbstractSportOrgMemoryModel (QAbstractTableModel):
         super().__init__()
         self.cache = []
         self.init_cache()
+        self.filter = {}
+
+        # mapping between sorted and filtered list and original list
+        # e.g. if we have 100 rows and after filter list contains only last 3 rows, it will contain [97,98,99]
+        self.sort_mask = []
 
     def columnCount(self, parent=None, *args, **kwargs):
         return len(self.get_headers())
@@ -54,28 +59,50 @@ class AbstractSportOrgMemoryModel (QAbstractTableModel):
 
         return QVariant()
 
-    # def removeRows(self, row, rows=1, index=QModelIndex()):
-    #     print("Removing at row: %s"%row)
-    #     self.beginRemoveRows(QModelIndex(), row, row + rows - 1)
-    #
-    #     self.cache = self.cache[:row] + self.cache[row + rows:]
-    #
-    #     self.endRemoveRows()
-    #     return True
+    def clear_filter(self):
+        self.filter.clear()
+
+    def set_filter_for_column(self, column_num, filter_regexp):
+        self.filter.update({column_num: filter_regexp})
+        self.apply_filter()
+
+    def apply_filter(self):
+        pass
 
     def sort(self, Ncol, order):
         """Sort table by given column number.
         """
         try:
             self.layoutAboutToBeChanged.emit()
-            if len(self.cache):
-                self.cache = sorted(self.cache, key=lambda x: (x[Ncol] is None, x[Ncol]))
+
+            source_array = self.get_source_array()
+
+            if len(source_array):
+                source_array = sorted(source_array,
+                                      key=lambda x: (self.get_item(x, Ncol) is None,
+                                                     str(type(self.get_item(x, Ncol))),
+                                                     self.get_item(x, Ncol)))
                 if order == Qt.DescendingOrder:
-                    self.cache = self.cache[::-1]
+                    source_array = source_array[::-1]
+
+                self.set_source_array(source_array)
+
+                self.init_cache()
             self.layoutChanged.emit()
         except:
             traceback.print_exc()
 
+    def get_values_from_object(self, object):
+        pass
+
+    def get_item(self, object, n_col):
+        return self.get_values_from_object(object)[n_col]
+
+    def get_source_array(self):
+        pass
+
+    def set_source_array(self, array):
+        pass
 
 class PersonMemoryModel(AbstractSportOrgMemoryModel):
     def __init__(self):
@@ -92,9 +119,9 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
             self.cache.append(self.get_participation_data(i))
 
     def get_participation_data(self, position):
-        return self.get_value_from_object(race().persons[position])
+        return self.get_values_from_object(race().persons[position])
 
-    def get_value_from_object(self, object):
+    def get_values_from_object(self, object):
         ret = []
         person = object
 
@@ -124,6 +151,12 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
         ret.append(out_of_comp_status)
 
         return ret
+
+    def get_source_array(self):
+        return race().persons
+
+    def set_source_array(self, array):
+        race().persons = array
 
     def update_one_object(self, part, index):
         self.values[index] = self.get_values_from_object(part)
@@ -165,6 +198,12 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
             i.status,
             i.penalty_time,
             i.place])
+
+    def get_source_array(self):
+        return race().results
+
+    def set_source_array(self, array):
+        race().results = array
 
     def update_one_object(self, part, index):
         self.values[index] = self.get_values_from_object(part)
@@ -213,6 +252,12 @@ class GroupMemoryModel(AbstractSportOrgMemoryModel):
             group.order_in_corridor,
         ])
 
+    def get_source_array(self):
+        return race().groups
+
+    def set_source_array(self, array):
+        race().groups = array
+
     def update_one_object(self, part, index):
         self.values[index] = self.get_values_from_object(part)
 
@@ -244,8 +289,14 @@ class CourseMemoryModel(AbstractSportOrgMemoryModel):
             course.length,
             len(course.controls),
             course.climb,
-            ' '.join(course.get_code_list())
+            ' '.join(course.get_code_list()),
         ])
+
+    def get_source_array(self):
+        return race().courses
+
+    def set_source_array(self, array):
+        race().courses = array
 
     def update_one_object(self, part, index):
         self.values[index] = self.get_values_from_object(part)
@@ -280,6 +331,12 @@ class TeamMemoryModel(AbstractSportOrgMemoryModel):
             team.city,
             team.contact.name
         ])
+
+    def get_source_array(self):
+        return race().organizations
+
+    def set_source_array(self, array):
+        race().organizations = array
 
     def update_one_object(self, part, index):
         self.values[index] = self.get_values_from_object(part)
