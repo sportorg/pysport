@@ -1,5 +1,7 @@
 import sys
 
+import re
+
 from sportorg.language import _
 import traceback
 
@@ -18,9 +20,10 @@ class AbstractSportOrgMemoryModel (QAbstractTableModel):
         self.init_cache()
         self.filter = {}
 
-        # mapping between sorted and filtered list and original list
-        # e.g. if we have 100 rows and after filter list contains only last 3 rows, it will contain [97,98,99]
-        self.sort_mask = []
+        # temporary list, used to keep all records
+        # main list will have only filtered elements
+        # while clearing of filter list is recovered from backup
+        self.filter_backup = []
 
     def columnCount(self, parent=None, *args, **kwargs):
         return len(self.get_headers())
@@ -61,13 +64,29 @@ class AbstractSportOrgMemoryModel (QAbstractTableModel):
 
     def clear_filter(self):
         self.filter.clear()
+        if self.filter_backup is not None and len(self.filter_backup):
+            self.set_source_array(self.filter_backup)
+            self.filter_backup = None
 
     def set_filter_for_column(self, column_num, filter_regexp):
         self.filter.update({column_num: filter_regexp})
-        self.apply_filter()
 
     def apply_filter(self):
-        pass
+        # backup initial list if not filtered yet
+        if self.filter_backup is None or len(self.filter_backup) == 0:
+            self.filter_backup = self.get_source_array()
+
+        # get initial list and filter it
+        current_array = self.filter_backup
+        for column in self.filter.keys():
+            check_regexp = self.filter.get(column)
+            check = re.compile(check_regexp)
+            current_array = list(filter(lambda x:  check.match(self.get_item(x, column)), current_array))
+
+        # set main list to result
+        # note, initial list is in filter_backup
+        self.set_source_array(current_array)
+        self.init_cache()
 
     def sort(self, Ncol, order):
         """Sort table by given column number.
