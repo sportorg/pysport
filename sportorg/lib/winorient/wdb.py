@@ -50,7 +50,10 @@ def bytes_compare(obj1, obj2):
     :param obj1:
     :param obj2:
     """
-    release = 0
+
+    # turn on / off debug
+    release = 1
+
     if release == 1:
         return False
 

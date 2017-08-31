@@ -4,6 +4,7 @@ from sportorg.app.models import model
 from sportorg.app.models.memory import Race, Organization, Group, Person, Result, race, find, Course, \
     CourseControl, Country, Contact, Address
 from sportorg.app.models.result_calculation import ResultCalculation
+from sportorg.app.plugins.utils.utils import int_to_time
 from sportorg.lib.winorient.wdb import WDB, WDBMan, WDBTeam, WDBGroup, WDBDistance, WDBPunch
 
 
@@ -86,7 +87,7 @@ class WinOrientBinary:
                     'person': person,
                     'bib_number': int(man.number),
                     'comment': man.comment,
-                    'start_time': self.int_to_time(man.start),
+                    'start_time': int_to_time(man.start),
                     'control_card': card
                 }
                 participation = model.Participation.create(**data_participation)
@@ -99,8 +100,8 @@ class WinOrientBinary:
                     data_result = {
                         'participation': participation,
                         'control_card': card,
-                        'start_time': self.int_to_time(man.start),
-                        'finish_time': self.int_to_time(finish_time)
+                        'start_time': int_to_time(man.start),
+                        'finish_time': int_to_time(finish_time)
                     }
                     model.Result.create(**data_result)
 
@@ -152,19 +153,6 @@ class WinOrientBinary:
             }
 
             model.Organization.create(**data)
-
-    def int_to_time(self, value):
-        """ convert value from 1/100 s to time """
-        # ret = datetime(1970, 1, 1) + timedelta(seconds= value/100, milliseconds=value*10%1000)
-        # ret = datetime.datetime.fromtimestamp(int(value)/100.0)
-        # TODO Find more simple solution!!!
-        # ret = datetime.time(value // 360000, (value % 360000) // 6000, (value % 6000) // 100, (value % 100) * 10000)
-        today = datetime.datetime.now()
-        assert (isinstance(today, datetime.datetime))
-        ret = datetime.datetime(today.year, today.month, today.day, value // 360000 % 24, (value % 360000) // 6000,
-                                (value % 6000) // 100, (value % 100) * 10000)
-
-        return ret
 
     def create_objects(self):
         """Create objects in memory, according to model"""
@@ -235,7 +223,7 @@ class WinOrientBinary:
 
             my_race.persons.append(new_person)
 
-            new_person.start_time = self.int_to_time(man.start)
+            new_person.start_time = int_to_time(man.start)
 
             # result
             fin = man.get_finish()
@@ -245,8 +233,8 @@ class WinOrientBinary:
                 new_person.result = result
 
                 result.card_number = man.si_card
-                result.start_time = self.int_to_time(man.start)
-                result.finish_time = self.int_to_time(fin.time)
+                result.start_time = int_to_time(man.start)
+                result.finish_time = int_to_time(fin.time)
                 result.status = man.status
                 result.result = man.result
 
@@ -260,7 +248,7 @@ class WinOrientBinary:
                         p = chip.punch[i]
                         assert isinstance(p, WDBPunch)
                         code = p.code
-                        time = self.int_to_time(p.time)
+                        time = int_to_time(p.time)
                         punch = (code, time)
                         if code > 0:
                             result.punches.append(punch)
