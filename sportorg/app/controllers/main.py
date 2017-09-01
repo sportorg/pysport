@@ -306,7 +306,8 @@ class MainWindow(QMainWindow, app.App):
 
     def save_file_as(self):
         self.create_file()
-        self.save_file()
+        if self.file is not None:
+            self.save_file()
 
     def save_file(self):
         if self.file is not None:
