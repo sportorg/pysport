@@ -291,7 +291,7 @@ class MainWindow(QMainWindow, app.App):
         self.tabwidget.addTab(courses.Widget(), _("Courses"))
         self.tabwidget.addTab(teams.Widget(), _("Teams"))
 
-    def create_file(self, file_name=None):
+    def create_file(self, file_name=None, update_data=True):
 
         # TODO: save changes in current file
 
@@ -301,11 +301,12 @@ class MainWindow(QMainWindow, app.App):
             self.setWindowTitle(file_name)
             super().create_file(file_name)
             # remove data
-            e[0] = Race()
+            if update_data:
+                e[0] = Race()
             self.refresh()
 
     def save_file_as(self):
-        self.create_file()
+        self.create_file(None, False)
         if self.file is not None:
             self.save_file()
 
