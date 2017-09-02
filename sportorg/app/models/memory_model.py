@@ -123,6 +123,7 @@ class AbstractSportOrgMemoryModel (QAbstractTableModel):
     def set_source_array(self, array):
         pass
 
+
 class PersonMemoryModel(AbstractSportOrgMemoryModel):
     def __init__(self):
         super().__init__()
