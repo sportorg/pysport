@@ -1,5 +1,5 @@
 from . import sireader
-from sportorg.core.event import event
+from sportorg.core.event import event, add_event
 from sportorg.app.models import memory
 
 
@@ -29,6 +29,9 @@ def start():
             func=lambda card_data: event('finish', 'sportident', get_result(card_data))
         )
         reader.start()
+
+        add_event('close', lambda: stop(reader))
+
         return reader
 
     return None
