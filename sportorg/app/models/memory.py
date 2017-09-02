@@ -133,13 +133,17 @@ class Result(Model):
     person = None  # type: Person reverse link to person
 
     def __repr__(self):
+        punches = ''
+        for punch in self.punches:
+            punches += '{} — {}\n'.format(punch[0], punch[1])
+
         return """
 Card number: {}
 Start: {}
 Finish: {}
 Person: {}
-Punches: {}
-""".format(self.card_number, self.start_time, self.finish_time, self.person, self.punches)
+Punches:
+{}""".format(self.card_number, self.start_time, self.finish_time, self.person, punches)
 
     def __eq__(self, other):
         eq = self.card_number == other.card_number
