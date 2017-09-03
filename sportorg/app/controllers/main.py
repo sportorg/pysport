@@ -16,7 +16,7 @@ from sportorg.app.controllers.dialogs.start_preparation import StartPreparationD
 from sportorg.app.controllers.global_access import GlobalAccess
 from sportorg.app.controllers.tabs import start_preparation, groups, teams, race_results, courses
 from sportorg.app.models.memory import Race, event as e
-from sportorg.app.models import result
+from sportorg.app.models import result_generation
 from sportorg.app.models.memory_model import PersonMemoryModel, ResultMemoryModel, GroupMemoryModel, CourseMemoryModel, \
     TeamMemoryModel
 from sportorg.core import event
@@ -41,7 +41,7 @@ class MainWindow(QMainWindow, app.App):
         plugin.run_plugins()
         event.event('mainwindow', self)
         event.add_event('init_model', (self, 'init_model'))
-        event.add_event('finish', result.add_result)
+        event.add_event('finish', result_generation.add_result)
         self.conf_read()
         self.setup_ui()
         self.setup_menu()
@@ -306,7 +306,7 @@ class MainWindow(QMainWindow, app.App):
         self.tabwidget.addTab(courses.Widget(), _("Courses"))
         self.tabwidget.addTab(teams.Widget(), _("Teams"))
 
-    def create_file(self, file_name=None):
+    def create_file(self, file_name=None, update_data=True):
 
         # TODO: save changes in current file
 
@@ -316,12 +316,14 @@ class MainWindow(QMainWindow, app.App):
             self.setWindowTitle(file_name)
             super().create_file(file_name)
             # remove data
-            e[0] = Race()
+            if update_data:
+                e[0] = Race()
             self.refresh()
 
     def save_file_as(self):
-        self.create_file()
-        self.save_file()
+        self.create_file(None, False)
+        if self.file is not None:
+            self.save_file()
 
     def save_file(self):
         if self.file is not None:

@@ -17,8 +17,6 @@ def start_reader():
         if reader is not None:
             print(_('Open port ' + reader.port))
             message(_('Open port ' + reader.port))
-            f_id = reader.append_reader(lambda data: print('from main.py', data))
-            # reader.delete_func(f_id)
         else:
             print(_('Port not open'))
             message(_('Port not open'))

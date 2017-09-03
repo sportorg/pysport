@@ -5,15 +5,15 @@ from sportorg import config
 
 
 def dump(file):
-    data = dict()
-    data['version'] = config.VERSION
-    data['data'] = memory.race().data
-    data['courses'] = memory.race().courses
-    data['groups'] = memory.race().groups
-    data['persons'] = memory.race().persons
-    data['results'] = memory.race().results
-    data['organizations'] = memory.race().organizations
-    data['settings'] = memory.race().settings
+    data = {'version': config.VERSION}
+    race = memory.race()
+    data['data'] = race.data
+    data['courses'] = race.courses
+    data['groups'] = race.groups
+    data['persons'] = race.persons
+    data['results'] = race.results
+    data['organizations'] = race.organizations
+    data['settings'] = race.settings
     pickle.dump(data, file)
 
 
@@ -22,12 +22,11 @@ def load(file):
     if not ('version' in data):
         return
     if data['version'] == config.VERSION:
-        memory.race().update(
-            data=data['data'],
-            courses=data['courses'],
-            groups=data['groups'],
-            persons=data['persons'],
-            results=data['results'],
-            organizations=data['organizations'],
-            settings=data['settings']
-        )
+        race = memory.race()
+        race.data = data['data']
+        race.courses = data['courses']
+        race.groups = data['groups']
+        race.persons = data['persons']
+        race.results = data['results']
+        race.organizations = data['organizations']
+        race.settings = data['settings']

@@ -1,5 +1,5 @@
 from . import sireader
-from sportorg.core.event import event
+from sportorg.core.event import event, add_event
 from sportorg.app.models import memory
 
 
@@ -20,15 +20,23 @@ def get_result(card_data):
 
 def start():
     port = sireader.choose_port()
+
+    def event_finish(card_data):
+        event('finish', 'sportident', get_result(card_data))
+        event('init_model')
+
     if port is not None:
         """
         :event: 'finish' 'sportident', result
         """
         reader = sireader.SIReaderThread(
             port,
-            func=lambda card_data: event('finish', 'sportident', get_result(card_data))
+            func=event_finish
         )
         reader.start()
+
+        add_event('close', lambda: stop(reader))
+
         return reader
 
     return None
