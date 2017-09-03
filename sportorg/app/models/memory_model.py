@@ -20,7 +20,7 @@ class AbstractSportOrgMemoryModel (QAbstractTableModel):
         self.init_cache()
         self.filter = {}
 
-        # temporary list, used to keep all records
+        # temporary list, used to keep records, that are not filtered
         # main list will have only filtered elements
         # while clearing of filter list is recovered from backup
         self.filter_backup = []
@@ -65,26 +65,33 @@ class AbstractSportOrgMemoryModel (QAbstractTableModel):
     def clear_filter(self):
         self.filter.clear()
         if self.filter_backup is not None and len(self.filter_backup):
-            self.set_source_array(self.filter_backup)
-            self.filter_backup = None
+            whole_list = self.get_source_array()
+            whole_list.extend(self.filter_backup)
+            self.set_source_array(whole_list)
+            self.filter_backup = []
 
     def set_filter_for_column(self, column_num, filter_regexp):
         self.filter.update({column_num: filter_regexp})
 
     def apply_filter(self):
-        # backup initial list if not filtered yet
-        if self.filter_backup is None or len(self.filter_backup) == 0:
-            self.filter_backup = self.get_source_array()
-
         # get initial list and filter it
-        current_array = self.filter_backup
+        current_array = self.get_source_array()
+        current_array.extend(self.filter_backup)
+
         for column in self.filter.keys():
             check_regexp = self.filter.get(column)
             check = re.compile(check_regexp)
-            current_array = list(filter(lambda x:  check.match(self.get_item(x, column)), current_array))
+            # current_array = list(filter(lambda x:  check.match(self.get_item(x, column)), current_array))
+            i = 0
+            while i < len(current_array):
+                value = self.get_item(current_array[i], column)
+                if not check.match(value):
+                    self.filter_backup.append(current_array.pop(i))
+                    i -= 1
+                i += 1
 
         # set main list to result
-        # note, initial list is in filter_backup
+        # note, unfiltered items are in filter_backup
         self.set_source_array(current_array)
         self.init_cache()
 
