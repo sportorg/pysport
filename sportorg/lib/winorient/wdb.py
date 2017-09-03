@@ -22,6 +22,8 @@ def format_string_to_bytes(string, length):
     :param length:
     :return:
     """
+    if string is None:
+        string = ''
     ret = bytearray(string, get_wdb_encoding())
     if len(string) > length:
         return ret[0:length]
@@ -77,9 +79,9 @@ class WDBPunch:
     Used for start, finish, ckeck, clear and control point.
     """
 
-    def __init__(self):
-        self.code = 0  # number 0-255
-        self.time = 0  # seconds * 100, e.g. 01:01:01 = 366100
+    def __init__(self, code=0, time=0):
+        self.code = code  # number 0-255
+        self.time = time  # seconds * 100, e.g. 01:01:01 = 366100
 
     def parse_bytes(self, byte_array):
         """
@@ -89,10 +91,6 @@ class WDBPunch:
         byteorder = get_wdb_byteorder()
         self.code = int.from_bytes(byte_array[0:4], byteorder)
         self.time = int.from_bytes(byte_array[4:8], byteorder)
-
-    def create_by_code_and_time(self, code, time):
-        self.code = code
-        self.time = time
 
     def get_bytes(self):
         byteorder = get_wdb_byteorder()
@@ -177,9 +175,13 @@ class WDBChip:
         if not is_new_format:
             punch_limit = 64
 
-        for i in self.punch[0:punch_limit]:
-            if isinstance(i, WDBPunch):
-                ret += i.get_bytes()
+        for i in range(punch_limit):
+            if i < len(self.punch):
+                current_punch = self.punch[i]
+            else:
+                current_punch = WDBPunch()
+            if isinstance(current_punch, WDBPunch):
+                ret += current_punch.get_bytes()
         return ret
 
 
@@ -236,8 +238,8 @@ class WDBDistance:
         self.id = 0
         self.name = '_'
         self.biathlon_columns = ''
-        self.point = []
-        self.leg = []
+        self.point = [100]
+        self.leg = [100]
         self.length = 0
         self.corridor = 0
         self.point_quantity = 0
@@ -463,7 +465,8 @@ class WDBMan:
 
         ret[82:83] = self.finished.to_bytes(1, byteorder)
 
-        ret[88:92] = self.si_card.to_bytes(4, byteorder)
+        if self.si_card:
+            ret[88:92] = self.si_card.to_bytes(4, byteorder)
         ret[92:96] = self.id.to_bytes(4, byteorder)
         ret[96:97] = self.is_checked.to_bytes(1, byteorder)
         ret[97:98] = self.is_not_qualified.to_bytes(1, byteorder)
@@ -506,7 +509,7 @@ class WDBMan:
 
 class WDBInfo:
     def __init__(self):
-        self.title = []  # Name of competition, sponsors, organizers. 8 lines * 100 chars
+        self.title = []  # Name of competition, sponsors, organizers. 10 lines * 80 chars
         self.place = ''  # Competition venue, 25 chars
         self.referee = ''  # Name of responsible referee - senior event adviser
         self.secretary = ''  # Name of secretary
@@ -731,7 +734,10 @@ class WDBInfo:
             ret.append(0)
 
         for i in range(10):
-            ret[i * 80:(i + 1) * 80] = format_string_to_bytes(self.title[i], 80)
+            string = ''
+            if len(self.title) > i:
+                string = self.title[i]
+            ret[i * 80:(i + 1) * 80] = format_string_to_bytes(string, 80)
         ret[800:825] = format_string_to_bytes(self.place, 25)
         ret[825:850] = format_string_to_bytes(self.secretary, 25)
         ret[850:875] = format_string_to_bytes(self.secretary, 25)
@@ -740,8 +746,10 @@ class WDBInfo:
         ret[897:898] = self.relay_type.to_bytes(1, byteorder)
         obj_size = 25
         for i in range(4):
-            ret[898 + i * obj_size:898 + (i + 1) * obj_size] = format_string_to_bytes(self.distance_service[i],
-                                                                                      obj_size)
+            string = ""
+            if len(self.distance_service) > i:
+                string = self.distance_service[i]
+            ret[898 + i * obj_size:898 + (i + 1) * obj_size] = format_string_to_bytes(string, obj_size)
         ret[998:1000] = self.filter_team.to_bytes(2, byteorder)
         ret[1000:1002] = self.filter_group.to_bytes(2, byteorder)
         ret[1002:1003] = self.filter_selection.to_bytes(1, byteorder)
@@ -818,22 +826,32 @@ class WDBInfo:
         ret[1116:1120] = self.person_time.to_bytes(4, byteorder)
         ret[1120:1124] = self.point_penalty.to_bytes(4, byteorder)
         for i in range(10):
-            cur_object = self.multi_day[i]
+            cur_object = True
+            if len(self.multi_day) > i:
+                cur_object = self.multi_day[i]
             assert isinstance(cur_object, bool)
             ret[1124 + i:1125 + i] = cur_object.to_bytes(1, byteorder)
+
         ret[1134:1135] = self.is_print_relay_number_dashed.to_bytes(1, byteorder)
         ret[1135:1136] = self.is_si_usb.to_bytes(1, byteorder)
         ret[1136:1137] = self.is_get_scores_personally.to_bytes(1, byteorder)
         obj_size = 12
         for i in range(9):
-            ret[1137 + i * obj_size: 1137 + (i + 1) * obj_size] = format_string_to_bytes(self.dsq_reason[i], obj_size)
-            ret[1245 + i * obj_size: 1245 + (i + 1) * obj_size] = format_string_to_bytes(self.dsq_text[i], obj_size)
+            dsq_reason = ""
+            dsq_text = ""
+            if len(dsq_reason) > i:
+                dsq_reason = self.dsq_reason[i]
+                dsq_text = self.dsq_text[i]
+            ret[1137 + i * obj_size: 1137 + (i + 1) * obj_size] = format_string_to_bytes(dsq_reason, obj_size)
+            ret[1245 + i * obj_size: 1245 + (i + 1) * obj_size] = format_string_to_bytes(dsq_text, obj_size)
         ret[1353:1453] = format_string_to_bytes(self.note, 100)
         ret[1453:1454] = self.is_print_note.to_bytes(1, byteorder)
         ret[1454:1455] = self.is_print_event_code.to_bytes(1, byteorder)
         ret[1455:1456] = self.is_print_comment.to_bytes(1, byteorder)
         for i in range(10):
-            cur_object = self.reserve[i]
+            cur_object = 0
+            if len(self.reserve) > i:
+                cur_object = self.reserve[i]
             assert isinstance(cur_object, int)
             ret[1456 + i: 1457 + i] = cur_object.to_bytes(1, byteorder)
         ret[1466:1525] = format_string_to_bytes(self.online_url, 59)
@@ -921,7 +939,7 @@ class WDBAdventure:
 
 class WDB:
     def __init__(self):
-        self.version = 0
+        self.version = 22
         self.man = []
         self.group = []
         self.team = []
@@ -1134,6 +1152,13 @@ class WDB:
                 return group
         return None
 
+    def find_group_by_name(self, name):
+        for group in self.group:
+            assert (isinstance(group, WDBGroup))
+            if group.name == name:
+                return group
+        return None
+
     def find_finish_by_number(self, number):
         for finish in self.fin:
             assert (isinstance(finish, WDBFinish))
@@ -1141,24 +1166,38 @@ class WDB:
                 return finish
         return None
 
-    def find_team_by_id(self, id):
+    def find_team_by_id(self, idx):
         for team in self.team:
             assert (isinstance(team, WDBTeam))
-            if team.id == id:
+            if team.id == idx:
                 return team
         return None
 
-    def find_chip_by_id(self, id):
+    def find_team_by_name(self, name):
+        for team in self.team:
+            assert (isinstance(team, WDBTeam))
+            if team.name == name:
+                return team
+        return None
+
+    def find_chip_by_id(self, idx):
         for chip in self.chip:
             assert (isinstance(chip, WDBChip))
-            if chip.id == id:
+            if chip.id == idx:
                 return chip
         return None
 
-    def find_course_by_id(self, id):
+    def find_course_by_id(self, idx):
         for course in self.dist:
             assert (isinstance(course, WDBDistance))
-            if course.id == id:
+            if course.id == idx:
+                return course
+        return None
+
+    def find_course_by_name(self, name):
+        for course in self.dist:
+            assert (isinstance(course, WDBDistance))
+            if course.name == name:
                 return course
         return None
 
@@ -1170,3 +1209,10 @@ def parse_wdb(file_path):
     wdb_object.parse_bytes(byte_array)
 
     return wdb_object
+
+
+def write_wdb(wdb_object, file_path):
+    wdb_file = open(file_path, 'wb')
+    b_object = wdb_object.get_bytes()
+    wdb_file.write(b_object)
+    wdb_file.close()

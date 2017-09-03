@@ -10,6 +10,7 @@ from PyQt5.QtWidgets import QFormLayout, QLabel, \
 
 from sportorg.app.controllers.global_access import GlobalAccess
 from sportorg.app.models.memory import race, Group, find
+from sportorg.app.plugins.utils.utils import datetime2qtime, qtime2datetime
 
 from sportorg.language import _
 
@@ -183,9 +184,9 @@ class GroupEditDialog(QDialog):
         if current_object.max_age is not None:
             self.item_age_max.setValue(current_object.max_age)
         if current_object.max_time is not None:
-            self.item_max_time.setValue(current_object.max_time)
+            self.item_max_time.setTime(datetime2qtime(current_object.max_time))
         if current_object.start_interval is not None:
-            self.item_start_interval.setValue(current_object.start_interval)
+            self.item_start_interval.setTime(datetime2qtime(current_object.start_interval))
         if current_object.start_corridor is not None:
             self.item_corridor.setValue(current_object.start_corridor)
         if current_object.order_in_corridor is not None:
@@ -241,12 +242,14 @@ class GroupEditDialog(QDialog):
             org.first_number = self.item_first_number.value()
             changed = True
 
-        if org.start_interval != self.item_start_interval.time():
-            org.start_interval = self.item_start_interval.time()
+        time = qtime2datetime(self.item_start_interval.time())
+        if org.start_interval != time:
+            org.start_interval = time
             changed = True
 
-        if org.max_time != self.item_max_time.time():
-            org.max_time = self.item_max_time.time()
+        time = qtime2datetime(self.item_max_time.time())
+        if org.max_time != time:
+            org.max_time = time
             changed = True
 
         if changed:

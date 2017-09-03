@@ -1,11 +1,14 @@
 import sys
 import traceback
 
+import time
+
 from sportorg.core import event
 from sportorg import config
 from sportorg.language import _
 from sportorg.app.models import model
 from sportorg.app.models import memory
+from sportorg.lib.winorient.wdb import write_wdb
 from .wdb import WinOrientBinary
 from sportorg.lib.winorient import wo
 from PyQt5 import QtWidgets
@@ -100,6 +103,20 @@ def import_wo_wdb():
             traceback.print_exc()
 
 
+def export_wo_wdb():
+    file_name = QtWidgets.QFileDialog.getSaveFileName(None, _('Save As WDB file'),
+                                                      '/sportorg_export_' + str(time.strftime("%Y%m%d")),
+                                                      _("WDB file (*.wdb)"))[0]
+    if file_name is not '':
+        try:
+            wb = WinOrientBinary()
+            wdb_object = wb.export()
+            write_wdb(wdb_object, file_name)
+
+        except:
+            traceback.print_exc()
+
+
 def menu_inport_csv():
     return [_("CSV Winorient"), import_wo_csv, config.icon_dir("csv.png")]
 
@@ -107,6 +124,8 @@ def menu_inport_csv():
 def menu_inport_wdb():
     return [_("WDB Winorient"), import_wo_wdb]
 
+def menu_export_wdb():
+    return [_("WDB Winorient"), export_wo_wdb]
 
 def set_app(app):
     global app_window
@@ -114,4 +133,5 @@ def set_app(app):
 
 event.add_event('menu_file_import', menu_inport_csv)
 event.add_event('menu_file_import', menu_inport_wdb)
+event.add_event('menu_file_export', menu_export_wdb)
 event.add_event('mainwindow', set_app)

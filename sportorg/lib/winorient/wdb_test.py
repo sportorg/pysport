@@ -1,7 +1,7 @@
 import struct
 import unittest
 
-
+from sportorg.app.plugins.winorient.wdb import WinOrientBinary
 from sportorg.lib.winorient.wdb import WDBPunch, WDBFinish, WDBChip, WDBTeam, WDBDistance, WDBGroup, WDBMan, \
     parse_wdb, WDB
 
@@ -17,8 +17,7 @@ class TestStringMethods(unittest.TestCase):
         byte_array = struct.pack("<I", code) + struct.pack("<I", time)
         obj1 = WDBPunch()
         obj1.parse_bytes(byte_array)
-        obj2 = WDBPunch()
-        obj2.create_by_code_and_time(code, time)
+        obj2 = WDBPunch(code, time)
 
         self.assertEqual(obj1.code, obj2.code)
         self.assertEqual(obj1.time, obj2.time)
@@ -47,8 +46,8 @@ class TestStringMethods(unittest.TestCase):
         obj1 = WDBChip()
         obj1.id = 1600888
         obj1.quantity = 2
-        obj1.punch.append(WDBPunch().create_by_code_and_time(31, 450000))
-        obj1.punch.append(WDBPunch().create_by_code_and_time(32, 453000))
+        obj1.punch.append(WDBPunch(31, 450000))
+        obj1.punch.append(WDBPunch(32, 453000))
 
         byte_array = obj1.get_bytes()
         obj2 = WDBChip()
@@ -121,3 +120,13 @@ class TestStringMethods(unittest.TestCase):
         byte_array_out = open(file_path_out, 'rb').read()
 
         self.assertEqual(byte_array_in, byte_array_out)
+
+    def test_import_export(self):
+        file_path = 'C:\\tmp\\test.wdb'
+        wdb_object = parse_wdb(file_path)
+        WinOrientBinary().create_objects()
+        wdb_object2 = WinOrientBinary().export()
+        test1 = wdb_object.get_bytes()
+        test2 = wdb_object2.get_bytes()
+
+        self.assertEqual(test1, test2)

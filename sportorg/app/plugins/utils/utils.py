@@ -21,13 +21,23 @@ def datetime2qtime(t):
 
 def int_to_time(value):
     """ convert value from 1/100 s to time """
-    # ret = datetime(1970, 1, 1) + timedelta(seconds= value/100, milliseconds=value*10%1000)
-    # ret = datetime.datetime.fromtimestamp(int(value)/100.0)
-    # TODO Find more simple solution!!!
-    # ret = datetime.time(value // 360000, (value % 360000) // 6000, (value % 6000) // 100, (value % 100) * 10000)
+
     today = datetime.datetime.now()
     assert (isinstance(today, datetime.datetime))
     ret = datetime.datetime(today.year, today.month, today.day, value // 360000 % 24, (value % 360000) // 6000,
                             (value % 6000) // 100, (value % 100) * 10000)
+    return ret
 
+
+def time_to_int(value):
+    """ convert value from time to 1/100s """
+
+    if value is None:
+        return 0
+
+    assert isinstance(value, datetime.datetime)
+    ret = value.hour * 3600 * 100 + \
+        value.minute * 60 * 100 + \
+        value.second * 100 + \
+        round(value.microsecond / 10000)
     return ret

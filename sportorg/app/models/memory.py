@@ -78,7 +78,7 @@ class Course(Model):
     bib = None
     length = None
     climb = None
-    controls = []
+    controls = [] # type: List[CourseControl]
     count_person = 0
     count_group = 0
 
@@ -175,7 +175,7 @@ class Person(Model):
     sex = None
 
     card_number = None
-    bib = None
+    bib = 0
     result = None  # type: Result
     results = {}  # type: Dict[str, Result]
 

@@ -1,11 +1,9 @@
-import datetime
-
 from sportorg.app.models import model
 from sportorg.app.models.memory import Race, Organization, Group, Person, Result, race, find, Course, \
     CourseControl, Country, Contact, Address
 from sportorg.app.models.result_calculation import ResultCalculation
-from sportorg.app.plugins.utils.utils import int_to_time
-from sportorg.lib.winorient.wdb import WDB, WDBMan, WDBTeam, WDBGroup, WDBDistance, WDBPunch
+from sportorg.app.plugins.utils.utils import int_to_time, time_to_int
+from sportorg.lib.winorient.wdb import WDB, WDBMan, WDBTeam, WDBGroup, WDBDistance, WDBPunch, WDBFinish, WDBChip
 
 
 class WinOrientBinary:
@@ -27,8 +25,9 @@ class WinOrientBinary:
     def __init__(self, file=None):
         self._file = file
         self.wdb_object = WDB()
-        self._is_complete = False
-        self._read_file()
+        if file:
+            self._is_complete = False
+            self._read_file()
 
     @property
     def is_complete(self):
@@ -254,3 +253,122 @@ class WinOrientBinary:
                             result.punches.append(punch)
 
         ResultCalculation().process_results()
+
+    def export(self):
+        wdb_object = WDB()
+        my_race = race()
+
+        title = my_race.get_setting('sub_title')
+        wdb_object.info.title = title.split('\n')
+        wdb_object.info.place = my_race.get_setting('location')
+        wdb_object.info.referee = my_race.get_setting('chief_referee')
+        wdb_object.info.secretary = my_race.get_setting('secretary')
+
+        for team in my_race.organizations:
+            new_team = WDBTeam()
+            new_team.name = team.name
+            if team.region:
+                new_team.region = int(team.region)
+
+            # TODO decode country id
+            new_team.country = 0
+            wdb_object.team.append(new_team)
+            new_team.id = len(wdb_object.team)
+
+        for course in my_race.courses:
+            new_course = WDBDistance()
+            new_course.name = course.name
+            new_course.elevation = course.climb
+            new_course.length = course.length
+
+            # controls
+            for i in range(len(course.controls)):
+
+                if len(new_course.point) >= i:
+                    new_course.point.append(0)
+                    new_course.leg.append(0)
+
+                new_course.point[i] = course.controls[i].code
+                leg = course.controls[i].length
+
+                if leg:
+                    new_course.leg[i] = leg
+
+            wdb_object.dist.append(new_course)
+            new_course.id = len(wdb_object.dist)
+
+        for group in my_race.groups:
+            new_group = WDBGroup()
+            new_group.name = group.name
+
+            if group.price:
+                new_group.owner_cost = group.price
+
+            if group.course:
+                course_found = wdb_object.find_course_by_name(group.course.name)
+                if course_found:
+                    new_group.distance_id = course_found.id
+
+            wdb_object.group.append(new_group)
+            new_group.id = len(wdb_object.group)
+
+        for man in my_race.persons:
+            assert isinstance(man, Person)
+            new_person = WDBMan(wdb_object)
+            new_person.name = str(man.surname) + " " + str(man.name)
+            if man.bib:
+                new_person.number = man.bib
+
+            # TODO decode qualification
+            new_person.qualification = 0  # int(man.qual)
+
+            if man.year:
+                new_person.year = man.year
+            new_person.si_card = man.card_number
+            new_person.is_not_qualified = man.is_out_of_competition
+            new_person.comment = man.comment
+            if man.group:
+                group_found = wdb_object.find_group_by_name(man.group.name)
+                if group_found:
+                    new_person.group = group_found.id
+            if man.organization:
+                team_found = wdb_object.find_team_by_name(man.organization.name)
+                if team_found:
+                    new_person.team = team_found.id
+
+            wdb_object.man.append(new_person)
+            new_person.id = len(wdb_object.man)
+
+            new_person.start = time_to_int(man.start_time)
+
+            # result
+            result = man.result
+            if result is not None:
+                new_finish = WDBFinish()
+
+                new_finish.time = time_to_int(result.finish_time)
+                new_finish.number = man.bib
+
+                new_person.status = result.status
+                new_person.result = result.result
+
+                wdb_object.fin.append(new_finish)
+
+                # punches
+
+                if result.punches:
+                    new_chip = WDBChip()
+                    new_chip.id = man.card_number
+                    new_chip.start = WDBPunch(time=time_to_int(result.start_time))
+                    new_chip.finish = WDBPunch(time=time_to_int(result.finish_time))
+
+                    new_chip.quantity = len(result.punches)
+                    for i in result.punches:
+                        new_punch = WDBPunch()
+                        new_punch.code = i[0]
+                        new_punch.time = time_to_int(i[1])
+                        new_chip.punch.append(new_punch)
+
+                    wdb_object.chip.append(new_chip)
+
+        return wdb_object

@@ -99,6 +99,7 @@ class MainWindow(QMainWindow, app.App):
 
         self.menu_file = QtWidgets.QMenu(self.menubar)
         self.menu_import = QtWidgets.QMenu(self.menu_file)
+        self.menu_export = QtWidgets.QMenu(self.menu_file)
         self.menu_start_preparation = QtWidgets.QMenu(self.menubar)
         self.menu_race = QtWidgets.QMenu(self.menubar)
         self.menu_help = QtWidgets.QMenu(self.menubar)
@@ -144,7 +145,7 @@ class MainWindow(QMainWindow, app.App):
         self.menu_file.addAction(self.action_event__settings)
         self.menu_file.addSeparator()
         self.menu_file.addAction(self.menu_import.menuAction())
-        self.menu_file.addAction(self.action_export)
+        self.menu_file.addAction(self.menu_export.menuAction())
         self.menu_file.addSeparator()
         self.menu_file.addAction(self.action_quit)
 
@@ -207,6 +208,20 @@ class MainWindow(QMainWindow, app.App):
                 action_import.triggered.connect(menu_import[1])
                 if len(menu_import) == 3:
                     action_import.setIcon(QtGui.QIcon(menu_import[2]))
+
+        self.menu_export.setTitle(_("Export"))
+        menu_file_export = event.event('menu_file_export')
+        """
+        :event: menu_file_export [[name, func, icon?],...]
+        """
+        if menu_file_export is not None:
+            for menu_export in menu_file_export:
+                action_export = QtWidgets.QAction(self)
+                self.menu_export.addAction(action_export)
+                action_export.setText(menu_export[0])
+                action_export.triggered.connect(menu_export[1])
+                if len(menu_export) == 3:
+                    action_export.setIcon(QtGui.QIcon(menu_export[2]))
 
         self.action_export.setText(_("Export"))
         self.action_quit.setText(_("Exit"))
