@@ -168,8 +168,10 @@ class Widget(QtWidgets.QWidget):
             s = str(index) + " " + str(i[0]) + " " + time.strftime("%H:%M:%S")
             self.ResultChipDetails.append(s)
             index += 1
-        self.ResultChipFinishEdit.setText(result.finish_time.strftime("%H:%M:%S"))
-        self.ResultChipStartEdit.setText(result.start_time.strftime("%H:%M:%S"))
+        if result.finish_time:
+            self.ResultChipFinishEdit.setText(result.finish_time.strftime("%H:%M:%S"))
+        if result.start_time:
+            self.ResultChipStartEdit.setText(result.start_time.strftime("%H:%M:%S"))
 
         self.ResultCourseDetails.clear()
         index = 1
