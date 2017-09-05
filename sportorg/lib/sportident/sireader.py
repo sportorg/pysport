@@ -315,6 +315,78 @@ class SIReader(object):
                      'PTL': 3,
                      'BC': 8,
                      },
+
+            # tCard support
+            # 8 byte punching record
+            #
+            # indirect and direct addressing mode
+            # record structure: CN-STD1-STD0-DATE1-DATE0-PTH-PTL-MS
+            # CN - control station code number, 0...255
+            # STD1   bit 17…9 -  Part of 24Bit SI-Station ID
+            # STD0   bit  8…2  -  Part of 24Bit SI-Station ID
+            # DATE1  bit 7-6  bit 1-0   -  Part of 24Bit SI-Station ID
+            #        bit 5-2  4bit year  0-16 Part of year
+            #        bit 1-0   bit 3-2 Part of 4bit Month 1-12
+            # DATE0  bit 7-6   bit 1-0 Part of 4bit Month 1-12
+            #        bit 5-1 5bit of Day in Month 1-31
+            #        bit 0 - am/pm halfday
+            # PTH, PTL - 12h binary punching time
+            # MS     8bit 1/256 of seconds
+            'SItCard': {'CN2': 25,
+                        'CN1': 26,
+                        'CN0': 27,
+                        'STD': 12,
+                        'ST': 14,
+                        'FTD': 16,
+                        'FT': 18,
+                        'CTD': 8,
+                        'CT': 10,
+                        'LTD': None,
+                        'LT': None,
+                        'RC': 22,
+                        'P1': 56,
+                        'PL': 8,
+                        'PM': 25,
+                        'PTD': 4,  # Day of week byte, SI6 and newer
+                        'CN': 0,
+                        'PTH': 5,
+                        'PTL': 6,
+                        'BC': 2,
+                        },
+
+            # pCard support
+            # 4 byte punching record; same as in SICard6
+            # indirect and direct addressing mode
+            # record structure: PTD - CN - PTH - PTL
+            # CN - control station code number, 0...255 or subsecond value
+            # PTD - day of week / halfday
+            # bit 0 - am / pm
+            # bit 3...1 - day of week, 000 = Sunday, 110 = Saturday
+            # bit 5...4 - reserved
+            # bit 7...6 - control station code number high
+            # (…511) (reserved)
+            # punching time PTH, PTL - 12h binary
+            'SIpCard': {'CN2': 25,
+                        'CN1': 26,
+                        'CN0': 27,
+                        'STD': 12,
+                        'ST': 14,
+                        'FTD': 16,
+                        'FT': 18,
+                        'CTD': 8,
+                        'CT': 10,
+                        'LTD': None,
+                        'LT': None,
+                        'RC': 22,
+                        'P1': 196,
+                        'PL': 4,
+                        'PM': 20,
+                        'PTD': 0,  # Day of week byte, SI6 and newer
+                        'CN': 1,
+                        'PTH': 2,
+                        'PTL': 3,
+                        'BC': 2,
+                        },
             }
 
     # punch trigger in control mode data structure
@@ -924,7 +996,7 @@ class SIReaderReadout(SIReader):
                                           SIReader.P_SI6_CB)[1][1:]
             raw_data += self._read_command()[1][1:]
             raw_data += self._read_command()[1][1:]
-        elif self.cardtype in ('SI8', 'SI9'):
+        elif self.cardtype in ('SI8', 'SI9', 'SIpCard', 'SItCard'):
             raw_data = b''
             for b in range(SIReader.CARD[self.cardtype]['BC']):
                 raw_data += self._send_command(SIReader.C_GET_SI9,
@@ -981,6 +1053,10 @@ class SIReaderReadout(SIReader):
                 self.cardtype = 'SI9'
             elif self.sicard >= 7000000 and self.sicard <= 9999999:
                 self.cardtype = 'SI10'
+            elif self.sicard >= 6000000 and self.sicard <= 6999999:
+                self.cardtype = 'SItCard'
+            elif self.sicard >= 4000000 and self.sicard <= 4999999:
+                self.cardtype = 'SIpCard'
             else:
                 raise SIReaderException('Unknown cardtype!')
             raise SIReaderCardChanged("SI-Card inserted during command.")
