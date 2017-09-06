@@ -117,7 +117,7 @@ class StartTimeManager(object):
         Set new start time for athletes
 
     """
-    def process(self, corridor_first_start, is_start_interval, fixed_start_interval=None):
+    def process(self, corridor_first_start, is_group_start_interval, fixed_start_interval=None):
         current_race = race()
         current_race.update_counters()
 
@@ -130,7 +130,7 @@ class StartTimeManager(object):
                 start_interval = fixed_start_interval
 
                 # try to take start interval from group properties
-                if not is_start_interval:
+                if is_group_start_interval:
                     if cur_group.start_interval is not None:
                         start_interval = cur_group.start_interval
 

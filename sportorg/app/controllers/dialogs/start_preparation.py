@@ -31,7 +31,7 @@ class StartPreparationDialog(QDialog):
         self.button_box = QtWidgets.QDialogButtonBox(self)
         self.button_box.setGeometry(QtCore.QRect(40, 280, 341, 32))
         self.button_box.setOrientation(QtCore.Qt.Horizontal)
-        self.button_box.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
+        self.button_box.setStandardButtons(QtWidgets.QDialogButtonBox.Close|QtWidgets.QDialogButtonBox.Ok)
         self.button_box.setObjectName("button_box")
         self.reserve_group_box = QtWidgets.QGroupBox(self)
         self.reserve_group_box.setGeometry(QtCore.QRect(8, 0, 311, 121))
@@ -247,6 +247,9 @@ class StartPreparationDialog(QDialog):
 
     def accept(self):
         try:
+
+            progressbar_delay = 0.05
+
             race().update_counters()
             if self.reserve_check_box.isChecked():
                 reserve_prefix = self.reserve_prefix.text()
@@ -255,7 +258,7 @@ class StartPreparationDialog(QDialog):
 
                 ReserveManager().process(reserve_prefix, reserve_count, reserve_percent)
             self.progress_bar.setValue(25)
-            sleep(1)
+            sleep(progressbar_delay)
 
             if self.start_check_box.isChecked():
                 corridor_first_start = qtime2datetime(self.start_first_time_edit.time())
@@ -267,7 +270,7 @@ class StartPreparationDialog(QDialog):
                     StartTimeManager().process(corridor_first_start.toPyTime(), True, None)
 
             self.progress_bar.setValue(50)
-            sleep(1)
+            sleep(progressbar_delay)
 
             if self.draw_check_box.isChecked():
                 split_start_groups = self.draw_groups_check_box.isChecked()
@@ -276,7 +279,7 @@ class StartPreparationDialog(QDialog):
                 DrawManager().process(split_start_groups, split_teams, split_regions)
 
             self.progress_bar.setValue(75)
-            sleep(1)
+            sleep(progressbar_delay)
 
             if self.numbers_check_box.isChecked():
                 if self.numbers_minute_radio_button.isChecked():
@@ -287,7 +290,7 @@ class StartPreparationDialog(QDialog):
                     StartNumberManager().process(True, first_number, interval)
 
             self.progress_bar.setValue(100)
-            sleep(1)
+
             GlobalAccess().get_main_window().refresh()
         except:
             traceback.print_exc()
