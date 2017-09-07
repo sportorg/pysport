@@ -3,6 +3,7 @@ import math
 import random
 
 from datetime import timedelta
+
 from sportorg.app.models.memory import race, Group, Person
 
 
@@ -46,18 +47,32 @@ class DrawManager(object):
         Execute draw in each group
         Now effect on all groups, but in future we'll possible implement working with filtered persons
     """
+    def __init__(self):
+        self.person_array = []
+        self.split_regions = False
+        self.split_teams = False
+        self.split_start_groups = False
+
+
     def process(self, split_start_groups, split_teams, split_regions):
         current_race = race()
         current_race.update_counters()
 
+        self.split_start_groups = split_start_groups
+        self.split_teams = split_teams
+        self.split_regions = split_regions
+
         # create temporary array
-        person_array = []
+        self.person_array = []
+        self.person_array = self.person_array
 
         for i in range(len(current_race.persons)):
             current_person = current_race.persons[i]
             assert isinstance(current_person, Person)
             index = i
-            group = current_person.group.name
+            group = ''
+            if current_person.group:
+                group = current_person.group.name
             start_group = current_person.start_group
             team = ''
             region = ''
@@ -65,25 +80,96 @@ class DrawManager(object):
                 team = current_person.organization.name
                 region = current_person.organization.region
 
-            person_array.append([index, group, start_group, team, region])
+            self.person_array.append([index, group, start_group, team, region])
 
         # shuffle
-        random.shuffle(person_array)
-        random.shuffle(person_array)
+        random.shuffle(self.person_array)
+        random.shuffle(self.person_array)
 
         # sort array by group and start_group
         if split_start_groups:
-            person_array = sorted(person_array, key=lambda item: str(item[1]) + str(item[2]))
+            self.person_array = sorted(self.person_array, key=lambda item: str(item[1]) + str(item[2]))
         else:
-            person_array = sorted(person_array, key=lambda item: str(item[1]))
+            self.person_array = sorted(self.person_array, key=lambda item: str(item[1]))
 
         # TODO process team and region conflicts in each start group
+        if split_teams or split_regions:
+            i = 0
+            run = True
+            checked_index = 0
+            while run:
+                if checked_index > len(self.person_array) - 2 :
+                    # no conflicts till the end!
+                    run = False
+                    continue
+
+                if self.conflict(checked_index, checked_index + 1):
+                    j = checked_index + 2
+                    while j != checked_index:
+
+                        # boundary processing
+                        if split_start_groups:
+                            if j > self.get_last_index_in_group(checked_index):
+                                # go to the beginning of start group
+                                j = self.get_first_index_in_group(checked_index)
+                        else:
+                            if j >= len(self.person_array):
+                                # go to the beginning of array
+                                j = 0
+
+                        if j == checked_index:
+                            break
+
+                        if self.conflict(checked_index, j):
+                            j += 1
+                        else:
+                            # j index is a solution to split conflicting pair
+                            break
+
+                    if j == checked_index:
+                        # no solution found
+                        print ('no solution found')
+                        break
+                    else:
+                        # insert j after checked_index
+                        assert isinstance(self.person_array, list)
+                        tmp = self.person_array.pop(j)
+                        if j < checked_index:
+                            checked_index -= 1
+                        self.person_array.insert(checked_index + 1, tmp)
+                checked_index += 1
 
         # apply to model
         index_array = []
-        for i in person_array:
+        for i in self.person_array:
             index_array.append(i[0])
         current_race.persons = [current_race.persons[x] for x in index_array]
+
+    def conflict(self, i, j):
+        conflict = False
+        cur_team = self.person_array[i][3]
+        cur_region = self.person_array[i][4]
+        next_team = self.person_array[j][3]
+        next_region = self.person_array[j][4]
+        if self.split_teams and cur_team == next_team:
+            conflict = True
+        if self.split_regions and cur_region == next_region:
+            conflict = True
+        return conflict
+
+    def get_first_index_in_group(self, search_index):
+        k = search_index
+        current_group = self.person_array[k][1]
+        while k >= 0 and self.person_array[k][1] == current_group:
+            k -= 1
+        return k + 1
+
+    def get_last_index_in_group(self, search_index):
+        k = search_index
+        current_group = self.person_array[k][1]
+        while k < len(self.person_array) and self.person_array[k][1] == current_group:
+            k += 1
+        return k - 1
 
 
 class StartNumberManager(object):
