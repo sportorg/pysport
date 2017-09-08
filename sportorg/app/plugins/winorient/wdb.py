@@ -324,7 +324,9 @@ class WinOrientBinary:
 
             if man.year:
                 new_person.year = man.year
-            new_person.si_card = man.card_number
+            if man.card_number:
+                new_person.si_card = man.card_number
+                new_person.is_own_card = 2
             new_person.is_not_qualified = man.is_out_of_competition
             new_person.comment = man.comment
             if man.group:

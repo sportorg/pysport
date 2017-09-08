@@ -76,7 +76,7 @@ def bytes_compare(obj1, obj2):
 class WDBPunch:
     """
     Class, describing 1 punch - code and time.
-    Used for start, finish, ckeck, clear and control point.
+    Used for start, finish, check, clear and control point.
     """
 
     def __init__(self, code=0, time=0):
@@ -402,7 +402,7 @@ class WDBMan:
         self.is_without_team = False
         self.round = 0
         self.unknown0 = 0
-        self.unknown1 = 0
+        self.is_own_card = 0
         self.unknown2 = 0
         self.status = 0
         self.wdb = wdb
@@ -435,7 +435,7 @@ class WDBMan:
         self.is_not_qualified = (byte_array[97] == 0x01)
         self.is_without_team = (byte_array[98] == 0x01)
 
-        self.unknown1 = int.from_bytes(byte_array[100:101], byteorder)
+        self.is_own_card = int.from_bytes(byte_array[100:101], byteorder)
 
         self.unknown2 = int.from_bytes(byte_array[104:105], byteorder)
 
@@ -472,7 +472,7 @@ class WDBMan:
         ret[97:98] = self.is_not_qualified.to_bytes(1, byteorder)
         ret[98:99] = self.is_without_team.to_bytes(1, byteorder)
 
-        ret[100:101] = self.unknown1.to_bytes(1, byteorder)
+        ret[100:101] = self.is_own_card.to_bytes(1, byteorder)
 
         ret[104:105] = self.unknown2.to_bytes(1, byteorder)
 
