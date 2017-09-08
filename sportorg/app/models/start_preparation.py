@@ -49,15 +49,17 @@ class DrawManager(object):
     """
     def __init__(self):
         self.person_array = []
+        self.mix_groups = False
         self.split_regions = False
         self.split_teams = False
         self.split_start_groups = False
 
 
-    def process(self, split_start_groups, split_teams, split_regions):
+    def process(self, split_start_groups, split_teams, split_regions, mix_groups=False):
         current_race = race()
         current_race.update_counters()
 
+        self.mix_groups = mix_groups
         self.split_start_groups = split_start_groups
         self.split_teams = split_teams
         self.split_regions = split_regions
@@ -87,63 +89,77 @@ class DrawManager(object):
         random.shuffle(self.person_array)
 
         # sort array by group and start_group
-        if split_start_groups:
-            self.person_array = sorted(self.person_array, key=lambda item: str(item[1]) + str(item[2]))
+        if mix_groups:
+            if split_start_groups:
+                self.person_array = sorted(self.person_array, key=lambda item: str(item[2]))
         else:
-            self.person_array = sorted(self.person_array, key=lambda item: str(item[1]))
+            if split_start_groups:
+                self.person_array = sorted(self.person_array, key=lambda item: str(item[1]) + str(item[2]))
+            else:
+                self.person_array = sorted(self.person_array, key=lambda item: str(item[1]))
 
-        # TODO process team and region conflicts in each start group
-        if split_teams or split_regions:
-            i = 0
-            run = True
-            checked_index = 0
-            while run:
-                if checked_index > len(self.person_array) - 2 :
-                    # no conflicts till the end!
-                    run = False
-                    continue
-
-                if self.conflict(checked_index, checked_index + 1):
-                    j = checked_index + 2
-                    while j != checked_index:
-
-                        # boundary processing
-                        if split_start_groups:
-                            if j > self.get_last_index_in_group(checked_index):
-                                # go to the beginning of start group
-                                j = self.get_first_index_in_group(checked_index)
-                        else:
-                            if j >= len(self.person_array):
-                                # go to the beginning of array
-                                j = 0
-
-                        if j == checked_index:
-                            break
-
-                        if self.conflict(checked_index, j):
-                            j += 1
-                        else:
-                            # j index is a solution to split conflicting pair
-                            break
-
-                    if j == checked_index:
-                        # no solution found
-                        print ('no solution found')
-                        break
-                    else:
-                        # insert j after checked_index
-                        assert isinstance(self.person_array, list)
-                        tmp = self.person_array.pop(j)
-                        if j < checked_index:
-                            checked_index -= 1
-                        self.person_array.insert(checked_index + 1, tmp)
-                checked_index += 1
+        # process team and region conflicts in each start group
+        self.process_conflicts()
 
         # apply to model
         index_array = []
         for i in self.person_array:
             index_array.append(i[0])
         current_race.persons = [current_race.persons[x] for x in index_array]
+
+    def process_conflicts(self):
+        start = 0
+        while start < len(self.person_array):
+
+            if self.split_start_groups:
+                end = self.get_last_index_in_start_group(start)
+            else:
+                if self.mix_groups:
+                    end = len(self.person_array) - 1
+                else:
+                    end = self.get_last_index_in_group(start)
+
+            self.process_conflicts_interval(start, end)
+            start = end + 1
+
+    def process_conflicts_interval(self, start, end):
+        if self.split_teams or self.split_regions:
+            i = start
+            run = True
+            while run:
+                if i >= end:
+                    # no conflicts till the end!
+                    return True
+
+                if self.conflict(i, i + 1):
+                    j = i + 2
+                    while j != i:
+
+                        # boundary processing
+                        if j > end:
+                            # go to the beginning of array
+                            j = start
+                            if j == i:
+                                break
+
+                        if self.conflict(i, j):
+                            j += 1
+                        else:
+                            # j index is a solution to split conflicting pair
+                            break
+
+                    if j == i:
+                        # no solution found
+                        print ('no solution found')
+                        return False
+                    else:
+                        # insert j after checked_index i
+                        assert isinstance(self.person_array, list)
+                        tmp = self.person_array.pop(j)
+                        if j < i:
+                            i -= 1
+                        self.person_array.insert(i + 1, tmp)
+                i += 1
 
     def conflict(self, i, j):
         conflict = False
@@ -168,6 +184,20 @@ class DrawManager(object):
         k = search_index
         current_group = self.person_array[k][1]
         while k < len(self.person_array) and self.person_array[k][1] == current_group:
+            k += 1
+        return k - 1
+
+    def get_first_index_in_start_group(self, search_index):
+        k = search_index
+        current_group = self.person_array[k][2]
+        while k >= 0 and self.person_array[k][2] == current_group:
+            k -= 1
+        return k + 1
+
+    def get_last_index_in_start_group(self, search_index):
+        k = search_index
+        current_group = self.person_array[k][2]
+        while k < len(self.person_array) and self.person_array[k][2] == current_group:
             k += 1
         return k - 1
 

@@ -93,8 +93,17 @@ class StartPreparationDialog(QDialog):
         self.draw_regions_check_box = QtWidgets.QCheckBox(self.widget1)
         self.draw_regions_check_box.setEnabled(False)
         self.draw_regions_check_box.setObjectName("draw_regions_check_box")
+        self.draw_regions_check_box.setMinimumHeight(13)
         self.draw_layout.setWidget(3, QtWidgets.QFormLayout.LabelRole, self.draw_regions_check_box)
+        self.draw_mix_groups_check_box = QtWidgets.QCheckBox(self.widget1)
+        self.draw_mix_groups_check_box.setEnabled(False)
+        self.draw_mix_groups_check_box.setObjectName("draw_mix_groups_check_box")
+        self.draw_mix_groups_check_box.setMinimumHeight(13)
+        self.draw_layout.setWidget(4, QtWidgets.QFormLayout.LabelRole, self.draw_mix_groups_check_box)
+
         self.draw_check_box.stateChanged.connect(self.draw_activate)
+
+
 
         self.start_group_box = QtWidgets.QGroupBox(self)
         self.start_group_box.setGeometry(QtCore.QRect(8, 120, 311, 121))
@@ -208,6 +217,7 @@ class StartPreparationDialog(QDialog):
         self.draw_groups_check_box.setText(_("Split by start groups"))
         self.draw_teams_check_box.setText(_("Split by teams"))
         self.draw_regions_check_box.setText(_("Split by regions"))
+        self.draw_mix_groups_check_box.setText(_("Mix groups"))
         self.start_group_box.setTitle(_("Start time"))
         self.start_check_box.setText(_("Change start time"))
         self.start_first_label.setText(_("First start in corridor"))
@@ -244,6 +254,7 @@ class StartPreparationDialog(QDialog):
         self.draw_groups_check_box.setEnabled(status)
         self.draw_regions_check_box.setEnabled(status)
         self.draw_teams_check_box.setEnabled(status)
+        self.draw_mix_groups_check_box.setEnabled(status)
 
     def accept(self):
         try:
@@ -260,6 +271,16 @@ class StartPreparationDialog(QDialog):
             self.progress_bar.setValue(25)
             sleep(progressbar_delay)
 
+            if self.draw_check_box.isChecked():
+                split_start_groups = self.draw_groups_check_box.isChecked()
+                split_teams = self.draw_teams_check_box.isChecked()
+                split_regions = self.draw_regions_check_box.isChecked()
+                mix_groups = self.draw_mix_groups_check_box.isChecked()
+                DrawManager().process(split_start_groups, split_teams, split_regions, mix_groups)
+
+            self.progress_bar.setValue(50)
+            sleep(progressbar_delay)
+
             if self.start_check_box.isChecked():
                 corridor_first_start = qtime2datetime(self.start_first_time_edit.time())
                 if self.start_interval_radio_button.isChecked():
@@ -268,15 +289,6 @@ class StartPreparationDialog(QDialog):
 
                 if self.start_group_settings_radion_button.isChecked():
                     StartTimeManager().process(corridor_first_start.toPyTime(), True, None)
-
-            self.progress_bar.setValue(50)
-            sleep(progressbar_delay)
-
-            if self.draw_check_box.isChecked():
-                split_start_groups = self.draw_groups_check_box.isChecked()
-                split_teams = self.draw_teams_check_box.isChecked()
-                split_regions = self.draw_regions_check_box.isChecked()
-                DrawManager().process(split_start_groups, split_teams, split_regions)
 
             self.progress_bar.setValue(75)
             sleep(progressbar_delay)
