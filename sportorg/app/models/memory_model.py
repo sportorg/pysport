@@ -2,6 +2,7 @@ import sys
 
 import re
 
+from sportorg.app.plugins.utils.utils import time_to_hhmmss
 from sportorg.language import _
 import traceback
 
@@ -137,8 +138,8 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
         self.init_cache()
 
     def get_headers(self):
-        return ['Last name', 'First name', 'Sex', 'Qualification', 'Group', 'Team', 'Year', 'Bib', 'Card',
-                'Rented card', 'Comment', 'World code', 'National code', 'Out of competition']
+        return ['Last name', 'First name', 'Sex', 'Qualification', 'Group', 'Team', 'Year', 'Bib', 'Start',
+                'Start group', 'Card', 'Rented card', 'Comment', 'World code', 'National code', 'Out of competition']
 
     def init_cache(self):
         self.cache.clear()
@@ -166,6 +167,11 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
             ret.append(person.organization.name)
         ret.append(person.year)
         ret.append(person.bib)
+        if person.start_time:
+            ret.append(time_to_hhmmss(person.start_time))
+        else:
+            ret.append('')
+        ret.append(person.start_group)
         ret.append(person.card_number)
         ret.append('rented stub')
         ret.append(person.comment)

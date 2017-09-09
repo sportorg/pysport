@@ -41,3 +41,8 @@ def time_to_int(value):
         value.second * 100 + \
         round(value.microsecond / 10000)
     return ret
+
+
+def time_to_hhmmss(value):
+    assert isinstance(value, datetime.datetime)
+    return value.strftime("%H:%M:%S")

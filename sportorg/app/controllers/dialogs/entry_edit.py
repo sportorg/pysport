@@ -273,6 +273,12 @@ class EntryEditDialog(QDialog):
         self.item_start.setDisplayFormat('hh:mm:ss')
         self.layout.addRow(self.label_start, self.item_start)
 
+        self.label_start_group = QLabel(_('Start group'))
+        self.item_start_group = QSpinBox()
+        self.item_start_group.setMinimum(0)
+        self.item_start_group.setMaximum(99)
+        self.layout.addRow(self.label_start_group, self.item_start_group)
+
         self.label_card = QLabel(_('Punch card #'))
         self.item_card = QSpinBox()
         self.item_card.setMinimum(0)
@@ -353,6 +359,8 @@ class EntryEditDialog(QDialog):
         if current_object.start_time is not None:
             time = datetime2qtime(current_object.start_time)
             self.item_start.setTime(time)
+        if current_object.start_group is not None:
+            self.item_start_group.setValue(int(current_object.start_group))
 
         if current_object.card_number is not None:
             self.item_card.setValue(int(current_object.card_number))
@@ -392,6 +400,10 @@ class EntryEditDialog(QDialog):
         new_time = qtime2datetime(self.item_start.time())
         if person.start_time != new_time:
             person.start_time = new_time
+            changed = True
+
+        if person.start_group != self.item_start_group.value() and self.item_start_group.value() != 0:
+            person.start_group = self.item_start_group.value()
             changed = True
 
         if (person.card_number is None or person.card_number != self.item_card.text()) \

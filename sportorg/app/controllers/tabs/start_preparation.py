@@ -35,6 +35,7 @@ class Widget(QtWidgets.QWidget):
         hor_header.setSectionsMovable(True)
         hor_header.setDropIndicatorShown(True)
         hor_header.setSectionResizeMode(QHeaderView.ResizeToContents)
+        hor_header.setSectionResizeMode(QHeaderView.Interactive)
 
         def entry_double_clicked(index):
             print('clicked on ' + str(index.row()))
