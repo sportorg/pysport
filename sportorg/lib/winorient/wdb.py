@@ -1201,6 +1201,12 @@ class WDB:
                 return course
         return None
 
+    def find_man_by_name(self, name):
+        for man in self.man:
+            assert (isinstance(man, WDBMan))
+            if man.name == name:
+                return man
+        return None
 
 def parse_wdb(file_path):
     wdb_file = open(file_path, 'rb')

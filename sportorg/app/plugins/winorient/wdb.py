@@ -19,7 +19,21 @@ class WinOrientBinary:
         '7': 'КМС',
         '8': 'МС',
         '9': 'МСМК',
-        '*': 'ЗМС'
+        '10': 'ЗМС'
+    }
+
+    qual_reverse = {
+        'б/р':  0,
+        'IIIю': 3,
+        'IIю':  2,
+        'Iю':   1,
+        'III':  6,
+        'II':   5,
+        'I':    4,
+        'КМС':  7,
+        'МС':   8,
+        'МСМК': 9,
+        'ЗМС':  10
     }
 
     def __init__(self, file=None):
@@ -215,8 +229,9 @@ class WinOrientBinary:
             new_person.card_number = man.si_card
             new_person.is_out_of_competition = man.is_not_qualified
             new_person.comment = man.comment
-            group_name = man.get_group().name
-            new_person.group = find(race().groups, name=group_name)
+            if man.get_group():
+                group_name = man.get_group().name
+                new_person.group = find(race().groups, name=group_name)
             team_name = man.get_team().name
             new_person.organization = find(race().organizations, name=team_name)
 
@@ -319,8 +334,8 @@ class WinOrientBinary:
             if man.bib:
                 new_person.number = man.bib
 
-            # TODO decode qualification
-            new_person.qualification = 0  # int(man.qual)
+            # decode qualification
+            new_person.qualification = WinOrientBinary.qual_reverse[man.qual]
 
             if man.year:
                 new_person.year = man.year
