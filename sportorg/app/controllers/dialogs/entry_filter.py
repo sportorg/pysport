@@ -13,6 +13,7 @@ from PyQt5.QtWidgets import QApplication, QDialog, QTableView
 
 from sportorg.app.controllers.dialogs import entry_edit
 from sportorg.app.controllers.global_access import GlobalAccess
+from sportorg.app.plugins.utils.custom_controls import AdvComboBox
 
 from sportorg.language import _
 
@@ -41,7 +42,7 @@ class DialogFilter(QDialog):
         self.group_label.setObjectName("group_label")
         self.grid_layout.addWidget(self.group_label, 0, 0, 1, 4)
 
-        self.group_combo = entry_edit.AdvComboBox(self)
+        self.group_combo = AdvComboBox(self)
         self.group_combo.setObjectName("group_combo")
         self.group_combo.addItem('')
         self.group_combo.addItems(entry_edit.get_groups())
@@ -51,7 +52,7 @@ class DialogFilter(QDialog):
         self.team_label.setObjectName("team_label")
         self.grid_layout.addWidget(self.team_label, 1, 0, 1, 4)
 
-        self.team_combo = entry_edit.AdvComboBox(self)
+        self.team_combo = AdvComboBox(self)
         self.team_combo.setObjectName("team_combo")
         self.team_combo.addItem('')
         self.team_combo.addItems(entry_edit.get_teams())
