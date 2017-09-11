@@ -81,18 +81,18 @@ class GlobalAccess(object):
             # recalculate places
             ResultCalculation().process_results()
             self.get_main_window().refresh()
-        if tab == 1:
+        elif tab == 1:
             race().delete_results(indexes, self.get_result_table())
             # recalculate places
             ResultCalculation().process_results()
             self.get_main_window().refresh()
-        if tab == 2:
+        elif tab == 2:
             race().delete_groups(indexes, self.get_group_table())
             self.get_main_window().refresh()
-        if tab == 3:
+        elif tab == 3:
             race().delete_courses(indexes, self.get_course_table())
             self.get_main_window().refresh()
-        if tab == 4:
+        elif tab == 4:
             race().delete_organizations(indexes, self.get_organization_table())
             self.get_main_window().refresh()
 
@@ -103,17 +103,17 @@ class GlobalAccess(object):
                 race().add_new_person()
                 self.get_person_table().model().init_cache()
                 self.get_main_window().refresh()
-            if tab == 1:
+            elif tab == 1:
                 pass
-            if tab == 2:
+            elif tab == 2:
                 race().add_new_group()
                 self.get_person_table().model().init_cache()
                 self.get_main_window().refresh()
-            if tab == 3:
+            elif tab == 3:
                 race().add_new_course()
                 self.get_course_table().model().init_cache()
                 self.get_main_window().refresh()
-            if tab == 4:
+            elif tab == 4:
                 race().add_new_organization()
                 self.get_organization_table().model().init_cache()
                 self.get_main_window().refresh()
