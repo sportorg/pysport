@@ -8,6 +8,18 @@ from PyQt5.QtWidgets import QAbstractItemView, QHeaderView
 
 from sportorg.app.controllers.dialogs.organization_edit import OrganizationEditDialog
 from sportorg.app.models.memory_model import TeamMemoryModel
+from sportorg.app.controllers.tabs.table import TableView
+from sportorg.app.controllers.global_access import GlobalAccess
+
+from sportorg.language import _
+
+
+class TeamsTableView(TableView):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.popup_items = [
+            (_("Add object"), GlobalAccess().add_object)
+        ]
 
 
 class Widget(QtWidgets.QWidget):
@@ -23,7 +35,7 @@ class Widget(QtWidgets.QWidget):
         self.team_layout = QtWidgets.QGridLayout(self)
         self.team_layout.setObjectName("team_layout")
 
-        self.TeamTable = QtWidgets.QTableView(self)
+        self.TeamTable = TeamsTableView(self)
         self.TeamTable.setObjectName("TeamTable")
 
         self.TeamTable.setModel(TeamMemoryModel())
