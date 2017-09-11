@@ -4,10 +4,33 @@ import sys
 import traceback
 
 from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtWidgets import QAbstractItemView, QHeaderView
+from PyQt5.QtCore import QPoint
+from PyQt5.QtWidgets import QAbstractItemView, QHeaderView, QMenu
 
 from sportorg.app.controllers.dialogs.entry_edit import EntryEditDialog
 from sportorg.app.models.memory_model import PersonMemoryModel
+from ..global_access import GlobalAccess
+from sportorg.language import _
+
+
+class StartPreparationTableView(QtWidgets.QTableView):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def mousePressEvent(self, qmouseevent):
+        super().mousePressEvent(qmouseevent)
+        bt = qmouseevent.button()
+        if bt == 2:
+            actions = [
+                (_("Add object"), GlobalAccess().add_object)
+            ]
+            menu = QMenu(self)
+            for action in actions:
+                _action = menu.addAction(action[0])
+                _action.triggered.connect(action[1])
+
+            point = QPoint(qmouseevent.globalX(), qmouseevent.globalY())
+            menu.popup(point)
 
 
 class Widget(QtWidgets.QWidget):
@@ -23,7 +46,7 @@ class Widget(QtWidgets.QWidget):
         self.entry_layout = QtWidgets.QGridLayout(self)
         self.entry_layout.setObjectName("entry_layout")
 
-        self.EntryTable = QtWidgets.QTableView(self)
+        self.EntryTable = StartPreparationTableView(self)
         self.EntryTable.setObjectName("EntryTable")
 
         self.EntryTable.setModel(PersonMemoryModel())
