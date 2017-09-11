@@ -4,33 +4,22 @@ import sys
 import traceback
 
 from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtCore import QPoint
-from PyQt5.QtWidgets import QAbstractItemView, QHeaderView, QMenu
+from PyQt5.QtWidgets import QAbstractItemView, QHeaderView
 
 from sportorg.app.controllers.dialogs.entry_edit import EntryEditDialog
 from sportorg.app.models.memory_model import PersonMemoryModel
-from ..global_access import GlobalAccess
+from sportorg.app.controllers.tabs.table import TableView
+from sportorg.app.controllers.global_access import GlobalAccess
+
 from sportorg.language import _
 
 
-class StartPreparationTableView(QtWidgets.QTableView):
+class StartPreparationTableView(TableView):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-    def mousePressEvent(self, qmouseevent):
-        super().mousePressEvent(qmouseevent)
-        bt = qmouseevent.button()
-        if bt == 2:
-            actions = [
-                (_("Add object"), GlobalAccess().add_object)
-            ]
-            menu = QMenu(self)
-            for action in actions:
-                _action = menu.addAction(action[0])
-                _action.triggered.connect(action[1])
-
-            point = QPoint(qmouseevent.globalX(), qmouseevent.globalY())
-            menu.popup(point)
+        self.popup_items = [
+            (_("Add object"), GlobalAccess().add_object)
+        ]
 
 
 class Widget(QtWidgets.QWidget):

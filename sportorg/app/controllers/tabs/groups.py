@@ -6,6 +6,18 @@ from PyQt5.QtWidgets import QAbstractItemView, QHeaderView
 
 from sportorg.app.controllers.dialogs.group_edit import GroupEditDialog
 from sportorg.app.models.memory_model import GroupMemoryModel
+from sportorg.app.controllers.tabs.table import TableView
+from sportorg.app.controllers.global_access import GlobalAccess
+
+from sportorg.language import _
+
+
+class GroupsTableView(TableView):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.popup_items = [
+            (_("Add object"), GlobalAccess().add_object)
+        ]
 
 
 class Widget(QtWidgets.QWidget):
@@ -21,7 +33,7 @@ class Widget(QtWidgets.QWidget):
         self.group_layout = QtWidgets.QGridLayout(self)
         self.group_layout.setObjectName("group_layout")
 
-        self.GroupTable = QtWidgets.QTableView(self)
+        self.GroupTable = GroupsTableView(self)
         self.GroupTable.setObjectName("GroupTable")
         self.GroupTable.setModel(GroupMemoryModel())
         self.GroupTable.setSortingEnabled(True)

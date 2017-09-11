@@ -1,12 +1,23 @@
 import logging
 import traceback
 
-import sys
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QAbstractItemView, QHeaderView
 
 from sportorg.app.controllers.dialogs.course_edit import CourseEditDialog
 from sportorg.app.models.memory_model import CourseMemoryModel
+from sportorg.app.controllers.tabs.table import TableView
+from sportorg.app.controllers.global_access import GlobalAccess
+
+from sportorg.language import _
+
+
+class CoursesTableView(TableView):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.popup_items = [
+            (_("Add object"), GlobalAccess().add_object)
+        ]
 
 
 class Widget(QtWidgets.QWidget):
@@ -22,7 +33,7 @@ class Widget(QtWidgets.QWidget):
         self.course_layout = QtWidgets.QGridLayout(self)
         self.course_layout.setObjectName("course_layout")
 
-        self.CourseTable = QtWidgets.QTableView(self)
+        self.CourseTable = CoursesTableView(self)
         self.CourseTable.setObjectName("CourseTable")
         self.CourseTable.setModel(CourseMemoryModel())
         self.CourseTable.setSortingEnabled(True)
