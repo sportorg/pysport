@@ -46,3 +46,9 @@ def time_to_int(value):
 def time_to_hhmmss(value):
     assert isinstance(value, datetime.datetime)
     return value.strftime("%H:%M:%S")
+
+def time_remove_day(value):
+    assert isinstance(value, datetime.datetime)
+    new_value = datetime.datetime(year=2000, month=1, day=1, hour=value.hour, minute=value.minute,
+                                  second=value.second, microsecond=value.microsecond)
+    return new_value

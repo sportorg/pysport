@@ -338,7 +338,7 @@ class WinOrientBinary:
             new_person.qualification = WinOrientBinary.qual_reverse[man.qual]
 
             if man.year:
-                new_person.year = man.year
+                new_person.year = int(man.year)
             if man.card_number:
                 new_person.si_card = man.card_number
                 new_person.is_own_card = 2

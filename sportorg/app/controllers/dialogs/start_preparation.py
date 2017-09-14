@@ -259,7 +259,7 @@ class StartPreparationDialog(QDialog):
     def accept(self):
         try:
 
-            progressbar_delay = 0.05
+            progressbar_delay = 0.01
 
             race().update_counters()
             if self.reserve_check_box.isChecked():

@@ -12,6 +12,7 @@ from sportorg.app.controllers.dialogs.entry_filter import DialogFilter
 from sportorg.app.controllers.dialogs.event_properties import EventPropertiesDialog
 from sportorg.app.controllers.dialogs.number_change import NumberChangeDialog
 from sportorg.app.controllers.dialogs.report_dialog import ReportDialog
+from sportorg.app.controllers.dialogs.sportident_properties import SportidentPropertiesDialog
 from sportorg.app.controllers.dialogs.start_preparation import StartPreparationDialog
 from sportorg.app.controllers.global_access import GlobalAccess
 from sportorg.app.controllers.tabs import start_preparation, groups, teams, race_results, courses
@@ -131,6 +132,7 @@ class MainWindow(QMainWindow, app.App):
         self.action_delete = QtWidgets.QAction(self)
         self.action_start_preparation = QtWidgets.QAction(self)
         self.action_number_change = QtWidgets.QAction(self)
+        self.action_sportident_settings = QtWidgets.QAction(self)
 
         self.menu_import.addSeparator()
 
@@ -157,6 +159,8 @@ class MainWindow(QMainWindow, app.App):
         self.menu_start_preparation.addAction(self.action_number_change)
 
         self.menu_results.addAction(self.action_report)
+
+        self.menu_options.addAction(self.action_sportident_settings)
 
         self.menu_help.addAction(self.action_help)
         self.menu_help.addAction(self.action_about_us)
@@ -255,6 +259,8 @@ class MainWindow(QMainWindow, app.App):
         self.menu_service.setTitle(_("Service"))
 
         self.menu_options.setTitle(_("Options"))
+        self.action_sportident_settings.setText(_('SPORTident settings'))
+        self.action_sportident_settings.triggered.connect(self.sportident_settings)
 
         self.menu_help.setTitle(_("Help"))
         self.action_help.setText(_("Help"))
@@ -366,8 +372,13 @@ class MainWindow(QMainWindow, app.App):
 
     def start_preparation(self):
         try:
-            obj = StartPreparationDialog()
-            obj.exec()
+            StartPreparationDialog().exec()
+        except:
+            traceback.print_exc()
+
+    def sportident_settings(self):
+        try:
+            SportidentPropertiesDialog().exec()
         except:
             traceback.print_exc()
 

@@ -96,22 +96,59 @@ class SportidentPropertiesDialog(QDialog):
         self.show()
 
     def set_values_from_model(self):
-        obj = race()
-        # self.item_main_title.setText(str(obj.get_setting('main_title')))
-        # self.item_sub_title.setText(str(obj.get_setting('sub_title')))
-        # self.item_location.setText(str(obj.get_setting('location')))
-        # self.item_refery.setText(str(obj.get_setting('chief_referee')))
-        # self.item_secretary.setText(str(obj.get_setting('secretary')))
+        cur_race = race()
+        start_source = cur_race.get_setting('start_source')
+        finish_source = cur_race.get_setting('finish_source')
+        if not start_source:
+            start_source = 'protocol'
+        if not finish_source:
+            finish_source = 'station'
+
+        if start_source == 'protocol':
+            self.item_start_protocol.setChecked(True)
+        elif start_source == 'station':
+            self.item_start_station.setChecked(True)
+        elif start_source == 'cp':
+            self.item_start_cp.setChecked(True)
+        elif start_source == 'gate':
+            self.item_start_gate.setChecked(True)
+
+        if finish_source == 'station':
+            self.item_finish_station.setChecked(True)
+        elif finish_source == 'cp':
+            self.item_finish_cp.setChecked(True)
+        elif finish_source == 'beam':
+            self.item_finish_beam.setChecked(True)
 
     def apply_changes_impl(self):
         changed = False
         obj = race()
 
-        # obj.set_setting('main_title', self.item_main_title.text())
-        # obj.set_setting('sub_title', self.item_sub_title.toPlainText())
-        # obj.set_setting('location', self.item_location.text())
-        # obj.set_setting('chief_referee', self.item_refery.text())
-        # obj.set_setting('secretary', self.item_secretary.text())
+        start_source=''
+        if self.item_start_protocol.isChecked():
+            start_source = 'protocol'
+        if self.item_start_station.isChecked():
+            start_source = 'station'
+        if self.item_start_cp.isChecked():
+            start_source = 'cp'
+        if self.item_start_gate.isChecked():
+            start_source = 'gate'
+
+        finish_source = ''
+
+        if self.item_finish_station.isChecked():
+            finish_source = 'station'
+        if self.item_finish_cp.isChecked():
+            finish_source = 'cp'
+        if self.item_finish_beam.isChecked():
+            finish_source = 'beam'
+
+
+        obj.set_setting('finish_source', finish_source)
+        obj.set_setting('start_source', start_source)
+
+        obj.set_setting('start_cp_number', self.item_start_cp_value.value())
+        obj.set_setting('finish_cp_number', self.item_finish_cp_value.value())
 
         if changed:
             win = self.get_main_window()

@@ -1,7 +1,9 @@
 import traceback
 
+import datetime
 from PyQt5.QtWidgets import QMessageBox
 
+from sportorg.app.plugins.utils.utils import time_remove_day
 from sportorg.language import _
 from sportorg.core.model import Model
 
@@ -126,7 +128,7 @@ class Result(Model):
     punches = []
     penalty_time = None  # time of penalties (marked route, false start)
     penalty_laps = None  # count of penalty legs (marked route)
-    status = None
+    status = 0
     result = None  # time in seconds * 100 (int)
     place = None
 
@@ -161,17 +163,42 @@ Punches:
     def get_result(self):
         if self.status != 0 and self.status != ResultStatus.OK:
             return None
-        return str(self.finish_time - self.start_time)
+        return str(self.get_finish_time() - self.get_start_time())
 
     def get_result_for_sort(self):
         ret = 0
         if self.status != 0 and self.status != ResultStatus.OK:
             ret += 24 * 3600 * 100
 
-        delta = self.finish_time - self.start_time
+        delta = self.get_finish_time() - self.get_start_time()
         ret += delta.seconds * 100
         return ret
 
+    def get_start_time(self):
+        obj = race()
+        start_source = obj.get_setting('start_source', 'protocol')
+        if start_source == 'protocol':
+            return time_remove_day(self.person.start_time)
+        elif start_source == 'station':
+            return time_remove_day(self.start_time)
+        elif start_source == 'cp':
+            pass
+        elif start_source == 'gate':
+            pass
+
+        return datetime.datetime.now()
+
+    def get_finish_time(self):
+        obj = race()
+        finish_source = obj.get_setting('finish_source', 'station')
+        if finish_source == 'station':
+            return time_remove_day(self.finish_time)
+        elif finish_source == 'cp':
+            pass
+        elif finish_source == 'beam':
+            pass
+
+        return datetime.datetime.now()
 
 class Person(Model):
     name = None
@@ -222,11 +249,11 @@ class Race(Model):
     def set_setting(self, setting, value):
         self.settings[setting] = value
 
-    def get_setting(self, setting):
+    def get_setting(self, setting, nvl_value=''):
         if setting in self.settings:
             return self.settings[setting]
         else:
-            return ''
+            return nvl_value
 
     def delete_persons(self, indexes, table):
         try:

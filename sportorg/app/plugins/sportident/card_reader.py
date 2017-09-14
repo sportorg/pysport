@@ -1,3 +1,5 @@
+from sportorg.app.controllers.global_access import GlobalAccess
+from sportorg.app.models.result_calculation import ResultCalculation
 from . import sireader
 from sportorg.core.event import event, add_event
 from sportorg.app.models import memory
@@ -23,7 +25,10 @@ def start():
 
     def event_finish(card_data):
         event('finish', 'sportident', get_result(card_data))
+
+        ResultCalculation().process_results()
         event('init_model')
+
 
     if port is not None:
         """
