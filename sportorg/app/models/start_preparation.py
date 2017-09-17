@@ -275,6 +275,8 @@ def get_corridors():
         for current_group in current_race.groups:
             assert isinstance(current_group, Group)
             cur_corridor = current_group.start_corridor
+            if not cur_corridor:
+                cur_corridor = 0
             if cur_corridor not in ret:
                 ret.append(cur_corridor)
         return sorted(ret)

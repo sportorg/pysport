@@ -23,6 +23,8 @@ class WinOrientBinary:
     }
 
     qual_reverse = {
+        '':     0,
+        ' ':    0,
         'б/р':  0,
         'IIIю': 3,
         'IIю':  2,
@@ -293,8 +295,8 @@ class WinOrientBinary:
         for course in my_race.courses:
             new_course = WDBDistance()
             new_course.name = course.name
-            new_course.elevation = course.climb
-            new_course.length = course.length
+            new_course.elevation = int(course.climb)
+            new_course.length = int(course.length)
 
             # controls
             for i in range(len(course.controls)):
@@ -303,11 +305,14 @@ class WinOrientBinary:
                     new_course.point.append(0)
                     new_course.leg.append(0)
 
-                new_course.point[i] = course.controls[i].code
+                new_course.point[i] = int(course.controls[i].code)
                 leg = course.controls[i].length
 
                 if leg:
-                    new_course.leg[i] = leg
+                    if str(leg).find('.') > -1:
+                        new_course.leg[i] = int(float(leg) * 1000)
+                    else:
+                        new_course.leg[i] = int(leg)
 
             wdb_object.dist.append(new_course)
             new_course.id = len(wdb_object.dist)
@@ -317,7 +322,7 @@ class WinOrientBinary:
             new_group.name = group.name
 
             if group.price:
-                new_group.owner_cost = group.price
+                new_group.owner_cost = int(group.price)
 
             if group.course:
                 course_found = wdb_object.find_course_by_name(group.course.name)
@@ -332,15 +337,16 @@ class WinOrientBinary:
             new_person = WDBMan(wdb_object)
             new_person.name = str(man.surname) + " " + str(man.name)
             if man.bib:
-                new_person.number = man.bib
+                new_person.number = int(man.bib)
 
             # decode qualification
-            new_person.qualification = WinOrientBinary.qual_reverse[man.qual]
+            if man.qual:
+                new_person.qualification = WinOrientBinary.qual_reverse[man.qual]
 
             if man.year:
                 new_person.year = int(man.year)
             if man.card_number:
-                new_person.si_card = man.card_number
+                new_person.si_card = int(man.card_number)
                 new_person.is_own_card = 2
             new_person.is_not_qualified = man.is_out_of_competition
             new_person.comment = man.comment
