@@ -13,7 +13,7 @@ from sportorg.app.controllers.dialogs.event_properties import EventPropertiesDia
 from sportorg.app.controllers.dialogs.number_change import NumberChangeDialog
 from sportorg.app.controllers.dialogs.report_dialog import ReportDialog
 from sportorg.app.controllers.dialogs.sportident_properties import SportidentPropertiesDialog
-from sportorg.app.controllers.dialogs.start_preparation import StartPreparationDialog
+from sportorg.app.controllers.dialogs.start_preparation import StartPreparationDialog, guess_courses_for_groups
 from sportorg.app.controllers.global_access import GlobalAccess
 from sportorg.app.controllers.tabs import start_preparation, groups, teams, race_results, courses
 from sportorg.app.models.memory import Race, event as e
@@ -132,6 +132,7 @@ class MainWindow(QMainWindow, app.App):
         self.action_delete = QtWidgets.QAction(self)
         self.action_start_preparation = QtWidgets.QAction(self)
         self.action_number_change = QtWidgets.QAction(self)
+        self.action_guess_courses = QtWidgets.QAction(self)
         self.action_sportident_settings = QtWidgets.QAction(self)
 
         self.menu_import.addSeparator()
@@ -157,6 +158,7 @@ class MainWindow(QMainWindow, app.App):
         self.menu_start_preparation.addAction(self.action_filter)
         self.menu_start_preparation.addAction(self.action_start_preparation)
         self.menu_start_preparation.addAction(self.action_number_change)
+        self.menu_start_preparation.addAction(self.action_guess_courses)
 
         self.menu_results.addAction(self.action_report)
 
@@ -249,6 +251,8 @@ class MainWindow(QMainWindow, app.App):
         self.action_start_preparation.triggered.connect(self.start_preparation)
         self.action_number_change.setText(_("Number Change"))
         self.action_number_change.triggered.connect(self.number_change)
+        self.action_guess_courses.setText(_("Guess courses"))
+        self.action_guess_courses.triggered.connect(self.guess_courses)
 
         self.menu_race.setTitle(_("Race"))
 
@@ -386,6 +390,12 @@ class MainWindow(QMainWindow, app.App):
         try:
             obj = NumberChangeDialog()
             obj.exec()
+        except:
+            traceback.print_exc()
+
+    def guess_courses(self):
+        try:
+            guess_courses_for_groups()
         except:
             traceback.print_exc()
 
