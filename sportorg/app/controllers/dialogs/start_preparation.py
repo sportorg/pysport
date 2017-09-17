@@ -3,10 +3,11 @@ import traceback
 from time import sleep
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import QTime
 from PyQt5.QtWidgets import QApplication, QDialog
 
 from sportorg.app.controllers.global_access import GlobalAccess
-from sportorg.app.models.memory import race
+from sportorg.app.models.memory import race, Group
 from sportorg.app.models.start_preparation import StartNumberManager, DrawManager, ReserveManager, StartTimeManager
 from sportorg.app.plugins.utils.utils import qtime2datetime
 from sportorg.language import _
@@ -203,6 +204,8 @@ class StartPreparationDialog(QDialog):
         self.button_box.rejected.connect(self.reject)
         QtCore.QMetaObject.connectSlotsByName(self)
 
+        self.recover_state()
+
     def retranslateUi(self):
         _translate = QtCore.QCoreApplication.translate
         self.setWindowTitle(_("Dialog"))
@@ -260,14 +263,15 @@ class StartPreparationDialog(QDialog):
         try:
 
             progressbar_delay = 0.01
-
-            race().update_counters()
+            obj = race()
+            obj.update_counters()
             if self.reserve_check_box.isChecked():
                 reserve_prefix = self.reserve_prefix.text()
                 reserve_count = self.reserve_group_count_spin_box.value()
                 reserve_percent = self.reserve_group_percent_spin_box.value()
 
                 ReserveManager().process(reserve_prefix, reserve_count, reserve_percent)
+
             self.progress_bar.setValue(25)
             sleep(progressbar_delay)
 
@@ -304,8 +308,67 @@ class StartPreparationDialog(QDialog):
             self.progress_bar.setValue(100)
 
             GlobalAccess().get_main_window().refresh()
+            self.save_state()
         except:
             traceback.print_exc()
+
+    def save_state(self):
+        obj = race()
+        obj.set_setting('is_start_preparation_reserve', self.reserve_check_box.isChecked())
+        obj.set_setting('reserve_prefix', self.reserve_prefix.text())
+        obj.set_setting('reserve_count', self.reserve_group_count_spin_box.value())
+        obj.set_setting('reserve_percent', self.reserve_group_percent_spin_box.value())
+
+        obj.set_setting('is_start_preparation_draw', self.reserve_check_box.isChecked())
+        obj.set_setting('is_split_start_groups', self.draw_groups_check_box.isChecked())
+        obj.set_setting('is_split_teams', self.draw_teams_check_box.isChecked())
+        obj.set_setting('is_split_regions', self.draw_regions_check_box.isChecked())
+        obj.set_setting('is_mix_groups', self.draw_mix_groups_check_box.isChecked())
+
+        obj.set_setting('is_start_preparation_time', self.start_check_box.isChecked())
+        obj.set_setting('is_fixed_start_interval', self.start_interval_radio_button.isChecked())
+        obj.set_setting('start_interval', self.start_interval_time_edit.time())
+
+        obj.set_setting('is_start_preparation_numbers', self.numbers_check_box.isChecked())
+        obj.set_setting('is_fixed_number_interval', self.numbers_interval_radio_button.isChecked())
+        obj.set_setting('numbers_interval', self.numbers_interval_spin_box.value())
+
+    def recover_state(self):
+        obj = race()
+
+        self.reserve_check_box.setChecked(obj.get_setting('is_start_preparation_reserve', False))
+        self.reserve_prefix.setText(obj.get_setting('reserve_prefix', _('Reserve')))
+        self.reserve_group_count_spin_box.setValue(obj.get_setting('reserve_count', 0))
+        self.reserve_group_percent_spin_box.setValue(obj.get_setting('reserve_percent', 0))
+
+        self.draw_check_box.setChecked(obj.get_setting('is_start_preparation_draw', False))
+        self.draw_groups_check_box.setChecked(obj.get_setting('is_split_start_groups', False))
+        self.draw_teams_check_box.setChecked(obj.get_setting('is_split_teams', False))
+        self.draw_regions_check_box.setChecked(obj.get_setting('is_split_regions', False))
+        self.draw_mix_groups_check_box.setChecked(obj.get_setting('is_mix_groups', False))
+
+        self.start_check_box.setChecked(obj.get_setting('is_start_preparation_time', False))
+        self.start_interval_radio_button.setChecked(obj.get_setting('is_fixed_start_interval', False))
+        self.start_interval_time_edit.setTime(obj.get_setting('start_interval', QTime()))
+
+        self.numbers_check_box.setChecked(obj.get_setting('is_start_preparation_numbers', False))
+        self.numbers_interval_radio_button.setChecked(obj.get_setting('is_fixed_number_interval', False))
+        self.numbers_interval_spin_box.setValue(obj.get_setting('numbers_interval', 1))
+
+
+def guess_courses_for_groups():
+    obj = race()
+    for cur_group in obj.groups:
+        assert isinstance(cur_group, Group)
+        if not cur_group.course or True: # TODO check empty courses after export!
+            for cur_course in obj.courses:
+                course_name = cur_course.name
+                group_name = cur_group.name
+                if str(course_name).find(group_name) > -1:
+                    cur_group.course = cur_course
+                    print('Connecting: group ' + group_name + ' with course ' + course_name);
+                    break;
+    GlobalAccess().get_main_window().refresh()
 
 
 def main(argv):
