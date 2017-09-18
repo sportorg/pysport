@@ -22,7 +22,7 @@ class SIReaderThread(threading.Thread):
         self.cards.append(card_data)
 
     def run(self):
-        si = sireader.SIReaderReadout(port=self.port)
+        si = sireader.SIReaderReadout(port=self.port, debug=True)
         while True:
             try:
                 while not si.poll_sicard():

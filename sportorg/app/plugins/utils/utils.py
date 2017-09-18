@@ -44,8 +44,11 @@ def time_to_int(value):
 
 
 def time_to_hhmmss(value):
-    assert isinstance(value, datetime.datetime)
-    return value.strftime("%H:%M:%S")
+    if isinstance(value, datetime.datetime):
+        return value.strftime("%H:%M:%S")
+    if isinstance(value, QTime):
+        return time_to_hhmmss(qtime2datetime(value))
+    return value
 
 def time_remove_day(value):
     assert isinstance(value, datetime.datetime)

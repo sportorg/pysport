@@ -120,6 +120,12 @@ class Group(Model):
     first_number = None
     count_person = 0
 
+    def get_count_finished(self):
+        pass
+
+    def get_count_all(self):
+        return self.count_person
+
 
 class Result(Model):
     card_number = None

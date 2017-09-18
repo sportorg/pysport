@@ -1,8 +1,10 @@
+import codecs
 import configparser
 import logging
 import sys
 import time
 import traceback
+import webbrowser
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow
@@ -16,13 +18,16 @@ from sportorg.app.controllers.dialogs.sportident_properties import SportidentPro
 from sportorg.app.controllers.dialogs.start_preparation import StartPreparationDialog, guess_courses_for_groups
 from sportorg.app.controllers.global_access import GlobalAccess
 from sportorg.app.controllers.tabs import start_preparation, groups, teams, race_results, courses
-from sportorg.app.models.memory import Race, event as e
+from sportorg.app.models.memory import Race, event as e, race
 from sportorg.app.models import result_generation
 from sportorg.app.models.memory_model import PersonMemoryModel, ResultMemoryModel, GroupMemoryModel, CourseMemoryModel, \
     TeamMemoryModel
+from sportorg.app.models.result_calculation import get_splits_data_printout
+from sportorg.config import TEMPLATE_DIR
 from sportorg.core import event
 from sportorg.core import plugin, app
 from sportorg.language import _
+from sportorg.lib.template.template import get_text_from_file
 
 logging.basicConfig(**config.LOG_CONFIG, level=logging.DEBUG if config.DEBUG else logging.WARNING)
 
@@ -127,6 +132,7 @@ class MainWindow(QMainWindow, app.App):
         self.action_help = QtWidgets.QAction(self)
         self.action_about_us = QtWidgets.QAction(self)
         self.action_report = QtWidgets.QAction(self)
+        self.action_split_printout = QtWidgets.QAction(self)
         self.action_filter = QtWidgets.QAction(self)
         self.action_new_row = QtWidgets.QAction(self)
         self.action_delete = QtWidgets.QAction(self)
@@ -161,6 +167,7 @@ class MainWindow(QMainWindow, app.App):
         self.menu_start_preparation.addAction(self.action_guess_courses)
 
         self.menu_results.addAction(self.action_report)
+        self.menu_results.addAction(self.action_split_printout)
 
         self.menu_options.addAction(self.action_sportident_settings)
 
@@ -234,9 +241,12 @@ class MainWindow(QMainWindow, app.App):
         self.action_filter.setText(_("Filter"))
         self.action_filter.triggered.connect(self.filter_dialog)
         self.action_filter.setShortcut("F2")
+
         self.action_report.setText(_("Create report"))
         self.action_report.triggered.connect(self.report_dialog)
         self.action_report.setShortcut("Ctrl+P")
+        self.action_split_printout.setText(_("Split printout"))
+        self.action_split_printout.triggered.connect(self.split_printout)
 
         self.action_new_row.setText(_("Add object"))
         self.action_new_row.triggered.connect(self.create_object)
@@ -356,7 +366,6 @@ class MainWindow(QMainWindow, app.App):
             ex = DialogFilter(table)
             ex.exec()
         except:
-            print(sys.exc_info())
             traceback.print_exc()
 
     def report_dialog(self):
@@ -364,7 +373,26 @@ class MainWindow(QMainWindow, app.App):
             ex = ReportDialog()
             ex.exec()
         except:
-            print(sys.exc_info())
+            traceback.print_exc()
+
+    def split_printout(self):
+        try:
+            obj = race()
+            person = obj.results[0].person
+            # template_path = 'C:\\tmp\\split_printout.html'
+            template_path = TEMPLATE_DIR + '\\split_printout.html'
+            template = get_text_from_file(template_path, **get_splits_data_printout(person))
+
+            file_name = QtWidgets.QFileDialog.getSaveFileName(self, _('Save As HTML file'),
+                                                              '/report_' + str(time.strftime("%Y%m%d")),
+                                                              _("HTML file (*.html)"))[0]
+            with codecs.open(file_name, 'w', 'utf-8') as file:
+                file.write(template)
+                file.close()
+
+            # Open file in your browser
+            webbrowser.open('file://' + file_name, new=2)
+        except:
             traceback.print_exc()
 
     def event_settings_dialog(self):

@@ -58,7 +58,6 @@ class ReportDialog(QDialog):
             try:
                 self.apply_changes_impl()
             except:
-                print(sys.exc_info())
                 traceback.print_exc()
             self.close()
 
