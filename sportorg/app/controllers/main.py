@@ -4,10 +4,9 @@ import time
 import traceback
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QMainWindow
+from PyQt5.QtWidgets import QMainWindow, QTableView, QMessageBox
 
-import sportorg
-from sportorg import config, app
+from sportorg import config
 from sportorg.app.controllers.dialogs.entry_filter import DialogFilter
 from sportorg.app.controllers.dialogs.event_properties import EventPropertiesDialog
 from sportorg.app.controllers.dialogs.number_change import NumberChangeDialog
@@ -19,8 +18,8 @@ from sportorg.app.controllers.global_access import GlobalAccess
 from sportorg.app.controllers.tabs import start_preparation, groups, teams, race_results, courses
 from sportorg.app.models.memory import Race, event as e, race
 from sportorg.app.models import result_generation
-from sportorg.app.models.memory_model import PersonMemoryModel, ResultMemoryModel, GroupMemoryModel, CourseMemoryModel, \
-    TeamMemoryModel
+from sportorg.app.models.memory_model import PersonMemoryModel, ResultMemoryModel, GroupMemoryModel, \
+    CourseMemoryModel, TeamMemoryModel
 from sportorg.app.models.result_calculation import get_splits_data_printout
 from sportorg.app.plugins.printing.printing import print_html
 from sportorg.config import TEMPLATE_DIR
@@ -384,21 +383,23 @@ class MainWindow(QMainWindow, App):
         try:
             obj = race()
 
-            person = obj.results[0].person
+            table = GlobalAccess().get_result_table()
+            assert isinstance(table, QTableView)
+            index = table.currentIndex().row()
+            if index < 0:
+                index = 0
+            if index >= len(obj.results):
+                mes = QMessageBox()
+                mes.setText(_('No results to print'))
+                mes.exec()
+                return
+
+            person = obj.results[index].person
 
             template_path = TEMPLATE_DIR + '\\split_printout.html'
             template = get_text_from_file(template_path, **get_splits_data_printout(person))
 
             print_html(obj.get_setting('split_printer'), template)
-
-            # file_name = QtWidgets.QFileDialog.getSaveFileName(self, _('Save As HTML file'),
-            #                                                   '/report_' + str(time.strftime("%Y%m%d")),
-            #                                                   _("HTML file (*.html)"))[0]
-            # with codecs.open(file_name, 'w', 'utf-8') as file:
-            #     file.write(template)
-            #     file.close()
-            # # Open file in your browser
-            # webbrowser.open('file://' + file_name, new=2)
         except:
             traceback.print_exc()
 

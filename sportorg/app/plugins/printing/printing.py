@@ -1,8 +1,6 @@
 import traceback
 
 import sys
-
-from PyQt5.QtCore import QTemporaryFile
 from PyQt5.QtGui import QTextDocument
 from PyQt5.QtPrintSupport import QPrinter
 from PyQt5.QtWebEngineWidgets import QWebEnginePage
@@ -14,18 +12,19 @@ def print_html(printer_name, html):
     if printer_name:
         printer.setPrinterName(printer_name)
 
-    # text_document = QTextDocument()
-    # text_document.setHtml("html")
-    # text_document.print_(printer)
-
     text_document = QWebEnginePage()
-    text_document.setHtml(html)
-    def callback(is_ok):
-        print('printing finished:' + is_ok)
-    text_document.print(printer, callback)
 
-    # tmp = QTemporaryFile().fileName()
-    # text_document.printToPdf(tmp)
+    def callback(is_ok):
+        if is_ok:
+            print('printing finished')
+        else:
+            print('printing error')
+
+    def print_exec():
+        text_document.print(printer, callback)
+
+    text_document.loadFinished.connect(print_exec)
+    text_document.setHtml(html)
 
 
 def main():
