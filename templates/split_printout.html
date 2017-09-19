@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-   <!-- <meta charset="UTF-8"> -->
+    <meta charset="UTF-8">
     <title>Sportorg Results - {{ title }}</title>
 {% raw %}
     <style>
@@ -735,16 +735,16 @@ pre {
 <body>
 <article class="markdown-body">
     <h4>{{ person.name }} - {{ person.group }}</h4>
-    <br> Team: {{person.team}}
-    <br> Bib: {{person.bib}} SI-card: {{person.card_number}}
-	<br> Start: {{result.start}}
-	<br> Finish: {{result.finish}}
-    <br> Result: {{result.result}}
-	<br> Place: {{result.place}} from {{result.group_count_finished}} (total {{result.group_count_finished}})
+    <br> Команда: {{person.team}}
+    <br> Номер: {{person.bib}} SI-card: {{person.card_number}}
+	<br> Старт: {{result.start}}
+	<br> Финиш: {{result.finish}}
+    <br> Результат: {{result.result}}
+	<br> Место: {{result.place}} из {{result.group_count_finished}} (всего {{result.group_count_finished}})
     {% for leg in legs %}
 		<br>
 		{{leg.index+1}}.<b>{{leg.code}}</b>: {{leg.absolute_time}} {{leg.leg_time}} {{leg.leg_speed}}
-        <br> leader: {{leg.leg_best_time}} ({{leg.leg_leader}})
+        <br> лидер: {{leg.leg_best_time}} ({{leg.leg_leader}})
     {% endfor %}
 </article>
 </body>
