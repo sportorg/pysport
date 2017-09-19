@@ -1,18 +1,17 @@
-import codecs
 import configparser
 import logging
-import sys
 import time
 import traceback
-import webbrowser
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow
 
-from sportorg import config
+import sportorg
+from sportorg import config, app
 from sportorg.app.controllers.dialogs.entry_filter import DialogFilter
 from sportorg.app.controllers.dialogs.event_properties import EventPropertiesDialog
 from sportorg.app.controllers.dialogs.number_change import NumberChangeDialog
+from sportorg.app.controllers.dialogs.print_properties import PrintPropertiesDialog
 from sportorg.app.controllers.dialogs.report_dialog import ReportDialog
 from sportorg.app.controllers.dialogs.sportident_properties import SportidentPropertiesDialog
 from sportorg.app.controllers.dialogs.start_preparation import StartPreparationDialog, guess_courses_for_groups
@@ -23,16 +22,17 @@ from sportorg.app.models import result_generation
 from sportorg.app.models.memory_model import PersonMemoryModel, ResultMemoryModel, GroupMemoryModel, CourseMemoryModel, \
     TeamMemoryModel
 from sportorg.app.models.result_calculation import get_splits_data_printout
+from sportorg.app.plugins.printing.printing import print_html
 from sportorg.config import TEMPLATE_DIR
-from sportorg.core import event
-from sportorg.core import plugin, app
+from sportorg.core import event, plugin
+from sportorg.core.app import App
 from sportorg.language import _
 from sportorg.lib.template.template import get_text_from_file
 
 logging.basicConfig(**config.LOG_CONFIG, level=logging.DEBUG if config.DEBUG else logging.WARNING)
 
 
-class MainWindow(QMainWindow, app.App):
+class MainWindow(QMainWindow, App):
 
     def __init__(self, argv=None):
         super().__init__()
@@ -140,6 +140,7 @@ class MainWindow(QMainWindow, app.App):
         self.action_number_change = QtWidgets.QAction(self)
         self.action_guess_courses = QtWidgets.QAction(self)
         self.action_sportident_settings = QtWidgets.QAction(self)
+        self.action_print_settings = QtWidgets.QAction(self)
 
         self.menu_import.addSeparator()
 
@@ -170,6 +171,7 @@ class MainWindow(QMainWindow, app.App):
         self.menu_results.addAction(self.action_split_printout)
 
         self.menu_options.addAction(self.action_sportident_settings)
+        self.menu_options.addAction(self.action_print_settings)
 
         self.menu_help.addAction(self.action_help)
         self.menu_help.addAction(self.action_about_us)
@@ -276,6 +278,9 @@ class MainWindow(QMainWindow, app.App):
         self.action_sportident_settings.setText(_('SPORTident settings'))
         self.action_sportident_settings.triggered.connect(self.sportident_settings)
 
+        self.action_print_settings.setText(_('Printer settings'))
+        self.action_print_settings.triggered.connect(self.print_settings)
+
         self.menu_help.setTitle(_("Help"))
         self.action_help.setText(_("Help"))
         self.action_about_us.setText(_("About"))
@@ -378,20 +383,22 @@ class MainWindow(QMainWindow, app.App):
     def split_printout(self):
         try:
             obj = race()
+
             person = obj.results[0].person
-            # template_path = 'C:\\tmp\\split_printout.html'
+
             template_path = TEMPLATE_DIR + '\\split_printout.html'
             template = get_text_from_file(template_path, **get_splits_data_printout(person))
 
-            file_name = QtWidgets.QFileDialog.getSaveFileName(self, _('Save As HTML file'),
-                                                              '/report_' + str(time.strftime("%Y%m%d")),
-                                                              _("HTML file (*.html)"))[0]
-            with codecs.open(file_name, 'w', 'utf-8') as file:
-                file.write(template)
-                file.close()
+            print_html(obj.get_setting('split_printer'), template)
 
-            # Open file in your browser
-            webbrowser.open('file://' + file_name, new=2)
+            # file_name = QtWidgets.QFileDialog.getSaveFileName(self, _('Save As HTML file'),
+            #                                                   '/report_' + str(time.strftime("%Y%m%d")),
+            #                                                   _("HTML file (*.html)"))[0]
+            # with codecs.open(file_name, 'w', 'utf-8') as file:
+            #     file.write(template)
+            #     file.close()
+            # # Open file in your browser
+            # webbrowser.open('file://' + file_name, new=2)
         except:
             traceback.print_exc()
 
@@ -411,6 +418,12 @@ class MainWindow(QMainWindow, app.App):
     def sportident_settings(self):
         try:
             SportidentPropertiesDialog().exec()
+        except:
+            traceback.print_exc()
+
+    def print_settings(self):
+        try:
+            PrintPropertiesDialog().exec()
         except:
             traceback.print_exc()
 

@@ -1,18 +1,15 @@
 import sys
 import traceback
 
-from PyQt5 import QtCore, QtWidgets, QtPrintSupport
-from PyQt5.QtCore import QSortFilterProxyModel, QModelIndex
+from PyQt5 import  QtPrintSupport
 from PyQt5.QtGui import QIcon
 from PyQt5.QtPrintSupport import QPrinter, QPrintDialog, QAbstractPrintDialog
 from PyQt5.QtWidgets import QFormLayout, QLabel, \
-    QLineEdit, QComboBox, QCompleter, QApplication, QTableView, QDialog, \
-    QPushButton, QTimeEdit, QRadioButton, QCheckBox
+    QApplication, QDialog, \
+    QPushButton,  QCheckBox
 
 from sportorg.app.controllers.global_access import GlobalAccess
-from sportorg.app.models.memory import race, Organization, Result
-from sportorg.app.models.result_calculation import ResultCalculation
-from sportorg.app.plugins.utils.utils import datetime2qtime, qtime2datetime
+from sportorg.app.models.memory import race
 
 from sportorg.language import _
 
@@ -54,22 +51,6 @@ class PrintPropertiesDialog(QDialog):
         self.selected_printer = QLabel()
         self.selected_split_printer = QLabel()
 
-        printer_name = 'main printer' # TODO
-        try:
-            QPrinter.setPrinterName(printer_name)
-        except:
-            # traceback.print_stack()
-            printer_name = QPrinter().printerName()
-        self.selected_printer.setText(printer_name)
-
-        printer_name = 'split printer' # TODO
-        try:
-            QPrinter.setPrinterName(printer_name)
-        except:
-            # traceback.print_stack()
-            printer_name = QPrinter().printerName()
-        self.selected_split_printer.setText(printer_name)
-
         self.layout.addRow(self.label_printer, self.printer_selector)
         self.layout.addRow(self.selected_printer)
 
@@ -79,6 +60,8 @@ class PrintPropertiesDialog(QDialog):
         self.print_splits_checkbox = QCheckBox(_('Print splits'))
         self.layout.addRow(self.print_splits_checkbox)
 
+        self.set_values()
+
         def cancel_changes():
             self.close()
 
@@ -86,7 +69,6 @@ class PrintPropertiesDialog(QDialog):
             try:
                 self.apply_changes_impl()
             except:
-                print(sys.exc_info())
                 traceback.print_exc()
             self.close()
 
@@ -98,25 +80,22 @@ class PrintPropertiesDialog(QDialog):
 
         self.show()
 
-    def set_values_from_table(self, table, index):
-        self.table = table
-        self.current_index = index
+    def set_values(self):
+        obj = race()
+        printer_name = obj.get_setting('main_printer', QPrinter().printerName())
+        try:
+            QPrinter().setPrinterName(printer_name)
+        except:
+            printer_name = QPrinter().printerName()
+        self.selected_printer.setText(printer_name)
 
-        assert (isinstance(index, QModelIndex))
-        orig_index_int = index.row()
-
-        current_object = race().results[orig_index_int]
-        assert (isinstance(current_object, Result))
-        self.current_object = current_object
-
-        if current_object.finish_time is not None:
-            self.item_finish.setTime(datetime2qtime(current_object.finish_time))
-        if current_object.start_time is not None:
-            self.item_start.setTime(datetime2qtime(current_object.start_time))
-        if current_object.result is not None:
-            self.item_result.setText(str(current_object.result))
-        if current_object.penalty_time is not None:
-            self.item_penalty.setTime(datetime2qtime(current_object.penalty_time))
+        printer_name = obj.get_setting('split_printer', QPrinter().printerName())
+        try:
+            QPrinter().setPrinterName(printer_name)
+        except:
+            traceback.print_exc()
+            printer_name = QPrinter().printerName()
+        self.selected_split_printer.setText(printer_name)
 
     def select_printer(self):
         try:
@@ -130,7 +109,11 @@ class PrintPropertiesDialog(QDialog):
         return None
 
     def apply_changes_impl(self):
-        pass
+        obj = race()
+        main_printer = self.selected_printer.text()
+        obj.set_setting('main_printer', main_printer)
+        split_printer = self.selected_split_printer.text()
+        obj.set_setting('split_printer', split_printer)
 
     def get_parent_window(self):
         return GlobalAccess().get_main_window()
@@ -139,4 +122,3 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = PrintPropertiesDialog()
     sys.exit(app.exec_())
-
