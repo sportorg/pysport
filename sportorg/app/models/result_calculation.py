@@ -1,4 +1,4 @@
-from sportorg.app.models.memory import race, Result, Person, ResultStatus, Course
+from sportorg.app.models.memory import race, Result, Person, ResultStatus, Course, Group
 from sportorg.app.plugins.utils.utils import time_to_hhmmss
 from sportorg.language import _
 
@@ -26,6 +26,18 @@ class ResultCalculation(object):
             if person.group == group:
                 ret.append(i)
         ret.sort()
+        group.count_finished = len(ret)
+        return ret
+
+    def get_group_persons(self, group):
+        assert isinstance(group, Group)
+        ret = []
+        for i in race().persons:
+            person = i
+            assert isinstance(person, Person)
+            if person.group == group:
+                ret.append(i)
+        group.count_person = len(ret)
         return ret
 
     def set_places(self, array):
