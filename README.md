@@ -20,6 +20,12 @@ pip install package-name
 pip install sireader
 ```
 
+or
+
+```
+pip install -r requirements.txt
+```
+
 ### Struct
 
 ```
