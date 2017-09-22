@@ -10,8 +10,9 @@ from PyQt5.QtCore import QSortFilterProxyModel
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QLabel, \
     QComboBox, QCompleter, QApplication, QDialog, \
-    QPushButton
+    QPushButton, QCheckBox
 
+from sportorg.app.models.split_calculation import get_splits_data
 from sportorg.app.plugins.utils.custom_controls import AdvComboBox
 from sportorg.core.template import get_templates, get_text_from_file
 from sportorg.app.models.result_calculation import get_result_data
@@ -40,6 +41,9 @@ class ReportDialog(QDialog):
         self.item_template = AdvComboBox()
         self.item_template.addItems(get_templates())
         self.layout.addRow(self.label_template, self.item_template)
+
+        self.item_split_checkbox = QCheckBox(_('Print splits'))
+        self.layout.addRow(self.item_split_checkbox)
 
         self.item_custom_path = QPushButton('...')
 
@@ -71,7 +75,13 @@ class ReportDialog(QDialog):
 
     def apply_changes_impl(self):
         template_path = self.item_template.currentText()
-        template = get_text_from_file(template_path, **get_result_data())
+
+        if_splits = self.item_split_checkbox.isChecked()
+        if if_splits:
+            template = get_text_from_file(template_path, **get_splits_data())
+        else:
+            template = get_text_from_file(template_path, **get_result_data())
+
         file_name = QtWidgets.QFileDialog.getSaveFileName(self, _('Save As HTML file'),
                                                           '/report_' + str(time.strftime("%Y%m%d")),
                                                           _("HTML file (*.html)"))[0]

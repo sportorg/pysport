@@ -21,8 +21,9 @@ from sportorg.app.models import result_generation
 from sportorg.app.models.memory_model import PersonMemoryModel, ResultMemoryModel, GroupMemoryModel, \
     CourseMemoryModel, TeamMemoryModel
 from sportorg.app.models.result_calculation import get_splits_data_printout
+from sportorg.app.models.split_calculation import GroupSplits
 from sportorg.app.plugins.printing.printing import print_html
-from sportorg.config import TEMPLATE_DIR
+from sportorg.config import TEMPLATE_DIR, template_dir
 from sportorg.core import event, plugin
 from sportorg.core.app import App
 from sportorg.language import _
@@ -396,8 +397,9 @@ class MainWindow(QMainWindow, App):
 
             person = obj.results[index].person
 
-            template_path = TEMPLATE_DIR + '\\split_printout.html'
-            template = get_text_from_file(template_path, **get_splits_data_printout(person))
+            template_path = template_dir('split_printout.html')
+            spl = GroupSplits(person.group)
+            template = get_text_from_file(template_path, **spl.get_json(person))
 
             print_html(obj.get_setting('split_printer'), template)
         except:

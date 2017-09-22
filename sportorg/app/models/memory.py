@@ -119,9 +119,10 @@ class Group(Model):
 
     first_number = None
     count_person = 0
+    count_finished = 0
 
     def get_count_finished(self):
-        pass
+        return self.count_finished
 
     def get_count_all(self):
         return self.count_person
