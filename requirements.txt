@@ -1,0 +1,5 @@
+PyQt5==5.8.2
+sireader==1.1.1
+peewee==2.9.1
+jinja2==2.8
+Flask==0.12.2
