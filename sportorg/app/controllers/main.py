@@ -12,7 +12,6 @@ from sportorg.app.controllers.dialogs.event_properties import EventPropertiesDia
 from sportorg.app.controllers.dialogs.number_change import NumberChangeDialog
 from sportorg.app.controllers.dialogs.print_properties import PrintPropertiesDialog
 from sportorg.app.controllers.dialogs.report_dialog import ReportDialog
-from sportorg.app.controllers.dialogs.sportident_properties import SportidentPropertiesDialog
 from sportorg.app.controllers.dialogs.start_preparation import StartPreparationDialog, guess_courses_for_groups
 from sportorg.app.controllers.global_access import GlobalAccess
 from sportorg.app.controllers.tabs import start_preparation, groups, teams, race_results, courses
@@ -20,10 +19,9 @@ from sportorg.app.models.memory import Race, event as e, race
 from sportorg.app.models import result_generation
 from sportorg.app.models.memory_model import PersonMemoryModel, ResultMemoryModel, GroupMemoryModel, \
     CourseMemoryModel, TeamMemoryModel
-from sportorg.app.models.result_calculation import get_splits_data_printout
 from sportorg.app.models.split_calculation import GroupSplits
 from sportorg.app.plugins.printing.printing import print_html
-from sportorg.config import TEMPLATE_DIR, template_dir
+from sportorg.config import template_dir
 from sportorg.core import event, plugin
 from sportorg.core.app import App
 from sportorg.language import _
@@ -139,7 +137,6 @@ class MainWindow(QMainWindow, App):
         self.action_start_preparation = QtWidgets.QAction(self)
         self.action_number_change = QtWidgets.QAction(self)
         self.action_guess_courses = QtWidgets.QAction(self)
-        self.action_sportident_settings = QtWidgets.QAction(self)
         self.action_print_settings = QtWidgets.QAction(self)
         self.action_manual_finish = QtWidgets.QAction(self)
 
@@ -173,7 +170,6 @@ class MainWindow(QMainWindow, App):
         self.menu_results.addAction(self.action_report)
         self.menu_results.addAction(self.action_split_printout)
 
-        self.menu_options.addAction(self.action_sportident_settings)
         self.menu_options.addAction(self.action_print_settings)
 
         self.menu_help.addAction(self.action_help)
@@ -281,8 +277,16 @@ class MainWindow(QMainWindow, App):
         self.menu_service.setTitle(_("Service"))
 
         self.menu_options.setTitle(_("Options"))
-        self.action_sportident_settings.setText(_('SPORTident settings'))
-        self.action_sportident_settings.triggered.connect(self.sportident_settings)
+
+        menu_options_event = event.event('menuoptions')
+        """
+        :event: toolbar [[title, func],...]
+        """
+        if menu_options_event is not None:
+            for moption in menu_options_event:
+                moption_action = QtWidgets.QAction(moption[0], self)
+                moption_action.triggered.connect(moption[1])
+                self.menu_options.addAction(moption_action)
 
         self.action_print_settings.setText(_('Printer settings'))
         self.action_print_settings.triggered.connect(self.print_settings)
@@ -421,12 +425,6 @@ class MainWindow(QMainWindow, App):
     def start_preparation(self):
         try:
             StartPreparationDialog().exec()
-        except:
-            traceback.print_exc()
-
-    def sportident_settings(self):
-        try:
-            SportidentPropertiesDialog().exec()
         except:
             traceback.print_exc()
 
