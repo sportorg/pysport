@@ -175,13 +175,14 @@ class Widget(QtWidgets.QWidget):
 
         self.ResultCourseDetails.clear()
         index = 1
-        course = result.person.group.course
-        assert isinstance(course, Course)
-        if course.controls is not None:
-            for i in course.controls:
-                assert isinstance(i, CourseControl)
-                s = str(index) + " " + str(i.code) + " " + str(i.length)
-                self.ResultCourseDetails.append(s)
-                index += 1
-        self.ResultCourseNameEdit.setText(course.name)
-        self.ResultCourseLengthEdit.setText(str(course.length))
+        if result.person and result.person.group and result.person.group.course:
+            course = result.person.group.course
+            assert isinstance(course, Course)
+            if course.controls is not None:
+                for i in course.controls:
+                    assert isinstance(i, CourseControl)
+                    s = str(index) + " " + str(i.code) + " " + str(i.length)
+                    self.ResultCourseDetails.append(s)
+                    index += 1
+            self.ResultCourseNameEdit.setText(course.name)
+            self.ResultCourseLengthEdit.setText(str(course.length))
