@@ -117,3 +117,17 @@ class GlobalAccess(object):
             self.get_main_window().refresh()
         except:
             traceback.print_exc()
+
+    def clear_filters(self, remove_condition=True):
+        self.get_person_table().model().clear_filter(remove_condition)
+        self.get_result_table().model().clear_filter(remove_condition)
+        self.get_person_table().model().clear_filter(remove_condition)
+        self.get_course_table().model().clear_filter(remove_condition)
+        self.get_organization_table().model().clear_filter(remove_condition)
+
+    def apply_filters(self):
+        self.get_person_table().model().apply_filter()
+        self.get_result_table().model().apply_filter()
+        self.get_person_table().model().apply_filter()
+        self.get_course_table().model().apply_filter()
+        self.get_organization_table().model().apply_filter()

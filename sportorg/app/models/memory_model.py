@@ -63,8 +63,9 @@ class AbstractSportOrgMemoryModel (QAbstractTableModel):
 
         return QVariant()
 
-    def clear_filter(self):
-        self.filter.clear()
+    def clear_filter(self, remove_condition=True):
+        if remove_condition:
+            self.filter.clear()
         if self.filter_backup is not None and len(self.filter_backup):
             whole_list = self.get_source_array()
             whole_list.extend(self.filter_backup)
