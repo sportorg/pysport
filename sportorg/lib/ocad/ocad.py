@@ -16,11 +16,10 @@ class Item:
 
 
 class CourseControl(Item):
-    order = ''
-    code = ''
-    length = ''
-
     def __init__(self, **kwargs):
+        self.order = ''
+        self.code = ''
+        self.length = ''
         super().__init__(**kwargs)
 
 
@@ -30,14 +29,13 @@ class CourseControlDict(dict):
 
 
 class Course(Item):
-    group = ''
-    type = ''
-    bib = ''
-    climb = 0
-    length = 0
-    controls = CourseControlDict()
-
     def __init__(self, **kwargs):
+        self.group = ''
+        self.type = ''
+        self.bib = ''
+        self.climb = 0
+        self.length = 0
+        self.controls = CourseControlDict()
         super().__init__(**kwargs)
 
 
