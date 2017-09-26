@@ -29,7 +29,6 @@ def start():
         ResultCalculation().process_results()
         event('init_model')
 
-
     if port is not None:
         """
         :event: 'finish' 'sportident', result

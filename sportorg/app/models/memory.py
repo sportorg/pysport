@@ -219,6 +219,7 @@ Punches:
 
         return datetime.datetime.now()
 
+
 class Person(Model):
     def __init__(self):
         self.name = None

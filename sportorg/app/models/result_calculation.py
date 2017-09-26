@@ -172,13 +172,6 @@ def get_splits_data_printout(person):
     return ret
 
 
-
-
-
-
-
-
-
 def get_entry_statistics_data():
     pass
 
