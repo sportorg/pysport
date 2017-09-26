@@ -468,6 +468,8 @@ class MainWindow(QMainWindow, App):
 
     def init_model(self):
         try:
+            GlobalAccess().clear_filters()  # clear filters not to loose filtered data
+
             table = GlobalAccess().get_person_table()
             table.setModel(PersonMemoryModel())
             table = GlobalAccess().get_result_table()

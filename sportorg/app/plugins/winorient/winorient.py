@@ -3,6 +3,7 @@ import traceback
 
 import time
 
+from sportorg.app.controllers.global_access import GlobalAccess
 from sportorg.core import event
 from sportorg import config
 from sportorg.language import _
@@ -110,7 +111,11 @@ def export_wo_wdb():
     if file_name is not '':
         try:
             wb = WinOrientBinary()
+
+            GlobalAccess().clear_filters(False)
             wdb_object = wb.export()
+            GlobalAccess().apply_filters()
+
             write_wdb(wdb_object, file_name)
 
         except:
