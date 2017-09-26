@@ -3,7 +3,7 @@ import traceback
 import datetime
 from PyQt5.QtWidgets import QMessageBox
 
-from sportorg.app.plugins.utils.utils import time_remove_day
+from sportorg.app.plugins.utils.utils import time_remove_day, int_to_time, time_to_hhmmss
 from sportorg.language import _
 from sportorg.core.model import Model
 
@@ -170,7 +170,11 @@ Punches:
     def get_result(self):
         if self.status != 0 and self.status != ResultStatus.OK:
             return None
-        return str(self.get_finish_time() - self.get_start_time())
+
+        if not self.person:
+            return None
+
+        return time_to_hhmmss(self.get_finish_time() - self.get_start_time())
 
     def get_result_for_sort(self):
         ret = 0
@@ -185,7 +189,8 @@ Punches:
         obj = race()
         start_source = obj.get_setting('start_source', 'protocol')
         if start_source == 'protocol':
-            return time_remove_day(self.person.start_time)
+            if self.person:
+                return time_remove_day(self.person.start_time)
         elif start_source == 'station':
             return time_remove_day(self.start_time)
         elif start_source == 'cp':
@@ -193,7 +198,7 @@ Punches:
         elif start_source == 'gate':
             pass
 
-        return datetime.datetime.now()
+        return int_to_time(0)
 
     def get_finish_time(self):
         obj = race()
@@ -344,6 +349,11 @@ class Race(Model):
         new_person = Person()
         new_person.name = '_new'
         race().persons.insert(0, new_person)
+
+    def add_new_result(self):
+        new_result = Result()
+        new_result.finish_time = datetime.datetime.now()
+        race().results.insert(0, new_result)
 
     def add_new_group(self):
         new_group = Group()

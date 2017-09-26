@@ -219,11 +219,20 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
         assert (isinstance(i, Result))
         person = i.person
         group = ''
-        if person.group:
-            group = person.group.name
         team = ''
-        if person.organization:
-            team = person.organization.name
+        first_name = ''
+        last_name = ''
+        bib = ''
+        if person:
+            first_name = person.name
+            last_name = person.surname
+            bib = person.bib
+
+            if person.group:
+                group = person.group.name
+
+            if person.organization:
+                team = person.organization.name
 
         start = ''
         if i.start_time:
@@ -233,13 +242,12 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
         if i.finish_time:
             finish = i.finish_time.strftime('%H:%M:%S')
 
-
         return list([
-            person.surname,
-            person.name,
+            last_name,
+            first_name,
             group,
             team,
-            person.bib,
+            bib,
             start,
             finish,
             i.get_result(),

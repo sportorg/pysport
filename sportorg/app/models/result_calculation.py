@@ -14,7 +14,8 @@ class ResultCalculation(object):
         for i in race().results:
             assert isinstance(i, Result)
             person = i.person
-            i.start_time = person.start_time
+            if person:
+                i.start_time = person.start_time
             i.result = i.get_result_for_sort()
 
     def get_group_finishes(self, group):
@@ -22,9 +23,10 @@ class ResultCalculation(object):
         for i in race().results:
             assert isinstance(i, Result)
             person = i.person
-            assert isinstance(person, Person)
-            if person.group == group:
-                ret.append(i)
+            if person:
+                assert isinstance(person, Person)
+                if person.group == group:
+                    ret.append(i)
         ret.sort()
         group.count_finished = len(ret)
         return ret
