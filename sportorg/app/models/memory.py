@@ -80,9 +80,12 @@ class Course(Model):
     bib = None
     length = None
     climb = None
-    controls = [] # type: List[CourseControl]
+    controls = None # type: List[CourseControl]
     count_person = 0
     count_group = 0
+
+    def __init__(self):
+        self.controls = []
 
     def get_code_list(self):
         ret = []
