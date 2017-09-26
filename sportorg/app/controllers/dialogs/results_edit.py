@@ -1,15 +1,14 @@
 import sys
 import traceback
 
-from PyQt5 import QtCore
-from PyQt5.QtCore import QSortFilterProxyModel, QModelIndex
+from PyQt5.QtCore import QModelIndex
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QLabel, \
-    QLineEdit, QComboBox, QCompleter, QApplication, QTableView, QDialog, \
+    QLineEdit, QApplication, QDialog, \
     QPushButton, QTimeEdit, QRadioButton, QSpinBox
 
 from sportorg.app.controllers.global_access import GlobalAccess
-from sportorg.app.models.memory import race, Organization, Result, find
+from sportorg.app.models.memory import race, Organization, Result, find, ResultStatus
 from sportorg.app.models.result_calculation import ResultCalculation
 from sportorg.app.plugins.utils.utils import datetime2qtime, qtime2datetime
 
@@ -69,12 +68,14 @@ class ResultEditDialog(QDialog):
         self.radio_ok.setChecked(True)
         self.radio_dns = QRadioButton(_('DNS'))
         self.radio_dnf = QRadioButton(_('DNF'))
+        self.radio_overtime = QRadioButton(_('Overtime'))
         self.radio_dsq = QRadioButton(_('DSQ'))
         self.text_dsq = QLineEdit()
 
         self.layout.addRow(self.radio_ok)
         self.layout.addRow(self.radio_dns)
         self.layout.addRow(self.radio_dnf)
+        self.layout.addRow(self.radio_overtime)
         self.layout.addRow(self.radio_dsq, self.text_dsq)
 
         def cancel_changes():
@@ -124,11 +125,22 @@ class ResultEditDialog(QDialog):
         if current_object.start_time is not None:
             self.item_start.setTime(datetime2qtime(current_object.start_time))
         if current_object.result is not None:
-            self.item_result.setText(str(current_object.result))
+            self.item_result.setText(str(current_object.get_result()))
         if current_object.penalty_time is not None:
             self.item_penalty.setTime(datetime2qtime(current_object.penalty_time))
         if current_object.person:
             self.item_bib.setValue(current_object.person.bib)
+
+        if current_object.status == ResultStatus.OK or current_object.status == 0:
+            self.radio_ok.setChecked(True)
+        elif current_object.status == ResultStatus.DISQUALIFIED or current_object.status == 1:
+            self.radio_dsq.setChecked(True)
+        elif current_object.status == ResultStatus.OVERTIME or current_object.status == 2:
+            self.radio_overtime.setChecked(True)
+        elif current_object.status == ResultStatus.DID_NOT_FINISH or current_object.status == 7:
+            self.radio_dnf.setChecked(True)
+        elif current_object.status == ResultStatus.DID_NOT_START or current_object.status == 8:
+            self.radio_dns.setChecked(True)
 
     def apply_changes_impl(self):
         changed = False
@@ -156,6 +168,21 @@ class ResultEditDialog(QDialog):
             GlobalAccess().get_result_table().model().init_cache()
             changed = True
 
+        status = -1
+        if self.radio_ok.isChecked():
+            status = 0
+        elif self.radio_dsq.isChecked():
+            status = 1
+        elif self.radio_overtime.isChecked():
+            status = 2
+        elif self.radio_dnf.isChecked():
+            status = 7
+        elif self.radio_dn8.isChecked():
+            status = 8
+        if result.status != status:
+            result.status = status
+            changed = True
+
         if changed:
             ResultCalculation().process_results()
             self.get_parent_window().refresh()
@@ -167,4 +194,3 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = ResultEditDialog()
     sys.exit(app.exec_())
-
