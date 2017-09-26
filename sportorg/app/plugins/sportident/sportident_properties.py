@@ -1,25 +1,21 @@
 import sys
 import traceback
 
-from PyQt5 import QtCore
-from PyQt5.QtCore import QSortFilterProxyModel, QTime
+from PyQt5.QtCore import QTime
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QLabel, \
-    QLineEdit, QComboBox, QCompleter, QApplication, QDialog, \
-    QPushButton, QTextEdit, QDateEdit, QTimeEdit, QSpinBox, QRadioButton, QGroupBox, QVBoxLayout
+    QApplication, QDialog, \
+    QPushButton, QTimeEdit, QSpinBox, QRadioButton, QGroupBox
 
 from sportorg.app.controllers.global_access import GlobalAccess
 from sportorg.app.models.memory import race
-from sportorg.app.plugins.utils.custom_controls import AdvComboBox
 from sportorg.config import icon_dir
 
 from sportorg.language import _
 
 
-
-
 class SportidentPropertiesDialog(QDialog):
-    def __init__(self, table=None, index=None):
+    def __init__(self):
         super().__init__()
         self.init_ui()
 
@@ -35,7 +31,6 @@ class SportidentPropertiesDialog(QDialog):
         self.setToolTip(_('SPORTident Properties Window'))
 
         self.layout = QFormLayout(self)
-
 
         self.label_zero_time = QLabel(_('Zero time'))
         self.item_zero_time = QTimeEdit()
@@ -124,7 +119,7 @@ class SportidentPropertiesDialog(QDialog):
         changed = False
         obj = race()
 
-        start_source=''
+        start_source = ''
         if self.item_start_protocol.isChecked():
             start_source = 'protocol'
         if self.item_start_station.isChecked():
@@ -142,7 +137,6 @@ class SportidentPropertiesDialog(QDialog):
             finish_source = 'cp'
         if self.item_finish_beam.isChecked():
             finish_source = 'beam'
-
 
         obj.set_setting('finish_source', finish_source)
         obj.set_setting('start_source', start_source)

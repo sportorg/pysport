@@ -80,7 +80,7 @@ class Course(Model):
     bib = None
     length = None
     climb = None
-    controls = [] # type: List[CourseControl]
+    controls = []  # type: List[CourseControl]
     count_person = 0
     count_group = 0
 
@@ -135,11 +135,11 @@ class Result(Model):
     punches = []
     penalty_time = None  # time of penalties (marked route, false start)
     penalty_laps = None  # count of penalty legs (marked route)
-    status = 0
+    status = ''
     result = None  # time in seconds * 100 (int)
     place = None
 
-    person = None  # type: Person reverse link to person
+    person = None  # type: Person
 
     def __repr__(self):
         punches = ''
@@ -212,6 +212,7 @@ Punches:
 
         return datetime.datetime.now()
 
+
 class Person(Model):
     name = None
     surname = None
@@ -225,7 +226,7 @@ class Person(Model):
     year = None  # sometime we have only year of birth
     birth_date = None  # datetime
     organization = None
-    group = None
+    group = None  # type: Group
     nationality = None  # type: Country
     address = None  # type: Address
     contact = []  # type: List[Contact]

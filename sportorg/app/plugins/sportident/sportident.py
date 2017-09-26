@@ -1,3 +1,6 @@
+import traceback
+
+from .sportident_properties import SportidentPropertiesDialog
 from . import card_reader
 from sportorg import config
 from sportorg.core import event
@@ -32,8 +35,19 @@ def start_reader():
             message(_('Close port ' + port))
 
 
+def sportident_settings():
+    try:
+        SportidentPropertiesDialog().exec()
+    except:
+        traceback.print_exc()
+
+
 def toolbar():
     return [config.plugin_dir('sportident', 'img', 'sportident.png'), _("SPORTident readout"), start_reader]
+
+
+def menu_setting():
+    return [_('SPORTident settings'), sportident_settings]
 
 
 def set_statusbar(sb):
@@ -46,5 +60,6 @@ def message(msg):
 
 
 event.add_event('toolbar', toolbar)
+event.add_event('menuoptions', menu_setting)
 event.add_event('statusbar', set_statusbar)
 event.add_event('finish', lambda _id, result: print(_id, result))

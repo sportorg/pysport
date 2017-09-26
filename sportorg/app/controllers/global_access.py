@@ -1,7 +1,7 @@
 import traceback
 
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import QItemSelectionModel, QModelIndex, QSortFilterProxyModel
+from PyQt5.QtCore import QItemSelectionModel, QModelIndex
 
 from PyQt5.QtWidgets import QTableView, QMessageBox
 
