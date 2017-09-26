@@ -355,8 +355,8 @@ class EntryEditDialog(QDialog):
         if person.qual != self.item_qual.currentText():
             person.qual = self.item_qual.currentText()
             changed = True
-        if person.bib != self.item_bib.text() and self.item_bib.text() != '0':
-            person.bib = self.item_bib.text()
+        if person.bib != self.item_bib.value() and self.item_bib.value() != 0:
+            person.bib = self.item_bib.value()
             changed = True
 
         new_time = qtime2datetime(self.item_start.time())
