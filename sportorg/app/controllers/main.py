@@ -141,6 +141,7 @@ class MainWindow(QMainWindow, App):
         self.action_guess_courses = QtWidgets.QAction(self)
         self.action_sportident_settings = QtWidgets.QAction(self)
         self.action_print_settings = QtWidgets.QAction(self)
+        self.action_manual_finish = QtWidgets.QAction(self)
 
         self.menu_import.addSeparator()
 
@@ -166,6 +167,8 @@ class MainWindow(QMainWindow, App):
         self.menu_start_preparation.addAction(self.action_start_preparation)
         self.menu_start_preparation.addAction(self.action_number_change)
         self.menu_start_preparation.addAction(self.action_guess_courses)
+
+        self.menu_race.addAction(self.action_manual_finish)
 
         self.menu_results.addAction(self.action_report)
         self.menu_results.addAction(self.action_split_printout)
@@ -267,6 +270,9 @@ class MainWindow(QMainWindow, App):
         self.action_guess_courses.triggered.connect(self.guess_courses)
 
         self.menu_race.setTitle(_("Race"))
+        self.action_manual_finish.setText(_('Manual finish'))
+        self.action_manual_finish.triggered.connect(self.manual_finish)
+        self.action_manual_finish.setShortcut("F3")
 
         self.menu_results.setTitle(_("Results"))
 
@@ -440,6 +446,14 @@ class MainWindow(QMainWindow, App):
     def guess_courses(self):
         try:
             guess_courses_for_groups()
+        except:
+            traceback.print_exc()
+
+    def manual_finish(self):
+        try:
+            race().add_new_result()
+            GlobalAccess().get_result_table().model().init_cache()
+            GlobalAccess().get_main_window().refresh()
         except:
             traceback.print_exc()
 

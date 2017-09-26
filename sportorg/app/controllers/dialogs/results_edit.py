@@ -6,10 +6,10 @@ from PyQt5.QtCore import QSortFilterProxyModel, QModelIndex
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QLabel, \
     QLineEdit, QComboBox, QCompleter, QApplication, QTableView, QDialog, \
-    QPushButton, QTimeEdit, QRadioButton
+    QPushButton, QTimeEdit, QRadioButton, QSpinBox
 
 from sportorg.app.controllers.global_access import GlobalAccess
-from sportorg.app.models.memory import race, Organization, Result
+from sportorg.app.models.memory import race, Organization, Result, find
 from sportorg.app.models.result_calculation import ResultCalculation
 from sportorg.app.plugins.utils.utils import datetime2qtime, qtime2datetime
 
@@ -35,6 +35,15 @@ class ResultEditDialog(QDialog):
         self.setToolTip(_('Result Edit Window'))
 
         self.layout = QFormLayout(self)
+
+        self.label_bib = QLabel(_('Bib'))
+        self.item_bib = QSpinBox()
+        self.item_bib.setMaximum(99999)
+        self.item_bib.valueChanged.connect(self.show_person_info)
+        self.layout.addRow(self.label_bib, self.item_bib)
+
+        self.label_person_info = QLabel('')
+        self.layout.addRow(self.label_person_info)
 
         self.label_finish = QLabel(_('Finish'))
         self.item_finish = QTimeEdit()
@@ -87,6 +96,18 @@ class ResultEditDialog(QDialog):
 
         self.show()
 
+    def show_person_info(self):
+        bib = self.item_bib.value()
+        if bib:
+            person = find(race().persons, bib=bib)
+            if person:
+                info = person.surname + ' ' + person.name
+                if person.group:
+                    info += '  ' + person.group.name
+                self.label_person_info.setText(info)
+            else:
+                self.label_person_info.setText(_('not found'))
+
     def set_values_from_table(self, table, index):
         self.table = table
         self.current_index = index
@@ -106,8 +127,8 @@ class ResultEditDialog(QDialog):
             self.item_result.setText(str(current_object.result))
         if current_object.penalty_time is not None:
             self.item_penalty.setTime(datetime2qtime(current_object.penalty_time))
-
-
+        if current_object.person:
+            self.item_bib.setValue(current_object.person.bib)
 
     def apply_changes_impl(self):
         changed = False
@@ -124,6 +145,16 @@ class ResultEditDialog(QDialog):
             result.start_time = time
             changed = True
 
+        cur_bib = -1
+        new_bib = self.item_bib.value()
+        if result.person:
+            cur_bib = result.person.bib
+
+        if cur_bib != new_bib:
+            new_person = find(race().persons, bib=new_bib)
+            result.person = new_person
+            GlobalAccess().get_result_table().model().init_cache()
+            changed = True
 
         if changed:
             ResultCalculation().process_results()

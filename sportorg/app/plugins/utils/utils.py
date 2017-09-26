@@ -16,7 +16,8 @@ def qtime2datetime(t):
 def datetime2qtime(t):
     assert isinstance(t, datetime.datetime)
     time = QTime()
-    time.setHMS(t.hour, t.minute, t.second, t.microsecond)
+    # time.setHMS(t.hour, t.minute, t.second, t.microsecond) TODO:show microseconds
+    time.setHMS(t.hour, t.minute, t.second)
     return time
 
 
