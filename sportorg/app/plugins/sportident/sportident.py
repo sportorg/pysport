@@ -1,4 +1,5 @@
 import traceback
+import logging
 
 from .sportident_properties import SportidentPropertiesDialog
 from . import card_reader
@@ -18,11 +19,9 @@ def start_reader():
     if reader is None:
         reader = card_reader.read()
         if reader is not None:
-            print(_('Open port ' + reader.port))
             message(_('Open port ' + reader.port))
         else:
-            print(_('Port not open'))
-            message(_('Port not open'))
+            message(_('Port not open'), True)
     elif not reader.reading:
         reader = None
         start_reader()
@@ -31,7 +30,6 @@ def start_reader():
         if not reader.reading:
             port = reader.port
             reader = None
-            print(_('Close port ' + port))
             message(_('Close port ' + port))
 
 
@@ -55,7 +53,11 @@ def set_statusbar(sb):
     statusbar = sb
 
 
-def message(msg):
+def message(msg, is_error=False):
+    if is_error:
+        logging.error(msg)
+    else:
+        logging.info(msg)
     statusbar.showMessage(msg, 5000)
 
 

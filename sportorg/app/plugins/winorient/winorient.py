@@ -77,8 +77,6 @@ def import_csv(source):
         )
         race.persons.append(person)
 
-print('winorient plugin')
-
 app_window = None
 
 
@@ -129,8 +127,10 @@ def menu_inport_csv():
 def menu_inport_wdb():
     return [_("WDB Winorient"), import_wo_wdb]
 
+
 def menu_export_wdb():
     return [_("WDB Winorient"), export_wo_wdb]
+
 
 def set_app(app):
     global app_window
