@@ -223,7 +223,7 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
         team = ''
         first_name = ''
         last_name = ''
-        bib = ''
+        bib = 0
         if person:
             first_name = person.name
             last_name = person.surname

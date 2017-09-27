@@ -4,6 +4,7 @@ import random
 
 from datetime import timedelta
 
+from sportorg.app.controllers.global_access import GlobalAccess
 from sportorg.app.models.memory import race, Group, Person
 
 
@@ -242,7 +243,7 @@ class StartNumberManager(object):
         if persons is not None and len(persons) > 0:
             first_start = persons[0].start_time
             minute = first_start.minute
-            min_num = int(first_number / 100) + minute
+            min_num = int(first_number / 100) * 100 + minute
             if min_num < first_number:
                 min_num += 100
 
@@ -326,3 +327,33 @@ def get_groups_by_corridor(corridor):
         if cur_corridor == corridor:
             ret.append(current_group)
     return sorted(ret, key=lambda item: item.order_in_corridor)
+
+
+def guess_courses_for_groups():
+    obj = race()
+    for cur_group in obj.groups:
+        assert isinstance(cur_group, Group)
+        if not cur_group.course or True: # TODO check empty courses after export!
+            for cur_course in obj.courses:
+                course_name = cur_course.name
+                group_name = cur_group.name
+                if str(course_name).find(group_name) > -1:
+                    cur_group.course = cur_course
+                    print('Connecting: group ' + group_name + ' with course ' + course_name);
+                    break;
+    GlobalAccess().get_main_window().refresh()
+
+
+def guess_corridors_for_groups():
+    obj = race()
+    course_index = 1
+    for cur_course in obj.courses:
+        cur_course.corridor = course_index
+        course_index += 1
+
+    for cur_group in obj.groups:
+        assert isinstance(cur_group, Group)
+        if cur_group.course:
+            cur_group.start_corridor = cur_group.course.corridor
+
+    GlobalAccess().get_main_window().refresh()

@@ -12,8 +12,7 @@ from sportorg.app.controllers.dialogs.event_properties import EventPropertiesDia
 from sportorg.app.controllers.dialogs.number_change import NumberChangeDialog
 from sportorg.app.controllers.dialogs.print_properties import PrintPropertiesDialog
 from sportorg.app.controllers.dialogs.report_dialog import ReportDialog
-from sportorg.app.controllers.dialogs.start_preparation import StartPreparationDialog, guess_courses_for_groups, \
-    guess_corridors_for_groups
+from sportorg.app.controllers.dialogs.start_preparation import StartPreparationDialog
 from sportorg.app.controllers.global_access import GlobalAccess
 from sportorg.app.controllers.tabs import start_preparation, groups, teams, race_results, courses
 from sportorg.app.models.memory import Race, event as e, race
@@ -21,6 +20,7 @@ from sportorg.app.models import result_generation
 from sportorg.app.models.memory_model import PersonMemoryModel, ResultMemoryModel, GroupMemoryModel, \
     CourseMemoryModel, TeamMemoryModel
 from sportorg.app.models.split_calculation import GroupSplits
+from sportorg.app.models.start_preparation import guess_courses_for_groups, guess_corridors_for_groups
 from sportorg.app.plugins.printing.printing import print_html
 from sportorg.config import template_dir
 from sportorg.core import event, plugin
