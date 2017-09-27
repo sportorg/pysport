@@ -287,12 +287,12 @@ class StartPreparationDialog(QDialog):
 
             if self.start_check_box.isChecked():
                 corridor_first_start = qtime2datetime(self.start_first_time_edit.time())
+                fixed_start_interval = qtime2datetime(self.start_interval_time_edit.time())
                 if self.start_interval_radio_button.isChecked():
-                    fixed_start_interval = qtime2datetime(self.start_interval_time_edit.time())
                     StartTimeManager().process(corridor_first_start, False, fixed_start_interval)
 
                 if self.start_group_settings_radion_button.isChecked():
-                    StartTimeManager().process(corridor_first_start.toPyTime(), True, None)
+                    StartTimeManager().process(corridor_first_start, True, fixed_start_interval)
 
             self.progress_bar.setValue(75)
             sleep(progressbar_delay)
@@ -338,7 +338,7 @@ class StartPreparationDialog(QDialog):
 
         self.reserve_check_box.setChecked(obj.get_setting('is_start_preparation_reserve', False))
         self.reserve_prefix.setText(obj.get_setting('reserve_prefix', _('Reserve')))
-        self.reserve_group_count_spin_box.setValue(obj.get_setting('reserve_count', 0))
+        self.reserve_group_count_spin_box.setValue(obj.get_setting('reserve_count', 1))
         self.reserve_group_percent_spin_box.setValue(obj.get_setting('reserve_percent', 0))
 
         self.draw_check_box.setChecked(obj.get_setting('is_start_preparation_draw', False))

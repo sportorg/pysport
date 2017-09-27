@@ -90,6 +90,7 @@ class GroupEditDialog(QDialog):
 
         self.label_start_interval = QLabel(_('Start interval'))
         self.item_start_interval = QTimeEdit()
+        self.item_start_interval.setDisplayFormat("hh:mm:ss")
         self.layout.addRow(self.label_start_interval, self.item_start_interval)
 
         self.label_first_number = QLabel(_('First number'))

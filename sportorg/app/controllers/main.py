@@ -12,7 +12,7 @@ from sportorg.app.controllers.dialogs.event_properties import EventPropertiesDia
 from sportorg.app.controllers.dialogs.number_change import NumberChangeDialog
 from sportorg.app.controllers.dialogs.print_properties import PrintPropertiesDialog
 from sportorg.app.controllers.dialogs.report_dialog import ReportDialog
-from sportorg.app.controllers.dialogs.start_preparation import StartPreparationDialog, guess_courses_for_groups
+from sportorg.app.controllers.dialogs.start_preparation import StartPreparationDialog
 from sportorg.app.controllers.global_access import GlobalAccess
 from sportorg.app.controllers.tabs import start_preparation, groups, teams, race_results, courses
 from sportorg.app.models.memory import Race, event as e, race
@@ -20,6 +20,7 @@ from sportorg.app.models import result_generation
 from sportorg.app.models.memory_model import PersonMemoryModel, ResultMemoryModel, GroupMemoryModel, \
     CourseMemoryModel, TeamMemoryModel
 from sportorg.app.models.split_calculation import GroupSplits
+from sportorg.app.models.start_preparation import guess_courses_for_groups, guess_corridors_for_groups
 from sportorg.app.plugins.printing.printing import print_html
 from sportorg.config import template_dir
 from sportorg.core import event, plugin
@@ -137,6 +138,7 @@ class MainWindow(QMainWindow, App):
         self.action_start_preparation = QtWidgets.QAction(self)
         self.action_number_change = QtWidgets.QAction(self)
         self.action_guess_courses = QtWidgets.QAction(self)
+        self.action_guess_corridors = QtWidgets.QAction(self)
         self.action_print_settings = QtWidgets.QAction(self)
         self.action_manual_finish = QtWidgets.QAction(self)
 
@@ -164,6 +166,7 @@ class MainWindow(QMainWindow, App):
         self.menu_start_preparation.addAction(self.action_start_preparation)
         self.menu_start_preparation.addAction(self.action_number_change)
         self.menu_start_preparation.addAction(self.action_guess_courses)
+        self.menu_start_preparation.addAction(self.action_guess_corridors)
 
         self.menu_race.addAction(self.action_manual_finish)
 
@@ -264,6 +267,8 @@ class MainWindow(QMainWindow, App):
         self.action_number_change.triggered.connect(self.number_change)
         self.action_guess_courses.setText(_("Guess courses"))
         self.action_guess_courses.triggered.connect(self.guess_courses)
+        self.action_guess_corridors.setText(_("Guess corridors"))
+        self.action_guess_corridors.triggered.connect(self.guess_corridors)
 
         self.menu_race.setTitle(_("Race"))
         self.action_manual_finish.setText(_('Manual finish'))
@@ -444,6 +449,12 @@ class MainWindow(QMainWindow, App):
     def guess_courses(self):
         try:
             guess_courses_for_groups()
+        except:
+            traceback.print_exc()
+
+    def guess_corridors(self):
+        try:
+            guess_corridors_for_groups()
         except:
             traceback.print_exc()
 
