@@ -76,5 +76,3 @@ def import_txt_v8(source):
         memory.race().courses.append(c)
 
     return True
-
-print('ocad plugin')
