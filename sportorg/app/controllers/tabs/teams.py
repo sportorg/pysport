@@ -59,7 +59,7 @@ class Widget(QtWidgets.QWidget):
 
             logging.info('Team: clicked on ' + str(index.row()))
 
-        self.TeamTable.doubleClicked.connect(team_double_clicked)
+        self.TeamTable.activated.connect(team_double_clicked)
         self.team_layout.addWidget(self.TeamTable)
 
     def get_table(self):
