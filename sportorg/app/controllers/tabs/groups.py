@@ -55,7 +55,7 @@ class Widget(QtWidgets.QWidget):
             except:
                 traceback.print_exc()
 
-        self.GroupTable.doubleClicked.connect(group_double_clicked)
+        self.GroupTable.activated.connect(group_double_clicked)
         self.group_layout.addWidget(self.GroupTable)
 
     def get_table(self):
