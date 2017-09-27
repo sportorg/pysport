@@ -287,12 +287,12 @@ class StartPreparationDialog(QDialog):
 
             if self.start_check_box.isChecked():
                 corridor_first_start = qtime2datetime(self.start_first_time_edit.time())
+                fixed_start_interval = qtime2datetime(self.start_interval_time_edit.time())
                 if self.start_interval_radio_button.isChecked():
-                    fixed_start_interval = qtime2datetime(self.start_interval_time_edit.time())
                     StartTimeManager().process(corridor_first_start, False, fixed_start_interval)
 
                 if self.start_group_settings_radion_button.isChecked():
-                    StartTimeManager().process(corridor_first_start.toPyTime(), True, None)
+                    StartTimeManager().process(corridor_first_start, True, fixed_start_interval)
 
             self.progress_bar.setValue(75)
             sleep(progressbar_delay)
@@ -368,6 +368,21 @@ def guess_courses_for_groups():
                     cur_group.course = cur_course
                     print('Connecting: group ' + group_name + ' with course ' + course_name);
                     break;
+    GlobalAccess().get_main_window().refresh()
+
+
+def guess_corridors_for_groups():
+    obj = race()
+    course_index = 1
+    for cur_course in obj.courses:
+        cur_course.corridor = course_index
+        course_index += 1
+
+    for cur_group in obj.groups:
+        assert isinstance(cur_group, Group)
+        if cur_group.course:
+            cur_group.start_corridor = cur_group.course.corridor
+
     GlobalAccess().get_main_window().refresh()
 
 

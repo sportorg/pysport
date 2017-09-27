@@ -88,6 +88,7 @@ class Course(Model):
         self.controls = [] # type: List[CourseControl]
         self.count_person = 0
         self.count_group = 0
+        self.corridor = 0
 
     def get_code_list(self):
         ret = []

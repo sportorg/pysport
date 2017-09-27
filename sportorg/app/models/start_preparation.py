@@ -217,6 +217,15 @@ class StartNumberManager(object):
                     assert isinstance(cur_group, Group)
                     self.process_group(cur_group, cur_num, interval)
                     cur_num += cur_group.count_person * interval
+        else:
+            corridors = get_corridors()
+            first_number = 1  # TODO calculate from first start minute
+            cur_num = first_number
+            for cur_corridor in corridors:
+                groups = get_groups_by_corridor(cur_corridor)
+                for cur_group in groups:
+                    cur_num = self.process_group_number_by_minute(cur_group, cur_num) + 1
+                cur_num = cur_num - (cur_num % 100) + 100
 
     def process_group(self, group, first_number, interval):
         current_race = race()
@@ -226,6 +235,30 @@ class StartNumberManager(object):
             for current_person in persons:
                 current_person.bib = current_num
                 current_num += interval
+
+    def process_group_number_by_minute(self, group, first_number):
+        current_race = race()
+        persons = current_race.get_persons_by_group(group)
+        if persons is not None and len(persons) > 0:
+            first_start = persons[0].start_time
+            minute = first_start.minute
+            min_num = int(first_number / 100) + minute
+            if min_num < first_number:
+                min_num += 100
+
+            for current_person in persons:
+                start_time = current_person.start_time
+                assert isinstance(start_time, datetime.datetime)
+                time_delta = (start_time - first_start)
+                assert isinstance(time_delta, timedelta)
+                delta = time_delta.seconds // 60
+                current_person.bib = min_num + delta
+            return persons[-1].bib
+
+        return first_number
+
+
+
 
 
 class StartTimeManager(object):
@@ -288,6 +321,8 @@ def get_groups_by_corridor(corridor):
     for current_group in current_race.groups:
         assert isinstance(current_group, Group)
         cur_corridor = current_group.start_corridor
+        if not cur_corridor:
+            cur_corridor = 0
         if cur_corridor == corridor:
             ret.append(current_group)
     return sorted(ret, key=lambda item: item.order_in_corridor)
