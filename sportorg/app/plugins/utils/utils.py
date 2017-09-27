@@ -1,9 +1,6 @@
 import datetime
-from datetime import timedelta
 
 from PyQt5.QtCore import QTime
-
-print('utils plugin')
 
 
 def qtime2datetime(t):

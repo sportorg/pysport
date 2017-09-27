@@ -1,5 +1,5 @@
 import configparser
-import logging
+import logging.config
 import time
 import traceback
 
@@ -27,7 +27,7 @@ from sportorg.core.app import App
 from sportorg.language import _
 from sportorg.lib.template.template import get_text_from_file
 
-logging.basicConfig(**config.LOG_CONFIG, level=logging.DEBUG if config.DEBUG else logging.WARNING)
+logging.config.dictConfig(config.LOG_CONFIG)
 
 
 class MainWindow(QMainWindow, App):

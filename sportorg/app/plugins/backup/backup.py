@@ -37,4 +37,3 @@ def event_load(file):
 
 add_event('dump', event_dump)
 add_event('load', event_load)
-print('backup plugin')

@@ -1,6 +1,8 @@
 import os
 import sys
 
+import logging
+
 import time
 
 NAME = 'SportOrg'
@@ -72,9 +74,48 @@ CONFIG_INI = data_dir('config.ini')
 
 LOCALE_DIR = base_dir('languages')
 
-FORMAT = '%(asctime)-15s - %(filename)s - %(levelname)s - %(message)s'
-
-LOG_CONFIG = dict(filename=log_dir(NAME.lower() + str(time.strftime("%Y%m%d")) + '.log'), format=FORMAT)
+LOG_CONFIG = {
+    'version': 1,
+    'formatters': {
+        'detailed': {
+            'class': 'logging.Formatter',
+            'format': '%(asctime)-15s - %(filename)s - %(processName)-10s - %(levelname)s - %(message)s'
+        },
+        'short': {
+            'class': 'logging.Formatter',
+            'format': '%(filename)s - %(levelname)s - %(message)s'
+        }
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'level': 'DEBUG',
+            'formatter': 'short'
+        },
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': log_dir(NAME.lower() + '.log'),
+            'mode': 'a',
+            'formatter': 'detailed'
+        },
+        'errors': {
+            'class': 'logging.FileHandler',
+            'filename': log_dir(NAME.lower() + '-errors.log'),
+            'mode': 'a',
+            'level': 'ERROR',
+            'formatter': 'detailed'
+        },
+    },
+    'loggers': {
+        'main': {
+            'handlers': ['file']
+        }
+    },
+    'root': {
+        'level': 'DEBUG',
+        'handlers': ['console', 'file', 'errors']
+    },
+}
 
 DIRS = [
     IMG_DIR,
