@@ -212,7 +212,8 @@ Punches:
         obj = race()
         finish_source = obj.get_setting('finish_source', 'station')
         if finish_source == 'station':
-            return time_remove_day(self.finish_time)
+            if self.finish_time:
+                return time_remove_day(self.finish_time)
         elif finish_source == 'cp':
             pass
         elif finish_source == 'beam':
