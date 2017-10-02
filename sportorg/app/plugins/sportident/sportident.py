@@ -5,13 +5,11 @@ from .sportident_properties import SportidentPropertiesDialog
 from . import card_reader
 from sportorg import config
 from sportorg.core import event
+from sportorg.language import _
+
 
 reader = None
 statusbar = None
-
-
-def _(string):
-    return string
 
 
 def start_reader():

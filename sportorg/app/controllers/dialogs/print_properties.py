@@ -22,11 +22,10 @@ class PrintPropertiesDialog(QDialog):
         self.close()
 
     def init_ui(self):
-        self.setWindowTitle(_('Print properties'))
+        self.setWindowTitle(_('Printer settings'))
         self.setWindowIcon(QIcon('sportorg.ico'))
         self.setSizeGripEnabled(False)
         self.setModal(True)
-        self.setToolTip(_('Print properties Window'))
 
         self.layout = QFormLayout(self)
 
