@@ -1,10 +1,6 @@
 import os
 import sys
 
-import logging
-
-import time
-
 NAME = 'SportOrg'
 VERSION = '1.0'
 DEBUG = True

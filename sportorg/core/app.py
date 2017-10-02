@@ -1,5 +1,3 @@
-import traceback
-
 from .event import event
 
 

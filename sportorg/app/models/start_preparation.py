@@ -55,7 +55,6 @@ class DrawManager(object):
         self.split_teams = False
         self.split_start_groups = False
 
-
     def process(self, split_start_groups, split_teams, split_regions, mix_groups=False):
         current_race = race()
         current_race.update_counters()
@@ -259,9 +258,6 @@ class StartNumberManager(object):
         return first_number
 
 
-
-
-
 class StartTimeManager(object):
     """
         Set new start time for athletes
@@ -333,14 +329,14 @@ def guess_courses_for_groups():
     obj = race()
     for cur_group in obj.groups:
         assert isinstance(cur_group, Group)
-        if not cur_group.course or True: # TODO check empty courses after export!
+        if not cur_group.course or True:  # TODO check empty courses after export!
             for cur_course in obj.courses:
                 course_name = cur_course.name
                 group_name = cur_group.name
                 if str(course_name).find(group_name) > -1:
                     cur_group.course = cur_course
-                    print('Connecting: group ' + group_name + ' with course ' + course_name);
-                    break;
+                    print('Connecting: group ' + group_name + ' with course ' + course_name)
+                    break
     GlobalAccess().get_main_window().refresh()
 
 

@@ -32,6 +32,7 @@ class LegSplit(object):
         ret['length_leg'] = self.length_leg
         return ret
 
+
 class PersonSplits(object):
     def __init__(self, result):
 
@@ -151,6 +152,7 @@ class PersonSplits(object):
 
         return ret
 
+
 class GroupSplits(object):
     def __init__(self, group):
 
@@ -265,10 +267,10 @@ class GroupSplits(object):
             persons.append(person_json)
 
         group_json['persons'] = persons
-        groups = []
-        groups.append(group_json)
+        groups = [group_json]
         ret['groups'] = groups
         return ret
+
 
 def get_splits_data():
     ret = {}
@@ -287,12 +289,13 @@ def get_splits_data():
     ret['title'] = race().get_setting('sub_title')
     titles = ['name', 'team', 'qual', 'year', 'result', 'place']
 
-    for i in range (mv - len(titles)):
+    for i in range(mv - len(titles)):
         titles.append('leg' + str(i+1))
 
     ret['table_titles'] = titles
 
     return ret
+
 
 class SplitsCalculation(object):
     def process_groups(self):

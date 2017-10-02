@@ -2,15 +2,13 @@ from enum import Enum
 
 
 class Data:
-    def __init__(self):
+    def __init__(self, **kwargs):
+        self.init(**kwargs)
         self.bib = ''
         self.start_time = ''
         self.finish_time = ''
         self.penalty = ''
         self.ard_number = ''
-
-    def __init__(self, **kwargs):
-        self.init(**kwargs)
 
     def init(self, **kwargs):
         for key, value in kwargs.items():

@@ -1,4 +1,3 @@
-from sportorg.app.controllers.global_access import GlobalAccess
 from sportorg.app.models.result_calculation import ResultCalculation
 from . import sireader
 from sportorg.core.event import event, add_event
