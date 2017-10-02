@@ -1,20 +1,18 @@
 import sys
 import traceback
 
-from PyQt5 import QtCore
-from PyQt5.QtCore import QSortFilterProxyModel, QModelIndex
+from PyQt5.QtCore import QModelIndex
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QLabel, \
-    QLineEdit, QComboBox, QCompleter, QApplication, QTableView, QDialog, \
-    QPushButton, QTimeEdit, QRadioButton
+    QLineEdit, QApplication, QDialog, \
+    QPushButton, QTimeEdit, QRadioButton, QSpinBox
 
 from sportorg.app.controllers.global_access import GlobalAccess
-from sportorg.app.models.memory import race, Organization, Result
+from sportorg.app.models.memory import race, Organization, Result, find, ResultStatus
 from sportorg.app.models.result_calculation import ResultCalculation
 from sportorg.app.plugins.utils.utils import datetime2qtime, qtime2datetime
 
 from sportorg.language import _
-
 
 
 class ResultEditDialog(QDialog):
@@ -35,6 +33,15 @@ class ResultEditDialog(QDialog):
         self.setToolTip(_('Result Edit Window'))
 
         self.layout = QFormLayout(self)
+
+        self.label_bib = QLabel(_('Bib'))
+        self.item_bib = QSpinBox()
+        self.item_bib.setMaximum(99999)
+        self.item_bib.valueChanged.connect(self.show_person_info)
+        self.layout.addRow(self.label_bib, self.item_bib)
+
+        self.label_person_info = QLabel('')
+        self.layout.addRow(self.label_person_info)
 
         self.label_finish = QLabel(_('Finish'))
         self.item_finish = QTimeEdit()
@@ -60,12 +67,14 @@ class ResultEditDialog(QDialog):
         self.radio_ok.setChecked(True)
         self.radio_dns = QRadioButton(_('DNS'))
         self.radio_dnf = QRadioButton(_('DNF'))
+        self.radio_overtime = QRadioButton(_('Overtime'))
         self.radio_dsq = QRadioButton(_('DSQ'))
         self.text_dsq = QLineEdit()
 
         self.layout.addRow(self.radio_ok)
         self.layout.addRow(self.radio_dns)
         self.layout.addRow(self.radio_dnf)
+        self.layout.addRow(self.radio_overtime)
         self.layout.addRow(self.radio_dsq, self.text_dsq)
 
         def cancel_changes():
@@ -87,6 +96,18 @@ class ResultEditDialog(QDialog):
 
         self.show()
 
+    def show_person_info(self):
+        bib = self.item_bib.value()
+        if bib:
+            person = find(race().persons, bib=bib)
+            if person:
+                info = person.surname + ' ' + person.name
+                if person.group:
+                    info += '  ' + person.group.name
+                self.label_person_info.setText(info)
+            else:
+                self.label_person_info.setText(_('not found'))
+
     def set_values_from_table(self, table, index):
         self.table = table
         self.current_index = index
@@ -103,11 +124,22 @@ class ResultEditDialog(QDialog):
         if current_object.start_time is not None:
             self.item_start.setTime(datetime2qtime(current_object.start_time))
         if current_object.result is not None:
-            self.item_result.setText(str(current_object.result))
+            self.item_result.setText(str(current_object.get_result()))
         if current_object.penalty_time is not None:
             self.item_penalty.setTime(datetime2qtime(current_object.penalty_time))
+        if current_object.person:
+            self.item_bib.setValue(current_object.person.bib)
 
-
+        if current_object.status == ResultStatus.OK or current_object.status == 0:
+            self.radio_ok.setChecked(True)
+        elif current_object.status == ResultStatus.DISQUALIFIED or current_object.status == 1:
+            self.radio_dsq.setChecked(True)
+        elif current_object.status == ResultStatus.OVERTIME or current_object.status == 2:
+            self.radio_overtime.setChecked(True)
+        elif current_object.status == ResultStatus.DID_NOT_FINISH or current_object.status == 7:
+            self.radio_dnf.setChecked(True)
+        elif current_object.status == ResultStatus.DID_NOT_START or current_object.status == 8:
+            self.radio_dns.setChecked(True)
 
     def apply_changes_impl(self):
         changed = False
@@ -124,6 +156,31 @@ class ResultEditDialog(QDialog):
             result.start_time = time
             changed = True
 
+        cur_bib = -1
+        new_bib = self.item_bib.value()
+        if result.person:
+            cur_bib = result.person.bib
+
+        if cur_bib != new_bib:
+            new_person = find(race().persons, bib=new_bib)
+            result.person = new_person
+            GlobalAccess().get_result_table().model().init_cache()
+            changed = True
+
+        status = -1
+        if self.radio_ok.isChecked():
+            status = 0
+        elif self.radio_dsq.isChecked():
+            status = 1
+        elif self.radio_overtime.isChecked():
+            status = 2
+        elif self.radio_dnf.isChecked():
+            status = 7
+        elif self.radio_dn8.isChecked():
+            status = 8
+        if result.status != status:
+            result.status = status
+            changed = True
 
         if changed:
             ResultCalculation().process_results()
@@ -132,8 +189,8 @@ class ResultEditDialog(QDialog):
     def get_parent_window(self):
         return GlobalAccess().get_main_window()
 
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = ResultEditDialog()
     sys.exit(app.exec_())
-

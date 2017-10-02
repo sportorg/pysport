@@ -46,7 +46,6 @@ class Widget(QtWidgets.QWidget):
         hor_header.setSectionResizeMode(QHeaderView.ResizeToContents)
 
         def course_double_clicked(index):
-            print('Courses - clicked on ' + str(index.row()))
             logging.info('Courses - clicked on ' + str(index.row()))
             try:
                 dialog = CourseEditDialog(self.CourseTable, index)
@@ -54,7 +53,7 @@ class Widget(QtWidgets.QWidget):
             except:
                 traceback.print_exc()
 
-        self.CourseTable.doubleClicked.connect(course_double_clicked)
+        self.CourseTable.activated.connect(course_double_clicked)
         self.course_layout.addWidget(self.CourseTable)
 
     def get_table(self):

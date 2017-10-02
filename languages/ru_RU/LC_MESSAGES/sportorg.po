@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: SportOrg\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-08-10 11:27+0500\n"
-"PO-Revision-Date: 2017-08-23 14:14+0500\n"
+"PO-Revision-Date: 2017-10-02 18:04+0500\n"
 "Last-Translator: SportOrg\n"
 "Language-Team: SportOrg\n"
 "Language: ru_RU\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Loco-Source-Locale: ru_RU\n"
-"X-Generator: Poedit 2.0.2\n"
+"X-Generator: Poedit 2.0.4\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Loco-Parser: loco_parse_po\n"
 
@@ -348,3 +348,204 @@ msgstr "Сохранить как HTML"
 
 msgid "SPORTident readout"
 msgstr "Чтение SPORTident"
+
+msgid "Number Change"
+msgstr "Смена номера"
+
+msgid "Guess courses"
+msgstr "Подбор дистанции для групп"
+
+msgid "Guess corridors"
+msgstr "Подбор коридора для групп"
+
+msgid "Manual finish"
+msgstr "Ручной финиш"
+
+msgid "Split printout"
+msgstr "Печать спитов"
+
+msgid "Printer settings"
+msgstr "Настройки печати"
+
+msgid "SPORTident settings"
+msgstr "Настройки  SPORTident"
+
+msgid "Reserves insert"
+msgstr "Вставка резервных участников"
+
+msgid "Insert reserves"
+msgstr "Добавлять резервы"
+
+msgid "Reserve prefix"
+msgstr "Имя для резервных участников"
+
+msgid "Reserve"
+msgstr "_Резерв"
+
+msgid "Reserves per group, %"
+msgstr "Количество резервов на группу, %"
+
+msgid "Reserves per group, ps"
+msgstr "Количество резервов на группу, шт."
+
+msgid "Change start time"
+msgstr "Присвоение стартового времени"
+
+msgid "First start in corridor"
+msgstr "Первый старт"
+
+msgid "Fixed start interval"
+msgstr "Заданный интервал"
+
+msgid "Take start interval from group settings"
+msgstr "Брать стартовый интервал из настроек групп"
+
+msgid "Draw"
+msgstr "Жеребьевка"
+
+msgid "Split by start groups"
+msgstr "С учетом забегов"
+
+msgid "Split by teams"
+msgstr "С учетом коллективов"
+
+msgid "Split by regions"
+msgstr "С учетом регионов"
+
+msgid "Mix groups"
+msgstr "Общая жеребьевка по дистанции"
+
+msgid "Start numbers"
+msgstr "Стартовые номера"
+
+msgid "Change start numbers"
+msgstr "Присваивать номера"
+
+msgid "interval"
+msgstr "интервал"
+
+msgid "Number = corridor + minute"
+msgstr "Номер = коридор + минута"
+
+msgid "Source number"
+msgstr "Исходный номер"
+
+msgid "Target number"
+msgstr "Присваиваемый номер"
+
+msgid "Remove source"
+msgstr "Удалять исходный номер"
+
+msgid "Replace source with reserve"
+msgstr "Создать резервного участника для исходного номера"
+
+msgid "Print splits"
+msgstr "Печать сплитов"
+
+msgid "Default printer"
+msgstr "Основной принтер"
+
+msgid "Default split printer"
+msgstr "Принтер для сплитов"
+
+msgid "Zero time"
+msgstr "Начало соревнований"
+
+msgid "From protocol"
+msgstr "Из потокола"
+
+msgid "Start station"
+msgstr "Стартовая станция"
+
+msgid "Finish station"
+msgstr "Финишная станция"
+
+msgid "Control point"
+msgstr "Контрольный пункт"
+
+msgid "Start gate"
+msgstr "Стартовая калитка"
+
+msgid "Finish time"
+msgstr "Финишное время"
+
+msgid "Light beam"
+msgstr "Луч"
+
+msgid "Start group"
+msgstr "Забег"
+
+msgid "DNS"
+msgstr "НЕ СТАРТ."
+
+msgid "DNF"
+msgstr "СОШЕЛ"
+
+msgid "DSQ"
+msgstr "ДИСКВ."
+
+msgid "select"
+msgstr "выбрать"
+
+msgid "Overtime"
+msgstr "ПРЕВЫШЕНО КВ"
+
+msgid "orienteering"
+msgstr "ориентирование"
+
+msgid "running"
+msgstr "легкая атлетика"
+
+msgid "cross country"
+msgstr "лыжные гонки"
+
+msgid "individual"
+msgstr "заданное направление"
+
+msgid "free order"
+msgstr "выбор"
+
+msgid "pursuit"
+msgstr "гонка преследования"
+
+msgid "mass start"
+msgstr "масс-старт"
+
+msgid "one-man-relay"
+msgstr "эстафета одного участника"
+
+msgid "relay"
+msgstr "эстафета"
+
+msgid "Event properties"
+msgstr "Свойства соревнования"
+
+msgid "Main title"
+msgstr "Название соревнований"
+
+msgid "Sub title"
+msgstr "Заголовок"
+
+msgid "Start date"
+msgstr "Дата начала"
+
+msgid "End date"
+msgstr "Дата завершения"
+
+msgid "Location"
+msgstr "Место проведения"
+
+msgid "Event type"
+msgstr "Тип соревнований"
+
+msgid "Sport kind"
+msgstr "Вид спорта"
+
+msgid "Chief referee"
+msgstr "Главный судья"
+
+msgid "Secretary"
+msgstr "Главный секретарь"
+
+msgid "Please confirm"
+msgstr "Пожалуйста, подтвердите действие"

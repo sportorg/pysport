@@ -2,14 +2,13 @@ from enum import Enum
 
 
 class Data:
-    bib = ''
-    start_time = ''
-    finish_time = ''
-    penalty = ''
-    card_number = ''
-
     def __init__(self, **kwargs):
         self.init(**kwargs)
+        self.bib = ''
+        self.start_time = ''
+        self.finish_time = ''
+        self.penalty = ''
+        self.ard_number = ''
 
     def init(self, **kwargs):
         for key, value in kwargs.items():
@@ -33,12 +32,11 @@ class EValue(Enum):
 
 
 class TextIO:
-    separator = ' '
-    data_list = []
-    identifier = EIdentifier.BIB
-    value = EValue.START_TIME
-
     def __init__(self, **kwargs):
+        self.separator = ' '
+        self.data_list = []
+        self.identifier = EIdentifier.BIB
+        self.value = EValue.START_TIME
         self.init(**kwargs)
 
     def init(self, **kwargs):

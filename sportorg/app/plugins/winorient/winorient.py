@@ -3,6 +3,7 @@ import traceback
 
 import time
 
+from sportorg.app.controllers.global_access import GlobalAccess
 from sportorg.core import event
 from sportorg import config
 from sportorg.language import _
@@ -76,8 +77,6 @@ def import_csv(source):
         )
         race.persons.append(person)
 
-print('winorient plugin')
-
 app_window = None
 
 
@@ -110,7 +109,11 @@ def export_wo_wdb():
     if file_name is not '':
         try:
             wb = WinOrientBinary()
+
+            GlobalAccess().clear_filters(False)
             wdb_object = wb.export()
+            GlobalAccess().apply_filters()
+
             write_wdb(wdb_object, file_name)
 
         except:
@@ -124,12 +127,15 @@ def menu_inport_csv():
 def menu_inport_wdb():
     return [_("WDB Winorient"), import_wo_wdb]
 
+
 def menu_export_wdb():
     return [_("WDB Winorient"), export_wo_wdb]
+
 
 def set_app(app):
     global app_window
     app_window = app
+
 
 event.add_event('menu_file_import', menu_inport_csv)
 event.add_event('menu_file_import', menu_inport_wdb)

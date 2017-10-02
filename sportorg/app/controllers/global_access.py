@@ -1,7 +1,7 @@
 import traceback
 
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import QItemSelectionModel, QModelIndex, QSortFilterProxyModel
+from PyQt5.QtCore import QItemSelectionModel, QModelIndex
 
 from PyQt5.QtWidgets import QTableView, QMessageBox
 
@@ -102,20 +102,32 @@ class GlobalAccess(object):
             if tab == 0:
                 race().add_new_person()
                 self.get_person_table().model().init_cache()
-                self.get_main_window().refresh()
             elif tab == 1:
-                pass
+                race().add_new_result()
+                self.get_result_table().model().init_cache()
             elif tab == 2:
                 race().add_new_group()
                 self.get_person_table().model().init_cache()
-                self.get_main_window().refresh()
             elif tab == 3:
                 race().add_new_course()
                 self.get_course_table().model().init_cache()
-                self.get_main_window().refresh()
             elif tab == 4:
                 race().add_new_organization()
                 self.get_organization_table().model().init_cache()
-                self.get_main_window().refresh()
+            self.get_main_window().refresh()
         except:
             traceback.print_exc()
+
+    def clear_filters(self, remove_condition=True):
+        self.get_person_table().model().clear_filter(remove_condition)
+        self.get_result_table().model().clear_filter(remove_condition)
+        self.get_person_table().model().clear_filter(remove_condition)
+        self.get_course_table().model().clear_filter(remove_condition)
+        self.get_organization_table().model().clear_filter(remove_condition)
+
+    def apply_filters(self):
+        self.get_person_table().model().apply_filter()
+        self.get_result_table().model().apply_filter()
+        self.get_person_table().model().apply_filter()
+        self.get_course_table().model().apply_filter()
+        self.get_organization_table().model().apply_filter()

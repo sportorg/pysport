@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QApplication
 from sportorg.app.plugins.winorient.wdb import WinOrientBinary
 from sportorg.lib.winorient.wdb import WDB, write_wdb
 
+
 def set_numbers(wdb_target, wdb_source):
     """
     :type wdb_target: WDB
@@ -18,6 +19,7 @@ def set_numbers(wdb_target, wdb_source):
             i.qualification = source.qualification
             changed = True
     return changed
+
 
 if __name__ == '__main__':
 

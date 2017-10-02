@@ -46,7 +46,6 @@ class Widget(QtWidgets.QWidget):
         hor_header.setSectionResizeMode(QHeaderView.ResizeToContents)
 
         def group_double_clicked(index):
-            print('clicked on ' + str(index.row()))
             logging.info('clicked on ' + str(index.row()))
 
             try:
@@ -55,7 +54,7 @@ class Widget(QtWidgets.QWidget):
             except:
                 traceback.print_exc()
 
-        self.GroupTable.doubleClicked.connect(group_double_clicked)
+        self.GroupTable.activated.connect(group_double_clicked)
         self.group_layout.addWidget(self.GroupTable)
 
     def get_table(self):

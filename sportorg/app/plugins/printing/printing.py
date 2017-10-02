@@ -12,6 +12,10 @@ def print_html(printer_name, html):
     if printer_name:
         printer.setPrinterName(printer_name)
 
+    # printer.setOutputFormat(QPrinter.PdfFormat)
+    # printer.setResolution(printer.HighResolution)
+    printer.setResolution(200)
+
     text_document = QWebEnginePage()
 
     def callback(is_ok):

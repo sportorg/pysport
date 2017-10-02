@@ -3,17 +3,18 @@ import traceback
 import datetime
 from PyQt5.QtWidgets import QMessageBox
 
-from sportorg.app.plugins.utils.utils import time_remove_day
+from sportorg.app.plugins.utils.utils import time_remove_day, int_to_time, time_to_hhmmss
 from sportorg.language import _
 from sportorg.core.model import Model
 
 
 class Country(Model):
-    name = None
-    code2 = None
-    code3 = None
-    digital_code = None
-    code = None
+    def __init__(self):
+        self.name = None
+        self.code2 = None
+        self.code3 = None
+        self.digital_code = None
+        self.code = None
 
 
 class ResultStatus(object):
@@ -41,48 +42,53 @@ class CompetitionType(object):
 
 
 class Address(Model):
-    care_of = None
-    street = None
-    zip_code = None
-    city = None
-    state = None
-    country = Country()
+    def __init__(self):
+        self.care_of = None
+        self.street = None
+        self.zip_code = None
+        self.city = None
+        self.state = None
+        self.country = Country()
 
 
 class Contact(Model):
-    name = None
-    value = None
+    def __init__(self):
+        self.name = None
+        self.value = None
 
 
 class Organization(Model):
-    name = None
-    address = Address()
-    contact = Contact()
-    country = Country()
-    city = None
-    region = None
-
-    count_person = 0
+    def __init__(self):
+        self.name = None
+        self.address = Address()
+        self.contact = Contact()
+        self.country = Country()
+        self.city = None
+        self.region = None
+        self.count_person = 0
 
 
 class CourseControl(Model):
-    code = None
-    length = None
-    order = None
+    def __init__(self):
+        self.code = None
+        self.length = None
+        self.order = None
 
     def __eq__(self, other):
         return self.code == other.code
 
 
 class Course(Model):
-    name = None
-    type = None
-    bib = None
-    length = None
-    climb = None
-    controls = [] # type: List[CourseControl]
-    count_person = 0
-    count_group = 0
+    def __init__(self):
+        self.name = None
+        self.type = None
+        self.bib = None
+        self.length = None
+        self.climb = None
+        self.controls = [] # type: List[CourseControl]
+        self.count_person = 0
+        self.count_group = 0
+        self.corridor = 0
 
     def get_code_list(self):
         ret = []
@@ -102,43 +108,46 @@ class Course(Model):
 
 
 class Group(Model):
-    name = None
-    course = Course()
-    price = None
-    long_name = None
-    sex = None
+    def __init__(self):
+        self.name = None
+        self.course = Course()
+        self.price = None
+        self.long_name = None
+        self.sex = None
 
-    min_age = None
-    max_age = None
+        self.min_age = None
+        self.max_age = None
 
-    max_time = None  # datetime
-    qual_assign_text = None
-    start_interval = None
-    start_corridor = None
-    order_in_corridor = 0
+        self.max_time = None  # datetime
+        self.qual_assign_text = None
+        self.start_interval = None
+        self.start_corridor = None
+        self.order_in_corridor = 0
 
-    first_number = None
-    count_person = 0
+        self.first_number = None
+        self.count_person = 0
+        self.count_finished = 0
 
     def get_count_finished(self):
-        pass
+        return self.count_finished
 
     def get_count_all(self):
         return self.count_person
 
 
 class Result(Model):
-    card_number = None
-    start_time = None
-    finish_time = None
-    punches = []
-    penalty_time = None  # time of penalties (marked route, false start)
-    penalty_laps = None  # count of penalty legs (marked route)
-    status = 0
-    result = None  # time in seconds * 100 (int)
-    place = None
+    def __init__(self):
+        self.card_number = None
+        self.start_time = None
+        self.finish_time = None
+        self.punches = []
+        self.penalty_time = None  # time of penalties (marked route, false start)
+        self.penalty_laps = None  # count of penalty legs (marked route)
+        self.status = 0
+        self.result = None  # time in seconds * 100 (int)
+        self.place = None
 
-    person = None  # type: Person reverse link to person
+        self.person = None  # type: Person reverse link to person
 
     def __repr__(self):
         punches = ''
@@ -169,7 +178,11 @@ Punches:
     def get_result(self):
         if self.status != 0 and self.status != ResultStatus.OK:
             return None
-        return str(self.get_finish_time() - self.get_start_time())
+
+        if not self.person:
+            return None
+
+        return time_to_hhmmss(self.get_finish_time() - self.get_start_time())
 
     def get_result_for_sort(self):
         ret = 0
@@ -184,7 +197,8 @@ Punches:
         obj = race()
         start_source = obj.get_setting('start_source', 'protocol')
         if start_source == 'protocol':
-            return time_remove_day(self.person.start_time)
+            if self.person:
+                return time_remove_day(self.person.start_time)
         elif start_source == 'station':
             return time_remove_day(self.start_time)
         elif start_source == 'cp':
@@ -192,13 +206,14 @@ Punches:
         elif start_source == 'gate':
             pass
 
-        return datetime.datetime.now()
+        return int_to_time(0)
 
     def get_finish_time(self):
         obj = race()
         finish_source = obj.get_setting('finish_source', 'station')
         if finish_source == 'station':
-            return time_remove_day(self.finish_time)
+            if self.finish_time:
+                return time_remove_day(self.finish_time)
         elif finish_source == 'cp':
             pass
         elif finish_source == 'beam':
@@ -206,40 +221,43 @@ Punches:
 
         return datetime.datetime.now()
 
+
 class Person(Model):
-    name = None
-    surname = None
-    sex = None
+    def __init__(self):
+        self.name = None
+        self.surname = None
+        self.sex = None
 
-    card_number = None
-    bib = 0
-    result = None  # type: Result
-    results = {}  # type: Dict[str, Result]
+        self.card_number = None
+        self.bib = 0
+        self.result = None  # type: Result
+        self.results = {}  # type: Dict[str, Result]
 
-    year = None  # sometime we have only year of birth
-    birth_date = None  # datetime
-    organization = None
-    group = None
-    nationality = None  # type: Country
-    address = None  # type: Address
-    contact = []  # type: List[Contact]
-    world_code = None  # WRE ID for orienteering and the same
-    national_code = None
-    rank = None  # position/scores in word ranking
-    qual = None  # qualification, used in Russia only
-    is_out_of_competition = False  # e.g. 20-years old person, running in M12
-    comment = None
+        self.year = None  # sometime we have only year of birth
+        self.birth_date = None  # datetime
+        self.organization = None
+        self.group = None
+        self.nationality = None  # type: Country
+        self.address = None  # type: Address
+        self.contact = []  # type: List[Contact]
+        self.world_code = None  # WRE ID for orienteering and the same
+        self.national_code = None
+        self.rank = None  # position/scores in word ranking
+        self.qual = None  # qualification, used in Russia only
+        self.is_out_of_competition = False  # e.g. 20-years old person, running in M12
+        self.comment = None
 
-    start_time = None
-    start_group = 0
+        self.start_time = None
+        self.start_group = 0
 
 
 class RaceData(Model):
-    name = None
-    organisation = None
-    start_time = None
-    end_time = None
-    live_url = None
+    def __init__(self):
+        self.name = None
+        self.organisation = None
+        self.start_time = None
+        self.end_time = None
+        self.live_url = None
 
 
 class Race(Model):
@@ -343,6 +361,11 @@ class Race(Model):
         new_person = Person()
         new_person.name = '_new'
         race().persons.insert(0, new_person)
+
+    def add_new_result(self):
+        new_result = Result()
+        new_result.finish_time = datetime.datetime.now()
+        race().results.insert(0, new_result)
 
     def add_new_group(self):
         new_group = Group()

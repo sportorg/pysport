@@ -63,8 +63,9 @@ class AbstractSportOrgMemoryModel (QAbstractTableModel):
 
         return QVariant()
 
-    def clear_filter(self):
-        self.filter.clear()
+    def clear_filter(self, remove_condition=True):
+        if remove_condition:
+            self.filter.clear()
         if self.filter_backup is not None and len(self.filter_backup):
             whole_list = self.get_source_array()
             whole_list.extend(self.filter_backup)
@@ -219,11 +220,20 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
         assert (isinstance(i, Result))
         person = i.person
         group = ''
-        if person.group:
-            group = person.group.name
         team = ''
-        if person.organization:
-            team = person.organization.name
+        first_name = ''
+        last_name = ''
+        bib = 0
+        if person:
+            first_name = person.name
+            last_name = person.surname
+            bib = person.bib
+
+            if person.group:
+                group = person.group.name
+
+            if person.organization:
+                team = person.organization.name
 
         start = ''
         if i.start_time:
@@ -233,13 +243,12 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
         if i.finish_time:
             finish = i.finish_time.strftime('%H:%M:%S')
 
-
         return list([
-            person.surname,
-            person.name,
+            last_name,
+            first_name,
             group,
             team,
-            person.bib,
+            bib,
             start,
             finish,
             i.get_result(),

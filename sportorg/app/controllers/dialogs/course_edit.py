@@ -135,7 +135,11 @@ class CourseEditDialog(QDialog):
             changed = True
 
         text = self.item_controls.toPlainText()
-        course.controls.clear()
+
+        if len(course.controls) == 0 and len(text):
+            changed = True
+
+            course.controls.clear()
         for i in text.split('\n'):
             control = CourseControl()
             if i is None or len(i) == 0:
@@ -150,6 +154,7 @@ class CourseEditDialog(QDialog):
 
     def get_main_window(self):
         return GlobalAccess().get_main_window()
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

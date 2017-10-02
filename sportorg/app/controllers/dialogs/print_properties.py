@@ -13,6 +13,7 @@ from sportorg.app.models.memory import race
 
 from sportorg.language import _
 
+
 class PrintPropertiesDialog(QDialog):
     def __init__(self):
         super().__init__()
@@ -22,11 +23,10 @@ class PrintPropertiesDialog(QDialog):
         self.close()
 
     def init_ui(self):
-        self.setWindowTitle(_('Print properties'))
+        self.setWindowTitle(_('Printer settings'))
         self.setWindowIcon(QIcon('sportorg.ico'))
         self.setSizeGripEnabled(False)
         self.setModal(True)
-        self.setToolTip(_('Print properties Window'))
 
         self.layout = QFormLayout(self)
 
@@ -117,6 +117,7 @@ class PrintPropertiesDialog(QDialog):
 
     def get_parent_window(self):
         return GlobalAccess().get_main_window()
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

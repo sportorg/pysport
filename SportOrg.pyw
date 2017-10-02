@@ -1,16 +1,15 @@
 import sys
+from pathlib import Path
 
-from PyQt5.QtWidgets import QApplication
-
-from sportorg.app.controllers.main import MainWindow
-
-
-def main(argv):
-    app = QApplication(argv)
-    main_window = MainWindow(argv)
-    main_window.show_window()
-    sys.exit(app.exec())
+lib = Path(__file__).parent / 'lib'
+sys.path.append(str(lib))
 
 
 if __name__ == '__main__':
-    main(sys.argv)
+    from PyQt5.QtWidgets import QApplication
+    from sportorg.app.controllers.main import MainWindow
+
+    app = QApplication(sys.argv)
+    main_window = MainWindow(sys.argv)
+    main_window.show_window()
+    sys.exit(app.exec())

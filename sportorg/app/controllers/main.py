@@ -1,5 +1,5 @@
 import configparser
-import logging
+import logging.config
 import time
 import traceback
 
@@ -12,23 +12,23 @@ from sportorg.app.controllers.dialogs.event_properties import EventPropertiesDia
 from sportorg.app.controllers.dialogs.number_change import NumberChangeDialog
 from sportorg.app.controllers.dialogs.print_properties import PrintPropertiesDialog
 from sportorg.app.controllers.dialogs.report_dialog import ReportDialog
-from sportorg.app.controllers.dialogs.sportident_properties import SportidentPropertiesDialog
-from sportorg.app.controllers.dialogs.start_preparation import StartPreparationDialog, guess_courses_for_groups
+from sportorg.app.controllers.dialogs.start_preparation import StartPreparationDialog
 from sportorg.app.controllers.global_access import GlobalAccess
 from sportorg.app.controllers.tabs import start_preparation, groups, teams, race_results, courses
 from sportorg.app.models.memory import Race, event as e, race
 from sportorg.app.models import result_generation
 from sportorg.app.models.memory_model import PersonMemoryModel, ResultMemoryModel, GroupMemoryModel, \
     CourseMemoryModel, TeamMemoryModel
-from sportorg.app.models.result_calculation import get_splits_data_printout
+from sportorg.app.models.split_calculation import GroupSplits
+from sportorg.app.models.start_preparation import guess_courses_for_groups, guess_corridors_for_groups
 from sportorg.app.plugins.printing.printing import print_html
-from sportorg.config import TEMPLATE_DIR
+from sportorg.config import template_dir
 from sportorg.core import event, plugin
 from sportorg.core.app import App
 from sportorg.language import _
 from sportorg.lib.template.template import get_text_from_file
 
-logging.basicConfig(**config.LOG_CONFIG, level=logging.DEBUG if config.DEBUG else logging.WARNING)
+logging.config.dictConfig(config.LOG_CONFIG)
 
 
 class MainWindow(QMainWindow, App):
@@ -138,8 +138,9 @@ class MainWindow(QMainWindow, App):
         self.action_start_preparation = QtWidgets.QAction(self)
         self.action_number_change = QtWidgets.QAction(self)
         self.action_guess_courses = QtWidgets.QAction(self)
-        self.action_sportident_settings = QtWidgets.QAction(self)
+        self.action_guess_corridors = QtWidgets.QAction(self)
         self.action_print_settings = QtWidgets.QAction(self)
+        self.action_manual_finish = QtWidgets.QAction(self)
 
         self.menu_import.addSeparator()
 
@@ -165,11 +166,13 @@ class MainWindow(QMainWindow, App):
         self.menu_start_preparation.addAction(self.action_start_preparation)
         self.menu_start_preparation.addAction(self.action_number_change)
         self.menu_start_preparation.addAction(self.action_guess_courses)
+        self.menu_start_preparation.addAction(self.action_guess_corridors)
+
+        self.menu_race.addAction(self.action_manual_finish)
 
         self.menu_results.addAction(self.action_report)
         self.menu_results.addAction(self.action_split_printout)
 
-        self.menu_options.addAction(self.action_sportident_settings)
         self.menu_options.addAction(self.action_print_settings)
 
         self.menu_help.addAction(self.action_help)
@@ -264,8 +267,13 @@ class MainWindow(QMainWindow, App):
         self.action_number_change.triggered.connect(self.number_change)
         self.action_guess_courses.setText(_("Guess courses"))
         self.action_guess_courses.triggered.connect(self.guess_courses)
+        self.action_guess_corridors.setText(_("Guess corridors"))
+        self.action_guess_corridors.triggered.connect(self.guess_corridors)
 
         self.menu_race.setTitle(_("Race"))
+        self.action_manual_finish.setText(_('Manual finish'))
+        self.action_manual_finish.triggered.connect(self.manual_finish)
+        self.action_manual_finish.setShortcut("F3")
 
         self.menu_results.setTitle(_("Results"))
 
@@ -274,8 +282,16 @@ class MainWindow(QMainWindow, App):
         self.menu_service.setTitle(_("Service"))
 
         self.menu_options.setTitle(_("Options"))
-        self.action_sportident_settings.setText(_('SPORTident settings'))
-        self.action_sportident_settings.triggered.connect(self.sportident_settings)
+
+        menu_options_event = event.event('menuoptions')
+        """
+        :event: toolbar [[title, func],...]
+        """
+        if menu_options_event is not None:
+            for moption in menu_options_event:
+                moption_action = QtWidgets.QAction(moption[0], self)
+                moption_action.triggered.connect(moption[1])
+                self.menu_options.addAction(moption_action)
 
         self.action_print_settings.setText(_('Printer settings'))
         self.action_print_settings.triggered.connect(self.print_settings)
@@ -396,8 +412,9 @@ class MainWindow(QMainWindow, App):
 
             person = obj.results[index].person
 
-            template_path = TEMPLATE_DIR + '\\split_printout.html'
-            template = get_text_from_file(template_path, **get_splits_data_printout(person))
+            template_path = template_dir('split_printout.html')
+            spl = GroupSplits(person.group)
+            template = get_text_from_file(template_path, **spl.get_json(person))
 
             print_html(obj.get_setting('split_printer'), template)
         except:
@@ -413,12 +430,6 @@ class MainWindow(QMainWindow, App):
     def start_preparation(self):
         try:
             StartPreparationDialog().exec()
-        except:
-            traceback.print_exc()
-
-    def sportident_settings(self):
-        try:
-            SportidentPropertiesDialog().exec()
         except:
             traceback.print_exc()
 
@@ -441,6 +452,20 @@ class MainWindow(QMainWindow, App):
         except:
             traceback.print_exc()
 
+    def guess_corridors(self):
+        try:
+            guess_corridors_for_groups()
+        except:
+            traceback.print_exc()
+
+    def manual_finish(self):
+        try:
+            race().add_new_result()
+            GlobalAccess().get_result_table().model().init_cache()
+            GlobalAccess().get_main_window().refresh()
+        except:
+            traceback.print_exc()
+
     def create_object(self):
         GlobalAccess().add_object()
 
@@ -452,6 +477,8 @@ class MainWindow(QMainWindow, App):
 
     def init_model(self):
         try:
+            GlobalAccess().clear_filters()  # clear filters not to loose filtered data
+
             table = GlobalAccess().get_person_table()
             table.setModel(PersonMemoryModel())
             table = GlobalAccess().get_result_table()

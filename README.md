@@ -1,10 +1,5 @@
 # SportOrg
 
-### Build
-`python setup.py build`
-
-For build, you need `cx_Freeze`
-
 ### Packages
 
 - PyQt5
@@ -20,12 +15,22 @@ pip install package-name
 pip install sireader
 ```
 
+or
+
+```
+pip install -t lib -r requirements.txt
+```
+
 ### Struct
 
 ```
 <sportorg>/
     data/
     docs/
+    log/
+    templates/
+    python/
+    lib/
     img/
         icon/
     languages/

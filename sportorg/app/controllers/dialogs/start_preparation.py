@@ -75,7 +75,7 @@ class StartPreparationDialog(QDialog):
         self.draw_group_box.setGeometry(QtCore.QRect(323, 0, 311, 121))
         self.draw_group_box.setObjectName("draw_group_box")
         self.widget1 = QtWidgets.QWidget(self.draw_group_box)
-        self.widget1.setGeometry(QtCore.QRect(20, 16, 128, 88))
+        self.widget1.setGeometry(QtCore.QRect(20, 16, 256, 88))
         self.widget1.setObjectName("widget1")
         self.draw_layout = QtWidgets.QFormLayout(self.widget1)
         self.draw_layout.setContentsMargins(0, 0, 0, 0)
@@ -110,7 +110,7 @@ class StartPreparationDialog(QDialog):
         self.start_group_box.setGeometry(QtCore.QRect(8, 120, 311, 121))
         self.start_group_box.setObjectName("start_group_box")
         self.widget2 = QtWidgets.QWidget(self.start_group_box)
-        self.widget2.setGeometry(QtCore.QRect(18, 16, 210, 94))
+        self.widget2.setGeometry(QtCore.QRect(18, 16, 256, 94))
         self.widget2.setObjectName("widget2")
         self.start_layout = QtWidgets.QFormLayout(self.widget2)
         self.start_layout.setContentsMargins(0, 0, 0, 0)
@@ -146,7 +146,7 @@ class StartPreparationDialog(QDialog):
         self.numbers_group_box.setGeometry(QtCore.QRect(322, 120, 311, 121))
         self.numbers_group_box.setObjectName("numbers_group_box")
         self.widget3 = QtWidgets.QWidget(self.numbers_group_box)
-        self.widget3.setGeometry(QtCore.QRect(19, 17, 230, 70))
+        self.widget3.setGeometry(QtCore.QRect(19, 17, 256, 70))
         self.widget3.setObjectName("widget3")
         self.numbers_vert_layout = QtWidgets.QVBoxLayout(self.widget3)
         self.numbers_vert_layout.setContentsMargins(0, 0, 0, 0)
@@ -159,6 +159,7 @@ class StartPreparationDialog(QDialog):
         self.numbers_interval_radio_button = QtWidgets.QRadioButton(self.widget3)
         self.numbers_interval_radio_button.setChecked(True)
         self.numbers_interval_radio_button.setObjectName("numbers_interval_radio_button")
+        self.numbers_interval_radio_button.setMinimumWidth(70)
         self.numbers_interval_hor_layout.addWidget(self.numbers_interval_radio_button)
         self.numbers_first_spin_box = QtWidgets.QSpinBox(self.widget3)
         self.numbers_first_spin_box.setEnabled(False)
@@ -287,12 +288,12 @@ class StartPreparationDialog(QDialog):
 
             if self.start_check_box.isChecked():
                 corridor_first_start = qtime2datetime(self.start_first_time_edit.time())
+                fixed_start_interval = qtime2datetime(self.start_interval_time_edit.time())
                 if self.start_interval_radio_button.isChecked():
-                    fixed_start_interval = qtime2datetime(self.start_interval_time_edit.time())
                     StartTimeManager().process(corridor_first_start, False, fixed_start_interval)
 
                 if self.start_group_settings_radion_button.isChecked():
-                    StartTimeManager().process(corridor_first_start.toPyTime(), True, None)
+                    StartTimeManager().process(corridor_first_start, True, fixed_start_interval)
 
             self.progress_bar.setValue(75)
             sleep(progressbar_delay)
@@ -338,7 +339,7 @@ class StartPreparationDialog(QDialog):
 
         self.reserve_check_box.setChecked(obj.get_setting('is_start_preparation_reserve', False))
         self.reserve_prefix.setText(obj.get_setting('reserve_prefix', _('Reserve')))
-        self.reserve_group_count_spin_box.setValue(obj.get_setting('reserve_count', 0))
+        self.reserve_group_count_spin_box.setValue(obj.get_setting('reserve_count', 1))
         self.reserve_group_percent_spin_box.setValue(obj.get_setting('reserve_percent', 0))
 
         self.draw_check_box.setChecked(obj.get_setting('is_start_preparation_draw', False))
@@ -360,14 +361,14 @@ def guess_courses_for_groups():
     obj = race()
     for cur_group in obj.groups:
         assert isinstance(cur_group, Group)
-        if not cur_group.course or True: # TODO check empty courses after export!
+        if not cur_group.course or True:  # TODO check empty courses after export!
             for cur_course in obj.courses:
                 course_name = cur_course.name
                 group_name = cur_group.name
                 if str(course_name).find(group_name) > -1:
                     cur_group.course = cur_course
-                    print('Connecting: group ' + group_name + ' with course ' + course_name);
-                    break;
+                    print('Connecting: group ' + group_name + ' with course ' + course_name)
+                    break
     GlobalAccess().get_main_window().refresh()
 
 

@@ -24,6 +24,7 @@ def import_action():
 def menu():
     return [_("Ocad txt v8"), import_action]
 
+
 event.add_event('menu_file_import', menu)
 
 
@@ -76,5 +77,3 @@ def import_txt_v8(source):
         memory.race().courses.append(c)
 
     return True
-
-print('ocad plugin')

@@ -39,7 +39,6 @@ class EventPropertiesDialog(QDialog):
         self.setWindowIcon(QIcon('sportorg.ico'))
         self.setSizeGripEnabled(False)
         self.setModal(True)
-        self.setToolTip(_('Event Properties Window'))
 
         self.layout = QFormLayout(self)
 

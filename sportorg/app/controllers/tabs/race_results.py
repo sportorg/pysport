@@ -1,17 +1,57 @@
 import logging
 
-import sys
 import traceback
 from datetime import datetime
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QModelIndex
-from PyQt5.QtWidgets import QAbstractItemView
+from PyQt5.QtWidgets import QAbstractItemView, QTableView
 
 from sportorg.app.controllers.dialogs.results_edit import ResultEditDialog
 from sportorg.app.models.memory import race, Result, Course, CourseControl
 from sportorg.app.models.memory_model import ResultMemoryModel
 from sportorg.language import _
+
+
+class ResultTable(QTableView):
+    def __init__(self, parent, obj):
+        super().__init__(obj)
+
+        self.parent_widget = parent
+        self.setObjectName("ResultTable")
+
+        self.setModel(ResultMemoryModel())
+        self.setSortingEnabled(True)
+        self.setSelectionBehavior(QAbstractItemView.SelectRows)
+
+        self.clicked.connect(self.entry_single_clicked)
+        self.activated.connect(self.double_clicked)
+
+    def keyPressEvent(self, event):
+        super().keyPressEvent(event)
+        try:
+            if event.key() == QtCore.Qt.Key_Up or event.key() == QtCore.Qt.Key_Down:
+                self.entry_single_clicked(self.currentIndex())
+        except:
+            traceback.print_exc()
+
+    def entry_single_clicked(self, index):
+        try:
+            logging.info('single result clicked on ' + str(index.row()))
+            #  show punches in the left area
+            self.parent_widget.show_punches(index)
+        except:
+            traceback.print_exc()
+
+        logging.info('Finish single result clicked on ' + str(index.row()))
+
+    def double_clicked(self, index):
+        try:
+            logging.info('Clicked on ' + str(index.row()))
+            dialog = ResultEditDialog(self, index)
+            dialog.exec()
+        except:
+            traceback.print_exc()
 
 
 class Widget(QtWidgets.QWidget):
@@ -86,41 +126,7 @@ class Widget(QtWidgets.QWidget):
         self.ResultChipDetails.setFont(font)
         self.ResultChipDetails.setObjectName("ResultChipDetails")
         self.verticalLayout_3.addWidget(self.ResultChipDetails)
-        self.ResultTable = QtWidgets.QTableView(self.ResultSplitter)
-        self.ResultTable.setObjectName("ResultTable")
-
-        self.ResultTable.setModel(ResultMemoryModel())
-        self.ResultTable.setSortingEnabled(True)
-        self.ResultTable.setSelectionBehavior(QAbstractItemView.SelectRows)
-
-        def entry_single_clicked(index):
-            print('single result clicked on ' + str(index.row()))
-            logging.info('single result clicked on ' + str(index.row()))
-
-            try:
-                #  show punches in the left area
-                self.show_punches(index)
-            except:
-                print(sys.exc_info())
-                traceback.print_exc()
-
-            print('finish single result clicked on ' + str(index.row()))
-            logging.info('finish single result clicked on ' + str(index.row()))
-
-        self.ResultTable.clicked.connect(entry_single_clicked)
-
-        def double_clicked(index):
-            print('clicked on ' + str(index.row()))
-            logging.info('clicked on ' + str(index.row()))
-
-            try:
-                 dialog = ResultEditDialog(self.ResultTable, index)
-                 dialog.exec()
-            except:
-                traceback.print_exc()
-
-        self.ResultTable.doubleClicked.connect(double_clicked)
-
+        self.ResultTable = ResultTable(self, self.ResultSplitter)
 
         self.gridLayout.addWidget(self.ResultSplitter)
         self.ResultCourseGroupBox.setTitle(_("Course"))
@@ -175,13 +181,14 @@ class Widget(QtWidgets.QWidget):
 
         self.ResultCourseDetails.clear()
         index = 1
-        course = result.person.group.course
-        assert isinstance(course, Course)
-        if course.controls is not None:
-            for i in course.controls:
-                assert isinstance(i, CourseControl)
-                s = str(index) + " " + str(i.code) + " " + str(i.length)
-                self.ResultCourseDetails.append(s)
-                index += 1
-        self.ResultCourseNameEdit.setText(course.name)
-        self.ResultCourseLengthEdit.setText(str(course.length))
+        if result.person and result.person.group and result.person.group.course:
+            course = result.person.group.course
+            assert isinstance(course, Course)
+            if course.controls is not None:
+                for i in course.controls:
+                    assert isinstance(i, CourseControl)
+                    s = str(index) + " " + str(i.code) + " " + str(i.length)
+                    self.ResultCourseDetails.append(s)
+                    index += 1
+            self.ResultCourseNameEdit.setText(course.name)
+            self.ResultCourseLengthEdit.setText(str(course.length))

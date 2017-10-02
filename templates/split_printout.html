@@ -468,12 +468,12 @@ pre {
 
 .markdown-body code {
   padding: 0;
-  padding-top: 0.2em;
-  padding-bottom: 0.2em;
+  <!--padding-top: 0.2em;-->
+  <!--padding-bottom: 0.2em;-->
   margin: 0;
-  font-size: 85%;
-  background-color: rgba(0,0,0,0.04);
-  border-radius: 3px;
+  <!--font-size: 85%;-->
+  <!--background-color: rgba(0,0,0,0.04);-->
+  <!--border-radius: 3px;-->
 }
 
 .markdown-body code:before,
@@ -734,18 +734,29 @@ pre {
 </head>
 <body>
 <article class="markdown-body">
-    <h4>{{ person.name }} - {{ person.group }}</h4>
-    <br> Команда: {{person.team}}
-    <br> Номер: {{person.bib}} SI-card: {{person.card_number}}
-	<br> Старт: {{result.start}}
-	<br> Финиш: {{result.finish}}
-    <br> Результат: {{result.result}}
-	<br> Место: {{result.place}} из {{result.group_count_finished}} (всего {{result.group_count_finished}})
-    {% for leg in legs %}
-		<br>
-		{{leg.index+1}}.<b>{{leg.code}}</b>: {{leg.absolute_time}} {{leg.leg_time}} {{leg.leg_speed}}
-        <br> лидер: {{leg.leg_best_time}} ({{leg.leg_leader}})
+<code>
+    {% for group in groups %}
+    <!--<h3>{{ group.name }}</h3>-->
+    {% for person in group.persons %}
+        <h4>{{ person.name }} - {{ group.name }}</h4>
+        <br> Команда: {{person.team}}
+        <br> Номер: {{person.bib}} SI-card: {{person.card_number}}
+        <br> Финиш:.......{{person.finish}}
+        <br> Старт:.......{{person.start}}
+        <br> Результат:...{{person.result}}
+        <br> Место: {{person.place}} из {{group.count_finished}} (всего {{group.count_all}})
+        {% for leg in person.legs %}
+            <br>
+            {% if leg.status == 'correct' %}
+                {{"{:02}".format(leg.course_index)}}.<b>{{"{:>3}".format(leg.code)}}</b>: <b>{{leg.leg_time}}</b> {{leg.absolute_time}} {{leg.speed}} ({{leg.leg_place}})
+                <br>лидер : {{leg.leader_time}} ({{leg.leader_name}})
+            {% else %}
+                ---{{"{:>3}".format(leg.code)}} --- {{leg.absolute_time}} --- нарушен порядок
+            {% endif %}
+        {% endfor %}
     {% endfor %}
+    {% endfor %}
+</code>
 </article>
 </body>
 </html>
