@@ -3,7 +3,7 @@ import traceback
 import datetime
 from PyQt5.QtWidgets import QMessageBox
 
-from sportorg.app.plugins.utils.utils import time_remove_day, int_to_time, time_to_hhmmss
+from sportorg.app.modules.utils.utils import time_remove_day, int_to_time, time_to_hhmmss
 from sportorg.language import _
 from sportorg.core.model import Model
 

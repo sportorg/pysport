@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import QApplication, QDialog
 from sportorg.app.controllers.global_access import GlobalAccess
 from sportorg.app.models.memory import race, Group
 from sportorg.app.models.start_preparation import StartNumberManager, DrawManager, ReserveManager, StartTimeManager
-from sportorg.app.plugins.utils.utils import qtime2datetime
+from sportorg.app.modules.utils.utils import qtime2datetime
 from sportorg.language import _
 from sportorg import config
 

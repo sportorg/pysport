@@ -2,7 +2,7 @@ import sys
 
 import re
 
-from sportorg.app.plugins.utils.utils import time_to_hhmmss
+from sportorg.app.modules.utils.utils import time_to_hhmmss
 from sportorg.language import _
 import traceback
 

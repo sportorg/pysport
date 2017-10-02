@@ -13,7 +13,7 @@ from PyQt5.QtWidgets import QFormLayout, QLabel, \
     QPushButton, QCheckBox
 
 from sportorg.app.models.split_calculation import get_splits_data
-from sportorg.app.plugins.utils.custom_controls import AdvComboBox
+from sportorg.app.modules.utils.custom_controls import AdvComboBox
 from sportorg.core.template import get_templates, get_text_from_file
 from sportorg.app.models.result_calculation import get_result_data
 

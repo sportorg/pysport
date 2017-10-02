@@ -1,5 +1,5 @@
 from sportorg.app.models.memory import race, Result, Person, ResultStatus, Course, Group
-from sportorg.app.plugins.utils.utils import time_to_hhmmss
+from sportorg.app.modules.utils.utils import time_to_hhmmss
 from sportorg.language import _
 
 

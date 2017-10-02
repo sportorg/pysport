@@ -14,16 +14,18 @@ from sportorg.app.controllers.dialogs.print_properties import PrintPropertiesDia
 from sportorg.app.controllers.dialogs.report_dialog import ReportDialog
 from sportorg.app.controllers.dialogs.start_preparation import StartPreparationDialog
 from sportorg.app.controllers.global_access import GlobalAccess
+from sportorg.app.controllers.menu import menu_list
 from sportorg.app.controllers.tabs import start_preparation, groups, teams, race_results, courses
+from sportorg.app.controllers.toolbar import toolbar_list
 from sportorg.app.models.memory import Race, event as e, race
 from sportorg.app.models import result_generation
 from sportorg.app.models.memory_model import PersonMemoryModel, ResultMemoryModel, GroupMemoryModel, \
     CourseMemoryModel, TeamMemoryModel
 from sportorg.app.models.split_calculation import GroupSplits
 from sportorg.app.models.start_preparation import guess_courses_for_groups, guess_corridors_for_groups
-from sportorg.app.plugins.printing.printing import print_html
+from sportorg.app.modules.printing.printing import print_html
 from sportorg.config import template_dir
-from sportorg.core import event, plugin
+from sportorg.core import event
 from sportorg.core.app import App
 from sportorg.language import _
 from sportorg.lib.template.template import get_text_from_file
@@ -43,7 +45,6 @@ class MainWindow(QMainWindow, App):
         GlobalAccess().set_main_window(self)
 
     def show_window(self):
-        plugin.run_plugins()
         event.event('mainwindow', self)
         event.add_event('init_model', (self, 'init_model'))
         event.add_event('finish', result_generation.add_result)
@@ -98,9 +99,25 @@ class MainWindow(QMainWindow, App):
                                        | QtWidgets.QMainWindow.AnimatedDocks
                                        | QtWidgets.QMainWindow.ForceTabbedDocks)
 
+    def create_menu(self, parent, actions_list):
+        for action_item in actions_list:
+            if 'action' in action_item:
+                action = QtWidgets.QAction(self)
+                parent.addAction(action)
+                action.setText(action_item['title'])
+                action.triggered.connect(action_item['action'])
+            else:
+                menu = QtWidgets.QMenu(parent)
+                menu.setTitle(action_item['title'])
+                self.create_menu(menu, action_item['actions'])
+                parent.addAction(menu.menuAction())
+
     def setup_menu(self):
         self.menubar = QtWidgets.QMenuBar(self)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 880, 21))
+        self.setMenuBar(self.menubar)
+
+        self.create_menu(self.menubar, menu_list())
 
         self.menu_file = QtWidgets.QMenu(self.menubar)
         self.menu_import = QtWidgets.QMenu(self.menu_file)
@@ -113,10 +130,6 @@ class MainWindow(QMainWindow, App):
         self.menu_tools = QtWidgets.QMenu(self.menubar)
         self.menu_service = QtWidgets.QMenu(self.menubar)
         self.menu_options = QtWidgets.QMenu(self.menubar)
-
-        self.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(self)
-        self.setStatusBar(self.statusbar)
 
         self.action_save = QtWidgets.QAction(self)
         self.action_open = QtWidgets.QAction(self)
@@ -302,28 +315,12 @@ class MainWindow(QMainWindow, App):
 
     def setup_toolbar(self):
         layout = QtWidgets.QVBoxLayout()
-        self.toolbar = self.addToolBar("File")
+        toolbar = self.addToolBar("File")
 
-        new = QtWidgets.QAction(QtGui.QIcon(config.icon_dir("file.png")), _("New"), self)
-        new.triggered.connect(self.create_file)
-        self.toolbar.addAction(new)
-
-        open = QtWidgets.QAction(QtGui.QIcon(config.icon_dir("folder.png")), _("Open"), self)
-        open.triggered.connect(self.open_file)
-        self.toolbar.addAction(open)
-        save = QtWidgets.QAction(QtGui.QIcon(config.icon_dir("save.png")), _("Save"), self)
-        save.triggered.connect(self.save_file)
-        self.toolbar.addAction(save)
-
-        toolbar_event = event.event('toolbar')
-        """
-        :event: toolbar [[icon, title, func],...]
-        """
-        if toolbar_event is not None:
-            for tb in toolbar_event:
-                tb_action = QtWidgets.QAction(QtGui.QIcon(tb[0]), tb[1], self)
-                tb_action.triggered.connect(tb[2])
-                self.toolbar.addAction(tb_action)
+        for tb in toolbar_list():
+            tb_action = QtWidgets.QAction(QtGui.QIcon(tb[0]), tb[1], self)
+            tb_action.triggered.connect(tb[2])
+            toolbar.addAction(tb_action)
 
         self.setLayout(layout)
 
@@ -331,7 +328,6 @@ class MainWindow(QMainWindow, App):
         self.statusbar = QtWidgets.QStatusBar()
         self.setStatusBar(self.statusbar)
         self.statusbar.showMessage(_("it works!"), 5000)
-        event.event('statusbar', self.statusbar)
 
     def setup_tab(self):
         self.centralwidget = QtWidgets.QWidget(self)

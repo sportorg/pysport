@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import QFormLayout, QLabel, \
 from sportorg.app.controllers.global_access import GlobalAccess
 from sportorg.app.models.memory import race, Organization, Result, find, ResultStatus
 from sportorg.app.models.result_calculation import ResultCalculation
-from sportorg.app.plugins.utils.utils import datetime2qtime, qtime2datetime
+from sportorg.app.modules.utils.utils import datetime2qtime, qtime2datetime
 
 from sportorg.language import _
 
