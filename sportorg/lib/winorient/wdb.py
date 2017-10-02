@@ -1208,6 +1208,7 @@ class WDB:
                 return man
         return None
 
+
 def parse_wdb(file_path):
     wdb_file = open(file_path, 'rb')
     byte_array = wdb_file.read()

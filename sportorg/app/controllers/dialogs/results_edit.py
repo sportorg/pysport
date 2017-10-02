@@ -15,7 +15,6 @@ from sportorg.app.plugins.utils.utils import datetime2qtime, qtime2datetime
 from sportorg.language import _
 
 
-
 class ResultEditDialog(QDialog):
     def __init__(self, table=None, index=None):
         super().__init__()
@@ -189,6 +188,7 @@ class ResultEditDialog(QDialog):
 
     def get_parent_window(self):
         return GlobalAccess().get_main_window()
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

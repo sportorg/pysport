@@ -12,5 +12,6 @@ def menu():
 def close():
     print('close plugin')
 
+
 event.add_event('menu_file_import', menu)
 event.add_event('close', close)

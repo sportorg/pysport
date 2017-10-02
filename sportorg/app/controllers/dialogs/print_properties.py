@@ -13,6 +13,7 @@ from sportorg.app.models.memory import race
 
 from sportorg.language import _
 
+
 class PrintPropertiesDialog(QDialog):
     def __init__(self):
         super().__init__()
@@ -117,6 +118,7 @@ class PrintPropertiesDialog(QDialog):
 
     def get_parent_window(self):
         return GlobalAccess().get_main_window()
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

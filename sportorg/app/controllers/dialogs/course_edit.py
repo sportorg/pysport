@@ -155,6 +155,7 @@ class CourseEditDialog(QDialog):
     def get_main_window(self):
         return GlobalAccess().get_main_window()
 
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = CourseEditDialog()

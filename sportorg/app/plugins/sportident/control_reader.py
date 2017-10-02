@@ -34,7 +34,6 @@ class SIControlThread(threading.Thread):
                     punches = si.poll_punch()
                 print(punches)
 
-
             except sireader.SIReaderException as e:
                 print(str(e))
             except sireader.SIReaderCardChanged as e:

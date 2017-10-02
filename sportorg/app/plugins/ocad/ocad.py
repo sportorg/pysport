@@ -24,6 +24,7 @@ def import_action():
 def menu():
     return [_("Ocad txt v8"), import_action]
 
+
 event.add_event('menu_file_import', menu)
 
 

@@ -30,8 +30,7 @@ def get_groups():
 
 
 def get_teams():
-    ret = []
-    ret.append('')
+    ret = ['']
     try:
         for i in race().organizations:
             ret.append(i.name)

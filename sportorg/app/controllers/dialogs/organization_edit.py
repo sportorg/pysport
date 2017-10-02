@@ -138,6 +138,7 @@ class OrganizationEditDialog(QDialog):
     def get_parent_window(self):
         return GlobalAccess().get_main_window()
 
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = OrganizationEditDialog()
