@@ -24,7 +24,7 @@ class SportidentPropertiesDialog(QDialog):
 
     def init_ui(self):
         # self.setFixedWidth(500)
-        self.setWindowTitle(_('SPORTident properties'))
+        self.setWindowTitle(_('SPORTident settings'))
         self.setWindowIcon(QIcon(icon_dir('sportident.png')))
         self.setSizeGripEnabled(False)
         self.setModal(True)

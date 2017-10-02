@@ -6,8 +6,9 @@
 #
 # WARNING! All changes made in this file will be lost!
 import sys
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QDialog, QApplication
+from sportorg.language import _
 
 
 class NumberChangeDialog(QDialog):
@@ -54,7 +55,7 @@ class NumberChangeDialog(QDialog):
         self.target_info_label.setObjectName("target_info_label")
         self.number_grid_layout.addWidget(self.target_info_label, 1, 2, 1, 1)
         self.layoutWidget1 = QtWidgets.QWidget(self)
-        self.layoutWidget1.setGeometry(QtCore.QRect(14, 70, 161, 42))
+        self.layoutWidget1.setGeometry(QtCore.QRect(14, 70, 256, 42))
         self.layoutWidget1.setObjectName("layoutWidget1")
         self.options_vert_layout = QtWidgets.QVBoxLayout(self.layoutWidget1)
         self.options_vert_layout.setContentsMargins(0, 0, 0, 0)
@@ -73,14 +74,13 @@ class NumberChangeDialog(QDialog):
         QtCore.QMetaObject.connectSlotsByName(self)
 
     def retranslateUi(self):
-        _translate = QtCore.QCoreApplication.translate
-        self.setWindowTitle(_translate("number_change", "Dialog"))
-        self.source_num_label.setText(_translate("number_change", "Source number"))
-        self.source_info_label.setText(_translate("number_change", "Ivan Churakoff M21 11:09:00"))
-        self.target_num_label.setText(_translate("number_change", "Target number"))
-        self.target_info_label.setText(_translate("number_change", "Reserve M60 11:40:00"))
-        self.remove_radio_button.setText(_translate("number_change", "Remove source"))
-        self.replace_radio_button.setText(_translate("number_change", "Replace source with reserve"))
+        self.setWindowTitle(_("Dialog"))
+        self.source_num_label.setText(_("Source number"))
+        self.source_info_label.setText(_("Ivan Churakoff M21 11:09:00"))
+        self.target_num_label.setText(_("Target number"))
+        self.target_info_label.setText(_("Reserve M60 11:40:00"))
+        self.remove_radio_button.setText(_("Remove source"))
+        self.replace_radio_button.setText(_("Replace source with reserve"))
 
 
 def main(argv):
