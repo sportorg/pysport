@@ -3,6 +3,7 @@ from sportorg.language import _
 from sportorg import config
 
 from sportorg.app.modules.winorient import winorient
+from sportorg.app.modules.sportident import sportident
 
 
 def menu_list():
@@ -154,6 +155,10 @@ def menu_list():
         {
             'title': _('Options'),
             'actions': [
+                {
+                    'title': _('SPORTident settings'),
+                    'action': sportident.sportident_settings
+                },
                 {
                     'title': _('Printer settings'),
                     'action': GlobalAccess().get_main_window().print_settings

@@ -45,8 +45,6 @@ class MainWindow(QMainWindow, App):
         GlobalAccess().set_main_window(self)
 
     def show_window(self):
-        event.event('mainwindow', self)
-        event.add_event('init_model', (self, 'init_model'))
         event.add_event('finish', result_generation.add_result)
         self.conf_read()
         self.setup_ui()
@@ -300,8 +298,7 @@ class MainWindow(QMainWindow, App):
             traceback.print_exc()
 
     def refresh(self):
-
-        print("refreshing interface")
+        logging.debug('refreshing interface')
         try:
             table = GlobalAccess().get_person_table()
             table.model().init_cache()
@@ -322,7 +319,5 @@ class MainWindow(QMainWindow, App):
             table = GlobalAccess().get_organization_table()
             table.model().init_cache()
             table.model().layoutChanged.emit()
-
-            event.event('refresh_window')
         except:
             traceback.print_exc()

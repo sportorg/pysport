@@ -1,5 +1,7 @@
 import time
 import logging
+
+from sportorg.app.controllers.global_access import GlobalAccess
 from sportorg.lib.ocad import ocad
 from sportorg.app.models import model
 from sportorg.app.models import memory
@@ -18,7 +20,7 @@ def import_action():
             import_txt_v8(file_name)
         except:
             traceback.print_exc()
-        event.event('init_model')
+        GlobalAccess().get_main_window().init_model()
 
 
 def menu():
