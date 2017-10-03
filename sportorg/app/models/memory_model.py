@@ -58,7 +58,7 @@ class AbstractSportOrgMemoryModel (QAbstractTableModel):
                 traceback.print_exc()
 
             # end = time.time()
-            # logging.info('Data() ' + str(index.row()) + ' ' + str(index.column()) + ': ' + str(end - start) + ' s')
+            # logging.debug('Data() ' + str(index.row()) + ' ' + str(index.column()) + ': ' + str(end - start) + ' s')
             return QVariant(answer)
 
         return QVariant()

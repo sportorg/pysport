@@ -50,7 +50,7 @@ class Widget(QtWidgets.QWidget):
         hor_header.setSectionResizeMode(QHeaderView.Interactive)
 
         def entry_double_clicked(index):
-            logging.info('clicked on ' + str(index.row()))
+            logging.debug('Clicked on ' + str(index.row()))
             # show_edit_dialog(index)
             try:
                 dialog = EntryEditDialog(self.EntryTable, index)

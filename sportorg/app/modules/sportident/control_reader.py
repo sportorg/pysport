@@ -1,3 +1,4 @@
+import logging
 import threading
 import time
 import serial
@@ -35,9 +36,9 @@ class SIControlThread(threading.Thread):
                 print(punches)
 
             except sireader.SIReaderException as e:
-                print(str(e))
+                logging.debug(str(e))
             except sireader.SIReaderCardChanged as e:
-                print(str(e))
+                logging.debug(str(e))
             except serial.serialutil.SerialException:
                 self.stop()
                 return
@@ -71,13 +72,13 @@ def get_ports():
 def choose_port():
     ports = get_ports()
     if len(ports):
-        print("Доступные порты:")
+        logging.debug("Доступные порты:")
         for i, p in enumerate(ports):
-            print("{} - {}".format(i, p))
+            logging.debug("{} - {}".format(i, p))
 
         return ports[0]
     else:
-        print("Нет доступных портов")
+        logging.debug("Нет доступных портов")
         return None
 
 

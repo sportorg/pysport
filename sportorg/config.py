@@ -77,16 +77,16 @@ LOG_CONFIG = {
             'class': 'logging.Formatter',
             'format': '%(asctime)-15s - %(filename)s - %(processName)-10s - %(levelname)s - %(message)s'
         },
-        'short': {
+        'cls': {
             'class': 'logging.Formatter',
-            'format': '%(filename)s - %(levelname)s - %(message)s'
+            'format': '%(message)s - %(filename)s - %(levelname)s - %(processName)-10s'
         }
     },
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
             'level': 'DEBUG',
-            'formatter': 'short'
+            'formatter': 'cls'
         },
         'file': {
             'class': 'logging.FileHandler',

@@ -33,7 +33,7 @@ event.add_event('menu_file_import', menu)
 def import_txt_v8_to_model(source):
     classes_v8 = ocad.parse_txt_v8(source)
     diff = time.time()
-    logging.info("Start")
+    logging.debug("Start import_txt_v8_to_model")
 
     for course in classes_v8.courses:
         c = model.Course.create(

@@ -1,3 +1,5 @@
+import logging
+
 from .event import event
 
 
@@ -46,7 +48,7 @@ class App:
                     method = getattr(cls, method_name)
                     return method(self.file)
                 except AttributeError:
-                    print("Class `{}` does not implement `{}`".format(cls.__class__.__name__, method_name))
+                    logging.debug("Class `{}` does not implement `{}`".format(cls.__class__.__name__, method_name))
                     return
 
         if self.file is None:

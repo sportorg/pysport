@@ -1,3 +1,5 @@
+import logging
+
 from . import memory
 from .result_checker import ResultChecker
 
@@ -30,7 +32,7 @@ def add_result(system_id, result):
         result.person.result = result
         memory.race().results.append(result)
 
-        print(result.status)
+        logging.debug(result.status)
     else:
         res = find_person_by_result(system_id, result)
         if res:
