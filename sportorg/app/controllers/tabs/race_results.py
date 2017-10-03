@@ -37,17 +37,17 @@ class ResultTable(QTableView):
 
     def entry_single_clicked(self, index):
         try:
-            logging.info('single result clicked on ' + str(index.row()))
+            logging.debug('Single result clicked on ' + str(index.row()))
             #  show punches in the left area
             self.parent_widget.show_punches(index)
         except:
             traceback.print_exc()
 
-        logging.info('Finish single result clicked on ' + str(index.row()))
+        logging.debug('Finish single result clicked on ' + str(index.row()))
 
     def double_clicked(self, index):
         try:
-            logging.info('Clicked on ' + str(index.row()))
+            logging.debug('Clicked on ' + str(index.row()))
             dialog = ResultEditDialog(self, index)
             dialog.exec()
         except:

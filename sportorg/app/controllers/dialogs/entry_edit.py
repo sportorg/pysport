@@ -13,8 +13,8 @@ from sportorg.app.controllers.global_access import GlobalAccess
 from sportorg.app.models.memory import race, Person, find
 from sportorg.app.models.model import Organization
 from sportorg.app.models.result_calculation import ResultCalculation
-from sportorg.app.plugins.utils.custom_controls import AdvComboBox
-from sportorg.app.plugins.utils.utils import qtime2datetime, datetime2qtime
+from sportorg.app.modules.utils.custom_controls import AdvComboBox
+from sportorg.app.modules.utils.utils import qtime2datetime, datetime2qtime
 
 from sportorg.language import _
 

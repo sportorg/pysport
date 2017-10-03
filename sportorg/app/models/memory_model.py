@@ -2,7 +2,7 @@ import sys
 
 import re
 
-from sportorg.app.plugins.utils.utils import time_to_hhmmss
+from sportorg.app.modules.utils.utils import time_to_hhmmss
 from sportorg.language import _
 import traceback
 
@@ -58,7 +58,7 @@ class AbstractSportOrgMemoryModel (QAbstractTableModel):
                 traceback.print_exc()
 
             # end = time.time()
-            # logging.info('Data() ' + str(index.row()) + ' ' + str(index.column()) + ': ' + str(end - start) + ' s')
+            # logging.debug('Data() ' + str(index.row()) + ' ' + str(index.column()) + ': ' + str(end - start) + ' s')
             return QVariant(answer)
 
         return QVariant()

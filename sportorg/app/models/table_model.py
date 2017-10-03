@@ -35,7 +35,7 @@ class PersonTableModel(AbstractSportOrgTableModel):
                     self.count = query.count()
 
             except:
-                print("Unexpected error:", sys.exc_info()[0])
+                logging.error("Unexpected error:", sys.exc_info()[0])
                 self.count = 300
 
         return self.count
@@ -55,7 +55,7 @@ class PersonTableModel(AbstractSportOrgTableModel):
                 traceback.print_stack()
 
             # end = time.time()
-            # logging.info('Data() ' + str(index.row()) + ' ' + str(index.column()) + ': ' + str(end - start) + ' s')
+            # logging.debug('Data() ' + str(index.row()) + ' ' + str(index.column()) + ': ' + str(end - start) + ' s')
             return QVariant(answer)
 
         return QVariant()
@@ -102,7 +102,7 @@ class PersonTableModel(AbstractSportOrgTableModel):
             for i in participation:
                 self.values.append(self.get_values_from_object(i))
             end = time.time()
-            logging.info('Entry structure was created in ' + str(end - start) + ' s')
+            logging.debug('Entry structure was created in ' + str(end - start) + ' s')
 
         ret = self.values[position]
         return ret
@@ -186,7 +186,7 @@ class ResultTableModel(AbstractSportOrgTableModel):
                 traceback.print_stack()
 
             # end = time.time()
-            # logging.info('Data() ' + str(index.row()) + ' ' + str(index.column()) + ': ' + str(end - start) + ' s')
+            # logging.debug('Data() ' + str(index.row()) + ' ' + str(index.column()) + ': ' + str(end - start) + ' s')
             return QVariant(answer)
 
         return QVariant()
@@ -220,7 +220,7 @@ class ResultTableModel(AbstractSportOrgTableModel):
             for i in result:
                 self.values.append(self.get_values_from_object(i))
             end = time.time()
-            logging.info('Entry structure was created in ' + str(end - start) + ' s')
+            logging.debug('Entry structure was created in ' + str(end - start) + ' s')
 
         ret = self.values[position]
         return ret

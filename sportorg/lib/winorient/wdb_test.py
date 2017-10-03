@@ -1,7 +1,7 @@
 import struct
 import unittest
 
-from sportorg.app.plugins.winorient.wdb import WinOrientBinary
+from sportorg.app.modules.winorient.wdb import WinOrientBinary
 from sportorg.lib.winorient.wdb import WDBPunch, WDBFinish, WDBChip, WDBTeam, WDBDistance, WDBGroup, WDBMan, \
     parse_wdb, WDB
 

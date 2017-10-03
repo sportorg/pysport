@@ -1,3 +1,4 @@
+import logging
 import sys
 import traceback
 from time import sleep
@@ -9,7 +10,7 @@ from PyQt5.QtWidgets import QApplication, QDialog
 from sportorg.app.controllers.global_access import GlobalAccess
 from sportorg.app.models.memory import race, Group
 from sportorg.app.models.start_preparation import StartNumberManager, DrawManager, ReserveManager, StartTimeManager
-from sportorg.app.plugins.utils.utils import qtime2datetime
+from sportorg.app.modules.utils.utils import qtime2datetime
 from sportorg.language import _
 from sportorg import config
 
@@ -367,7 +368,7 @@ def guess_courses_for_groups():
                 group_name = cur_group.name
                 if str(course_name).find(group_name) > -1:
                     cur_group.course = cur_course
-                    print('Connecting: group ' + group_name + ' with course ' + course_name)
+                    logging.debug('Connecting: group ' + group_name + ' with course ' + course_name)
                     break
     GlobalAccess().get_main_window().refresh()
 

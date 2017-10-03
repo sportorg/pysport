@@ -1,15 +1,14 @@
 import traceback
 import logging
 
+from sportorg.app.controllers.global_access import GlobalAccess
 from .sportident_properties import SportidentPropertiesDialog
 from . import card_reader
-from sportorg import config
 from sportorg.core import event
 from sportorg.language import _
 
 
 reader = None
-statusbar = None
 
 
 def start_reader():
@@ -38,28 +37,12 @@ def sportident_settings():
         traceback.print_exc()
 
 
-def toolbar():
-    return [config.plugin_dir('sportident', 'img', 'sportident.png'), _("SPORTident readout"), start_reader]
-
-
-def menu_setting():
-    return [_('SPORTident settings'), sportident_settings]
-
-
-def set_statusbar(sb):
-    global statusbar
-    statusbar = sb
-
-
 def message(msg, is_error=False):
     if is_error:
         logging.error(msg)
     else:
         logging.info(msg)
-    statusbar.showMessage(msg, 5000)
+    GlobalAccess().get_main_window().statusbar.showMessage(msg, 5000)
 
 
-event.add_event('toolbar', toolbar)
-event.add_event('menuoptions', menu_setting)
-event.add_event('statusbar', set_statusbar)
 event.add_event('finish', lambda _id, result: print(_id, result))

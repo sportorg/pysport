@@ -46,7 +46,7 @@ class Widget(QtWidgets.QWidget):
         hor_header.setSectionResizeMode(QHeaderView.ResizeToContents)
 
         def group_double_clicked(index):
-            logging.info('clicked on ' + str(index.row()))
+            logging.debug('clicked on ' + str(index.row()))
 
             try:
                  dialog = GroupEditDialog(self.GroupTable, index)

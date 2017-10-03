@@ -2,7 +2,7 @@
 import sys
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QApplication
-from sportorg.app.plugins.winorient.wdb import WinOrientBinary
+from sportorg.app.modules.winorient.wdb import WinOrientBinary
 from sportorg.lib.winorient.wdb import WDB, write_wdb
 
 

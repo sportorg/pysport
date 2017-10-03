@@ -23,6 +23,10 @@ class GlobalAccess(object):
         self.main_window = window
 
     def get_main_window(self):
+        """
+
+        :return: MainWindow
+        """
         return self.main_window
 
     def get_current_tab_index(self):

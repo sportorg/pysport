@@ -49,7 +49,7 @@ class Widget(QtWidgets.QWidget):
         hor_header.setSectionResizeMode(QHeaderView.ResizeToContents)
 
         def team_double_clicked(index):
-            print('Team: clicked on ' + str(index.row()))
+            logging.debug('Team: clicked on ' + str(index.row()))
             try:
                 dialog = OrganizationEditDialog(self.TeamTable, index)
                 dialog.exec()
@@ -57,7 +57,7 @@ class Widget(QtWidgets.QWidget):
                 print(sys.exc_info())
                 traceback.print_exc()
 
-            logging.info('Team: clicked on ' + str(index.row()))
+            logging.debug('Team: clicked on ' + str(index.row()))
 
         self.TeamTable.activated.connect(team_double_clicked)
         self.team_layout.addWidget(self.TeamTable)

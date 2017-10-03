@@ -1,3 +1,5 @@
+import logging
+
 _events = {}
 
 
@@ -34,7 +36,7 @@ def event(event_name, *args, **kwargs):
                 method = getattr(cls, method_name)
                 r = method(*args, **kwargs)
             except AttributeError:
-                print("Class `{}` does not implement `{}`".format(cls.__class__.__name__, method_name))
+                logging.error("Class `{}` does not implement `{}`".format(cls.__class__.__name__, method_name))
                 r = None
 
         if r is not None:

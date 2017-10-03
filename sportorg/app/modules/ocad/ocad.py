@@ -1,16 +1,16 @@
 import time
 import logging
+
+from sportorg.app.controllers.global_access import GlobalAccess
 from sportorg.lib.ocad import ocad
 from sportorg.app.models import model
 from sportorg.app.models import memory
-from sportorg.core import event
-from sportorg.language import _
 
 import traceback
 from PyQt5 import QtWidgets
 
 
-def import_action():
+def import_txt_v8_action():
     file_name = QtWidgets.QFileDialog.getOpenFileName(None, 'Open Ocad txt v8 file',
                                                       '', "Ocad classes v8 (*.txt)")[0]
     if file_name is not '':
@@ -18,20 +18,13 @@ def import_action():
             import_txt_v8(file_name)
         except:
             traceback.print_exc()
-        event.event('init_model')
-
-
-def menu():
-    return [_("Ocad txt v8"), import_action]
-
-
-event.add_event('menu_file_import', menu)
+        GlobalAccess().get_main_window().init_model()
 
 
 def import_txt_v8_to_model(source):
     classes_v8 = ocad.parse_txt_v8(source)
     diff = time.time()
-    logging.info("Start")
+    logging.debug("Start import_txt_v8_to_model")
 
     for course in classes_v8.courses:
         c = model.Course.create(

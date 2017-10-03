@@ -13,7 +13,7 @@ from PyQt5.QtWidgets import QApplication, QDialog, QTableView
 
 from sportorg.app.controllers.dialogs import entry_edit
 from sportorg.app.controllers.global_access import GlobalAccess
-from sportorg.app.plugins.utils.custom_controls import AdvComboBox
+from sportorg.app.modules.utils.custom_controls import AdvComboBox
 
 from sportorg.language import _
 
