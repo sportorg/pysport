@@ -4,6 +4,7 @@ from sportorg import config
 
 from sportorg.app.modules.winorient import winorient
 from sportorg.app.modules.sportident import sportident
+from sportorg.app.modules.ocad import ocad
 
 
 def menu_list():
@@ -55,13 +56,17 @@ def menu_list():
                     'title': _('Import'),
                     'actions': [
                         {
-                            'title': _("CSV Winorient"),
-                            'icon': config.icon_dir("csv.png"),
+                            'title': _('CSV Winorient'),
+                            'icon': config.icon_dir('csv.png'),
                             'action': winorient.import_wo_csv
                         },
                         {
-                            'title': _("WDB Winorient"),
+                            'title': _('WDB Winorient'),
                             'action': winorient.import_wo_wdb
+                        },
+                        {
+                            'title': _('Ocad txt v8'),
+                            'action': ocad.import_txt_v8_action
                         },
                     ]
                 },
@@ -69,7 +74,7 @@ def menu_list():
                     'title': _('Export'),
                     'actions': [
                         {
-                            'title': _("WDB Winorient"),
+                            'title': _('WDB Winorient'),
                             'action': winorient.export_wo_wdb
                         },
                     ]

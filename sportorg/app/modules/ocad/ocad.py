@@ -5,14 +5,12 @@ from sportorg.app.controllers.global_access import GlobalAccess
 from sportorg.lib.ocad import ocad
 from sportorg.app.models import model
 from sportorg.app.models import memory
-from sportorg.core import event
-from sportorg.language import _
 
 import traceback
 from PyQt5 import QtWidgets
 
 
-def import_action():
+def import_txt_v8_action():
     file_name = QtWidgets.QFileDialog.getOpenFileName(None, 'Open Ocad txt v8 file',
                                                       '', "Ocad classes v8 (*.txt)")[0]
     if file_name is not '':
@@ -21,13 +19,6 @@ def import_action():
         except:
             traceback.print_exc()
         GlobalAccess().get_main_window().init_model()
-
-
-def menu():
-    return [_("Ocad txt v8"), import_action]
-
-
-event.add_event('menu_file_import', menu)
 
 
 def import_txt_v8_to_model(source):
