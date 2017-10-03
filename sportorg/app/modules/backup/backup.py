@@ -1,3 +1,4 @@
+import logging
 from . import bin
 from . import formats
 from sportorg.core.event import add_event
@@ -28,12 +29,16 @@ def backup(file, func, mode='wb'):
 
 
 def event_dump(file):
+    logging.debug('Dump')
     backup(file, bin.dump)
 
 
 def event_load(file):
+    logging.debug('load')
     backup(file, bin.load, 'rb')
 
 
-add_event('dump', event_dump)
-add_event('load', event_load)
+def init():
+    add_event('dump', event_dump)
+    add_event('load', event_load)
+

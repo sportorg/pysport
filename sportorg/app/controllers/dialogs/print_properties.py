@@ -12,7 +12,7 @@ from sportorg.app.controllers.global_access import GlobalAccess
 from sportorg.app.models.memory import race
 
 from sportorg.language import _
-
+from sportorg import config
 
 class PrintPropertiesDialog(QDialog):
     def __init__(self):
@@ -24,7 +24,7 @@ class PrintPropertiesDialog(QDialog):
 
     def init_ui(self):
         self.setWindowTitle(_('Printer settings'))
-        self.setWindowIcon(QIcon('sportorg.ico'))
+        self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(True)
 

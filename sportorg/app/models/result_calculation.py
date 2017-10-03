@@ -107,7 +107,7 @@ def get_splits_data_printout(person):
     assert isinstance(course, Course)
     result = person.result
 
-    person_json['name'] = person.surname + ' ' + person.name
+    person_json['name'] = person.full_name
     person_json['group'] = person.group.name
     person_json['bib'] = person.bib
     person_json['team'] = person.organization.name
@@ -184,7 +184,7 @@ def get_person_result_data(res):
     ret = []
     person = res.person
     assert isinstance(person, Person)
-    ret.append(person.surname + ' ' + person.name)
+    ret.append(person.full_name)
     ret.append(person.organization.name)
     ret.append(person.qual)
     ret.append(person.year)

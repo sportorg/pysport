@@ -13,6 +13,7 @@ from sportorg.app.controllers.dialogs.number_change import NumberChangeDialog
 from sportorg.app.controllers.dialogs.print_properties import PrintPropertiesDialog
 from sportorg.app.controllers.dialogs.report_dialog import ReportDialog
 from sportorg.app.controllers.dialogs.start_preparation import StartPreparationDialog
+from sportorg.app.controllers.dialogs.start_report_dialog import StartReportDialog
 from sportorg.app.controllers.global_access import GlobalAccess
 from sportorg.app.controllers.menu import menu_list
 from sportorg.app.controllers.tabs import start_preparation, groups, teams, race_results, courses
@@ -23,6 +24,7 @@ from sportorg.app.models.memory_model import PersonMemoryModel, ResultMemoryMode
     CourseMemoryModel, TeamMemoryModel
 from sportorg.app.models.split_calculation import GroupSplits
 from sportorg.app.models.start_preparation import guess_courses_for_groups, guess_corridors_for_groups
+from sportorg.app.modules.backup import backup
 from sportorg.app.modules.printing.printing import print_html
 from sportorg.config import template_dir
 from sportorg.core import event
@@ -43,6 +45,7 @@ class MainWindow(QMainWindow, App):
             self.file = None
         self.conf = configparser.ConfigParser()
         GlobalAccess().set_main_window(self)
+        backup.init()
 
     def show_window(self):
         event.add_event('finish', result_generation.add_result)
@@ -267,6 +270,13 @@ class MainWindow(QMainWindow, App):
             race().add_new_result()
             GlobalAccess().get_result_table().model().init_cache()
             GlobalAccess().get_main_window().refresh()
+        except:
+            traceback.print_exc()
+
+    def create_start_protocol(self):
+        try:
+            ex = StartReportDialog()
+            ex.exec()
         except:
             traceback.print_exc()
 

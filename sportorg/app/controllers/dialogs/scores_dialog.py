@@ -3,10 +3,11 @@ import traceback
 
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import  QApplication, QDialog, \
-    QPushButton, QFormLayout, QRadioButton, QTextEdit, QCheckBox, QSpinBox, QLineEdit, QLabel
+    QPushButton, QFormLayout, QRadioButton, QCheckBox, QSpinBox, QLineEdit, QLabel
 
 from sportorg.app.models.memory import race
 from sportorg.language import _
+from sportorg import config
 
 
 class ScoresDialog(QDialog):
@@ -19,7 +20,7 @@ class ScoresDialog(QDialog):
 
     def init_ui(self):
         self.setWindowTitle(_('Scores assign'))
-        self.setWindowIcon(QIcon('sportorg.ico'))
+        self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(False)
         self.setMinimumWidth(650)

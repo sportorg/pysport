@@ -27,7 +27,7 @@ def menu_list():
                 {
                     'title': _('Open'),
                     'shortcut': 'Ctrl+O',
-                    'icon': config.icon_dir('save.png'),
+                    'icon': config.icon_dir('folder.png'),
                     'action': GlobalAccess().get_main_window().open_file
                 },
                 {
@@ -120,6 +120,10 @@ def menu_list():
                 {
                     'title': _('Guess corridors'),
                     'action': GlobalAccess().get_main_window().guess_corridors
+                },
+                {
+                    'title': _('Create start'),
+                    'action': GlobalAccess().get_main_window().create_start_protocol
                 }
             ]
         },

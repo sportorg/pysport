@@ -1,11 +1,10 @@
 import sys
 import traceback
 
-from PyQt5 import QtCore
-from PyQt5.QtCore import QSortFilterProxyModel, QModelIndex
+from PyQt5.QtCore import QModelIndex
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QLabel, \
-    QLineEdit, QComboBox, QCompleter, QSpinBox, QApplication, QTimeEdit, QTextEdit, QCheckBox, QDialog, \
+    QLineEdit, QSpinBox, QApplication, QTimeEdit, QTextEdit, QCheckBox, QDialog, \
     QPushButton
 from datetime import date
 
@@ -17,6 +16,7 @@ from sportorg.app.modules.utils.custom_controls import AdvComboBox
 from sportorg.app.modules.utils.utils import qtime2datetime, datetime2qtime
 
 from sportorg.language import _
+from sportorg import config
 
 
 def get_groups():
@@ -186,7 +186,7 @@ class EntryEditDialog(QDialog):
 
     def init_ui(self):
         self.setWindowTitle(_('Entry properties'))
-        self.setWindowIcon(QIcon('sportorg.ico'))
+        self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(True)
         self.setToolTip(_('Entry properties Window'))

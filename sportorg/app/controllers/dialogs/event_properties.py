@@ -1,11 +1,9 @@
 import sys
 import traceback
 
-from PyQt5 import QtCore
-from PyQt5.QtCore import QSortFilterProxyModel
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QLabel, \
-    QLineEdit, QComboBox, QCompleter, QApplication, QDialog, \
+    QLineEdit, QApplication, QDialog, \
     QPushButton, QTextEdit, QDateEdit
 
 from sportorg.app.controllers.global_access import GlobalAccess
@@ -13,6 +11,7 @@ from sportorg.app.models.memory import race
 from sportorg.app.modules.utils.custom_controls import AdvComboBox
 
 from sportorg.language import _
+from sportorg import config
 
 
 def get_sport_kinds():
@@ -36,7 +35,7 @@ class EventPropertiesDialog(QDialog):
     def init_ui(self):
         self.setFixedWidth(500)
         self.setWindowTitle(_('Event properties'))
-        self.setWindowIcon(QIcon('sportorg.ico'))
+        self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(True)
 

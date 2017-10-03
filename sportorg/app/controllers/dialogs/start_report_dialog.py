@@ -7,18 +7,17 @@ import webbrowser
 
 from PyQt5 import QtWidgets
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QFormLayout, QLabel, QApplication, QDialog, QPushButton, QCheckBox
+from PyQt5.QtWidgets import QFormLayout, QLabel, QApplication, QDialog, QPushButton
 
-from sportorg.app.models.split_calculation import get_splits_data
+from sportorg.app.models.start_calculation import get_start_data
 from sportorg.app.modules.utils.custom_controls import AdvComboBox
 from sportorg.core.template import get_templates, get_text_from_file
-from sportorg.app.models.result_calculation import get_result_data
 
 from sportorg.language import _
 from sportorg import config
 
 
-class ReportDialog(QDialog):
+class StartReportDialog(QDialog):
     def __init__(self):
         super().__init__()
         self.init_ui()
@@ -27,7 +26,7 @@ class ReportDialog(QDialog):
         self.close()
 
     def init_ui(self):
-        self.setWindowTitle(_('Report creating'))
+        self.setWindowTitle(_('Create start'))
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(True)
@@ -50,9 +49,6 @@ class ReportDialog(QDialog):
         self.item_custom_path.clicked.connect(select_custom_path)
         self.layout.addRow(self.item_custom_path)
 
-        self.item_split_checkbox = QCheckBox(_('Print splits'))
-        self.layout.addRow(self.item_split_checkbox)
-
         def cancel_changes():
             self.close()
 
@@ -74,14 +70,10 @@ class ReportDialog(QDialog):
     def apply_changes_impl(self):
         template_path = self.item_template.currentText()
 
-        if_splits = self.item_split_checkbox.isChecked()
-        if if_splits:
-            template = get_text_from_file(template_path, **get_splits_data())
-        else:
-            template = get_text_from_file(template_path, **get_result_data())
+        template = get_text_from_file(template_path, **get_start_data())
 
         file_name = QtWidgets.QFileDialog.getSaveFileName(self, _('Save As HTML file'),
-                                                          '/report_' + str(time.strftime("%Y%m%d")),
+                                                          '/start_' + str(time.strftime("%Y%m%d")),
                                                           _("HTML file (*.html)"))[0]
         with codecs.open(file_name, 'w', 'utf-8') as file:
             file.write(template)
@@ -93,5 +85,5 @@ class ReportDialog(QDialog):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    ex = ReportDialog()
+    ex = StartReportDialog()
     sys.exit(app.exec_())

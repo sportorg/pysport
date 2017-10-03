@@ -13,6 +13,7 @@ from sportorg.app.models.result_calculation import ResultCalculation
 from sportorg.app.modules.utils.utils import datetime2qtime, qtime2datetime
 
 from sportorg.language import _
+from sportorg import config
 
 
 class ResultEditDialog(QDialog):
@@ -27,7 +28,7 @@ class ResultEditDialog(QDialog):
 
     def init_ui(self):
         self.setWindowTitle(_('Result'))
-        self.setWindowIcon(QIcon('sportorg.ico'))
+        self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(True)
         self.setToolTip(_('Result Edit Window'))
@@ -101,7 +102,7 @@ class ResultEditDialog(QDialog):
         if bib:
             person = find(race().persons, bib=bib)
             if person:
-                info = person.surname + ' ' + person.name
+                info = person.full_name
                 if person.group:
                     info += '  ' + person.group.name
                 self.label_person_info.setText(info)

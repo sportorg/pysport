@@ -38,6 +38,7 @@ class App:
         :param e: event: 'load' or 'dump'
         :return: 
         """
+        logging.debug('Backup start ' + self.file)
         if func is not None:
             if not isinstance(func, tuple):
                 return func(self.file)
