@@ -2,6 +2,8 @@ from sportorg.app.controllers.global_access import GlobalAccess
 from sportorg.language import _
 from sportorg import config
 
+from sportorg.app.modules.winorient import winorient
+
 
 def menu_list():
     return [
@@ -52,8 +54,13 @@ def menu_list():
                     'title': _('Import'),
                     'actions': [
                         {
-                            'title': 'Wdb',
-                            'action': lambda: print('...')
+                            'title': _("CSV Winorient"),
+                            'icon': config.icon_dir("csv.png"),
+                            'action': winorient.import_wo_csv
+                        },
+                        {
+                            'title': _("WDB Winorient"),
+                            'action': winorient.import_wo_wdb
                         },
                     ]
                 },
@@ -61,8 +68,8 @@ def menu_list():
                     'title': _('Export'),
                     'actions': [
                         {
-                            'title': 'Wdb',
-                            'action': lambda: print('...')
+                            'title': _("WDB Winorient"),
+                            'action': winorient.export_wo_wdb
                         },
                     ]
                 },
