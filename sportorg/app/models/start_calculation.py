@@ -55,6 +55,10 @@ class GroupsStartList(object):
         return data
 
     def get_data_list(self):
+        """
+
+        :return: [[titles...], ...]
+        """
         result = []
         self._persons.sort(key=self._sort_func)
         for person in self._persons:
@@ -73,12 +77,38 @@ class GroupsStartList(object):
     @staticmethod
     def _get_person_data(person):
         return [
-                person.full_name,
-                person.organization.name if person.organization is not None else '',
-                person.qual if person.qual is not None else '',
-                person.year if person.year is not None else '',
-                person.start_time.strftime("%H:%M:%S")
-            ]
+            person.full_name,
+            person.organization.name if person.organization is not None else '',
+            person.qual if person.qual is not None else '',
+            person.year if person.year is not None else '',
+            person.start_time.strftime("%H:%M:%S")
+        ]
+
+
+class ChessGenerator(GroupsStartList):
+    def get_list(self):
+        cache = set()
+        data = {}
+        self._persons.sort(key=self._sort_func)
+        for person in self._persons:
+            time = person.start_time.strftime("%H:%M:%S")
+            if time not in cache:
+                data[time] = [self._get_chess_person(person)]
+            else:
+                data[time].append(self._get_chess_person(person))
+            cache.add(time)
+
+        for time in data.keys():
+            data[time].sort(key=lambda val: val[0])
+
+        return data
+
+    @staticmethod
+    def _get_chess_person(person):
+        return (
+            person.bib,
+            person.full_name
+        )
 
 
 def get_start_data(general=False):
@@ -94,3 +124,9 @@ def get_start_data(general=False):
     }
 
     return result
+
+
+def get_chess_list():
+    start_list = ChessGenerator(race().persons)
+    return start_list.get_list()
+

@@ -124,6 +124,10 @@ def menu_list():
                 {
                     'title': _('Create start'),
                     'action': GlobalAccess().get_main_window().create_start_protocol
+                },
+                {
+                    'title': _('Create chess'),
+                    'action': GlobalAccess().get_main_window().create_chess
                 }
             ]
         },
