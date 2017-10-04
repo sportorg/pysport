@@ -235,20 +235,27 @@ class Person(Model):
 
         self.year = None  # sometime we have only year of birth
         self.birth_date = None  # datetime
-        self.organization = None
-        self.group = None
+        self.organization = None  # type: Organization
+        self.group = None  # type: Group
         self.nationality = None  # type: Country
         self.address = None  # type: Address
         self.contact = []  # type: List[Contact]
         self.world_code = None  # WRE ID for orienteering and the same
         self.national_code = None
         self.rank = None  # position/scores in word ranking
-        self.qual = None  # qualification, used in Russia only
+        self.qual = None  # type: str 'qualification, used in Russia only'
         self.is_out_of_competition = False  # e.g. 20-years old person, running in M12
         self.comment = None
 
         self.start_time = None
         self.start_group = 0
+
+    @property
+    def full_name(self):
+        def xstr(s):
+            return '' if s is None else str(s)
+
+        return '{} {}'.format(xstr(self.surname), xstr(self.name))
 
 
 class RaceData(Model):

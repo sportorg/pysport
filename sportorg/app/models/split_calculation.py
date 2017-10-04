@@ -46,7 +46,7 @@ class PersonSplits(object):
 
         self.legs = []
 
-        self.name = person.surname + ' ' + person.name
+        self.name = person.full_name
         self.group = person.group.name
         self.bib = person.bib
         self.team = person.organization.name

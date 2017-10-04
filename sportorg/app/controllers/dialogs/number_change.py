@@ -7,7 +7,10 @@
 # WARNING! All changes made in this file will be lost!
 import sys
 from PyQt5 import QtCore, QtWidgets
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QDialog, QApplication
+
+from sportorg import config
 from sportorg.language import _
 
 
@@ -75,6 +78,7 @@ class NumberChangeDialog(QDialog):
 
     def retranslateUi(self):
         self.setWindowTitle(_("Dialog"))
+        self.setWindowIcon(QIcon(config.ICON))
         self.source_num_label.setText(_("Source number"))
         self.source_info_label.setText(_("Ivan Churakoff M21 11:09:00"))
         self.target_num_label.setText(_("Target number"))

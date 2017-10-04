@@ -9,6 +9,7 @@ import sys
 import traceback
 
 from PyQt5 import QtCore, QtWidgets
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QDialog, QTableView
 
 from sportorg.app.controllers.dialogs import entry_edit
@@ -16,6 +17,7 @@ from sportorg.app.controllers.global_access import GlobalAccess
 from sportorg.app.modules.utils.custom_controls import AdvComboBox
 
 from sportorg.language import _
+from sportorg import config
 
 
 class DialogFilter(QDialog):
@@ -32,6 +34,7 @@ class DialogFilter(QDialog):
     def init_ui(self):
         self.setObjectName("filter_dialog")
         self.setWindowModality(QtCore.Qt.WindowModal)
+        self.setWindowIcon(QIcon(config.ICON))
         self.resize(300, 200)
         self.setSizeGripEnabled(False)
         self.setModal(True)
