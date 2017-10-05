@@ -12,6 +12,7 @@ from sportorg.app.controllers.dialogs.event_properties import EventPropertiesDia
 from sportorg.app.controllers.dialogs.number_change import NumberChangeDialog
 from sportorg.app.controllers.dialogs.print_properties import PrintPropertiesDialog
 from sportorg.app.controllers.dialogs.report_dialog import ReportDialog
+from sportorg.app.controllers.dialogs.start_chess_dialog import StartChessDialog
 from sportorg.app.controllers.dialogs.start_preparation import StartPreparationDialog
 from sportorg.app.controllers.dialogs.start_report_dialog import StartReportDialog
 from sportorg.app.controllers.global_access import GlobalAccess
@@ -276,6 +277,13 @@ class MainWindow(QMainWindow, App):
     def create_start_protocol(self):
         try:
             ex = StartReportDialog()
+            ex.exec()
+        except:
+            traceback.print_exc()
+
+    def create_chess(self):
+        try:
+            ex = StartChessDialog()
             ex.exec()
         except:
             traceback.print_exc()
