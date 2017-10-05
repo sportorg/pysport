@@ -103,7 +103,10 @@ class MainWindow(QMainWindow, App):
 
     def create_menu(self, parent, actions_list):
         for action_item in actions_list:
-            if 'action' in action_item:
+            if 'type' in action_item:
+                if action_item['type'] == 'separator':
+                    parent.addSeparator()
+            elif 'action' in action_item:
                 action = QtWidgets.QAction(self)
                 parent.addAction(action)
                 action.setText(action_item['title'])
