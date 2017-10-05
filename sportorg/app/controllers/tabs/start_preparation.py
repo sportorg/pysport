@@ -1,8 +1,5 @@
 import logging
 
-import sys
-import traceback
-
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QAbstractItemView, QHeaderView
 
@@ -54,9 +51,8 @@ class Widget(QtWidgets.QWidget):
             # show_edit_dialog(index)
             try:
                 dialog = EntryEditDialog(self.EntryTable, index)
-            except:
-                print(sys.exc_info())
-                traceback.print_exc()
+            except Exception as e:
+                logging.exception(e)
 
             dialog.exec()
 

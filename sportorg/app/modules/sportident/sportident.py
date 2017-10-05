@@ -1,4 +1,3 @@
-import traceback
 import logging
 
 from sportorg.app.controllers.global_access import GlobalAccess
@@ -33,15 +32,12 @@ def start_reader():
 def sportident_settings():
     try:
         SportidentPropertiesDialog().exec()
-    except:
-        traceback.print_exc()
+    except Exception as e:
+        logging.exception(e)
 
 
 def message(msg, is_error=False):
-    if is_error:
-        logging.error(msg)
-    else:
-        logging.info(msg)
+    logging.info(msg)
     GlobalAccess().get_main_window().statusbar.showMessage(msg, 5000)
 
 

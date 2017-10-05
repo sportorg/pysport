@@ -1,4 +1,4 @@
-import traceback
+import logging
 
 import sys
 from PyQt5.QtGui import QTextDocument
@@ -39,8 +39,8 @@ def main():
         text_document = QTextDocument()
         text_document.setHtml("hello")
         text_document.print_(printer)
-    except:
-        traceback.print_exc()
+    except Exception as e:
+        logging.exception(e)
 
 
 if __name__ == '__main__':

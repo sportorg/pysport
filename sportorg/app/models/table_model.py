@@ -3,7 +3,6 @@ import sys
 import logging
 
 import time
-import traceback
 
 from PyQt5.QtCore import QVariant, QAbstractTableModel, Qt, QSortFilterProxyModel
 from peewee import prefetch
@@ -34,7 +33,7 @@ class PersonTableModel(AbstractSportOrgTableModel):
                     query = m.select()
                     self.count = query.count()
 
-            except:
+            except Exception as e:
                 logging.error("Unexpected error:", sys.exc_info()[0])
                 self.count = 300
 
@@ -50,9 +49,8 @@ class PersonTableModel(AbstractSportOrgTableModel):
             answer = ''
             try:
                 answer = self.get_participation_data(index.row())[index.column()]
-            except:
-                print(sys.exc_info())
-                traceback.print_stack()
+            except Exception as e:
+                logging.exception(e)
 
             # end = time.time()
             # logging.debug('Data() ' + str(index.row()) + ' ' + str(index.column()) + ': ' + str(end - start) + ' s')
@@ -165,7 +163,7 @@ class ResultTableModel(AbstractSportOrgTableModel):
                     query = m.select()
                     self.count = query.count()
 
-            except:
+            except Exception as e:
                 print("Unexpected error:", sys.exc_info()[0])
                 self.count = 300
 
@@ -181,9 +179,8 @@ class ResultTableModel(AbstractSportOrgTableModel):
             answer = ''
             try:
                 answer = self.get_participation_data(index.row())[index.column()]
-            except:
-                print(sys.exc_info())
-                traceback.print_stack()
+            except Exception as e:
+                logging.exception(e)
 
             # end = time.time()
             # logging.debug('Data() ' + str(index.row()) + ' ' + str(index.column()) + ': ' + str(end - start) + ' s')
@@ -299,7 +296,6 @@ class PersonProxyModel(QSortFilterProxyModel):
                     cell = source_model.data(source_model.index(row, i), Qt.DisplayRole)
                     if str(cell.value()).find(filter_string) == -1:
                         return False
-        except:
-            print(sys.exc_info())
-            traceback.print_stack()
+        except Exception as e:
+            logging.exception(str(e))
         return True

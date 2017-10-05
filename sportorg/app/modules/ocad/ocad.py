@@ -6,7 +6,6 @@ from sportorg.lib.ocad import ocad
 from sportorg.app.models import model
 from sportorg.app.models import memory
 
-import traceback
 from PyQt5 import QtWidgets
 
 
@@ -16,15 +15,15 @@ def import_txt_v8_action():
     if file_name is not '':
         try:
             import_txt_v8(file_name)
-        except:
-            traceback.print_exc()
+        except Exception as e:
+            logging.exception(str(e))
         GlobalAccess().get_main_window().init_model()
 
 
 def import_txt_v8_to_model(source):
     classes_v8 = ocad.parse_txt_v8(source)
     diff = time.time()
-    logging.debug("Start import_txt_v8_to_model")
+    logging.info("Start import_txt_v8_to_model")
 
     for course in classes_v8.courses:
         c = model.Course.create(

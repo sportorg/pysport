@@ -1,6 +1,5 @@
 import logging
 import sys
-import traceback
 from time import sleep
 
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -311,8 +310,8 @@ class StartPreparationDialog(QDialog):
 
             GlobalAccess().get_main_window().refresh()
             self.save_state()
-        except:
-            traceback.print_exc()
+        except Exception as e:
+            logging.exception(str(e))
 
     def save_state(self):
         obj = race()

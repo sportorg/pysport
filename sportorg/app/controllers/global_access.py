@@ -1,4 +1,4 @@
-import traceback
+import logging
 
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import QItemSelectionModel, QModelIndex
@@ -119,8 +119,8 @@ class GlobalAccess(object):
                 race().add_new_organization()
                 self.get_organization_table().model().init_cache()
             self.get_main_window().refresh()
-        except:
-            traceback.print_exc()
+        except Exception as e:
+            logging.exception(str(e))
 
     def clear_filters(self, remove_condition=True):
         self.get_person_table().model().clear_filter(remove_condition)

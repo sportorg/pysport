@@ -1,5 +1,5 @@
 import sys
-import traceback
+import logging
 
 from PyQt5.QtCore import QModelIndex
 from PyQt5.QtGui import QIcon
@@ -22,7 +22,7 @@ def get_courses():
         for i in race().courses:
             ret.append(i.name)
         return ret
-    except:
+    except Exception as e:
         return ['']
 
 
@@ -110,9 +110,8 @@ class GroupEditDialog(QDialog):
         def apply_changes():
             try:
                 self.apply_changes_impl()
-            except:
-                print(sys.exc_info())
-                traceback.print_exc()
+            except Exception as e:
+                logging.exception(e)
             self.close()
 
         self.button_ok = QPushButton(_('OK'))

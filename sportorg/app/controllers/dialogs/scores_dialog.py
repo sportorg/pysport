@@ -1,5 +1,5 @@
 import sys
-import traceback
+import logging
 
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import  QApplication, QDialog, \
@@ -53,9 +53,8 @@ class ScoresDialog(QDialog):
         def apply_changes():
             try:
                 self.apply_changes_impl()
-            except:
-                print(sys.exc_info())
-                traceback.print_exc()
+            except Exception as e:
+                logging.exception(e)
             self.close()
 
         self.button_ok = QPushButton(_('OK'))

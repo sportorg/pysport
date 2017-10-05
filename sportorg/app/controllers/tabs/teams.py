@@ -1,8 +1,5 @@
 import logging
 
-import sys
-import traceback
-
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QAbstractItemView, QHeaderView
 
@@ -53,9 +50,8 @@ class Widget(QtWidgets.QWidget):
             try:
                 dialog = OrganizationEditDialog(self.TeamTable, index)
                 dialog.exec()
-            except:
-                print(sys.exc_info())
-                traceback.print_exc()
+            except Exception as e:
+                logging.exception(e)
 
             logging.debug('Team: clicked on ' + str(index.row()))
 

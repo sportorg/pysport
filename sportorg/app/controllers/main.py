@@ -1,7 +1,6 @@
 import configparser
 import logging.config
 import time
-import traceback
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow, QTableView, QMessageBox
@@ -196,15 +195,15 @@ class MainWindow(QMainWindow, App):
             table = GlobalAccess().get_current_table()
             ex = DialogFilter(table)
             ex.exec()
-        except:
-            traceback.print_exc()
+        except Exception as e:
+            logging.exception(str(e))
 
     def report_dialog(self):
         try:
             ex = ReportDialog()
             ex.exec()
-        except:
-            traceback.print_exc()
+        except Exception as e:
+            logging.exception(str(e))
 
     def split_printout(self):
         try:
@@ -228,68 +227,68 @@ class MainWindow(QMainWindow, App):
             template = get_text_from_file(template_path, **spl.get_json(person))
 
             print_html(obj.get_setting('split_printer'), template)
-        except:
-            traceback.print_exc()
+        except Exception as e:
+            logging.exception(str(e))
 
     def event_settings_dialog(self):
         try:
             ex = EventPropertiesDialog()
             ex.exec()
-        except:
-            traceback.print_exc()
+        except Exception as e:
+            logging.exception(str(e))
 
     def start_preparation(self):
         try:
             StartPreparationDialog().exec()
-        except:
-            traceback.print_exc()
+        except Exception as e:
+            logging.exception(str(e))
 
     def print_settings(self):
         try:
             PrintPropertiesDialog().exec()
-        except:
-            traceback.print_exc()
+        except Exception as e:
+            logging.exception(str(e))
 
     def number_change(self):
         try:
             obj = NumberChangeDialog()
             obj.exec()
-        except:
-            traceback.print_exc()
+        except Exception as e:
+            logging.exception(str(e))
 
     def guess_courses(self):
         try:
             guess_courses_for_groups()
-        except:
-            traceback.print_exc()
+        except Exception as e:
+            logging.exception(str(e))
 
     def guess_corridors(self):
         try:
             guess_corridors_for_groups()
-        except:
-            traceback.print_exc()
+        except Exception as e:
+            logging.exception(str(e))
 
     def manual_finish(self):
         try:
             race().add_new_result()
             GlobalAccess().get_result_table().model().init_cache()
             GlobalAccess().get_main_window().refresh()
-        except:
-            traceback.print_exc()
+        except Exception as e:
+            logging.exception(str(e))
 
     def create_start_protocol(self):
         try:
             ex = StartReportDialog()
             ex.exec()
-        except:
-            traceback.print_exc()
+        except Exception as e:
+            logging.exception(str(e))
 
     def create_chess(self):
         try:
             ex = StartChessDialog()
             ex.exec()
-        except:
-            traceback.print_exc()
+        except Exception as e:
+            logging.exception(str(e))
 
     def create_object(self):
         GlobalAccess().add_object()
@@ -297,8 +296,8 @@ class MainWindow(QMainWindow, App):
     def delete_object(self):
         try:
             GlobalAccess().delete_object()
-        except:
-            traceback.print_exc()
+        except Exception as e:
+            logging.exception(str(e))
 
     def init_model(self):
         try:
@@ -315,8 +314,8 @@ class MainWindow(QMainWindow, App):
             table = GlobalAccess().get_organization_table()
             table.setModel(TeamMemoryModel())
 
-        except:
-            traceback.print_exc()
+        except Exception as e:
+            logging.exception(str(e))
 
     def refresh(self):
         logging.debug('refreshing interface')
@@ -340,5 +339,5 @@ class MainWindow(QMainWindow, App):
             table = GlobalAccess().get_organization_table()
             table.model().init_cache()
             table.model().layoutChanged.emit()
-        except:
-            traceback.print_exc()
+        except Exception as e:
+            logging.exception(str(e))
