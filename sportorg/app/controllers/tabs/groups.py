@@ -1,5 +1,4 @@
 import logging
-import traceback
 
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QAbstractItemView, QHeaderView
@@ -51,8 +50,8 @@ class Widget(QtWidgets.QWidget):
             try:
                  dialog = GroupEditDialog(self.GroupTable, index)
                  dialog.exec()
-            except:
-                traceback.print_exc()
+            except Exception as e:
+                logging.exception(e)
 
         self.GroupTable.activated.connect(group_double_clicked)
         self.group_layout.addWidget(self.GroupTable)

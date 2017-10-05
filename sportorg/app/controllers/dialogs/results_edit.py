@@ -1,5 +1,5 @@
+import logging
 import sys
-import traceback
 
 from PyQt5.QtCore import QModelIndex
 from PyQt5.QtGui import QIcon
@@ -84,9 +84,8 @@ class ResultEditDialog(QDialog):
         def apply_changes():
             try:
                 self.apply_changes_impl()
-            except:
-                print(sys.exc_info())
-                traceback.print_exc()
+            except Exception as e:
+                logging.exception(e)
             self.close()
 
         self.button_ok = QPushButton(_('OK'))

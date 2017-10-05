@@ -1,7 +1,7 @@
 import sys
-import traceback
+import logging
 
-from PyQt5 import  QtPrintSupport
+from PyQt5 import QtPrintSupport
 from PyQt5.QtGui import QIcon
 from PyQt5.QtPrintSupport import QPrinter, QPrintDialog, QAbstractPrintDialog
 from PyQt5.QtWidgets import QFormLayout, QLabel, \
@@ -13,6 +13,7 @@ from sportorg.app.models.memory import race
 
 from sportorg.language import _
 from sportorg import config
+
 
 class PrintPropertiesDialog(QDialog):
     def __init__(self):
@@ -68,8 +69,8 @@ class PrintPropertiesDialog(QDialog):
         def apply_changes():
             try:
                 self.apply_changes_impl()
-            except:
-                traceback.print_exc()
+            except Exception as e:
+                logging.exception(e)
             self.close()
 
         self.button_ok = QPushButton(_('OK'))
@@ -85,15 +86,15 @@ class PrintPropertiesDialog(QDialog):
         printer_name = obj.get_setting('main_printer', QPrinter().printerName())
         try:
             QPrinter().setPrinterName(printer_name)
-        except:
+        except Exception as e:
             printer_name = QPrinter().printerName()
         self.selected_printer.setText(printer_name)
 
         printer_name = obj.get_setting('split_printer', QPrinter().printerName())
         try:
             QPrinter().setPrinterName(printer_name)
-        except:
-            traceback.print_exc()
+        except Exception as e:
+            logging.exception(str(e))
             printer_name = QPrinter().printerName()
         self.selected_split_printer.setText(printer_name)
 
@@ -104,8 +105,8 @@ class PrintPropertiesDialog(QDialog):
             pd.setOption(QAbstractPrintDialog.PrintSelection)
             pd.exec()
             return printer.printerName()
-        except:
-            traceback.print_exc()
+        except Exception as e:
+            logging.exception(str(e))
         return None
 
     def apply_changes_impl(self):

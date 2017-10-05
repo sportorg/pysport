@@ -1,6 +1,6 @@
 import codecs
 import sys
-import traceback
+import logging
 
 import time
 import webbrowser
@@ -55,8 +55,8 @@ class StartReportDialog(QDialog):
         def apply_changes():
             try:
                 self.apply_changes_impl()
-            except:
-                traceback.print_exc()
+            except Exception as e:
+                logging.exception(e)
             self.close()
 
         self.button_ok = QPushButton(_('OK'))

@@ -4,7 +4,7 @@ import re
 
 from sportorg.app.modules.utils.utils import time_to_hhmmss
 from sportorg.language import _
-import traceback
+import logging
 
 from PyQt5.QtCore import QVariant, QAbstractTableModel, Qt, QSortFilterProxyModel
 
@@ -54,8 +54,8 @@ class AbstractSportOrgMemoryModel (QAbstractTableModel):
                 row = index.row()
                 column = index.column()
                 answer = self.cache[row][column]
-            except:
-                traceback.print_exc()
+            except Exception as e:
+                logging.exception(e)
 
             # end = time.time()
             # logging.debug('Data() ' + str(index.row()) + ' ' + str(index.column()) + ': ' + str(end - start) + ' s')
@@ -117,8 +117,8 @@ class AbstractSportOrgMemoryModel (QAbstractTableModel):
 
                 self.init_cache()
             self.layoutChanged.emit()
-        except:
-            traceback.print_exc()
+        except Exception as e:
+            logging.exception(str(e))
 
     def get_values_from_object(self, object):
         pass
@@ -431,7 +431,6 @@ class PersonProxyModel(QSortFilterProxyModel):
                     cell = source_model.data(source_model.index(row, i), Qt.DisplayRole)
                     if str(cell.value()).find(filter_string) == -1:
                         return False
-        except:
-            print(sys.exc_info())
-            traceback.print_exc()
+        except Exception as e:
+            logging.exception(str(e))
         return True

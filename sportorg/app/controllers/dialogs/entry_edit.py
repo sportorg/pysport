@@ -1,5 +1,5 @@
 import sys
-import traceback
+import logging
 
 from PyQt5.QtCore import QModelIndex
 from PyQt5.QtGui import QIcon
@@ -25,7 +25,7 @@ def get_groups():
         for i in race().groups:
             ret.append(i.name)
         return ret
-    except:
+    except Exception as e:
         return ['', 'M12', 'M14', 'M16', 'M21', 'D12', 'D14', 'M16', 'D21']
 
 
@@ -35,7 +35,7 @@ def get_teams():
         for i in race().organizations:
             ret.append(i.name)
         return ret
-    except:
+    except Exception as e:
         return ['', 'Тюменская обл.', 'Курганская обл.', 'Челябинская обл.', 'Республика Коми', 'г.Москва',
                 'ХМАО-Югра']
 
@@ -48,7 +48,7 @@ def get_teams_db():
         for i in team.select():
             ret.append(i.name)
         return ret
-    except:
+    except Exception as e:
         return ['', 'Тюменская обл.', 'Курганская обл.', 'Челябинская обл.', 'Республика Коми', 'г.Москва', 'ХМАО-Югра']
 
 
@@ -263,8 +263,8 @@ class EntryEditDialog(QDialog):
         def apply_changes():
             try:
                 self.apply_changes_impl()
-            except:
-                traceback.print_exc()
+            except Exception as e:
+                logging.exception(e)
             self.close()
 
         self.button_ok = QPushButton(_('OK'))

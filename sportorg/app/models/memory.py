@@ -1,4 +1,4 @@
-import traceback
+import logging
 
 import datetime
 from PyQt5.QtWidgets import QMessageBox
@@ -291,8 +291,8 @@ class Race(Model):
             indexes = sorted(indexes, reverse=True)
             for i in indexes:
                 del self.persons[i]
-        except:
-            traceback.print_exc()
+        except Exception as e:
+            logging.exception(str(e))
 
     def delete_results(self, indexes, table):
         try:
@@ -300,8 +300,8 @@ class Race(Model):
             for i in indexes:
                 del self.results[i]
 
-        except:
-            traceback.print_exc()
+        except Exception as e:
+            logging.exception(str(e))
 
     def delete_groups(self, indexes, table):
         try:
@@ -318,8 +318,8 @@ class Race(Model):
             for i in indexes:
                 del self.groups[i]
 
-        except:
-            traceback.print_exc()
+        except Exception as e:
+            logging.exception(str(e))
             return False
         return True
 
@@ -339,8 +339,8 @@ class Race(Model):
             for i in indexes:
                 del self.courses[i]
 
-        except:
-            traceback.print_exc()
+        except Exception as e:
+            logging.exception(str(e))
             return False
         return True
 
@@ -359,8 +359,8 @@ class Race(Model):
             for i in indexes:
                 del self.organizations[i]
 
-        except:
-            traceback.print_exc()
+        except Exception as e:
+            logging.exception(str(e))
             return False
         return True
 

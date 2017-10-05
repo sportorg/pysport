@@ -1,5 +1,4 @@
 import logging
-import traceback
 
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QAbstractItemView, QHeaderView
@@ -50,8 +49,8 @@ class Widget(QtWidgets.QWidget):
             try:
                 dialog = CourseEditDialog(self.CourseTable, index)
                 dialog.exec()
-            except:
-                traceback.print_exc()
+            except Exception as e:
+                logging.exception(e)
 
         self.CourseTable.activated.connect(course_double_clicked)
         self.course_layout.addWidget(self.CourseTable)

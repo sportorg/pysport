@@ -6,7 +6,7 @@
 #
 # WARNING! All changes made in this file will be lost!
 import sys
-import traceback
+import logging
 
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtGui import QIcon
@@ -96,8 +96,8 @@ class DialogFilter(QDialog):
                 proxy_model.apply_filter()
 
                 GlobalAccess().get_main_window().refresh()
-        except:
-            traceback.print_exc()
+        except Exception as e:
+            logging.exception(str(e))
 
         self.close_dialog()
 

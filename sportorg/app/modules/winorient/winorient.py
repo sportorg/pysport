@@ -1,5 +1,4 @@
-import sys
-import traceback
+import logging
 
 import time
 
@@ -93,9 +92,8 @@ def import_wo_wdb():
             # wb.run()
             wb.create_objects()
             GlobalAccess().get_main_window().init_model()
-        except:
-            print(sys.exc_info())
-            traceback.print_exc()
+        except Exception as e:
+            logging.exception(str(e))
 
 
 def export_wo_wdb():
@@ -112,5 +110,5 @@ def export_wo_wdb():
 
             write_wdb(wdb_object, file_name)
 
-        except:
-            traceback.print_exc()
+        except Exception as e:
+            logging.exception(str(e))

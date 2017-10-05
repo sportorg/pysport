@@ -1,6 +1,5 @@
 import logging
 
-import traceback
 from datetime import datetime
 
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -32,16 +31,16 @@ class ResultTable(QTableView):
         try:
             if event.key() == QtCore.Qt.Key_Up or event.key() == QtCore.Qt.Key_Down:
                 self.entry_single_clicked(self.currentIndex())
-        except:
-            traceback.print_exc()
+        except Exception as e:
+            logging.exception(str(e))
 
     def entry_single_clicked(self, index):
         try:
             logging.debug('Single result clicked on ' + str(index.row()))
             #  show punches in the left area
             self.parent_widget.show_punches(index)
-        except:
-            traceback.print_exc()
+        except Exception as e:
+            logging.exception(str(e))
 
         logging.debug('Finish single result clicked on ' + str(index.row()))
 
@@ -50,8 +49,8 @@ class ResultTable(QTableView):
             logging.debug('Clicked on ' + str(index.row()))
             dialog = ResultEditDialog(self, index)
             dialog.exec()
-        except:
-            traceback.print_exc()
+        except Exception as e:
+            logging.exception(str(e))
 
 
 class Widget(QtWidgets.QWidget):
