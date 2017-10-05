@@ -31,10 +31,6 @@ def menu_list():
                     'action': GlobalAccess().get_main_window().open_file
                 },
                 {
-                    'title': _('New Race'),
-                    'action': lambda: print('...')
-                },
-                {
                     'title': _('Save As'),
                     'shortcut': 'Ctrl+Shift+S',
                     'icon': config.icon_dir('save.png'),
@@ -45,12 +41,22 @@ def menu_list():
                     'action': lambda: print('...')
                 },
                 {
+                    'type': 'separator',
+                },
+                {
+                    'title': _('New Race'),
+                    'action': lambda: print('...')
+                },
+                {
                     'title': _('Settings'),
                     'action': lambda: print('...')
                 },
                 {
                     'title': _('Event Settings'),
                     'action': GlobalAccess().get_main_window().event_settings_dialog
+                },
+                {
+                    'type': 'separator',
                 },
                 {
                     'title': _('Import'),
@@ -78,6 +84,9 @@ def menu_list():
                             'action': winorient.export_wo_wdb
                         },
                     ]
+                },
+                {
+                    'type': 'separator',
                 },
                 {
                     'title': _('Exit'),
