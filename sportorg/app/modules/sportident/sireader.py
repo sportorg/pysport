@@ -76,13 +76,13 @@ def get_ports():
 def choose_port():
     ports = get_ports()
     if len(ports):
-        logging.debug("Доступные порты:")
+        logging.debug('Available Ports')
         for i, p in enumerate(ports):
             logging.debug("{} - {}".format(i, p))
 
         return ports[0]
     else:
-        logging.debug("Нет доступных портов")
+        logging.debug("No ports available")
         return None
 
 
