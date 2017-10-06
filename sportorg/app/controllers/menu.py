@@ -103,6 +103,7 @@ def menu_list():
                 },
                 {
                     'title': _('Delete'),
+                    'shortcut': 'Del',
                     'action': GlobalAccess().get_main_window().delete_object
                 }
             ]
@@ -112,6 +113,7 @@ def menu_list():
             'actions': [
                 {
                     'title': _('Filter'),
+                    'shortcut': 'F2',
                     'action': GlobalAccess().get_main_window().filter_dialog
                 },
                 {
@@ -131,11 +133,11 @@ def menu_list():
                     'action': GlobalAccess().get_main_window().guess_corridors
                 },
                 {
-                    'title': _('Create start'),
+                    'title': _('Start list'),
                     'action': GlobalAccess().get_main_window().create_start_protocol
                 },
                 {
-                    'title': _('Create chess'),
+                    'title': _('Start times'),
                     'action': GlobalAccess().get_main_window().create_chess
                 }
             ]

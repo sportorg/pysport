@@ -26,7 +26,6 @@ class Widget(QtWidgets.QWidget):
 
     def setup_ui(self):
         self.setAcceptDrops(False)
-        self.setToolTip("")
         self.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.setAutoFillBackground(False)
         self.course_layout = QtWidgets.QGridLayout(self)

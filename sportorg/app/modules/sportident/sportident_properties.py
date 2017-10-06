@@ -28,7 +28,6 @@ class SportidentPropertiesDialog(QDialog):
         self.setWindowIcon(QIcon(icon_dir('sportident.png')))
         self.setSizeGripEnabled(False)
         self.setModal(True)
-        self.setToolTip(_('SPORTident Properties Window'))
 
         self.layout = QFormLayout(self)
 

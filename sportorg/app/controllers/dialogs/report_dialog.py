@@ -31,7 +31,6 @@ class ReportDialog(QDialog):
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(True)
-        self.setToolTip(_('Creating of report'))
 
         self.layout = QFormLayout(self)
 

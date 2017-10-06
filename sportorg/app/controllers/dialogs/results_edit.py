@@ -31,7 +31,6 @@ class ResultEditDialog(QDialog):
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(True)
-        self.setToolTip(_('Result Edit Window'))
 
         self.layout = QFormLayout(self)
 

@@ -26,11 +26,10 @@ class StartReportDialog(QDialog):
         self.close()
 
     def init_ui(self):
-        self.setWindowTitle(_('Create start'))
+        self.setWindowTitle(_('Start list'))
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(True)
-        self.setToolTip(_('Creating of report'))
 
         self.layout = QFormLayout(self)
 

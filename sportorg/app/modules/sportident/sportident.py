@@ -15,9 +15,9 @@ def start_reader():
     if reader is None:
         reader = card_reader.read()
         if reader is not None:
-            message(_('Open port') + ' ' + reader.port)
+            message(_('Opening port') + ' ' + reader.port)
         else:
-            message(_('Port not open'), True)
+            message(_('Cannot open port'), True)
     elif not reader.reading:
         reader = None
         start_reader()
@@ -26,7 +26,7 @@ def start_reader():
         if not reader.reading:
             port = reader.port
             reader = None
-            message(_('Close port' + ' ' + port))
+            message(_('Closing port' + ' ' + port))
 
 
 def sportident_settings():

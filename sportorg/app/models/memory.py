@@ -310,7 +310,7 @@ class Race(Model):
                 group = self.groups[i]  # type: Group
                 if group.count_person > 0:
                     QMessageBox.question(table,
-                                         _('Abort'),
+                                         _('Error'),
                                          _('Cannot remove group') + ' ' + group.name)
                     return False
 
@@ -330,7 +330,7 @@ class Race(Model):
                 course = self.courses[i]  # type: Course
                 if course.count_group > 0:
                     QMessageBox.question(table,
-                                         _('Abort'),
+                                         _('Error'),
                                          _('Cannot remove course') + ' ' + course.name)
                     return False
 
@@ -351,7 +351,7 @@ class Race(Model):
                 organization = self.organizations[i]  # type: Organization
                 if organization.count_person > 0:
                     QMessageBox.question(table,
-                                         _('Abort'),
+                                         _('Error'),
                                          _('Cannot remove organization') + ' ' + organization.name)
                     return False
             indexes = sorted(indexes, reverse=True)
