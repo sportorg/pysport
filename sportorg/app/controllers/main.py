@@ -18,7 +18,7 @@ from sportorg.app.controllers.global_access import GlobalAccess
 from sportorg.app.controllers.menu import menu_list
 from sportorg.app.controllers.tabs import start_preparation, groups, teams, race_results, courses
 from sportorg.app.controllers.toolbar import toolbar_list
-from sportorg.app.models.memory import Race, event as e, race
+from sportorg.app.models.memory import Race, event as races, race
 from sportorg.app.models import result_generation
 from sportorg.app.models.memory_model import PersonMemoryModel, ResultMemoryModel, GroupMemoryModel, \
     CourseMemoryModel, TeamMemoryModel
@@ -164,10 +164,13 @@ class MainWindow(QMainWindow, App):
                                             '/' + str(time.strftime("%Y%m%d")), "SportOrg file (*.sportorg)")[0]
         if file_name is not '':
             self.setWindowTitle(file_name)
-            super().create_file(file_name)
+            try:
+                super().create_file(file_name)
+            except Exception as e:
+                logging.exception(e)
             # remove data
             if update_data:
-                e[0] = Race()
+                races[0] = Race()
             self.refresh()
 
     def save_file_as(self):
@@ -177,7 +180,10 @@ class MainWindow(QMainWindow, App):
 
     def save_file(self):
         if self.file is not None:
-            super().save_file()
+            try:
+                super().save_file()
+            except Exception as e:
+                logging.exception(e)
         else:
             self.save_file_as()
 
@@ -187,7 +193,10 @@ class MainWindow(QMainWindow, App):
                                                           "SportOrg file (*.sportorg)")[0]
         if file_name is not '':
             self.setWindowTitle(file_name)
-            super().open_file(file_name)
+            try:
+                super().open_file(file_name)
+            except Exception as e:
+                logging.exception(e)
             self.init_model()
 
     def filter_dialog(self):

@@ -28,17 +28,23 @@ def backup(file, func, mode='wb'):
         func(f)
 
 
+def event_create(file):
+    logging.debug('Create ' + file)
+    backup(file, lambda f: bin.dump(f, True))
+
+
 def event_dump(file):
-    logging.debug('Dump')
+    logging.debug('Dump ' + file)
     backup(file, bin.dump)
 
 
 def event_load(file):
-    logging.debug('load')
+    logging.debug('load ' + file)
     backup(file, bin.load, 'rb')
 
 
 def init():
+    add_event('create_file', event_create)
     add_event('dump', event_dump)
     add_event('load', event_load)
 

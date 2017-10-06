@@ -5,12 +5,16 @@ from sportorg.app.models import memory
 from sportorg import config
 
 
-def dump(file):
+def dump(file, create=False):
     # temporary restore whole lists, but keep filter conditions
     GlobalAccess().clear_filters(remove_condition=False)
 
     data = {'version': config.VERSION}
-    race = memory.race()
+    if create:
+        race = memory.Race()
+    else:
+        race = memory.race()
+
     data['data'] = race.data
     data['courses'] = race.courses
     data['groups'] = race.groups
