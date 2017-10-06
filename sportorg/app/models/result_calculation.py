@@ -53,7 +53,7 @@ class ResultCalculation(object):
 
             res.place = ''
             # give place only if status = OK
-            if res.status == ResultStatus.OK or res.status == 0:
+            if res.status == ResultStatus.OK:
                 # skip if out of competition
                 if res.person.is_out_of_competition:
                     res.place = _('o/c')

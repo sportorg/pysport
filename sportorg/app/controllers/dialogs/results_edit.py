@@ -130,15 +130,15 @@ class ResultEditDialog(QDialog):
         if current_object.person:
             self.item_bib.setValue(current_object.person.bib)
 
-        if current_object.status == ResultStatus.OK or current_object.status == 0:
+        if current_object.status == ResultStatus.OK:
             self.radio_ok.setChecked(True)
-        elif current_object.status == ResultStatus.DISQUALIFIED or current_object.status == 1:
+        elif current_object.status == ResultStatus.DISQUALIFIED:
             self.radio_dsq.setChecked(True)
-        elif current_object.status == ResultStatus.OVERTIME or current_object.status == 2:
+        elif current_object.status == ResultStatus.OVERTIME:
             self.radio_overtime.setChecked(True)
-        elif current_object.status == ResultStatus.DID_NOT_FINISH or current_object.status == 7:
+        elif current_object.status == ResultStatus.DID_NOT_FINISH:
             self.radio_dnf.setChecked(True)
-        elif current_object.status == ResultStatus.DID_NOT_START or current_object.status == 8:
+        elif current_object.status == ResultStatus.DID_NOT_START:
             self.radio_dns.setChecked(True)
 
     def apply_changes_impl(self):
@@ -167,17 +167,17 @@ class ResultEditDialog(QDialog):
             GlobalAccess().get_result_table().model().init_cache()
             changed = True
 
-        status = -1
+        status = ''
         if self.radio_ok.isChecked():
-            status = 0
+            status = ResultStatus.OK
         elif self.radio_dsq.isChecked():
-            status = 1
+            status = ResultStatus.DISQUALIFIED
         elif self.radio_overtime.isChecked():
-            status = 2
+            status = ResultStatus.OVERTIME
         elif self.radio_dnf.isChecked():
-            status = 7
-        elif self.radio_dn8.isChecked():
-            status = 8
+            status = ResultStatus.DID_NOT_FINISH
+        elif self.radio_dns.isChecked():
+            status = ResultStatus.DID_NOT_START
         if result.status != status:
             result.status = status
             changed = True

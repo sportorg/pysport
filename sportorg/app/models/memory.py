@@ -143,7 +143,7 @@ class Result(Model):
         self.punches = []
         self.penalty_time = None  # time of penalties (marked route, false start)
         self.penalty_laps = None  # count of penalty legs (marked route)
-        self.status = 0
+        self.status = ResultStatus.OK
         self.result = None  # time in seconds * 100 (int)
         self.place = None
 
