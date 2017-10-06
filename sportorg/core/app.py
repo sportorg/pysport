@@ -12,6 +12,7 @@ class App:
     def create_file(self, file_name):
         if file_name is not '':
             self.file = file_name
+            logging.debug('Create start ' + self.file)
             event('create_file', file_name)
 
     def open_file(self, file_name):
