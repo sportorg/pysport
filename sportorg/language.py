@@ -1,5 +1,6 @@
 import configparser
 import gettext
+import logging
 import os
 from sportorg import config
 
@@ -10,7 +11,14 @@ locale_current = conf.get('locale', 'current', fallback='ru_RU')
 
 def locale():
     cat = gettext.Catalog(config.NAME.lower(), config.LOCALE_DIR, languages=[locale_current])
-    return cat.gettext
+
+    def get_text(message):
+        result = cat.gettext(message)
+        if result == message:
+            logging.debug('No translation "{}"'.format(result))
+        return result
+
+    return get_text
 
 
 def get_languages():
