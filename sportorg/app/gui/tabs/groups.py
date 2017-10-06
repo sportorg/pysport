@@ -3,10 +3,10 @@ import logging
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QAbstractItemView, QHeaderView
 
-from sportorg.app.controllers.dialogs.group_edit import GroupEditDialog
+from sportorg.app.gui.dialogs.group_edit import GroupEditDialog
 from sportorg.app.models.memory_model import GroupMemoryModel
-from sportorg.app.controllers.tabs.table import TableView
-from sportorg.app.controllers.global_access import GlobalAccess
+from sportorg.app.gui.tabs.table import TableView
+from sportorg.app.gui.global_access import GlobalAccess
 
 from sportorg.language import _
 

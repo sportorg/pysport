@@ -1,6 +1,6 @@
 from sportorg import config
 from sportorg.language import _
-from sportorg.app.controllers.global_access import GlobalAccess
+from sportorg.app.gui.global_access import GlobalAccess
 
 from sportorg.app.modules.sportident import sportident
 

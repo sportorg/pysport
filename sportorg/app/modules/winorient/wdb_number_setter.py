@@ -5,6 +5,8 @@ from PyQt5.QtWidgets import QApplication
 from sportorg.app.modules.winorient.wdb import WinOrientBinary
 from sportorg.lib.winorient.wdb import WDB, write_wdb
 
+from sportorg.language import _
+
 
 def set_numbers(wdb_target, wdb_source):
     """
@@ -24,11 +26,11 @@ def set_numbers(wdb_target, wdb_source):
 if __name__ == '__main__':
 
     app = QApplication(sys.argv)
-    file1 = QtWidgets.QFileDialog.getOpenFileName(None, ('Open target WDB file'), '/', ("WDB file (*.wdb)"))[0]
-    file2 = QtWidgets.QFileDialog.getOpenFileName(None, ('Open source WDB file'), '/', ("WDB file (*.wdb)"))[0]
+    file1 = QtWidgets.QFileDialog.getOpenFileName(None, _('Open target WDB file'), '/', _("WDB file (*.wdb)"))[0]
+    file2 = QtWidgets.QFileDialog.getOpenFileName(None, _('Open source WDB file'), '/', _("WDB file (*.wdb)"))[0]
     wb1 = WinOrientBinary(file1).wdb_object
     wb2 = WinOrientBinary(file2).wdb_object
 
     if set_numbers(wb1, wb2):
-        file3 = QtWidgets.QFileDialog.getSaveFileName(None, ('Save WDB file'), '/', ("WDB file (*.wdb)"))[0]
+        file3 = QtWidgets.QFileDialog.getSaveFileName(None, _('Save WDB file'), '/', _("WDB file (*.wdb)"))[0]
         write_wdb(wb1, file3)
