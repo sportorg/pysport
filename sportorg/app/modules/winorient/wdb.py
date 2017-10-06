@@ -1,6 +1,6 @@
 from sportorg.app.models import model
 from sportorg.app.models.memory import Race, Organization, Group, Person, Result, race, find, Course, \
-    CourseControl, Country, Contact, Address
+    CourseControl, Country, Contact, Address, ResultStatus
 from sportorg.app.models.result_calculation import ResultCalculation
 from sportorg.app.modules.utils.utils import int_to_time, time_to_int
 from sportorg.lib.winorient.wdb import WDB, WDBMan, WDBTeam, WDBGroup, WDBDistance, WDBPunch, WDBFinish, WDBChip
@@ -36,6 +36,22 @@ class WinOrientBinary:
         'МС':   8,
         'МСМК': 9,
         'ЗМС':  10
+    }
+
+    status = {
+        0: ResultStatus.OK,
+        1: ResultStatus.DISQUALIFIED,
+        2: ResultStatus.OVERTIME,
+        7: ResultStatus.DID_NOT_FINISH,
+        8: ResultStatus.DID_NOT_START
+    }
+
+    status_reverse = {
+        ResultStatus.OK: 0,
+        ResultStatus.DISQUALIFIED: 1,
+        ResultStatus.OVERTIME: 2,
+        ResultStatus.DID_NOT_FINISH: 7,
+        ResultStatus.DID_NOT_START: 8
     }
 
     def __init__(self, file=None):
@@ -251,7 +267,8 @@ class WinOrientBinary:
                 result.card_number = man.si_card
                 result.start_time = int_to_time(man.start)
                 result.finish_time = int_to_time(fin.time)
-                result.status = man.status
+                if man.status in self.status:
+                    result.status = self.status[man.status]
                 result.result = man.result
 
                 my_race.results.append(result)
@@ -372,7 +389,8 @@ class WinOrientBinary:
                 new_finish.time = time_to_int(result.finish_time)
                 new_finish.number = man.bib
 
-                new_person.status = result.status
+                if result.status in self.status_reverse:
+                    new_person.status = self.status_reverse[result.status]
                 new_person.result = result.result
 
                 wdb_object.fin.append(new_finish)
