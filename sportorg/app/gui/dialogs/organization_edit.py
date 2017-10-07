@@ -39,7 +39,6 @@ class OrganizationEditDialog(QDialog):
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(True)
-        self.setToolTip(_('Team Edit Window'))
 
         self.layout = QFormLayout(self)
 

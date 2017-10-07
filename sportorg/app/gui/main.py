@@ -163,8 +163,8 @@ class MainWindow(QMainWindow, App):
 
         # TODO: save changes in current file
 
-        file_name = QtWidgets.QFileDialog.getSaveFileName(None, 'Create SportOrg file',
-                                            '/' + str(time.strftime("%Y%m%d")), "SportOrg file (*.sportorg)")[0]
+        file_name = QtWidgets.QFileDialog.getSaveFileName(None, _('Create SportOrg file'),
+                                            '/' + str(time.strftime("%Y%m%d")), _("SportOrg file (*.sportorg)"))[0]
         if file_name is not '':
             self.setWindowTitle(file_name)
             try:
@@ -191,9 +191,9 @@ class MainWindow(QMainWindow, App):
             self.save_file_as()
 
     def open_file(self, file_name=None):
-        file_name = QtWidgets.QFileDialog.getOpenFileName(None, 'Open SportOrg file',
+        file_name = QtWidgets.QFileDialog.getOpenFileName(None, _('Open SportOrg file'),
                                                           '/',
-                                                          "SportOrg file (*.sportorg)")[0]
+                                                          _("SportOrg file (*.sportorg)"))[0]
         if file_name is not '':
             self.setWindowTitle(file_name)
             try:

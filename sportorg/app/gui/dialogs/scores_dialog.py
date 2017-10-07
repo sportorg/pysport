@@ -24,7 +24,6 @@ class ScoresDialog(QDialog):
         self.setSizeGripEnabled(False)
         self.setModal(False)
         self.setMinimumWidth(650)
-        self.setToolTip(_('Assign scores'))
 
         self.layout = QFormLayout(self)
 

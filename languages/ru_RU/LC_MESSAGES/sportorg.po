@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: SportOrg\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-08-10 11:27+0500\n"
-"PO-Revision-Date: 2017-10-02 18:04+0500\n"
+"PO-Revision-Date: 2017-10-07 03:56+0500\n"
 "Last-Translator: SportOrg\n"
 "Language-Team: SportOrg\n"
 "Language: ru_RU\n"
@@ -41,7 +41,7 @@ msgid "Help"
 msgstr "Помощь"
 
 msgid "New"
-msgstr "Новое"
+msgstr "Новый"
 
 msgid "Exit"
 msgstr "Выход"
@@ -72,12 +72,6 @@ msgstr "Дистанция"
 
 msgid "Person"
 msgstr "Личность"
-
-msgid "Start list"
-msgstr "Стартовый лист"
-
-msgid "Finish list"
-msgstr "Финиш лист"
 
 msgid "Live"
 msgstr "Live"
@@ -277,6 +271,9 @@ msgstr "Отмена"
 msgid "OK"
 msgstr "ОК"
 
+msgid "Abort"
+msgstr "Прервать"
+
 msgid "Close"
 msgstr "Закрыть"
 
@@ -353,10 +350,10 @@ msgid "Number Change"
 msgstr "Смена номера"
 
 msgid "Guess courses"
-msgstr "Подбор дистанции для групп"
+msgstr "Подбор дистанций для групп"
 
 msgid "Guess corridors"
-msgstr "Подбор коридора для групп"
+msgstr "Подбор коридоров для групп"
 
 msgid "Manual finish"
 msgstr "Ручной финиш"
@@ -549,3 +546,78 @@ msgstr "Главный секретарь"
 
 msgid "Please confirm"
 msgstr "Пожалуйста, подтвердите действие"
+
+msgid "CSV Winorient"
+msgstr "Файл CSV Winorient"
+
+msgid "WDB Winorient"
+msgstr "Файл WDB Winorient"
+
+msgid "Ocad txt v8"
+msgstr "Дистанции версии OCAD8 (Текст)"
+
+msgid "Start list"
+msgstr "Протокол старта"
+
+msgid "Start times"
+msgstr "Шахматка"
+
+msgid "it works!"
+msgstr "работает!"
+
+msgid "o/c"
+msgstr "в/к"
+
+msgid "Creating of report"
+msgstr "Создание отчета"
+
+msgid "Save to file"
+msgstr "Сохранить в файл"
+
+msgid "Save As TXT file"
+msgstr "Сохранить в текстовый файл (TXT)"
+
+msgid "Save As WDB file"
+msgstr "Сохранить в файл Winorient (WDB)"
+
+msgid "Txt file (*.txt)"
+msgstr "Текстовый файл (*.txt)"
+
+msgid "WDB file (*.wdb)"
+msgstr "Файл Winorient (*.wdb)"
+
+msgid "Open SportOrg file"
+msgstr "Открыть файл SportOrg"
+
+msgid "Create SportOrg file"
+msgstr "Создать файл SportOrg"
+
+msgid "SportOrg file (*.sportorg)"
+msgstr "Файл SportOrg (*.sportorg)"
+
+msgid "Question"
+msgstr "Вопрос"
+
+msgid "No results to print"
+msgstr "Нет результатов для печати"
+
+msgid "Cannot remove group"
+msgstr "Невозможно удалить группу"
+
+msgid "Cannot remove course"
+msgstr "Невозможно удалить дистанцию"
+
+msgid "Cannot remove organization"
+msgstr "Невозможно удалить коллектив"
+
+msgid "not found"
+msgstr "не найдено"
+
+msgid "Opening port"
+msgstr "Открытие порта"
+
+msgid "Closing port"
+msgstr "Закрытие порта"
+
+msgid "Cannot open port"
+msgstr "Ошибка при открытии порта"

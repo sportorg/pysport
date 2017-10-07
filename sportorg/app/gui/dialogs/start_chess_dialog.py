@@ -23,11 +23,10 @@ class StartChessDialog(QDialog):
         self.close()
 
     def init_ui(self):
-        self.setWindowTitle(_('Create chess'))
+        self.setWindowTitle(_('Start times'))
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(True)
-        self.setToolTip(_('Creating of report'))
 
         self.layout = QFormLayout(self)
 
@@ -70,7 +69,7 @@ class StartChessDialog(QDialog):
 
     def apply_changes_impl(self):
         file_name = QtWidgets.QFileDialog.getSaveFileName(self, _('Save As TXT file'),
-                                                          '/start-chess_' + str(time.strftime("%Y%m%d")),
+                                                          '/start_times_' + str(time.strftime("%Y%m%d")),
                                                           _("Txt file (*.txt)"))[0]
         with codecs.open(file_name, 'w', 'utf-8') as file:
             file.write(self.text.toPlainText())

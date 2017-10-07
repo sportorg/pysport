@@ -189,7 +189,6 @@ class EntryEditDialog(QDialog):
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(True)
-        self.setToolTip(_('Entry properties Window'))
 
         self.layout = QFormLayout(self)
         self.label_surname = QLabel(_('Last name'))
