@@ -6,7 +6,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QModelIndex
 from PyQt5.QtWidgets import QAbstractItemView, QTableView
 
-from sportorg.app.controllers.dialogs.results_edit import ResultEditDialog
+from sportorg.app.gui.dialogs.results_edit import ResultEditDialog
 from sportorg.app.models.memory import race, Result, Course, CourseControl
 from sportorg.app.models.memory_model import ResultMemoryModel
 from sportorg.language import _

@@ -6,18 +6,19 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow, QTableView, QMessageBox
 
 from sportorg import config
-from sportorg.app.controllers.dialogs.entry_filter import DialogFilter
-from sportorg.app.controllers.dialogs.event_properties import EventPropertiesDialog
-from sportorg.app.controllers.dialogs.number_change import NumberChangeDialog
-from sportorg.app.controllers.dialogs.print_properties import PrintPropertiesDialog
-from sportorg.app.controllers.dialogs.report_dialog import ReportDialog
-from sportorg.app.controllers.dialogs.start_chess_dialog import StartChessDialog
-from sportorg.app.controllers.dialogs.start_preparation import StartPreparationDialog
-from sportorg.app.controllers.dialogs.start_report_dialog import StartReportDialog
-from sportorg.app.controllers.global_access import GlobalAccess
-from sportorg.app.controllers.menu import menu_list
-from sportorg.app.controllers.tabs import start_preparation, groups, teams, race_results, courses
-from sportorg.app.controllers.toolbar import toolbar_list
+from sportorg.app.gui.dialogs.entry_filter import DialogFilter
+from sportorg.app.gui.dialogs.event_properties import EventPropertiesDialog
+from sportorg.app.gui.dialogs.number_change import NumberChangeDialog
+from sportorg.app.gui.dialogs.print_properties import PrintPropertiesDialog
+from sportorg.app.gui.dialogs.report_dialog import ReportDialog
+from sportorg.app.gui.dialogs.sportident_properties import SportidentPropertiesDialog
+from sportorg.app.gui.dialogs.start_chess_dialog import StartChessDialog
+from sportorg.app.gui.dialogs.start_preparation import StartPreparationDialog
+from sportorg.app.gui.dialogs.start_report_dialog import StartReportDialog
+from sportorg.app.gui.global_access import GlobalAccess
+from sportorg.app.gui.menu import menu_list
+from sportorg.app.gui.tabs import start_preparation, groups, teams, race_results, courses
+from sportorg.app.gui.toolbar import toolbar_list
 from sportorg.app.models.memory import Race, event as races, race
 from sportorg.app.models import result_generation
 from sportorg.app.models.memory_model import PersonMemoryModel, ResultMemoryModel, GroupMemoryModel, \
@@ -25,7 +26,9 @@ from sportorg.app.models.memory_model import PersonMemoryModel, ResultMemoryMode
 from sportorg.app.models.split_calculation import GroupSplits
 from sportorg.app.models.start_preparation import guess_courses_for_groups, guess_corridors_for_groups
 from sportorg.app.modules.backup import backup
+from sportorg.app.modules.ocad import ocad
 from sportorg.app.modules.printing.printing import print_html
+from sportorg.app.modules.winorient import winorient
 from sportorg.config import template_dir
 from sportorg.core import event
 from sportorg.core.app import App
@@ -350,3 +353,49 @@ class MainWindow(QMainWindow, App):
             table.model().layoutChanged.emit()
         except Exception as e:
             logging.exception(str(e))
+
+    def sportident_settings(self):
+        try:
+            SportidentPropertiesDialog().exec()
+        except Exception as e:
+            logging.exception(e)
+
+    def import_wo_csv(self):
+        file_name = QtWidgets.QFileDialog.getOpenFileName(None, _('Open CSV Winorient file'),
+                                                          '', _("CSV Winorient (*.csv)"))[0]
+        if file_name is not '':
+            try:
+                winorient.import_csv(file_name)
+            except Exception as e:
+                logging.exception(e)
+            self.init_model()
+
+    def import_wo_wdb(self):
+        file_name = QtWidgets.QFileDialog.getOpenFileName(None, _('Open WDB Winorient file'),
+                                                          '', _("WDB Winorient (*.wdb)"))[0]
+        if file_name is not '':
+            try:
+                winorient.import_wo_wdb(file_name)
+            except Exception as e:
+                logging.exception(e)
+            self.init_model()
+
+    def export_wo_wdb(self):
+        file_name = QtWidgets.QFileDialog.getSaveFileName(None, _('Save As WDB file'),
+                                                          '/sportorg_export_' + str(time.strftime("%Y%m%d")),
+                                                          _("WDB file (*.wdb)"))[0]
+        if file_name is not '':
+            try:
+                winorient.export_wo_wdb(file_name)
+            except Exception as e:
+                logging.exception(e)
+
+    def import_txt_v8_action(self):
+        file_name = QtWidgets.QFileDialog.getOpenFileName(None, _('Open Ocad txt v8 file'),
+                                                          '', _("Ocad classes v8 (*.txt)"))[0]
+        if file_name is not '':
+            try:
+                ocad.import_txt_v8(file_name)
+            except Exception as e:
+                logging.exception(str(e))
+            self.init_model()

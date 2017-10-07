@@ -1,6 +1,6 @@
 import pickle
 
-from sportorg.app.controllers.global_access import GlobalAccess
+from sportorg.app.gui.global_access import GlobalAccess
 from sportorg.app.models import memory
 from sportorg import config
 

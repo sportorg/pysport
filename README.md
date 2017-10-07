@@ -41,9 +41,8 @@ pip install -t lib -r requirements.txt
     sportorg/
         core/
         app/
-            controllers/
+            gui/
             models/
-            view/
             plugins/
         lib/
 ```
