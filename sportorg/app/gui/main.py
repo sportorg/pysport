@@ -234,6 +234,12 @@ class MainWindow(QMainWindow, App):
 
             person = obj.results[index].person
 
+            if not person or not person.group:
+                mes = QMessageBox()
+                mes.setText(_('No results to print'))
+                mes.exec()
+                return
+
             template_path = template_dir('split_printout.html')
             spl = GroupSplits(person.group)
             template = get_text_from_file(template_path, **spl.get_json(person))

@@ -49,7 +49,9 @@ class PersonSplits(object):
         self.name = person.full_name
         self.group = person.group.name
         self.bib = person.bib
-        self.team = person.organization.name
+        self.team = ''
+        if person.organization:
+            self.team = person.organization.name
         self.card_number = person.card_number
         self.qual = person.qual
         self.year = person.year
@@ -64,7 +66,8 @@ class PersonSplits(object):
 
         person_index = 0
         course_index = 0
-        course_code = course.controls[course_index].code
+        if len(course.controls) > course_index:
+            course_code = course.controls[course_index].code
         leg_start_time = result.get_start_time()
         start_time = result.get_start_time()
 
