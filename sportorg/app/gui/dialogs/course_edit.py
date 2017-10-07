@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QFormLayout, QLabel, \
     QLineEdit, QApplication, QDialog, \
     QPushButton, QSpinBox, QTextEdit
 
-from sportorg.app.controllers.global_access import  GlobalAccess
+from sportorg.app.gui.global_access import  GlobalAccess
 from sportorg.app.models.memory import race, Course, CourseControl
 from sportorg.app.modules.utils.custom_controls import AdvComboBox
 

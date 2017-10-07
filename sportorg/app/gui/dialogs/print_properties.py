@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QFormLayout, QLabel, \
     QApplication, QDialog, \
     QPushButton,  QCheckBox
 
-from sportorg.app.controllers.global_access import GlobalAccess
+from sportorg.app.gui.global_access import GlobalAccess
 from sportorg.app.models.memory import race
 
 from sportorg.language import _

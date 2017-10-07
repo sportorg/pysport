@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QFormLayout, QLabel, \
     QApplication, QDialog, \
     QPushButton, QTimeEdit, QSpinBox, QRadioButton, QGroupBox
 
-from sportorg.app.controllers.global_access import GlobalAccess
+from sportorg.app.gui.global_access import GlobalAccess
 from sportorg.app.models.memory import race
 from sportorg.config import icon_dir
 

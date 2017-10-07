@@ -5,7 +5,7 @@ import random
 
 from datetime import timedelta
 
-from sportorg.app.controllers.global_access import GlobalAccess
+from sportorg.app.gui.global_access import GlobalAccess
 from sportorg.app.models.memory import race, Group, Person
 
 

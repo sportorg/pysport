@@ -6,7 +6,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QTime
 from PyQt5.QtWidgets import QApplication, QDialog
 
-from sportorg.app.controllers.global_access import GlobalAccess
+from sportorg.app.gui.global_access import GlobalAccess
 from sportorg.app.models.memory import race, Group
 from sportorg.app.models.start_preparation import StartNumberManager, DrawManager, ReserveManager, StartTimeManager
 from sportorg.app.modules.utils.utils import qtime2datetime

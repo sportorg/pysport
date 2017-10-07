@@ -1,15 +1,9 @@
-import logging
-
-import time
-
-from sportorg.app.controllers.global_access import GlobalAccess
-from sportorg.language import _
+from sportorg.app.gui.global_access import GlobalAccess
 from sportorg.app.models import model
 from sportorg.app.models import memory
 from sportorg.lib.winorient.wdb import write_wdb
 from .wdb import WinOrientBinary
 from sportorg.lib.winorient import wo
-from PyQt5 import QtWidgets
 
 
 def import_csv_to_model(source):
@@ -75,40 +69,17 @@ def import_csv(source):
         race.persons.append(person)
 
 
-def import_wo_csv():
-    file_name = QtWidgets.QFileDialog.getOpenFileName(None, 'Open CSV Winorient file',
-                                        '', "CSV Winorient (*.csv)")[0]
-    if file_name is not '':
-        import_csv(file_name)
-        GlobalAccess().get_main_window().init_model()
+def import_wo_wdb(file_name):
+    wb = WinOrientBinary(file=file_name)
+    # wb.run()
+    wb.create_objects()
 
 
-def import_wo_wdb():
-    file_name = QtWidgets.QFileDialog.getOpenFileName(None, 'Open WDB Winorient file',
-                                        '', "WDB Winorient (*.wdb)")[0]
-    if file_name is not '':
-        try:
-            wb = WinOrientBinary(file=file_name)
-            # wb.run()
-            wb.create_objects()
-            GlobalAccess().get_main_window().init_model()
-        except Exception as e:
-            logging.exception(str(e))
+def export_wo_wdb(file_name):
+    wb = WinOrientBinary()
 
+    GlobalAccess().clear_filters(False)
+    wdb_object = wb.export()
+    GlobalAccess().apply_filters()
 
-def export_wo_wdb():
-    file_name = QtWidgets.QFileDialog.getSaveFileName(None, _('Save As WDB file'),
-                                                      '/sportorg_export_' + str(time.strftime("%Y%m%d")),
-                                                      _("WDB file (*.wdb)"))[0]
-    if file_name is not '':
-        try:
-            wb = WinOrientBinary()
-
-            GlobalAccess().clear_filters(False)
-            wdb_object = wb.export()
-            GlobalAccess().apply_filters()
-
-            write_wdb(wdb_object, file_name)
-
-        except Exception as e:
-            logging.exception(str(e))
+    write_wdb(wdb_object, file_name)

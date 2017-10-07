@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QFormLayout, QLabel, \
     QPushButton
 from datetime import date
 
-from sportorg.app.controllers.global_access import GlobalAccess
+from sportorg.app.gui.global_access import GlobalAccess
 from sportorg.app.models.memory import race, Person, find
 from sportorg.app.models.model import Organization
 from sportorg.app.models.result_calculation import ResultCalculation

@@ -1,7 +1,6 @@
 import logging
 
-from sportorg.app.controllers.global_access import GlobalAccess
-from .sportident_properties import SportidentPropertiesDialog
+from sportorg.app.gui.global_access import GlobalAccess
 from . import card_reader
 from sportorg.core import event
 from sportorg.language import _
@@ -17,7 +16,7 @@ def start_reader():
         if reader is not None:
             message(_('Opening port') + ' ' + reader.port)
         else:
-            message(_('Cannot open port'), True)
+            message(_('Cannot open port'))
     elif not reader.reading:
         reader = None
         start_reader()
@@ -29,14 +28,7 @@ def start_reader():
             message(_('Closing port' + ' ' + port))
 
 
-def sportident_settings():
-    try:
-        SportidentPropertiesDialog().exec()
-    except Exception as e:
-        logging.exception(e)
-
-
-def message(msg, is_error=False):
+def message(msg):
     logging.info(msg)
     GlobalAccess().get_main_window().statusbar.showMessage(msg, 5000)
 

@@ -50,7 +50,7 @@ def data_dir(*paths):
     return os.path.join(DATA_DIR, *paths)
 
 
-PLUGIN_DIR = base_dir('sportorg', 'app', 'modules')
+PLUGIN_DIR = base_dir('sportorg', 'app', 'plugins')
 
 
 def plugin_dir(*paths):
