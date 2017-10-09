@@ -6,6 +6,34 @@ class GroupsStartList(object):
         self._group = {}
         self._noname_group = []
         self._persons = persons
+        self._first_time = None
+        self._last_time = None
+
+    @property
+    def first_time(self):
+        if self._first_time is None:
+            self._gen_time()
+        return self._first_time
+
+    @property
+    def last_time(self):
+        if self._last_time is None:
+            self._gen_time()
+        return self._last_time
+
+    def _gen_time(self):
+        if len(self._persons) == 0:
+            return
+        first_time = self._persons[0].start_time
+        last_time = self._persons[0].start_time
+        for person in self._persons:
+            if person.start_time is not None:
+                if first_time > person.start_time:
+                    first_time = person.start_time
+                if last_time < person.start_time:
+                    last_time = person.start_time
+        self._first_time = first_time
+        self._last_time = last_time
 
     def _groups_generate(self):
         for person in self._persons:
@@ -68,7 +96,7 @@ class GroupsStartList(object):
 
     @staticmethod
     def _sort_func(person):
-        return person.start_time
+        return person.start_time is None, person.start_time
 
     @staticmethod
     def get_titles():
@@ -91,6 +119,8 @@ class ChessGenerator(GroupsStartList):
         data = {}
         self._persons.sort(key=self._sort_func)
         for person in self._persons:
+            if person.start_time is None:
+                continue
             time = person.start_time.strftime("%H:%M:%S")
             if time not in cache:
                 data[time] = [self._get_chess_person(person)]
@@ -99,7 +129,7 @@ class ChessGenerator(GroupsStartList):
             cache.add(time)
 
         for time in data.keys():
-            data[time].sort(key=lambda val: val[0])
+            data[time].sort(key=lambda val: (val[0] is None, val[0]))
 
         return data
 
