@@ -2,7 +2,7 @@ import configparser
 import logging.config
 import time
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtGui, QtWidgets, Qt
 from PyQt5.QtWidgets import QMainWindow, QTableView, QMessageBox
 
 from sportorg import config
@@ -53,11 +53,12 @@ class MainWindow(QMainWindow, App):
     def show_window(self):
         event.add_event('finish', result_generation.add_result)
         self.conf_read()
-        self.setup_ui()
-        self.setup_menu()
-        self.setup_toolbar()
-        self.setup_tab()
-        self.setup_statusbar()
+        self._setup_ui()
+        self._setup_menu()
+        self._setup_toolbar()
+        self._setup_tab()
+        self._setup_statusbar()
+        self._setup_system_tray_icon()
         self.show()
 
     def close(self):
@@ -85,7 +86,7 @@ class MainWindow(QMainWindow, App):
         with open(config.CONFIG_INI, 'w') as configfile:
             self.conf.write(configfile)
 
-    def setup_ui(self):
+    def _setup_ui(self):
         geometry = 'geometry'
         x = self.conf.getint('%s' % geometry, 'x', fallback=480)
         y = self.conf.getint(geometry, 'y', fallback=320)
@@ -103,7 +104,7 @@ class MainWindow(QMainWindow, App):
                                        | QtWidgets.QMainWindow.AnimatedDocks
                                        | QtWidgets.QMainWindow.ForceTabbedDocks)
 
-    def create_menu(self, parent, actions_list):
+    def _create_menu(self, parent, actions_list):
         for action_item in actions_list:
             if 'type' in action_item:
                 if action_item['type'] == 'separator':
@@ -120,19 +121,19 @@ class MainWindow(QMainWindow, App):
             else:
                 menu = QtWidgets.QMenu(parent)
                 menu.setTitle(action_item['title'])
-                self.create_menu(menu, action_item['actions'])
+                self._create_menu(menu, action_item['actions'])
                 parent.addAction(menu.menuAction())
 
-    def setup_menu(self):
+    def _setup_menu(self):
         self.menubar = QtWidgets.QMenuBar(self)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 880, 21))
         self.setMenuBar(self.menubar)
 
-        self.create_menu(self.menubar, menu_list())
+        self._create_menu(self.menubar, menu_list())
 
-    def setup_toolbar(self):
+    def _setup_toolbar(self):
         layout = QtWidgets.QVBoxLayout()
-        toolbar = self.addToolBar("File")
+        toolbar = self.addToolBar(_('Toolbar'))
 
         for tb in toolbar_list():
             tb_action = QtWidgets.QAction(QtGui.QIcon(tb[0]), tb[1], self)
@@ -141,12 +142,16 @@ class MainWindow(QMainWindow, App):
 
         self.setLayout(layout)
 
-    def setup_statusbar(self):
+    def _setup_statusbar(self):
         self.statusbar = QtWidgets.QStatusBar()
         self.setStatusBar(self.statusbar)
-        self.statusbar.showMessage(_("it works!"), 5000)
+        self.statusbar_message(_("it works!"))
 
-    def setup_tab(self):
+    def _setup_system_tray_icon(self):
+        self.system_tray_icon = Qt.QSystemTrayIcon(self)
+        self.system_tray_icon.show()
+
+    def _setup_tab(self):
         self.centralwidget = QtWidgets.QWidget(self)
         layout = QtWidgets.QVBoxLayout(self.centralwidget)
         self.tabwidget = QtWidgets.QTabWidget(self.centralwidget)
@@ -201,6 +206,25 @@ class MainWindow(QMainWindow, App):
             except Exception as e:
                 logging.exception(e)
             self.init_model()
+
+    def system_message(self, title, content, icon=None, msecs=5000):
+        if icon is None:
+            icon = 0
+        icon_val = {
+            'context': Qt.QSystemTrayIcon.Context,
+            'critical': Qt.QSystemTrayIcon.Critical,
+            'doubleclick': Qt.QSystemTrayIcon.DoubleClick,
+            'information': Qt.QSystemTrayIcon.Information,
+            'middleclick': Qt.QSystemTrayIcon.MiddleClick,
+            'noicon': Qt.QSystemTrayIcon.NoIcon,
+            'trigger': Qt.QSystemTrayIcon.Trigger,
+            'unknown': Qt.QSystemTrayIcon.Unknown,
+            'warning': Qt.QSystemTrayIcon.Warning
+        }
+        self.system_tray_icon.showMessage(title, content, icon_val[icon] if icon in icon_val else icon, msecs)
+
+    def statusbar_message(self, msg, msecs=5000):
+        self.statusbar.showMessage(msg, msecs)
 
     def filter_dialog(self):
         try:
