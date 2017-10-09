@@ -1,6 +1,8 @@
 import sys
 import logging
+from datetime import datetime
 
+from PyQt5.QtCore import QTime
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QLabel, \
     QLineEdit, QApplication, QDialog, \
@@ -108,6 +110,10 @@ class EventPropertiesDialog(QDialog):
         self.item_location.setText(str(obj.get_setting('location')))
         self.item_refery.setText(str(obj.get_setting('chief_referee')))
         self.item_secretary.setText(str(obj.get_setting('secretary')))
+        self.item_start_date.setDateTime(obj.get_setting('start_date', datetime.now()))
+        self.item_end_date.setDateTime(obj.get_setting('end_date', datetime.now()))
+        self.item_sport.setCurrentIndex(obj.get_setting('sport_kind_index', 0))
+        self.item_type.setCurrentIndex(obj.get_setting('course_type_index', 0))
 
     def apply_changes_impl(self):
         changed = False
@@ -118,6 +124,10 @@ class EventPropertiesDialog(QDialog):
         obj.set_setting('location', self.item_location.text())
         obj.set_setting('chief_referee', self.item_refery.text())
         obj.set_setting('secretary', self.item_secretary.text())
+        obj.set_setting('start_date', self.item_start_date.dateTime())
+        obj.set_setting('end_date', self.item_end_date.dateTime())
+        obj.set_setting('sport_kind_index', self.item_sport.currentIndex())
+        obj.set_setting('course_type_index', self.item_type.currentIndex())
 
         if changed:
             win = self.get_main_window()
