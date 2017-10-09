@@ -137,7 +137,7 @@ class CourseEditDialog(QDialog):
         if len(course.controls) == 0 and len(text):
             changed = True
 
-            course.controls.clear()
+        course.controls.clear()
         for i in text.split('\n'):
             control = CourseControl()
             if i is None or len(i) == 0:

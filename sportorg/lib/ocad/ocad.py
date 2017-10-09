@@ -31,7 +31,7 @@ class CourseControlDict(dict):
 class Course(Item):
     def __init__(self, **kwargs):
         self.group = ''
-        self.type = ''
+        self.course = ''
         self.bib = ''
         self.climb = 0
         self.length = 0
@@ -73,7 +73,8 @@ class ClassesV8:
             raise TypeError("file is not str or IO")
         if isinstance(file, str):
             try:
-                with open(file) as f:
+                enc = 'windows-1251'
+                with open(file, encoding=enc) as f:
                     content = f.readlines()
             except FileNotFoundError:
                 raise FileNotFoundError("Not found " + file)
@@ -141,7 +142,7 @@ class ClassesV8:
             item = str(item).split(';')
         course = {
             "group": item[0],
-            "type": item[1],
+            "course": item[1],
             "bib": item[2],
             "length": float(item[3]) if len(item[3]) else 0.0,
             "climb": float(item[4]) if len(item[4]) else 0.0,
