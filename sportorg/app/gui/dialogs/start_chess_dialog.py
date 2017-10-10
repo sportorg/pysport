@@ -59,7 +59,7 @@ class StartChessDialog(QDialog):
     def set_text(self):
         text = ''
         data = get_chess_list()
-        for time in data:
+        for time in sorted(data):
             text += time + ' '
             for item in data[time]:
                 text += str(item[0]) + ' '
