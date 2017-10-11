@@ -35,7 +35,7 @@ class StartReportDialog(QDialog):
 
         self.label_template = QLabel(_('Template'))
         self.item_template = AdvComboBox()
-        self.item_template.addItems(get_templates())
+        self.item_template.addItems(get_templates(config.template_dir('start')))
         self.layout.addRow(self.label_template, self.item_template)
 
         self.item_custom_path = QPushButton('...')

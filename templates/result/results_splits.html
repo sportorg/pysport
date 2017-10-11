@@ -738,21 +738,24 @@ pre {
 <article class="markdown-body">
     <h2>{{ title }}</h2>
  
-    {% for group in data %}
+    {% macro view_groups() -%}{% for group in groups %}<a href="#{{group.name}}">{{group.name}}</a> {% endfor %}{%- endmacro %}
+
+    {% for group in groups %}
     <br>
-    <h2 id="{{group}}">{{group}}</h2>
+    {{ view_groups() }}
+
+    <h2 id="{{group.name}}">{{group.name}}</h2>
     <table>
+        {% for person in group.persons %}
         <tr>
-		    <th>N</th>
-            {% for i in range(table_titles|length) %}
-                <th>{{ table_titles[i] }}</th>
-            {% endfor %}
-        </tr>
-        {% for i in range(data[group]|length) %}
-        <tr>
-			<td>{{ i+1 }}</td>
-            {% for j in range(data[group][i]|length) %}
-                <td>{{ data[group][i][j] }}</td>
+            <td>{{ person.name }}</td>
+            <td>{{ person.team }}</td>
+            <td>{{ person.qual }}</td>
+            <td>{{ person.year }}</td>
+            <td>{{ person.result }}</td>
+            <td>{{ person.place }}</td>
+            {% for leg in person.legs %}
+                <td>{{ leg }}</td>
             {% endfor %}
         </tr>
         {% endfor %}

@@ -3,6 +3,7 @@ from sportorg.app.modules.utils.utils import time_to_hhmmss
 from sportorg.language import _
 
 
+# FIXME: does not work sorting
 class ResultCalculation(object):
     def process_results(self):
         self.set_times()
@@ -74,19 +75,34 @@ def get_start_list_data():
 
 
 def get_result_data():
-    ret = {}
-    data = {}
+    """
+
+    :return: {
+        "title": str,
+        "groups": [
+            {
+                "name": str,
+                "persons": [
+                    get_person_result_data
+                    ...
+                ]
+            }
+        ]
+    }
+    """
+    data = []
     for group in race().groups:
         array = ResultCalculation().get_group_finishes(group)
-        group_data = []
+        group_data = {
+            'name': group.name,
+            'persons': []
+        }
         for res in array:
             assert isinstance(res, Result)
             person_data = get_person_result_data(res)
-            group_data.append(person_data)
-        data[group.name] = group_data
-    ret['data'] = data
-    ret['title'] = 'Competition title'
-    ret['table_titles'] = ['name', 'team', 'qual', 'year', 'result', 'place']
+            group_data['persons'].append(person_data)
+        data.append(group_data)
+    ret = {'groups': data, 'title': 'Competition title'}
 
     return ret
 
@@ -181,13 +197,14 @@ def get_team_statistics_data():
 
 
 def get_person_result_data(res):
-    ret = []
     person = res.person
     assert isinstance(person, Person)
-    ret.append(person.full_name)
-    ret.append(person.organization.name)
-    ret.append(person.qual)
-    ret.append(person.year)
-    ret.append(res.get_result())
-    ret.append(res.place)
+    ret = {
+        'name': person.full_name,
+        'team': person.organization.name,
+        'qual': person.qual,
+        'year': person.year,
+        'result': res.get_result(),
+        'place': res.place
+    }
     return ret
