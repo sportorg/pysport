@@ -61,31 +61,50 @@ class GroupsStartList(object):
 
         return self
 
-    def get_data(self, name_noname=None):
+    def get_group_list(self, name_noname=None):
         """
 
-        :return: {group_name: [titles...], ...}
+        :return: [
+            {
+                "name": str,
+                "persons": [
+                    self._get_person_data,
+                    ...
+                ]
+            }
+        ]
         """
-        data = {}
+        result = []
         group_names = list(self._groups_generate()._sort_persons()._group.keys())
         group_names.sort()
         for group_name in group_names:
-            data[group_name] = []
+            group = {
+                'name': group_name,
+                'persons': []
+            }
             for person in self._group[group_name]:
-                data[group_name].append(self._get_person_data(person))
+                group['persons'].append(self._get_person_data(person))
+            result.append(group)
+
         if name_noname is not None:
             if len(self._noname_group) == 0:
-                return data
-            data[name_noname] = []
+                return result
+            noname_group = {
+                'name': name_noname,
+                'persons': []
+            }
             for person in self._sort_noname_group()._noname_group:
-                data[name_noname].append(self._get_person_data(person))
+                noname_group['persons'].append(self._get_person_data(person))
 
-        return data
+        return result
 
-    def get_data_list(self):
+    def get_person_list(self):
         """
 
-        :return: [[titles...], ...]
+        :return: [
+            self._get_person_data,
+            ...
+        ]
         """
         result = []
         self._persons.sort(key=self._sort_func)
@@ -99,18 +118,15 @@ class GroupsStartList(object):
         return person.start_time is None, person.start_time
 
     @staticmethod
-    def get_titles():
-        return ['name', 'team', 'qual', 'year', 'start']
-
-    @staticmethod
     def _get_person_data(person):
-        return [
-            person.full_name,
-            person.organization.name if person.organization is not None else '',
-            person.qual if person.qual is not None else '',
-            person.year if person.year is not None else '',
-            person.start_time.strftime("%H:%M:%S")
-        ]
+        return {
+            'name': person.full_name,
+            'bib': person.bib,
+            'team': person.organization.name if person.organization is not None else '',
+            'qual': person.qual if person.qual is not None else '',
+            'year': person.year if person.year is not None else '',
+            'start': person.start_time.strftime("%H:%M:%S")
+        }
 
 
 class ChessGenerator(GroupsStartList):
@@ -123,34 +139,38 @@ class ChessGenerator(GroupsStartList):
                 continue
             time = person.start_time.strftime("%H:%M:%S")
             if time not in cache:
-                data[time] = [self._get_chess_person(person)]
+                data[time] = [self._get_person_data(person)]
             else:
-                data[time].append(self._get_chess_person(person))
+                data[time].append(self._get_person_data(person))
             cache.add(time)
 
         for time in data.keys():
-            data[time].sort(key=lambda val: (val[0] is None, val[0]))
+            data[time].sort(key=lambda val: (val['bib'] is None, val['bib']))
 
         return data
 
-    @staticmethod
-    def _get_chess_person(person):
-        return (
-            person.bib,
-            person.full_name
-        )
 
+def get_start_data():
+    """
 
-def get_start_data(general=False):
+    :return: {
+        "title": str,
+        "groups": [
+            {
+                "name": str,
+                "persons": [
+                    GroupsStartList _get_person_data
+                    ...
+                ]
+            }
+        ]
+    }
+    """
     start_list = GroupsStartList(race().persons)
-    if general:
-        data = start_list.get_data_list()
-    else:
-        data = start_list.get_data()
+    groups = start_list.get_group_list()
     result = {
-        'data': data,
         'title': race().get_setting('sub_title'),
-        'table_titles': start_list.get_titles()
+        'groups': groups
     }
 
     return result

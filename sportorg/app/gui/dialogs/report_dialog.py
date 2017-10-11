@@ -7,12 +7,11 @@ import webbrowser
 
 from PyQt5 import QtWidgets
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QFormLayout, QLabel, QApplication, QDialog, QPushButton, QCheckBox
+from PyQt5.QtWidgets import QFormLayout, QLabel, QApplication, QDialog, QPushButton
 
 from sportorg.app.models.split_calculation import get_splits_data
 from sportorg.app.modules.utils.custom_controls import AdvComboBox
 from sportorg.core.template import get_templates, get_text_from_file
-from sportorg.app.models.result_calculation import get_result_data
 
 from sportorg.language import _
 from sportorg import config
@@ -36,7 +35,7 @@ class ReportDialog(QDialog):
 
         self.label_template = QLabel(_('Template'))
         self.item_template = AdvComboBox()
-        self.item_template.addItems(get_templates())
+        self.item_template.addItems(get_templates(config.template_dir('result')))
         self.layout.addRow(self.label_template, self.item_template)
 
         self.item_custom_path = QPushButton('...')
@@ -48,9 +47,6 @@ class ReportDialog(QDialog):
 
         self.item_custom_path.clicked.connect(select_custom_path)
         self.layout.addRow(self.item_custom_path)
-
-        self.item_split_checkbox = QCheckBox(_('Print splits'))
-        self.layout.addRow(self.item_split_checkbox)
 
         def cancel_changes():
             self.close()
@@ -73,11 +69,7 @@ class ReportDialog(QDialog):
     def apply_changes_impl(self):
         template_path = self.item_template.currentText()
 
-        if_splits = self.item_split_checkbox.isChecked()
-        if if_splits:
-            template = get_text_from_file(template_path, **get_splits_data())
-        else:
-            template = get_text_from_file(template_path, **get_result_data())
+        template = get_text_from_file(template_path, **get_splits_data())
 
         file_name = QtWidgets.QFileDialog.getSaveFileName(self, _('Save As HTML file'),
                                                           '/report_' + str(time.strftime("%Y%m%d")),

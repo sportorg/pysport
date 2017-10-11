@@ -18,18 +18,19 @@ class LegSplit(object):
         self.length_leg = 0
 
     def get_json(self):
-        ret = {}
-        ret['index'] = self.index
-        ret['course_index'] = self.course_index + 1
-        ret['code'] = self.code
-        ret['absolute_time'] = self.absolute_time
-        ret['relative_time'] = self.relative_time
-        ret['leg_time'] = self.leg_time
-        ret['leg_place'] = self.leg_place
-        ret['relative_place'] = self.relative_place
-        ret['status'] = self.status
-        ret['speed'] = self.speed
-        ret['length_leg'] = self.length_leg
+        ret = {
+            'index': self.index,
+            'course_index': self.course_index + 1,
+            'code': self.code,
+            'absolute_time': self.absolute_time,
+            'relative_time': self.relative_time,
+            'leg_time': self.leg_time,
+            'leg_place': self.leg_place,
+            'relative_place': self.relative_place,
+            'status': self.status,
+            'speed': self.speed,
+            'length_leg': self.length_leg
+        }
         return ret
 
 
@@ -138,20 +139,22 @@ class PersonSplits(object):
     # draft split generation - array basis
     # ['name', 'team', 'qual', 'year', 'result', 'place']
     def get_person_split_data(self):
-        ret = []
-        ret.append(self.name)
-        ret.append(self.team)
-        ret.append(self.qual)
-        ret.append(self.year)
-        ret.append(self.result)
-        ret.append(self.place)
+        ret = {
+            'name': self.name,
+            'team': self.team,
+            'qual': self.qual,
+            'year': self.year,
+            'result': self.result if self.result is not None else '',
+            'place': self.place,
+            'legs': []
+        }
 
         for i in self.legs:
             assert isinstance(i, LegSplit)
             leg_info = str(i.code) + ':' + i.absolute_time
             if i.leg_place:
                 leg_info += "(" + str(i.leg_place) + ")"
-            ret.append(leg_info)
+            ret['legs'].append(leg_info)
 
         return ret
 
@@ -183,9 +186,12 @@ class GroupSplits(object):
         self.sort_by_result()
 
     def set_places(self):
+        len_persons = len(self.person_splits)
         for i in range(self.cp_count):
            self.sort_by_leg(i)
            self.set_places_for_leg(i)
+           if not len_persons > 0:
+               continue
            self.set_leg_leader(i, self.person_splits[0])
 
            self.sort_by_leg(i, relative=True)
@@ -194,11 +200,11 @@ class GroupSplits(object):
     def sort_by_leg(self, index, relative=False):
         if(relative):
             self.person_splits = sorted(self.person_splits,
-                                        key=lambda item: (item.get_leg_relative_time(index) is None, \
+                                        key=lambda item: (item.get_leg_relative_time(index) is None,
                                                           item.get_leg_relative_time(index)))
         else:
             self.person_splits = sorted(self.person_splits,
-                                        key=lambda item: (item.get_leg_time(index) is None, \
+                                        key=lambda item: (item.get_leg_time(index) is None,
                                                           item.get_leg_time(index)))
 
     def sort_by_result(self):
@@ -276,8 +282,23 @@ class GroupSplits(object):
 
 
 def get_splits_data():
+    """
+
+    :return: {
+        "title": str,
+        "groups": [
+            {
+                "name": str,
+                "persons": [
+                    PersonSplits.get_person_split_data,
+                    ...
+                ]
+            }
+        ]
+    }
+    """
     ret = {}
-    data = {}
+    data = []
     for group in race().groups:
         gs = GroupSplits(group)
         group_data = []
@@ -287,16 +308,12 @@ def get_splits_data():
             person_data = res.get_person_split_data()
             group_data.append(person_data)
             mv = max(mv, len(person_data))
-        data[group.name] = group_data
-    ret['data'] = data
+        data.append({
+            'name': group.name,
+            'persons': group_data
+        })
+    ret['groups'] = data
     ret['title'] = race().get_setting('sub_title')
-    titles = ['name', 'team', 'qual', 'year', 'result', 'place']
-
-    for i in range(mv - len(titles)):
-        titles.append('leg' + str(i+1))
-
-    ret['table_titles'] = titles
-
     return ret
 
 

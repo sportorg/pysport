@@ -6,7 +6,7 @@ from sportorg import config
 
 def get_templates(path=None):
     if path is None:
-        path = config.TEMPLATE_DIR
+        path = config.template_dir()
     files = []
     for p in os.listdir(path):
         full_path = os.path.join(path, p)
@@ -18,10 +18,6 @@ def get_templates(path=None):
             files.append(full_path)
 
     return files
-
-
-def get_text(**kwargs):
-    return get_text_from_file(config.template_dir('main.html'), **kwargs)
 
 
 def get_text_from_file(path, **kwargs):
