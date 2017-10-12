@@ -735,16 +735,12 @@ pre {
 {% endraw %}
 </head>
 <body>
+{% macro view_groups() -%}{% for group in groups %}<a href="#{{group.name}}">{{group.name}}</a> {% endfor %}{%- endmacro %}
 <article class="markdown-body">
     <h2>{{ title }}</h2>
- 
-    {% macro view_groups() -%}{% for group in groups %}<a href="#{{group.name}}">{{group.name}}</a> {% endfor %}{%- endmacro %}
-
     {% for group in groups %}
-    <br>
-    {{ view_groups() }}
-
     <h2 id="{{group.name}}">{{group.name}}</h2>
+    {{ view_groups() }}
     <table>
         {% for person in group.persons %}
         <tr>

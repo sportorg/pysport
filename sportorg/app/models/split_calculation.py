@@ -1,6 +1,6 @@
 from sportorg.app.models.memory import race, Person, Course, Group
 from sportorg.app.models.result_calculation import ResultCalculation
-from sportorg.app.modules.utils.utils import time_to_hhmmss, get_speed_min_per_km
+from sportorg.app.modules.utils.utils import time_to_hhmmss, get_speed_min_per_km, if_none
 
 
 class LegSplit(object):
@@ -144,7 +144,7 @@ class PersonSplits(object):
             'team': self.team,
             'qual': self.qual,
             'year': self.year,
-            'result': self.result if self.result is not None else '',
+            'result': if_none(self.result, ''),
             'place': self.place,
             'legs': []
         }
