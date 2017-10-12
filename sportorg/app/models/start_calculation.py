@@ -1,4 +1,5 @@
 from sportorg.app.models.memory import race
+from sportorg.app.modules.utils.utils import if_none
 
 
 class GroupsStartList(object):
@@ -123,8 +124,9 @@ class GroupsStartList(object):
             'name': person.full_name,
             'bib': person.bib,
             'team': person.organization.name if person.organization is not None else '',
-            'qual': person.qual if person.qual is not None else '',
-            'year': person.year if person.year is not None else '',
+            'qual': if_none(person.qual, ''),
+            'year': if_none(person.year, ''),
+            'card_number': if_none(person.card_number, ''),
             'start': person.start_time.strftime("%H:%M:%S")
         }
 
