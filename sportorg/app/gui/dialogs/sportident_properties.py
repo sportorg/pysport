@@ -34,9 +34,6 @@ class SportidentPropertiesDialog(QDialog):
         self.label_zero_time = QLabel(_('Zero time'))
         self.item_zero_time = QTimeEdit()
         self.item_zero_time.setDisplayFormat("HH:mm")
-        default_time = QTime()
-        default_time.setHMS(8, 0, 0)
-        self.item_zero_time.setTime(default_time)
         self.layout.addRow(self.label_zero_time, self.item_zero_time)
         self.layout.addRow(self.label_zero_time, self.item_zero_time)
 
@@ -90,12 +87,15 @@ class SportidentPropertiesDialog(QDialog):
 
     def set_values_from_model(self):
         cur_race = race()
-        start_source = cur_race.get_setting('start_source')
-        finish_source = cur_race.get_setting('finish_source')
+        zero_time = cur_race.get_setting('sportident_zero_time', (8, 0, 0))
+        start_source = cur_race.get_setting('sportident_start_source')
+        finish_source = cur_race.get_setting('sportident_finish_source')
         if not start_source:
             start_source = 'protocol'
         if not finish_source:
             finish_source = 'station'
+
+        self.item_zero_time.setTime(QTime(zero_time[0], zero_time[1]))
 
         if start_source == 'protocol':
             self.item_start_protocol.setChecked(True)
@@ -136,11 +136,17 @@ class SportidentPropertiesDialog(QDialog):
         if self.item_finish_beam.isChecked():
             finish_source = 'beam'
 
-        obj.set_setting('finish_source', finish_source)
-        obj.set_setting('start_source', start_source)
+        obj.set_setting('sportident_zero_time', (
+            self.item_zero_time.time().hour(),
+            self.item_zero_time.time().minute(),
+            0
+        ))
 
-        obj.set_setting('start_cp_number', self.item_start_cp_value.value())
-        obj.set_setting('finish_cp_number', self.item_finish_cp_value.value())
+        obj.set_setting('sportident_finish_source', finish_source)
+        obj.set_setting('sportident_start_source', start_source)
+
+        obj.set_setting('sportident_start_cp_number', self.item_start_cp_value.value())
+        obj.set_setting('sportident_finish_cp_number', self.item_finish_cp_value.value())
 
         if changed:
             win = self.get_main_window()

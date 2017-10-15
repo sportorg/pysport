@@ -163,16 +163,6 @@ def menu_list():
             ]
         },
         {
-            'title': _('Tools'),
-            'actions': [
-            ]
-        },
-        {
-            'title': _('Service'),
-            'actions': [
-            ]
-        },
-        {
             'title': _('Options'),
             'actions': [
                 {

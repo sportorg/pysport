@@ -224,6 +224,7 @@ class MainWindow(QMainWindow, App):
         self.system_tray_icon.showMessage(title, content, icon_val[icon] if icon in icon_val else icon, msecs)
 
     def statusbar_message(self, msg, msecs=5000):
+        self.statusbar.showMessage('', 0)
         self.statusbar.showMessage(msg, msecs)
 
     def filter_dialog(self):
