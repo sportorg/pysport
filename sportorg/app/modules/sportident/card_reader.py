@@ -1,8 +1,11 @@
+import datetime
+
 from sportorg.app.gui.global_access import GlobalAccess
 from sportorg.app.models.result_calculation import ResultCalculation
 from . import sireader
 from sportorg.core.event import event, add_event
 from sportorg.app.models import memory
+from sportorg import config
 
 
 def read():
@@ -15,7 +18,6 @@ def get_result(card_data):
     result.punches = card_data['punches']
     result.start_time = card_data['start']
     result.finish_time = card_data['finish']
-    result.person = None
 
     return result
 
@@ -35,7 +37,15 @@ def start():
         """
         reader = sireader.SIReaderThread(
             port,
-            func=event_finish
+            func=event_finish,
+            debug=config.DEBUG
+        )
+        start_time = memory.race().get_setting('sportident_zero_time', (8, 0, 0))
+        reader.start_time = datetime.datetime.today().replace(
+            hour=start_time[0],
+            minute=start_time[1],
+            second=start_time[2],
+            microsecond=0
         )
         reader.start()
 
