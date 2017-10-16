@@ -4,6 +4,7 @@ from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QAbstractItemView, QHeaderView
 
 from sportorg.app.gui.dialogs.course_edit import CourseEditDialog
+from sportorg.app.models.memory import race
 from sportorg.app.models.memory_model import CourseMemoryModel
 from sportorg.app.gui.tabs.table import TableView
 from sportorg.app.gui.global_access import GlobalAccess
@@ -46,8 +47,9 @@ class Widget(QtWidgets.QWidget):
         def course_double_clicked(index):
             logging.debug('Courses - clicked on ' + str(index.row()))
             try:
-                dialog = CourseEditDialog(self.CourseTable, index)
-                dialog.exec()
+                if index.row() < len(race().courses):
+                    dialog = CourseEditDialog(self.CourseTable, index)
+                    dialog.exec()
             except Exception as e:
                 logging.exception(e)
 

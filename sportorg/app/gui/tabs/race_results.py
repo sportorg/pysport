@@ -38,7 +38,8 @@ class ResultTable(QTableView):
         try:
             logging.debug('Single result clicked on ' + str(index.row()))
             #  show punches in the left area
-            self.parent_widget.show_punches(index)
+            if index.row() > -1 and index.row() < len(race().results):
+                self.parent_widget.show_punches(index)
         except Exception as e:
             logging.exception(str(e))
 
@@ -47,8 +48,9 @@ class ResultTable(QTableView):
     def double_clicked(self, index):
         try:
             logging.debug('Clicked on ' + str(index.row()))
-            dialog = ResultEditDialog(self, index)
-            dialog.exec()
+            if index.row() < len(race().results):
+                dialog = ResultEditDialog(self, index)
+                dialog.exec()
         except Exception as e:
             logging.exception(str(e))
 

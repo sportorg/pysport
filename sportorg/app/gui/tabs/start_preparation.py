@@ -4,6 +4,7 @@ from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QAbstractItemView, QHeaderView
 
 from sportorg.app.gui.dialogs.entry_edit import EntryEditDialog
+from sportorg.app.models.memory import race
 from sportorg.app.models.memory_model import PersonMemoryModel
 from sportorg.app.gui.tabs.table import TableView
 from sportorg.app.gui.global_access import GlobalAccess
@@ -49,11 +50,11 @@ class Widget(QtWidgets.QWidget):
             logging.debug('Clicked on ' + str(index.row()))
             # show_edit_dialog(index)
             try:
-                dialog = EntryEditDialog(self.EntryTable, index)
+                if index.row() < len(race().persons):
+                    dialog = EntryEditDialog(self.EntryTable, index)
+                    dialog.exec()
             except Exception as e:
                 logging.exception(e)
-
-            dialog.exec()
 
         self.EntryTable.activated.connect(entry_double_clicked)
         self.entry_layout.addWidget(self.EntryTable)
