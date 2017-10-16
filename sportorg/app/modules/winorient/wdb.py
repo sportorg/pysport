@@ -250,8 +250,9 @@ class WinOrientBinary:
             if man.get_group():
                 group_name = man.get_group().name
                 new_person.group = find(race().groups, name=group_name)
-            team_name = man.get_team().name
-            new_person.organization = find(race().organizations, name=team_name)
+            if man.get_team():
+                team_name = man.get_team().name
+                new_person.organization = find(race().organizations, name=team_name)
 
             my_race.persons.append(new_person)
 

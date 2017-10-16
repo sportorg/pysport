@@ -89,7 +89,7 @@ class WDBPunch:
         :param byte_array:
         """
         byteorder = get_wdb_byteorder()
-        self.code = int.from_bytes(byte_array[0:4], byteorder)
+        self.code = int.from_bytes(byte_array[0:1], byteorder)
         self.time = int.from_bytes(byte_array[4:8], byteorder)
 
     def get_bytes(self):
