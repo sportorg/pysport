@@ -228,6 +228,10 @@ class MainWindow(QMainWindow, App):
         self.statusbar.showMessage('', 0)
         self.statusbar.showMessage(msg, msecs)
 
+    def select_tab(self, index):
+        if index < self.tabwidget.count():
+            self.tabwidget.setCurrentIndex(index)
+
     def filter_dialog(self):
         try:
             table = GlobalAccess().get_current_table()
@@ -317,6 +321,7 @@ class MainWindow(QMainWindow, App):
             race().add_new_result()
             GlobalAccess().get_result_table().model().init_cache()
             GlobalAccess().get_main_window().refresh()
+            self.statusbar_message(_('Manual finish'))
         except Exception as e:
             logging.exception(str(e))
 

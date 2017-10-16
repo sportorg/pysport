@@ -32,21 +32,21 @@ def menu_list():
                     'icon': config.icon_dir('save.png'),
                     'action': GlobalAccess().get_main_window().save_file_as
                 },
-                {
-                    'title': _('Open Recent'),
-                    'action': lambda: print('...')
-                },
+                # {
+                #     'title': _('Open Recent'),
+                #     'action': lambda: print('...')
+                # },
                 {
                     'type': 'separator',
                 },
-                {
-                    'title': _('New Race'),
-                    'action': lambda: print('...')
-                },
-                {
-                    'title': _('Settings'),
-                    'action': lambda: print('...')
-                },
+                # {
+                #     'title': _('New Race'),
+                #     'action': lambda: print('...')
+                # },
+                # {
+                #     'title': _('Settings'),
+                #     'action': lambda: print('...')
+                # },
                 {
                     'title': _('Event Settings'),
                     'action': GlobalAccess().get_main_window().event_settings_dialog
@@ -95,12 +95,51 @@ def menu_list():
             'actions': [
                 {
                     'title': _('Add object'),
+                    'shortcut': 'insert',
                     'action': GlobalAccess().get_main_window().create_object
                 },
                 {
                     'title': _('Delete'),
                     'shortcut': 'Del',
                     'action': GlobalAccess().get_main_window().delete_object
+                }
+            ]
+        },
+        {
+            'title': _('View'),
+            'actions': [
+                {
+                    'title': _('Refresh'),
+                    'shortcut': 'F5',
+                    'action': GlobalAccess().get_main_window().refresh
+                },
+                {
+                    'type': 'separator',
+                },
+                {
+                    'title': _('Start Preparation'),
+                    'shortcut': 'Ctrl+1',
+                    'action': lambda: GlobalAccess().get_main_window().select_tab(0)
+                },
+                {
+                    'title': _('Race Results'),
+                    'shortcut': 'Ctrl+2',
+                    'action': lambda: GlobalAccess().get_main_window().select_tab(1)
+                },
+                {
+                    'title': _('Groups'),
+                    'shortcut': 'Ctrl+3',
+                    'action': lambda: GlobalAccess().get_main_window().select_tab(2)
+                },
+                {
+                    'title': _('Courses'),
+                    'shortcut': 'Ctrl+4',
+                    'action': lambda: GlobalAccess().get_main_window().select_tab(3)
+                },
+                {
+                    'title': _('Teams'),
+                    'shortcut': 'Ctrl+5',
+                    'action': lambda: GlobalAccess().get_main_window().select_tab(4)
                 }
             ]
         },
@@ -178,10 +217,10 @@ def menu_list():
         {
             'title': _('Help'),
             'actions': [
-                {
-                    'title': _('Help'),
-                    'action': lambda: print('...')
-                },
+                # {
+                #     'title': _('Help'),
+                #     'action': lambda: print('...')
+                # },
                 {
                     'title': _('About'),
                     'shortcut': 'F1',
