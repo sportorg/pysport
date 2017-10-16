@@ -184,7 +184,8 @@ def menu_list():
                 },
                 {
                     'title': _('About'),
-                    'action': lambda: print('...')
+                    'shortcut': 'F1',
+                    'action': GlobalAccess().get_main_window().about
                 }
             ]
         },
