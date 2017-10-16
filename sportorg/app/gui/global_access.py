@@ -72,6 +72,10 @@ class GlobalAccess(object):
         return ret
 
     def delete_object(self):
+        indexes = self.get_selected_rows()
+        if not len(indexes):
+            return
+
         confirm = QMessageBox.question(self.get_main_window(),
                                        _('Question'),
                                        _('Please confirm'),
@@ -79,7 +83,7 @@ class GlobalAccess(object):
         if confirm == QMessageBox.No:
             return
         tab = self.get_current_tab_index()
-        indexes = self.get_selected_rows()
+
         if tab == 0:
             race().delete_persons(indexes, self.get_person_table())
             # recalculate places
