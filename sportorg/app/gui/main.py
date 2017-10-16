@@ -6,6 +6,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets, Qt
 from PyQt5.QtWidgets import QMainWindow, QTableView, QMessageBox
 
 from sportorg import config
+from sportorg.app.gui.dialogs.about import About
 from sportorg.app.gui.dialogs.entry_filter import DialogFilter
 from sportorg.app.gui.dialogs.event_properties import EventPropertiesDialog
 from sportorg.app.gui.dialogs.number_change import NumberChangeDialog
@@ -430,3 +431,9 @@ class MainWindow(QMainWindow, App):
             except Exception as e:
                 logging.exception(str(e))
             self.init_model()
+
+    def about(self):
+        try:
+            About().exec()
+        except Exception as e:
+            logging.exception(str(e))
