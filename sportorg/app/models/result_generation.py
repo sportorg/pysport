@@ -1,5 +1,8 @@
 import logging
 
+from sportorg.app.gui.global_access import GlobalAccess
+from sportorg.language import _
+
 from . import memory
 from .result_checker import ResultChecker
 
@@ -16,12 +19,24 @@ def find_person_by_result(system_id, result):
     return False
 
 
+def has_result(result):
+    for res in memory.race().results:
+        if res is None:
+            continue
+        if res == result:
+            return True
+    return False
+
+
 def add_result(system_id, result):
     """
     :type system_id: str
     :type result: memory.Result
     """
     assert result, memory.Result
+    if has_result(result):
+        GlobalAccess().get_main_window().statusbar_message(_('Result already exists'))
+        return
     if isinstance(result.person, memory.Person):
         result.status = memory.ResultStatus.OK
         if len(result.punches):
@@ -32,6 +47,7 @@ def add_result(system_id, result):
         result.person.result = result
         memory.race().results.append(result)
 
+        logging.info(system_id + str(result))
         logging.debug(result.status)
     else:
         res = find_person_by_result(system_id, result)

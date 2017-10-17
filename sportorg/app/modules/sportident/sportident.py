@@ -2,7 +2,6 @@ import logging
 
 from sportorg.app.gui.global_access import GlobalAccess
 from . import card_reader
-from sportorg.core import event
 from sportorg.language import _
 
 
@@ -31,6 +30,3 @@ def start_reader():
 def message(msg):
     logging.info(msg)
     GlobalAccess().get_main_window().statusbar.showMessage(msg, 5000)
-
-
-event.add_event('finish', lambda _id, result: print(_id, result))

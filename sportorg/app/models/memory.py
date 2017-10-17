@@ -3,7 +3,7 @@ import logging
 import datetime
 from PyQt5.QtWidgets import QMessageBox
 
-from sportorg.app.modules.utils.utils import time_remove_day, int_to_time, time_to_hhmmss
+from sportorg.app.modules.utils.utils import time_remove_day, int_to_time, time_to_hhmmss, time_to_sec
 from sportorg.language import _
 from sportorg.core.model import Model
 
@@ -153,20 +153,26 @@ class Result(Model):
         punches = ''
         for punch in self.punches:
             punches += '{} — {}\n'.format(punch[0], punch[1])
-
+        person = self.person.full_name if self.person is not None else ''
         return """
 Card number: {}
 Start: {}
 Finish: {}
 Person: {}
 Punches:
-{}""".format(self.card_number, self.start_time, self.finish_time, self.person, punches)
+{}""".format(self.card_number, self.start_time, self.finish_time, person, punches)
 
     def __eq__(self, other):
         eq = self.card_number == other.card_number
-        eq = eq and self.start_time == other.start_time
-        eq = eq and self.finish_time == other.finish_time
-        eq = eq and self.punches == other.punches
+        if self.start_time and other.start_time:
+            eq = eq and time_to_sec(self.start_time) == time_to_sec(other.start_time)
+        if self.finish_time and other.finish_time:
+            eq = eq and time_to_sec(self.finish_time) == time_to_sec(other.finish_time)
+        if len(self.punches) == len(other.punches):
+            for i in range(len(self.punches)):
+                eq = eq and self.punches[i][0] == other.punches[i][0] and time_to_sec(self.punches[i][1]) == time_to_sec(other.punches[i][1])
+        else:
+            return False
         return eq
 
     def __gt__(self, other):
@@ -195,7 +201,7 @@ Punches:
 
     def get_start_time(self):
         obj = race()
-        start_source = obj.get_setting('start_source', 'protocol')
+        start_source = obj.get_setting('sportident_start_source', 'protocol')
         if start_source == 'protocol':
             if self.person:
                 return time_remove_day(self.person.start_time)
@@ -210,7 +216,7 @@ Punches:
 
     def get_finish_time(self):
         obj = race()
-        finish_source = obj.get_setting('finish_source', 'station')
+        finish_source = obj.get_setting('sportident_finish_source', 'station')
         if finish_source == 'station':
             if self.finish_time:
                 return time_remove_day(self.finish_time)

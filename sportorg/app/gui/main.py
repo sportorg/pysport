@@ -6,6 +6,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets, Qt
 from PyQt5.QtWidgets import QMainWindow, QTableView, QMessageBox
 
 from sportorg import config
+from sportorg.app.gui.dialogs.about import About
 from sportorg.app.gui.dialogs.entry_filter import DialogFilter
 from sportorg.app.gui.dialogs.event_properties import EventPropertiesDialog
 from sportorg.app.gui.dialogs.number_change import NumberChangeDialog
@@ -205,6 +206,9 @@ class MainWindow(QMainWindow, App):
                 super().open_file(file_name)
             except Exception as e:
                 logging.exception(e)
+                QMessageBox.question(None,
+                                     _('Error'),
+                                     _('Cannot read file, format unknown') + ': ' + file_name)
             self.init_model()
 
     def system_message(self, title, content, icon=None, msecs=5000):
@@ -224,7 +228,12 @@ class MainWindow(QMainWindow, App):
         self.system_tray_icon.showMessage(title, content, icon_val[icon] if icon in icon_val else icon, msecs)
 
     def statusbar_message(self, msg, msecs=5000):
+        self.statusbar.showMessage('', 0)
         self.statusbar.showMessage(msg, msecs)
+
+    def select_tab(self, index):
+        if index < self.tabwidget.count():
+            self.tabwidget.setCurrentIndex(index)
 
     def filter_dialog(self):
         try:
@@ -315,6 +324,7 @@ class MainWindow(QMainWindow, App):
             race().add_new_result()
             GlobalAccess().get_result_table().model().init_cache()
             GlobalAccess().get_main_window().refresh()
+            self.statusbar_message(_('Manual finish'))
         except Exception as e:
             logging.exception(str(e))
 
@@ -398,6 +408,9 @@ class MainWindow(QMainWindow, App):
                 winorient.import_csv(file_name)
             except Exception as e:
                 logging.exception(e)
+                QMessageBox.question(None,
+                                     _('Error'),
+                                     _('Import error') + ': ' + file_name)
             self.init_model()
 
     def import_wo_wdb(self):
@@ -428,4 +441,14 @@ class MainWindow(QMainWindow, App):
                 ocad.import_txt_v8(file_name)
             except Exception as e:
                 logging.exception(str(e))
+                QMessageBox.question(None,
+                                     _('Error'),
+                                     _('Import error') + ': ' + file_name)
+
             self.init_model()
+
+    def about(self):
+        try:
+            About().exec()
+        except Exception as e:
+            logging.exception(str(e))

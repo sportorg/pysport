@@ -1,17 +1,20 @@
 import logging
 import threading
 import time
+import datetime
 import serial
 from sportorg.lib.sportident import sireader
 
 
 class SIReaderThread(threading.Thread):
-    def __init__(self, port, func=lambda card_data: card_data):
+    def __init__(self, port, func=lambda card_data: card_data, start_time=None, debug=False):
         super().__init__()
         self.port = port
         self.readers = [func]
         self.cards = []
         self._reading = True
+        self.start_time = start_time
+        self.debug = debug
 
     @property
     def reading(self):
@@ -23,7 +26,7 @@ class SIReaderThread(threading.Thread):
         self.cards.append(card_data)
 
     def run(self):
-        si = sireader.SIReaderReadout(port=self.port, debug=True)
+        si = sireader.SIReaderReadout(port=self.port, debug=self.debug)
         while True:
             try:
                 while not si.poll_sicard():
@@ -32,9 +35,10 @@ class SIReaderThread(threading.Thread):
                         si.disconnect()
                         return
                 # card_number = si.sicard
-                # card_type = si.cardtype
 
                 card_data = si.read_sicard()
+                card_data['card_type'] = si.cardtype
+                card_data = self.check_data(card_data)
                 self.add_card_data(card_data)
 
                 # beep
@@ -46,6 +50,28 @@ class SIReaderThread(threading.Thread):
             except serial.serialutil.SerialException:
                 self.stop()
                 return
+            except Exception as e:
+                logging.error(e)
+
+    def check_data(self, card_data):
+        if self.start_time and card_data['card_type'] == 'SI5':
+            start_time = self.time_to_sec(self.start_time)
+            for i in range(len(card_data['punches'])):
+                if self.time_to_sec(card_data['punches'][i][1]) < start_time:
+                    new_datetime = card_data['punches'][i][1].replace(hour=card_data['punches'][i][1].hour+12)
+                    card_data['punches'][i] = (card_data['punches'][i][0], new_datetime)
+
+        return card_data
+
+    @staticmethod
+    def time_to_sec(value, max_val=86400):
+        if isinstance(value, datetime.datetime):
+            ret = value.hour * 3600 + value.minute * 60 + value.second + value.microsecond / 1000000
+            if max_val:
+                ret = ret % max_val
+            return ret
+
+        return 0
 
     def stop(self):
         self._reading = False

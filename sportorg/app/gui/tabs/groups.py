@@ -4,6 +4,7 @@ from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QAbstractItemView, QHeaderView
 
 from sportorg.app.gui.dialogs.group_edit import GroupEditDialog
+from sportorg.app.models.memory import race
 from sportorg.app.models.memory_model import GroupMemoryModel
 from sportorg.app.gui.tabs.table import TableView
 from sportorg.app.gui.global_access import GlobalAccess
@@ -47,8 +48,9 @@ class Widget(QtWidgets.QWidget):
             logging.debug('clicked on ' + str(index.row()))
 
             try:
-                 dialog = GroupEditDialog(self.GroupTable, index)
-                 dialog.exec()
+                 if index.row() < len(race().groups):
+                    dialog = GroupEditDialog(self.GroupTable, index)
+                    dialog.exec()
             except Exception as e:
                 logging.exception(e)
 

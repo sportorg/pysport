@@ -16,7 +16,7 @@ from sportorg import config
 
 
 def get_course_types():
-    return ['order', 'free', 'marked route']
+    return [_('order'), _('free'), _('marked route')]
 
 
 class CourseEditDialog(QDialog):
