@@ -1,4 +1,6 @@
 import sys
+
+import datetime
 from PyQt5.QtCore import Qt
 
 from PyQt5.QtGui import QIcon, QPixmap, QFont
@@ -43,6 +45,9 @@ class About(QDialog):
         home_page_text.setText(
             '\n{0}: <a href="{1}">{1}</a>'.format(_('Home page'), 'https://sportorg.github.io/pysport/')
         )
+        # home_page_text.setTextInteractionFlags(Qt.TextBrowserInteraction)
+        home_page_text.setOpenExternalLinks(True)
+
         self.layout.addRow(home_page_text)
 
         licence_title = QLabel()
@@ -57,7 +62,8 @@ class About(QDialog):
         licence_text.setMinimumHeight(250)
         licence_text.setMaximumHeight(250)
         licence_text.setReadOnly(True)
-        licence_text.setText("""Copyright (c) 2017 SportOrg
+        year = max(datetime.datetime.today().year, 2017)
+        licence_text.setText("Copyright (c) " + str(year) + """ SportOrg
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

@@ -35,7 +35,7 @@ def add_result(system_id, result):
     """
     assert result, memory.Result
     if has_result(result):
-        GlobalAccess().get_main_window().statusbar_message(_('Result already exist'))
+        GlobalAccess().get_main_window().statusbar_message(_('Result already exists'))
         return
     if isinstance(result.person, memory.Person):
         result.status = memory.ResultStatus.OK
