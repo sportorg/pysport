@@ -206,6 +206,9 @@ class MainWindow(QMainWindow, App):
                 super().open_file(file_name)
             except Exception as e:
                 logging.exception(e)
+                QMessageBox.question(None,
+                                     _('Error'),
+                                     _('Cannot read file, format unknown') + ': ' + file_name)
             self.init_model()
 
     def system_message(self, title, content, icon=None, msecs=5000):
@@ -405,6 +408,9 @@ class MainWindow(QMainWindow, App):
                 winorient.import_csv(file_name)
             except Exception as e:
                 logging.exception(e)
+                QMessageBox.question(None,
+                                     _('Error'),
+                                     _('Import error') + ': ' + file_name)
             self.init_model()
 
     def import_wo_wdb(self):
@@ -435,6 +441,10 @@ class MainWindow(QMainWindow, App):
                 ocad.import_txt_v8(file_name)
             except Exception as e:
                 logging.exception(str(e))
+                QMessageBox.question(None,
+                                     _('Error'),
+                                     _('Import error') + ': ' + file_name)
+
             self.init_model()
 
     def about(self):

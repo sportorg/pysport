@@ -1,3 +1,7 @@
+import traceback
+
+from PyQt5.QtWidgets import QMessageBox
+from sportorg.language import _
 from sportorg.app.models import model
 from sportorg.app.models.memory import Race, Organization, Group, Person, Result, race, find, Course, \
     CourseControl, Country, Contact, Address, ResultStatus
@@ -73,6 +77,11 @@ class WinOrientBinary:
                 self.wdb_object.parse_bytes(byte_array)
         except FileNotFoundError:
             pass
+        except:
+            traceback.print_exc()
+            QMessageBox.question(None,
+                                 _('Error'),
+                                 _('Import error') + ': ' + self._file)
 
     def run(self):
 
@@ -242,7 +251,8 @@ class WinOrientBinary:
             new_person.surname = man.name.split(" ")[0]
             new_person.name = man.name.split(" ")[-1]
             new_person.bib = man.number
-            new_person.qual = self.qual[str(man.qualification)]
+            if str(man.qualification) in self.qual.keys():
+                new_person.qual = self.qual[str(man.qualification)]
             new_person.year = man.year
             new_person.card_number = man.si_card
             new_person.is_out_of_competition = man.is_not_qualified
