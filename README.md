@@ -50,3 +50,13 @@ pip install -t lib -r requirements.txt
 ![Mainwindow sportorg](img/mainwindow.png)
 
 ![Dialogedit sportorg](img/dialogedit.png)
+
+### build `go`
+
+[josephspurrier](https://github.com/josephspurrier/goversioninfo) for build `.syso`
+
+```
+./goversioninfo -icon=img/icon/sportorg.ico
+
+go build -ldflags="-H windowsgui"
+```
