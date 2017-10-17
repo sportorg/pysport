@@ -347,13 +347,13 @@ class EntryEditDialog(QDialog):
                 (person.organization is None and len(self.item_team.currentText()) > 0):
             person.organization = find(race().organizations, name=self.item_team.currentText())
             changed = True
-        if person.year != str(self.item_year.value()):
-            person.year = str(self.item_year.value())
+        if person.year != self.item_year.value():
+            person.year = self.item_year.value()
             changed = True
         if person.qual != self.item_qual.currentText():
             person.qual = self.item_qual.currentText()
             changed = True
-        if person.bib != self.item_bib.value() and self.item_bib.value() != 0:
+        if person.bib != self.item_bib.value() and self.item_bib.value():
             person.bib = self.item_bib.value()
             changed = True
 
@@ -362,13 +362,13 @@ class EntryEditDialog(QDialog):
             person.start_time = new_time
             changed = True
 
-        if person.start_group != self.item_start_group.value() and self.item_start_group.value() != 0:
+        if person.start_group != self.item_start_group.value() and self.item_start_group.value():
             person.start_group = self.item_start_group.value()
             changed = True
 
-        if (person.card_number is None or person.card_number != self.item_card.text()) \
-                and self.item_card.text() != '0':
-            person.card_number = self.item_card.text()
+        if (person.card_number is None or person.card_number != self.item_card.value()) \
+                and self.item_card.value:
+            person.card_number = self.item_card.value()
             changed = True
 
         if person.is_out_of_competition != self.item_out_of_competition.isChecked():
