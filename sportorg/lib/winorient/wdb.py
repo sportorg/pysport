@@ -405,6 +405,7 @@ class WDBMan:
         self.is_own_card = 0
         self.unknown2 = 0
         self.status = 0
+        self.start_group = 0
         self.wdb = wdb
 
     def parse_bytes(self, byte_array):
@@ -427,6 +428,7 @@ class WDBMan:
         self.finish = int.from_bytes(byte_array[64:68], byteorder)
         self.result = int.from_bytes(byte_array[68:72], byteorder)
 
+        self.start_group = int.from_bytes(byte_array[80:81], byteorder)
         self.finished = int.from_bytes(byte_array[82:83], byteorder)
 
         self.si_card = int.from_bytes(byte_array[88:92], byteorder)
@@ -462,6 +464,8 @@ class WDBMan:
         ret[60:64] = self.start.to_bytes(4, byteorder)
         ret[64:68] = self.finish.to_bytes(4, byteorder)
         ret[68:72] = self.result.to_bytes(4, byteorder)
+
+        ret[80:81] = self.start_group.to_bytes(1, byteorder)
 
         ret[82:83] = self.finished.to_bytes(1, byteorder)
 

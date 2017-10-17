@@ -247,11 +247,17 @@ class WinOrientBinary:
             new_person.card_number = man.si_card
             new_person.is_out_of_competition = man.is_not_qualified
             new_person.comment = man.comment
-            if man.get_group():
-                group_name = man.get_group().name
+            new_person.start_group = man.start_group
+
+            found_group = man.get_group()
+            if found_group:
+                group_name = found_group.name
                 new_person.group = find(race().groups, name=group_name)
-            team_name = man.get_team().name
-            new_person.organization = find(race().organizations, name=team_name)
+
+            found_team = man.get_team()
+            if found_team:
+                team_name = found_team.name
+                new_person.organization = find(race().organizations, name=team_name)
 
             my_race.persons.append(new_person)
 
@@ -380,6 +386,7 @@ class WinOrientBinary:
             new_person.id = len(wdb_object.man)
 
             new_person.start = time_to_int(man.start_time)
+            new_person.start_group = man.start_group
 
             # result
             result = man.result
