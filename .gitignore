@@ -9,8 +9,10 @@ log/
 data/*
 /python/
 /lib/
-SportOrg.exe
+/*.exe
 SportOrg.spec
 SportOrg.bat
+
+resource.syso
 
 *.log

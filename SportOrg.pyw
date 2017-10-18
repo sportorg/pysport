@@ -3,6 +3,7 @@ from pathlib import Path
 
 lib = Path(__file__).parent / 'lib'
 sys.path.append(str(lib))
+sys.path.append(str(Path(__file__).parent))
 
 
 if __name__ == '__main__':
