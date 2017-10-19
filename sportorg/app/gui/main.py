@@ -61,6 +61,8 @@ class MainWindow(QMainWindow, App):
         self._setup_statusbar()
         self._setup_system_tray_icon()
         self.show()
+        if self.file:
+            self.open_file(self.file)
 
     def close(self):
         self.conf['geometry'] = {
@@ -197,10 +199,7 @@ class MainWindow(QMainWindow, App):
             self.save_file_as()
 
     def open_file(self, file_name=None):
-        file_name = QtWidgets.QFileDialog.getOpenFileName(None, _('Open SportOrg file'),
-                                                          '/',
-                                                          _("SportOrg file (*.sportorg)"))[0]
-        if file_name is not '':
+        if file_name:
             self.setWindowTitle(file_name)
             try:
                 super().open_file(file_name)
@@ -210,6 +209,12 @@ class MainWindow(QMainWindow, App):
                                      _('Error'),
                                      _('Cannot read file, format unknown') + ': ' + file_name)
             self.init_model()
+
+    def open_file_dialog(self):
+        file_name = QtWidgets.QFileDialog.getOpenFileName(None, _('Open SportOrg file'),
+                                                          '/',
+                                                          _("SportOrg file (*.sportorg)"))[0]
+        self.open_file(file_name)
 
     def system_message(self, title, content, icon=None, msecs=5000):
         if icon is None:

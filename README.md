@@ -58,5 +58,5 @@ pip install -t lib -r requirements.txt
 ```
 ./goversioninfo -icon=img/icon/sportorg.ico
 
-go build -ldflags="-H windowsgui"
+go build -ldflags="-H windowsgui" -o SportOrg.exe
 ```

@@ -24,7 +24,7 @@ def menu_list():
                     'title': _('Open'),
                     'shortcut': 'Ctrl+O',
                     'icon': config.icon_dir('folder.png'),
-                    'action': GlobalAccess().get_main_window().open_file
+                    'action': GlobalAccess().get_main_window().open_file_dialog
                 },
                 {
                     'title': _('Save As'),

@@ -1,14 +1,24 @@
 package main
 
 import (
-    "log"
     "os"
     "os/exec"
+    "path"
+    "path/filepath"
+    "fmt"
+    "log"
 )
 
 func main() {
-    cmd := exec.Command("python/pythonw.exe", "SportOrg.pyw")
+    dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+    if err != nil {
+            log.Fatal(err)
+    }
+    argsWithoutProg := os.Args[1:]
+    cmd := exec.Command(
+        path.Join(dir, "python/pythonw.exe"),
+        append([]string{path.Join(dir, "SportOrg.pyw")}, argsWithoutProg...)...)
     cmd.Stdout = os.Stdout
     cmd.Stderr = os.Stderr
-    log.Println(cmd.Run())
+    fmt.Println(cmd.Run())
 }
