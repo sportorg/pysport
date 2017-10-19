@@ -31,7 +31,7 @@ class About(QDialog):
 
         title_font = QFont("Times", 24)
         title_text = QLabel()
-        title_text.setText('{} v{}-beta'.format(config.NAME, config.VERSION))
+        title_text.setText('{} v{}'.format(config.NAME, config.VERSION))
         title_text.setFont(title_font)
         title_icon = QLabel()
         title_icon.setPixmap(QPixmap(config.ICON).scaled(75, 75))

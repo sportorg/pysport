@@ -99,7 +99,7 @@ class MainWindow(QMainWindow, App):
         self.setMinimumSize(QtCore.QSize(480, 320))
         self.setGeometry(x, y, 480, 320)
         self.setWindowIcon(QtGui.QIcon(config.ICON))
-        self.setWindowTitle(_(config.NAME))
+        self.set_title()
         self.resize(width, height)
         self.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.setDockNestingEnabled(False)
@@ -167,6 +167,13 @@ class MainWindow(QMainWindow, App):
         self.tabwidget.addTab(courses.Widget(), _("Courses"))
         self.tabwidget.addTab(teams.Widget(), _("Teams"))
 
+    def set_title(self, title=None):
+        main_title = '{} v{}'.format(_(config.NAME), config.VERSION)
+        if title:
+            self.setWindowTitle('{} - {}'.format(title, main_title))
+        else:
+            self.setWindowTitle(main_title)
+
     def create_file(self, file_name=None, update_data=True):
 
         # TODO: save changes in current file
@@ -174,7 +181,7 @@ class MainWindow(QMainWindow, App):
         file_name = QtWidgets.QFileDialog.getSaveFileName(None, _('Create SportOrg file'),
                                             '/' + str(time.strftime("%Y%m%d")), _("SportOrg file (*.sportorg)"))[0]
         if file_name is not '':
-            self.setWindowTitle(file_name)
+            self.set_title(file_name)
             try:
                 super().create_file(file_name)
             except Exception as e:
@@ -200,7 +207,7 @@ class MainWindow(QMainWindow, App):
 
     def open_file(self, file_name=None):
         if file_name:
-            self.setWindowTitle(file_name)
+            self.set_title(file_name)
             try:
                 super().open_file(file_name)
             except Exception as e:
