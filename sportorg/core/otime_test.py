@@ -2,7 +2,7 @@ import unittest
 from sportorg.core.otime import *
 
 
-class TestStringMethods(unittest.TestCase):
+class TestOTime(unittest.TestCase):
     def test_otime(self):
         vals = [
             ((1, 13, 5, 35), (1, 13, 5, 35), '37:05:35'),
@@ -24,7 +24,3 @@ class TestStringMethods(unittest.TestCase):
         otime1 = OTime(0, 0, 25, 44)
         otime2 = OTime(0, 0, 25, 44)
         self.assertEqual(True, otime1 == otime2, 'Error')
-
-
-if __name__ == '__main__':
-    unittest.main()
