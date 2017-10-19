@@ -3,7 +3,6 @@
 __pycache__/
 build
 dist
-test/
 log/
 
 data/*
@@ -14,5 +13,3 @@ SportOrg.spec
 SportOrg.bat
 
 resource.syso
-
-*.log

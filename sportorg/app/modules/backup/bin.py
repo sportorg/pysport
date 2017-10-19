@@ -32,7 +32,8 @@ def load(file):
     data = pickle.load(file)
     if not ('version' in data):
         return
-    if data['version'] == config.VERSION:
+    # FIXME
+    if True or data['version'] == config.VERSION:
         race = memory.race()
         race.data = data['data']
         race.courses = data['courses']
