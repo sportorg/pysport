@@ -12,6 +12,7 @@ from sportorg.app.gui.dialogs.event_properties import EventPropertiesDialog
 from sportorg.app.gui.dialogs.number_change import NumberChangeDialog
 from sportorg.app.gui.dialogs.print_properties import PrintPropertiesDialog
 from sportorg.app.gui.dialogs.report_dialog import ReportDialog
+from sportorg.app.gui.dialogs.settings import SettingsDialog
 from sportorg.app.gui.dialogs.sportident_properties import SportidentPropertiesDialog
 from sportorg.app.gui.dialogs.start_chess_dialog import StartChessDialog
 from sportorg.app.gui.dialogs.start_preparation import StartPreparationDialog
@@ -20,7 +21,7 @@ from sportorg.app.gui.global_access import GlobalAccess
 from sportorg.app.gui.menu import menu_list
 from sportorg.app.gui.tabs import start_preparation, groups, teams, race_results, courses
 from sportorg.app.gui.toolbar import toolbar_list
-from sportorg.app.models.memory import Race, event as races, race
+from sportorg.app.models.memory import Race, event as races, race, Config as Configuration
 from sportorg.app.models import result_generation
 from sportorg.app.models.memory_model import PersonMemoryModel, ResultMemoryModel, GroupMemoryModel, \
     CourseMemoryModel, TeamMemoryModel
@@ -71,6 +72,7 @@ class MainWindow(QMainWindow, App):
             'width': self.width(),
             'height': self.height(),
         }
+        self.conf['configuration'] = Configuration.get_all()
         self.conf_write()
 
         """
@@ -90,6 +92,11 @@ class MainWindow(QMainWindow, App):
             self.conf.write(configfile)
 
     def _setup_ui(self):
+        if self.conf.has_section('configuration'):
+            for option in self.conf.options('configuration'):
+                Configuration.set_parse(
+                    option, self.conf.get('configuration', option, fallback=Configuration.get(option)))
+
         geometry = 'geometry'
         x = self.conf.getint('%s' % geometry, 'x', fallback=480)
         y = self.conf.getint(geometry, 'y', fallback=320)
@@ -247,6 +254,16 @@ class MainWindow(QMainWindow, App):
         if index < self.tabwidget.count():
             self.tabwidget.setCurrentIndex(index)
 
+    @staticmethod
+    def get_configuration():
+        return Configuration
+
+    def settings_dialog(self):
+        try:
+            SettingsDialog().exec()
+        except Exception as e:
+            logging.exception(str(e))
+
     def filter_dialog(self):
         try:
             table = GlobalAccess().get_current_table()
@@ -263,6 +280,9 @@ class MainWindow(QMainWindow, App):
             logging.exception(str(e))
 
     def split_printout(self):
+        if self.tabwidget.currentIndex() != 1:
+            self.statusbar_message(_('No result selected'))
+            return
         try:
             obj = race()
 
@@ -337,6 +357,7 @@ class MainWindow(QMainWindow, App):
             GlobalAccess().get_result_table().model().init_cache()
             GlobalAccess().get_main_window().refresh()
             self.statusbar_message(_('Manual finish'))
+            GlobalAccess().auto_save()
         except Exception as e:
             logging.exception(str(e))
 

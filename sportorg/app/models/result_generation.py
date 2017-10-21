@@ -49,6 +49,7 @@ def add_result(system_id, result):
 
         logging.info(system_id + str(result))
         logging.debug(result.status)
+        GlobalAccess().auto_save()
     else:
         res = find_person_by_result(system_id, result)
         if res:

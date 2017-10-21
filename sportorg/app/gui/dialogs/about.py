@@ -25,7 +25,7 @@ class About(QDialog):
         self.setModal(True)
         self.setStyleSheet("background:white")
         # self.setFixedSize(640, 400)
-        self.setMinimumWidth(640)
+        self.setMinimumWidth(540)
         self.setMaximumWidth(640)
         self.layout = QFormLayout(self)
 
@@ -59,8 +59,8 @@ class About(QDialog):
 
         licence_text = QTextEdit()
         licence_text.setStyleSheet("QScrollBar:vertical {background: #bfbfbf}")
-        licence_text.setMinimumHeight(250)
-        licence_text.setMaximumHeight(250)
+        licence_text.setMinimumHeight(220)
+        licence_text.setMaximumHeight(220)
         licence_text.setReadOnly(True)
         year = max(datetime.datetime.today().year, 2017)
         licence_text.setText("Copyright (c) " + str(year) + """ SportOrg

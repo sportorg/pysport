@@ -139,3 +139,15 @@ class GlobalAccess(object):
         self.get_person_table().model().apply_filter()
         self.get_course_table().model().apply_filter()
         self.get_organization_table().model().apply_filter()
+
+    def auto_save(self):
+        main_window = self.get_main_window()
+        if not main_window:
+            return
+        if not main_window.get_configuration().get('autosave'):
+            return
+        if main_window.file:
+            main_window.save_file()
+            logging.info(_('Auto save'))
+        else:
+            main_window.statusbar_message(_('No file to auto save'))
