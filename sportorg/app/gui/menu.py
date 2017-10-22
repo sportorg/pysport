@@ -43,10 +43,12 @@ def menu_list():
                 #     'title': _('New Race'),
                 #     'action': lambda: print('...')
                 # },
-                # {
-                #     'title': _('Settings'),
-                #     'action': lambda: print('...')
-                # },
+                {
+                    'title': _('Settings'),
+                    'shortcut': 'Ctrl+Alt+S',
+                    'icon': config.icon_dir('settings.png'),
+                    'action': GlobalAccess().get_main_window().settings_dialog
+                },
                 {
                     'title': _('Event Settings'),
                     'action': GlobalAccess().get_main_window().event_settings_dialog
@@ -96,11 +98,13 @@ def menu_list():
                 {
                     'title': _('Add object'),
                     'shortcut': 'insert',
+                    'icon': config.icon_dir('plus.png'),
                     'action': GlobalAccess().get_main_window().create_object
                 },
                 {
                     'title': _('Delete'),
                     'shortcut': 'Del',
+                    'icon': config.icon_dir('delete.png'),
                     'action': GlobalAccess().get_main_window().delete_object
                 }
             ]
@@ -110,6 +114,7 @@ def menu_list():
             'actions': [
                 {
                     'title': _('Refresh'),
+                    'icon': config.icon_dir('refresh.png'),
                     'shortcut': 'F5',
                     'action': GlobalAccess().get_main_window().refresh
                 },
@@ -149,6 +154,7 @@ def menu_list():
                 {
                     'title': _('Filter'),
                     'shortcut': 'F2',
+                    'icon': config.icon_dir('filter.png'),
                     'action': GlobalAccess().get_main_window().filter_dialog
                 },
                 {
@@ -183,6 +189,7 @@ def menu_list():
                 {
                     'title': _('Manual finish'),
                     'shortcut': 'F3',
+                    'icon': config.icon_dir('flag.png'),
                     'action': GlobalAccess().get_main_window().manual_finish
                 }
             ]
@@ -206,10 +213,12 @@ def menu_list():
             'actions': [
                 {
                     'title': _('SPORTident settings'),
+                    'icon': config.icon_dir('sportident.png'),
                     'action': GlobalAccess().get_main_window().sportident_settings
                 },
                 {
                     'title': _('Printer settings'),
+                    'icon': config.icon_dir('print.png'),
                     'action': GlobalAccess().get_main_window().print_settings
                 }
             ]
