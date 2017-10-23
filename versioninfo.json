@@ -5,13 +5,13 @@
 			"Major": 0,
 			"Minor": 7,
 			"Patch": 2,
-			"Build": 0
+			"Build": 2
 		},
 		"ProductVersion": {
 			"Major": 0,
 			"Minor": 7,
 			"Patch": 2,
-			"Build": 0
+			"Build": 2
 		},
 		"FileFlagsMask": "3f",
 		"FileFlags ": "00",
@@ -24,7 +24,7 @@
 		"Comments": "SportOrg program",
 		"CompanyName": "SportOrg",
 		"FileDescription": "SportOrg",
-		"FileVersion": "0.7.2.0",
+		"FileVersion": "0.7.2.2",
 		"InternalName": "SportOrg",
 		"LegalCopyright": "MIT Licence SportOrg",
 		"LegalTrademarks": "",

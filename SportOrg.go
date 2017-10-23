@@ -5,20 +5,48 @@ import (
     "os/exec"
     "path"
     "path/filepath"
-    "fmt"
     "log"
 )
 
-func main() {
-    dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+func getGlobalPython() string {
+	return "pythonw"
+}
+
+func getLocalPython() string {
+	return "python/pythonw.exe"
+}
+
+func baseDir(p string) string {
+	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
     if err != nil {
-            log.Fatal(err)
+		log.Fatal(err)
     }
+    return path.Join(dir, p)
+}
+
+func hasPython(p string) bool {
+	cmd := exec.Command(p)
+	if cmd.Run() == nil {
+		return true
+	}
+	return false
+}
+
+func main() {
     argsWithoutProg := os.Args[1:]
-    cmd := exec.Command(
-        path.Join(dir, "python/pythonw.exe"),
-        append([]string{path.Join(dir, "SportOrg.pyw")}, argsWithoutProg...)...)
+
+    var pythonName string
+    if hasPython(getLocalPython()) {
+    	pythonName = baseDir(getLocalPython())
+	} else {
+		pythonName = getGlobalPython()
+	}
+
+	cmd := exec.Command(
+        pythonName,
+        append([]string{baseDir("SportOrg.pyw")}, argsWithoutProg...)...)
+
     cmd.Stdout = os.Stdout
     cmd.Stderr = os.Stderr
-    fmt.Println(cmd.Run())
+    log.Println(cmd.Run())
 }
