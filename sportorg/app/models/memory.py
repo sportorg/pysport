@@ -431,7 +431,8 @@ class Race(Model):
 
 class Config(object):
     _configurations = {
-        'autosave': False
+        'autosave': False,
+        'autoconnect': False,
     }
 
     @classmethod

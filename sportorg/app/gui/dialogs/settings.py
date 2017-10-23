@@ -29,6 +29,10 @@ class SettingsDialog(QDialog):
         self.auto_save.setChecked(Config.get('autosave'))
         self.layout.addRow(self.auto_save)
 
+        self.auto_connect = QCheckBox(_('Auto connect to station'))
+        self.auto_connect.setChecked(Config.get('autoconnect'))
+        self.layout.addRow(self.auto_connect)
+
         def cancel_changes():
             self.close()
 
@@ -49,3 +53,4 @@ class SettingsDialog(QDialog):
 
     def apply_changes_impl(self):
         Config.set('autosave', self.auto_save.isChecked())
+        Config.set('autoconnect', self.auto_connect.isChecked())

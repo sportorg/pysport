@@ -30,6 +30,7 @@ from sportorg.app.models.start_preparation import guess_courses_for_groups, gues
 from sportorg.app.modules.backup import backup
 from sportorg.app.modules.ocad import ocad
 from sportorg.app.modules.printing.printing import print_html
+from sportorg.app.modules.sportident import sportident
 from sportorg.app.modules.winorient import winorient
 from sportorg.config import template_dir
 from sportorg.core import event
@@ -64,6 +65,8 @@ class MainWindow(QMainWindow, App):
         self.show()
         if self.file:
             self.open_file(self.file)
+        if Configuration.get('autoconnect'):
+            self.sportident_connect()
 
     def close(self):
         self.conf['geometry'] = {
@@ -430,6 +433,12 @@ class MainWindow(QMainWindow, App):
     def sportident_settings(self):
         try:
             SportidentPropertiesDialog().exec()
+        except Exception as e:
+            logging.exception(e)
+
+    def sportident_connect(self):
+        try:
+            sportident.start_reader()
         except Exception as e:
             logging.exception(e)
 
