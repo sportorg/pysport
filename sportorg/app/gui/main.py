@@ -111,6 +111,10 @@ class MainWindow(QMainWindow, App):
     def post_show(self):
         if self.file:
             self.open_file(self.file)
+        elif Configuration.get('open_recent_file'):
+            if len(self.recent_files):
+                self.open_file(self.recent_files[0])
+
         if Configuration.get('autoconnect'):
             self.sportident_connect()
         event.add_event('finish', result_generation.add_result)

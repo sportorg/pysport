@@ -433,6 +433,7 @@ class Config(object):
     _configurations = {
         'autosave': False,
         'autoconnect': False,
+        'open_recent_file': False,
     }
 
     @classmethod
