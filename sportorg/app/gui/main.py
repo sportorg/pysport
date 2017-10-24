@@ -9,6 +9,7 @@ from sportorg import config
 from sportorg.app.gui.dialogs.about import About
 from sportorg.app.gui.dialogs.entry_filter import DialogFilter
 from sportorg.app.gui.dialogs.event_properties import EventPropertiesDialog
+from sportorg.app.gui.dialogs.file_dialog import get_open_file_name, get_save_file_name
 from sportorg.app.gui.dialogs.number_change import NumberChangeDialog
 from sportorg.app.gui.dialogs.print_properties import PrintPropertiesDialog
 from sportorg.app.gui.dialogs.report_dialog import ReportDialog
@@ -95,12 +96,12 @@ class MainWindow(QMainWindow, App):
             self.conf.write(configfile)
 
     def _setup_ui(self):
-        if self.conf.has_section('configuration'):
-            for option in self.conf.options('configuration'):
+        if self.conf.has_section(config.ConfigFile.CONFIGURATION):
+            for option in self.conf.options(config.ConfigFile.CONFIGURATION):
                 Configuration.set_parse(
-                    option, self.conf.get('configuration', option, fallback=Configuration.get(option)))
+                    option, self.conf.get(config.ConfigFile.CONFIGURATION, option, fallback=Configuration.get(option)))
 
-        geometry = 'geometry'
+        geometry = config.ConfigFile.GEOMETRY
         x = self.conf.getint('%s' % geometry, 'x', fallback=480)
         y = self.conf.getint(geometry, 'y', fallback=320)
         width = self.conf.getint(geometry, 'width', fallback=880)
@@ -188,8 +189,8 @@ class MainWindow(QMainWindow, App):
 
         # TODO: save changes in current file
 
-        file_name = QtWidgets.QFileDialog.getSaveFileName(None, _('Create SportOrg file'),
-                                            '/' + str(time.strftime("%Y%m%d")), _("SportOrg file (*.sportorg)"))[0]
+        file_name = get_save_file_name(_('Create SportOrg file'), _("SportOrg file (*.sportorg)"),
+                                       str(time.strftime("%Y%m%d")))
         if file_name is not '':
             self.set_title(file_name)
             try:
@@ -228,9 +229,7 @@ class MainWindow(QMainWindow, App):
             self.init_model()
 
     def open_file_dialog(self):
-        file_name = QtWidgets.QFileDialog.getOpenFileName(None, _('Open SportOrg file'),
-                                                          '/',
-                                                          _("SportOrg file (*.sportorg)"))[0]
+        file_name = get_open_file_name(_('Open SportOrg file'), _("SportOrg file (*.sportorg)"))
         self.open_file(file_name)
 
     def system_message(self, title, content, icon=None, msecs=5000):
@@ -443,8 +442,7 @@ class MainWindow(QMainWindow, App):
             logging.exception(e)
 
     def import_wo_csv(self):
-        file_name = QtWidgets.QFileDialog.getOpenFileName(None, _('Open CSV Winorient file'),
-                                                          '', _("CSV Winorient (*.csv)"))[0]
+        file_name = get_open_file_name(_('Open CSV Winorient file'), _("CSV Winorient (*.csv)"))
         if file_name is not '':
             try:
                 winorient.import_csv(file_name)
@@ -456,8 +454,7 @@ class MainWindow(QMainWindow, App):
             self.init_model()
 
     def import_wo_wdb(self):
-        file_name = QtWidgets.QFileDialog.getOpenFileName(None, _('Open WDB Winorient file'),
-                                                          '', _("WDB Winorient (*.wdb)"))[0]
+        file_name = get_open_file_name(_('Open WDB Winorient file'), _("WDB Winorient (*.wdb)"))
         if file_name is not '':
             try:
                 winorient.import_wo_wdb(file_name)
@@ -466,9 +463,8 @@ class MainWindow(QMainWindow, App):
             self.init_model()
 
     def export_wo_wdb(self):
-        file_name = QtWidgets.QFileDialog.getSaveFileName(None, _('Save As WDB file'),
-                                                          '/sportorg_export_' + str(time.strftime("%Y%m%d")),
-                                                          _("WDB file (*.wdb)"))[0]
+        file_name = get_save_file_name(_('Save As WDB file'), _("WDB file (*.wdb)"),
+                                       'sportorg_export_' + str(time.strftime("%Y%m%d")))
         if file_name is not '':
             try:
                 winorient.export_wo_wdb(file_name)
@@ -476,8 +472,7 @@ class MainWindow(QMainWindow, App):
                 logging.exception(e)
 
     def import_txt_v8_action(self):
-        file_name = QtWidgets.QFileDialog.getOpenFileName(None, _('Open Ocad txt v8 file'),
-                                                          '', _("Ocad classes v8 (*.txt)"))[0]
+        file_name = get_open_file_name(_('Open Ocad txt v8 file'), _("Ocad classes v8 (*.txt)"))
         if file_name is not '':
             try:
                 ocad.import_txt_v8(file_name)

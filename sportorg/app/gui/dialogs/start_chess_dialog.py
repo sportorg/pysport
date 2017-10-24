@@ -3,11 +3,11 @@ import sys
 import logging
 
 import time
-from PyQt5 import QtWidgets
 
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QApplication, QDialog, QPushButton, QTextEdit
 
+from sportorg.app.gui.dialogs.file_dialog import get_save_file_name
 from sportorg.app.models.start_calculation import get_chess_list
 
 from sportorg.language import _
@@ -68,9 +68,8 @@ class StartChessDialog(QDialog):
         self.text.setText(text)
 
     def apply_changes_impl(self):
-        file_name = QtWidgets.QFileDialog.getSaveFileName(self, _('Save As TXT file'),
-                                                          '/start_times_' + str(time.strftime("%Y%m%d")),
-                                                          _("Txt file (*.txt)"))[0]
+        file_name = get_save_file_name(_('Save As TXT file'), _("Txt file (*.txt)"),
+                                       'start_times_' + str(time.strftime("%Y%m%d")),)
         with codecs.open(file_name, 'w', 'utf-8') as file:
             file.write(self.text.toPlainText())
             file.close()

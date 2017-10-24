@@ -125,3 +125,9 @@ DIRS = [
 for DIR in DIRS:
     if not os.path.exists(DIR):
         os.makedirs(DIR)
+
+
+class ConfigFile(object):
+    GEOMETRY = 'geometry'
+    CONFIGURATION = 'configuration'
+    DIRECTORY = 'directory'
