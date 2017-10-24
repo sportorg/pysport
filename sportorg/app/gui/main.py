@@ -1,3 +1,4 @@
+import ast
 import configparser
 import logging.config
 import time
@@ -43,11 +44,12 @@ logging.config.dictConfig(config.LOG_CONFIG)
 
 
 class MainWindow(QMainWindow, App):
-
     def __init__(self, argv=None):
         super().__init__()
+        self.recent_files = []
         try:
             self.file = argv[1]
+            self.add_recent_file(self.file)
         except IndexError:
             self.file = None
         self.conf = configparser.ConfigParser()
@@ -55,7 +57,10 @@ class MainWindow(QMainWindow, App):
         backup.init()
 
     def show_window(self):
-        self.conf_read()
+        try:
+            self.conf_read()
+        except Exception as e:
+            logging.error(e)
         self._setup_ui()
         self._setup_menu()
         self._setup_toolbar()
@@ -63,20 +68,9 @@ class MainWindow(QMainWindow, App):
         self._setup_statusbar()
         self._setup_system_tray_icon()
         self.show()
-        if self.file:
-            self.open_file(self.file)
-        if Configuration.get('autoconnect'):
-            self.sportident_connect()
-        event.add_event('finish', result_generation.add_result)
+        self.post_show()
 
     def close(self):
-        self.conf['geometry'] = {
-            'x': self.x() + 8,
-            'y': self.y() + 30,
-            'width': self.width(),
-            'height': self.height(),
-        }
-        self.conf['configuration'] = Configuration.get_all()
         self.conf_write()
 
         """
@@ -90,17 +84,38 @@ class MainWindow(QMainWindow, App):
 
     def conf_read(self):
         self.conf.read(config.CONFIG_INI)
-
-    def conf_write(self):
-        with open(config.CONFIG_INI, 'w') as configfile:
-            self.conf.write(configfile)
-
-    def _setup_ui(self):
         if self.conf.has_section(config.ConfigFile.CONFIGURATION):
             for option in self.conf.options(config.ConfigFile.CONFIGURATION):
                 Configuration.set_parse(
                     option, self.conf.get(config.ConfigFile.CONFIGURATION, option, fallback=Configuration.get(option)))
 
+        if self.conf.has_section(config.ConfigFile.PATH):
+            recent_files = ast.literal_eval(self.conf.get(config.ConfigFile.PATH, 'recent_files', fallback='[]'))
+            if isinstance(recent_files, list):
+                self.recent_files = recent_files
+
+    def conf_write(self):
+        self.conf[config.ConfigFile.GEOMETRY] = {
+            'x': self.x() + 8,
+            'y': self.y() + 30,
+            'width': self.width(),
+            'height': self.height(),
+        }
+        self.conf[config.ConfigFile.CONFIGURATION] = Configuration.get_all()
+        self.conf[config.ConfigFile.PATH] = {
+            'recent_files': self.recent_files
+        }
+        with open(config.CONFIG_INI, 'w') as configfile:
+            self.conf.write(configfile)
+
+    def post_show(self):
+        if self.file:
+            self.open_file(self.file)
+        if Configuration.get('autoconnect'):
+            self.sportident_connect()
+        event.add_event('finish', result_generation.add_result)
+
+    def _setup_ui(self):
         geometry = config.ConfigFile.GEOMETRY
         x = self.conf.getint('%s' % geometry, 'x', fallback=480)
         y = self.conf.getint(geometry, 'y', fallback=320)
@@ -115,8 +130,8 @@ class MainWindow(QMainWindow, App):
         self.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.setDockNestingEnabled(False)
         self.setDockOptions(QtWidgets.QMainWindow.AllowTabbedDocks
-                                       | QtWidgets.QMainWindow.AnimatedDocks
-                                       | QtWidgets.QMainWindow.ForceTabbedDocks)
+                            | QtWidgets.QMainWindow.AnimatedDocks
+                            | QtWidgets.QMainWindow.ForceTabbedDocks)
 
     def _create_menu(self, parent, actions_list):
         for action_item in actions_list:
@@ -132,6 +147,8 @@ class MainWindow(QMainWindow, App):
                     action.setShortcut(action_item['shortcut'])
                 if 'icon' in action_item:
                     action.setIcon(QtGui.QIcon(action_item['icon']))
+                if 'status_tip' in action_item:
+                    action.setStatusTip(action_item['status_tip'])
             else:
                 menu = QtWidgets.QMenu(parent)
                 menu.setTitle(action_item['title'])
@@ -200,6 +217,7 @@ class MainWindow(QMainWindow, App):
             # remove data
             if update_data:
                 races[0] = Race()
+            self.add_recent_file(self.file)
             self.refresh()
 
     def save_file_as(self):
@@ -218,15 +236,17 @@ class MainWindow(QMainWindow, App):
 
     def open_file(self, file_name=None):
         if file_name:
-            self.set_title(file_name)
             try:
                 super().open_file(file_name)
+                self.set_title(file_name)
+                self.add_recent_file(self.file)
+                self.init_model()
             except Exception as e:
                 logging.exception(e)
-                QMessageBox.question(None,
+                self.delete_from_recent_files(file_name)
+                QMessageBox.warning(self,
                                      _('Error'),
                                      _('Cannot read file, format unknown') + ': ' + file_name)
-            self.init_model()
 
     def open_file_dialog(self):
         file_name = get_open_file_name(_('Open SportOrg file'), _("SportOrg file (*.sportorg)"))
@@ -269,6 +289,14 @@ class MainWindow(QMainWindow, App):
     @staticmethod
     def get_configuration():
         return Configuration
+
+    def add_recent_file(self, file):
+        self.delete_from_recent_files(file)
+        self.recent_files.insert(0, file)
+
+    def delete_from_recent_files(self, file):
+        if file in self.recent_files:
+            self.recent_files.remove(file)
 
     def settings_dialog(self):
         try:

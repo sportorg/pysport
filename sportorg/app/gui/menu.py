@@ -1,3 +1,5 @@
+import os
+
 from sportorg.app.gui.global_access import GlobalAccess
 from sportorg.language import _
 from sportorg import config
@@ -32,10 +34,10 @@ def menu_list():
                     'icon': config.icon_dir('save.png'),
                     'action': GlobalAccess().get_main_window().save_file_as
                 },
-                # {
-                #     'title': _('Open Recent'),
-                #     'action': lambda: print('...')
-                # },
+                {
+                    'title': _('Open Recent'),
+                    'actions': menu_recent_files()
+                },
                 {
                     'type': 'separator',
                 },
@@ -238,3 +240,16 @@ def menu_list():
             ]
         },
     ]
+
+
+def menu_recent_files():
+    def open_file(f):
+        return lambda: GlobalAccess().get_main_window().open_file(f)
+    result = []
+    for file in GlobalAccess().get_main_window().recent_files:
+        result.append({
+            'title': os.path.basename(file),
+            'status_tip': '{} {}'.format(_('Open'), file),
+            'action': open_file(file)
+        })
+    return result

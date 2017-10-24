@@ -131,3 +131,4 @@ class ConfigFile(object):
     GEOMETRY = 'geometry'
     CONFIGURATION = 'configuration'
     DIRECTORY = 'directory'
+    PATH = 'path'
