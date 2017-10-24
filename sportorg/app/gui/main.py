@@ -6,7 +6,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets, Qt
 from PyQt5.QtWidgets import QMainWindow, QTableView, QMessageBox
 
 from sportorg import config
-from sportorg.app.gui.dialogs.about import About
+from sportorg.app.gui.dialogs.about import AboutDialog
 from sportorg.app.gui.dialogs.entry_filter import DialogFilter
 from sportorg.app.gui.dialogs.event_properties import EventPropertiesDialog
 from sportorg.app.gui.dialogs.file_dialog import get_open_file_name, get_save_file_name
@@ -55,7 +55,6 @@ class MainWindow(QMainWindow, App):
         backup.init()
 
     def show_window(self):
-        event.add_event('finish', result_generation.add_result)
         self.conf_read()
         self._setup_ui()
         self._setup_menu()
@@ -68,6 +67,7 @@ class MainWindow(QMainWindow, App):
             self.open_file(self.file)
         if Configuration.get('autoconnect'):
             self.sportident_connect()
+        event.add_event('finish', result_generation.add_result)
 
     def close(self):
         self.conf['geometry'] = {
@@ -253,8 +253,18 @@ class MainWindow(QMainWindow, App):
         self.statusbar.showMessage(msg, msecs)
 
     def select_tab(self, index):
+        self.current_tab = index
+
+    @property
+    def current_tab(self):
+        return self.tabwidget.currentIndex()
+
+    @current_tab.setter
+    def current_tab(self, index):
         if index < self.tabwidget.count():
             self.tabwidget.setCurrentIndex(index)
+        else:
+            logging.error("{} {}".format(index, _('Tab not exists')))
 
     @staticmethod
     def get_configuration():
@@ -282,7 +292,7 @@ class MainWindow(QMainWindow, App):
             logging.exception(str(e))
 
     def split_printout(self):
-        if self.tabwidget.currentIndex() != 1:
+        if self.current_tab != 1:
             self.statusbar_message(_('No result selected'))
             return
         try:
@@ -322,19 +332,19 @@ class MainWindow(QMainWindow, App):
         except Exception as e:
             logging.exception(str(e))
 
-    def start_preparation(self):
+    def start_preparation_dialog(self):
         try:
             StartPreparationDialog().exec()
         except Exception as e:
             logging.exception(str(e))
 
-    def print_settings(self):
+    def print_settings_dialog(self):
         try:
             PrintPropertiesDialog().exec()
         except Exception as e:
             logging.exception(str(e))
 
-    def number_change(self):
+    def number_change_dialog(self):
         try:
             obj = NumberChangeDialog()
             obj.exec()
@@ -363,14 +373,14 @@ class MainWindow(QMainWindow, App):
         except Exception as e:
             logging.exception(str(e))
 
-    def create_start_protocol(self):
+    def create_start_protocol_dialog(self):
         try:
             ex = StartReportDialog()
             ex.exec()
         except Exception as e:
             logging.exception(str(e))
 
-    def create_chess(self):
+    def create_chess_dialog(self):
         try:
             ex = StartChessDialog()
             ex.exec()
@@ -429,7 +439,7 @@ class MainWindow(QMainWindow, App):
         except Exception as e:
             logging.exception(str(e))
 
-    def sportident_settings(self):
+    def sportident_settings_dialog(self):
         try:
             SportidentPropertiesDialog().exec()
         except Exception as e:
@@ -471,7 +481,7 @@ class MainWindow(QMainWindow, App):
             except Exception as e:
                 logging.exception(e)
 
-    def import_txt_v8_action(self):
+    def import_txt_v8(self):
         file_name = get_open_file_name(_('Open Ocad txt v8 file'), _("Ocad classes v8 (*.txt)"))
         if file_name is not '':
             try:
@@ -484,8 +494,8 @@ class MainWindow(QMainWindow, App):
 
             self.init_model()
 
-    def about(self):
+    def about_dialog(self):
         try:
-            About().exec()
+            AboutDialog().exec()
         except Exception as e:
             logging.exception(str(e))
