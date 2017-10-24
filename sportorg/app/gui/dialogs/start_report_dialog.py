@@ -9,6 +9,7 @@ from PyQt5 import QtWidgets
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QLabel, QApplication, QDialog, QPushButton
 
+from sportorg.app.gui.dialogs.file_dialog import get_open_file_name, get_save_file_name
 from sportorg.app.models.start_calculation import get_start_data
 from sportorg.app.modules.utils.custom_controls import AdvComboBox
 from sportorg.core.template import get_templates, get_text_from_file
@@ -41,8 +42,7 @@ class StartReportDialog(QDialog):
         self.item_custom_path = QPushButton('...')
 
         def select_custom_path():
-            file_name = QtWidgets.QFileDialog.getOpenFileName(self, _('Open HTML template'), '',
-                                                              _("HTML file (*.html)"))[0]
+            file_name = get_open_file_name(_('Open HTML template'), _("HTML file (*.html)"))
             self.item_template.setCurrentText(file_name)
 
         self.item_custom_path.clicked.connect(select_custom_path)
@@ -71,9 +71,8 @@ class StartReportDialog(QDialog):
 
         template = get_text_from_file(template_path, **get_start_data())
 
-        file_name = QtWidgets.QFileDialog.getSaveFileName(self, _('Save As HTML file'),
-                                                          '/start_' + str(time.strftime("%Y%m%d")),
-                                                          _("HTML file (*.html)"))[0]
+        file_name = get_save_file_name(_('Save As HTML file'), _("HTML file (*.html)"),
+                                       'start_' + str(time.strftime("%Y%m%d")))
         with codecs.open(file_name, 'w', 'utf-8') as file:
             file.write(template)
             file.close()
