@@ -121,7 +121,7 @@ class Group(Model):
         self.max_time = None  # datetime
         self.qual_assign_text = None
         self.start_interval = None
-        self.start_corridor = None
+        self.start_corridor = 0
         self.order_in_corridor = 0
 
         self.first_number = None
@@ -427,6 +427,15 @@ class Race(Model):
 
     def get_persons_by_group(self, group):
         return find(self.persons, group=group, return_all=True)
+
+    def get_persons_by_corridor(self, corridor):
+        obj = race()
+        ret = []
+        for person in obj.persons:
+            if person.group:
+                if person.group.start_corridor == corridor:
+                    ret.append(person)
+        return ret
 
 
 class Config(object):

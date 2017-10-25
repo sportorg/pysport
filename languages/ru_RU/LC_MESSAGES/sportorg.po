@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: SportOrg\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-08-10 11:27+0500\n"
-"PO-Revision-Date: 2017-10-17 11:37+0500\n"
+"PO-Revision-Date: 2017-10-26 09:16+0500\n"
 "Last-Translator: SportOrg\n"
 "Language-Team: SportOrg\n"
 "Language: ru_RU\n"
@@ -669,6 +669,18 @@ msgstr "выбор"
 
 msgid "marked route"
 msgstr "маркированная дистанция"
+
+msgid "Auto save"
+msgstr "Автосохранение"
+
+msgid "Auto connect to station"
+msgstr "Автоматическое подключение станции SPORTident"
+
+msgid "Open recent file"
+msgstr "Открыть последний файл"
+
+msgid "No result selected"
+msgstr "Результат не выбран"
 
 msgid "Refresh"
 msgstr "Обновить"

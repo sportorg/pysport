@@ -208,16 +208,15 @@ class StartNumberManager(object):
         Assign new start numbers
 
     """
-    def process(self, is_interval, first_number=None, interval=None):
+    def process(self, is_interval, first_number=None, interval=None, mix_groups=False):
         if is_interval:
-            corridors = get_corridors()
             cur_num = first_number
-            for cur_corridor in corridors:
-                groups = get_groups_by_corridor(cur_corridor)
-                for cur_group in groups:
-                    assert isinstance(cur_group, Group)
-                    self.process_group(cur_group, cur_num, interval)
-                    cur_num += cur_group.count_person * interval
+            for cur_corridor in get_corridors():
+                if mix_groups:
+                    cur_num = self.process_corridor(cur_corridor, cur_num, interval)
+                else:
+                    for cur_group in get_groups_by_corridor(cur_corridor):
+                        cur_num = self.process_group(cur_group, cur_num, interval)
         else:
             corridors = get_corridors()
             first_number = 1  # TODO calculate from first start minute
@@ -231,11 +230,22 @@ class StartNumberManager(object):
     def process_group(self, group, first_number, interval):
         current_race = race()
         persons = current_race.get_persons_by_group(group)
+        current_num = first_number
         if persons is not None:
-            current_num = first_number
             for current_person in persons:
                 current_person.bib = current_num
                 current_num += interval
+        return current_num
+
+    def process_corridor(self, corridor, first_number, interval):
+        current_race = race()
+        persons = current_race.get_persons_by_corridor(corridor)
+        current_num = first_number
+        if persons is not None:
+            for current_person in persons:
+                current_person.bib = current_num
+                current_num += interval
+        return current_num
 
     def process_group_number_by_minute(self, group, first_number):
         current_race = race()
@@ -264,31 +274,43 @@ class StartTimeManager(object):
         Set new start time for athletes
 
     """
-    def process(self, corridor_first_start, is_group_start_interval, fixed_start_interval=None):
+    def process(self, corridor_first_start, is_group_start_interval, fixed_start_interval=None, mix_groups=False):
         current_race = race()
         current_race.update_counters()
 
         corridors = get_corridors()
         for cur_corridor in corridors:
             cur_start = corridor_first_start
-            groups = get_groups_by_corridor(cur_corridor)
-            for cur_group in groups:
-                assert isinstance(cur_group, Group)
-                start_interval = fixed_start_interval
 
-                # try to take start interval from group properties
-                if is_group_start_interval:
-                    if cur_group.start_interval is not None:
-                        start_interval = cur_group.start_interval
+            if mix_groups:
+                self.process_corridor(cur_corridor, cur_start, fixed_start_interval)
+            else:
+                groups = get_groups_by_corridor(cur_corridor)
+                for cur_group in groups:
+                    assert isinstance(cur_group, Group)
+                    start_interval = fixed_start_interval
 
-                self.process_group(cur_group, cur_start, start_interval)
+                    # try to take start interval from group properties
+                    if is_group_start_interval:
+                        if cur_group.start_interval is not None:
+                            start_interval = cur_group.start_interval
 
-                cur_start = cur_start + timedelta(seconds=start_interval.second, minutes=start_interval.minute) \
-                    * cur_group.count_person
+                    cur_start = self.process_group(cur_group, cur_start, start_interval)
+
 
     def process_group(self, group, first_start, start_interval):
         current_race = race()
         persons = current_race.get_persons_by_group(group)
+        current_start = first_start
+        if persons is not None:
+            for current_person in persons:
+                current_person.start_time = current_start
+                current_start = current_start + timedelta(seconds=start_interval.second, minutes=start_interval.minute)
+        return current_start
+
+    def process_corridor(self, corridor, first_start, start_interval):
+        current_race = race()
+        persons = current_race.get_persons_by_corridor(corridor)
         if persons is not None:
             current_start = first_start
             for current_person in persons:

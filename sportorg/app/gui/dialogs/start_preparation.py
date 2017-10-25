@@ -209,7 +209,7 @@ class StartPreparationDialog(QDialog):
 
     def retranslateUi(self):
         _translate = QtCore.QCoreApplication.translate
-        self.setWindowTitle(_("Dialog"))
+        self.setWindowTitle(_("Start Preparation"))
         self.reserve_group_box.setTitle(_("Reserves insert"))
         self.reserve_prefix_label.setText(_("Reserve prefix"))
         self.reserve_prefix.setText(_("Reserve"))
@@ -276,6 +276,7 @@ class StartPreparationDialog(QDialog):
             self.progress_bar.setValue(25)
             sleep(progressbar_delay)
 
+            mix_groups = False
             if self.draw_check_box.isChecked():
                 split_start_groups = self.draw_groups_check_box.isChecked()
                 split_teams = self.draw_teams_check_box.isChecked()
@@ -290,7 +291,7 @@ class StartPreparationDialog(QDialog):
                 corridor_first_start = qtime2datetime(self.start_first_time_edit.time())
                 fixed_start_interval = qtime2datetime(self.start_interval_time_edit.time())
                 if self.start_interval_radio_button.isChecked():
-                    StartTimeManager().process(corridor_first_start, False, fixed_start_interval)
+                    StartTimeManager().process(corridor_first_start, False, fixed_start_interval, mix_groups=mix_groups)
 
                 if self.start_group_settings_radion_button.isChecked():
                     StartTimeManager().process(corridor_first_start, True, fixed_start_interval)
@@ -304,7 +305,7 @@ class StartPreparationDialog(QDialog):
                 if self.numbers_interval_radio_button.isChecked():
                     first_number = self.numbers_first_spin_box.value()
                     interval = self.numbers_interval_spin_box.value()
-                    StartNumberManager().process(True, first_number, interval)
+                    StartNumberManager().process(True, first_number, interval, mix_groups=mix_groups)
 
             self.progress_bar.setValue(100)
 
@@ -320,7 +321,7 @@ class StartPreparationDialog(QDialog):
         obj.set_setting('reserve_count', self.reserve_group_count_spin_box.value())
         obj.set_setting('reserve_percent', self.reserve_group_percent_spin_box.value())
 
-        obj.set_setting('is_start_preparation_draw', self.reserve_check_box.isChecked())
+        obj.set_setting('is_start_preparation_draw', self.draw_check_box.isChecked())
         obj.set_setting('is_split_start_groups', self.draw_groups_check_box.isChecked())
         obj.set_setting('is_split_teams', self.draw_teams_check_box.isChecked())
         obj.set_setting('is_split_regions', self.draw_regions_check_box.isChecked())
