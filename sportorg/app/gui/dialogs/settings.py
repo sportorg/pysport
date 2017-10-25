@@ -33,6 +33,10 @@ class SettingsDialog(QDialog):
         self.auto_connect.setChecked(Config.get('autoconnect'))
         self.layout.addRow(self.auto_connect)
 
+        self.open_recent_file = QCheckBox(_('Open recent file'))
+        self.open_recent_file.setChecked(Config.get('open_recent_file'))
+        self.layout.addRow(self.open_recent_file)
+
         def cancel_changes():
             self.close()
 
@@ -54,3 +58,4 @@ class SettingsDialog(QDialog):
     def apply_changes_impl(self):
         Config.set('autosave', self.auto_save.isChecked())
         Config.set('autoconnect', self.auto_connect.isChecked())
+        Config.set('open_recent_file', self.open_recent_file.isChecked())

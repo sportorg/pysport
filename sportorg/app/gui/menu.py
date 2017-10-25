@@ -1,3 +1,5 @@
+import os
+
 from sportorg.app.gui.global_access import GlobalAccess
 from sportorg.language import _
 from sportorg import config
@@ -32,10 +34,10 @@ def menu_list():
                     'icon': config.icon_dir('save.png'),
                     'action': GlobalAccess().get_main_window().save_file_as
                 },
-                # {
-                #     'title': _('Open Recent'),
-                #     'action': lambda: print('...')
-                # },
+                {
+                    'title': _('Open Recent'),
+                    'actions': menu_recent_files()
+                },
                 {
                     'type': 'separator',
                 },
@@ -70,7 +72,7 @@ def menu_list():
                         },
                         {
                             'title': _('Ocad txt v8'),
-                            'action': GlobalAccess().get_main_window().import_txt_v8_action
+                            'action': GlobalAccess().get_main_window().import_txt_v8
                         },
                     ]
                 },
@@ -159,11 +161,11 @@ def menu_list():
                 },
                 {
                     'title': _('Start Preparation'),
-                    'action': GlobalAccess().get_main_window().start_preparation
+                    'action': GlobalAccess().get_main_window().start_preparation_dialog
                 },
                 {
                     'title': _('Number Change'),
-                    'action': GlobalAccess().get_main_window().number_change
+                    'action': GlobalAccess().get_main_window().number_change_dialog
                 },
                 {
                     'title': _('Guess courses'),
@@ -175,11 +177,11 @@ def menu_list():
                 },
                 {
                     'title': _('Start list'),
-                    'action': GlobalAccess().get_main_window().create_start_protocol
+                    'action': GlobalAccess().get_main_window().create_start_protocol_dialog
                 },
                 {
                     'title': _('Start times'),
-                    'action': GlobalAccess().get_main_window().create_chess
+                    'action': GlobalAccess().get_main_window().create_chess_dialog
                 }
             ]
         },
@@ -214,12 +216,12 @@ def menu_list():
                 {
                     'title': _('SPORTident settings'),
                     'icon': config.icon_dir('sportident.png'),
-                    'action': GlobalAccess().get_main_window().sportident_settings
+                    'action': GlobalAccess().get_main_window().sportident_settings_dialog
                 },
                 {
                     'title': _('Printer settings'),
                     'icon': config.icon_dir('print.png'),
-                    'action': GlobalAccess().get_main_window().print_settings
+                    'action': GlobalAccess().get_main_window().print_settings_dialog
                 }
             ]
         },
@@ -233,8 +235,21 @@ def menu_list():
                 {
                     'title': _('About'),
                     'shortcut': 'F1',
-                    'action': GlobalAccess().get_main_window().about
+                    'action': GlobalAccess().get_main_window().about_dialog
                 }
             ]
         },
     ]
+
+
+def menu_recent_files():
+    def open_file(f):
+        return lambda: GlobalAccess().get_main_window().open_file(f)
+    result = []
+    for file in GlobalAccess().get_main_window().recent_files:
+        result.append({
+            'title': os.path.basename(file),
+            'status_tip': '{} {}'.format(_('Open'), file),
+            'action': open_file(file)
+        })
+    return result

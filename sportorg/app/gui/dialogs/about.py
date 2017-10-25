@@ -10,7 +10,7 @@ from sportorg.language import _
 from sportorg import config
 
 
-class About(QDialog):
+class AboutDialog(QDialog):
     def __init__(self):
         super().__init__()
         self.init_ui()
@@ -94,5 +94,5 @@ THE SOFTWARE.""")
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    ex = About()
+    ex = AboutDialog()
     sys.exit(app.exec_())
