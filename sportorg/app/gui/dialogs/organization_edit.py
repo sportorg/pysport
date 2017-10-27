@@ -100,7 +100,7 @@ class OrganizationEditDialog(QDialog):
         if current_object.region is not None:
             self.item_region.setCurrentText(current_object.region)
         if current_object.contact is not None:
-            self.item_contact.setText(current_object.contact.name)
+            self.item_contact.setText(current_object.contact.value)
         if current_object.address is not None:
             self.item_address.setText(current_object.address.street)
 
@@ -121,8 +121,9 @@ class OrganizationEditDialog(QDialog):
             org.region = self.item_region.currentText()
             changed = True
 
-        if org.contact != self.item_contact.text():
-            org.contact.name = self.item_contact.text()
+        if org.contact.value != self.item_contact.text():
+            org.contact.value = self.item_contact.text()
+            org.contact.name = 'phone'
             changed = True
 
         if org.address != self.item_address.text():

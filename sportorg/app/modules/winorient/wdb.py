@@ -318,7 +318,8 @@ class WinOrientBinary:
             new_team = WDBTeam()
             new_team.name = team.name
             if team.region:
-                new_team.region = int(team.region)
+                if isinstance(team.region, int):
+                    new_team.region = team.region
 
             # TODO decode country id
             new_team.country = 0
