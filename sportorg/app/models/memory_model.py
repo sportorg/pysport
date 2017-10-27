@@ -386,7 +386,7 @@ class TeamMemoryModel(AbstractSportOrgMemoryModel):
             team.country.name,
             team.region,
             team.city,
-            team.contact.name
+            team.contact.value
         ])
 
     def get_source_array(self):
