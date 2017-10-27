@@ -80,11 +80,11 @@ class CourseControl(Model):
 
 class Course(Model):
     def __init__(self):
-        self.name = None
-        self.type = None
-        self.bib = None
-        self.length = None
-        self.climb = None
+        self.name = ''
+        self.type = ''
+        self.bib = 0
+        self.length = 0
+        self.climb = 0
         self.controls = [] # type: List[CourseControl]
         self.count_person = 0
         self.count_group = 0
