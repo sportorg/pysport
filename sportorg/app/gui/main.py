@@ -115,8 +115,10 @@ class MainWindow(QMainWindow, App):
             if len(self.recent_files):
                 self.open_file(self.recent_files[0])
 
+        sportident.toolbar_sportident()
         if Configuration.get('autoconnect'):
             self.sportident_connect()
+
         event.add_event('finish', result_generation.add_result)
 
     def _setup_ui(self):
@@ -153,6 +155,8 @@ class MainWindow(QMainWindow, App):
                     action.setIcon(QtGui.QIcon(action_item['icon']))
                 if 'status_tip' in action_item:
                     action.setStatusTip(action_item['status_tip'])
+                if 'property' in action_item:
+                    self.menu_property[action_item['property']] = action
             else:
                 menu = QtWidgets.QMenu(parent)
                 menu.setTitle(action_item['title'])
@@ -160,20 +164,22 @@ class MainWindow(QMainWindow, App):
                 parent.addAction(menu.menuAction())
 
     def _setup_menu(self):
+        self.menu_property = {}
         self.menubar = QtWidgets.QMenuBar(self)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 880, 21))
         self.setMenuBar(self.menubar)
-
         self._create_menu(self.menubar, menu_list())
 
     def _setup_toolbar(self):
         layout = QtWidgets.QVBoxLayout()
-        toolbar = self.addToolBar(_('Toolbar'))
-
+        self.toolbar = self.addToolBar(_('Toolbar'))
+        self.toolbar_property = {}
         for tb in toolbar_list():
             tb_action = QtWidgets.QAction(QtGui.QIcon(tb[0]), tb[1], self)
             tb_action.triggered.connect(tb[2])
-            toolbar.addAction(tb_action)
+            if len(tb) == 4:
+                self.toolbar_property[tb[3]] = tb_action
+            self.toolbar.addAction(tb_action)
 
         self.setLayout(layout)
 

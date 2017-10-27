@@ -8,11 +8,15 @@ from sportorg.language import _
 reader = None
 
 
+def is_readout():
+    return reader is not None
+
+
 def start_reader():
     global reader
-    if reader is None:
+    if not is_readout():
         reader = card_reader.read()
-        if reader is not None:
+        if is_readout():
             message(_('Opening port') + ' ' + reader.port)
         else:
             message(_('Cannot open port'))
@@ -26,7 +30,14 @@ def start_reader():
             reader = None
             message(_('Closing port' + ' ' + port))
 
+    toolbar_sportident()
+
 
 def message(msg):
     logging.info(msg)
     GlobalAccess().get_main_window().statusbar.showMessage(msg, 5000)
+
+
+def toolbar_sportident():
+    GlobalAccess().get_main_window().toolbar_property['sportident'].setStatusTip(
+        _('Working') if is_readout() else _('Does`t work'))
