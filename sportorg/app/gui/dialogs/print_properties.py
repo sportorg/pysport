@@ -98,6 +98,8 @@ class PrintPropertiesDialog(QDialog):
             printer_name = QPrinter().printerName()
         self.selected_split_printer.setText(printer_name)
 
+        self.print_splits_checkbox.setChecked(obj.get_setting('split_printout', False))
+
     def select_printer(self):
         try:
             printer = QtPrintSupport.QPrinter()
@@ -115,6 +117,7 @@ class PrintPropertiesDialog(QDialog):
         obj.set_setting('main_printer', main_printer)
         split_printer = self.selected_split_printer.text()
         obj.set_setting('split_printer', split_printer)
+        obj.set_setting('split_printout', self.print_splits_checkbox.isChecked())
 
     def get_parent_window(self):
         return GlobalAccess().get_main_window()

@@ -1,6 +1,12 @@
+from PyQt5.QtWidgets import QMessageBox
+
 from sportorg.app.models.memory import race, Person, Course, Group
 from sportorg.app.models.result_calculation import ResultCalculation
+from sportorg.app.modules.printing.printing import print_html
 from sportorg.app.modules.utils.utils import time_to_hhmmss, get_speed_min_per_km, if_none
+from sportorg.config import template_dir
+from sportorg.lib.template.template import get_text_from_file
+from sportorg.language import _
 
 
 class LegSplit(object):
@@ -67,6 +73,7 @@ class PersonSplits(object):
 
         person_index = 0
         course_index = 0
+        course_code = 0
         if len(course.controls) > course_index:
             course_code = course.controls[course_index].code
         leg_start_time = result.get_start_time()
@@ -188,17 +195,17 @@ class GroupSplits(object):
     def set_places(self):
         len_persons = len(self.person_splits)
         for i in range(self.cp_count):
-           self.sort_by_leg(i)
-           self.set_places_for_leg(i)
-           if not len_persons > 0:
-               continue
-           self.set_leg_leader(i, self.person_splits[0])
+            self.sort_by_leg(i)
+            self.set_places_for_leg(i)
+            if not len_persons > 0:
+                continue
+            self.set_leg_leader(i, self.person_splits[0])
 
-           self.sort_by_leg(i, relative=True)
-           self.set_places_for_leg(i, relative=True)
+            self.sort_by_leg(i, relative=True)
+            self.set_places_for_leg(i, relative=True)
 
     def sort_by_leg(self, index, relative=False):
-        if(relative):
+        if relative:
             self.person_splits = sorted(self.person_splits,
                                         key=lambda item: (item.get_leg_relative_time(index) is None,
                                                           item.get_leg_relative_time(index)))
@@ -215,7 +222,7 @@ class GroupSplits(object):
             person = self.person_splits[i]
             leg = person.get_leg_by_course_index(index)
             if leg:
-                if(relative):
+                if relative:
                     leg.relative_place = i + 1
                 else:
                     leg.leg_place = i + 1
@@ -230,8 +237,8 @@ class GroupSplits(object):
 
     def set_places_relative(self):
         for i in range(self.cp_count):
-            self.sort_by_leg_relative(i)
-            self.set_places_for_leg_relative(i)
+            self.sort_by_leg(i, True)
+            self.set_places_for_leg(i, True)
 
     def get_json(self, person_to_export=None):
         ret = {}
@@ -320,6 +327,21 @@ def get_splits_data():
 class SplitsCalculation(object):
     def process_groups(self):
         for i in race().groups:
-            group = GroupSplits(i)
+            GroupSplits(i)
 
 
+def split_printout(result):
+    person = result.person
+
+    if not person or not person.group:
+        mes = QMessageBox()
+        mes.setText(_('No results to print'))
+        mes.exec()
+        return
+
+    template_path = template_dir('split_printout.html')
+    spl = GroupSplits(person.group)
+    template = get_text_from_file(template_path, **spl.get_json(person))
+
+    obj = race()
+    print_html(obj.get_setting('split_printer'), template)
