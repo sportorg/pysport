@@ -14,17 +14,18 @@ class ResultChecker:
         :param controls: [model.CourseControl, ...]
         :return: 
         """
-        i = 1
+        i = 0
+        count_controls = len(controls)
         for punch in punches:
+            if i == count_controls:
+                return True
             try:
                 is_equal = int(punch[0]) == int(controls[i].code)
                 if is_equal:
                     i += 1
             except KeyError:
                 return False
-        count_controls = len(controls)
-        if i == count_controls:
-            return True
+
 
         return False
 

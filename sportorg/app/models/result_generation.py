@@ -11,7 +11,7 @@ from .result_checker import ResultChecker
 
 def find_person_by_result(system_id, result):
     assert result, memory.Result
-    number = str(result.card_number)
+    number = int(result.card_number)
     for person in memory.race().persons:
         if person.card_number == number:
             result.person = person
