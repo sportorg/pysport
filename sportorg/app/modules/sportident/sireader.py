@@ -39,12 +39,13 @@ class SIReaderThread(threading.Thread):
                 # card_number = si.sicard
 
                 card_data = si.read_sicard()
+                # beep
+                si.ack_sicard()
+
                 card_data['card_type'] = si.cardtype
                 card_data = self.check_data(card_data)
                 self.add_card_data(card_data)
 
-                # beep
-                si.ack_sicard()
             except sireader.SIReaderException as e:
                 logging.debug(str(e))
             except sireader.SIReaderCardChanged as e:
