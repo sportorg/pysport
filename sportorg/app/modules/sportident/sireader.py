@@ -2,6 +2,8 @@ import logging
 import threading
 import time
 import datetime
+import traceback
+
 import serial
 from sportorg.lib.sportident import sireader
 
@@ -52,6 +54,7 @@ class SIReaderThread(threading.Thread):
                 return
             except Exception as e:
                 logging.error(e)
+                traceback.print_exc()
 
     def check_data(self, card_data):
         if self.start_time and card_data['card_type'] == 'SI5':
