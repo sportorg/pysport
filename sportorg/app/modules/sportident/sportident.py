@@ -40,4 +40,4 @@ def message(msg):
 
 def toolbar_sportident():
     GlobalAccess().get_main_window().toolbar_property['sportident'].setStatusTip(
-        _('Working') if is_readout() else _('Does`t work'))
+        _('Working') if is_readout() else _('Doesn\'t work'))
