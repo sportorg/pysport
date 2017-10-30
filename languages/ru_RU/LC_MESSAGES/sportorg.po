@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: SportOrg\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-08-10 11:27+0500\n"
-"PO-Revision-Date: 2017-10-26 09:16+0500\n"
+"PO-Revision-Date: 2017-10-30 22:24+0500\n"
 "Last-Translator: SportOrg\n"
 "Language-Team: SportOrg\n"
 "Language: ru_RU\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Loco-Source-Locale: ru_RU\n"
-"X-Generator: Poedit 2.0.2\n"
+"X-Generator: Poedit 2.0.4\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Loco-Parser: loco_parse_po\n"
 
@@ -673,6 +673,9 @@ msgstr "маркированная дистанция"
 msgid "Auto save"
 msgstr "Автосохранение"
 
+msgid "No file to auto save"
+msgstr "Имя файла не задано, автосохранение отменено"
+
 msgid "Auto connect to station"
 msgstr "Автоматическое подключение станции SPORTident"
 
@@ -681,6 +684,15 @@ msgstr "Открыть последний файл"
 
 msgid "No result selected"
 msgstr "Результат не выбран"
+
+msgid "SPORTident readout activated"
+msgstr "Чтение чипов запущено"
+
+msgid "SPORTident readout not activated"
+msgstr "Чтение чипов не запущено"
+
+msgid "Tab doesn't exist"
+msgstr "Раздел не существует"
 
 msgid "Refresh"
 msgstr "Обновить"

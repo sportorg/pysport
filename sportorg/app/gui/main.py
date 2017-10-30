@@ -294,7 +294,7 @@ class MainWindow(QMainWindow, App):
         if index < self.tabwidget.count():
             self.tabwidget.setCurrentIndex(index)
         else:
-            logging.error("{} {}".format(index, _('Tab not exists')))
+            logging.error("{} {}".format(index, _("Tab doesn't exist")))
 
     @staticmethod
     def get_configuration():
