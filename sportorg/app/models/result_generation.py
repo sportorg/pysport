@@ -1,6 +1,8 @@
 import logging
 
 from sportorg.app.gui.global_access import GlobalAccess
+from sportorg.app.models.memory import race
+from sportorg.app.models.split_calculation import split_printout
 from sportorg.language import _
 
 from . import memory
@@ -9,7 +11,7 @@ from .result_checker import ResultChecker
 
 def find_person_by_result(system_id, result):
     assert result, memory.Result
-    number = str(result.card_number)
+    number = int(result.card_number)
     for person in memory.race().persons:
         if person.card_number == number:
             result.person = person
@@ -50,6 +52,10 @@ def add_result(system_id, result):
         logging.info(system_id + str(result))
         logging.debug(result.status)
         GlobalAccess().auto_save()
+
+        if race().get_setting('split_printout', False):
+            split_printout(result)
+
     else:
         res = find_person_by_result(system_id, result)
         if res:

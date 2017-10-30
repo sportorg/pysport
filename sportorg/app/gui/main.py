@@ -27,18 +27,15 @@ from sportorg.app.models.memory import Race, event as races, race, Config as Con
 from sportorg.app.models import result_generation
 from sportorg.app.models.memory_model import PersonMemoryModel, ResultMemoryModel, GroupMemoryModel, \
     CourseMemoryModel, TeamMemoryModel
-from sportorg.app.models.split_calculation import GroupSplits
+from sportorg.app.models.split_calculation import split_printout
 from sportorg.app.models.start_preparation import guess_courses_for_groups, guess_corridors_for_groups
 from sportorg.app.modules.backup import backup
 from sportorg.app.modules.ocad import ocad
-from sportorg.app.modules.printing.printing import print_html
 from sportorg.app.modules.sportident import sportident
 from sportorg.app.modules.winorient import winorient
-from sportorg.config import template_dir
 from sportorg.core import event
 from sportorg.core.app import App
 from sportorg.language import _
-from sportorg.lib.template.template import get_text_from_file
 
 logging.config.dictConfig(config.LOG_CONFIG)
 
@@ -347,19 +344,8 @@ class MainWindow(QMainWindow, App):
                 mes.exec()
                 return
 
-            person = obj.results[index].person
+            split_printout(obj.results[index])
 
-            if not person or not person.group:
-                mes = QMessageBox()
-                mes.setText(_('No results to print'))
-                mes.exec()
-                return
-
-            template_path = template_dir('split_printout.html')
-            spl = GroupSplits(person.group)
-            template = get_text_from_file(template_path, **spl.get_json(person))
-
-            print_html(obj.get_setting('split_printer'), template)
         except Exception as e:
             logging.exception(str(e))
 
