@@ -3,15 +3,15 @@
 	{
 		"FileVersion": {
 			"Major": 0,
-			"Minor": 7,
-			"Patch": 2,
-			"Build": 2
+			"Minor": 8,
+			"Patch": 0,
+			"Build": 0
 		},
 		"ProductVersion": {
 			"Major": 0,
-			"Minor": 7,
-			"Patch": 2,
-			"Build": 2
+			"Minor": 8,
+			"Patch": 0,
+			"Build": 0
 		},
 		"FileFlagsMask": "3f",
 		"FileFlags ": "00",
@@ -24,14 +24,14 @@
 		"Comments": "SportOrg program",
 		"CompanyName": "SportOrg",
 		"FileDescription": "SportOrg",
-		"FileVersion": "0.7.2.2",
+		"FileVersion": "0.8.0.0",
 		"InternalName": "SportOrg",
 		"LegalCopyright": "MIT Licence SportOrg",
 		"LegalTrademarks": "",
 		"OriginalFilename": "SportOrg",
 		"PrivateBuild": "",
 		"ProductName": "SportOrg",
-		"ProductVersion": "v0.7.2-beta",
+		"ProductVersion": "v0.8.0-beta",
 		"SpecialBuild": ""
 	},
 	"VarFileInfo":
