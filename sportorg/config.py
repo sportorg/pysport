@@ -2,7 +2,7 @@ import os
 import sys
 
 NAME = 'SportOrg'
-VERSION = '0.7.2-beta'
+VERSION = '0.8.0-beta'
 DEBUG = True
 
 
