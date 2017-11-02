@@ -179,6 +179,12 @@ Punches:
         if self.status is not None and other.status is not None:
             if self.status == ResultStatus.OK and other.status != ResultStatus.OK:
                 return False
+
+        if not self.result:
+            return True
+        if not other.result:
+            return False
+
         return self.result > other.result
 
     def get_result(self):
