@@ -5,10 +5,10 @@ from PyQt5.QtCore import QTime
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QLabel, \
     QApplication, QDialog, \
-    QPushButton, QTimeEdit, QSpinBox, QRadioButton, QGroupBox
+    QPushButton, QTimeEdit, QSpinBox, QRadioButton, QGroupBox, QCheckBox, QGridLayout
 
 from sportorg.app.gui.global_access import GlobalAccess
-from sportorg.app.models.memory import race
+from sportorg.app.models.memory import race, Config
 from sportorg.config import icon_dir
 
 from sportorg.language import _
@@ -65,6 +65,9 @@ class SportidentPropertiesDialog(QDialog):
         self.finish_group_box.setLayout(self.finish_layout)
         self.layout.addRow(self.finish_group_box)
 
+        self.auto_connect = QCheckBox(_('Auto connect to station'))
+        self.layout.addRow(self.auto_connect)
+
         def cancel_changes():
             self.close()
 
@@ -75,11 +78,14 @@ class SportidentPropertiesDialog(QDialog):
                 logging.exception(e)
             self.close()
 
+        bottom = QGridLayout()
         self.button_ok = QPushButton(_('OK'))
         self.button_ok.clicked.connect(apply_changes)
         self.button_cancel = QPushButton(_('Cancel'))
         self.button_cancel.clicked.connect(cancel_changes)
-        self.layout.addRow(self.button_ok, self.button_cancel)
+        bottom.addWidget(self.button_ok, 0, 0)
+        bottom.addWidget(self.button_cancel, 0, 1)
+        self.layout.addRow(bottom)
 
         self.set_values_from_model()
 
@@ -112,6 +118,8 @@ class SportidentPropertiesDialog(QDialog):
             self.item_finish_cp.setChecked(True)
         elif finish_source == 'beam':
             self.item_finish_beam.setChecked(True)
+
+        self.auto_connect.setChecked(Config.get('autoconnect'))
 
     def apply_changes_impl(self):
         changed = False
@@ -147,6 +155,8 @@ class SportidentPropertiesDialog(QDialog):
 
         obj.set_setting('sportident_start_cp_number', self.item_start_cp_value.value())
         obj.set_setting('sportident_finish_cp_number', self.item_finish_cp_value.value())
+
+        Config.set('autoconnect', self.auto_connect.isChecked())
 
         if changed:
             win = self.get_main_window()
