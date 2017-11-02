@@ -16,16 +16,20 @@ class ResultChecker:
         """
         i = 0
         count_controls = len(controls)
+        if count_controls == 0:
+            return True
+
         for punch in punches:
-            if i == count_controls:
-                return True
             try:
                 is_equal = int(punch[0]) == int(controls[i].code)
                 if is_equal:
                     i += 1
+
+                if i == count_controls:
+                    return True
+
             except KeyError:
                 return False
-
 
         return False
 

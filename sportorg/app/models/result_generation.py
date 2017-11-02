@@ -45,6 +45,8 @@ def add_result(system_id, result):
             checker = ResultChecker(result.person)
             if not checker.check_result(result):
                 result.status = memory.ResultStatus.DISQUALIFIED
+            if not result.finish_time:
+                result.status = memory.ResultStatus.DID_NOT_FINISH
 
         result.person.result = result
         memory.race().results.append(result)
