@@ -75,11 +75,11 @@ LOG_CONFIG = {
     'formatters': {
         'detailed': {
             'class': 'logging.Formatter',
-            'format': '%(levelname)s %(asctime)-15s %(processName)-10s@%(filename)s:%(lineno)d %(message)s'
+            'format': '%(levelname)s %(asctime)-15s %(threadName)-10s@%(filename)s:%(lineno)d %(message)s'
         },
         'cls': {
             'class': 'logging.Formatter',
-            'format': '%(levelname)s %(processName)-10s@%(filename)s:%(lineno)d %(message)s'
+            'format': '%(levelname)s %(threadName)-10s@%(filename)s:%(lineno)d %(message)s'
         }
     },
     'handlers': {

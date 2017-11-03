@@ -5,7 +5,6 @@ import logging
 import time
 import webbrowser
 
-from PyQt5 import QtWidgets
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QLabel, QApplication, QDialog, QPushButton
 

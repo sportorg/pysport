@@ -1,11 +1,25 @@
 import logging
-
 import datetime
+from enum import Enum
+
 from PyQt5.QtWidgets import QMessageBox
 
 from sportorg.app.modules.utils.utils import time_remove_day, int_to_time, time_to_hhmmss, time_to_sec
 from sportorg.language import _
 from sportorg.core.model import Model
+
+
+class SystemType(Enum):
+    MANUAL = 1
+    SPORTIDENT = 2
+    ALT = 3
+    SFR = 4
+
+    def __str__(self):
+        return "%s" % self._name_
+
+    def __repr__(self):
+        return self.__str__()
 
 
 class Country(Model):
@@ -137,6 +151,7 @@ class Group(Model):
 
 class Result(Model):
     def __init__(self):
+        self.type = None  # type: SystemType
         self.card_number = None
         self.start_time = None
         self.finish_time = None
@@ -243,7 +258,7 @@ class Person(Model):
         self.card_number = None
         self.bib = 0
         self.result = None  # type: Result
-        self.results = {}  # type: Dict[str, Result]
+        self.results = []  # type: List[Result]
 
         self.year = None  # sometime we have only year of birth
         self.birth_date = None  # datetime
@@ -383,6 +398,7 @@ class Race(Model):
 
     def add_new_result(self):
         new_result = Result()
+        new_result.type = SystemType.MANUAL
         new_result.finish_time = datetime.datetime.now()
         race().results.insert(0, new_result)
 

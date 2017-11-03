@@ -7,13 +7,12 @@ from PyQt5.QtWidgets import QFormLayout, QLabel, \
     QLineEdit, QApplication, QDialog, \
     QPushButton, QTimeEdit, QRadioButton, QSpinBox
 
-from sportorg.app.gui.global_access import GlobalAccess
-from sportorg.app.models.memory import race, Organization, Result, find, ResultStatus
-from sportorg.app.models.result_calculation import ResultCalculation
-from sportorg.app.modules.utils.utils import datetime2qtime, qtime2datetime
-
-from sportorg.language import _
 from sportorg import config
+from sportorg.app.gui.global_access import GlobalAccess
+from sportorg.app.models.memory import race, Result, find, ResultStatus
+from sportorg.app.models.result.result_calculation import ResultCalculation
+from sportorg.app.modules.utils.utils import datetime2qtime, qtime2datetime
+from sportorg.language import _
 
 
 class ResultEditDialog(QDialog):
@@ -33,6 +32,9 @@ class ResultEditDialog(QDialog):
         self.setModal(True)
 
         self.layout = QFormLayout(self)
+
+        self.label_card_number = QLabel('')
+        self.layout.addRow(self.label_card_number)
 
         self.label_bib = QLabel(_('Bib'))
         self.item_bib = QSpinBox()
@@ -97,12 +99,15 @@ class ResultEditDialog(QDialog):
 
     def show_person_info(self):
         bib = self.item_bib.value()
+        self.label_person_info.setText('')
         if bib:
             person = find(race().persons, bib=bib)
             if person:
                 info = person.full_name
                 if person.group:
-                    info += '  ' + person.group.name
+                    info = '{}\n{}: {}'.format(info, _('Group'), person.group.name)
+                if person.card_number:
+                    info = '{}\n{}: {}'.format(info, _('Card'), person.card_number)
                 self.label_person_info.setText(info)
             else:
                 self.label_person_info.setText(_('not found'))
@@ -118,6 +123,8 @@ class ResultEditDialog(QDialog):
         assert (isinstance(current_object, Result))
         self.current_object = current_object
 
+        if current_object.card_number:
+            self.label_card_number.setText('{}: {}'.format(_('Card'), current_object.card_number))
         if current_object.finish_time is not None:
             self.item_finish.setTime(datetime2qtime(current_object.finish_time))
         if current_object.start_time is not None:
@@ -163,6 +170,9 @@ class ResultEditDialog(QDialog):
         if cur_bib != new_bib:
             new_person = find(race().persons, bib=new_bib)
             result.person = new_person
+            result.person.results.append(result)
+            result.person.result = result
+            result.person.card_number = result.card_number
             GlobalAccess().get_result_table().model().init_cache()
             changed = True
 
