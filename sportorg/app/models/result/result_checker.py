@@ -1,4 +1,4 @@
-from .memory import Person, Result
+from sportorg.app.models.memory import Person, Result
 
 
 class ResultChecker:

@@ -1,12 +1,12 @@
 from PyQt5.QtWidgets import QMessageBox
 
 from sportorg.app.models.memory import race, Person, Course, Group
-from sportorg.app.models.result_calculation import ResultCalculation
+from sportorg.app.models.result.result_calculation import ResultCalculation
 from sportorg.app.modules.printing.printing import print_html
 from sportorg.app.modules.utils.utils import time_to_hhmmss, get_speed_min_per_km, if_none
 from sportorg.config import template_dir
-from sportorg.lib.template.template import get_text_from_file
 from sportorg.language import _
+from sportorg.lib.template.template import get_text_from_file
 
 
 class LegSplit(object):

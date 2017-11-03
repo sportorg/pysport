@@ -1,12 +1,13 @@
 import traceback
 
 from PyQt5.QtWidgets import QMessageBox
-from sportorg.language import _
+
 from sportorg.app.models import model
 from sportorg.app.models.memory import Race, Organization, Group, Person, Result, race, find, Course, \
     CourseControl, Country, Contact, Address, ResultStatus
-from sportorg.app.models.result_calculation import ResultCalculation
+from sportorg.app.models.result.result_calculation import ResultCalculation
 from sportorg.app.modules.utils.utils import int_to_time, time_to_int
+from sportorg.language import _
 from sportorg.lib.winorient.wdb import WDB, WDBMan, WDBTeam, WDBGroup, WDBDistance, WDBPunch, WDBFinish, WDBChip
 
 
