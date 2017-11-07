@@ -60,7 +60,9 @@ class PersonSplits(object):
         if person.organization:
             self.team = person.organization.name
         self.card_number = person.card_number
-        self.qual = person.qual
+        self.qual = ''
+        if person.qual:
+            self.qual = person.qual.get_title()
         self.year = person.year
 
         self.start = time_to_hhmmss(person.start_time)

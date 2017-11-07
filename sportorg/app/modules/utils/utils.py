@@ -2,6 +2,8 @@ import datetime
 
 from PyQt5.QtCore import QTime
 
+from sportorg.core.otime import OTime
+
 
 def qtime2datetime(t):
     now = datetime.datetime.now()
@@ -10,11 +12,31 @@ def qtime2datetime(t):
     return new_time
 
 
+def qtime2otime(t):
+    now = datetime.datetime.now()
+    assert isinstance(t, QTime)
+    new_time = OTime(now.day, t.hour(), t.minute(), t.second(), t.msec())
+    return new_time
+
+
 def datetime2qtime(t):
     assert isinstance(t, datetime.datetime)
     time = QTime()
     # time.setHMS(t.hour, t.minute, t.second, t.microsecond) TODO:show microseconds
     time.setHMS(t.hour, t.minute, t.second)
+    return time
+
+
+def otime2qtime(t):
+    assert isinstance(t, OTime)
+    time = QTime()
+    time.setHMS(t.hour, t.minute, t.second)
+    return time
+
+
+def datetime2otime(t):
+    assert isinstance(t, datetime.datetime)
+    time = OTime(0, t.hour, t.minute, t.second, t.microsecond//1000)
     return time
 
 

@@ -5,7 +5,7 @@ from PyQt5.QtCore import QModelIndex
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QLabel, \
     QLineEdit, QApplication, QDialog, \
-    QPushButton, QSpinBox, QTimeEdit
+    QPushButton, QSpinBox, QTimeEdit, QCheckBox
 
 from sportorg.app.gui.global_access import GlobalAccess
 from sportorg.app.models.memory import race, Group, find
@@ -92,16 +92,15 @@ class GroupEditDialog(QDialog):
         self.item_start_interval.setDisplayFormat("hh:mm:ss")
         self.layout.addRow(self.label_start_interval, self.item_start_interval)
 
-        self.label_first_number = QLabel(_('First number'))
-        self.item_first_number = QSpinBox()
-        self.item_first_number.setMaximum(1000000)
-        self.layout.addRow(self.label_first_number, self.item_first_number)
-
         self.label_price = QLabel(_('Start fee'))
         self.item_price = QSpinBox()
         self.item_price.setSingleStep(50)
         self.item_price.setMaximum(100000000)
         self.layout.addRow(self.label_price, self.item_price)
+
+        self.rank_checkbox = QCheckBox(_('Rank calculation'))
+        self.rank_button = QPushButton(_('Configuration'))
+        self.layout.addRow(self.rank_checkbox, self.rank_button)
 
         def cancel_changes():
             self.close()

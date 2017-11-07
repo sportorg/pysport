@@ -1,6 +1,8 @@
 import logging
 
 import datetime
+from enum import IntEnum
+
 from PyQt5.QtWidgets import QMessageBox
 
 from sportorg.app.modules.utils.utils import time_remove_day, int_to_time, time_to_hhmmss, time_to_sec
@@ -127,6 +129,8 @@ class Group(Model):
         self.first_number = None
         self.count_person = 0
         self.count_finished = 0
+
+        self.ranking = Ranking()
 
     def get_count_finished(self):
         return self.count_finished
@@ -255,7 +259,7 @@ class Person(Model):
         self.world_code = None  # WRE ID for orienteering and the same
         self.national_code = None
         self.rank = None  # position/scores in word ranking
-        self.qual = None  # type: str 'qualification, used in Russia only'
+        self.qual = Qualification.NOT_QUALIFIED  # type: Qualification 'qualification, used in Russia only'
         self.is_out_of_competition = False  # e.g. 20-years old person, running in M12
         self.comment = None
 
@@ -491,6 +495,101 @@ class Config(object):
         elif is_float(param):
             param = float(param)
         cls.set(option, param)
+
+
+class Qualification(IntEnum):
+    NOT_QUALIFIED = 0
+    I_Y = 1
+    II_Y = 2
+    III_Y = 3
+    I = 4
+    II = 5
+    III = 6
+    KMS = 7
+    MS = 8
+    MSMK = 9
+    ZMS = 10
+
+    @staticmethod
+    def get_qual_by_code(code):
+        return Qualification(code)
+
+    @staticmethod
+    def get_qual_by_name(name):
+        qual_reverse = {
+            '': 0,
+            ' ': 0,
+            'б/р': 0,
+            'IIIю': 3,
+            'IIю': 2,
+            'Iю': 1,
+            'III': 6,
+            'II': 5,
+            'I': 4,
+            'КМС': 7,
+            'МС': 8,
+            'МСМК': 9,
+            'ЗМС': 10
+        }
+        return Qualification(qual_reverse[name])
+
+    def get_title(self):
+        qual = {
+            '': 'б/р',
+            0: 'б/р',
+            3: 'IIIю',
+            2: 'IIю',
+            1: 'Iю',
+            6: 'III',
+            5: 'II',
+            4: 'I',
+            7: 'КМС',
+            8: 'МС',
+            9: 'МСМК',
+            10: 'ЗМС'
+        }
+        return qual[self.value]
+
+    # see https://www.minsport.gov.ru/sportorentir.xls - Russian orienteering only!
+    def get_scores(self):
+        scores = {
+            '': 0,
+            0: 0,
+            3: 1,
+            2: 2,
+            1: 3,
+            6: 6,
+            5: 25,
+            4: 50,
+            7: 80,
+            8: 100,
+            9: 100,
+            10: 100
+        }
+        return scores[self.value]
+
+
+class RankingItem(object):
+    def __init__(self, qual=Qualification.NOT_QUALIFIED, use_scores=True, max_place=0, max_time=None, is_active=False):
+        self.qual = qual
+        self.use_scores = use_scores
+        self.max_place = max_place
+        self.max_time = max_time
+        self.is_active = is_active
+
+
+class Ranking(object):
+    def __init__(self):
+        self.is_active = True
+        self.rank = {}
+        self.rank[Qualification.MS] = RankingItem(qual=Qualification.MS, use_scores=False, max_place=2)
+        self.rank[Qualification.KMS] = RankingItem(qual=Qualification.KMS, use_scores=False, max_place=6)
+        self.rank[Qualification.I] = RankingItem(qual=Qualification.I)
+        self.rank[Qualification.II] = RankingItem(qual=Qualification.II)
+        self.rank[Qualification.III] = RankingItem(qual=Qualification.III)
+        self.rank[Qualification.I_Y] = RankingItem(qual=Qualification.I_Y)
+        self.rank[Qualification.II_Y] = RankingItem(qual=Qualification.II_Y)
+        self.rank[Qualification.III_Y] = RankingItem(qual=Qualification.III_Y)
 
 
 def create(obj, **kwargs):

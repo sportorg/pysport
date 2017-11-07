@@ -202,7 +202,7 @@ def get_person_result_data(res):
     ret = {
         'name': person.full_name,
         'team': person.organization.name,
-        'qual': person.qual,
+        'qual': person.qual.get_title(),
         'year': person.year,
         'result': res.get_result(),
         'place': res.place
