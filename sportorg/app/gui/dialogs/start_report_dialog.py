@@ -71,13 +71,14 @@ class StartReportDialog(QDialog):
         template = get_text_from_file(template_path, **get_start_data())
 
         file_name = get_save_file_name(_('Save As HTML file'), _("HTML file (*.html)"),
-                                       'start_' + str(time.strftime("%Y%m%d")))
-        with codecs.open(file_name, 'w', 'utf-8') as file:
-            file.write(template)
-            file.close()
+                                       '{}_start'.format(time.strftime("%Y%m%d")))
+        if file_name:
+            with codecs.open(file_name, 'w', 'utf-8') as file:
+                file.write(template)
+                file.close()
 
-        # Open file in your browser
-        webbrowser.open('file://' + file_name, new=2)
+            # Open file in your browser
+            webbrowser.open('file://' + file_name, new=2)
 
 
 if __name__ == '__main__':

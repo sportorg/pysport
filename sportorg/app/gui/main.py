@@ -8,7 +8,6 @@ from PyQt5.QtWidgets import QMainWindow, QTableView, QMessageBox
 
 from sportorg import config
 from sportorg.app.gui.dialogs.about import AboutDialog
-from sportorg.app.gui.dialogs.bib_dialog import BibDialog
 from sportorg.app.gui.dialogs.entry_filter import DialogFilter
 from sportorg.app.gui.dialogs.event_properties import EventPropertiesDialog
 from sportorg.app.gui.dialogs.file_dialog import get_open_file_name, get_save_file_name
@@ -499,7 +498,7 @@ class MainWindow(QMainWindow, App):
 
     def export_wo_wdb(self):
         file_name = get_save_file_name(_('Save As WDB file'), _("WDB file (*.wdb)"),
-                                       'sportorg_export_' + str(time.strftime("%Y%m%d")))
+                                       '{}_sportorg_export'.format(time.strftime("%Y%m%d")))
         if file_name is not '':
             try:
                 winorient.export_wo_wdb(file_name)
@@ -522,12 +521,5 @@ class MainWindow(QMainWindow, App):
     def about_dialog(self):
         try:
             AboutDialog().exec()
-        except Exception as e:
-            logging.exception(str(e))
-
-    def bib_dialog(self):
-        try:
-            b = BibDialog()
-            b.exec()
         except Exception as e:
             logging.exception(str(e))

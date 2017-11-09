@@ -69,10 +69,11 @@ class StartChessDialog(QDialog):
 
     def apply_changes_impl(self):
         file_name = get_save_file_name(_('Save As TXT file'), _("Txt file (*.txt)"),
-                                       'start_times_' + str(time.strftime("%Y%m%d")),)
-        with codecs.open(file_name, 'w', 'utf-8') as file:
-            file.write(self.text.toPlainText())
-            file.close()
+                                       '{}_start_times'.format(time.strftime("%Y%m%d")))
+        if file_name:
+            with codecs.open(file_name, 'w', 'utf-8') as file:
+                file.write(self.text.toPlainText())
+                file.close()
 
 
 if __name__ == '__main__':
