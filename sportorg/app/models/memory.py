@@ -6,6 +6,7 @@ from enum import IntEnum
 from PyQt5.QtWidgets import QMessageBox
 
 from sportorg.app.modules.utils.utils import time_remove_day, int_to_time, time_to_hhmmss, time_to_sec
+from sportorg.core.otime import OTime
 from sportorg.language import _
 from sportorg.core.model import Model
 
@@ -152,6 +153,7 @@ class Result(Model):
         self.place = None
 
         self.person = None  # type: Person reverse link to person
+        self.assigned_rank = Qualification.NOT_QUALIFIED  # type: Qualification assigned rank (Russia only)
 
     def __repr__(self):
         punches = ''
@@ -208,6 +210,9 @@ Punches:
         delta = self.get_finish_time() - self.get_start_time()
         ret += delta.seconds * 100
         return ret
+
+    def get_result_otime(self):
+        return OTime(msec=self.get_result_for_sort()*10)
 
     def get_start_time(self):
         obj = race()
@@ -570,7 +575,7 @@ class Qualification(IntEnum):
 
 
 class RankingItem(object):
-    def __init__(self, qual=Qualification.NOT_QUALIFIED, use_scores=True, max_place=0, max_time=None, is_active=False):
+    def __init__(self, qual=Qualification.NOT_QUALIFIED, use_scores=True, max_place=0, max_time=None, is_active=True):
         self.qual = qual
         self.use_scores = use_scores
         self.max_place = max_place
@@ -580,16 +585,16 @@ class RankingItem(object):
 
 class Ranking(object):
     def __init__(self):
-        self.is_active = True
+        self.is_active = False
         self.rank = {}
-        self.rank[Qualification.MS] = RankingItem(qual=Qualification.MS, use_scores=False, max_place=2)
-        self.rank[Qualification.KMS] = RankingItem(qual=Qualification.KMS, use_scores=False, max_place=6)
+        self.rank[Qualification.MS] = RankingItem(qual=Qualification.MS, use_scores=False, max_place=2, is_active=False)
+        self.rank[Qualification.KMS] = RankingItem(qual=Qualification.KMS, use_scores=False, max_place=6, is_active=False)
         self.rank[Qualification.I] = RankingItem(qual=Qualification.I)
         self.rank[Qualification.II] = RankingItem(qual=Qualification.II)
         self.rank[Qualification.III] = RankingItem(qual=Qualification.III)
-        self.rank[Qualification.I_Y] = RankingItem(qual=Qualification.I_Y)
-        self.rank[Qualification.II_Y] = RankingItem(qual=Qualification.II_Y)
-        self.rank[Qualification.III_Y] = RankingItem(qual=Qualification.III_Y)
+        self.rank[Qualification.I_Y] = RankingItem(qual=Qualification.I_Y, is_active=False)
+        self.rank[Qualification.II_Y] = RankingItem(qual=Qualification.II_Y, is_active=False)
+        self.rank[Qualification.III_Y] = RankingItem(qual=Qualification.III_Y, is_active=False)
 
 
 def create(obj, **kwargs):

@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import QFormLayout, QLabel, \
     QLineEdit, QApplication, QDialog, \
     QPushButton, QSpinBox, QTimeEdit, QCheckBox
 
+from sportorg.app.gui.dialogs.group_ranking import GroupRankingDialog
 from sportorg.app.gui.global_access import GlobalAccess
 from sportorg.app.models.memory import race, Group, find
 from sportorg.app.modules.utils.custom_controls import AdvComboBox
@@ -153,8 +154,14 @@ class GroupEditDialog(QDialog):
             self.item_corridor_order.setValue(current_object.order_in_corridor)
         if current_object.price is not None:
             self.item_price.setValue(current_object.price)
-        if current_object.first_number is not None:
-            self.item_first_number.setValue(current_object.first_number)
+
+        self.rank_checkbox.setChecked(current_object.ranking.is_active)
+
+        def rank_configuration():
+            group = current_object
+            GroupRankingDialog(group).exec()
+
+        self.rank_button.clicked.connect(rank_configuration)
 
     def apply_changes_impl(self):
         changed = False
@@ -198,10 +205,6 @@ class GroupEditDialog(QDialog):
             org.price = self.item_price.value()
             changed = True
 
-        if org.first_number != self.item_first_number.value():
-            org.first_number = self.item_first_number.value()
-            changed = True
-
         time = qtime2datetime(self.item_start_interval.time())
         if org.start_interval != time:
             org.start_interval = time
@@ -210,6 +213,10 @@ class GroupEditDialog(QDialog):
         time = qtime2datetime(self.item_max_time.time())
         if org.max_time != time:
             org.max_time = time
+            changed = True
+
+        if org.ranking.is_active != self.rank_checkbox.isChecked():
+            org.ranking.is_active = self.rank_checkbox.isChecked()
             changed = True
 
         if changed:

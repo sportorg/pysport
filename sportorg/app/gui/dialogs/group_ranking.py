@@ -82,7 +82,7 @@ def get_widget_from_ranking(ranking):
     type_combo.setObjectName(qual + '_combo')
 
     max_place = QSpinBox()
-    max_place.setValue(1)
+    max_place.setValue(0)
     max_place.setFixedWidth(50)
     max_place.setObjectName(qual + '_place')
 

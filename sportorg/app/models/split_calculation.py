@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QMessageBox
 
-from sportorg.app.models.memory import race, Person, Course, Group
+from sportorg.app.models.memory import race, Person, Course, Group, Result, Qualification
 from sportorg.app.models.result_calculation import ResultCalculation
 from sportorg.app.modules.printing.printing import print_html
 from sportorg.app.modules.utils.utils import time_to_hhmmss, get_speed_min_per_km, if_none
@@ -72,6 +72,11 @@ class PersonSplits(object):
         self.place = result.place
         self.group_count_all = person.group.get_count_all()
         self.group_count_finished = person.group.get_count_finished()
+
+        if result.assigned_rank == Qualification.NOT_QUALIFIED:
+            self.assigned_rank = ''
+        else:
+            self.assigned_rank = result.assigned_rank.get_title()
 
         person_index = 0
         course_index = 0
@@ -155,6 +160,7 @@ class PersonSplits(object):
             'year': self.year,
             'result': if_none(self.result, ''),
             'place': self.place,
+            'assigned_rank': if_none(self.assigned_rank, ''),
             'legs': []
         }
 

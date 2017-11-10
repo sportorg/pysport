@@ -65,6 +65,7 @@ class ReportDialog(QDialog):
         self.layout.addRow(self.button_ok, self.button_cancel)
 
         self.show()
+        self.button_ok.setFocus()
 
     def apply_changes_impl(self):
         template_path = self.item_template.currentText()

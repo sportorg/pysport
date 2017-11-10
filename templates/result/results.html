@@ -186,6 +186,7 @@
             <td>Year</td>
             <td>Result</td>
             <td>Place</td>
+            <td>Rank</td>
         </tr>
         {% for person in group.persons %}
         <tr>
@@ -196,6 +197,7 @@
             <td>{{ person.year }}</td>
             <td>{{ person.result }}</td>
             <td>{{ person.place }}</td>
+            <td>{{ person.assigned_rank }}</td>
         </tr>
         {% endfor %}
     {% endif %}

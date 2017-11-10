@@ -1,5 +1,8 @@
-from sportorg.app.models.memory import race, Result, Person, ResultStatus, Course, Group, Qualification
+import logging
+
+from sportorg.app.models.memory import race, Result, Person, ResultStatus, Course, Group, Qualification, RankingItem
 from sportorg.app.modules.utils.utils import time_to_hhmmss
+from sportorg.core.otime import OTime
 from sportorg.language import _
 
 
@@ -10,6 +13,7 @@ class ResultCalculation(object):
         for i in race().groups:
             array = self.get_group_finishes(i)
             self.set_places(array)
+            self.set_rank(i)
 
     def set_times(self):
         for i in race().results:
@@ -69,6 +73,41 @@ class ResultCalculation(object):
                 res.place = last_place
                 current_place += 1
 
+    def set_rank(self, group):
+        assert isinstance(group, Group)
+        ranking = group.ranking
+        if ranking.is_active:
+            rank = self.get_group_rank(group)
+            if rank > 0:
+                results = self.get_group_finishes(group)
+                leader_result = results[0]
+                assert isinstance(leader_result, Result)
+                leader_time = leader_result.get_result_otime()
+                for i in ranking.rank.values():
+                    assert isinstance(i, RankingItem)
+                    if i.is_active and i.use_scores:
+                        i.max_time = self.get_time_for_rank(leader_time, i.qual, rank)
+
+                # Rank assigning for all athletes
+                for i in results:
+                    assert isinstance(i, Result)
+                    result_time = i.get_result_otime()
+                    place = i.place
+
+                    if i.person.is_out_of_competition or i.status != ResultStatus.OK:
+                        continue
+
+                    for j in ranking.rank.values():
+                        assert isinstance(j, RankingItem)
+                        if j.is_active:
+                            if isinstance(place, int) and j.max_place >= place:
+                                i.assigned_rank = j.qual
+                                break
+                            if j.max_time and j.max_time >= result_time:
+                                i.assigned_rank = j.qual
+                                break
+
+
     def get_group_rank(self, group):
         """
         Rank calculation, takes sums or scores from qualification of best 10 athletes, who have OK result and not o/c
@@ -87,7 +126,7 @@ class ResultCalculation(object):
             return -1
 
         scores = sorted(scores)
-        return sum(scores[0:10])
+        return sum(scores[-10:])
 
     def get_percent_for_rank(self, qual, rank):
         table = []
@@ -210,6 +249,14 @@ class ResultCalculation(object):
             if cur_value <= rank:
                 return table[i][1]
         return 0
+
+    def get_time_for_rank(self, leader_time, qual, rank):
+        percent = self.get_percent_for_rank(qual, rank)
+        assert isinstance(leader_time, OTime)
+        msec_new = leader_time.to_msec() * percent // 100
+        ret = OTime(msec=msec_new)
+        return ret
+
 
 def get_start_list_data():
     pass
@@ -346,6 +393,7 @@ def get_person_result_data(res):
         'qual': person.qual.get_title(),
         'year': person.year,
         'result': res.get_result(),
-        'place': res.place
+        'place': res.place,
+        'assigned_rank': res.assigned_rank.get_title()
     }
     return ret
