@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QFormLayout, \
 
 from sportorg.app.gui.global_access import GlobalAccess
 from sportorg.app.models.memory import Group, RankingItem, Qualification
-from sportorg.app.models.result_calculation import ResultCalculation
+from sportorg.app.models.result.result_calculation import ResultCalculation
 from sportorg.app.modules.utils.custom_controls import AdvComboBox
 from sportorg.app.modules.utils.utils import qtime2otime, otime2qtime
 
