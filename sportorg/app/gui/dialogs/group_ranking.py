@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import QFormLayout, \
 
 from sportorg.app.gui.global_access import GlobalAccess
 from sportorg.app.models.memory import Group, RankingItem, Qualification
+from sportorg.app.models.result_calculation import ResultCalculation
 from sportorg.app.modules.utils.custom_controls import AdvComboBox
 from sportorg.app.modules.utils.utils import qtime2otime, otime2qtime
 
@@ -34,7 +35,10 @@ class GroupRankingDialog(QDialog):
 
         for i in self.group.ranking.rank:
             cur_item = self.group.ranking.rank[i]
-            self.layout.addRow(get_widget_from_ranking(cur_item))
+            try:
+                self.layout.addRow(get_widget_from_ranking(cur_item))
+            except:
+                logging.exception()
 
         def cancel_changes():
             self.close()
@@ -64,6 +68,7 @@ class GroupRankingDialog(QDialog):
                 rank.max_place = self.findChild(QSpinBox, name + '_place').value()
                 rank.max_time = qtime2otime(self.findChild(QTimeEdit, name + '_time').time())
                 rank.use_scores = self.findChild(AdvComboBox, name + '_combo').currentText() == _('Rank')
+        ResultCalculation().set_rank(self.group)
 
     def get_parent_window(self):
         return GlobalAccess().get_main_window()
@@ -72,7 +77,7 @@ class GroupRankingDialog(QDialog):
 def get_widget_from_ranking(ranking):
     assert isinstance(ranking, RankingItem)
     qual = ranking.qual.name
-    qual_checkbox = QCheckBox(_(ranking.qual.get_title()))
+    qual_checkbox = QCheckBox(ranking.qual.get_title())
     qual_checkbox.setFixedWidth(50)
     qual_checkbox.setObjectName(qual + '_checkbox')
 
@@ -83,11 +88,12 @@ def get_widget_from_ranking(ranking):
 
     max_place = QSpinBox()
     max_place.setValue(0)
-    max_place.setFixedWidth(50)
+    max_place.setFixedWidth(70)
     max_place.setObjectName(qual + '_place')
 
     max_time = QTimeEdit()
-    max_time.setFixedWidth(50)
+    max_time.setFixedWidth(70)
+    max_time.setDisplayFormat("HH:mm:ss")
     max_time.setObjectName(qual + '_time')
 
     def select_type():

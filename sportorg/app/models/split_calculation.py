@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QMessageBox
 
-from sportorg.app.models.memory import race, Person, Course, Group, Result, Qualification
+from sportorg.app.models.memory import race, Person, Course, Group, Qualification
 from sportorg.app.models.result_calculation import ResultCalculation
 from sportorg.app.modules.printing.printing import print_html
 from sportorg.app.modules.utils.utils import time_to_hhmmss, get_speed_min_per_km, if_none
@@ -323,9 +323,13 @@ def get_splits_data():
             person_data = res.get_person_split_data()
             group_data.append(person_data)
             mv = max(mv, len(person_data))
+
+        ranking_data = group.ranking.get_json_data()
+
         data.append({
             'name': group.name,
-            'persons': group_data
+            'persons': group_data,
+            'ranking': ranking_data
         })
     ret['groups'] = data
     ret['title'] = race().get_setting('sub_title')

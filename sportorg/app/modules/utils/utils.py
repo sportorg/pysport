@@ -13,9 +13,8 @@ def qtime2datetime(t):
 
 
 def qtime2otime(t):
-    now = datetime.datetime.now()
     assert isinstance(t, QTime)
-    new_time = OTime(now.day, t.hour(), t.minute(), t.second(), t.msec())
+    new_time = OTime(0, t.hour(), t.minute(), t.second(), t.msec())
     return new_time
 
 
@@ -30,7 +29,7 @@ def datetime2qtime(t):
 def otime2qtime(t):
     assert isinstance(t, OTime)
     time = QTime()
-    time.setHMS(t.hour, t.minute, t.second)
+    time.setHMS(t.hour, t.minute, t.sec)
     return time
 
 
@@ -45,6 +44,13 @@ def timedelta2datetime(t):
     now = datetime.datetime.now()
     new_time = datetime.datetime(now.year, now.month, now.day, 0, 0, 0)
     new_time += t
+    return new_time
+
+
+def otime2datetime(t):
+    assert isinstance(t, OTime)
+    now = datetime.datetime.now()
+    new_time = datetime.datetime(now.year, now.month, now.day, t.hour, t.minute, t.sec, t.msec * 1000)
     return new_time
 
 
@@ -70,6 +76,8 @@ def time_to_hhmmss(value):
         return time_to_hhmmss(qtime2datetime(value))
     if isinstance(value, datetime.timedelta):
         return time_to_hhmmss(timedelta2datetime(value))
+    if isinstance(value, OTime):
+        return time_to_hhmmss(otime2datetime(value))
     return value
 
 

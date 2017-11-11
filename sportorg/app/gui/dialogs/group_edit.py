@@ -10,6 +10,7 @@ from PyQt5.QtWidgets import QFormLayout, QLabel, \
 from sportorg.app.gui.dialogs.group_ranking import GroupRankingDialog
 from sportorg.app.gui.global_access import GlobalAccess
 from sportorg.app.models.memory import race, Group, find
+from sportorg.app.models.result_calculation import ResultCalculation
 from sportorg.app.modules.utils.custom_controls import AdvComboBox
 from sportorg.app.modules.utils.utils import datetime2qtime, qtime2datetime
 
@@ -220,7 +221,9 @@ class GroupEditDialog(QDialog):
             changed = True
 
         if changed:
+            ResultCalculation().set_rank(org)
             self.get_parent_window().refresh()
+
 
     def get_parent_window(self):
         return GlobalAccess().get_main_window()

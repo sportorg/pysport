@@ -1,5 +1,3 @@
-import logging
-
 from sportorg.app.models.memory import race, Result, Person, ResultStatus, Course, Group, Qualification, RankingItem
 from sportorg.app.modules.utils.utils import time_to_hhmmss
 from sportorg.core.otime import OTime
@@ -76,10 +74,16 @@ class ResultCalculation(object):
     def set_rank(self, group):
         assert isinstance(group, Group)
         ranking = group.ranking
+        results = self.get_group_finishes(group)
+
+        # initial turning off, for disabling ranking
+        for i in results:
+            i.assigned_rank = Qualification.NOT_QUALIFIED
+
         if ranking.is_active:
             rank = self.get_group_rank(group)
+            ranking.rank_scores = rank
             if rank > 0:
-                results = self.get_group_finishes(group)
                 leader_result = results[0]
                 assert isinstance(leader_result, Result)
                 leader_time = leader_result.get_result_otime()
@@ -87,26 +91,27 @@ class ResultCalculation(object):
                     assert isinstance(i, RankingItem)
                     if i.is_active and i.use_scores:
                         i.max_time = self.get_time_for_rank(leader_time, i.qual, rank)
+                        i.percent = self.get_percent_for_rank(i.qual, rank)
 
-                # Rank assigning for all athletes
-                for i in results:
-                    assert isinstance(i, Result)
-                    result_time = i.get_result_otime()
-                    place = i.place
+            # Rank assigning for all athletes
+            for i in results:
+                assert isinstance(i, Result)
+                result_time = i.get_result_otime()
+                place = i.place
 
-                    if i.person.is_out_of_competition or i.status != ResultStatus.OK:
-                        continue
+                if i.person.is_out_of_competition or i.status != ResultStatus.OK:
+                    continue
 
-                    for j in ranking.rank.values():
-                        assert isinstance(j, RankingItem)
-                        if j.is_active:
-                            if isinstance(place, int) and j.max_place >= place:
-                                i.assigned_rank = j.qual
-                                break
-                            if j.max_time and j.max_time >= result_time:
-                                i.assigned_rank = j.qual
-                                break
-
+                qual_list = sorted(ranking.rank.values(), reverse=True, key=lambda item: item.qual.get_scores())
+                for j in qual_list:
+                    assert isinstance(j, RankingItem)
+                    if j.is_active:
+                        if isinstance(place, int) and j.max_place >= place:
+                            i.assigned_rank = j.qual
+                            break
+                        if j.max_time and j.max_time >= result_time:
+                            i.assigned_rank = j.qual
+                            break
 
     def get_group_rank(self, group):
         """

@@ -581,11 +581,21 @@ class RankingItem(object):
         self.max_place = max_place
         self.max_time = max_time
         self.is_active = is_active
+        self.percent = 0
+
+    def get_json_data(self):
+        ret = {}
+        ret['qual'] = self.qual.get_title()
+        ret['max_place'] = self.max_place
+        ret['max_time'] = time_to_hhmmss(self.max_time)
+        ret['percent'] = self.percent
+        return ret
 
 
 class Ranking(object):
     def __init__(self):
         self.is_active = False
+        self.rank_scores = 0
         self.rank = {}
         self.rank[Qualification.MS] = RankingItem(qual=Qualification.MS, use_scores=False, max_place=2, is_active=False)
         self.rank[Qualification.KMS] = RankingItem(qual=Qualification.KMS, use_scores=False, max_place=6, is_active=False)
@@ -595,6 +605,32 @@ class Ranking(object):
         self.rank[Qualification.I_Y] = RankingItem(qual=Qualification.I_Y, is_active=False)
         self.rank[Qualification.II_Y] = RankingItem(qual=Qualification.II_Y, is_active=False)
         self.rank[Qualification.III_Y] = RankingItem(qual=Qualification.III_Y, is_active=False)
+
+    def get_max_qual(self):
+        max_qual = Qualification.NOT_QUALIFIED
+        for i in self.rank.values():
+            assert isinstance(i, RankingItem)
+            if i.is_active:
+                if i.max_place or (i.max_time and i.max_time.to_msec() > 0):
+                    if max_qual.get_scores() < i.qual.get_scores():
+                        max_qual = i.qual
+        return max_qual
+
+    def get_json_data(self):
+        ret = {}
+        ret['is_active'] = self.is_active
+        if self.is_active:
+            ret['rank_scores'] = self.rank_scores
+            ret['max_qual'] = self.get_max_qual().get_title()
+            rank_array = []
+
+            for i in self.rank.values():
+                if i.is_active:
+                    if i.max_place or (i.max_time and i.max_time.to_msec() > 0):
+                        rank_array.append(i.get_json_data())
+
+            ret['rank'] = rank_array
+        return ret
 
 
 def create(obj, **kwargs):
