@@ -120,11 +120,11 @@ class AbstractSportOrgMemoryModel (QAbstractTableModel):
         except Exception as e:
             logging.exception(str(e))
 
-    def get_values_from_object(self, object):
+    def get_values_from_object(self, obj):
         pass
 
-    def get_item(self, object, n_col):
-        return self.get_values_from_object(object)[n_col]
+    def get_item(self, obj, n_col):
+        return self.get_values_from_object(obj)[n_col]
 
     def get_source_array(self):
         pass
@@ -150,22 +150,25 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
     def get_participation_data(self, position):
         return self.get_values_from_object(race().persons[position])
 
-    def get_values_from_object(self, object):
+    def get_values_from_object(self, obj):
         ret = []
-        person = object
+        person = obj
 
         ret.append(person.surname)
         ret.append(person.name)
         ret.append(person.sex)
-        ret.append(person.qual)
-        if person.group is None:
-            ret.append('')
+        if person.qual:
+            ret.append(person.qual.get_title())
         else:
+            ret.append('')
+        if person.group:
             ret.append(person.group.name)
-        if person.organization is None:
-            ret.append('')
         else:
+            ret.append('')
+        if person.organization:
             ret.append(person.organization.name)
+        else:
+            ret.append('')
         ret.append(person.year)
         ret.append(person.bib)
         if person.start_time:
@@ -271,8 +274,8 @@ class GroupMemoryModel(AbstractSportOrgMemoryModel):
         super().__init__()
 
     def get_headers(self):
-        return ['Name', 'Full name', 'Course name', 'Course type', 'Length', 'Point count', 'Climb', 'Sex', 'Min age', 'Max age',\
-                'Start interval', 'Start corridor', 'Order in corridor']
+        return ['Name', 'Full name', 'Course name', 'Course type', 'Length', 'Point count', 'Climb', 'Sex', 'Min age',
+                'Max age', 'Start interval', 'Start corridor', 'Order in corridor']
 
     def init_cache(self):
         self.cache.clear()

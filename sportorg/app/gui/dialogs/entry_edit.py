@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import QFormLayout, QLabel, \
 
 from sportorg import config
 from sportorg.app.gui.global_access import GlobalAccess
-from sportorg.app.models.memory import race, Person, find
+from sportorg.app.models.memory import race, Person, find, Qualification
 from sportorg.app.models.model import Organization
 from sportorg.app.models.result.result_calculation import ResultCalculation
 from sportorg.app.modules.utils.custom_controls import AdvComboBox
@@ -218,7 +218,8 @@ class EntryEditDialog(QDialog):
 
         self.label_qual = QLabel(_('Qualification'))
         self.item_qual = AdvComboBox()
-        self.item_qual.addItems(['б/р', '1ю', '2ю', '3ю', '1', '2', '3', 'КМС', 'МС', 'МСМК', 'ЗМС'])
+        for i in list(Qualification):
+            self.item_qual.addItem(i.get_title())
         self.layout.addRow(self.label_qual, self.item_qual)
 
         self.label_bib = QLabel(_('Bib'))
@@ -312,7 +313,7 @@ class EntryEditDialog(QDialog):
         if current_object.year is not None:
             self.item_year.setValue(int(current_object.year))
         if current_object.qual is not None:
-            self.item_qual.setCurrentText(str(current_object.qual))
+            self.item_qual.setCurrentText(current_object.qual.get_title())
         if current_object.bib is not None:
             self.item_bib.setValue(int(current_object.bib))
         if current_object.start_time is not None:
@@ -349,8 +350,8 @@ class EntryEditDialog(QDialog):
         if person.year != self.item_year.value():
             person.year = self.item_year.value()
             changed = True
-        if person.qual != self.item_qual.currentText():
-            person.qual = self.item_qual.currentText()
+        if person.qual.get_title() != self.item_qual.currentText():
+            person.qual = Qualification.get_qual_by_name(self.item_qual.currentText())
             changed = True
         if person.bib != self.item_bib.value() and self.item_bib.value():
             person.bib = self.item_bib.value()

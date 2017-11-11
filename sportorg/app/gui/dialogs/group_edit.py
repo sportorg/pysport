@@ -5,10 +5,12 @@ from PyQt5.QtCore import QModelIndex
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QLabel, \
     QLineEdit, QApplication, QDialog, \
-    QPushButton, QSpinBox, QTimeEdit
+    QPushButton, QSpinBox, QTimeEdit, QCheckBox
 
+from sportorg.app.gui.dialogs.group_ranking import GroupRankingDialog
 from sportorg.app.gui.global_access import GlobalAccess
 from sportorg.app.models.memory import race, Group, find
+from sportorg.app.models.result.result_calculation import ResultCalculation
 from sportorg.app.modules.utils.custom_controls import AdvComboBox
 from sportorg.app.modules.utils.utils import datetime2qtime, qtime2datetime
 
@@ -92,16 +94,15 @@ class GroupEditDialog(QDialog):
         self.item_start_interval.setDisplayFormat("hh:mm:ss")
         self.layout.addRow(self.label_start_interval, self.item_start_interval)
 
-        self.label_first_number = QLabel(_('First number'))
-        self.item_first_number = QSpinBox()
-        self.item_first_number.setMaximum(1000000)
-        self.layout.addRow(self.label_first_number, self.item_first_number)
-
         self.label_price = QLabel(_('Start fee'))
         self.item_price = QSpinBox()
         self.item_price.setSingleStep(50)
         self.item_price.setMaximum(100000000)
         self.layout.addRow(self.label_price, self.item_price)
+
+        self.rank_checkbox = QCheckBox(_('Rank calculation'))
+        self.rank_button = QPushButton(_('Configuration'))
+        self.layout.addRow(self.rank_checkbox, self.rank_button)
 
         def cancel_changes():
             self.close()
@@ -154,8 +155,14 @@ class GroupEditDialog(QDialog):
             self.item_corridor_order.setValue(current_object.order_in_corridor)
         if current_object.price is not None:
             self.item_price.setValue(current_object.price)
-        if current_object.first_number is not None:
-            self.item_first_number.setValue(current_object.first_number)
+
+        self.rank_checkbox.setChecked(current_object.ranking.is_active)
+
+        def rank_configuration():
+            group = current_object
+            GroupRankingDialog(group).exec()
+
+        self.rank_button.clicked.connect(rank_configuration)
 
     def apply_changes_impl(self):
         changed = False
@@ -199,10 +206,6 @@ class GroupEditDialog(QDialog):
             org.price = self.item_price.value()
             changed = True
 
-        if org.first_number != self.item_first_number.value():
-            org.first_number = self.item_first_number.value()
-            changed = True
-
         time = qtime2datetime(self.item_start_interval.time())
         if org.start_interval != time:
             org.start_interval = time
@@ -213,8 +216,14 @@ class GroupEditDialog(QDialog):
             org.max_time = time
             changed = True
 
+        if org.ranking.is_active != self.rank_checkbox.isChecked():
+            org.ranking.is_active = self.rank_checkbox.isChecked()
+            changed = True
+
         if changed:
+            ResultCalculation().set_rank(org)
             self.get_parent_window().refresh()
+
 
     def get_parent_window(self):
         return GlobalAccess().get_main_window()

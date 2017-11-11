@@ -1,21 +1,9 @@
 import csv
 
+from sportorg.app.models.memory import Qualification
+
 
 class CSVReader:
-    qual = {
-        '0': 'б/р',
-        '3': 'IIIю',
-        '2': 'IIю',
-        '1': 'Iю',
-        '6': 'III',
-        '5': 'II',
-        '4': 'I',
-        '7': 'КМС',
-        '8': 'МС',
-        '9': 'МСМК',
-        '*': 'ЗМС'
-    }
-
     def __init__(self, data=None):
         self._data = [] if data is None else data
 
@@ -49,7 +37,7 @@ class CSVReader:
         person_dict = {
             'group_name': person[0],
             'team_name': person[2],
-            'qual': self.qual[person[3]],
+            'qual': Qualification(person[3]),
             'bib': ifempty(person[4]),
             'year': int(person[5]) if len(person[5]) else None,
             'card_number': int(person[6]) if len(person[6]) else None,

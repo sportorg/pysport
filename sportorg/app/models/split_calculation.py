@@ -1,12 +1,12 @@
 from PyQt5.QtWidgets import QMessageBox
 
-from sportorg.app.models.memory import race, Person, Course, Group
+from sportorg.app.models.memory import race, Person, Course, Group, Qualification
 from sportorg.app.models.result.result_calculation import ResultCalculation
 from sportorg.app.modules.printing.printing import print_html
 from sportorg.app.modules.utils.utils import time_to_hhmmss, get_speed_min_per_km, if_none
 from sportorg.config import template_dir
-from sportorg.language import _
 from sportorg.lib.template.template import get_text_from_file
+from sportorg.language import _
 
 
 class LegSplit(object):
@@ -60,7 +60,9 @@ class PersonSplits(object):
         if person.organization:
             self.team = person.organization.name
         self.card_number = person.card_number
-        self.qual = person.qual
+        self.qual = ''
+        if person.qual:
+            self.qual = person.qual.get_title()
         self.year = person.year
 
         self.start = time_to_hhmmss(person.start_time)
@@ -70,6 +72,11 @@ class PersonSplits(object):
         self.place = result.place
         self.group_count_all = person.group.get_count_all()
         self.group_count_finished = person.group.get_count_finished()
+
+        if result.assigned_rank == Qualification.NOT_QUALIFIED:
+            self.assigned_rank = ''
+        else:
+            self.assigned_rank = result.assigned_rank.get_title()
 
         person_index = 0
         course_index = 0
@@ -153,6 +160,7 @@ class PersonSplits(object):
             'year': self.year,
             'result': if_none(self.result, ''),
             'place': self.place,
+            'assigned_rank': if_none(self.assigned_rank, ''),
             'legs': []
         }
 
@@ -315,9 +323,13 @@ def get_splits_data():
             person_data = res.get_person_split_data()
             group_data.append(person_data)
             mv = max(mv, len(person_data))
+
+        ranking_data = group.ranking.get_json_data()
+
         data.append({
             'name': group.name,
-            'persons': group_data
+            'persons': group_data,
+            'ranking': ranking_data
         })
     ret['groups'] = data
     ret['title'] = race().get_setting('sub_title')

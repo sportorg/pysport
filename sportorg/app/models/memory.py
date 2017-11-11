@@ -1,10 +1,12 @@
 import logging
+
 import datetime
-from enum import Enum
+from enum import IntEnum, Enum
 
 from PyQt5.QtWidgets import QMessageBox
 
 from sportorg.app.modules.utils.utils import time_remove_day, int_to_time, time_to_hhmmss, time_to_sec
+from sportorg.core.otime import OTime
 from sportorg.language import _
 from sportorg.core.model import Model
 
@@ -142,6 +144,8 @@ class Group(Model):
         self.count_person = 0
         self.count_finished = 0
 
+        self.ranking = Ranking()
+
     def get_count_finished(self):
         return self.count_finished
 
@@ -163,6 +167,7 @@ class Result(Model):
         self.place = None
 
         self.person = None  # type: Person reverse link to person
+        self.assigned_rank = Qualification.NOT_QUALIFIED  # type: Qualification assigned rank (Russia only)
 
     def __repr__(self):
         punches = ''
@@ -220,6 +225,9 @@ Punches:
         ret += delta.seconds * 100
         return ret
 
+    def get_result_otime(self):
+        return OTime(msec=self.get_result_for_sort()*10)
+
     def get_start_time(self):
         obj = race()
         start_source = obj.get_setting('sportident_start_source', 'protocol')
@@ -270,7 +278,7 @@ class Person(Model):
         self.world_code = None  # WRE ID for orienteering and the same
         self.national_code = None
         self.rank = None  # position/scores in word ranking
-        self.qual = None  # type: str 'qualification, used in Russia only'
+        self.qual = Qualification.NOT_QUALIFIED  # type: Qualification 'qualification, used in Russia only'
         self.is_out_of_competition = False  # e.g. 20-years old person, running in M12
         self.comment = None
 
@@ -507,6 +515,137 @@ class Config(object):
         elif is_float(param):
             param = float(param)
         cls.set(option, param)
+
+
+class Qualification(IntEnum):
+    NOT_QUALIFIED = 0
+    I_Y = 1
+    II_Y = 2
+    III_Y = 3
+    I = 4
+    II = 5
+    III = 6
+    KMS = 7
+    MS = 8
+    MSMK = 9
+    ZMS = 10
+
+    @staticmethod
+    def get_qual_by_code(code):
+        return Qualification(code)
+
+    @staticmethod
+    def get_qual_by_name(name):
+        qual_reverse = {
+            '': 0,
+            ' ': 0,
+            'б/р': 0,
+            'IIIю': 3,
+            'IIю': 2,
+            'Iю': 1,
+            'III': 6,
+            'II': 5,
+            'I': 4,
+            'КМС': 7,
+            'МС': 8,
+            'МСМК': 9,
+            'ЗМС': 10
+        }
+        return Qualification(qual_reverse[name])
+
+    def get_title(self):
+        qual = {
+            '': 'б/р',
+            0: 'б/р',
+            3: 'IIIю',
+            2: 'IIю',
+            1: 'Iю',
+            6: 'III',
+            5: 'II',
+            4: 'I',
+            7: 'КМС',
+            8: 'МС',
+            9: 'МСМК',
+            10: 'ЗМС'
+        }
+        return qual[self.value]
+
+    # see https://www.minsport.gov.ru/sportorentir.xls - Russian orienteering only!
+    def get_scores(self):
+        scores = {
+            '': 0,
+            0: 0,
+            3: 1,
+            2: 2,
+            1: 3,
+            6: 6,
+            5: 25,
+            4: 50,
+            7: 80,
+            8: 100,
+            9: 100,
+            10: 100
+        }
+        return scores[self.value]
+
+
+class RankingItem(object):
+    def __init__(self, qual=Qualification.NOT_QUALIFIED, use_scores=True, max_place=0, max_time=None, is_active=True):
+        self.qual = qual
+        self.use_scores = use_scores
+        self.max_place = max_place
+        self.max_time = max_time
+        self.is_active = is_active
+        self.percent = 0
+
+    def get_json_data(self):
+        ret = {}
+        ret['qual'] = self.qual.get_title()
+        ret['max_place'] = self.max_place
+        ret['max_time'] = time_to_hhmmss(self.max_time)
+        ret['percent'] = self.percent
+        return ret
+
+
+class Ranking(object):
+    def __init__(self):
+        self.is_active = False
+        self.rank_scores = 0
+        self.rank = {}
+        self.rank[Qualification.MS] = RankingItem(qual=Qualification.MS, use_scores=False, max_place=2, is_active=False)
+        self.rank[Qualification.KMS] = RankingItem(qual=Qualification.KMS, use_scores=False, max_place=6, is_active=False)
+        self.rank[Qualification.I] = RankingItem(qual=Qualification.I)
+        self.rank[Qualification.II] = RankingItem(qual=Qualification.II)
+        self.rank[Qualification.III] = RankingItem(qual=Qualification.III)
+        self.rank[Qualification.I_Y] = RankingItem(qual=Qualification.I_Y, is_active=False)
+        self.rank[Qualification.II_Y] = RankingItem(qual=Qualification.II_Y, is_active=False)
+        self.rank[Qualification.III_Y] = RankingItem(qual=Qualification.III_Y, is_active=False)
+
+    def get_max_qual(self):
+        max_qual = Qualification.NOT_QUALIFIED
+        for i in self.rank.values():
+            assert isinstance(i, RankingItem)
+            if i.is_active:
+                if i.max_place or (i.max_time and i.max_time.to_msec() > 0):
+                    if max_qual.get_scores() < i.qual.get_scores():
+                        max_qual = i.qual
+        return max_qual
+
+    def get_json_data(self):
+        ret = {}
+        ret['is_active'] = self.is_active
+        if self.is_active:
+            ret['rank_scores'] = self.rank_scores
+            ret['max_qual'] = self.get_max_qual().get_title()
+            rank_array = []
+
+            for i in self.rank.values():
+                if i.is_active:
+                    if i.max_place or (i.max_time and i.max_time.to_msec() > 0):
+                        rank_array.append(i.get_json_data())
+
+            ret['rank'] = rank_array
+        return ret
 
 
 def create(obj, **kwargs):

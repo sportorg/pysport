@@ -2,47 +2,16 @@ import traceback
 
 from PyQt5.QtWidgets import QMessageBox
 
+from sportorg.app.models.result.result_calculation import ResultCalculation
+from sportorg.language import _
 from sportorg.app.models import model
 from sportorg.app.models.memory import Race, Organization, Group, Person, Result, race, find, Course, \
-    CourseControl, Country, Contact, Address, ResultStatus
-from sportorg.app.models.result.result_calculation import ResultCalculation
+    CourseControl, Country, Contact, Address, ResultStatus, Qualification
 from sportorg.app.modules.utils.utils import int_to_time, time_to_int
-from sportorg.language import _
 from sportorg.lib.winorient.wdb import WDB, WDBMan, WDBTeam, WDBGroup, WDBDistance, WDBPunch, WDBFinish, WDBChip
 
 
 class WinOrientBinary:
-    qual = {
-        '': 'б/р',
-        '0': 'б/р',
-        '3': 'IIIю',
-        '2': 'IIю',
-        '1': 'Iю',
-        '6': 'III',
-        '5': 'II',
-        '4': 'I',
-        '7': 'КМС',
-        '8': 'МС',
-        '9': 'МСМК',
-        '10': 'ЗМС'
-    }
-
-    qual_reverse = {
-        '':     0,
-        ' ':    0,
-        'б/р':  0,
-        'IIIю': 3,
-        'IIю':  2,
-        'Iю':   1,
-        'III':  6,
-        'II':   5,
-        'I':    4,
-        'КМС':  7,
-        'МС':   8,
-        'МСМК': 9,
-        'ЗМС':  10
-    }
-
     status = {
         0: ResultStatus.OK,
         1: ResultStatus.DISQUALIFIED,
@@ -252,8 +221,8 @@ class WinOrientBinary:
             new_person.surname = man.name.split(" ")[0]
             new_person.name = man.name.split(" ")[-1]
             new_person.bib = man.number
-            if str(man.qualification) in self.qual.keys():
-                new_person.qual = self.qual[str(man.qualification)]
+            if man.qualification:
+                new_person.qual = Qualification.get_qual_by_code(man.qualification)
             new_person.year = man.year
             new_person.card_number = man.si_card
             new_person.is_out_of_competition = man.is_not_qualified
@@ -376,7 +345,7 @@ class WinOrientBinary:
 
             # decode qualification
             if man.qual:
-                new_person.qualification = WinOrientBinary.qual_reverse[man.qual]
+                new_person.qualification = man.qual.value
 
             if man.year:
                 new_person.year = int(man.year)

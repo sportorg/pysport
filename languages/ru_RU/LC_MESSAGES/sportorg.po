@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: SportOrg\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-08-10 11:27+0500\n"
-"PO-Revision-Date: 2017-10-30 23:51+0500\n"
+"PO-Revision-Date: 2017-11-11 09:53+0500\n"
 "Last-Translator: SportOrg\n"
 "Language-Team: SportOrg\n"
 "Language: ru_RU\n"
@@ -693,6 +693,51 @@ msgstr "Чтение чипов не запущено"
 
 msgid "Tab doesn't exist"
 msgstr "Раздел не существует"
+
+msgid "Rank calculation"
+msgstr "Выполнение разрядов"
+
+msgid "Configuration"
+msgstr "Настройка"
+
+msgid "Rank"
+msgstr "Ранг (ориентирование)"
+
+msgid "Max place"
+msgstr "Макс. место"
+
+msgid "Result time"
+msgstr "Результат"
+
+msgid "Iю"
+msgstr "Iю"
+
+msgid "IIю"
+msgstr "IIю"
+
+msgid "IIIю"
+msgstr "IIIю"
+
+msgid "I"
+msgstr "I"
+
+msgid "II"
+msgstr "II"
+
+msgid "III"
+msgstr "III"
+
+msgid "КМС"
+msgstr "КМС"
+
+msgid "МС"
+msgstr "МС"
+
+msgid "МСМК"
+msgstr "МСМК"
+
+msgid "ЗМС"
+msgstr "ЗМС"
 
 msgid "Refresh"
 msgstr "Обновить"
