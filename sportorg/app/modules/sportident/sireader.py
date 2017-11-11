@@ -9,6 +9,7 @@ from sportorg.lib.sportident import sireader
 class SIReaderThread(threading.Thread):
     def __init__(self, port, func=lambda card_data: card_data, start_time=None, debug=False):
         super().__init__()
+        self.setName('SportidentThread')
         self.port = port
         self.readers = [func]
         self.cards = []
@@ -22,7 +23,8 @@ class SIReaderThread(threading.Thread):
 
     def add_card_data(self, card_data):
         for f in self.readers:
-            f(card_data)
+            thread = threading.Thread(target=f, args=(card_data,))
+            thread.start()
         self.cards.append(card_data)
 
     def run(self):

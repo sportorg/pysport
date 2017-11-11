@@ -21,10 +21,10 @@ from sportorg.app.gui.dialogs.start_preparation import StartPreparationDialog
 from sportorg.app.gui.dialogs.start_report_dialog import StartReportDialog
 from sportorg.app.gui.global_access import GlobalAccess
 from sportorg.app.gui.menu import menu_list
+from sportorg.app.gui.post_init import POST_INIT
 from sportorg.app.gui.tabs import start_preparation, groups, teams, race_results, courses
 from sportorg.app.gui.toolbar import toolbar_list
 from sportorg.app.models.memory import Race, event as races, race, Config as Configuration
-from sportorg.app.models import result_generation
 from sportorg.app.models.memory_model import PersonMemoryModel, ResultMemoryModel, GroupMemoryModel, \
     CourseMemoryModel, TeamMemoryModel
 from sportorg.app.models.split_calculation import split_printout
@@ -112,11 +112,11 @@ class MainWindow(QMainWindow, App):
             if len(self.recent_files):
                 self.open_file(self.recent_files[0])
 
-        sportident.toolbar_sportident()
         if Configuration.get('autoconnect'):
             self.sportident_connect()
 
-        event.add_event('finish', result_generation.add_result)
+        for init in POST_INIT:
+            init()
 
     def _setup_ui(self):
         geometry = config.ConfigFile.GEOMETRY
@@ -498,7 +498,7 @@ class MainWindow(QMainWindow, App):
 
     def export_wo_wdb(self):
         file_name = get_save_file_name(_('Save As WDB file'), _("WDB file (*.wdb)"),
-                                       'sportorg_export_' + str(time.strftime("%Y%m%d")))
+                                       '{}_sportorg_export'.format(time.strftime("%Y%m%d")))
         if file_name is not '':
             try:
                 winorient.export_wo_wdb(file_name)

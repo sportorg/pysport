@@ -1,11 +1,15 @@
 import datetime
+import logging
 
-from sportorg.app.gui.global_access import GlobalAccess
-from sportorg.app.models.result_calculation import ResultCalculation
-from . import sireader
-from sportorg.core.event import event, add_event
-from sportorg.app.models import memory
 from sportorg import config
+from sportorg.app.gui.dialogs.bib_dialog import BibDialog
+from sportorg.app.gui.global_access import GlobalAccess
+from sportorg.app.models import memory
+from sportorg.app.models.memory import SystemType
+from sportorg.app.models.result.result_calculation import ResultCalculation
+from sportorg.app.modules.sportident.result_generation import ResultSportidentGeneration
+from sportorg.app.modules.sportident import sireader
+from sportorg.core.event import add_event
 
 
 def read():
@@ -14,6 +18,7 @@ def read():
 
 def get_result(card_data):
     result = memory.Result()
+    result.type = SystemType.SPORTIDENT
     result.card_number = card_data['card_number']
     result.punches = card_data['punches']
     result.start_time = card_data['start']
@@ -26,15 +31,21 @@ def start():
     port = sireader.choose_port()
 
     def event_finish(card_data):
-        event('finish', 'sportident', get_result(card_data))
-
-        ResultCalculation().process_results()
+        assignment_mode = memory.race().get_setting('sportident_assignment_mode', False)
+        if not assignment_mode:
+            ResultSportidentGeneration(get_result(card_data)).add_result()
+            ResultCalculation().process_results()
+        else:
+            try:
+                bib_dialog = BibDialog()
+                bib_dialog.exec()
+                person = bib_dialog.get_person()
+                person.card_number = card_data['card_number']
+            except Exception as e:
+                logging.exception(str(e))
         GlobalAccess().get_main_window().init_model()
 
     if port is not None:
-        """
-        :event: 'finish' 'sportident', result
-        """
         reader = sireader.SIReaderThread(
             port,
             func=event_finish,

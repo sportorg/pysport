@@ -2,11 +2,10 @@ import logging
 
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import QItemSelectionModel, QModelIndex
-
 from PyQt5.QtWidgets import QTableView, QMessageBox
 
 from sportorg.app.models.memory import race
-from sportorg.app.models.result_calculation import ResultCalculation
+from sportorg.app.models.result.result_calculation import ResultCalculation
 from sportorg.language import _
 
 
