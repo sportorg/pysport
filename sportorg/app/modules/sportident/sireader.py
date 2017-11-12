@@ -23,7 +23,10 @@ class SIReaderThread(threading.Thread):
 
     def add_card_data(self, card_data):
         for f in self.readers:
-            thread = threading.Thread(target=f, args=(card_data,))
+            thread = threading.Thread(
+                target=f,
+                args=(card_data,),
+                name='Sportident-{}-Thread'.format(f.__name__))
             thread.start()
         self.cards.append(card_data)
 

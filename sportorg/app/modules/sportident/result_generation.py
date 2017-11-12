@@ -57,7 +57,7 @@ class ResultSportidentGeneration(ResultObject):
 
             self._add_result_to_race()
 
-            logging.info(self.system_id() + str(self._result))
+            logging.info('{}{}'.format(self.system_id(), self._result))
             logging.debug(self._result.status)
             GlobalAccess().auto_save()
 
