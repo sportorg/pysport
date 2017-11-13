@@ -257,7 +257,7 @@ class WinOrientBinary:
                     result.status = self.status[man.status]
                 result.result = man.result
 
-                my_race.results.append(result)
+                my_race.add_result(result)
 
                 # punches
                 chip = man.get_chip()

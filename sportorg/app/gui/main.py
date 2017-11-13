@@ -79,6 +79,14 @@ class MainWindow(QMainWindow, App):
         self.close()
         _event.accept()
 
+    def resizeEvent(self, e):
+        event.event('resize', {
+            'x': self.x() + 8,
+            'y': self.y() + 30,
+            'width': self.width(),
+            'height': self.height(),
+        })
+
     def conf_read(self):
         self.conf.read(config.CONFIG_INI)
         if self.conf.has_section(config.ConfigFile.CONFIGURATION):

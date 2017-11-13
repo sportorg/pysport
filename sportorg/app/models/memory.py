@@ -101,7 +101,7 @@ class Course(Model):
         self.bib = 0
         self.length = 0
         self.climb = 0
-        self.controls = [] # type: List[CourseControl]
+        self.controls = []  # type: List[CourseControl]
         self.count_person = 0
         self.count_group = 0
         self.corridor = 0
@@ -285,6 +285,16 @@ class Person(Model):
         self.start_time = None
         self.start_group = 0
 
+    def add_result(self, result):
+        assert isinstance(result, Result)
+        add = True
+        for r in self.results:
+            if r is Result:
+                add = False
+                break
+        if add:
+            self.results.append(result)
+
     @property
     def full_name(self):
         def xstr(s):
@@ -466,6 +476,16 @@ class Race(Model):
                 if person.group.start_corridor == corridor:
                     ret.append(person)
         return ret
+
+    def add_result(self, result):
+        assert isinstance(result, Result)
+        add = True
+        for r in self.results:
+            if r is Result:
+                add = False
+                break
+        if add:
+            self.results.insert(0, result)
 
 
 class Config(object):

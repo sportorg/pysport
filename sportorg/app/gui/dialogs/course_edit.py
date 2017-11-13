@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QFormLayout, QLabel, \
     QLineEdit, QApplication, QDialog, \
     QPushButton, QSpinBox, QTextEdit
 
-from sportorg.app.gui.global_access import  GlobalAccess
+from sportorg.app.gui.global_access import GlobalAccess
 from sportorg.app.models.memory import race, Course, CourseControl
 from sportorg.app.modules.utils.custom_controls import AdvComboBox
 
@@ -109,7 +109,7 @@ class CourseEditDialog(QDialog):
             self.item_control_qty.setValue(len(current_object.controls))
         for i in current_object.controls:
             assert isinstance(i, CourseControl)
-            self.item_controls.append(str(i.code) + ' ' + str(i.length))
+            self.item_controls.append('{} {}'.format(i.code, i.length if i.length else ''))
 
     def apply_changes_impl(self):
         changed = False
@@ -144,7 +144,11 @@ class CourseEditDialog(QDialog):
                 continue
             control.code = i.split()[0]
             if len(i.split()) > 1:
-                control.length = i.split()[1]
+                try:
+                    control.length = int(i.split()[1])
+                except Exception as e:
+                    logging.exception(e)
+                    control.length = 0
             course.controls.append(control)
 
         if changed:

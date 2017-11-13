@@ -6,6 +6,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QModelIndex
 from PyQt5.QtWidgets import QAbstractItemView, QTableView
 
+from sportorg.core import event as event_handler
 from sportorg.app.gui.dialogs.results_edit import ResultEditDialog
 from sportorg.app.models.memory import race, Result, Course, CourseControl
 from sportorg.app.models.memory_model import ResultMemoryModel
@@ -38,7 +39,7 @@ class ResultTable(QTableView):
         try:
             logging.debug('Single result clicked on ' + str(index.row()))
             #  show punches in the left area
-            if index.row() > -1 and index.row() < len(race().results):
+            if -1 < index.row() < len(race().results):
                 self.parent_widget.show_punches(index)
         except Exception as e:
             logging.exception(str(e))
@@ -51,6 +52,7 @@ class ResultTable(QTableView):
             if index.row() < len(race().results):
                 dialog = ResultEditDialog(self, index)
                 dialog.exec()
+                self.parent_widget.show_punches(index)
         except Exception as e:
             logging.exception(str(e))
 
@@ -72,7 +74,6 @@ class Widget(QtWidgets.QWidget):
         self.ResultLeftPart.setFrameShadow(QtWidgets.QFrame.Raised)
         self.ResultLeftPart.setObjectName("ResultLeftPart")
         self.ResultCourseGroupBox = QtWidgets.QGroupBox(self.ResultLeftPart)
-        self.ResultCourseGroupBox.setGeometry(QtCore.QRect(1, 1, 120, 399))
         self.ResultCourseGroupBox.setObjectName("ResultCourseGroupBox")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.ResultCourseGroupBox)
         self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
@@ -100,7 +101,6 @@ class Widget(QtWidgets.QWidget):
         self.ResultCourseDetails.setObjectName("ResultCourseDetails")
         self.verticalLayout_2.addWidget(self.ResultCourseDetails)
         self.ResultChipGroupBox = QtWidgets.QGroupBox(self.ResultLeftPart)
-        self.ResultChipGroupBox.setGeometry(QtCore.QRect(120, 1, 300, 399))
         self.ResultChipGroupBox.setObjectName("ResultChipGroupBox")
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.ResultChipGroupBox)
         self.verticalLayout_3.setContentsMargins(0, 0, 0, 0)
@@ -139,6 +139,8 @@ class Widget(QtWidgets.QWidget):
         self.ResultChipFinishLabel.setText(_("Finish"))
         # self.ResultChipDetails.setHtml()
 
+        event_handler.add_event('resize', self.resize_event)
+
     def show_punches(self, index):
 
         assert (isinstance(index, QModelIndex))
@@ -151,7 +153,7 @@ class Widget(QtWidgets.QWidget):
         for i in result.punches:
             time = i[1]
             assert isinstance(time, datetime)
-            s = str(index) + " " + str(i[0]) + " " + time.strftime("%H:%M:%S")
+            s = '{} {} {}'.format(index, i[0], time.strftime("%H:%M:%S"))
             self.ResultChipDetails.append(s)
             index += 1
         if result.finish_time:
@@ -167,8 +169,12 @@ class Widget(QtWidgets.QWidget):
             if course.controls is not None:
                 for i in course.controls:
                     assert isinstance(i, CourseControl)
-                    s = str(index) + " " + str(i.code) + " " + str(i.length)
+                    s = '{} {} {}'.format(index, i.code, i.length if i.length else '')
                     self.ResultCourseDetails.append(s)
                     index += 1
             self.ResultCourseNameEdit.setText(course.name)
             self.ResultCourseLengthEdit.setText(str(course.length))
+
+    def resize_event(self, koor):
+        self.ResultCourseGroupBox.setGeometry(QtCore.QRect(1, 1, 120, koor['height']-140))
+        self.ResultChipGroupBox.setGeometry(QtCore.QRect(120, 1, 235, koor['height']-140))

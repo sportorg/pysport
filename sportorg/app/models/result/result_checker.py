@@ -1,4 +1,4 @@
-from sportorg.app.models.memory import Person, Result
+from sportorg.app.models.memory import Person, Result, ResultStatus
 
 
 class ResultChecker:
@@ -34,6 +34,8 @@ class ResultChecker:
         return False
 
     def check_result(self, result: Result):
+        if self.person is None:
+            return True
         if self.person.group is None:
             return True
 
@@ -43,3 +45,16 @@ class ResultChecker:
             return True
 
         return self.check(result.punches, controls)
+
+    @classmethod
+    def checking(cls, result, person=None):
+        if person is None:
+            person = result.person
+        o = cls(person)
+        result.status = ResultStatus.OK
+        if not o.check_result(result):
+            result.status = ResultStatus.DISQUALIFIED
+        if not result.finish_time:
+            result.status = ResultStatus.DID_NOT_FINISH
+
+        return o
