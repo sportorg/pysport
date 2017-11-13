@@ -176,6 +176,7 @@ def get_names():
 class EntryEditDialog(QDialog):
     def __init__(self, table=None, index=None):
         super().__init__()
+        self.is_ok = {}
         self.init_ui()
         if table is not None:
             self.set_values_from_table(table, index)
@@ -222,11 +223,16 @@ class EntryEditDialog(QDialog):
             self.item_qual.addItem(i.get_title())
         self.layout.addRow(self.label_qual, self.item_qual)
 
+        self.is_ok['bib'] = True
         self.label_bib = QLabel(_('Bib'))
         self.item_bib = QSpinBox()
         self.item_bib.setMinimum(0)
         self.item_bib.setMaximum(100000)
+        self.item_bib.valueChanged.connect(self.check_bib)
         self.layout.addRow(self.label_bib, self.item_bib)
+
+        self.label_bib_info = QLabel('')
+        self.layout.addRow(QLabel(''), self.label_bib_info)
 
         self.label_start = QLabel(_('Start time'))
         self.item_start = QTimeEdit()
@@ -239,11 +245,16 @@ class EntryEditDialog(QDialog):
         self.item_start_group.setMaximum(99)
         self.layout.addRow(self.label_start_group, self.item_start_group)
 
+        self.is_ok['card'] = True
         self.label_card = QLabel(_('Punch card #'))
         self.item_card = QSpinBox()
         self.item_card.setMinimum(0)
         self.item_card.setMaximum(9999999)
+        self.item_card.valueChanged.connect(self.check_card)
         self.layout.addRow(self.label_card, self.item_card)
+
+        self.label_card_info = QLabel('')
+        self.layout.addRow(QLabel(''), self.label_card_info)
 
         self.item_rented = QCheckBox(_('rented card'))
         self.item_paid = QCheckBox(_('is paid'))
@@ -293,6 +304,60 @@ class EntryEditDialog(QDialog):
             if new_year > cur_year:
                 new_year -= 100
             widget.setValue(new_year)
+
+    def items_ok(self):
+        result = True
+        for item_name in self.is_ok.keys():
+            if self.is_ok[item_name] is not True:
+                result = False
+                break
+        return result
+
+    def check_bib(self):
+        bib = self.item_bib.value()
+        self.label_bib_info.setText('')
+        if bib:
+            person = find(race().persons, bib=bib)
+            if person:
+                if person.bib == self.current_object.bib:
+                    return
+                self.button_ok.setDisabled(True)
+                self.is_ok['bib'] = False
+                info = 'Number already exist\n{}'.format(person.full_name)
+                if person.group:
+                    info = '{}\n{}: {}'.format(info, _('Group'), person.group.name)
+                self.label_bib_info.setText(info)
+            else:
+                self.label_bib_info.setText(_('Number is unique'))
+                self.is_ok['bib'] = True
+                if self.items_ok():
+                    self.button_ok.setEnabled(True)
+        else:
+            self.button_ok.setEnabled(True)
+
+    def check_card(self):
+        card = self.item_card.value()
+        self.label_card_info.setText('')
+        if card:
+            person = find(race().persons, card_number=card)
+            if person:
+                if person.card_number == self.current_object.card_number:
+                    return
+                self.button_ok.setDisabled(True)
+                self.is_ok['card'] = False
+                info = 'Card number already exist\n{}'.format(person.full_name)
+                if person.group:
+                    info = '{}\n{}: {}'.format(info, _('Group'), person.group.name)
+                if person.bib:
+                    info = '{}\n{}: {}'.format(info, _('Bib'), person.bib)
+                self.label_card_info.setText(info)
+            else:
+                self.label_card_info.setText(_('Card number is unique'))
+                self.is_ok['card'] = True
+                if self.items_ok():
+                    self.button_ok.setEnabled(True)
+        else:
+            self.button_ok.setEnabled(True)
 
     def set_values_from_table(self, table, index):
         self.table = table
