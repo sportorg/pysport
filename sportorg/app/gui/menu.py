@@ -163,10 +163,10 @@ def menu_list():
                     'title': _('Start Preparation'),
                     'action': GlobalAccess().get_main_window().start_preparation_dialog
                 },
-                {
-                    'title': _('Number Change'),
-                    'action': GlobalAccess().get_main_window().number_change_dialog
-                },
+                # {
+                #     'title': _('Number Change'),
+                #     'action': GlobalAccess().get_main_window().number_change_dialog
+                # },
                 {
                     'title': _('Guess courses'),
                     'action': GlobalAccess().get_main_window().guess_courses
