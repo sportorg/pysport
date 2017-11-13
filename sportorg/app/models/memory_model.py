@@ -1,5 +1,3 @@
-import sys
-
 import re
 
 from sportorg.app.modules.utils.utils import time_to_hhmmss
@@ -206,7 +204,7 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
         self.count = None
 
     def get_headers(self):
-        return ['Last name', 'First name', 'Group', 'Team', 'Bib', 'Start', 'Finish', 'Result',
+        return ['Last name', 'First name', 'Group', 'Team', 'Bib', 'Card', 'Start', 'Finish', 'Result',
                 'Status', 'Penalty', 'Place']
 
     def init_cache(self):
@@ -227,6 +225,7 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
         first_name = ''
         last_name = ''
         bib = 0
+        card_number = str(result.card_number) if result.card_number else ''
         if person:
             first_name = person.name
             last_name = person.surname
@@ -252,6 +251,7 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
             group,
             team,
             bib,
+            card_number,
             start,
             finish,
             i.get_result(),

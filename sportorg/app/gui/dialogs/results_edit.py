@@ -11,6 +11,7 @@ from sportorg import config
 from sportorg.app.gui.global_access import GlobalAccess
 from sportorg.app.models.memory import race, Result, find, ResultStatus
 from sportorg.app.models.result.result_calculation import ResultCalculation
+from sportorg.app.models.result.result_checker import ResultChecker
 from sportorg.app.modules.utils.utils import datetime2qtime, qtime2datetime
 from sportorg.language import _
 
@@ -167,12 +168,21 @@ class ResultEditDialog(QDialog):
         if result.person:
             cur_bib = result.person.bib
 
+        recheck = False
         if cur_bib != new_bib:
+            recheck = True
+            if self.current_object.person:
+                self.current_object.person.card_number = 0
             new_person = find(race().persons, bib=new_bib)
             result.person = new_person
-            result.person.results.append(result)
+            result.person.add_result(result)
             result.person.result = result
             result.person.card_number = result.card_number
+
+            logging.info('Old status {}'.format(result.status))
+            ResultChecker.checking(result)
+            logging.info('New status {}'.format(result.status))
+
             GlobalAccess().get_result_table().model().init_cache()
             changed = True
 
@@ -187,7 +197,7 @@ class ResultEditDialog(QDialog):
             status = ResultStatus.DID_NOT_FINISH
         elif self.radio_dns.isChecked():
             status = ResultStatus.DID_NOT_START
-        if result.status != status:
+        if result.status != status and not recheck:
             result.status = status
             changed = True
 

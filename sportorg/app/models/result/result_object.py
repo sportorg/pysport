@@ -23,7 +23,7 @@ class ResultObject(Base):
         return False
 
     def _add_result_to_race(self):
-        race().results.insert(0, self._result)
+        race().add_result(self._result)
 
     def _has_result(self):
         for result in race().results:

@@ -2,7 +2,7 @@ import logging
 
 from sportorg.app.gui.dialogs.bib_dialog import BibDialog
 from sportorg.app.gui.global_access import GlobalAccess
-from sportorg.app.models.memory import race, Person, ResultStatus, SystemType
+from sportorg.app.models.memory import race, Person, SystemType
 from sportorg.app.models.result.result_checker import ResultChecker
 from sportorg.app.models.result.result_object import ResultObject
 from sportorg.app.models.split_calculation import split_printout
@@ -46,14 +46,11 @@ class ResultSportidentGeneration(ResultObject):
 
     def _add_result(self):
         if isinstance(self._result.person, Person):
-            self._result.status = ResultStatus.OK
-            if not self.check_punches():
-                self._result.status = ResultStatus.DISQUALIFIED
-            if not self._result.finish_time:
-                self._result.status = ResultStatus.DID_NOT_FINISH
+            self._find_person_by_result()
+            ResultChecker.checking(self._result)
 
             self._result.person.result = self._result
-            self._result.person.results.append(self._result)
+            self._result.person.add_result(self._result)
 
             self._add_result_to_race()
 

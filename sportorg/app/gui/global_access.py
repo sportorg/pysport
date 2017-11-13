@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QTableView, QMessageBox
 
 from sportorg.app.models.memory import race
 from sportorg.app.models.result.result_calculation import ResultCalculation
+from sportorg.app.models.result.result_checker import ResultChecker
 from sportorg.language import _
 
 
@@ -131,6 +132,16 @@ class GlobalAccess(object):
         self.get_person_table().model().clear_filter(remove_condition)
         self.get_course_table().model().clear_filter(remove_condition)
         self.get_organization_table().model().clear_filter(remove_condition)
+
+    def rechecking(self):
+        try:
+            logging.debug('Rechecking start')
+            for result in race().results:
+                ResultChecker.checking(result)
+            logging.debug('Rechecking finish')
+            self.get_main_window().refresh()
+        except Exception as e:
+            logging.exception(str(e))
 
     def apply_filters(self):
         self.get_person_table().model().apply_filter()
