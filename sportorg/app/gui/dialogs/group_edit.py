@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import QFormLayout, QLabel, \
 
 from sportorg.app.gui.dialogs.group_ranking import GroupRankingDialog
 from sportorg.app.gui.global_access import GlobalAccess
-from sportorg.app.models.memory import race, Group, find
+from sportorg.app.models.memory import race, Group, find, Sex
 from sportorg.app.models.result.result_calculation import ResultCalculation
 from sportorg.app.modules.utils.custom_controls import AdvComboBox
 from sportorg.app.modules.utils.utils import datetime2qtime, qtime2datetime
@@ -25,11 +25,11 @@ def get_courses():
             ret.append(i.name)
         return ret
     except Exception as e:
-        return ['']
+        logging.exception(e)
 
 
 def get_sexes():
-    return ['', 'M', 'F']
+    return [str(Sex.MF), str(Sex.M), str(Sex.F)]
 
 
 class GroupEditDialog(QDialog):
@@ -135,25 +135,25 @@ class GroupEditDialog(QDialog):
 
         self.item_name.setText(current_object.name)
 
-        if current_object.long_name is not None:
+        if current_object.long_name:
             self.item_full_name.setText(current_object.long_name)
-        if current_object.course is not None:
+        if current_object.course:
             self.item_course.setCurrentText(current_object.course.name)
-        if current_object.sex is not None:
-            self.item_sex.setCurrentText(current_object.sex)
-        if current_object.min_age is not None:
+        if current_object.sex:
+            self.item_sex.setCurrentText(str(current_object.sex))
+        if current_object.min_age:
             self.item_age_min.setValue(current_object.min_age)
-        if current_object.max_age is not None:
+        if current_object.max_age:
             self.item_age_max.setValue(current_object.max_age)
-        if current_object.max_time is not None:
+        if current_object.max_time:
             self.item_max_time.setTime(datetime2qtime(current_object.max_time))
-        if current_object.start_interval is not None:
+        if current_object.start_interval:
             self.item_start_interval.setTime(datetime2qtime(current_object.start_interval))
-        if current_object.start_corridor is not None:
+        if current_object.start_corridor:
             self.item_corridor.setValue(current_object.start_corridor)
-        if current_object.order_in_corridor is not None:
+        if current_object.order_in_corridor:
             self.item_corridor_order.setValue(current_object.order_in_corridor)
-        if current_object.price is not None:
+        if current_object.price:
             self.item_price.setValue(current_object.price)
 
         self.rank_checkbox.setChecked(current_object.ranking.is_active)
@@ -182,8 +182,8 @@ class GroupEditDialog(QDialog):
             org.course = find(race().courses, name=self.item_course.currentText())
             changed = True
 
-        if org.sex != self.item_sex.currentText():
-            org.sex = self.item_sex.currentText()
+        if str(org.sex) != self.item_sex.currentText():
+            org.sex = Sex.__dict__[self.item_sex.currentText()]
             changed = True
 
         if org.min_age != self.item_age_min.value():
@@ -222,11 +222,7 @@ class GroupEditDialog(QDialog):
 
         if changed:
             ResultCalculation().set_rank(org)
-            self.get_parent_window().refresh()
-
-
-    def get_parent_window(self):
-        return GlobalAccess().get_main_window()
+            GlobalAccess().get_main_window().refresh()
 
 
 if __name__ == '__main__':

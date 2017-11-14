@@ -442,7 +442,7 @@ class MainWindow(QMainWindow, App):
             table.setModel(CourseMemoryModel())
             table = GlobalAccess().get_organization_table()
             table.setModel(TeamMemoryModel())
-
+            event.event('init_model')
         except Exception as e:
             logging.exception(str(e))
 
@@ -468,6 +468,7 @@ class MainWindow(QMainWindow, App):
             table = GlobalAccess().get_organization_table()
             table.model().init_cache()
             table.model().layoutChanged.emit()
+            event.event('refresh')
         except Exception as e:
             logging.exception(str(e))
 

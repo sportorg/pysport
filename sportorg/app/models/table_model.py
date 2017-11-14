@@ -131,7 +131,7 @@ class PersonTableModel(AbstractSportOrgTableModel):
         return list([
             person.surname,
             person.name,
-            person.sex,
+            str(person.sex),
             person.qual,
             group_name,
             team_name,

@@ -376,11 +376,11 @@ class EntryEditDialog(QDialog):
             self.item_group.setCurrentText(current_object.group.name)
         if current_object.organization is not None:
             self.item_team.setCurrentText(current_object.organization.name)
-        if current_object.year is not None:
+        if current_object.year:
             self.item_year.setValue(int(current_object.year))
-        if current_object.qual is not None:
+        if current_object.qual:
             self.item_qual.setCurrentText(current_object.qual.get_title())
-        if current_object.bib is not None:
+        if current_object.bib:
             self.item_bib.setValue(int(current_object.bib))
         if current_object.start_time is not None:
             time = datetime2qtime(current_object.start_time)
@@ -388,7 +388,7 @@ class EntryEditDialog(QDialog):
         if current_object.start_group is not None:
             self.item_start_group.setValue(int(current_object.start_group))
 
-        if current_object.card_number is not None:
+        if current_object.card_number:
             self.item_card.setValue(int(current_object.card_number))
 
         self.item_out_of_competition.setChecked(current_object.is_out_of_competition)
@@ -451,11 +451,8 @@ class EntryEditDialog(QDialog):
 
         if changed:
             ResultCalculation().process_results()
-            self.get_parent_window().refresh()
-            #table.model().sourceModel().update_one_object(part, table.model().mapToSource(self.current_index).row())
-
-    def get_parent_window(self):
-        return GlobalAccess().get_main_window()
+            GlobalAccess().get_main_window().refresh()
+            # table.model().sourceModel().update_one_object(part, table.model().mapToSource(self.current_index).row())
 
 
 if __name__ == '__main__':

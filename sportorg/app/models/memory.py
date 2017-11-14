@@ -24,71 +24,96 @@ class SystemType(Enum):
         return self.__str__()
 
 
+class Sex(Enum):
+    MF = 0
+    M = 1
+    F = 2
+
+    def __str__(self):
+        return "%s" % self._name_
+
+    def __repr__(self):
+        return self.__str__()
+
+
+class ResultStatus(Enum):
+    NONE = 0
+    OK = 1
+    FINISHED = 2
+    MISSING_PUNCH = 3
+    DISQUALIFIED = 4
+    DID_NOT_FINISH = 5
+    ACTIVE = 6
+    INACTIVE = 7
+    OVERTIME = 8
+    SPORTING_WITHDRAWAL = 9
+    NOT_COMPETING = 10
+    MOVED = 11
+    MOVED_UP = 12
+    DID_NOT_START = 13
+    DID_NOT_ENTER = 14
+    CANCELLED = 15
+
+    def __str__(self):
+        return "%s" % self._name_
+
+    def __repr__(self):
+        return self.__str__()
+
+
+class CompetitionType(Enum):
+    PREDETERMINED = 1
+    SELECTION = 2
+    MARKING = 3
+
+    def __str__(self):
+        return "%s" % self._name_
+
+    def __repr__(self):
+        return self.__str__()
+
+
 class Country(Model):
     def __init__(self):
-        self.name = None
-        self.code2 = None
-        self.code3 = None
-        self.digital_code = None
-        self.code = None
-
-
-class ResultStatus(object):
-    OK = "OK"
-    FINISHED = "Finished"
-    MISSING_PUNCH = "MissingPunch"
-    DISQUALIFIED = "Disqualified"
-    DID_NOT_FINISH = "DidNotFinish"
-    ACTIVE = "Active"
-    INACTIVE = "Inactive"
-    OVERTIME = "OverTime"
-    SPORTING_WITHDRAWAL = "SportingWithdrawal"
-    NOT_COMPETING = "NotCompeting"
-    MOVED = "Moved"
-    MOVED_UP = "MovedUp"
-    DID_NOT_START = "DidNotStart"
-    DID_NOT_ENTER = "DidNotEnter"
-    CANCELLED = "Cancelled"
-
-
-class CompetitionType(object):
-    PREDETERMINED = 'Predetermined'
-    SELECTION = 'Selection'
-    MARKING = 'Marking'
+        self.name = ''
+        self.code2 = ''
+        self.code3 = ''
+        self.digital_code = ''
+        self.code = ''
 
 
 class Address(Model):
     def __init__(self):
-        self.care_of = None
-        self.street = None
-        self.zip_code = None
-        self.city = None
-        self.state = None
+        self.care_of = ''
+        self.street = ''
+        self.zip_code = ''
+        self.city = ''
+        self.state = ''
         self.country = Country()
 
 
 class Contact(Model):
     def __init__(self):
-        self.name = None
-        self.value = None
+        self.name = ''
+        self.value = ''
 
 
 class Organization(Model):
     def __init__(self):
-        self.name = None
+        self.name = ''
         self.address = Address()
         self.contact = Contact()
         self.country = Country()
-        self.city = None
-        self.region = None
+        self.city = ''
+        self.region = ''
         self.count_person = 0
 
 
 class CourseControl(Model):
     def __init__(self):
-        self.code = None
-        self.length = None
-        self.order = None
+        self.code = ''
+        self.length = 0
+        self.order = 0
 
     def __eq__(self, other):
         return self.code == other.code
@@ -125,22 +150,22 @@ class Course(Model):
 
 class Group(Model):
     def __init__(self):
-        self.name = None
+        self.name = ''
         self.course = Course()
-        self.price = None
-        self.long_name = None
-        self.sex = None
+        self.price = 0
+        self.long_name = ''
+        self.sex = Sex.MF
 
-        self.min_age = None
-        self.max_age = None
+        self.min_age = 0
+        self.max_age = 0
 
         self.max_time = None  # datetime
-        self.qual_assign_text = None
+        self.qual_assign_text = ''
         self.start_interval = None
         self.start_corridor = 0
         self.order_in_corridor = 0
 
-        self.first_number = None
+        self.first_number = 0
         self.count_person = 0
         self.count_finished = 0
 
@@ -156,7 +181,7 @@ class Group(Model):
 class Result(Model):
     def __init__(self):
         self.type = None  # type: SystemType
-        self.card_number = None
+        self.card_number = 0
         self.start_time = None
         self.finish_time = None
         self.punches = []
@@ -164,7 +189,7 @@ class Result(Model):
         self.penalty_laps = None  # count of penalty legs (marked route)
         self.status = ResultStatus.OK
         self.result = None  # time in seconds * 100 (int)
-        self.place = None
+        self.place = 0
 
         self.person = None  # type: Person reverse link to person
         self.assigned_rank = Qualification.NOT_QUALIFIED  # type: Qualification assigned rank (Russia only)
@@ -196,9 +221,8 @@ Punches:
         return eq
 
     def __gt__(self, other):
-        if self.status is not None and other.status is not None:
-            if self.status == ResultStatus.OK and other.status != ResultStatus.OK:
-                return False
+        if self.status == ResultStatus.OK and other.status != ResultStatus.OK:
+            return False
 
         if not self.result:
             return True
@@ -259,16 +283,16 @@ Punches:
 
 class Person(Model):
     def __init__(self):
-        self.name = None
-        self.surname = None
-        self.sex = None
+        self.name = ''
+        self.surname = ''
+        self.sex = Sex.MF
 
-        self.card_number = None
+        self.card_number = 0
         self.bib = 0
         self.result = None  # type: Result
         self.results = []  # type: List[Result]
 
-        self.year = None  # sometime we have only year of birth
+        self.year = 0  # sometime we have only year of birth
         self.birth_date = None  # datetime
         self.organization = None  # type: Organization
         self.group = None  # type: Group
@@ -280,7 +304,7 @@ class Person(Model):
         self.rank = None  # position/scores in word ranking
         self.qual = Qualification.NOT_QUALIFIED  # type: Qualification 'qualification, used in Russia only'
         self.is_out_of_competition = False  # e.g. 20-years old person, running in M12
-        self.comment = None
+        self.comment = ''
 
         self.start_time = None
         self.start_group = 0
@@ -305,11 +329,11 @@ class Person(Model):
 
 class RaceData(Model):
     def __init__(self):
-        self.name = None
+        self.name = ''
         self.organisation = None
         self.start_time = None
         self.end_time = None
-        self.live_url = None
+        self.url = ''
 
 
 class Race(Model):

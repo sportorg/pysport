@@ -6,7 +6,6 @@ from PyQt5.QtWidgets import QFormLayout, \
     QApplication, QDialog, \
     QPushButton, QCheckBox, QSpinBox, QTimeEdit, QHBoxLayout
 
-from sportorg.app.gui.global_access import GlobalAccess
 from sportorg.app.models.memory import Group, RankingItem, Qualification
 from sportorg.app.models.result.result_calculation import ResultCalculation
 from sportorg.app.modules.utils.custom_controls import AdvComboBox
@@ -70,9 +69,6 @@ class GroupRankingDialog(QDialog):
                 rank.use_scores = self.findChild(AdvComboBox, name + '_combo').currentText() == _('Rank')
         ResultCalculation().set_rank(self.group)
 
-    def get_parent_window(self):
-        return GlobalAccess().get_main_window()
-
 
 def get_widget_from_ranking(ranking):
     assert isinstance(ranking, RankingItem)
@@ -106,7 +102,6 @@ def get_widget_from_ranking(ranking):
         type_combo.setEnabled(flag)
         max_place.setEnabled(flag)
         max_time.setEnabled(flag)
-
 
     type_combo.currentIndexChanged.connect(select_type)
     qual_checkbox.stateChanged.connect(set_enabled)

@@ -8,7 +8,6 @@ from PyQt5.QtWidgets import QFormLayout, QLabel, \
     QApplication, QDialog, \
     QPushButton,  QCheckBox
 
-from sportorg.app.gui.global_access import GlobalAccess
 from sportorg.app.models.memory import race
 
 from sportorg.language import _
@@ -118,9 +117,6 @@ class PrintPropertiesDialog(QDialog):
         split_printer = self.selected_split_printer.text()
         obj.set_setting('split_printer', split_printer)
         obj.set_setting('split_printout', self.print_splits_checkbox.isChecked())
-
-    def get_parent_window(self):
-        return GlobalAccess().get_main_window()
 
 
 if __name__ == '__main__':
