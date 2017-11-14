@@ -30,7 +30,7 @@ class Sex(Enum):
     F = 2
 
     def __str__(self):
-        return "%s" % self._name_
+        return _("%s" % self._name_)
 
     def __repr__(self):
         return self.__str__()
@@ -60,6 +60,8 @@ class ResultStatus(Enum):
     def __repr__(self):
         return self.__str__()
 
+    def get_title(self):
+        return _(self.name)
 
 class CompetitionType(Enum):
     PREDETERMINED = 1
@@ -232,11 +234,11 @@ Punches:
         return self.result > other.result
 
     def get_result(self):
-        if self.status != 0 and self.status != ResultStatus.OK:
-            return None
+        if self.status != ResultStatus.OK:
+            return self.status.get_title()
 
         if not self.person:
-            return None
+            return ''
 
         return time_to_hhmmss(self.get_finish_time() - self.get_start_time())
 
