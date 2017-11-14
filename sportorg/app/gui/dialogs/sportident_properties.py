@@ -220,7 +220,4 @@ class SportidentPropertiesDialog(QDialog):
         Config.set('autoconnect', self.auto_connect.isChecked())
 
         if changed:
-            win = self.get_main_window()
-
-    def get_main_window(self):
-        return GlobalAccess().get_main_window()
+            win = GlobalAccess().get_main_window()

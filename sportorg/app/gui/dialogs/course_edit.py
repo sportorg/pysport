@@ -64,7 +64,7 @@ class CourseEditDialog(QDialog):
         self.item_control_qty = QSpinBox()
         self.layout.addRow(self.label_control_qty, self.item_control_qty)
 
-        self.label_controls = QLabel(_('Controls'))
+        self.label_controls = QLabel('{}\n\n31 150\n32 200\n33\n34 500\n...\n90 150'.format(_('Controls')))
         self.item_controls = QTextEdit()
         self.layout.addRow(self.label_controls, self.item_controls)
 
@@ -99,13 +99,13 @@ class CourseEditDialog(QDialog):
 
         self.item_name.setText(current_object.name)
 
-        if current_object.type is not None:
+        if current_object.type:
             self.item_type.setCurrentText(str(current_object.type))
-        if current_object.length is not None:
+        if current_object.length:
             self.item_length.setValue(current_object.length)
-        if current_object.climb is not None:
+        if current_object.climb:
             self.item_climb.setValue(current_object.climb)
-        if current_object.controls is not None:
+        if current_object.controls:
             self.item_control_qty.setValue(len(current_object.controls))
         for i in current_object.controls:
             assert isinstance(i, CourseControl)
@@ -152,10 +152,7 @@ class CourseEditDialog(QDialog):
             course.controls.append(control)
 
         if changed:
-            self.get_main_window().refresh()
-
-    def get_main_window(self):
-        return GlobalAccess().get_main_window()
+            GlobalAccess().get_main_window().refresh()
 
 
 if __name__ == '__main__':

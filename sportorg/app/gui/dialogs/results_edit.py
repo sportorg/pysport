@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import QFormLayout, QLabel, \
 
 from sportorg import config
 from sportorg.app.gui.global_access import GlobalAccess
-from sportorg.app.models.memory import race, Result, find, ResultStatus
+from sportorg.app.models.memory import race, Result, find, ResultStatus, Person
 from sportorg.app.models.result.result_calculation import ResultCalculation
 from sportorg.app.models.result.result_checker import ResultChecker
 from sportorg.app.modules.utils.utils import datetime2qtime, qtime2datetime
@@ -101,6 +101,7 @@ class ResultEditDialog(QDialog):
     def show_person_info(self):
         bib = self.item_bib.value()
         self.label_person_info.setText('')
+        self.button_ok.setEnabled(True)
         if bib:
             person = find(race().persons, bib=bib)
             if person:
@@ -112,6 +113,7 @@ class ResultEditDialog(QDialog):
                 self.label_person_info.setText(info)
             else:
                 self.label_person_info.setText(_('not found'))
+                self.button_ok.setDisabled(True)
 
     def set_values_from_table(self, table, index):
         self.table = table
@@ -169,24 +171,29 @@ class ResultEditDialog(QDialog):
             cur_bib = result.person.bib
 
         recheck = False
-        if cur_bib != new_bib:
-            recheck = True
+        if new_bib == 0:
+            result.person = None
+            changed = True
+        elif cur_bib != new_bib:
             if self.current_object.person:
                 self.current_object.person.card_number = 0
             new_person = find(race().persons, bib=new_bib)
-            result.person = new_person
-            result.person.add_result(result)
-            result.person.result = result
-            result.person.card_number = result.card_number
+            if new_person is not None:
+                assert isinstance(new_person, Person)
+                recheck = True
+                result.person = new_person
+                result.person.add_result(result)
+                result.person.result = result
+                result.person.card_number = result.card_number
 
-            logging.info('Old status {}'.format(result.status))
-            ResultChecker.checking(result)
-            logging.info('New status {}'.format(result.status))
+                logging.info('Old status {}'.format(result.status))
+                ResultChecker.checking(result)
+                logging.info('New status {}'.format(result.status))
 
             GlobalAccess().get_result_table().model().init_cache()
             changed = True
 
-        status = ''
+        status = ResultStatus.NONE
         if self.radio_ok.isChecked():
             status = ResultStatus.OK
         elif self.radio_dsq.isChecked():
@@ -203,10 +210,7 @@ class ResultEditDialog(QDialog):
 
         if changed:
             ResultCalculation().process_results()
-            self.get_parent_window().refresh()
-
-    def get_parent_window(self):
-        return GlobalAccess().get_main_window()
+            GlobalAccess().get_main_window().refresh()
 
 
 if __name__ == '__main__':

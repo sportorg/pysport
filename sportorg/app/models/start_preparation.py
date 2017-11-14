@@ -297,7 +297,6 @@ class StartTimeManager(object):
 
                     cur_start = self.process_group(cur_group, cur_start, start_interval)
 
-
     def process_group(self, group, first_start, start_interval):
         current_race = race()
         persons = current_race.get_persons_by_group(group)

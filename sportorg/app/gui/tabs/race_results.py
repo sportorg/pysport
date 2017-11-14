@@ -27,6 +27,12 @@ class ResultTable(QTableView):
         self.clicked.connect(self.entry_single_clicked)
         self.activated.connect(self.double_clicked)
 
+        event_handler.add_event('refresh', self.update_punches)
+
+    def update_punches(self):
+        if -1 < self.currentIndex().row() < len(race().results):
+            self.parent_widget.show_punches(self.currentIndex())
+
     def keyPressEvent(self, event):
         super().keyPressEvent(event)
         try:
@@ -52,7 +58,6 @@ class ResultTable(QTableView):
             if index.row() < len(race().results):
                 dialog = ResultEditDialog(self, index)
                 dialog.exec()
-                self.parent_widget.show_punches(index)
         except Exception as e:
             logging.exception(str(e))
 

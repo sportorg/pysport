@@ -97,7 +97,7 @@ class OrganizationEditDialog(QDialog):
 
         if current_object.country is not None:
             self.item_country.setCurrentText(current_object.country.name)
-        if current_object.region is not None:
+        if current_object.region:
             self.item_region.setCurrentText(current_object.region)
         if current_object.contact is not None:
             self.item_contact.setText(current_object.contact.value)
@@ -131,11 +131,8 @@ class OrganizationEditDialog(QDialog):
             changed = True
 
         if changed:
-            self.get_parent_window().refresh()
+            GlobalAccess().get_main_window().refresh()
             # table.model().sourceModel().update_one_object(part, table.model().mapToSource(self.current_index).row())
-
-    def get_parent_window(self):
-        return GlobalAccess().get_main_window()
 
 
 if __name__ == '__main__':

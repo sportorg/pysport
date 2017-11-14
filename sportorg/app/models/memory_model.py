@@ -255,7 +255,7 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
             start,
             finish,
             i.get_result(),
-            i.status,
+            str(i.status),
             i.penalty_time,
             i.place])
 
@@ -304,7 +304,7 @@ class GroupMemoryModel(AbstractSportOrgMemoryModel):
             course.length,
             control_count,
             course.climb,
-            group.sex,
+            str(group.sex),
             group.min_age,
             group.max_age,
             group.start_interval,
