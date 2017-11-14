@@ -174,7 +174,6 @@ class WinOrientBinary:
         my_race.set_setting('chief_referee', self.wdb_object.info.referee)
         my_race.set_setting('secretary', self.wdb_object.info.secretary)
 
-
         for team in self.wdb_object.team:
             assert (isinstance(team, WDBTeam))
             new_team = Organization()
@@ -301,6 +300,7 @@ class WinOrientBinary:
             new_course.name = course.name
             new_course.elevation = int(course.climb)
             new_course.length = int(course.length)
+            new_course.point_quantity = len(course.controls)
 
             # controls
             for i in range(len(course.controls)):

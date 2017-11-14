@@ -61,6 +61,3 @@ class Widget(QtWidgets.QWidget):
 
     def get_table(self):
         return self.EntryTable
-
-    def get_parent_window(self):
-        return self.parent
