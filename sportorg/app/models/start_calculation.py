@@ -124,7 +124,7 @@ class GroupsStartList(object):
             'name': person.full_name,
             'bib': person.bib,
             'team': person.organization.name if person.organization is not None else '',
-            'qual': if_none(person.qual, ''),
+            'qual': person.qual.get_title(),
             'year': if_none(person.year, ''),
             'card_number': if_none(person.card_number, ''),
             'start': person.start_time.strftime("%H:%M:%S")

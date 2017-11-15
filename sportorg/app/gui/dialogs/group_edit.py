@@ -29,7 +29,7 @@ def get_courses():
 
 
 def get_sexes():
-    return [str(Sex.MF), str(Sex.M), str(Sex.F)]
+    return [Sex.MF.get_title(), Sex.M.get_title(), Sex.F.get_title()]
 
 
 class GroupEditDialog(QDialog):
@@ -140,7 +140,7 @@ class GroupEditDialog(QDialog):
         if current_object.course:
             self.item_course.setCurrentText(current_object.course.name)
         if current_object.sex:
-            self.item_sex.setCurrentText(str(current_object.sex))
+            self.item_sex.setCurrentText(current_object.sex.get_title())
         if current_object.min_age:
             self.item_age_min.setValue(current_object.min_age)
         if current_object.max_age:
@@ -183,7 +183,7 @@ class GroupEditDialog(QDialog):
             changed = True
 
         if str(org.sex) != self.item_sex.currentText():
-            org.sex = Sex.__dict__[self.item_sex.currentText()]
+            org.sex = Sex.get_by_title(self.item_sex.currentText())
             changed = True
 
         if org.min_age != self.item_age_min.value():
