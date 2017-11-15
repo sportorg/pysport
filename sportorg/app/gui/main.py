@@ -211,7 +211,7 @@ class MainWindow(QMainWindow, App):
         self.tabwidget.addTab(teams.Widget(), _("Teams"))
 
     def set_title(self, title=None):
-        main_title = '{} v{}'.format(_(config.NAME), config.VERSION)
+        main_title = '{} {}'.format(_(config.NAME), config.VERSION)
         if title:
             self.setWindowTitle('{} - {}'.format(title, main_title))
         else:
