@@ -172,14 +172,17 @@ class ResultEditDialog(QDialog):
 
         recheck = False
         if new_bib == 0:
+            if result.person:
+                if result.person.card_number == result.card_number:
+                    result.person.card_number = 0
             result.person = None
             changed = True
         elif cur_bib != new_bib:
-            if self.current_object.person:
-                self.current_object.person.card_number = 0
             new_person = find(race().persons, bib=new_bib)
             if new_person is not None:
                 assert isinstance(new_person, Person)
+                if result.person:
+                    result.person.card_number = 0
                 recheck = True
                 result.person = new_person
                 result.person.add_result(result)
