@@ -36,7 +36,7 @@ class Sex(Enum):
         return self.__str__()
 
     def get_title(self):
-        return _(self.name)
+        return _(self.__str__())
 
     @staticmethod
     def get_by_title(title):
@@ -47,6 +47,7 @@ class Sex(Enum):
         if title in sex_reverse:
             return sex_reverse[title]
         return Sex.MF
+
 
 class ResultStatus(Enum):
     NONE = 0
@@ -73,7 +74,7 @@ class ResultStatus(Enum):
         return self.__str__()
 
     def get_title(self):
-        return _(self.name)
+        return _(self.__str__())
 
 
 class CompetitionType(Enum):
