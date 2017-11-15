@@ -180,13 +180,15 @@
         </tr>
         <tr>
             <td>№</td>
-            <td>Name</td>
-            <td>Team</td>
-            <td>Qual</td>
-            <td>Year</td>
-            <td>Result</td>
-            <td>Place</td>
-            <td>Rank</td>
+            <td>Фамилия, имя</td>
+            <td>Коллектив</td>
+            <td>Разряд</td>
+            <td>ГР</td>
+            <td>Результат</td>
+            <td>Место</td>
+            {% if group.ranking.rank_scores and group.ranking.rank_scores > 0 %}
+                <td>Вып.</td>
+            {% endif %}
         </tr>
         {% for person in group.persons %}
         <tr>
@@ -197,25 +199,28 @@
             <td>{{ person.year }}</td>
             <td>{{ person.result }}</td>
             <td>{{ person.place }}</td>
-            <td>{{ person.assigned_rank }}</td>
+            {% if group.ranking.rank_scores and group.ranking.rank_scores > 0 %}
+                <td>{{ person.assigned_rank }}</td>
+            {% endif %}
         </tr>
         {% endfor %}
         <tr style="background: white; border: 0">
             <td colspan="7" style="border: 0">
-                Квалификационный уровень (баллы): {{group.ranking.rank_scores}}<br>
-                Класс дистанции: {{group.ranking.max_qual}}<br>
-                {% for rank in group.ranking.rank %}
-                    {{"{}".format(rank.qual)}} --
-                    {% if rank.max_place %}
-                        до {{rank.max_place}} места
-                    {% else %}
-                        {{rank.max_time}} ({{rank.percent}}%)
-                    {% endif %}
-                    <br>
-                {% endfor %}
+                {% if group.ranking.rank_scores and group.ranking.rank_scores > 0 %}
+                    Квалификационный уровень (баллы): {{group.ranking.rank_scores}}<br>
+                    Класс дистанции: {{group.ranking.max_qual}}<br>
+                    {% for rank in group.ranking.rank %}
+                        {{"{}".format(rank.qual)}} --
+                        {% if rank.max_place %}
+                            до {{rank.max_place}} места
+                        {% else %}
+                            {{rank.max_time}} ({{rank.percent}}%)
+                        {% endif %}
+                        <br>
+                    {% endfor %}
+                {% endif %}
             </td>
         </tr>
-
     {% endif %}
     {% endfor %}
     </table>

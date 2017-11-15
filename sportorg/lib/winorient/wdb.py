@@ -1129,7 +1129,10 @@ class WDB:
 
         if is_new_format:  # format changing of 2009/03-2010/09: 64 -> 200 punches + added Adventure block
             ret += int(0).to_bytes(4, byteorder)
+
+            #ret += int(257).to_bytes(4, byteorder)
             ret += len(self.adv).to_bytes(4, byteorder)
+
             for i in self.adv:
                 assert isinstance(i, WDBAdventure)
                 ret += i.get_bytes()

@@ -300,6 +300,7 @@ class WinOrientBinary:
             new_course.name = course.name
             new_course.elevation = int(course.climb)
             new_course.length = int(course.length)
+            new_course.point_quantity = len(course.controls)
 
             # controls
             for i in range(len(course.controls)):
