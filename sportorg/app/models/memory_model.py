@@ -175,7 +175,7 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
             ret.append('')
         ret.append(person.start_group)
         ret.append(person.card_number)
-        ret.append('rented stub')
+        ret.append(_('rented stub'))
         ret.append(person.comment)
         ret.append(person.world_code)
         ret.append(person.national_code)
@@ -255,7 +255,7 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
             start,
             finish,
             i.get_result(),
-            str(i.status),
+            i.status.get_title(),
             i.penalty_time,
             i.place])
 
@@ -304,7 +304,7 @@ class GroupMemoryModel(AbstractSportOrgMemoryModel):
             course.length,
             control_count,
             course.climb,
-            str(group.sex),
+            group.sex.get_title(),
             group.min_age,
             group.max_age,
             group.start_interval,

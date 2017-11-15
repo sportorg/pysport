@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: SportOrg\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-08-10 11:27+0500\n"
-"PO-Revision-Date: 2017-11-11 09:53+0500\n"
+"PO-Revision-Date: 2017-11-15 02:05+0500\n"
 "Last-Translator: SportOrg\n"
 "Language-Team: SportOrg\n"
 "Language: ru_RU\n"
@@ -738,6 +738,93 @@ msgstr "МСМК"
 
 msgid "ЗМС"
 msgstr "ЗМС"
+
+msgid "Rechecking"
+msgstr "Перепроверить отметку"
+
+msgid "NONE"
+msgstr "-"
+
+msgid "FINISHED"
+msgstr "Финишировал"
+
+msgid "MISSING_PUNCH"
+msgstr "Непр. отметка"
+
+msgid "DISQUALIFIED"
+msgstr "Дискв."
+
+msgid "DID_NOT_FINISH"
+msgstr "Сошел"
+
+msgid "ACTIVE"
+msgstr "Активный"
+
+msgid "INACTIVE"
+msgstr "Неактивный"
+
+msgid "OVERTIME"
+msgstr "Превышено КВ"
+
+msgid "SPORTING_WITHDRAWAL"
+msgstr "Проведена жеребьевка"
+
+msgid "NOT_COMPETING"
+msgstr "Вне конкурса"
+
+msgid "MOVED"
+msgstr "Перемещен"
+
+msgid "MOVED_UP"
+msgstr "Перемещен наверх"
+
+msgid "DID_NOT_START"
+msgstr "Не стартовал"
+
+msgid "DID_NOT_ENTER"
+msgstr "Не заявлен"
+
+msgid "CANCELLED"
+msgstr "Заявка отменена"
+
+msgid "rented stub"
+msgstr "Свой чип"
+
+msgid "MF"
+msgstr "МЖ"
+
+msgid "M"
+msgstr "М"
+
+msgid "F"
+msgstr "Ж"
+
+msgid "Assigning a chip when reading"
+msgstr "Присвоение чипов при чтении"
+
+msgid "Off"
+msgstr "Отключено"
+
+msgid "Only unknown members"
+msgstr "Только неизвестные чипы"
+
+msgid "Always"
+msgstr "Всегда"
+
+msgid "Repeated reading"
+msgstr "Повторное чтение"
+
+msgid "Rewrite"
+msgstr "Переписывать"
+
+msgid "Add"
+msgstr "Добавлять"
+
+msgid "Keep all versions"
+msgstr "Сохранить все версии"
+
+msgid "Assignment mode"
+msgstr "Режим присвоения"
 
 msgid "Refresh"
 msgstr "Обновить"

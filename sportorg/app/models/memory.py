@@ -35,6 +35,18 @@ class Sex(Enum):
     def __repr__(self):
         return self.__str__()
 
+    def get_title(self):
+        return _(self.name)
+
+    @staticmethod
+    def get_by_title(title):
+        sex_reverse = {
+            _(str(Sex.M)): Sex.M,
+            _(str(Sex.F)): Sex.F,
+        }
+        if title in sex_reverse:
+            return sex_reverse[title]
+        return Sex.MF
 
 class ResultStatus(Enum):
     NONE = 0
@@ -59,6 +71,9 @@ class ResultStatus(Enum):
 
     def __repr__(self):
         return self.__str__()
+
+    def get_title(self):
+        return _(self.name)
 
 
 class CompetitionType(Enum):
@@ -232,11 +247,11 @@ Punches:
         return self.result > other.result
 
     def get_result(self):
-        if self.status != 0 and self.status != ResultStatus.OK:
-            return None
+        if self.status != ResultStatus.OK:
+            return self.status.get_title()
 
         if not self.person:
-            return None
+            return ''
 
         return time_to_hhmmss(self.get_finish_time() - self.get_start_time())
 
