@@ -2,6 +2,7 @@ import unittest
 
 testmodules = [
     'sportorg.core.otime_test',
+    'sportorg.core.version_test',
     'sportorg.lib.winorient.wdb_test',
     'sportorg.lib.ocad.ocad_test',
 ]

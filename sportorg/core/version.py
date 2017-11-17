@@ -64,5 +64,20 @@ class Version:
     def __eq__(self, o):
         return str(self) == str(o)
 
+    def __ne__(self, o):
+        return str(self) != str(o)
+
+    def __lt__(self, o):
+        return self.major < o.major
+
+    def __gt__(self, o):
+        return self.major > o.major
+
+    def __le__(self, o):
+        return self.major <= o.major
+
+    def __ge__(self, o):
+        return self.major >= o.major
+
     def is_compatible(self, o):
         return self.major == o.major

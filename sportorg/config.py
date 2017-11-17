@@ -8,6 +8,13 @@ VERSION = Version(0, 9, 0, 0, 'v', 'beta')
 DEBUG = True
 
 
+class ConfigFile(object):
+    GEOMETRY = 'geometry'
+    CONFIGURATION = 'configuration'
+    DIRECTORY = 'directory'
+    PATH = 'path'
+
+
 def module_path():
     if hasattr(sys, 'frozen'):
         return os.path.dirname(
@@ -169,13 +176,6 @@ DIRS = [
     TEMPLATE_DIR
 ]
 
-for DIR in DIRS:
-    if not os.path.exists(DIR):
-        os.makedirs(DIR)
-
-
-class ConfigFile(object):
-    GEOMETRY = 'geometry'
-    CONFIGURATION = 'configuration'
-    DIRECTORY = 'directory'
-    PATH = 'path'
+for _DIR in DIRS:
+    if not os.path.exists(_DIR):
+        os.makedirs(_DIR)
