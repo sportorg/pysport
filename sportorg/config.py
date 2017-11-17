@@ -1,13 +1,22 @@
 import os
 import sys
 
+from sportorg.core.version import Version
+
 NAME = 'SportOrg'
-VERSION = 'v0.9.0-beta'
+VERSION = Version(0, 9, 0, 0, 'v', 'beta')
 DEBUG = True
 
 
+class ConfigFile(object):
+    GEOMETRY = 'geometry'
+    CONFIGURATION = 'configuration'
+    DIRECTORY = 'directory'
+    PATH = 'path'
+
+
 def module_path():
-    if hasattr(sys, "frozen"):
+    if hasattr(sys, 'frozen'):
         return os.path.dirname(
             sys.executable
         )
@@ -113,6 +122,51 @@ LOG_CONFIG = {
     },
 }
 
+VERSION_INFO = {
+    'FixedFileInfo':
+        {
+            'FileVersion': {
+                'Major': VERSION.major,
+                'Minor': VERSION.minor,
+                'Patch': VERSION.patch,
+                'Build': VERSION.build
+            },
+            'ProductVersion': {
+                'Major': VERSION.major,
+                'Minor': VERSION.minor,
+                'Patch': VERSION.patch,
+                'Build': VERSION.build
+            },
+            'FileFlagsMask': '3f',
+            'FileFlags ': '00',
+            'FileOS': '040004',
+            'FileType': '01',
+            'FileSubType': '00'
+        },
+    'StringFileInfo':
+        {
+            'Comments': '{} program'.format(NAME),
+            'CompanyName': NAME,
+            'FileDescription': NAME,
+            'FileVersion': VERSION.file,
+            'InternalName': NAME,
+            'LegalCopyright': 'MIT Licence {}'.format(NAME),
+            'LegalTrademarks': '',
+            'OriginalFilename': NAME,
+            'PrivateBuild': '',
+            'ProductName': NAME,
+            'ProductVersion': str(VERSION),
+            'SpecialBuild': ''
+        },
+    'VarFileInfo':
+        {
+            'Translation': {
+                'LangID': '0409',
+                'CharsetID': '04B0'
+            }
+        }
+}
+
 DIRS = [
     IMG_DIR,
     ICON_DIR,
@@ -122,13 +176,6 @@ DIRS = [
     TEMPLATE_DIR
 ]
 
-for DIR in DIRS:
-    if not os.path.exists(DIR):
-        os.makedirs(DIR)
-
-
-class ConfigFile(object):
-    GEOMETRY = 'geometry'
-    CONFIGURATION = 'configuration'
-    DIRECTORY = 'directory'
-    PATH = 'path'
+for _DIR in DIRS:
+    if not os.path.exists(_DIR):
+        os.makedirs(_DIR)
