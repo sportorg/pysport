@@ -1,13 +1,15 @@
 import os
 import sys
 
+from sportorg.core.version import Version
+
 NAME = 'SportOrg'
-VERSION = 'v0.9.0-beta'
+VERSION = Version(0, 9, 0, 0, 'v', 'beta')
 DEBUG = True
 
 
 def module_path():
-    if hasattr(sys, "frozen"):
+    if hasattr(sys, 'frozen'):
         return os.path.dirname(
             sys.executable
         )
@@ -111,6 +113,51 @@ LOG_CONFIG = {
         'level': 'DEBUG',
         'handlers': ['console', 'file', 'errors']
     },
+}
+
+VERSION_INFO = {
+    'FixedFileInfo':
+        {
+            'FileVersion': {
+                'Major': VERSION.major,
+                'Minor': VERSION.minor,
+                'Patch': VERSION.patch,
+                'Build': VERSION.build
+            },
+            'ProductVersion': {
+                'Major': VERSION.major,
+                'Minor': VERSION.minor,
+                'Patch': VERSION.patch,
+                'Build': VERSION.build
+            },
+            'FileFlagsMask': '3f',
+            'FileFlags ': '00',
+            'FileOS': '040004',
+            'FileType': '01',
+            'FileSubType': '00'
+        },
+    'StringFileInfo':
+        {
+            'Comments': '{} program'.format(NAME),
+            'CompanyName': NAME,
+            'FileDescription': NAME,
+            'FileVersion': VERSION.file,
+            'InternalName': NAME,
+            'LegalCopyright': 'MIT Licence {}'.format(NAME),
+            'LegalTrademarks': '',
+            'OriginalFilename': NAME,
+            'PrivateBuild': '',
+            'ProductName': NAME,
+            'ProductVersion': str(VERSION),
+            'SpecialBuild': ''
+        },
+    'VarFileInfo':
+        {
+            'Translation': {
+                'LangID': '0409',
+                'CharsetID': '04B0'
+            }
+        }
 }
 
 DIRS = [
