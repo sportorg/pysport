@@ -111,7 +111,7 @@ class WinOrientBinary:
             if man.qualification:
                 new_person.qual = Qualification.get_qual_by_code(man.qualification)
             new_person.year = man.year
-            new_person.card_number = man.si_card
+            race().person_sportident_card(new_person, man.si_card)
             new_person.is_out_of_competition = man.is_not_qualified
             new_person.comment = man.comment
             new_person.start_group = man.start_group
@@ -135,9 +135,8 @@ class WinOrientBinary:
             if fin is not None:
                 result = Result()
                 result.person = new_person
-                new_person.result = result
 
-                result.card_number = man.si_card
+                result.sportident_card = race().new_sportident_card(man.si_card)
                 result.start_time = int_to_time(man.start)
                 result.finish_time = int_to_time(fin.time)
                 if man.status in self.status:
@@ -237,8 +236,8 @@ class WinOrientBinary:
 
             if man.year:
                 new_person.year = int(man.year)
-            if man.card_number:
-                new_person.si_card = int(man.card_number)
+            if man.sportident_card is not None:
+                new_person.si_card = int(man.sportident_card)
                 new_person.is_own_card = 2
             new_person.is_not_qualified = man.is_out_of_competition
             new_person.comment = man.comment
@@ -267,7 +266,6 @@ class WinOrientBinary:
 
                 if result.status in self.status_reverse:
                     new_person.status = self.status_reverse[result.status]
-                new_person.result = result.result
 
                 wdb_object.fin.append(new_finish)
 
@@ -275,7 +273,7 @@ class WinOrientBinary:
 
                 if result.punches:
                     new_chip = WDBChip()
-                    new_chip.id = man.card_number
+                    new_chip.id = int(man.sportident_card)
                     new_chip.start = WDBPunch(time=time_to_int(result.start_time))
                     new_chip.finish = WDBPunch(time=time_to_int(result.finish_time))
 

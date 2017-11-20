@@ -1,11 +1,10 @@
 import logging
 
-from datetime import datetime
-
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QModelIndex
 from PyQt5.QtWidgets import QAbstractItemView, QTableView
 
+from sportorg.app.modules.utils.utils import time_to_hhmmss
 from sportorg.core import event as event_handler
 from sportorg.app.gui.dialogs.results_edit import ResultEditDialog
 from sportorg.app.models.memory import race, Result, Course, CourseControl
@@ -157,14 +156,13 @@ class Widget(QtWidgets.QWidget):
         index = 1
         for i in result.punches:
             time = i[1]
-            assert isinstance(time, datetime)
-            s = '{} {} {}'.format(index, i[0], time.strftime("%H:%M:%S"))
+            s = '{} {} {}'.format(index, i[0], time_to_hhmmss(time))
             self.ResultChipDetails.append(s)
             index += 1
         if result.finish_time:
-            self.ResultChipFinishEdit.setText(result.finish_time.strftime("%H:%M:%S"))
+            self.ResultChipFinishEdit.setText(time_to_hhmmss(result.finish_time))
         if result.start_time:
-            self.ResultChipStartEdit.setText(result.start_time.strftime("%H:%M:%S"))
+            self.ResultChipStartEdit.setText(time_to_hhmmss(result.start_time))
 
         self.ResultCourseDetails.clear()
         index = 1

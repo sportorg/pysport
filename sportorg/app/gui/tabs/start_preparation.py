@@ -54,7 +54,7 @@ class Widget(QtWidgets.QWidget):
                     dialog = EntryEditDialog(self.EntryTable, index)
                     dialog.exec()
             except Exception as e:
-                logging.exception(e)
+                logging.exception(str(e))
 
         self.EntryTable.activated.connect(entry_double_clicked)
         self.entry_layout.addWidget(self.EntryTable)

@@ -39,7 +39,7 @@ def event_dump(file):
 
 
 def event_load(file):
-    logging.debug('load ' + file)
+    logging.debug('Load ' + file)
     backup(file, bin.load, 'rb')
 
 

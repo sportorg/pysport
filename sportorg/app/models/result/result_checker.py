@@ -10,7 +10,7 @@ class ResultChecker:
     def check(punches, controls):
         """
         
-        :param punches: [(code, datetime()), ...]
+        :param punches: [(code, otime()), ...]
         :param controls: [model.CourseControl, ...]
         :return: 
         """

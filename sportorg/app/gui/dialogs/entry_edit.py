@@ -10,11 +10,10 @@ from PyQt5.QtWidgets import QFormLayout, QLabel, \
 
 from sportorg import config
 from sportorg.app.gui.global_access import GlobalAccess
-from sportorg.app.models.memory import race, Person, find, Qualification
+from sportorg.app.models.memory import race, Person, find, Qualification, Limit
 from sportorg.app.models.result.result_calculation import ResultCalculation
-from sportorg.app.models.result.result_checker import ResultChecker
 from sportorg.app.modules.utils.custom_controls import AdvComboBox
-from sportorg.app.modules.utils.utils import qtime2datetime, datetime2qtime
+from sportorg.app.modules.utils.utils import qtime2otime, otime2qtime
 from sportorg.language import _
 
 
@@ -25,6 +24,7 @@ def get_groups():
             ret.append(i.name)
         return ret
     except Exception as e:
+        logging.exception(str(e))
         return ['', 'M12', 'M14', 'M16', 'M21', 'D12', 'D14', 'M16', 'D21']
 
 
@@ -35,6 +35,7 @@ def get_teams():
             ret.append(i.name)
         return ret
     except Exception as e:
+        logging.exception(str(e))
         return ['', 'Тюменская обл.', 'Курганская обл.', 'Челябинская обл.', 'Республика Коми', 'г.Москва',
                 'ХМАО-Югра']
 
@@ -215,7 +216,7 @@ class EntryEditDialog(QDialog):
         self.label_bib = QLabel(_('Bib'))
         self.item_bib = QSpinBox()
         self.item_bib.setMinimum(0)
-        self.item_bib.setMaximum(100000)
+        self.item_bib.setMaximum(Limit.BIB)
         self.item_bib.valueChanged.connect(self.check_bib)
         self.layout.addRow(self.label_bib, self.item_bib)
 
@@ -262,7 +263,7 @@ class EntryEditDialog(QDialog):
             try:
                 self.apply_changes_impl()
             except Exception as e:
-                logging.exception(e)
+                logging.exception(str(e))
             self.close()
 
         self.button_ok = QPushButton(_('OK'))
@@ -294,12 +295,12 @@ class EntryEditDialog(QDialog):
             widget.setValue(new_year)
 
     def items_ok(self):
-        result = True
+        ret = True
         for item_name in self.is_ok.keys():
             if self.is_ok[item_name] is not True:
-                result = False
+                ret = False
                 break
-        return result
+        return ret
 
     def check_bib(self):
         bib = self.item_bib.value()
@@ -325,12 +326,16 @@ class EntryEditDialog(QDialog):
             self.button_ok.setEnabled(True)
 
     def check_card(self):
-        card = self.item_card.value()
+        number = self.item_card.value()
         self.label_card_info.setText('')
-        if card:
-            person = find(race().persons, card_number=card)
+        if number:
+            person = None
+            for _p in race().persons:
+                if _p.sportident_card is not None and int(_p.sportident_card) == number:
+                    person = _p
+                    break
             if person:
-                if person.card_number == self.current_object.card_number:
+                if person.sportident_card == self.current_object.sportident_card:
                     self.button_ok.setEnabled(True)
                     return
                 self.button_ok.setDisabled(True)
@@ -372,13 +377,13 @@ class EntryEditDialog(QDialog):
         if current_object.bib:
             self.item_bib.setValue(int(current_object.bib))
         if current_object.start_time is not None:
-            time = datetime2qtime(current_object.start_time)
+            time = otime2qtime(current_object.start_time)
             self.item_start.setTime(time)
         if current_object.start_group is not None:
             self.item_start_group.setValue(int(current_object.start_group))
 
-        if current_object.card_number:
-            self.item_card.setValue(int(current_object.card_number))
+        if current_object.sportident_card is not None:
+            self.item_card.setValue(int(current_object.sportident_card))
 
         self.item_out_of_competition.setChecked(current_object.is_out_of_competition)
 
@@ -397,10 +402,10 @@ class EntryEditDialog(QDialog):
         if (person.group is not None and person.group.name != self.item_group.currentText()) or\
                 (person.group is None and len(self.item_group.currentText()) > 0):
             person.group = find(race().groups, name=self.item_group.currentText())
-            if person.result:
-                logging.info('Old status {}'.format(person.result.status))
-                ResultChecker.checking(person.result)
-                logging.info('New status {}'.format(person.result.status))
+            # if person.result:
+            #     logging.info('Old status {}'.format(person.result.status))
+            #     ResultChecker.checking(person.result)
+            #     logging.info('New status {}'.format(person.result.status))
             changed = True
         if (person.organization is not None and person.organization.name != self.item_team.currentText()) or \
                 (person.organization is None and len(self.item_team.currentText()) > 0):
@@ -416,7 +421,7 @@ class EntryEditDialog(QDialog):
             person.bib = self.item_bib.value()
             changed = True
 
-        new_time = qtime2datetime(self.item_start.time())
+        new_time = qtime2otime(self.item_start.time())
         if person.start_time != new_time:
             person.start_time = new_time
             changed = True
@@ -425,9 +430,9 @@ class EntryEditDialog(QDialog):
             person.start_group = self.item_start_group.value()
             changed = True
 
-        if (person.card_number is None or person.card_number != self.item_card.value()) \
+        if (person.sportident_card is None or int(person.sportident_card) != self.item_card.value()) \
                 and self.item_card.value:
-            person.card_number = self.item_card.value()
+            person.sportident_card = race().new_sportident_card(self.item_card.value())
             changed = True
 
         if person.is_out_of_competition != self.item_out_of_competition.isChecked():

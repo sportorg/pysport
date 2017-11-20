@@ -9,10 +9,10 @@ from PyQt5.QtWidgets import QFormLayout, QLabel, \
 
 from sportorg.app.gui.dialogs.group_ranking import GroupRankingDialog
 from sportorg.app.gui.global_access import GlobalAccess
-from sportorg.app.models.memory import race, Group, find, Sex
+from sportorg.app.models.memory import race, Group, find, Sex, Limit
 from sportorg.app.models.result.result_calculation import ResultCalculation
 from sportorg.app.modules.utils.custom_controls import AdvComboBox
-from sportorg.app.modules.utils.utils import datetime2qtime, qtime2datetime
+from sportorg.app.modules.utils.utils import otime2qtime, qtime2otime
 
 from sportorg.language import _
 from sportorg import config
@@ -25,7 +25,7 @@ def get_courses():
             ret.append(i.name)
         return ret
     except Exception as e:
-        logging.exception(e)
+        logging.exception(str(e))
 
 
 def get_sexes():
@@ -97,7 +97,7 @@ class GroupEditDialog(QDialog):
         self.label_price = QLabel(_('Start fee'))
         self.item_price = QSpinBox()
         self.item_price.setSingleStep(50)
-        self.item_price.setMaximum(100000000)
+        self.item_price.setMaximum(Limit.PRICE)
         self.layout.addRow(self.label_price, self.item_price)
 
         self.rank_checkbox = QCheckBox(_('Rank calculation'))
@@ -111,7 +111,7 @@ class GroupEditDialog(QDialog):
             try:
                 self.apply_changes_impl()
             except Exception as e:
-                logging.exception(e)
+                logging.exception(str(e))
             self.close()
 
         self.button_ok = QPushButton(_('OK'))
@@ -146,9 +146,9 @@ class GroupEditDialog(QDialog):
         if current_object.max_age:
             self.item_age_max.setValue(current_object.max_age)
         if current_object.max_time:
-            self.item_max_time.setTime(datetime2qtime(current_object.max_time))
+            self.item_max_time.setTime(otime2qtime(current_object.max_time))
         if current_object.start_interval:
-            self.item_start_interval.setTime(datetime2qtime(current_object.start_interval))
+            self.item_start_interval.setTime(otime2qtime(current_object.start_interval))
         if current_object.start_corridor:
             self.item_corridor.setValue(current_object.start_corridor)
         if current_object.order_in_corridor:
@@ -206,12 +206,12 @@ class GroupEditDialog(QDialog):
             org.price = self.item_price.value()
             changed = True
 
-        time = qtime2datetime(self.item_start_interval.time())
+        time = qtime2otime(self.item_start_interval.time())
         if org.start_interval != time:
             org.start_interval = time
             changed = True
 
-        time = qtime2datetime(self.item_max_time.time())
+        time = qtime2otime(self.item_max_time.time())
         if org.max_time != time:
             org.max_time = time
             changed = True

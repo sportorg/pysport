@@ -33,7 +33,7 @@ class BibDialog(QDialog):
 
         self.label_bib = QLabel(_('Bib'))
         self.item_bib = QSpinBox()
-        self.item_bib.setMaximum(99999)
+        self.item_bib.setMaximum(memory.Limit.BIB)
         self.item_bib.setValue(self.bib)
         self.item_bib.valueChanged.connect(self.show_person_info)
         self.layout.addRow(self.label_bib, self.item_bib)
@@ -49,7 +49,7 @@ class BibDialog(QDialog):
             try:
                 self.apply_changes_impl()
             except Exception as e:
-                logging.exception(e)
+                logging.exception(str(e))
             self.close()
 
         self.button_ok = QPushButton(_('OK'))
@@ -69,8 +69,8 @@ class BibDialog(QDialog):
                 info = person.full_name
                 if person.group:
                     info = '{}\n{}: {}'.format(info, _('Group'), person.group.name)
-                if person.card_number:
-                    info = '{}\n{}: {}'.format(info, _('Card'), person.card_number)
+                if person.sportident_card is not None:
+                    info = '{}\n{}: {}'.format(info, _('Card'), person.sportident_card)
                 self.label_person_info.setText(info)
                 self.person = person
             else:

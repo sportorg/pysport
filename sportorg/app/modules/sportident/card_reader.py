@@ -5,7 +5,6 @@ from sportorg import config
 from sportorg.app.gui.dialogs.bib_dialog import BibDialog
 from sportorg.app.gui.global_access import GlobalAccess
 from sportorg.app.models import memory
-from sportorg.app.models.memory import SystemType
 from sportorg.app.models.result.result_calculation import ResultCalculation
 from sportorg.app.modules.sportident.result_generation import ResultSportidentGeneration
 from sportorg.app.modules.sportident import sireader
@@ -17,9 +16,8 @@ def read():
 
 
 def get_result(card_data):
-    result = memory.Result()
-    result.type = SystemType.SPORTIDENT
-    result.card_number = card_data['card_number']
+    result = memory.ResultSportident()
+    result.sportident_card = memory.race().new_sportident_card(card_data['card_number'])
     result.punches = card_data['punches']
     result.start_time = card_data['start']
     result.finish_time = card_data['finish']
@@ -40,7 +38,7 @@ def start():
                 bib_dialog = BibDialog()
                 bib_dialog.exec()
                 person = bib_dialog.get_person()
-                person.card_number = card_data['card_number']
+                person.sportident_card = memory.race().new_sportident_card(card_data['card_number'])
             except Exception as e:
                 logging.exception(str(e))
         GlobalAccess().get_main_window().init_model()

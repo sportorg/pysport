@@ -23,4 +23,21 @@ class TestOTime(unittest.TestCase):
     def test_otime_eq(self):
         otime1 = OTime(0, 0, 25, 44)
         otime2 = OTime(0, 0, 25, 44)
-        self.assertEqual(True, otime1 == otime2, 'Error')
+        otime3 = OTime(0, 0, 26, 44)
+        self.assertEqual(True, otime1 == otime2, 'Error ==')
+        self.assertEqual(True, otime1 <= otime2, 'Error <=')
+        self.assertEqual(True, otime1 <= otime3, 'Error <=')
+        self.assertEqual(True, otime3 >= otime2, 'Error >=')
+        self.assertEqual(False, otime1 > otime3, 'Error >')
+        self.assertEqual(True, otime1 < otime3, 'Error <')
+        self.assertEqual(True, otime1 != otime3, 'Error !=')
+        self.assertEqual(False, otime1 != otime2, 'Error !=')
+
+    def test_otime_sum(self):
+        otime1 = OTime(0, 0, 25, 40)
+        otime2 = OTime(0, 0, 25, 20)
+        otime3 = OTime(0, 0, 51, 0)
+        otime4 = OTime(0, 0, 0, 20)
+        self.assertEqual(otime3, otime1 + otime2, 'Error +')
+        self.assertEqual(True, (otime1 + otime2) == otime3, 'Error +')
+        self.assertEqual(True, (otime1 - otime2) == otime4, 'Error -')
