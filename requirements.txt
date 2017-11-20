@@ -3,3 +3,4 @@ sireader==1.1.1
 peewee==2.9.1
 jinja2==2.8
 Flask==0.12.2
+polib==1.0.8

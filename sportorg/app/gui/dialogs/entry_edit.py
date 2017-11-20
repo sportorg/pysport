@@ -321,10 +321,11 @@ class EntryEditDialog(QDialog):
             person = find(race().persons, bib=bib)
             if person:
                 if person.bib == self.current_object.bib:
+                    self.button_ok.setEnabled(True)
                     return
                 self.button_ok.setDisabled(True)
                 self.is_ok['bib'] = False
-                info = 'Number already exist\n{}'.format(person.full_name)
+                info = '{}\n{}'.format(_('Number already exists'), person.full_name)
                 if person.group:
                     info = '{}\n{}: {}'.format(info, _('Group'), person.group.name)
                 self.label_bib_info.setText(info)
@@ -343,10 +344,11 @@ class EntryEditDialog(QDialog):
             person = find(race().persons, card_number=card)
             if person:
                 if person.card_number == self.current_object.card_number:
+                    self.button_ok.setEnabled(True)
                     return
                 self.button_ok.setDisabled(True)
                 self.is_ok['card'] = False
-                info = 'Card number already exist\n{}'.format(person.full_name)
+                info = '{}\n{}'.format(_('Card number already exists'), person.full_name)
                 if person.group:
                     info = '{}\n{}: {}'.format(info, _('Group'), person.group.name)
                 if person.bib:
