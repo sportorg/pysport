@@ -11,7 +11,6 @@ from PyQt5.QtWidgets import QFormLayout, QLabel, \
 from sportorg import config
 from sportorg.app.gui.global_access import GlobalAccess
 from sportorg.app.models.memory import race, Person, find, Qualification
-from sportorg.app.models.model import Organization
 from sportorg.app.models.result.result_calculation import ResultCalculation
 from sportorg.app.models.result.result_checker import ResultChecker
 from sportorg.app.modules.utils.custom_controls import AdvComboBox
@@ -38,18 +37,6 @@ def get_teams():
     except Exception as e:
         return ['', 'Тюменская обл.', 'Курганская обл.', 'Челябинская обл.', 'Республика Коми', 'г.Москва',
                 'ХМАО-Югра']
-
-
-# Deprecated
-def get_teams_db():
-    team = Organization
-    ret = []
-    try:
-        for i in team.select():
-            ret.append(i.name)
-        return ret
-    except Exception as e:
-        return ['', 'Тюменская обл.', 'Курганская обл.', 'Челябинская обл.', 'Республика Коми', 'г.Москва', 'ХМАО-Югра']
 
 
 def get_names():
