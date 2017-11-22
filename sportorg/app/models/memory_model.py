@@ -245,6 +245,7 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
         if i.finish_time:
             finish = str(i.finish_time)
 
+
         return list([
             last_name,
             first_name,

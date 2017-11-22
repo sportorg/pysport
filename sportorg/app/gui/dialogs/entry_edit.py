@@ -13,7 +13,8 @@ from sportorg.app.gui.global_access import GlobalAccess
 from sportorg.app.models.memory import race, Person, find, Qualification, Limit
 from sportorg.app.models.result.result_calculation import ResultCalculation
 from sportorg.app.modules.utils.custom_controls import AdvComboBox
-from sportorg.app.modules.utils.utils import qtime2otime, otime2qtime
+from sportorg.app.modules.utils.utils import time_to_qtime, time_to_otime
+
 from sportorg.language import _
 
 
@@ -377,7 +378,7 @@ class EntryEditDialog(QDialog):
         if current_object.bib:
             self.item_bib.setValue(int(current_object.bib))
         if current_object.start_time is not None:
-            time = otime2qtime(current_object.start_time)
+            time = time_to_qtime(current_object.start_time)
             self.item_start.setTime(time)
         if current_object.start_group is not None:
             self.item_start_group.setValue(int(current_object.start_group))
@@ -421,7 +422,7 @@ class EntryEditDialog(QDialog):
             person.bib = self.item_bib.value()
             changed = True
 
-        new_time = qtime2otime(self.item_start.time())
+        new_time = time_to_otime(self.item_start.time())
         if person.start_time != new_time:
             person.start_time = new_time
             changed = True

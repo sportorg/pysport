@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import QFormLayout, \
 from sportorg.app.models.memory import Group, RankingItem, Qualification
 from sportorg.app.models.result.result_calculation import ResultCalculation
 from sportorg.app.modules.utils.custom_controls import AdvComboBox
-from sportorg.app.modules.utils.utils import qtime2otime, otime2qtime
+from sportorg.app.modules.utils.utils import time_to_otime, time_to_qtime
 
 from sportorg.language import _
 from sportorg import config
@@ -65,7 +65,7 @@ class GroupRankingDialog(QDialog):
                 assert isinstance(rank, RankingItem)
                 rank.is_active = self.findChild(QCheckBox, name + '_checkbox').isChecked()
                 rank.max_place = self.findChild(QSpinBox, name + '_place').value()
-                rank.max_time = qtime2otime(self.findChild(QTimeEdit, name + '_time').time())
+                rank.max_time = time_to_otime(self.findChild(QTimeEdit, name + '_time').time())
                 rank.use_scores = self.findChild(AdvComboBox, name + '_combo').currentText() == _('Rank')
         ResultCalculation().set_rank(self.group)
 
@@ -113,7 +113,7 @@ def get_widget_from_ranking(ranking):
         max_place.setValue(ranking.max_place)
     else:
         type_combo.setCurrentText(_('Result time'))
-        max_time.setTime(otime2qtime(ranking.max_time))
+        max_time.setTime(time_to_qtime(ranking.max_time))
 
     qual_checkbox.setChecked(ranking.is_active)
     select_type()

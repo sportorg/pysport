@@ -1,5 +1,5 @@
 from sportorg.app.models.memory import race
-from sportorg.app.modules.utils.utils import if_none
+from sportorg.app.modules.utils.utils import if_none, time_to_hhmmss
 
 
 class GroupsStartList(object):
@@ -127,7 +127,8 @@ class GroupsStartList(object):
             'qual': person.qual.get_title(),
             'year': if_none(person.year, ''),
             'sportident_card': str(person.sportident_card) if person.sportident_card is not None else '',
-            'start': person.start_time.strftime("%H:%M:%S")
+            'start': time_to_hhmmss(person.start_time)
+
         }
 
 
@@ -139,7 +140,7 @@ class ChessGenerator(GroupsStartList):
         for person in self._persons:
             if person.start_time is None:
                 continue
-            time = person.start_time.strftime("%H:%M:%S")
+            time = time_to_hhmmss(person.start_time)
             if time not in cache:
                 data[time] = [self._get_person_data(person)]
             else:

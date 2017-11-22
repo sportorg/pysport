@@ -4,6 +4,7 @@ from PyQt5 import QtWidgets
 from PyQt5.QtCore import QItemSelectionModel, QModelIndex
 from PyQt5.QtWidgets import QTableView, QMessageBox
 
+from sportorg.app.gui.dialogs.text_io import TextExchangeDialog
 from sportorg.app.models.memory import race
 from sportorg.app.models.result.result_calculation import ResultCalculation
 from sportorg.app.models.result.result_checker import ResultChecker
@@ -161,3 +162,11 @@ class GlobalAccess(object):
             logging.info(_('Auto save'))
         else:
             main_window.statusbar_message(_('No file to auto save'))
+
+    def text_exchange(self):
+        TextExchangeDialog().exec()
+        self.refresh()
+
+    def refresh(self):
+        self.get_main_window().refresh()
+        

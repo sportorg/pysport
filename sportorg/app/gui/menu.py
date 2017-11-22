@@ -108,6 +108,10 @@ def menu_list():
                     'shortcut': 'Del',
                     'icon': config.icon_dir('delete.png'),
                     'action': GlobalAccess().get_main_window().delete_object
+                },
+                {
+                    'title': _('Text exchange'),
+                    'action': GlobalAccess().text_exchange
                 }
             ]
         },

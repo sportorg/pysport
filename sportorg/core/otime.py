@@ -40,11 +40,13 @@ class OTime:
         return self._args
 
     def __eq__(self, other):
-        if other is None:
+        if not other:
             return False
         return self.to_msec() == other.to_msec()
 
     def __gt__(self, other):
+        if not other:
+            return True
         return self.to_msec() > other.to_msec()
 
     def __ge__(self, other):
@@ -65,6 +67,9 @@ class OTime:
             self.minute if self.minute > 9 else '0' + str(self.minute),
             self.sec if self.sec > 9 else '0' + str(self.sec)
         )
+
+    def __truediv__(self, fl):
+        return OTime(msec=(int(self.to_msec() / fl)))
 
     @classmethod
     def now(cls):

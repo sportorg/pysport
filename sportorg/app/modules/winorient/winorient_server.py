@@ -2,6 +2,8 @@ from socket import *
 
 import datetime
 
+from sportorg.app.modules.utils.utils import time_to_hhmmss
+
 """
 Format of WDB data package
  - length is 1772 bytes
@@ -70,9 +72,9 @@ while True:
     for i in range(punch_qty):
         cp = int.from_bytes(conn[init_offset + i*8:init_offset + i*8 + 1], byteorder)
         time = int_to_time(int.from_bytes(conn[init_offset + i*8 + 4:init_offset + i*8 + 8], byteorder))
-        punches.append((cp, time.strftime("%H:%M:%S")))
+        punches.append((cp, time_to_hhmmss(time)))
 
-    print("bib=" + bib + " result=" + result.strftime("%H:%M:%S") + " punches=")
+    print("bib=" + bib + " result=" + time_to_hhmmss(result) + " punches=")
     print(punches)
 
     # sendto - responce

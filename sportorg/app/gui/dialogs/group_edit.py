@@ -12,7 +12,8 @@ from sportorg.app.gui.global_access import GlobalAccess
 from sportorg.app.models.memory import race, Group, find, Sex, Limit
 from sportorg.app.models.result.result_calculation import ResultCalculation
 from sportorg.app.modules.utils.custom_controls import AdvComboBox
-from sportorg.app.modules.utils.utils import otime2qtime, qtime2otime
+from sportorg.app.modules.utils.utils import time_to_qtime, time_to_otime
+
 
 from sportorg.language import _
 from sportorg import config
@@ -146,9 +147,9 @@ class GroupEditDialog(QDialog):
         if current_object.max_age:
             self.item_age_max.setValue(current_object.max_age)
         if current_object.max_time:
-            self.item_max_time.setTime(otime2qtime(current_object.max_time))
+            self.item_max_time.setTime(time_to_qtime(current_object.max_time))
         if current_object.start_interval:
-            self.item_start_interval.setTime(otime2qtime(current_object.start_interval))
+            self.item_start_interval.setTime(time_to_qtime(current_object.start_interval))
         if current_object.start_corridor:
             self.item_corridor.setValue(current_object.start_corridor)
         if current_object.order_in_corridor:
@@ -206,12 +207,13 @@ class GroupEditDialog(QDialog):
             org.price = self.item_price.value()
             changed = True
 
-        time = qtime2otime(self.item_start_interval.time())
+        time = time_to_otime(self.item_start_interval.time())
         if org.start_interval != time:
             org.start_interval = time
             changed = True
 
-        time = qtime2otime(self.item_max_time.time())
+        time = time_to_otime(self.item_max_time.time())
+
         if org.max_time != time:
             org.max_time = time
             changed = True

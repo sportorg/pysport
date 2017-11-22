@@ -5,56 +5,31 @@ from PyQt5.QtCore import QTime
 from sportorg.core.otime import OTime
 
 
-def qtime2datetime(t):
-    now = datetime.datetime.now()
-    assert isinstance(t, QTime)
-    new_time = datetime.datetime(now.year, now.month, now.day, t.hour(), t.minute(), t.second(), t.msec())
-    return new_time
+def time_to_otime(t):
+    if isinstance(t, datetime.datetime):
+        return OTime(0, t.hour, t.minute, t.second, t.microsecond // 1000)
+    if isinstance(t, QTime):
+        return OTime(0, t.hour(), t.minute(), t.second(), t.msec())
+    if isinstance(t, datetime.timedelta):
+        return time_to_otime(datetime.datetime(2000, 1, 1, 0, 0, 0) + t)
+    if isinstance(t, OTime):
+        return t
+    return OTime()
 
 
-def qtime2otime(t):
-    assert isinstance(t, QTime)
-    new_time = OTime(0, t.hour(), t.minute(), t.second(), t.msec())
-    return new_time
+def time_to_datetime(t):
+    otime = time_to_otime(t)
+    return datetime.datetime(2000, 1, 1, otime.hour, otime.minute, otime.sec, otime.msec * 1000)
 
 
-def datetime2qtime(t):
-    assert isinstance(t, datetime.datetime)
+def time_to_qtime(t):
+    otime = time_to_otime(t)
     time = QTime()
-    # time.setHMS(t.hour, t.minute, t.second, t.microsecond) TODO:show microseconds
-    time.setHMS(t.hour, t.minute, t.second)
+    time.setHMS(otime.hour, otime.minute, otime.sec)
     return time
 
 
-def otime2qtime(t):
-    assert isinstance(t, OTime)
-    time = QTime()
-    time.setHMS(t.hour, t.minute, t.sec)
-    return time
-
-
-def datetime2otime(t):
-    assert isinstance(t, datetime.datetime)
-    time = OTime(0, t.hour, t.minute, t.second, t.microsecond//1000)
-    return time
-
-
-def timedelta2datetime(t):
-    assert isinstance(t, datetime.timedelta)
-    now = datetime.datetime.now()
-    new_time = datetime.datetime(now.year, now.month, now.day, 0, 0, 0)
-    new_time += t
-    return new_time
-
-
-def otime2datetime(t):
-    assert isinstance(t, OTime)
-    now = datetime.datetime.now()
-    new_time = datetime.datetime(now.year, now.month, now.day, t.hour, t.minute, t.sec, t.msec * 1000)
-    return new_time
-
-
-def int_to_time(value):
+def _int_to_time(value):
     """ convert value from 1/100 s to time """
 
     today = datetime.datetime.now()
@@ -64,31 +39,32 @@ def int_to_time(value):
     return ret
 
 
+def int_to_otime(value):
+    """ convert value from 1/100 s to otime """
+    ret = OTime(0,value // 360000 % 24, (value % 360000) // 6000, (value % 6000) // 100, (value % 100) * 10000)
+    return ret
+
+
 def time_to_int(value):
     """ convert value from time to 1/100s """
     return round(time_to_sec(value) * 100)
 
 
-def time_to_hhmmss(value):
-    if isinstance(value, datetime.datetime):
-        return str(value.strftime("%H:%M:%S"))
-    if isinstance(value, QTime):
-        return time_to_hhmmss(qtime2datetime(value))
-    if isinstance(value, datetime.timedelta):
-        return time_to_hhmmss(timedelta2datetime(value))
-    if isinstance(value, OTime):
-        return time_to_hhmmss(otime2datetime(value))
-    return value
-
-
 def time_to_mmss(value):
-    if isinstance(value, datetime.datetime):
-        return str(value.strftime("%M:%S"))
-    if isinstance(value, QTime):
-        return time_to_mmss(qtime2datetime(value))
-    if isinstance(value, datetime.timedelta):
-        return time_to_mmss(timedelta2datetime(value))
-    return value
+    time = time_to_datetime(value)
+    return str(time.strftime("%M:%S"))
+
+
+def time_to_hhmmss(value):
+    time = time_to_datetime(value)
+    return str(time.strftime("%H:%M:%S"))
+
+
+def hhmmss_to_time(value):
+    arr = str(value).split(':')
+    if len(arr) == 3:
+        return OTime(0, int(arr[0]), int(arr[1]), int(arr[2]), 0)
+    return OTime()
 
 
 def time_remove_day(value):
@@ -98,7 +74,8 @@ def time_remove_day(value):
     return new_value
 
 
-def time_to_sec(value, max_val=86400):  # default max value = 24h
+def _time_to_sec(value, max_val=86400):  # default max value = 24h
+
     if isinstance(value, datetime.datetime):
         ret = value.hour * 3600 + value.minute * 60 + value.second + value.microsecond / 1000000
         if max_val:
@@ -106,9 +83,18 @@ def time_to_sec(value, max_val=86400):  # default max value = 24h
         return ret
 
     if isinstance(value, QTime):
-        return time_to_sec(qtime2datetime(value), max_val)
+        return time_to_sec(time_to_datetime(value), max_val)
 
     return 0
+
+
+def time_to_sec(value, max_val=86400):  # default max value = 24h
+    otime = time_to_otime(value)
+    ret = otime.to_sec()
+
+    if max_val:
+        ret = ret % max_val
+    return ret
 
 
 def time_to_minutes(value, max_val=24*60):
