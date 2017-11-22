@@ -159,6 +159,7 @@ class CourseControl(Model):
     def __eq__(self, other):
         return self.code == other.code
 
+
 class CoursePart(Model):
     def __init__(self):
         self.controls = []  # type: List[CourseControl]
@@ -210,8 +211,7 @@ class Group(Model):
         self.min_age = 0
         self.max_age = 0
 
-
-        self.max_time = OTime()  # OTime
+        self.max_time = OTime()
         self.qual_assign_text = ''
         self.start_interval = OTime()
         self.start_corridor = 0
@@ -294,19 +294,6 @@ class Result(Model):
         self.person = None  # type: Person 'reverse link to person'
         self.assigned_rank = Qualification.NOT_QUALIFIED  # type: Qualification 'assigned rank (Russia only)'
 
-    def __repr__(self):
-        punches = ''
-        for punch in self.punches:
-            punches += '{} — {}\n'.format(punch[0], punch[1])
-        person = self.person.full_name if self.person is not None else ''
-        return """
-Card number: {}
-Start: {}
-Finish: {}
-Person: {}
-Punches:
-{}""".format(self.sportident_card, self.start_time, self.finish_time, person, punches)
-
     def __eq__(self, other):
         eq = self.sportident_card == other.sportident_card
         if self.start_time and other.start_time:
@@ -386,6 +373,7 @@ class ResultObject(Result):
         super().__init__()
         self.start = None
         self.finish = None
+        self.result = None
         self.person = None  # type: Person
         self.status = ResultStatus.OK
         self.penalty_time = None  # time of penalties (marked route, false start)
@@ -396,7 +384,7 @@ class ResultObject(Result):
         return str(self.system_type)
 
     def __repr__(self):
-        return '{} {}'.format(self.system_type, self.status)
+        return 'Result {} {}'.format(self.system_type, self.status)
 
     @property
     @abstractmethod
@@ -415,6 +403,14 @@ class ResultSportident(ResultObject):
         super().__init__()
         self.sportident_card = None  # type: SportidentCard
         self.punches = []
+
+    def __repr__(self):
+        punches = ''
+        for punch in self.punches:
+            punches += '{} — {}\n'.format(punch[0], punch[1])
+        person = self.person.full_name if self.person is not None else ''
+        return "Card: {}\nStart: {}\nFinish: {}\nPerson: {}\nPunches:\n{}".format(
+            self.sportident_card, self.start_time, self.finish_time, person, punches)
 
     def get_start_time(self):
         obj = race()
@@ -455,7 +451,6 @@ class ResultSFR(ResultObject):
     def __init__(self):
         super().__init__()
         self.punches = []
-
 
 
 class Person(Model):
@@ -530,23 +525,6 @@ class Race(Model):
         else:
             return nvl_value
 
-    def delete_persons(self, indexes, table):
-        try:
-            indexes = sorted(indexes, reverse=True)
-            for i in indexes:
-                del self.persons[i]
-        except Exception as e:
-            logging.exception(str(e))
-
-    def delete_results(self, indexes, table):
-        try:
-            indexes = sorted(indexes, reverse=True)
-            for i in indexes:
-                del self.results[i]
-
-        except Exception as e:
-            logging.exception(str(e))
-
     def new_sportident_card(self, number=0):
         assert isinstance(number, int)
         for card in self.sportident_cards:
@@ -566,6 +544,23 @@ class Race(Model):
         person.sportident_card = card
 
         return person
+
+    def delete_persons(self, indexes, table):
+        try:
+            indexes = sorted(indexes, reverse=True)
+            for i in indexes:
+                del self.persons[i]
+        except Exception as e:
+            logging.exception(str(e))
+
+    def delete_results(self, indexes, table):
+        try:
+            indexes = sorted(indexes, reverse=True)
+            for i in indexes:
+                del self.results[i]
+
+        except Exception as e:
+            logging.exception(str(e))
 
     def delete_groups(self, indexes, table):
         try:
@@ -638,6 +633,12 @@ class Race(Model):
     @staticmethod
     def add_new_result():
         new_result = ResultManual()
+        new_result.finish_time = OTime.now()
+        race().results.insert(0, new_result)
+
+    @staticmethod
+    def add_new_sportident_result():
+        new_result = ResultSportident()
         new_result.finish_time = OTime.now()
         race().results.insert(0, new_result)
 

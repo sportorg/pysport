@@ -840,3 +840,6 @@ msgstr "Номер чипа уже существует"
 
 msgid "Card number is unique"
 msgstr "Номер чипа уникален"
+
+msgid "Add SPORTident result"
+msgstr "Добавить SPORTident результат"

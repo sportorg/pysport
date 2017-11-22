@@ -405,9 +405,21 @@ class MainWindow(QMainWindow, App):
     def manual_finish(self):
         try:
             race().add_new_result()
+            logging.info('Manual finish')
             GlobalAccess().get_result_table().model().init_cache()
             GlobalAccess().get_main_window().refresh()
             self.statusbar_message(_('Manual finish'))
+            GlobalAccess().auto_save()
+        except Exception as e:
+            logging.exception(str(e))
+
+    def sportident_result(self):
+        try:
+            race().add_new_sportident_result()
+            logging.info('SPORTident result')
+            GlobalAccess().get_result_table().model().init_cache()
+            GlobalAccess().get_main_window().refresh()
+            self.statusbar_message(_('SPORTident result'))
             GlobalAccess().auto_save()
         except Exception as e:
             logging.exception(str(e))
