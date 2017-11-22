@@ -169,3 +169,4 @@ class GlobalAccess(object):
 
     def refresh(self):
         self.get_main_window().refresh()
+        
