@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import QApplication, QDialog
 from sportorg.app.gui.global_access import GlobalAccess
 from sportorg.app.models.memory import race, Group
 from sportorg.app.models.start_preparation import StartNumberManager, DrawManager, ReserveManager, StartTimeManager
-from sportorg.app.modules.utils.utils import qtime2datetime
+from sportorg.app.modules.utils.utils import time_to_otime
 from sportorg.language import _
 from sportorg import config
 
@@ -288,8 +288,8 @@ class StartPreparationDialog(QDialog):
             sleep(progressbar_delay)
 
             if self.start_check_box.isChecked():
-                corridor_first_start = qtime2datetime(self.start_first_time_edit.time())
-                fixed_start_interval = qtime2datetime(self.start_interval_time_edit.time())
+                corridor_first_start = time_to_otime(self.start_first_time_edit.time())
+                fixed_start_interval = time_to_otime(self.start_interval_time_edit.time())
                 if self.start_interval_radio_button.isChecked():
                     StartTimeManager().process(corridor_first_start, False, fixed_start_interval, mix_groups=mix_groups)
 

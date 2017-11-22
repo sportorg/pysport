@@ -40,15 +40,23 @@ class OTime:
         return self._args
 
     def __eq__(self, other):
+        if not other:
+            return False
         return self.to_msec() == other.to_msec()
 
     def __ne__(self, other):
+        if not other:
+            return True
         return self.to_msec() != other.to_msec()
 
     def __lt__(self, other):
+        if not other:
+            return False
         return self.to_msec() < other.to_msec()
 
     def __gt__(self, other):
+        if not other:
+            return True
         return self.to_msec() > other.to_msec()
 
     def __le__(self, other):
@@ -58,10 +66,10 @@ class OTime:
         return self.to_msec() >= other.to_msec()
 
     def __add__(self, other):
-        return OTime(msec=(self.to_msec() + self.to_msec()))
+        return OTime(msec=(self.to_msec() + other.to_msec()))
 
     def __sub__(self, other):
-        return OTime(msec=(self.to_msec() - self.to_msec()))
+        return OTime(msec=(self.to_msec() - other.to_msec()))
 
     def __int__(self):
         return self.to_msec()
@@ -72,6 +80,9 @@ class OTime:
             self.minute if self.minute > 9 else '0' + str(self.minute),
             self.sec if self.sec > 9 else '0' + str(self.sec)
         )
+
+    def __truediv__(self, fl):
+        return OTime(msec=(int(self.to_msec() / fl)))
 
     def replace(self, day=None, hour=None, minute=None, sec=None, msec=None):
         return OTime(

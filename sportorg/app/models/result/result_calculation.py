@@ -259,7 +259,7 @@ class ResultCalculation(object):
         percent = self.get_percent_for_rank(qual, rank)
         assert isinstance(leader_time, OTime)
         msec_new = leader_time.to_msec() * percent // 100
-        ret = OTime(msec=msec_new)
+        ret = OTime(msec=int(msec_new))
         return ret
 
 

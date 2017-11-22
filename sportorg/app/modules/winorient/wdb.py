@@ -7,7 +7,7 @@ from sportorg.language import _
 from sportorg.app.models import model
 from sportorg.app.models.memory import Race, Organization, Group, Person, Result, race, find, Course, \
     CourseControl, Country, Contact, Address, ResultStatus, Qualification
-from sportorg.app.modules.utils.utils import int_to_time, time_to_int
+from sportorg.app.modules.utils.utils import int_to_otime, time_to_int
 from sportorg.lib.winorient.wdb import WDB, WDBMan, WDBTeam, WDBGroup, WDBDistance, WDBPunch, WDBFinish, WDBChip
 
 
@@ -97,7 +97,7 @@ class WinOrientBinary:
                     'person': person,
                     'bib_number': int(man.number),
                     'comment': man.comment,
-                    'start_time': int_to_time(man.start),
+                    'start_time': int_to_otime(man.start),
                     'control_card': card
                 }
                 participation = model.Participation.create(**data_participation)
@@ -110,8 +110,8 @@ class WinOrientBinary:
                     data_result = {
                         'participation': participation,
                         'control_card': card,
-                        'start_time': int_to_time(man.start),
-                        'finish_time': int_to_time(finish_time)
+                        'start_time': int_to_otime(man.start),
+                        'finish_time': int_to_otime(finish_time)
                     }
                     model.Result.create(**data_result)
 
@@ -240,7 +240,7 @@ class WinOrientBinary:
 
             my_race.persons.append(new_person)
 
-            new_person.start_time = int_to_time(man.start)
+            new_person.start_time = int_to_otime(man.start)
 
             # result
             fin = man.get_finish()
@@ -250,8 +250,8 @@ class WinOrientBinary:
                 new_person.result = result
 
                 result.card_number = man.si_card
-                result.start_time = int_to_time(man.start)
-                result.finish_time = int_to_time(fin.time)
+                result.start_time = int_to_otime(man.start)
+                result.finish_time = int_to_otime(fin.time)
                 if man.status in self.status:
                     result.status = self.status[man.status]
                 result.result = man.result
@@ -266,7 +266,7 @@ class WinOrientBinary:
                         p = chip.punch[i]
                         assert isinstance(p, WDBPunch)
                         code = p.code
-                        time = int_to_time(p.time)
+                        time = int_to_otime(p.time)
                         punch = (code, time)
                         if code > 0:
                             result.punches.append(punch)

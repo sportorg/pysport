@@ -12,7 +12,7 @@ from sportorg.app.gui.global_access import GlobalAccess
 from sportorg.app.models.memory import race, Result, find, ResultStatus, Person
 from sportorg.app.models.result.result_calculation import ResultCalculation
 from sportorg.app.models.result.result_checker import ResultChecker
-from sportorg.app.modules.utils.utils import datetime2qtime, qtime2datetime
+from sportorg.app.modules.utils.utils import time_to_qtime, time_to_otime
 from sportorg.language import _
 
 
@@ -129,13 +129,13 @@ class ResultEditDialog(QDialog):
         if current_object.card_number:
             self.label_card_number.setText('{}: {}'.format(_('Card'), current_object.card_number))
         if current_object.finish_time is not None:
-            self.item_finish.setTime(datetime2qtime(current_object.finish_time))
+            self.item_finish.setTime(time_to_qtime(current_object.finish_time))
         if current_object.start_time is not None:
-            self.item_start.setTime(datetime2qtime(current_object.start_time))
+            self.item_start.setTime(time_to_qtime(current_object.start_time))
         if current_object.result is not None:
             self.item_result.setText(str(current_object.get_result()))
         if current_object.penalty_time is not None:
-            self.item_penalty.setTime(datetime2qtime(current_object.penalty_time))
+            self.item_penalty.setTime(time_to_qtime(current_object.penalty_time))
         if current_object.person:
             self.item_bib.setValue(current_object.person.bib)
 
@@ -155,12 +155,12 @@ class ResultEditDialog(QDialog):
         result = self.current_object
         assert (isinstance(result, Result))
 
-        time = qtime2datetime(self.item_finish.time())
+        time = time_to_otime(self.item_finish.time())
         if result.finish_time != time:
             result.finish_time = time
             changed = True
 
-        time = qtime2datetime(self.item_start.time())
+        time = time_to_otime(self.item_start.time())
         if result.start_time != time:
             result.start_time = time
             changed = True

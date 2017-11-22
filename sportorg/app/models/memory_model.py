@@ -239,11 +239,11 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
 
         start = ''
         if i.start_time:
-            start = i.start_time.strftime('%H:%M:%S')
+            start = time_to_hhmmss(i.start_time)
 
         finish = ''
         if i.finish_time:
-            finish = i.finish_time.strftime('%H:%M:%S')
+            finish = time_to_hhmmss(i.finish_time)
 
         return list([
             last_name,

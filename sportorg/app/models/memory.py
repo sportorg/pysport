@@ -5,7 +5,7 @@ from enum import IntEnum, Enum
 
 from PyQt5.QtWidgets import QMessageBox
 
-from sportorg.app.modules.utils.utils import time_remove_day, int_to_time, time_to_hhmmss, time_to_sec
+from sportorg.app.modules.utils.utils import int_to_otime, time_to_hhmmss, time_to_sec
 from sportorg.core.otime import OTime
 from sportorg.language import _
 from sportorg.core.model import Model
@@ -134,6 +134,12 @@ class CourseControl(Model):
     def __eq__(self, other):
         return self.code == other.code
 
+class CoursePart(Model):
+    def __init__(self):
+        self.controls = []  # type: List[CourseControl]
+        self.control_count = 0
+        self.is_free = False
+
 
 class Course(Model):
     def __init__(self):
@@ -142,7 +148,7 @@ class Course(Model):
         self.bib = 0
         self.length = 0
         self.climb = 0
-        self.controls = []  # type: List[CourseControl]
+        self.parts = []  # type: List[CoursePart]
         self.count_person = 0
         self.count_group = 0
         self.corridor = 0
@@ -175,9 +181,9 @@ class Group(Model):
         self.min_age = 0
         self.max_age = 0
 
-        self.max_time = None  # datetime
+        self.max_time = OTime()  # datetime
         self.qual_assign_text = ''
-        self.start_interval = None
+        self.start_interval = OTime()
         self.start_corridor = 0
         self.order_in_corridor = 0
 
@@ -262,7 +268,7 @@ Punches:
             ret += 24 * 3600 * 100
 
         delta = self.get_finish_time() - self.get_start_time()
-        ret += delta.seconds * 100
+        ret += delta.to_sec() * 100
         return ret
 
     def get_result_otime(self):
@@ -273,28 +279,28 @@ Punches:
         start_source = obj.get_setting('sportident_start_source', 'protocol')
         if start_source == 'protocol':
             if self.person:
-                return time_remove_day(self.person.start_time)
+                return self.person.start_time
         elif start_source == 'station':
-            return time_remove_day(self.start_time)
+            return self.start_time
         elif start_source == 'cp':
             pass
         elif start_source == 'gate':
             pass
 
-        return int_to_time(0)
+        return int_to_otime(0)
 
     def get_finish_time(self):
         obj = race()
         finish_source = obj.get_setting('sportident_finish_source', 'station')
         if finish_source == 'station':
             if self.finish_time:
-                return time_remove_day(self.finish_time)
+                return self.finish_time
         elif finish_source == 'cp':
             pass
         elif finish_source == 'beam':
             pass
 
-        return datetime.datetime.now()
+        return OTime()
 
 
 class Person(Model):
