@@ -52,7 +52,7 @@ class Widget(QtWidgets.QWidget):
                     dialog = OrganizationEditDialog(self.TeamTable, index)
                     dialog.exec()
             except Exception as e:
-                logging.exception(e)
+                logging.exception(str(e))
 
             logging.debug('Team: clicked on ' + str(index.row()))
 

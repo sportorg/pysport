@@ -1,6 +1,6 @@
 import ast
 import configparser
-import logging.config
+import logging
 import time
 
 from PyQt5 import QtCore, QtGui, QtWidgets, Qt
@@ -36,8 +36,6 @@ from sportorg.app.modules.winorient import winorient
 from sportorg.core import event
 from sportorg.core.app import App
 from sportorg.language import _
-
-logging.config.dictConfig(config.LOG_CONFIG)
 
 
 class MainWindow(QMainWindow, App):
@@ -228,7 +226,7 @@ class MainWindow(QMainWindow, App):
             try:
                 super().create_file(file_name)
             except Exception as e:
-                logging.exception(e)
+                logging.exception(str(e))
             # remove data
             if update_data:
                 races[0] = Race()
@@ -245,7 +243,7 @@ class MainWindow(QMainWindow, App):
             try:
                 super().save_file()
             except Exception as e:
-                logging.exception(e)
+                logging.exception(str(e))
         else:
             self.save_file_as()
 
@@ -257,7 +255,7 @@ class MainWindow(QMainWindow, App):
                 self.add_recent_file(self.file)
                 self.init_model()
             except Exception as e:
-                logging.exception(e)
+                logging.exception(str(e))
                 self.delete_from_recent_files(file_name)
                 QMessageBox.warning(self,
                                      _('Error'),
@@ -313,13 +311,15 @@ class MainWindow(QMainWindow, App):
         if file in self.recent_files:
             self.recent_files.remove(file)
 
-    def settings_dialog(self):
+    @staticmethod
+    def settings_dialog():
         try:
             SettingsDialog().exec()
         except Exception as e:
             logging.exception(str(e))
 
-    def filter_dialog(self):
+    @staticmethod
+    def filter_dialog():
         try:
             table = GlobalAccess().get_current_table()
             ex = DialogFilter(table)
@@ -327,7 +327,8 @@ class MainWindow(QMainWindow, App):
         except Exception as e:
             logging.exception(str(e))
 
-    def report_dialog(self):
+    @staticmethod
+    def report_dialog():
         try:
             ex = ReportDialog()
             ex.exec()
@@ -357,39 +358,45 @@ class MainWindow(QMainWindow, App):
         except Exception as e:
             logging.exception(str(e))
 
-    def event_settings_dialog(self):
+    @staticmethod
+    def event_settings_dialog():
         try:
             ex = EventPropertiesDialog()
             ex.exec()
         except Exception as e:
             logging.exception(str(e))
 
-    def start_preparation_dialog(self):
+    @staticmethod
+    def start_preparation_dialog():
         try:
             StartPreparationDialog().exec()
         except Exception as e:
             logging.exception(str(e))
 
-    def print_settings_dialog(self):
+    @staticmethod
+    def print_settings_dialog():
         try:
             PrintPropertiesDialog().exec()
         except Exception as e:
             logging.exception(str(e))
 
-    def number_change_dialog(self):
+    @staticmethod
+    def number_change_dialog():
         try:
             obj = NumberChangeDialog()
             obj.exec()
         except Exception as e:
             logging.exception(str(e))
 
-    def guess_courses(self):
+    @staticmethod
+    def guess_courses():
         try:
             guess_courses_for_groups()
         except Exception as e:
             logging.exception(str(e))
 
-    def guess_corridors(self):
+    @staticmethod
+    def guess_corridors():
         try:
             guess_corridors_for_groups()
         except Exception as e:
@@ -405,30 +412,35 @@ class MainWindow(QMainWindow, App):
         except Exception as e:
             logging.exception(str(e))
 
-    def create_start_protocol_dialog(self):
+    @staticmethod
+    def create_start_protocol_dialog():
         try:
             ex = StartReportDialog()
             ex.exec()
         except Exception as e:
             logging.exception(str(e))
 
-    def create_chess_dialog(self):
+    @staticmethod
+    def create_chess_dialog():
         try:
             ex = StartChessDialog()
             ex.exec()
         except Exception as e:
             logging.exception(str(e))
 
-    def create_object(self):
+    @staticmethod
+    def create_object():
         GlobalAccess().add_object()
 
-    def delete_object(self):
+    @staticmethod
+    def delete_object():
         try:
             GlobalAccess().delete_object()
         except Exception as e:
             logging.exception(str(e))
 
-    def init_model(self):
+    @staticmethod
+    def init_model():
         try:
             GlobalAccess().clear_filters()  # clear filters not to loose filtered data
 
@@ -446,8 +458,9 @@ class MainWindow(QMainWindow, App):
         except Exception as e:
             logging.exception(str(e))
 
-    def refresh(self):
-        logging.debug('refreshing interface')
+    @staticmethod
+    def refresh():
+        logging.debug('Refreshing interface')
         try:
             table = GlobalAccess().get_person_table()
             table.model().init_cache()
@@ -472,17 +485,19 @@ class MainWindow(QMainWindow, App):
         except Exception as e:
             logging.exception(str(e))
 
-    def sportident_settings_dialog(self):
+    @staticmethod
+    def sportident_settings_dialog():
         try:
             SportidentPropertiesDialog().exec()
         except Exception as e:
-            logging.exception(e)
+            logging.exception(str(e))
 
-    def sportident_connect(self):
+    @staticmethod
+    def sportident_connect():
         try:
             sportident.start_reader()
         except Exception as e:
-            logging.exception(e)
+            logging.exception(str(e))
 
     def import_wo_csv(self):
         file_name = get_open_file_name(_('Open CSV Winorient file'), _("CSV Winorient (*.csv)"))
@@ -490,7 +505,7 @@ class MainWindow(QMainWindow, App):
             try:
                 winorient.import_csv(file_name)
             except Exception as e:
-                logging.exception(e)
+                logging.exception(str(e))
                 QMessageBox.question(None,
                                      _('Error'),
                                      _('Import error') + ': ' + file_name)
@@ -502,17 +517,18 @@ class MainWindow(QMainWindow, App):
             try:
                 winorient.import_wo_wdb(file_name)
             except Exception as e:
-                logging.exception(e)
+                logging.exception(str(e))
             self.init_model()
 
-    def export_wo_wdb(self):
+    @staticmethod
+    def export_wo_wdb():
         file_name = get_save_file_name(_('Save As WDB file'), _("WDB file (*.wdb)"),
                                        '{}_sportorg_export'.format(time.strftime("%Y%m%d")))
         if file_name is not '':
             try:
                 winorient.export_wo_wdb(file_name)
             except Exception as e:
-                logging.exception(e)
+                logging.exception(str(e))
 
     def import_txt_v8(self):
         file_name = get_open_file_name(_('Open Ocad txt v8 file'), _("Ocad classes v8 (*.txt)"))

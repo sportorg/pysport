@@ -13,6 +13,7 @@ from sportorg.app.models.memory import race, Result, find, ResultStatus, Person
 from sportorg.app.models.result.result_calculation import ResultCalculation
 from sportorg.app.models.result.result_checker import ResultChecker
 from sportorg.app.modules.utils.utils import time_to_qtime, time_to_otime
+
 from sportorg.language import _
 
 
@@ -34,8 +35,8 @@ class ResultEditDialog(QDialog):
 
         self.layout = QFormLayout(self)
 
-        self.label_card_number = QLabel('')
-        self.layout.addRow(self.label_card_number)
+        self.label_sportident_card = QLabel('')
+        self.layout.addRow(self.label_sportident_card)
 
         self.label_bib = QLabel(_('Bib'))
         self.item_bib = QSpinBox()
@@ -87,7 +88,7 @@ class ResultEditDialog(QDialog):
             try:
                 self.apply_changes_impl()
             except Exception as e:
-                logging.exception(e)
+                logging.exception(str(e))
             self.close()
 
         self.button_ok = QPushButton(_('OK'))
@@ -108,8 +109,8 @@ class ResultEditDialog(QDialog):
                 info = person.full_name
                 if person.group:
                     info = '{}\n{}: {}'.format(info, _('Group'), person.group.name)
-                if person.card_number:
-                    info = '{}\n{}: {}'.format(info, _('Card'), person.card_number)
+                if person.sportident_card is not None:
+                    info = '{}\n{}: {}'.format(info, _('Card'), person.sportident_card)
                 self.label_person_info.setText(info)
             else:
                 self.label_person_info.setText(_('not found'))
@@ -126,8 +127,8 @@ class ResultEditDialog(QDialog):
         assert (isinstance(current_object, Result))
         self.current_object = current_object
 
-        if current_object.card_number:
-            self.label_card_number.setText('{}: {}'.format(_('Card'), current_object.card_number))
+        if current_object.sportident_card is not None:
+            self.label_sportident_card.setText('{}: {}'.format(_('Card'), current_object.sportident_card))
         if current_object.finish_time is not None:
             self.item_finish.setTime(time_to_qtime(current_object.finish_time))
         if current_object.start_time is not None:
@@ -155,10 +156,12 @@ class ResultEditDialog(QDialog):
         result = self.current_object
         assert (isinstance(result, Result))
 
+
         time = time_to_otime(self.item_finish.time())
         if result.finish_time != time:
             result.finish_time = time
             changed = True
+
 
         time = time_to_otime(self.item_start.time())
         if result.start_time != time:
@@ -173,8 +176,8 @@ class ResultEditDialog(QDialog):
         recheck = False
         if new_bib == 0:
             if result.person:
-                if result.person.card_number == result.card_number:
-                    result.person.card_number = 0
+                if result.person.sportident_card == result.sportident_card:
+                    result.person.sportident_card = None
             result.person = None
             changed = True
         elif cur_bib != new_bib:
@@ -182,12 +185,10 @@ class ResultEditDialog(QDialog):
             if new_person is not None:
                 assert isinstance(new_person, Person)
                 if result.person:
-                    result.person.card_number = 0
+                    result.person.sportident_card = None
                 recheck = True
                 result.person = new_person
-                result.person.add_result(result)
-                result.person.result = result
-                result.person.card_number = result.card_number
+                result.person.sportident_card = result.sportident_card
 
                 logging.info('Old status {}'.format(result.status))
                 ResultChecker.checking(result)

@@ -54,13 +54,11 @@ class OTime:
             return False
         return self.to_msec() < other.to_msec()
 
+
     def __gt__(self, other):
         if not other:
             return True
         return self.to_msec() > other.to_msec()
-
-    def __le__(self, other):
-        return self.to_msec() <= other.to_msec()
 
     def __ge__(self, other):
         return self.to_msec() >= other.to_msec()
@@ -84,6 +82,11 @@ class OTime:
     def __truediv__(self, fl):
         return OTime(msec=(int(self.to_msec() / fl)))
 
+    @classmethod
+    def now(cls):
+        now = datetime.datetime.now()
+        return OTime(0, now.hour, now.minute, now.second, round(now.microsecond / 1000))
+
     def replace(self, day=None, hour=None, minute=None, sec=None, msec=None):
         return OTime(
             self.if_none(day, self.day),
@@ -104,10 +107,6 @@ class OTime:
 
     def to_time(self):
         return datetime.time(self.hour, self.minute, self.sec, self.msec*1000)
-
-    def to_datetime(self):
-        return datetime.datetime.today()\
-            .replace(hour=self.hour, minute=self.minute, second=self.sec, microsecond=self.msec*1000)
 
     @staticmethod
     def get_msec(day=0, hour=0, minute=0, sec=0, msec=0):

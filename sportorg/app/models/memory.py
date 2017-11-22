@@ -1,6 +1,7 @@
 import logging
 
 import datetime
+from abc import abstractmethod
 from enum import IntEnum, Enum
 
 from PyQt5.QtWidgets import QMessageBox
@@ -11,7 +12,13 @@ from sportorg.language import _
 from sportorg.core.model import Model
 
 
+class Limit:
+    BIB = 10000
+    PRICE = 100000000
+
+
 class SystemType(Enum):
+    NONE = 0
     MANUAL = 1
     SPORTIDENT = 2
     ALT = 3
@@ -97,6 +104,9 @@ class Country(Model):
         self.digital_code = ''
         self.code = ''
 
+    def __repr__(self):
+        return self.name
+
 
 class Address(Model):
     def __init__(self):
@@ -113,6 +123,9 @@ class Contact(Model):
         self.name = ''
         self.value = ''
 
+    def __repr__(self):
+        return '{} {}'.format(self.name, self.value)
+
 
 class Organization(Model):
     def __init__(self):
@@ -124,12 +137,24 @@ class Organization(Model):
         self.region = ''
         self.count_person = 0
 
+    def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        return 'Organization {}'.format(self.name)
+
 
 class CourseControl(Model):
     def __init__(self):
         self.code = ''
         self.length = 0
         self.order = 0
+
+    def __str__(self):
+        return '{} {}'.format(self.code, self.length)
+
+    def __repr__(self):
+        return self.__str__()
 
     def __eq__(self, other):
         return self.code == other.code
@@ -148,17 +173,14 @@ class Course(Model):
         self.bib = 0
         self.length = 0
         self.climb = 0
-        self.parts = []  # type: List[CoursePart]
+        self.controls = []  # type: list[CourseControl]
+
         self.count_person = 0
         self.count_group = 0
         self.corridor = 0
 
-    def get_code_list(self):
-        ret = []
-        for i in self.controls:
-            assert isinstance(i, CourseControl)
-            ret.append(str(i.code))
-        return ret
+    def __repr__(self):
+        return 'Course {} {}'.format(self.name, self.type)
 
     def __eq__(self, other):
         if len(self.controls) != len(other.controls):
@@ -168,6 +190,13 @@ class Course(Model):
                 return False
 
         return True
+
+    def get_code_list(self):
+        ret = []
+        for i in self.controls:
+            assert isinstance(i, CourseControl)
+            ret.append(str(i.code))
+        return ret
 
 
 class Group(Model):
@@ -181,7 +210,8 @@ class Group(Model):
         self.min_age = 0
         self.max_age = 0
 
-        self.max_time = OTime()  # datetime
+
+        self.max_time = OTime()  # OTime
         self.qual_assign_text = ''
         self.start_interval = OTime()
         self.start_corridor = 0
@@ -193,6 +223,9 @@ class Group(Model):
 
         self.ranking = Ranking()
 
+    def __repr__(self):
+        return 'Group {}'.format(self.name)
+
     def get_count_finished(self):
         return self.count_finished
 
@@ -200,10 +233,55 @@ class Group(Model):
         return self.count_person
 
 
+class SportidentCardModel(Enum):
+    NONE = 0
+    P_CARD = 1
+    SI5 = 2
+    SI8 = 3
+    SI9 = 4
+    SI10 = 5
+    SI11 = 6
+    SIAC = 7
+
+    def __str__(self):
+        return "%s" % self._name_
+
+    def __repr__(self):
+        return self.__str__()
+
+
+class SportidentCard(Model):
+    def __init__(self, number=0):
+        self.number = number
+        self.model = SportidentCardModel.NONE
+        self.club = ''
+        self.owner = ''
+        self.person = None
+
+    def __int__(self):
+        return int(self.number)
+
+    def __str__(self):
+        return str(self.number)
+
+    def __repr__(self):
+        return '{} {}'.format(self.model, self.number)
+
+    def __eq__(self, other):
+        if other is None:
+            return False
+        assert isinstance(other, SportidentCard)
+        if self.number == 0:
+            return False
+        return self.number == other.number
+
+
 class Result(Model):
+    system_type = SystemType.NONE
+
     def __init__(self):
-        self.type = None  # type: SystemType
-        self.card_number = 0
+        super().__init__()
+        self.sportident_card = None  # type: SportidentCard 'delete'
         self.start_time = None
         self.finish_time = None
         self.punches = []
@@ -213,8 +291,8 @@ class Result(Model):
         self.result = None  # time in seconds * 100 (int)
         self.place = 0
 
-        self.person = None  # type: Person reverse link to person
-        self.assigned_rank = Qualification.NOT_QUALIFIED  # type: Qualification assigned rank (Russia only)
+        self.person = None  # type: Person 'reverse link to person'
+        self.assigned_rank = Qualification.NOT_QUALIFIED  # type: Qualification 'assigned rank (Russia only)'
 
     def __repr__(self):
         punches = ''
@@ -227,10 +305,10 @@ Start: {}
 Finish: {}
 Person: {}
 Punches:
-{}""".format(self.card_number, self.start_time, self.finish_time, person, punches)
+{}""".format(self.sportident_card, self.start_time, self.finish_time, person, punches)
 
     def __eq__(self, other):
-        eq = self.card_number == other.card_number
+        eq = self.sportident_card == other.sportident_card
         if self.start_time and other.start_time:
             eq = eq and time_to_sec(self.start_time) == time_to_sec(other.start_time)
         if self.finish_time and other.finish_time:
@@ -300,7 +378,84 @@ Punches:
         elif finish_source == 'beam':
             pass
 
-        return OTime()
+        return OTime.now()
+
+
+class ResultObject(Result):
+    def __init__(self):
+        super().__init__()
+        self.start = None
+        self.finish = None
+        self.person = None  # type: Person
+        self.status = ResultStatus.OK
+        self.penalty_time = None  # time of penalties (marked route, false start)
+        self.penalty_laps = None  # count of penalty legs (marked route)
+        self.place = 0
+
+    def __str__(self):
+        return str(self.system_type)
+
+    def __repr__(self):
+        return '{} {}'.format(self.system_type, self.status)
+
+    @property
+    @abstractmethod
+    def system_type(self) -> SystemType:
+        pass
+
+
+class ResultManual(ResultObject):
+    system_type = SystemType.MANUAL
+
+
+class ResultSportident(ResultObject):
+    system_type = SystemType.SPORTIDENT
+
+    def __init__(self):
+        super().__init__()
+        self.sportident_card = None  # type: SportidentCard
+        self.punches = []
+
+    def get_start_time(self):
+        obj = race()
+        start_source = obj.get_setting('sportident_start_source', 'protocol')
+        if start_source == 'protocol':
+            if self.person:
+                return time_remove_day(self.person.start_time)
+        elif start_source == 'station':
+            return time_remove_day(self.start)
+        elif start_source == 'cp':
+            pass
+        elif start_source == 'gate':
+            pass
+
+        return int_to_time(0)
+
+    def get_finish_time(self):
+        obj = race()
+        finish_source = obj.get_setting('sportident_finish_source', 'station')
+        if finish_source == 'station':
+            if self.finish:
+                return time_remove_day(self.finish)
+        elif finish_source == 'cp':
+            pass
+        elif finish_source == 'beam':
+            pass
+
+        return OTime.now()
+
+
+class ResultAlt(ResultObject):
+    system_type = SystemType.ALT
+
+
+class ResultSFR(ResultObject):
+    system_type = SystemType.SFR
+
+    def __init__(self):
+        super().__init__()
+        self.punches = []
+
 
 
 class Person(Model):
@@ -309,10 +464,8 @@ class Person(Model):
         self.surname = ''
         self.sex = Sex.MF
 
-        self.card_number = 0
+        self.sportident_card = None  # type: SportidentCard
         self.bib = 0
-        self.result = None  # type: Result
-        self.results = []  # type: List[Result]
 
         self.year = 0  # sometime we have only year of birth
         self.birth_date = None  # datetime
@@ -320,7 +473,7 @@ class Person(Model):
         self.group = None  # type: Group
         self.nationality = None  # type: Country
         self.address = None  # type: Address
-        self.contact = []  # type: List[Contact]
+        self.contact = []  # type: list[Contact]
         self.world_code = None  # WRE ID for orienteering and the same
         self.national_code = None
         self.rank = None  # position/scores in word ranking
@@ -331,22 +484,15 @@ class Person(Model):
         self.start_time = None
         self.start_group = 0
 
-    def add_result(self, result):
-        assert isinstance(result, Result)
-        add = True
-        for r in self.results:
-            if r is Result:
-                add = False
-                break
-        if add:
-            self.results.append(result)
+    def __repr__(self):
+        return '{} {} {}'.format(self.full_name, self.bib, self.group)
 
     @property
     def full_name(self):
-        def xstr(s):
-            return '' if s is None else str(s)
-
-        return '{} {}'.format(xstr(self.surname), xstr(self.name))
+        surname = self.surname
+        if surname:
+            surname += ' '
+        return '{}{}'.format(surname, self.name)
 
 
 class RaceData(Model):
@@ -357,16 +503,23 @@ class RaceData(Model):
         self.end_time = None
         self.url = ''
 
+    def __repr__(self):
+        return '{} {}'.format(self.name, self.start_time)
+
 
 class Race(Model):
     def __init__(self):
         self.data = RaceData()
-        self.courses = []  # type: List[Course]
-        self.groups = []  # type: List[Group]
-        self.persons = []  # type: List[Person]
-        self.results = []  # type: List[Result]
-        self.organizations = []  # type: List[Organization]
+        self.courses = []  # type: list[Course]
+        self.groups = []  # type: list[Group]
+        self.persons = []  # type: list[Person]
+        self.results = []  # type: list[Result]
+        self.organizations = []  # type: list[Organization]
+        self.sportident_cards = []
         self.settings = {}
+
+    def __repr__(self):
+        return repr(self.data)
 
     def set_setting(self, setting, value):
         self.settings[setting] = value
@@ -394,12 +547,33 @@ class Race(Model):
         except Exception as e:
             logging.exception(str(e))
 
+    def new_sportident_card(self, number=0):
+        assert isinstance(number, int)
+        for card in self.sportident_cards:
+            if number == int(card):
+                return card
+        card = SportidentCard(number)
+        self.sportident_cards.append(card)
+        return card
+
+    def person_sportident_card(self, person, number=0):
+        assert isinstance(number, int)
+        assert isinstance(person, Person)
+        card = self.new_sportident_card(number)
+        if card.person is not None:
+            card.person.sportident_card = None
+        card.person = person
+        person.sportident_card = card
+
+        return person
+
     def delete_groups(self, indexes, table):
         try:
             race().update_counters()
             for i in indexes:
                 group = self.groups[i]  # type: Group
                 if group.count_person > 0:
+                    # FIXME: Эту херню надо отсюда выпилить и возвращать номер ошибки как результат. Относиться ко всем
                     QMessageBox.question(table,
                                          _('Error'),
                                          _('Cannot remove group') + ' ' + group.name)
@@ -455,28 +629,32 @@ class Race(Model):
             return False
         return True
 
-    def add_new_person(self):
+    @staticmethod
+    def add_new_person():
         new_person = Person()
         new_person.name = '_new'
         race().persons.insert(0, new_person)
 
-    def add_new_result(self):
-        new_result = Result()
-        new_result.type = SystemType.MANUAL
-        new_result.finish_time = datetime.datetime.now()
+    @staticmethod
+    def add_new_result():
+        new_result = ResultManual()
+        new_result.finish_time = OTime.now()
         race().results.insert(0, new_result)
 
-    def add_new_group(self):
+    @staticmethod
+    def add_new_group():
         new_group = Group()
         new_group.name = '_new'
         race().groups.insert(0, new_group)
 
-    def add_new_course(self):
+    @staticmethod
+    def add_new_course():
         new_course = Course()
         new_course.name = '_new'
         race().courses.insert(0, new_course)
 
-    def add_new_organization(self):
+    @staticmethod
+    def add_new_organization():
         new_organization = Organization()
         new_organization.name = '_new'
         race().organizations.insert(0, new_organization)
@@ -514,7 +692,8 @@ class Race(Model):
     def get_persons_by_group(self, group):
         return find(self.persons, group=group, return_all=True)
 
-    def get_persons_by_corridor(self, corridor):
+    @staticmethod
+    def get_persons_by_corridor(corridor):
         obj = race()
         ret = []
         for person in obj.persons:

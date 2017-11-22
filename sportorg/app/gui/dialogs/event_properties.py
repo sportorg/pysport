@@ -2,7 +2,6 @@ import sys
 import logging
 from datetime import datetime
 
-from PyQt5.QtCore import QTime
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QLabel, \
     QLineEdit, QApplication, QDialog, \
@@ -90,7 +89,7 @@ class EventPropertiesDialog(QDialog):
             try:
                 self.apply_changes_impl()
             except Exception as e:
-                logging.exception(e)
+                logging.exception(str(e))
             self.close()
 
         self.button_ok = QPushButton(_('OK'))

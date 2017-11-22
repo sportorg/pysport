@@ -75,7 +75,7 @@ class CourseEditDialog(QDialog):
             try:
                 self.apply_changes_impl()
             except Exception as e:
-                logging.exception(e)
+                logging.exception(str(e))
             self.close()
 
         self.button_ok = QPushButton(_('OK'))
@@ -147,7 +147,7 @@ class CourseEditDialog(QDialog):
                 try:
                     control.length = int(i.split()[1])
                 except Exception as e:
-                    logging.exception(e)
+                    logging.exception(str(e))
                     control.length = 0
             course.controls.append(control)
 

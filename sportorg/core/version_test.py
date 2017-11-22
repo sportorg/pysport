@@ -26,3 +26,4 @@ class TestVersion(unittest.TestCase):
         version3 = Version(1, 0, 25, 44)
         self.assertEqual(True, version1.is_compatible(version2), 'Error')
         self.assertEqual(False, version1.is_compatible(version3), 'Error')
+        self.assertEqual(True, version2 <= version1 < version3, 'Error')

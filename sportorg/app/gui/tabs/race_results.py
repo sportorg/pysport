@@ -1,7 +1,5 @@
 import logging
 
-from datetime import datetime
-
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QModelIndex
 from PyQt5.QtWidgets import QAbstractItemView, QTableView
@@ -159,7 +157,9 @@ class Widget(QtWidgets.QWidget):
         index = 1
         for i in result.punches:
             time = i[1]
+
             assert isinstance(time, OTime)
+            
             s = '{} {} {}'.format(index, i[0], time_to_hhmmss(time))
             self.ResultChipDetails.append(s)
             index += 1

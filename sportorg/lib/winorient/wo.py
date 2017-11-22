@@ -40,7 +40,7 @@ class CSVReader:
             'qual': Qualification(person[3]),
             'bib': ifempty(person[4]),
             'year': int(person[5]) if len(person[5]) else None,
-            'card_number': int(person[6]) if len(person[6]) else None,
+            'sportident_card': int(person[6]) if len(person[6]) else None,
             'comment': person[7]
         }
         if len(str(person[1]).split(' ')) == 2:
@@ -66,7 +66,7 @@ class CSVReader:
     def cards(self):
         if not len(self._cards):
             for row in self.data:
-                self._cards.add(row['card_number'])
+                self._cards.add(row['sportident_card'])
 
         return self._cards
 

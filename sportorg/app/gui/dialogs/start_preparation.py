@@ -288,6 +288,7 @@ class StartPreparationDialog(QDialog):
             sleep(progressbar_delay)
 
             if self.start_check_box.isChecked():
+
                 corridor_first_start = time_to_otime(self.start_first_time_edit.time())
                 fixed_start_interval = time_to_otime(self.start_interval_time_edit.time())
                 if self.start_interval_radio_button.isChecked():

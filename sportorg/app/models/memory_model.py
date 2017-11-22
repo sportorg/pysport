@@ -53,7 +53,7 @@ class AbstractSportOrgMemoryModel (QAbstractTableModel):
                 column = index.column()
                 answer = self.cache[row][column]
             except Exception as e:
-                logging.exception(e)
+                logging.exception(str(e))
 
             # end = time.time()
             # logging.debug('Data() ' + str(index.row()) + ' ' + str(index.column()) + ': ' + str(end - start) + ' s')
@@ -174,7 +174,7 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
         else:
             ret.append('')
         ret.append(person.start_group)
-        ret.append(person.card_number)
+        ret.append(int(person.sportident_card) if person.sportident_card is not None else 0)
         ret.append(_('rented stub'))
         ret.append(person.comment)
         ret.append(person.world_code)
@@ -205,7 +205,7 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
 
     def get_headers(self):
         return ['Last name', 'First name', 'Group', 'Team', 'Bib', 'Card', 'Start', 'Finish', 'Result',
-                'Status', 'Penalty', 'Place']
+                'Status', 'Penalty', 'Place', 'Type']
 
     def init_cache(self):
         self.cache.clear()
@@ -225,7 +225,7 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
         first_name = ''
         last_name = ''
         bib = 0
-        card_number = str(result.card_number) if result.card_number else ''
+        sportident_card = str(result.sportident_card) if result.sportident_card is not None else ''
         if person:
             first_name = person.name
             last_name = person.surname
@@ -239,11 +239,12 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
 
         start = ''
         if i.start_time:
-            start = time_to_hhmmss(i.start_time)
+            start = str(i.start_time)
 
         finish = ''
         if i.finish_time:
-            finish = time_to_hhmmss(i.finish_time)
+            finish = str(i.finish_time)
+
 
         return list([
             last_name,
@@ -251,13 +252,15 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
             group,
             team,
             bib,
-            card_number,
+            sportident_card,
             start,
             finish,
             i.get_result(),
             i.status.get_title(),
             i.penalty_time,
-            i.place])
+            i.place,
+            str(i.system_type)
+        ])
 
     def get_source_array(self):
         return race().results

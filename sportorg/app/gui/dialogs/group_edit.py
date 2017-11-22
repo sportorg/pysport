@@ -9,10 +9,11 @@ from PyQt5.QtWidgets import QFormLayout, QLabel, \
 
 from sportorg.app.gui.dialogs.group_ranking import GroupRankingDialog
 from sportorg.app.gui.global_access import GlobalAccess
-from sportorg.app.models.memory import race, Group, find, Sex
+from sportorg.app.models.memory import race, Group, find, Sex, Limit
 from sportorg.app.models.result.result_calculation import ResultCalculation
 from sportorg.app.modules.utils.custom_controls import AdvComboBox
 from sportorg.app.modules.utils.utils import time_to_qtime, time_to_otime
+
 
 from sportorg.language import _
 from sportorg import config
@@ -25,7 +26,7 @@ def get_courses():
             ret.append(i.name)
         return ret
     except Exception as e:
-        logging.exception(e)
+        logging.exception(str(e))
 
 
 def get_sexes():
@@ -97,7 +98,7 @@ class GroupEditDialog(QDialog):
         self.label_price = QLabel(_('Start fee'))
         self.item_price = QSpinBox()
         self.item_price.setSingleStep(50)
-        self.item_price.setMaximum(100000000)
+        self.item_price.setMaximum(Limit.PRICE)
         self.layout.addRow(self.label_price, self.item_price)
 
         self.rank_checkbox = QCheckBox(_('Rank calculation'))
@@ -111,7 +112,7 @@ class GroupEditDialog(QDialog):
             try:
                 self.apply_changes_impl()
             except Exception as e:
-                logging.exception(e)
+                logging.exception(str(e))
             self.close()
 
         self.button_ok = QPushButton(_('OK'))
@@ -212,6 +213,7 @@ class GroupEditDialog(QDialog):
             changed = True
 
         time = time_to_otime(self.item_max_time.time())
+
         if org.max_time != time:
             org.max_time = time
             changed = True

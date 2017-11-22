@@ -39,7 +39,6 @@ class SIReaderThread(threading.Thread):
                     if not self.reading:
                         si.disconnect()
                         return
-                # card_number = si.sicard
 
                 card_data = si.read_sicard()
                 # beep
@@ -57,7 +56,7 @@ class SIReaderThread(threading.Thread):
                 self.stop()
                 return
             except Exception as e:
-                logging.exception(e)
+                logging.exception(str(e))
 
     def check_data(self, card_data):
         if self.start_time and card_data['card_type'] == 'SI5':

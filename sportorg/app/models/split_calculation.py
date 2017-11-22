@@ -59,7 +59,7 @@ class PersonSplits(object):
         self.team = ''
         if person.organization:
             self.team = person.organization.name
-        self.card_number = person.card_number
+        self.sportident_card = person.sportident_card
         self.qual = ''
         if person.qual:
             self.qual = person.qual.get_title()
@@ -270,7 +270,7 @@ class GroupSplits(object):
             person_json['name'] = i.name
             person_json['bib'] = i.bib
             person_json['team'] = i.team
-            person_json['card_number'] = i.card_number
+            person_json['sportident_card'] = int(i.sportident_card)
             person_json['last_correct_index'] = i.last_correct_index
             person_json['place'] = i.place
             person_json['start'] = i.start

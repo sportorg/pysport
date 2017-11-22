@@ -51,7 +51,7 @@ class Widget(QtWidgets.QWidget):
                     dialog = CourseEditDialog(self.CourseTable, index)
                     dialog.exec()
             except Exception as e:
-                logging.exception(e)
+                logging.exception(str(e))
 
         self.CourseTable.activated.connect(course_double_clicked)
         self.course_layout.addWidget(self.CourseTable)

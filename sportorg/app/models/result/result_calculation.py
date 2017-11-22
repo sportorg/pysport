@@ -320,7 +320,7 @@ def get_splits_data_printout(person):
     person_json['group'] = person.group.name
     person_json['bib'] = person.bib
     person_json['team'] = person.organization.name
-    person_json['card_number'] = person.card_number
+    person_json['sportident_card'] = int(person.sportident_card)
 
     result_json['start'] = time_to_hhmmss(person.start_time)
     result_json['finish'] = time_to_hhmmss(result.finish_time)

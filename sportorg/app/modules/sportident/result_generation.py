@@ -2,7 +2,7 @@ import logging
 
 from sportorg.app.gui.dialogs.bib_dialog import BibDialog
 from sportorg.app.gui.global_access import GlobalAccess
-from sportorg.app.models.memory import race, Person, SystemType
+from sportorg.app.models.memory import race, Person
 from sportorg.app.models.result.result_checker import ResultChecker
 from sportorg.app.models.result.result_object import ResultObject
 from sportorg.app.models.split_calculation import split_printout
@@ -13,6 +13,24 @@ class ResultSportidentGeneration(ResultObject):
         super().__init__(*args, **kwargs)
         self.assign_chip_reading = race().get_setting('sportident_assign_chip_reading', 'off')
         self.repeated_reading = race().get_setting('sportident_repeated_reading', 'rewrite')
+
+    def _find_person_by_result(self):
+        if self._person is not None:
+            return True
+        for person in race().persons:
+            if person.sportident_card is not None and person.sportident_card == self._result.sportident_card:
+                self._person = person
+                return True
+
+        return False
+
+    def _has_sportident_card(self):
+        for result in race().results:
+            if result is None:
+                continue
+            if result.sportident_card == self._result.sportident_card:
+                return True
+        return False
 
     def add_result(self):
         if self._has_result():
@@ -25,9 +43,6 @@ class ResultSportidentGeneration(ResultObject):
         if self._find_person_by_result():
             return ResultChecker(self._person).check_result(self._result)
         return False
-
-    def system_id(self):
-        return SystemType.SPORTIDENT
 
     def _no_person(self):
         if self.assign_chip_reading == 'off':
@@ -49,12 +64,9 @@ class ResultSportidentGeneration(ResultObject):
             self._find_person_by_result()
             ResultChecker.checking(self._result)
 
-            self._result.person.result = self._result
-            self._result.person.add_result(self._result)
-
             self._add_result_to_race()
 
-            logging.info('{}{}'.format(self.system_id(), self._result))
+            logging.info('Sportident {}'.format(self._result))
             logging.debug(self._result.status)
             GlobalAccess().auto_save()
 
