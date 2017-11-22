@@ -258,8 +258,13 @@ class WinOrientBinary:
             new_person.start_group = man.start_group
 
             # result
-            result = man.result
-            if result is not None:
+            result = None  # find result
+            for i in my_race.results:
+                if i.person == man:
+                    result = i
+                    break
+
+            if result:
                 new_finish = WDBFinish()
 
                 new_finish.time = time_to_int(result.finish_time)

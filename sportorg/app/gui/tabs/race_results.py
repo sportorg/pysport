@@ -157,8 +157,6 @@ class Widget(QtWidgets.QWidget):
         index = 1
         for i in result.punches:
             time = i[1]
-
-            assert isinstance(time, OTime)
             
             s = '{} {} {}'.format(index, i[0], time_to_hhmmss(time))
             self.ResultChipDetails.append(s)

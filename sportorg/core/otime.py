@@ -44,17 +44,6 @@ class OTime:
             return False
         return self.to_msec() == other.to_msec()
 
-    def __ne__(self, other):
-        if not other:
-            return True
-        return self.to_msec() != other.to_msec()
-
-    def __lt__(self, other):
-        if not other:
-            return False
-        return self.to_msec() < other.to_msec()
-
-
     def __gt__(self, other):
         if not other:
             return True

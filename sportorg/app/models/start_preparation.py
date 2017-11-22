@@ -259,11 +259,9 @@ class StartNumberManager(object):
 
             for current_person in persons:
                 start_time = current_person.start_time
-                assert isinstance(start_time, datetime.datetime)
                 time_delta = (start_time - first_start)
-                assert isinstance(time_delta, timedelta)
-                delta = time_delta.seconds // 60
-                current_person.bib = min_num + delta
+                delta = time_delta.to_sec() // 60
+                current_person.bib = int(min_num + delta)
             return persons[-1].bib
 
         return first_number
@@ -304,7 +302,7 @@ class StartTimeManager(object):
         if persons is not None:
             for current_person in persons:
                 current_person.start_time = current_start
-                current_start = current_start + timedelta(seconds=start_interval.second, minutes=start_interval.minute)
+                current_start = current_start + start_interval
         return current_start
 
     def process_corridor(self, corridor, first_start, start_interval):

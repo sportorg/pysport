@@ -421,22 +421,22 @@ class ResultSportident(ResultObject):
         start_source = obj.get_setting('sportident_start_source', 'protocol')
         if start_source == 'protocol':
             if self.person:
-                return time_remove_day(self.person.start_time)
+                return self.person.start_time
         elif start_source == 'station':
-            return time_remove_day(self.start)
+            return self.start
         elif start_source == 'cp':
             pass
         elif start_source == 'gate':
             pass
 
-        return int_to_time(0)
+        return int_to_otime(0)
 
     def get_finish_time(self):
         obj = race()
         finish_source = obj.get_setting('sportident_finish_source', 'station')
         if finish_source == 'station':
             if self.finish:
-                return time_remove_day(self.finish)
+                return self.finish
         elif finish_source == 'cp':
             pass
         elif finish_source == 'beam':

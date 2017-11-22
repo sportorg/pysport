@@ -8,6 +8,7 @@ from sportorg.app.models import memory
 from sportorg.app.models.result.result_calculation import ResultCalculation
 from sportorg.app.modules.sportident.result_generation import ResultSportidentGeneration
 from sportorg.app.modules.sportident import sireader
+from sportorg.app.modules.utils.utils import time_to_otime
 from sportorg.core.event import add_event
 
 
@@ -19,8 +20,8 @@ def get_result(card_data):
     result = memory.ResultSportident()
     result.sportident_card = memory.race().new_sportident_card(card_data['card_number'])
     result.punches = card_data['punches']
-    result.start_time = card_data['start']
-    result.finish_time = card_data['finish']
+    result.start_time = time_to_otime(card_data['start'])
+    result.finish_time = time_to_otime(card_data['finish'])
 
     return result
 

@@ -156,7 +156,6 @@ class ResultEditDialog(QDialog):
         result = self.current_object
         assert (isinstance(result, Result))
 
-
         time = time_to_otime(self.item_finish.time())
         if result.finish_time != time:
             result.finish_time = time
