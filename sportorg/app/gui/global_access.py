@@ -161,7 +161,7 @@ class GlobalAccess(object):
             main_window.save_file()
             logging.info(_('Auto save'))
         else:
-            main_window.statusbar_message(_('No file to auto save'))
+            logging.warning(_('No file to auto save'))
 
     def text_exchange(self):
         TextExchangeDialog().exec()

@@ -24,6 +24,8 @@ class CoursesTableView(TableView):
 class Widget(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
+        self.course_layout = None
+        self.CourseTable = None
         self.setup_ui()
 
     def setup_ui(self):

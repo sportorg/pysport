@@ -843,3 +843,6 @@ msgstr "Номер чипа уникален"
 
 msgid "Add SPORTident result"
 msgstr "Добавить SPORTident результат"
+
+msgid "Logs"
+msgstr "Логи"

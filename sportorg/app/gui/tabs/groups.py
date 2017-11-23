@@ -49,7 +49,7 @@ class Widget(QtWidgets.QWidget):
             logging.debug('clicked on ' + str(index.row()))
 
             try:
-                 if index.row() < len(race().groups):
+                if index.row() < len(race().groups):
                     dialog = GroupEditDialog(self.GroupTable, index)
                     dialog.exec()
             except Exception as e:
