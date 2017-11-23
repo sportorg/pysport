@@ -27,10 +27,10 @@ from sportorg.app.gui.tabs.memory_model import PersonMemoryModel, ResultMemoryMo
     CourseMemoryModel, TeamMemoryModel
 from sportorg.app.gui.toolbar import toolbar_list
 from sportorg.app.models.memory import Race, event as races, race, Config as Configuration
-from sportorg.app.models.result.split_calculation import split_printout
 from sportorg.app.models.start.start_preparation import guess_courses_for_groups, guess_corridors_for_groups
 from sportorg.app.modules.backup import backup
 from sportorg.app.modules.ocad import ocad
+from sportorg.app.modules.printing.model import NoResultToPrintException, split_printout
 from sportorg.app.modules.sportident import sportident
 from sportorg.app.modules.winorient import winorient
 from sportorg.core import event
@@ -356,7 +356,7 @@ class MainWindow(QMainWindow, App):
         except Exception as e:
             logging.exception(str(e))
 
-    def split_printout(self):
+    def split_printout_selected(self):
         if self.current_tab != 1:
             logging.warning(_('No result selected'))
             return
@@ -373,11 +373,18 @@ class MainWindow(QMainWindow, App):
                 mes.setText(_('No results to print'))
                 mes.exec()
                 return
-
-            split_printout(obj.results[index])
-
+            self.split_printout(obj.results[index])
         except Exception as e:
             logging.exception(str(e))
+
+    def split_printout(self, result):
+        try:
+            split_printout(result)
+        except NoResultToPrintException as e:
+            logging.warning(str(e))
+            mes = QMessageBox(self)
+            mes.setText(_('No results to print'))
+            mes.exec()
 
     @staticmethod
     def event_settings_dialog():
@@ -576,7 +583,8 @@ class MainWindow(QMainWindow, App):
 
             self.init_model()
 
-    def about_dialog(self):
+    @staticmethod
+    def about_dialog():
         try:
             AboutDialog().exec()
         except Exception as e:

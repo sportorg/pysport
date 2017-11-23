@@ -210,7 +210,7 @@ def menu_list():
                 },
                 {
                     'title': _('Split printout'),
-                    'action': GlobalAccess().get_main_window().split_printout
+                    'action': GlobalAccess().get_main_window().split_printout_selected
                 },
                 {
                     'title': _('Rechecking'),

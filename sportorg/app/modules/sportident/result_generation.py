@@ -1,11 +1,10 @@
 import logging
 
-from sportorg.app.gui.dialogs.bib_dialog import BibDialog
 from sportorg.app.gui.global_access import GlobalAccess
 from sportorg.app.models.memory import race, Person
 from sportorg.app.models.result.result_checker import ResultChecker
 from sportorg.app.models.result.result_object import ResultObject
-from sportorg.app.models.result.split_calculation import split_printout
+from sportorg.app.modules.printing.model import split_printout, NoResultToPrintException
 
 
 class ResultSportidentGeneration(ResultObject):
@@ -36,7 +35,7 @@ class ResultSportidentGeneration(ResultObject):
         if self._has_result():
             return
         if self.assign_chip_reading == 'always':
-            self.bib_dialog()
+            pass  # bib
         self._add_result()
 
     def check_punches(self):
@@ -48,16 +47,8 @@ class ResultSportidentGeneration(ResultObject):
         if self.assign_chip_reading == 'off':
             self._add_result_to_race()
         elif self.assign_chip_reading == 'only_unknown_members':
-            self.bib_dialog()
+            # bib
             self._add_result()
-
-    def bib_dialog(self):
-        try:
-            bib_dialog = BibDialog()
-            bib_dialog.exec()
-            self._person = bib_dialog.get_person()
-        except Exception as e:
-            logging.exception(str(e))
 
     def _add_result(self):
         if isinstance(self._result.person, Person):
@@ -71,7 +62,10 @@ class ResultSportidentGeneration(ResultObject):
             GlobalAccess().auto_save()
 
             if race().get_setting('split_printout', False):
-                split_printout(self._result)
+                try:
+                    split_printout(self._result)
+                except NoResultToPrintException as e:
+                    logging.error(str(e))
         else:
             if self._find_person_by_result():
                 self._result.person = self._person

@@ -1,15 +1,14 @@
-import logging
-
-import datetime
 from abc import abstractmethod
 from enum import IntEnum, Enum
 
-from PyQt5.QtWidgets import QMessageBox
-
 from sportorg.app.modules.utils.utils import int_to_otime, time_to_hhmmss, time_to_sec
 from sportorg.core.otime import OTime
-from sportorg.language import _
 from sportorg.core.model import Model
+from sportorg.language import _
+
+
+class NotEmptyException(Exception):
+    pass
 
 
 class Limit:
@@ -545,83 +544,51 @@ class Race(Model):
 
         return person
 
-    def delete_persons(self, indexes, table):
-        try:
-            indexes = sorted(indexes, reverse=True)
-            for i in indexes:
-                del self.persons[i]
-        except Exception as e:
-            logging.exception(str(e))
+    def delete_persons(self, indexes):
+        indexes = sorted(indexes, reverse=True)
+        for i in indexes:
+            del self.persons[i]
 
-    def delete_results(self, indexes, table):
-        try:
-            indexes = sorted(indexes, reverse=True)
-            for i in indexes:
-                del self.results[i]
+    def delete_results(self, indexes):
+        indexes = sorted(indexes, reverse=True)
+        for i in indexes:
+            del self.results[i]
 
-        except Exception as e:
-            logging.exception(str(e))
+    def delete_groups(self, indexes):
+        race().update_counters()
+        for i in indexes:
+            group = self.groups[i]  # type: Group
+            if group.count_person > 0:
+                raise NotEmptyException('Cannot remove group')
 
-    def delete_groups(self, indexes, table):
-        try:
-            race().update_counters()
-            for i in indexes:
-                group = self.groups[i]  # type: Group
-                if group.count_person > 0:
-                    # FIXME: Эту херню надо отсюда выпилить и возвращать номер ошибки как результат. Относиться ко всем
-                    QMessageBox.question(table,
-                                         _('Error'),
-                                         _('Cannot remove group') + ' ' + group.name)
-                    return False
-
-            indexes = sorted(indexes, reverse=True)
-            for i in indexes:
-                del self.groups[i]
-
-        except Exception as e:
-            logging.exception(str(e))
-            return False
+        indexes = sorted(indexes, reverse=True)
+        for i in indexes:
+            del self.groups[i]
         return True
 
-    def delete_courses(self, indexes, table):
-        try:
-            race().update_counters()
-            for i in indexes:
-                course = self.courses[i]  # type: Course
-                if course.count_group > 0:
-                    QMessageBox.question(table,
-                                         _('Error'),
-                                         _('Cannot remove course') + ' ' + course.name)
-                    return False
+    def delete_courses(self, indexes):
+        race().update_counters()
+        for i in indexes:
+            course = self.courses[i]  # type: Course
+            if course.count_group > 0:
+                raise NotEmptyException('Cannot remove course')
 
-            indexes = sorted(indexes, reverse=True)
+        indexes = sorted(indexes, reverse=True)
 
-            for i in indexes:
-                del self.courses[i]
-
-        except Exception as e:
-            logging.exception(str(e))
-            return False
+        for i in indexes:
+            del self.courses[i]
         return True
 
-    def delete_organizations(self, indexes, table):
-        try:
-            race().update_counters()
-            for i in indexes:
-                organization = self.organizations[i]  # type: Organization
-                if organization.count_person > 0:
-                    QMessageBox.question(table,
-                                         _('Error'),
-                                         _('Cannot remove organization') + ' ' + organization.name)
-                    return False
-            indexes = sorted(indexes, reverse=True)
+    def delete_organizations(self, indexes):
+        race().update_counters()
+        for i in indexes:
+            organization = self.organizations[i]  # type: Organization
+            if organization.count_person > 0:
+                raise NotEmptyException('Cannot remove organization')
+        indexes = sorted(indexes, reverse=True)
 
-            for i in indexes:
-                del self.organizations[i]
-
-        except Exception as e:
-            logging.exception(str(e))
-            return False
+        for i in indexes:
+            del self.organizations[i]
         return True
 
     @staticmethod
