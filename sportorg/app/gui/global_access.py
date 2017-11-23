@@ -138,7 +138,8 @@ class GlobalAccess(object):
         try:
             logging.debug('Rechecking start')
             for result in race().results:
-                ResultChecker.checking(result)
+                if result.person is not None:
+                    ResultChecker.checking(result)
             logging.debug('Rechecking finish')
             self.get_main_window().refresh()
         except Exception as e:
@@ -169,4 +170,3 @@ class GlobalAccess(object):
 
     def refresh(self):
         self.get_main_window().refresh()
-        
