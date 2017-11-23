@@ -4,11 +4,10 @@ from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QAbstractItemView, QHeaderView
 
 from sportorg.app.gui.dialogs.course_edit import CourseEditDialog
-from sportorg.app.models.memory import race
-from sportorg.app.models.memory_model import CourseMemoryModel
-from sportorg.app.gui.tabs.table import TableView
 from sportorg.app.gui.global_access import GlobalAccess
-
+from sportorg.app.gui.tabs.memory_model import CourseMemoryModel
+from sportorg.app.gui.tabs.table import TableView
+from sportorg.app.models.memory import race
 from sportorg.language import _
 
 
@@ -16,13 +15,16 @@ class CoursesTableView(TableView):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.popup_items = [
-            (_("Add object"), GlobalAccess().add_object)
+            (_("Add object"), GlobalAccess().add_object),
+            (_('Delete'), GlobalAccess().get_main_window().delete_object)
         ]
 
 
 class Widget(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
+        self.course_layout = None
+        self.CourseTable = None
         self.setup_ui()
 
     def setup_ui(self):
@@ -42,7 +44,7 @@ class Widget(QtWidgets.QWidget):
         assert (isinstance(hor_header, QHeaderView))
         hor_header.setSectionsMovable(True)
         hor_header.setDropIndicatorShown(True)
-        hor_header.setSectionResizeMode(QHeaderView.ResizeToContents)
+        hor_header.setSectionResizeMode(QHeaderView.Interactive)
 
         def course_double_clicked(index):
             logging.debug('Courses - clicked on ' + str(index.row()))

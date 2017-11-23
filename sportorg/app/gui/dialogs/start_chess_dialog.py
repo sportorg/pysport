@@ -1,17 +1,15 @@
 import codecs
-import sys
 import logging
-
+import sys
 import time
 
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QApplication, QDialog, QPushButton, QTextEdit
 
-from sportorg.app.gui.dialogs.file_dialog import get_save_file_name
-from sportorg.app.models.start_calculation import get_chess_list
-
-from sportorg.language import _
 from sportorg import config
+from sportorg.app.gui.dialogs.file_dialog import get_save_file_name
+from sportorg.app.models.start.start_calculation import get_chess_list
+from sportorg.language import _
 
 
 class StartChessDialog(QDialog):

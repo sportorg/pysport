@@ -2,18 +2,19 @@ import logging
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QModelIndex
-from PyQt5.QtWidgets import QAbstractItemView, QTableView
+from PyQt5.QtWidgets import QAbstractItemView, QHeaderView
 
+from sportorg.app.gui.dialogs.results_edit import ResultEditDialog
+from sportorg.app.gui.global_access import GlobalAccess
+from sportorg.app.gui.tabs.memory_model import ResultMemoryModel
+from sportorg.app.gui.tabs.table import TableView
+from sportorg.app.models.memory import race, Result, Course, CourseControl
 from sportorg.app.modules.utils.utils import time_to_hhmmss
 from sportorg.core import event as event_handler
-from sportorg.app.gui.dialogs.results_edit import ResultEditDialog
-from sportorg.app.models.memory import race, Result, Course, CourseControl
-from sportorg.app.models.memory_model import ResultMemoryModel
-from sportorg.core.otime import OTime
 from sportorg.language import _
 
 
-class ResultTable(QTableView):
+class ResultTable(TableView):
     def __init__(self, parent, obj):
         super().__init__(obj)
 
@@ -26,6 +27,12 @@ class ResultTable(QTableView):
 
         self.clicked.connect(self.entry_single_clicked)
         self.activated.connect(self.double_clicked)
+
+        self.popup_items = [
+            (_('Manual finish'), GlobalAccess().get_main_window().manual_finish),
+            (_('Add SPORTident result'), GlobalAccess().get_main_window().sportident_result),
+            (_('Delete'), GlobalAccess().get_main_window().delete_object)
+        ]
 
         event_handler.add_event('refresh', self.update_punches)
 
@@ -133,6 +140,13 @@ class Widget(QtWidgets.QWidget):
         self.ResultChipDetails.setObjectName("ResultChipDetails")
         self.verticalLayout_3.addWidget(self.ResultChipDetails)
         self.ResultTable = ResultTable(self, self.ResultSplitter)
+
+        hor_header = self.ResultTable.horizontalHeader()
+        assert (isinstance(hor_header, QHeaderView))
+        hor_header.setSectionsMovable(True)
+        hor_header.setDropIndicatorShown(True)
+        hor_header.setSectionResizeMode(QHeaderView.Interactive)
+        event_handler.add_event('refresh', lambda: hor_header.setSectionResizeMode(QHeaderView.ResizeToContents))
 
         self.gridLayout.addWidget(self.ResultSplitter)
         self.ResultCourseGroupBox.setTitle(_("Course"))

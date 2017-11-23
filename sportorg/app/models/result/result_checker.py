@@ -1,6 +1,10 @@
 from sportorg.app.models.memory import Person, Result, ResultStatus
 
 
+class ResultCheckerException(Exception):
+    pass
+
+
 class ResultChecker:
     def __init__(self, person: Person):
         assert person, Person
@@ -47,10 +51,10 @@ class ResultChecker:
         return self.check(result.punches, controls)
 
     @classmethod
-    def checking(cls, result, person=None):
-        if person is None:
-            person = result.person
-        o = cls(person)
+    def checking(cls, result):
+        if result.person is None:
+            raise ResultCheckerException('Not person')
+        o = cls(result.person)
         result.status = ResultStatus.OK
         if not o.check_result(result):
             result.status = ResultStatus.DISQUALIFIED

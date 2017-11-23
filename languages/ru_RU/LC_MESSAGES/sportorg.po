@@ -879,3 +879,9 @@ msgstr "пользовательский"
 
 msgid "Refresh"
 msgstr "Обновить"
+
+msgid "Add SPORTident result"
+msgstr "Добавить SPORTident результат"
+
+msgid "Logs"
+msgstr "Логи"

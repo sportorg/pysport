@@ -243,7 +243,7 @@ def get_property(person, key):
         result = find_person_result(person)
         if result:
             return time_to_hhmmss(result.get_penalty_time())
-    elif key == _('Penalty laps'):
+    elif key == _('Penalty legs'):
         result = find_person_result(person)
         if result:
             return str(result.penalty_laps)
@@ -279,12 +279,12 @@ def set_property(person, key, value):
         result = find_person_result(person)
         if result:
             result.penalty_time = hhmmss_to_time(value)
-    elif key == _('Penalty laps'):
+    elif key == _('Penalty legs'):
         result = find_person_result(person)
         if result:
             result.penalty_laps = int(value)
     elif key == _('Card number'):
-        person.sportident_card = int(value)
+        race().person_sportident_card(person, int(value))
     elif key == _('Group'):
         None
     elif key == _('Team'):

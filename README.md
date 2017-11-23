@@ -4,9 +4,8 @@
 
 - PyQt5
 - [sireader](https://pypi.python.org/pypi/sireader/1.0.1)
-- [peewee](http://docs.peewee-orm.com/en/latest/peewee/quickstart.html)
-- Flask
 - jinja2
+- [polib](http://polib.readthedocs.io/en/latest/quickstart.html)
 
 Install packages
 ```
@@ -36,7 +35,6 @@ pip install -t lib -r requirements.txt
     languages/
         <lang>/
             LC_MESSAGES/
-                sportorg.mo
                 sportorg.po
     sportorg/
         core/

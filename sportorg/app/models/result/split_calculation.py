@@ -1,12 +1,6 @@
-from PyQt5.QtWidgets import QMessageBox
-
 from sportorg.app.models.memory import race, Person, Course, Group, Qualification
 from sportorg.app.models.result.result_calculation import ResultCalculation
-from sportorg.app.modules.printing.printing import print_html
 from sportorg.app.modules.utils.utils import time_to_hhmmss, get_speed_min_per_km, if_none, time_to_otime
-from sportorg.config import template_dir
-from sportorg.lib.template.template import get_text_from_file
-from sportorg.language import _
 
 
 class LegSplit(object):
@@ -340,23 +334,7 @@ def get_splits_data():
 
 
 class SplitsCalculation(object):
-    def process_groups(self):
+    @staticmethod
+    def process_groups():
         for i in race().groups:
             GroupSplits(i)
-
-
-def split_printout(result):
-    person = result.person
-
-    if not person or not person.group:
-        mes = QMessageBox()
-        mes.setText(_('No results to print'))
-        mes.exec()
-        return
-
-    template_path = template_dir('split_printout.html')
-    spl = GroupSplits(person.group)
-    template = get_text_from_file(template_path, **spl.get_json(person))
-
-    obj = race()
-    print_html(obj.get_setting('split_printer'), template)
