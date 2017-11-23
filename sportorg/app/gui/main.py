@@ -23,12 +23,12 @@ from sportorg.app.gui.global_access import GlobalAccess
 from sportorg.app.gui.menu import menu_list
 from sportorg.app.gui.post_init import POST_INIT
 from sportorg.app.gui.tabs import start_preparation, groups, teams, race_results, courses, log
+from sportorg.app.gui.tabs.memory_model import PersonMemoryModel, ResultMemoryModel, GroupMemoryModel, \
+    CourseMemoryModel, TeamMemoryModel
 from sportorg.app.gui.toolbar import toolbar_list
 from sportorg.app.models.memory import Race, event as races, race, Config as Configuration
-from sportorg.app.models.memory_model import PersonMemoryModel, ResultMemoryModel, GroupMemoryModel, \
-    CourseMemoryModel, TeamMemoryModel
-from sportorg.app.models.split_calculation import split_printout
-from sportorg.app.models.start_preparation import guess_courses_for_groups, guess_corridors_for_groups
+from sportorg.app.models.result.split_calculation import split_printout
+from sportorg.app.models.start.start_preparation import guess_courses_for_groups, guess_corridors_for_groups
 from sportorg.app.modules.backup import backup
 from sportorg.app.modules.ocad import ocad
 from sportorg.app.modules.sportident import sportident

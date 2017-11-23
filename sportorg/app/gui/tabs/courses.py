@@ -4,11 +4,10 @@ from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QAbstractItemView, QHeaderView
 
 from sportorg.app.gui.dialogs.course_edit import CourseEditDialog
-from sportorg.app.models.memory import race
-from sportorg.app.models.memory_model import CourseMemoryModel
-from sportorg.app.gui.tabs.table import TableView
 from sportorg.app.gui.global_access import GlobalAccess
-
+from sportorg.app.gui.tabs.memory_model import CourseMemoryModel
+from sportorg.app.gui.tabs.table import TableView
+from sportorg.app.models.memory import race
 from sportorg.language import _
 
 

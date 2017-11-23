@@ -6,12 +6,13 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QTime
 from PyQt5.QtWidgets import QApplication, QDialog
 
+from sportorg import config
 from sportorg.app.gui.global_access import GlobalAccess
 from sportorg.app.models.memory import race, Group
-from sportorg.app.models.start_preparation import StartNumberManager, DrawManager, ReserveManager, StartTimeManager
+from sportorg.app.models.start.start_preparation import StartNumberManager, DrawManager, ReserveManager, \
+    StartTimeManager
 from sportorg.app.modules.utils.utils import time_to_otime
 from sportorg.language import _
-from sportorg import config
 
 
 class StartPreparationDialog(QDialog):

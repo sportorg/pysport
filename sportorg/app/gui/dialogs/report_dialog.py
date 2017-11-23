@@ -1,20 +1,18 @@
 import codecs
-import sys
 import logging
-
+import sys
 import time
 import webbrowser
 
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QLabel, QApplication, QDialog, QPushButton
 
+from sportorg import config
 from sportorg.app.gui.dialogs.file_dialog import get_open_file_name, get_save_file_name
-from sportorg.app.models.split_calculation import get_splits_data
+from sportorg.app.models.result.split_calculation import get_splits_data
 from sportorg.app.modules.utils.custom_controls import AdvComboBox
 from sportorg.core.template import get_templates, get_text_from_file
-
 from sportorg.language import _
-from sportorg import config
 
 
 class ReportDialog(QDialog):

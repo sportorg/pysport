@@ -4,13 +4,13 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QModelIndex
 from PyQt5.QtWidgets import QAbstractItemView, QHeaderView
 
+from sportorg.app.gui.dialogs.results_edit import ResultEditDialog
 from sportorg.app.gui.global_access import GlobalAccess
+from sportorg.app.gui.tabs.memory_model import ResultMemoryModel
 from sportorg.app.gui.tabs.table import TableView
+from sportorg.app.models.memory import race, Result, Course, CourseControl
 from sportorg.app.modules.utils.utils import time_to_hhmmss
 from sportorg.core import event as event_handler
-from sportorg.app.gui.dialogs.results_edit import ResultEditDialog
-from sportorg.app.models.memory import race, Result, Course, CourseControl
-from sportorg.app.models.memory_model import ResultMemoryModel
 from sportorg.language import _
 
 

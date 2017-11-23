@@ -5,7 +5,7 @@ from sportorg.app.gui.global_access import GlobalAccess
 from sportorg.app.models.memory import race, Person
 from sportorg.app.models.result.result_checker import ResultChecker
 from sportorg.app.models.result.result_object import ResultObject
-from sportorg.app.models.split_calculation import split_printout
+from sportorg.app.models.result.split_calculation import split_printout
 
 
 class ResultSportidentGeneration(ResultObject):
