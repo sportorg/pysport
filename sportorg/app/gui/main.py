@@ -409,21 +409,22 @@ class MainWindow(QMainWindow, App):
         except Exception as e:
             logging.exception(str(e))
 
-    @staticmethod
-    def guess_courses():
+    def guess_courses(self):
         try:
             guess_courses_for_groups()
+            self.refresh()
+        except Exception as e:
+            logging.exception(str(e))
+
+    def guess_corridors(self):
+        try:
+            guess_corridors_for_groups()
+            self.refresh()
         except Exception as e:
             logging.exception(str(e))
 
     @staticmethod
-    def guess_corridors():
-        try:
-            guess_corridors_for_groups()
-        except Exception as e:
-            logging.exception(str(e))
-
-    def manual_finish(self):
+    def manual_finish():
         try:
             race().add_new_result()
             logging.info('Manual finish')
@@ -433,7 +434,8 @@ class MainWindow(QMainWindow, App):
         except Exception as e:
             logging.exception(str(e))
 
-    def sportident_result(self):
+    @staticmethod
+    def sportident_result():
         try:
             race().add_new_sportident_result()
             logging.info('SPORTident result')

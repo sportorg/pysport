@@ -271,7 +271,7 @@ class StartPreparationDialog(QDialog):
                 reserve_count = self.reserve_group_count_spin_box.value()
                 reserve_percent = self.reserve_group_percent_spin_box.value()
 
-                ReserveManager().process(reserve_prefix, reserve_count, reserve_percent)
+                ReserveManager.process(reserve_prefix, reserve_count, reserve_percent)
 
             self.progress_bar.setValue(25)
             sleep(progressbar_delay)

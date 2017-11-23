@@ -337,7 +337,8 @@ def get_splits_data():
 
 
 class SplitsCalculation(object):
-    def process_groups(self):
+    @staticmethod
+    def process_groups():
         for i in race().groups:
             GroupSplits(i)
 
