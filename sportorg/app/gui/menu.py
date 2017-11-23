@@ -210,12 +210,16 @@ def menu_list():
                 },
                 {
                     'title': _('Split printout'),
-                    'action': GlobalAccess().get_main_window().split_printout
+                    'action': GlobalAccess().get_main_window().split_printout_selected
                 },
                 {
                     'title': _('Rechecking'),
                     'shortcut': 'Ctrl+R',
                     'action': GlobalAccess().rechecking
+                },
+                {
+                    'title': _('Add SPORTident result'),
+                    'action': GlobalAccess().get_main_window().sportident_result
                 }
             ]
         },

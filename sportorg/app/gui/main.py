@@ -22,20 +22,30 @@ from sportorg.app.gui.dialogs.start_report_dialog import StartReportDialog
 from sportorg.app.gui.global_access import GlobalAccess
 from sportorg.app.gui.menu import menu_list
 from sportorg.app.gui.post_init import POST_INIT
-from sportorg.app.gui.tabs import start_preparation, groups, teams, race_results, courses
+from sportorg.app.gui.tabs import start_preparation, groups, teams, race_results, courses, log
+from sportorg.app.gui.tabs.memory_model import PersonMemoryModel, ResultMemoryModel, GroupMemoryModel, \
+    CourseMemoryModel, TeamMemoryModel
 from sportorg.app.gui.toolbar import toolbar_list
 from sportorg.app.models.memory import Race, event as races, race, Config as Configuration
-from sportorg.app.models.memory_model import PersonMemoryModel, ResultMemoryModel, GroupMemoryModel, \
-    CourseMemoryModel, TeamMemoryModel
-from sportorg.app.models.split_calculation import split_printout
-from sportorg.app.models.start_preparation import guess_courses_for_groups, guess_corridors_for_groups
+from sportorg.app.models.start.start_preparation import guess_courses_for_groups, guess_corridors_for_groups
 from sportorg.app.modules.backup import backup
 from sportorg.app.modules.ocad import ocad
+from sportorg.app.modules.printing.model import NoResultToPrintException, split_printout
 from sportorg.app.modules.sportident import sportident
 from sportorg.app.modules.winorient import winorient
 from sportorg.core import event
 from sportorg.core.app import App
 from sportorg.language import _
+
+
+class ConsolePanelHandler(logging.Handler):
+
+    def __init__(self, parent):
+        logging.Handler.__init__(self)
+        self.parent = parent
+
+    def emit(self, record):
+        self.parent.logging(self.format(record))
 
 
 class MainWindow(QMainWindow, App):
@@ -50,6 +60,10 @@ class MainWindow(QMainWindow, App):
         self.conf = configparser.ConfigParser()
         GlobalAccess().set_main_window(self)
         backup.init()
+
+        handler = ConsolePanelHandler(self)
+        handler.setFormatter(logging.Formatter('%(asctime)-15s %(levelname)s %(message)s'))
+        logging.root.addHandler(handler)
 
     def show_window(self):
         try:
@@ -189,7 +203,6 @@ class MainWindow(QMainWindow, App):
     def _setup_statusbar(self):
         self.statusbar = QtWidgets.QStatusBar()
         self.setStatusBar(self.statusbar)
-        self.statusbar_message(_("it works!"))
 
     def _setup_system_tray_icon(self):
         self.system_tray_icon = Qt.QSystemTrayIcon(self)
@@ -207,6 +220,8 @@ class MainWindow(QMainWindow, App):
         self.tabwidget.addTab(groups.Widget(), _("Groups"))
         self.tabwidget.addTab(courses.Widget(), _("Courses"))
         self.tabwidget.addTab(teams.Widget(), _("Teams"))
+        self.logging_tab = log.Widget()
+        self.tabwidget.addTab(self.logging_tab, _("Logs"))
 
     def set_title(self, title=None):
         main_title = '{} {}'.format(_(config.NAME), config.VERSION)
@@ -282,8 +297,14 @@ class MainWindow(QMainWindow, App):
         self.system_tray_icon.showMessage(title, content, icon_val[icon] if icon in icon_val else icon, msecs)
 
     def statusbar_message(self, msg, msecs=5000):
-        self.statusbar.showMessage('', 0)
-        self.statusbar.showMessage(msg, msecs)
+        if hasattr(self, 'statusbar'):
+            self.statusbar.showMessage('', 0)
+            self.statusbar.showMessage(msg, msecs)
+
+    def logging(self, text):
+        self.statusbar_message(text)
+        if hasattr(self, 'logging_tab'):
+            self.logging_tab.write(text)
 
     def select_tab(self, index):
         self.current_tab = index
@@ -335,9 +356,9 @@ class MainWindow(QMainWindow, App):
         except Exception as e:
             logging.exception(str(e))
 
-    def split_printout(self):
+    def split_printout_selected(self):
         if self.current_tab != 1:
-            self.statusbar_message(_('No result selected'))
+            logging.warning(_('No result selected'))
             return
         try:
             obj = race()
@@ -352,11 +373,18 @@ class MainWindow(QMainWindow, App):
                 mes.setText(_('No results to print'))
                 mes.exec()
                 return
-
-            split_printout(obj.results[index])
-
+            self.split_printout(obj.results[index])
         except Exception as e:
             logging.exception(str(e))
+
+    def split_printout(self, result):
+        try:
+            split_printout(result)
+        except NoResultToPrintException as e:
+            logging.warning(str(e))
+            mes = QMessageBox(self)
+            mes.setText(_('No results to print'))
+            mes.exec()
 
     @staticmethod
     def event_settings_dialog():
@@ -388,26 +416,38 @@ class MainWindow(QMainWindow, App):
         except Exception as e:
             logging.exception(str(e))
 
-    @staticmethod
-    def guess_courses():
+    def guess_courses(self):
         try:
             guess_courses_for_groups()
+            self.refresh()
+        except Exception as e:
+            logging.exception(str(e))
+
+    def guess_corridors(self):
+        try:
+            guess_corridors_for_groups()
+            self.refresh()
         except Exception as e:
             logging.exception(str(e))
 
     @staticmethod
-    def guess_corridors():
+    def manual_finish():
         try:
-            guess_corridors_for_groups()
+            race().add_new_result()
+            logging.info('Manual finish')
+            GlobalAccess().get_result_table().model().init_cache()
+            GlobalAccess().get_main_window().refresh()
+            GlobalAccess().auto_save()
         except Exception as e:
             logging.exception(str(e))
 
-    def manual_finish(self):
+    @staticmethod
+    def sportident_result():
         try:
-            race().add_new_result()
+            race().add_new_sportident_result()
+            logging.info('SPORTident result')
             GlobalAccess().get_result_table().model().init_cache()
             GlobalAccess().get_main_window().refresh()
-            self.statusbar_message(_('Manual finish'))
             GlobalAccess().auto_save()
         except Exception as e:
             logging.exception(str(e))
@@ -543,7 +583,8 @@ class MainWindow(QMainWindow, App):
 
             self.init_model()
 
-    def about_dialog(self):
+    @staticmethod
+    def about_dialog():
         try:
             AboutDialog().exec()
         except Exception as e:

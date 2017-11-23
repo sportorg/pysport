@@ -35,8 +35,9 @@ class ResultEditDialog(QDialog):
 
         self.layout = QFormLayout(self)
 
+        self.label_sportident = QLabel('')
         self.label_sportident_card = QLabel('')
-        self.layout.addRow(self.label_sportident_card)
+        self.layout.addRow(self.label_sportident, self.label_sportident_card)
 
         self.label_bib = QLabel(_('Bib'))
         self.item_bib = QSpinBox()
@@ -45,7 +46,7 @@ class ResultEditDialog(QDialog):
         self.layout.addRow(self.label_bib, self.item_bib)
 
         self.label_person_info = QLabel('')
-        self.layout.addRow(self.label_person_info)
+        self.layout.addRow(QLabel(''), self.label_person_info)
 
         self.label_finish = QLabel(_('Finish'))
         self.item_finish = QTimeEdit()
@@ -128,7 +129,8 @@ class ResultEditDialog(QDialog):
         self.current_object = current_object
 
         if current_object.sportident_card is not None:
-            self.label_sportident_card.setText('{}: {}'.format(_('Card'), current_object.sportident_card))
+            self.label_sportident.setText(_('Card'))
+            self.label_sportident_card.setText(str(current_object.sportident_card))
         if current_object.finish_time is not None:
             self.item_finish.setTime(time_to_qtime(current_object.finish_time))
         if current_object.start_time is not None:

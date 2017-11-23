@@ -1,15 +1,14 @@
-import logging
-
-import datetime
 from abc import abstractmethod
 from enum import IntEnum, Enum
 
-from PyQt5.QtWidgets import QMessageBox
-
 from sportorg.app.modules.utils.utils import int_to_otime, time_to_hhmmss, time_to_sec
 from sportorg.core.otime import OTime
-from sportorg.language import _
 from sportorg.core.model import Model
+from sportorg.language import _
+
+
+class NotEmptyException(Exception):
+    pass
 
 
 class Limit:
@@ -159,6 +158,7 @@ class CourseControl(Model):
     def __eq__(self, other):
         return self.code == other.code
 
+
 class CoursePart(Model):
     def __init__(self):
         self.controls = []  # type: List[CourseControl]
@@ -210,8 +210,7 @@ class Group(Model):
         self.min_age = 0
         self.max_age = 0
 
-
-        self.max_time = OTime()  # OTime
+        self.max_time = OTime()
         self.qual_assign_text = ''
         self.start_interval = OTime()
         self.start_corridor = 0
@@ -293,19 +292,6 @@ class Result(Model):
 
         self.person = None  # type: Person 'reverse link to person'
         self.assigned_rank = Qualification.NOT_QUALIFIED  # type: Qualification 'assigned rank (Russia only)'
-
-    def __repr__(self):
-        punches = ''
-        for punch in self.punches:
-            punches += '{} — {}\n'.format(punch[0], punch[1])
-        person = self.person.full_name if self.person is not None else ''
-        return """
-Card number: {}
-Start: {}
-Finish: {}
-Person: {}
-Punches:
-{}""".format(self.sportident_card, self.start_time, self.finish_time, person, punches)
 
     def __eq__(self, other):
         eq = self.sportident_card == other.sportident_card
@@ -390,6 +376,7 @@ class ResultObject(Result):
         super().__init__()
         self.start = None
         self.finish = None
+        self.result = None
         self.person = None  # type: Person
         self.status = ResultStatus.OK
         self.penalty_time = None  # time of penalties (marked route, false start)
@@ -400,7 +387,7 @@ class ResultObject(Result):
         return str(self.system_type)
 
     def __repr__(self):
-        return '{} {}'.format(self.system_type, self.status)
+        return 'Result {} {}'.format(self.system_type, self.status)
 
     @property
     @abstractmethod
@@ -419,6 +406,14 @@ class ResultSportident(ResultObject):
         super().__init__()
         self.sportident_card = None  # type: SportidentCard
         self.punches = []
+
+    def __repr__(self):
+        punches = ''
+        for punch in self.punches:
+            punches += '{} — {}\n'.format(punch[0], punch[1])
+        person = self.person.full_name if self.person is not None else ''
+        return "Card: {}\nStart: {}\nFinish: {}\nPerson: {}\nPunches:\n{}".format(
+            self.sportident_card, self.start_time, self.finish_time, person, punches)
 
     def get_start_time(self):
         obj = race()
@@ -459,7 +454,6 @@ class ResultSFR(ResultObject):
     def __init__(self):
         super().__init__()
         self.punches = []
-
 
 
 class Person(Model):
@@ -534,23 +528,6 @@ class Race(Model):
         else:
             return nvl_value
 
-    def delete_persons(self, indexes, table):
-        try:
-            indexes = sorted(indexes, reverse=True)
-            for i in indexes:
-                del self.persons[i]
-        except Exception as e:
-            logging.exception(str(e))
-
-    def delete_results(self, indexes, table):
-        try:
-            indexes = sorted(indexes, reverse=True)
-            for i in indexes:
-                del self.results[i]
-
-        except Exception as e:
-            logging.exception(str(e))
-
     def new_sportident_card(self, number=0):
         assert isinstance(number, int)
         for card in self.sportident_cards:
@@ -571,66 +548,51 @@ class Race(Model):
 
         return person
 
-    def delete_groups(self, indexes, table):
-        try:
-            race().update_counters()
-            for i in indexes:
-                group = self.groups[i]  # type: Group
-                if group.count_person > 0:
-                    # FIXME: Эту херню надо отсюда выпилить и возвращать номер ошибки как результат. Относиться ко всем
-                    QMessageBox.question(table,
-                                         _('Error'),
-                                         _('Cannot remove group') + ' ' + group.name)
-                    return False
+    def delete_persons(self, indexes):
+        indexes = sorted(indexes, reverse=True)
+        for i in indexes:
+            del self.persons[i]
 
-            indexes = sorted(indexes, reverse=True)
-            for i in indexes:
-                del self.groups[i]
+    def delete_results(self, indexes):
+        indexes = sorted(indexes, reverse=True)
+        for i in indexes:
+            del self.results[i]
 
-        except Exception as e:
-            logging.exception(str(e))
-            return False
+    def delete_groups(self, indexes):
+        race().update_counters()
+        for i in indexes:
+            group = self.groups[i]  # type: Group
+            if group.count_person > 0:
+                raise NotEmptyException('Cannot remove group')
+
+        indexes = sorted(indexes, reverse=True)
+        for i in indexes:
+            del self.groups[i]
         return True
 
-    def delete_courses(self, indexes, table):
-        try:
-            race().update_counters()
-            for i in indexes:
-                course = self.courses[i]  # type: Course
-                if course.count_group > 0:
-                    QMessageBox.question(table,
-                                         _('Error'),
-                                         _('Cannot remove course') + ' ' + course.name)
-                    return False
+    def delete_courses(self, indexes):
+        race().update_counters()
+        for i in indexes:
+            course = self.courses[i]  # type: Course
+            if course.count_group > 0:
+                raise NotEmptyException('Cannot remove course')
 
-            indexes = sorted(indexes, reverse=True)
+        indexes = sorted(indexes, reverse=True)
 
-            for i in indexes:
-                del self.courses[i]
-
-        except Exception as e:
-            logging.exception(str(e))
-            return False
+        for i in indexes:
+            del self.courses[i]
         return True
 
-    def delete_organizations(self, indexes, table):
-        try:
-            race().update_counters()
-            for i in indexes:
-                organization = self.organizations[i]  # type: Organization
-                if organization.count_person > 0:
-                    QMessageBox.question(table,
-                                         _('Error'),
-                                         _('Cannot remove organization') + ' ' + organization.name)
-                    return False
-            indexes = sorted(indexes, reverse=True)
+    def delete_organizations(self, indexes):
+        race().update_counters()
+        for i in indexes:
+            organization = self.organizations[i]  # type: Organization
+            if organization.count_person > 0:
+                raise NotEmptyException('Cannot remove organization')
+        indexes = sorted(indexes, reverse=True)
 
-            for i in indexes:
-                del self.organizations[i]
-
-        except Exception as e:
-            logging.exception(str(e))
-            return False
+        for i in indexes:
+            del self.organizations[i]
         return True
 
     @staticmethod
@@ -642,6 +604,12 @@ class Race(Model):
     @staticmethod
     def add_new_result():
         new_result = ResultManual()
+        new_result.finish_time = OTime.now()
+        race().results.insert(0, new_result)
+
+    @staticmethod
+    def add_new_sportident_result():
+        new_result = ResultSportident()
         new_result.finish_time = OTime.now()
         race().results.insert(0, new_result)
 

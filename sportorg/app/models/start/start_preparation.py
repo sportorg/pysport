@@ -4,7 +4,6 @@ import random
 
 from datetime import timedelta
 
-from sportorg.app.gui.global_access import GlobalAccess
 from sportorg.app.models.memory import race, Group, Person
 
 
@@ -16,7 +15,8 @@ class ReserveManager(object):
 
         Now effect on all groups, but in future we'll possible implement working with selected groups only
     """
-    def process(self, reserve_prefix, reserve_count, reserve_percent):
+    @staticmethod
+    def process(reserve_prefix, reserve_count, reserve_percent):
         current_race = race()
 
         for current_group in current_race.groups:
@@ -356,7 +356,6 @@ def guess_courses_for_groups():
                     cur_group.course = cur_course
                     logging.debug('Connecting: group ' + group_name + ' with course ' + course_name)
                     break
-    GlobalAccess().get_main_window().refresh()
 
 
 def guess_corridors_for_groups():
@@ -370,5 +369,3 @@ def guess_corridors_for_groups():
         assert isinstance(cur_group, Group)
         if cur_group.course:
             cur_group.start_corridor = cur_group.course.corridor
-
-    GlobalAccess().get_main_window().refresh()

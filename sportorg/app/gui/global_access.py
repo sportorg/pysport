@@ -5,7 +5,7 @@ from PyQt5.QtCore import QItemSelectionModel, QModelIndex
 from PyQt5.QtWidgets import QTableView, QMessageBox
 
 from sportorg.app.gui.dialogs.text_io import TextExchangeDialog
-from sportorg.app.models.memory import race
+from sportorg.app.models.memory import race, NotEmptyException
 from sportorg.app.models.result.result_calculation import ResultCalculation
 from sportorg.app.models.result.result_checker import ResultChecker
 from sportorg.language import _
@@ -86,23 +86,41 @@ class GlobalAccess(object):
         tab = self.get_current_tab_index()
 
         if tab == 0:
-            race().delete_persons(indexes, self.get_person_table())
+            race().delete_persons(indexes)
             # recalculate places
             ResultCalculation().process_results()
             self.get_main_window().refresh()
         elif tab == 1:
-            race().delete_results(indexes, self.get_result_table())
+            race().delete_results(indexes)
             # recalculate places
             ResultCalculation().process_results()
             self.get_main_window().refresh()
         elif tab == 2:
-            race().delete_groups(indexes, self.get_group_table())
+            try:
+                race().delete_groups(indexes)
+            except NotEmptyException as e:
+                logging.warning(str(e))
+                QMessageBox.question(self.get_group_table(),
+                                     _('Error'),
+                                     _('Cannot remove group'))
             self.get_main_window().refresh()
         elif tab == 3:
-            race().delete_courses(indexes, self.get_course_table())
+            try:
+                race().delete_courses(indexes)
+            except NotEmptyException as e:
+                logging.warning(str(e))
+                QMessageBox.question(self.get_course_table(),
+                                     _('Error'),
+                                     _('Cannot remove course'))
             self.get_main_window().refresh()
         elif tab == 4:
-            race().delete_organizations(indexes, self.get_organization_table())
+            try:
+                race().delete_organizations(indexes)
+            except NotEmptyException as e:
+                logging.warning(str(e))
+                QMessageBox.question(self.get_organization_table(),
+                                     _('Error'),
+                                     _('Cannot remove organization'))
             self.get_main_window().refresh()
 
     def add_object(self):
@@ -138,7 +156,8 @@ class GlobalAccess(object):
         try:
             logging.debug('Rechecking start')
             for result in race().results:
-                ResultChecker.checking(result)
+                if result.person is not None:
+                    ResultChecker.checking(result)
             logging.debug('Rechecking finish')
             self.get_main_window().refresh()
         except Exception as e:
@@ -161,7 +180,7 @@ class GlobalAccess(object):
             main_window.save_file()
             logging.info(_('Auto save'))
         else:
-            main_window.statusbar_message(_('No file to auto save'))
+            logging.warning(_('No file to auto save'))
 
     def text_exchange(self):
         TextExchangeDialog().exec()
@@ -169,4 +188,3 @@ class GlobalAccess(object):
 
     def refresh(self):
         self.get_main_window().refresh()
-        
