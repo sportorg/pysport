@@ -43,7 +43,7 @@ class Widget(QtWidgets.QWidget):
         assert (isinstance(hor_header, QHeaderView))
         hor_header.setSectionsMovable(True)
         hor_header.setDropIndicatorShown(True)
-        hor_header.setSectionResizeMode(QHeaderView.ResizeToContents)
+        hor_header.setSectionResizeMode(QHeaderView.Interactive)
 
         def course_double_clicked(index):
             logging.debug('Courses - clicked on ' + str(index.row()))

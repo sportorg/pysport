@@ -2,7 +2,7 @@ import logging
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QModelIndex
-from PyQt5.QtWidgets import QAbstractItemView, QTableView
+from PyQt5.QtWidgets import QAbstractItemView, QHeaderView
 
 from sportorg.app.gui.global_access import GlobalAccess
 from sportorg.app.gui.tabs.table import TableView
@@ -140,6 +140,13 @@ class Widget(QtWidgets.QWidget):
         self.ResultChipDetails.setObjectName("ResultChipDetails")
         self.verticalLayout_3.addWidget(self.ResultChipDetails)
         self.ResultTable = ResultTable(self, self.ResultSplitter)
+
+        hor_header = self.ResultTable.horizontalHeader()
+        assert (isinstance(hor_header, QHeaderView))
+        hor_header.setSectionsMovable(True)
+        hor_header.setDropIndicatorShown(True)
+        hor_header.setSectionResizeMode(QHeaderView.Interactive)
+        event_handler.add_event('refresh', lambda: hor_header.setSectionResizeMode(QHeaderView.ResizeToContents))
 
         self.gridLayout.addWidget(self.ResultSplitter)
         self.ResultCourseGroupBox.setTitle(_("Course"))
