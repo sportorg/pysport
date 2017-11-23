@@ -73,6 +73,8 @@ class PersonSplits(object):
         self.group_count_all = person.group.get_count_all()
         self.group_count_finished = person.group.get_count_finished()
 
+        self.penalty_time = time_to_hhmmss(result.get_penalty_time())
+
         if result.assigned_rank == Qualification.NOT_QUALIFIED:
             self.assigned_rank = ''
         else:
@@ -89,7 +91,7 @@ class PersonSplits(object):
         while person_index < len(result.punches):
             cur_punch = result.punches[person_index]
             cur_code = cur_punch[0]
-            cur_time = time_to_otime(cur_punch[1])
+            cur_time = cur_punch[1]
 
             leg = LegSplit()
             leg.code = cur_code
@@ -159,6 +161,7 @@ class PersonSplits(object):
             'qual': self.qual,
             'year': self.year,
             'result': if_none(self.result, ''),
+            'penalty_time': self.penalty_time,
             'place': self.place,
             'assigned_rank': if_none(self.assigned_rank, ''),
             'legs': []

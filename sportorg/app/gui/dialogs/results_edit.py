@@ -161,10 +161,14 @@ class ResultEditDialog(QDialog):
             result.finish_time = time
             changed = True
 
-
         time = time_to_otime(self.item_start.time())
         if result.start_time != time:
             result.start_time = time
+            changed = True
+
+        time = time_to_otime(self.item_penalty.time())
+        if result.penalty_time != time:
+            result.penalty_time = time
             changed = True
 
         cur_bib = -1

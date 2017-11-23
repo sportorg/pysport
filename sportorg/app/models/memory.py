@@ -338,14 +338,14 @@ Punches:
         if not self.person:
             return ''
 
-        return time_to_hhmmss(self.get_finish_time() - self.get_start_time())
+        return time_to_hhmmss(self.get_finish_time() - self.get_start_time() + self.get_penalty_time())
 
     def get_result_for_sort(self):
         ret = 0
         if self.status != 0 and self.status != ResultStatus.OK:
             ret += 24 * 3600 * 100
 
-        delta = self.get_finish_time() - self.get_start_time()
+        delta = self.get_finish_time() - self.get_start_time() + self.get_penalty_time()
         ret += delta.to_sec() * 100
         return ret
 
@@ -380,6 +380,10 @@ Punches:
 
         return OTime.now()
 
+    def get_penalty_time(self):
+        if self.penalty_time:
+            return self.penalty_time
+        return OTime()
 
 class ResultObject(Result):
     def __init__(self):
@@ -920,6 +924,13 @@ def find(iterable: list, **kwargs):
         return results
     else:
         return None
+
+
+def find_person_result(person):
+    for i in race().results:
+        if i.person == person:
+            return  i
+    return None
 
 
 event = [create(Race)]

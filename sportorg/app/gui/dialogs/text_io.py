@@ -2,9 +2,9 @@ import sys
 
 import logging
 from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtWidgets import QApplication, QDialog
+from PyQt5.QtWidgets import QApplication, QDialog, QPushButton
 
-from sportorg.app.models.memory import race, Person
+from sportorg.app.models.memory import race, Person, find_person_result
 from sportorg.app.modules.utils.utils import time_to_hhmmss, hhmmss_to_time
 from sportorg.language import _
 
@@ -82,13 +82,21 @@ class TextExchangeDialog(QDialog):
         self.gridLayout_3.addWidget(self.text_edit, 1, 0, 1, 2)
         self.button_box = QtWidgets.QDialogButtonBox(self)
         self.button_box.setOrientation(QtCore.Qt.Horizontal)
-        self.button_box.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok|QtWidgets.QDialogButtonBox.Open|QtWidgets.QDialogButtonBox.Save)
-        self.button_box.setObjectName("button_box")
-        self.gridLayout_3.addWidget(self.button_box, 2, 0, 1, 2)
+
+        self.button_ok = QPushButton(_('OK'))
+        self.button_ok.setMaximumWidth(100)
+        self.button_cancel = QPushButton(_('Cancel'))
+        self.button_cancel.setMaximumWidth(100)
+
+        # self.button_save = QPushButton(_('Save'))
+        # self.button_load = QPushButton(_('Load'))
+
+        self.gridLayout_3.addWidget(self.button_ok)
+        self.gridLayout_3.addWidget(self.button_cancel)
 
         self.retranslate_ui(self)
-        self.button_box.accepted.connect(self.accept)
-        self.button_box.rejected.connect(self.reject)
+        self.button_ok.clicked.connect(self.accept)
+        self.button_cancel.clicked.connect(self.reject)
         QtCore.QMetaObject.connectSlotsByName(self)
 
     def retranslate_ui(self, text_io):
@@ -104,6 +112,8 @@ class TextExchangeDialog(QDialog):
         self.semicolon_radio_button.setText(_("semicolon"))
         self.custom_radio_button.setText(_("custom"))
         self.text_edit.setPlainText('')
+
+        self.get_text_wrapper()
 
         self.value_combo_box.currentIndexChanged.connect(self.get_text_wrapper)
         self.bib_radio_button.clicked.connect(self.get_text_wrapper)
@@ -214,25 +224,31 @@ def get_person_by_id(index, value):
 
 def get_property(person, key):
     assert isinstance(person, Person)
+
     if key == _('Start'):
-        if person.result:
-            return time_to_hhmmss(person.result.get_start_time())
+        result = find_person_result(person)
+        if result:
+            return time_to_hhmmss(result.get_start_time())
         else:
             return time_to_hhmmss(person.start_time)
     elif key == _('Finish'):
-        if person.result:
-            return time_to_hhmmss(person.result.get_finish_time())
+        result = find_person_result(person)
+        if result:
+            return time_to_hhmmss(result.get_finish_time())
     elif key == _('Result'):
-        if person.result:
-            return person.result.get_result()
+        result = find_person_result(person)
+        if result:
+            return result.get_result()
     elif key == _('Penalty time'):
-        if person.result:
-            return time_to_hhmmss(person.result.penalty_time)
+        result = find_person_result(person)
+        if result:
+            return time_to_hhmmss(result.get_penalty_time())
     elif key == _('Penalty laps'):
-        if person.result:
-            return str(person.result.penalty_laps)
+        result = find_person_result(person)
+        if result:
+            return str(result.penalty_laps)
     elif key == _('Card number'):
-        return str(person.card_number)
+        return str(person.sportident_card)
     elif key == _('Group'):
         if person.group:
             return person.group.name
@@ -248,23 +264,27 @@ def get_property(person, key):
 def set_property(person, key, value):
     assert isinstance(person, Person)
     if key == _('Start'):
-        if person.result:
-            person.result.start_time = hhmmss_to_time(value)
+        result = find_person_result(person)
+        if result:
+            result.start_time = hhmmss_to_time(value)
         else:
             person.start_time = hhmmss_to_time(value)
     elif key == _('Finish'):
-        if person.result:
-            person.result.finish_time = hhmmss_to_time(value)
+        result = find_person_result(person)
+        if result:
+            result.finish_time = hhmmss_to_time(value)
     elif key == _('Result'):
         None
     elif key == _('Penalty time'):
-        if person.result:
-            person.result.penalty_time = hhmmss_to_time(value)
+        result = find_person_result(person)
+        if result:
+            result.penalty_time = hhmmss_to_time(value)
     elif key == _('Penalty laps'):
-        if person.result:
-            person.result.penalty_laps = int(value)
+        result = find_person_result(person)
+        if result:
+            result.penalty_laps = int(value)
     elif key == _('Card number'):
-        person.card_number = int(value)
+        person.sportident_card = int(value)
     elif key == _('Group'):
         None
     elif key == _('Team'):
