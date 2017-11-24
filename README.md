@@ -38,11 +38,11 @@ pip install -t lib -r requirements.txt
                 sportorg.po
     sportorg/
         core/
-        app/
-            gui/
-            models/
-            modules/
+        gui/
+        models/
+        modules/
         lib/
+        utils/
 ```
 
 ![Mainwindow sportorg](img/mainwindow.png)

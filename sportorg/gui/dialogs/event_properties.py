@@ -8,8 +8,8 @@ from PyQt5.QtWidgets import QFormLayout, QLabel, \
     QPushButton, QTextEdit, QDateEdit
 
 from sportorg import config
-from sportorg.modules.utils.custom_controls import AdvComboBox
 from sportorg.gui.global_access import GlobalAccess
+from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
 from sportorg.models.memory import race
 

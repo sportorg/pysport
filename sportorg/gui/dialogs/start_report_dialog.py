@@ -8,9 +8,9 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QLabel, QApplication, QDialog, QPushButton
 
 from sportorg import config
-from sportorg.modules.utils.custom_controls import AdvComboBox
 from sportorg.core.template import get_templates, get_text_from_file
 from sportorg.gui.dialogs.file_dialog import get_open_file_name, get_save_file_name
+from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
 from sportorg.models.start.start_calculation import get_start_data
 

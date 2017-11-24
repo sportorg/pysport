@@ -1,13 +1,13 @@
-import traceback
-
-from PyQt5.QtWidgets import QMessageBox
 from sportorg.models.memory import Race, Organization, Group, Person, Result, race, find, Course, \
     CourseControl, Country, Contact, Address, ResultStatus, Qualification, find_person_result, SystemType
 
 from sportorg.modules.utils.utils import int_to_otime, time_to_int
-from sportorg.language import _
 from sportorg.libs.winorient.wdb import WDB, WDBMan, WDBTeam, WDBGroup, WDBDistance, WDBPunch, WDBFinish, WDBChip
 from sportorg.models.result.result_calculation import ResultCalculation
+
+
+class WDBImportError(Exception):
+    pass
 
 
 class WinOrientBinary:
@@ -46,11 +46,8 @@ class WinOrientBinary:
                 self.wdb_object.parse_bytes(byte_array)
         except FileNotFoundError:
             pass
-        except:
-            traceback.print_exc()
-            QMessageBox.question(None,
-                                 _('Error'),
-                                 _('Import error') + ': ' + self._file)
+        except Exception as e:
+            raise WDBImportError(e)
 
     def create_objects(self):
         """Create objects in memory, according to model"""

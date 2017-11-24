@@ -5,11 +5,14 @@ import time
 
 from PyQt5 import QtCore, QtGui, QtWidgets, Qt
 from PyQt5.QtWidgets import QMainWindow, QTableView, QMessageBox
+
+from sportorg.libs.winorient.wdb import write_wdb
 from sportorg.models.memory import Race, event as races, race, Config as Configuration
 
 from sportorg import config
 from sportorg.modules.backup import backup
 from sportorg.modules.ocad import ocad
+from sportorg.modules.ocad.ocad import OcadImportException
 from sportorg.modules.printing.model import NoResultToPrintException, split_printout
 from sportorg.modules.sportident import sportident
 from sportorg.modules.winorient import winorient
@@ -36,6 +39,7 @@ from sportorg.gui.tabs.memory_model import PersonMemoryModel, ResultMemoryModel,
 from sportorg.gui.toolbar import toolbar_list
 from sportorg.language import _
 from sportorg.models.start.start_preparation import guess_courses_for_groups, guess_corridors_for_groups
+from sportorg.modules.winorient.wdb import WDBImportError, WinOrientBinary
 
 
 class ConsolePanelHandler(logging.Handler):
@@ -556,8 +560,11 @@ class MainWindow(QMainWindow, App):
         if file_name is not '':
             try:
                 winorient.import_wo_wdb(file_name)
-            except Exception as e:
+            except WDBImportError as e:
                 logging.exception(str(e))
+                QMessageBox.warning(None,
+                                     _('Error'),
+                                     _('Import error') + ': ' + file_name)
             self.init_model()
 
     @staticmethod
@@ -566,7 +573,13 @@ class MainWindow(QMainWindow, App):
                                        '{}_sportorg_export'.format(time.strftime("%Y%m%d")))
         if file_name is not '':
             try:
-                winorient.export_wo_wdb(file_name)
+                wb = WinOrientBinary()
+
+                GlobalAccess().clear_filters(False)
+                wdb_object = wb.export()
+                GlobalAccess().apply_filters()
+
+                write_wdb(wdb_object, file_name)
             except Exception as e:
                 logging.exception(str(e))
 
@@ -575,7 +588,7 @@ class MainWindow(QMainWindow, App):
         if file_name is not '':
             try:
                 ocad.import_txt_v8(file_name)
-            except Exception as e:
+            except OcadImportException as e:
                 logging.exception(str(e))
                 QMessageBox.question(None,
                                      _('Error'),

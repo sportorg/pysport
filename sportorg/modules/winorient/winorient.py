@@ -1,9 +1,7 @@
-from sportorg.gui.global_access import GlobalAccess
 from sportorg.libs.winorient import wo
-from sportorg.libs.winorient.wdb import write_wdb
 from sportorg.models.memory import Qualification
 from sportorg.models import memory
-from .wdb import WinOrientBinary
+from sportorg.modules.winorient.wdb import WinOrientBinary
 
 
 def import_csv(source):
@@ -33,13 +31,3 @@ def import_wo_wdb(file_name):
     wb = WinOrientBinary(file=file_name)
     # wb.run()
     wb.create_objects()
-
-
-def export_wo_wdb(file_name):
-    wb = WinOrientBinary()
-
-    GlobalAccess().clear_filters(False)
-    wdb_object = wb.export()
-    GlobalAccess().apply_filters()
-
-    write_wdb(wdb_object, file_name)

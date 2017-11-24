@@ -6,15 +6,15 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QLabel, \
     QLineEdit, QApplication, QDialog, \
     QPushButton, QSpinBox, QTimeEdit, QCheckBox
-from sportorg.models.memory import race, Group, find, Sex, Limit
 
 from sportorg import config
-from sportorg.modules.utils.custom_controls import AdvComboBox
-from sportorg.modules.utils.utils import time_to_qtime, time_to_otime
 from sportorg.gui.dialogs.group_ranking import GroupRankingDialog
 from sportorg.gui.global_access import GlobalAccess
+from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
+from sportorg.models.memory import race, Group, find, Sex, Limit
 from sportorg.models.result.result_calculation import ResultCalculation
+from sportorg.modules.utils.utils import time_to_qtime, time_to_otime
 
 
 def get_courses():

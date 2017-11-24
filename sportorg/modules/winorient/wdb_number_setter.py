@@ -4,7 +4,7 @@ import sys
 from PyQt5.QtWidgets import QApplication
 
 from sportorg.modules.winorient.wdb import WinOrientBinary
-from sportorg.gui.dialogs import get_open_file_name, get_save_file_name
+from sportorg.gui.dialogs.file_dialog import get_open_file_name, get_save_file_name
 from sportorg.language import _
 from sportorg.libs.winorient.wdb import WDB, write_wdb
 

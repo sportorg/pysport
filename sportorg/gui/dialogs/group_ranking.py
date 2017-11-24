@@ -5,13 +5,13 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, \
     QApplication, QDialog, \
     QPushButton, QCheckBox, QSpinBox, QTimeEdit, QHBoxLayout
-from sportorg.models.memory import Group, RankingItem, Qualification
 
 from sportorg import config
-from sportorg.modules.utils.custom_controls import AdvComboBox
-from sportorg.modules.utils.utils import time_to_otime, time_to_qtime
+from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
+from sportorg.models.memory import Group, RankingItem, Qualification
 from sportorg.models.result.result_calculation import ResultCalculation
+from sportorg.modules.utils.utils import time_to_otime, time_to_qtime
 
 
 class GroupRankingDialog(QDialog):
