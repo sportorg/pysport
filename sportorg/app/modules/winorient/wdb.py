@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QMessageBox
 from sportorg.app.models.result.result_calculation import ResultCalculation
 from sportorg.language import _
 from sportorg.app.models.memory import Race, Organization, Group, Person, Result, race, find, Course, \
-    CourseControl, Country, Contact, Address, ResultStatus, Qualification
+    CourseControl, Country, Contact, Address, ResultStatus, Qualification, find_person_result, SystemType
 from sportorg.app.modules.utils.utils import int_to_otime, time_to_int
 from sportorg.lib.winorient.wdb import WDB, WDBMan, WDBTeam, WDBGroup, WDBDistance, WDBPunch, WDBFinish, WDBChip
 
@@ -134,6 +134,7 @@ class WinOrientBinary:
             fin = man.get_finish()
             if fin is not None:
                 result = Result()
+                result.system_type = SystemType.MANUAL
                 result.person = new_person
 
                 result.sportident_card = race().new_sportident_card(man.si_card)
@@ -149,6 +150,7 @@ class WinOrientBinary:
                 # punches
                 chip = man.get_chip()
                 if chip is not None:
+                    result.system_type = SystemType.SPORTIDENT
                     result.punches = []
                     for i in range(chip.quantity):
                         p = chip.punch[i]
@@ -233,7 +235,7 @@ class WinOrientBinary:
 
             # decode qualification
             if man.qual:
-                new_person.qualification = man.qual.value
+                new_person.qualification = Qualification(int(man.qual.value))
 
             if man.year:
                 new_person.year = int(man.year)
@@ -258,11 +260,7 @@ class WinOrientBinary:
             new_person.start_group = man.start_group
 
             # result
-            result = None  # find result
-            for i in my_race.results:
-                if i.person == man:
-                    result = i
-                    break
+            result = find_person_result(man)
 
             if result:
                 new_finish = WDBFinish()

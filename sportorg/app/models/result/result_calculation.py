@@ -325,6 +325,7 @@ def get_splits_data_printout(person):
     result_json['start'] = time_to_hhmmss(person.start_time)
     result_json['finish'] = time_to_hhmmss(result.finish_time)
     result_json['result'] = result.get_result()
+    result_json['penalty_time'] = time_to_hhmmss(result.get_penalty_time())
     result_json['status'] = result.status
     result_json['place'] = result.place
     result_json['group_count_all'] = person.group.get_count_all()
@@ -397,6 +398,7 @@ def get_person_result_data(res):
         'team': person.organization.name,
         'qual': person.qual.get_title(),
         'year': person.year,
+        'penalty_time': time_to_hhmmss(res.get_penalty_time()),
         'result': res.get_result(),
         'place': res.place,
         'assigned_rank': res.assigned_rank.get_title()

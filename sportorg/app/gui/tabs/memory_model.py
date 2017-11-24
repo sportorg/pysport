@@ -257,7 +257,7 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
             finish,
             i.get_result(),
             i.status.get_title(),
-            i.penalty_time,
+            time_to_hhmmss(i.get_penalty_time()),
             i.place,
             str(i.system_type)
         ])

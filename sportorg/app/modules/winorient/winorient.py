@@ -1,5 +1,8 @@
+from typing import _qualname
+
 from sportorg.app.gui.global_access import GlobalAccess
 from sportorg.app.models import memory
+from sportorg.app.models.memory import Qualification
 from sportorg.lib.winorient.wdb import write_wdb
 from .wdb import WinOrientBinary
 from sportorg.lib.winorient import wo
@@ -22,7 +25,8 @@ def import_csv(source):
             memory.Person,
             **person_dict,
             group=memory.find(race.groups, name=person_dict['group_name']),
-            organization=memory.find(race.organizations, name=person_dict['team_name'])
+            organization=memory.find(race.organizations, name=person_dict['team_name']),
+            qual=Qualification(int(person_dict['qual_id']))
         )
         race.persons.append(person)
 
