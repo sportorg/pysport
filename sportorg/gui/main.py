@@ -67,6 +67,7 @@ class MainWindow(QMainWindow, App):
 
         handler = ConsolePanelHandler(self)
         handler.setFormatter(logging.Formatter('%(asctime)-15s %(levelname)s %(message)s'))
+        handler.setLevel('INFO')
         logging.root.addHandler(handler)
 
     def show_window(self):
@@ -550,9 +551,7 @@ class MainWindow(QMainWindow, App):
                 winorient.import_csv(file_name)
             except Exception as e:
                 logging.exception(str(e))
-                QMessageBox.question(None,
-                                     _('Error'),
-                                     _('Import error') + ': ' + file_name)
+                QMessageBox.warning(self, _('Error'), _('Import error') + ': ' + file_name)
             self.init_model()
 
     def import_wo_wdb(self):
@@ -562,13 +561,10 @@ class MainWindow(QMainWindow, App):
                 winorient.import_wo_wdb(file_name)
             except WDBImportError as e:
                 logging.exception(str(e))
-                QMessageBox.warning(None,
-                                     _('Error'),
-                                     _('Import error') + ': ' + file_name)
+                QMessageBox.warning(self, _('Error'), _('Import error') + ': ' + file_name)
             self.init_model()
 
-    @staticmethod
-    def export_wo_wdb():
+    def export_wo_wdb(self):
         file_name = get_save_file_name(_('Save As WDB file'), _("WDB file (*.wdb)"),
                                        '{}_sportorg_export'.format(time.strftime("%Y%m%d")))
         if file_name is not '':
@@ -582,6 +578,7 @@ class MainWindow(QMainWindow, App):
                 write_wdb(wdb_object, file_name)
             except Exception as e:
                 logging.exception(str(e))
+                QMessageBox.warning(self, _('Error'), _('Export error') + ': ' + file_name)
 
     def import_txt_v8(self):
         file_name = get_open_file_name(_('Open Ocad txt v8 file'), _("Ocad classes v8 (*.txt)"))
@@ -590,9 +587,7 @@ class MainWindow(QMainWindow, App):
                 ocad.import_txt_v8(file_name)
             except OcadImportException as e:
                 logging.exception(str(e))
-                QMessageBox.question(None,
-                                     _('Error'),
-                                     _('Import error') + ': ' + file_name)
+                QMessageBox.question(self, _('Error'), _('Import error') + ': ' + file_name)
 
             self.init_model()
 
