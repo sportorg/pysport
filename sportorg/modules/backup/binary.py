@@ -6,9 +6,6 @@ from sportorg.models import memory
 
 
 def dump(file, create=False):
-    # temporary restore whole lists, but keep filter conditions
-    GlobalAccess().clear_filters(remove_condition=False)
-
     data = {'version': config.VERSION}
     if create:
         race = memory.Race()

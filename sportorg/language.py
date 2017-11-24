@@ -10,6 +10,7 @@ def _get_conf_locale():
     conf.read(config.CONFIG_INI)
     return conf.get('locale', 'current', fallback='ru_RU')
 
+
 locale_current = _get_conf_locale()
 
 

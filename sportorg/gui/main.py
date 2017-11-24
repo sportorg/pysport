@@ -10,14 +10,13 @@ from sportorg.libs.winorient.wdb import write_wdb
 from sportorg.models.memory import Race, event as races, race, Config as Configuration
 
 from sportorg import config
-from sportorg.modules.backup import backup
+from sportorg.modules.backup.file import File
 from sportorg.modules.ocad import ocad
 from sportorg.modules.ocad.ocad import OcadImportException
 from sportorg.modules.printing.model import NoResultToPrintException, split_printout
 from sportorg.modules.sportident import sportident
 from sportorg.modules.winorient import winorient
 from sportorg.core import event
-from sportorg.core.app import App
 from sportorg.gui.dialogs.about import AboutDialog
 from sportorg.gui.dialogs.entry_filter import DialogFilter
 from sportorg.gui.dialogs.event_properties import EventPropertiesDialog
@@ -32,7 +31,6 @@ from sportorg.gui.dialogs.start_preparation import StartPreparationDialog
 from sportorg.gui.dialogs.start_report_dialog import StartReportDialog
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.menu import menu_list
-from sportorg.gui.post_init import POST_INIT
 from sportorg.gui.tabs import start_preparation, groups, teams, race_results, courses, log
 from sportorg.gui.tabs.memory_model import PersonMemoryModel, ResultMemoryModel, GroupMemoryModel, \
     CourseMemoryModel, TeamMemoryModel
@@ -43,16 +41,17 @@ from sportorg.modules.winorient.wdb import WDBImportError, WinOrientBinary
 
 
 class ConsolePanelHandler(logging.Handler):
-
     def __init__(self, parent):
         logging.Handler.__init__(self)
+        self.setFormatter(logging.Formatter('%(asctime)-15s %(levelname)s %(message)s'))
+        self.setLevel('INFO')
         self.parent = parent
 
     def emit(self, record):
         self.parent.logging(self.format(record))
 
 
-class MainWindow(QMainWindow, App):
+class MainWindow(QMainWindow):
     def __init__(self, argv=None):
         super().__init__()
         self.recent_files = []
@@ -63,11 +62,8 @@ class MainWindow(QMainWindow, App):
             self.file = None
         self.conf = configparser.ConfigParser()
         GlobalAccess().set_main_window(self)
-        backup.init()
 
         handler = ConsolePanelHandler(self)
-        handler.setFormatter(logging.Formatter('%(asctime)-15s %(levelname)s %(message)s'))
-        handler.setLevel('INFO')
         logging.root.addHandler(handler)
 
     def show_window(self):
@@ -140,8 +136,7 @@ class MainWindow(QMainWindow, App):
         if Configuration.get('autoconnect'):
             self.sportident_connect()
 
-        for init in POST_INIT:
-            init()
+        sportident.toolbar_sportident()
 
     def _setup_ui(self):
         geometry = config.ConfigFile.GEOMETRY
@@ -235,33 +230,37 @@ class MainWindow(QMainWindow, App):
         else:
             self.setWindowTitle(main_title)
 
-    def create_file(self, file_name=None, update_data=True):
+    def create_file(self, update_data=True):
 
         # TODO: save changes in current file
 
         file_name = get_save_file_name(_('Create SportOrg file'), _("SportOrg file (*.sportorg)"),
                                        str(time.strftime("%Y%m%d")))
         if file_name is not '':
-            self.set_title(file_name)
             try:
-                super().create_file(file_name)
+                GlobalAccess().clear_filters(remove_condition=False)
+                File(file_name, logging.root).create()
+                self.file = file_name
+                self.add_recent_file(self.file)
+                self.set_title(file_name)
             except Exception as e:
                 logging.exception(str(e))
+                QMessageBox.warning(self, _('Error'), _('Cannot create file') + ': ' + file_name)
             # remove data
             if update_data:
                 races[0] = Race()
-            self.add_recent_file(self.file)
             self.refresh()
 
     def save_file_as(self):
-        self.create_file(None, False)
+        self.create_file(False)
         if self.file is not None:
             self.save_file()
 
     def save_file(self):
         if self.file is not None:
             try:
-                super().save_file()
+                GlobalAccess().clear_filters(remove_condition=False)
+                File(self.file, logging.root).save()
             except Exception as e:
                 logging.exception(str(e))
         else:
@@ -270,16 +269,15 @@ class MainWindow(QMainWindow, App):
     def open_file(self, file_name=None):
         if file_name:
             try:
-                super().open_file(file_name)
+                File(file_name, logging.root).open()
+                self.file = file_name
                 self.set_title(file_name)
                 self.add_recent_file(self.file)
                 self.init_model()
             except Exception as e:
                 logging.exception(str(e))
                 self.delete_from_recent_files(file_name)
-                QMessageBox.warning(self,
-                                     _('Error'),
-                                     _('Cannot read file, format unknown') + ': ' + file_name)
+                QMessageBox.warning(self, _('Error'), _('Cannot read file, format unknown') + ': ' + file_name)
 
     def open_file_dialog(self):
         file_name = get_open_file_name(_('Open SportOrg file'), _("SportOrg file (*.sportorg)"))
