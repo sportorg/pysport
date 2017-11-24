@@ -1,10 +1,10 @@
 from abc import abstractmethod
 from enum import IntEnum, Enum
 
-from sportorg.modules.utils.utils import int_to_otime, time_to_hhmmss, time_to_sec
-from sportorg.core.otime import OTime
 from sportorg.core.model import Model
+from sportorg.core.otime import OTime
 from sportorg.language import _
+from sportorg.utils.time import int_to_otime, time_to_hhmmss, time_to_sec
 
 
 class NotEmptyException(Exception):

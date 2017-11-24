@@ -1,9 +1,8 @@
+from sportorg.libs.winorient.wdb import WDB, WDBMan, WDBTeam, WDBGroup, WDBDistance, WDBPunch, WDBFinish, WDBChip
 from sportorg.models.memory import Race, Organization, Group, Person, Result, race, find, Course, \
     CourseControl, Country, Contact, Address, ResultStatus, Qualification, find_person_result, SystemType
-
-from sportorg.modules.utils.utils import int_to_otime, time_to_int
-from sportorg.libs.winorient.wdb import WDB, WDBMan, WDBTeam, WDBGroup, WDBDistance, WDBPunch, WDBFinish, WDBChip
 from sportorg.models.result.result_calculation import ResultCalculation
+from sportorg.utils.time import int_to_otime, time_to_int
 
 
 class WDBImportError(Exception):

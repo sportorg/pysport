@@ -1,8 +1,7 @@
+import datetime
 from socket import *
 
-import datetime
-
-from sportorg.modules.utils.utils import time_to_hhmmss
+from sportorg.utils.time import time_to_hhmmss
 
 """
 Format of WDB data package

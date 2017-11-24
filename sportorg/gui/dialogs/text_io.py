@@ -4,9 +4,9 @@ import sys
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QApplication, QDialog, QPushButton
 
-from sportorg.modules.utils.utils import time_to_hhmmss, hhmmss_to_time
 from sportorg.language import _
 from sportorg.models.memory import race, Person, find_person_result
+from sportorg.utils.time import time_to_hhmmss, hhmmss_to_time
 
 
 def get_value_options():

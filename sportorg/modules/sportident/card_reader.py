@@ -1,16 +1,15 @@
 import datetime
 import logging
 
-from sportorg.models import memory
-
 from sportorg import config
-from sportorg.modules.sportident import sireader
-from sportorg.modules.sportident.result_generation import ResultSportidentGeneration
-from sportorg.modules.utils.utils import time_to_otime
 from sportorg.core.event import add_event
 from sportorg.gui.dialogs.bib_dialog import BibDialog
 from sportorg.gui.global_access import GlobalAccess
+from sportorg.models import memory
 from sportorg.models.result.result_calculation import ResultCalculation
+from sportorg.modules.sportident import sireader
+from sportorg.modules.sportident.result_generation import ResultSportidentGeneration
+from sportorg.utils.time import time_to_otime
 
 
 def read():

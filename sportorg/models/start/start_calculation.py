@@ -1,5 +1,5 @@
-from sportorg.modules.utils.utils import if_none, time_to_hhmmss
 from sportorg.models.memory import race
+from sportorg.utils.time import if_none, time_to_hhmmss
 
 
 class GroupsStartList(object):

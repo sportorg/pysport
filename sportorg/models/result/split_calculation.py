@@ -1,7 +1,6 @@
 from sportorg.models.memory import race, Person, Course, Group, Qualification
-
-from sportorg.modules.utils.utils import time_to_hhmmss, get_speed_min_per_km, if_none
 from sportorg.models.result.result_calculation import ResultCalculation
+from sportorg.utils.time import time_to_hhmmss, get_speed_min_per_km, if_none
 
 
 class LegSplit(object):

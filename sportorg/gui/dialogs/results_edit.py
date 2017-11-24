@@ -6,14 +6,14 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QLabel, \
     QLineEdit, QApplication, QDialog, \
     QPushButton, QTimeEdit, QRadioButton, QSpinBox
-from sportorg.models.memory import race, Result, find, ResultStatus, Person
-from sportorg.models.result.result_checker import ResultChecker
 
 from sportorg import config
-from sportorg.modules.utils.utils import time_to_qtime, time_to_otime
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import _
+from sportorg.models.memory import race, Result, find, ResultStatus, Person
 from sportorg.models.result.result_calculation import ResultCalculation
+from sportorg.models.result.result_checker import ResultChecker
+from sportorg.utils.time import time_to_qtime, time_to_otime
 
 
 class ResultEditDialog(QDialog):

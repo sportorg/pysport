@@ -14,7 +14,7 @@ from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
 from sportorg.models.memory import race, Person, find, Qualification, Limit
 from sportorg.models.result.result_calculation import ResultCalculation
-from sportorg.modules.utils.utils import time_to_qtime, time_to_otime
+from sportorg.utils.time import time_to_qtime, time_to_otime
 
 
 def get_groups():

@@ -3,9 +3,9 @@ import re
 
 from PyQt5.QtCore import QVariant, QAbstractTableModel, Qt, QSortFilterProxyModel
 
-from sportorg.modules.utils.utils import time_to_hhmmss
 from sportorg.language import _
 from sportorg.models.memory import race, Result, Group, Course, Organization
+from sportorg.utils.time import time_to_hhmmss
 
 
 class AbstractSportOrgMemoryModel (QAbstractTableModel):

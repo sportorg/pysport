@@ -5,14 +5,14 @@ from time import sleep
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QTime
 from PyQt5.QtWidgets import QApplication, QDialog
-from sportorg.models.memory import race, Group
 
 from sportorg import config
-from sportorg.modules.utils.utils import time_to_otime
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import _
+from sportorg.models.memory import race, Group
 from sportorg.models.start.start_preparation import StartNumberManager, DrawManager, ReserveManager, \
     StartTimeManager
+from sportorg.utils.time import time_to_otime
 
 
 class StartPreparationDialog(QDialog):

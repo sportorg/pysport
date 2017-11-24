@@ -4,7 +4,6 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QModelIndex
 from PyQt5.QtWidgets import QAbstractItemView, QHeaderView
 
-from sportorg.modules.utils.utils import time_to_hhmmss
 from sportorg.core import event as event_handler
 from sportorg.gui.dialogs.results_edit import ResultEditDialog
 from sportorg.gui.global_access import GlobalAccess
@@ -12,6 +11,7 @@ from sportorg.gui.tabs.memory_model import ResultMemoryModel
 from sportorg.gui.tabs.table import TableView
 from sportorg.language import _
 from sportorg.models.memory import race, Result, Course, CourseControl
+from sportorg.utils.time import time_to_hhmmss
 
 
 class ResultTable(TableView):

@@ -1,7 +1,7 @@
-from sportorg.modules.utils.utils import time_to_hhmmss
 from sportorg.core.otime import OTime
 from sportorg.language import _
 from sportorg.models.memory import race, Result, Person, ResultStatus, Course, Group, Qualification, RankingItem
+from sportorg.utils.time import time_to_hhmmss
 
 
 # FIXME: does not work sorting

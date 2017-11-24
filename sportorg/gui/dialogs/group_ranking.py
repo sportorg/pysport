@@ -11,7 +11,7 @@ from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
 from sportorg.models.memory import Group, RankingItem, Qualification
 from sportorg.models.result.result_calculation import ResultCalculation
-from sportorg.modules.utils.utils import time_to_otime, time_to_qtime
+from sportorg.utils.time import time_to_otime, time_to_qtime
 
 
 class GroupRankingDialog(QDialog):
