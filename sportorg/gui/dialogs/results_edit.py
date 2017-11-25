@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import QFormLayout, QLabel, \
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import _
-from sportorg.models.memory import race, Result, find, ResultStatus, Person
+from sportorg.models.memory import race, Result, find, ResultStatus, Person, Limit, SystemType
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.result_checker import ResultChecker
 from sportorg.utils.time import time_to_qtime, time_to_otime
@@ -19,9 +19,17 @@ from sportorg.utils.time import time_to_qtime, time_to_otime
 class ResultEditDialog(QDialog):
     def __init__(self, table=None, index=None):
         super().__init__()
-        self.init_ui()
         if table is not None:
-            self.set_values_from_table(table, index)
+            self.table = table
+            self.current_index = index
+            assert (isinstance(self.current_index, QModelIndex))
+            self.current_object = race().results[self.current_index.row()]
+            assert (isinstance(self.current_object, Result))
+
+    def exec(self):
+        self.init_ui()
+        self.set_values_from_table()
+        super().exec()
 
     def close_dialog(self):
         self.close()
@@ -34,38 +42,26 @@ class ResultEditDialog(QDialog):
 
         self.layout = QFormLayout(self)
 
-        self.label_sportident = QLabel('')
-        self.label_sportident_card = QLabel('')
-        self.layout.addRow(self.label_sportident, self.label_sportident_card)
+        self.item_sportident_card = QSpinBox()
+        self.item_sportident_card.setMaximum(9999999)
 
-        self.label_bib = QLabel(_('Bib'))
         self.item_bib = QSpinBox()
-        self.item_bib.setMaximum(99999)
+        self.item_bib.setMaximum(Limit.BIB)
         self.item_bib.valueChanged.connect(self.show_person_info)
-        self.layout.addRow(self.label_bib, self.item_bib)
 
         self.label_person_info = QLabel('')
-        self.layout.addRow(QLabel(''), self.label_person_info)
 
-        self.label_finish = QLabel(_('Finish'))
         self.item_finish = QTimeEdit()
         self.item_finish.setDisplayFormat("hh:mm:ss")
-        self.layout.addRow(self.label_finish, self.item_finish)
 
-        self.label_start = QLabel(_('Start'))
         self.item_start = QTimeEdit()
         self.item_start.setDisplayFormat("hh:mm:ss")
-        self.layout.addRow(self.label_start, self.item_start)
 
-        self.label_result = QLabel(_('Result'))
         self.item_result = QLineEdit()
         self.item_result.setEnabled(False)
-        self.layout.addRow(self.label_result, self.item_result)
 
-        self.label_penalty = QLabel(_('Penalty'))
         self.item_penalty = QTimeEdit()
         self.item_penalty.setDisplayFormat("mm:ss")
-        self.layout.addRow(self.label_penalty, self.item_penalty)
 
         self.radio_ok = QRadioButton(_('OK'))
         self.radio_ok.setChecked(True)
@@ -74,6 +70,15 @@ class ResultEditDialog(QDialog):
         self.radio_overtime = QRadioButton(_('Overtime'))
         self.radio_dsq = QRadioButton(_('DSQ'))
         self.text_dsq = QLineEdit()
+
+        if self.current_object.system_type == SystemType.SPORTIDENT:
+            self.layout.addRow(QLabel(_('Card')), self.item_sportident_card)
+        self.layout.addRow(QLabel(_('Bib')), self.item_bib)
+        self.layout.addRow(QLabel(''), self.label_person_info)
+        self.layout.addRow(QLabel(_('Finish')), self.item_finish)
+        self.layout.addRow(QLabel(_('Start')), self.item_start)
+        self.layout.addRow(QLabel(_('Result')), self.item_result)
+        self.layout.addRow(QLabel(_('Penalty')), self.item_penalty)
 
         self.layout.addRow(self.radio_ok)
         self.layout.addRow(self.radio_dns)
@@ -116,46 +121,40 @@ class ResultEditDialog(QDialog):
                 self.label_person_info.setText(_('not found'))
                 self.button_ok.setDisabled(True)
 
-    def set_values_from_table(self, table, index):
-        self.table = table
-        self.current_index = index
+    def set_values_from_table(self):
+        if self.current_object.system_type == SystemType.SPORTIDENT:
+            if self.current_object.sportident_card is not None:
+                self.item_sportident_card.setValue(int(self.current_object.sportident_card))
+        if self.current_object.finish_time is not None:
+            self.item_finish.setTime(time_to_qtime(self.current_object.finish_time))
+        if self.current_object.start_time is not None:
+            self.item_start.setTime(time_to_qtime(self.current_object.start_time))
+        if self.current_object.result is not None:
+            self.item_result.setText(str(self.current_object.get_result()))
+        if self.current_object.penalty_time is not None:
+            self.item_penalty.setTime(time_to_qtime(self.current_object.penalty_time))
+        if self.current_object.person:
+            self.item_bib.setValue(self.current_object.person.bib)
 
-        assert (isinstance(index, QModelIndex))
-        orig_index_int = index.row()
-
-        current_object = race().results[orig_index_int]
-        assert (isinstance(current_object, Result))
-        self.current_object = current_object
-
-        if current_object.sportident_card is not None:
-            self.label_sportident.setText(_('Card'))
-            self.label_sportident_card.setText(str(current_object.sportident_card))
-        if current_object.finish_time is not None:
-            self.item_finish.setTime(time_to_qtime(current_object.finish_time))
-        if current_object.start_time is not None:
-            self.item_start.setTime(time_to_qtime(current_object.start_time))
-        if current_object.result is not None:
-            self.item_result.setText(str(current_object.get_result()))
-        if current_object.penalty_time is not None:
-            self.item_penalty.setTime(time_to_qtime(current_object.penalty_time))
-        if current_object.person:
-            self.item_bib.setValue(current_object.person.bib)
-
-        if current_object.status == ResultStatus.OK:
+        if self.current_object.status == ResultStatus.OK:
             self.radio_ok.setChecked(True)
-        elif current_object.status == ResultStatus.DISQUALIFIED:
+        elif self.current_object.status == ResultStatus.DISQUALIFIED:
             self.radio_dsq.setChecked(True)
-        elif current_object.status == ResultStatus.OVERTIME:
+        elif self.current_object.status == ResultStatus.OVERTIME:
             self.radio_overtime.setChecked(True)
-        elif current_object.status == ResultStatus.DID_NOT_FINISH:
+        elif self.current_object.status == ResultStatus.DID_NOT_FINISH:
             self.radio_dnf.setChecked(True)
-        elif current_object.status == ResultStatus.DID_NOT_START:
+        elif self.current_object.status == ResultStatus.DID_NOT_START:
             self.radio_dns.setChecked(True)
 
     def apply_changes_impl(self):
-        changed = False
         result = self.current_object
-        assert (isinstance(result, Result))
+        changed = False
+
+        if result.system_type == SystemType.SPORTIDENT:
+            if int(result.sportident_card) != self.item_sportident_card.value():
+                result.sportident_card = race().new_sportident_card(self.item_sportident_card.value())
+                changed = True
 
         time = time_to_otime(self.item_finish.time())
         if result.finish_time != time:
