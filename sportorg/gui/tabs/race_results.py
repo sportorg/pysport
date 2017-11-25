@@ -161,13 +161,12 @@ class Widget(QtWidgets.QWidget):
         event_handler.add_event('resize', self.resize_event)
 
     def show_punches(self, index):
-
         assert (isinstance(index, QModelIndex))
-        orig_index_int = index.row()
-
-        result = race().results[orig_index_int]
+        result = race().results[index.row()]
         assert isinstance(result, Result)
         self.ResultChipDetails.clear()
+        self.ResultChipFinishEdit.setText('')
+        self.ResultChipStartEdit.setText('')
         index = 1
         for i in result.punches:
             time = i[1]
@@ -181,6 +180,8 @@ class Widget(QtWidgets.QWidget):
             self.ResultChipStartEdit.setText(time_to_hhmmss(result.start_time))
 
         self.ResultCourseDetails.clear()
+        self.ResultCourseNameEdit.setText('')
+        self.ResultCourseLengthEdit.setText('')
         index = 1
         if result.person and result.person.group and result.person.group.course:
             course = result.person.group.course
