@@ -1,5 +1,8 @@
 from abc import abstractmethod
 from enum import IntEnum, Enum
+from typing import Dict, List, Any
+
+import datetime
 
 from sportorg.core.model import Model
 from sportorg.core.otime import OTime
@@ -173,7 +176,7 @@ class Course(Model):
         self.bib = 0
         self.length = 0
         self.climb = 0
-        self.controls = []  # type: list[CourseControl]
+        self.controls = []  # type: List[CourseControl]
 
         self.count_person = 0
         self.count_group = 0
@@ -255,7 +258,7 @@ class SportidentCard(Model):
         self.model = SportidentCardModel.NONE
         self.club = ''
         self.owner = ''
-        self.person = None
+        self.person = None  # type: Person
 
     def __int__(self):
         return int(self.number)
@@ -280,18 +283,18 @@ class Result(Model):
 
     def __init__(self):
         super().__init__()
-        self.sportident_card = None  # type: SportidentCard 'delete'
+        self.sportident_card = None  # type: SportidentCard
         self.start_time = None
         self.finish_time = None
         self.punches = []
-        self.penalty_time = None  # time of penalties (marked route, false start)
-        self.penalty_laps = None  # count of penalty legs (marked route)
+        self.penalty_time = None
+        self.penalty_laps = None
         self.status = ResultStatus.OK
         self.result = None  # time in seconds * 100 (int)
         self.place = 0
 
-        self.person = None  # type: Person 'reverse link to person'
-        self.assigned_rank = Qualification.NOT_QUALIFIED  # type: Qualification 'assigned rank (Russia only)'
+        self.person = None  # type: Person
+        self.assigned_rank = Qualification.NOT_QUALIFIED  # type: Qualification
 
     def __eq__(self, other):
         eq = self.sportident_card == other.sportident_card
@@ -375,12 +378,12 @@ class Result(Model):
 class ResultObject(Result):
     def __init__(self):
         super().__init__()
-        self.start = None
-        self.finish = None
-        self.result = None
+        self.start_time = None  # type: OTime
+        self.finish_time = None  # type: OTime
+        self.result = None  # type: OTime
         self.person = None  # type: Person
         self.status = ResultStatus.OK
-        self.penalty_time = None  # time of penalties (marked route, false start)
+        self.penalty_time = None  # type: OTime
         self.penalty_laps = None  # count of penalty legs (marked route)
         self.place = 0
 
@@ -423,7 +426,7 @@ class ResultSportident(ResultObject):
             if self.person:
                 return self.person.start_time
         elif start_source == 'station':
-            return self.start
+            return self.start_time
         elif start_source == 'cp':
             pass
         elif start_source == 'gate':
@@ -435,8 +438,8 @@ class ResultSportident(ResultObject):
         obj = race()
         finish_source = obj.get_setting('sportident_finish_source', 'station')
         if finish_source == 'station':
-            if self.finish:
-                return self.finish
+            if self.finish_time:
+                return self.finish_time
         elif finish_source == 'cp':
             pass
         elif finish_source == 'beam':
@@ -467,12 +470,12 @@ class Person(Model):
         self.bib = 0
 
         self.year = 0  # sometime we have only year of birth
-        self.birth_date = None  # datetime
+        self.birth_date = None  # type: datetime
         self.organization = None  # type: Organization
         self.group = None  # type: Group
         self.nationality = None  # type: Country
         self.address = None  # type: Address
-        self.contact = []  # type: list[Contact]
+        self.contact = []  # type: List[Contact]
         self.world_code = None  # WRE ID for orienteering and the same
         self.national_code = None
         self.rank = None  # position/scores in word ranking
@@ -480,7 +483,7 @@ class Person(Model):
         self.is_out_of_competition = False  # e.g. 20-years old person, running in M12
         self.comment = ''
 
-        self.start_time = None
+        self.start_time = None  # type: OTime
         self.start_group = 0
 
     def __repr__(self):
@@ -497,9 +500,9 @@ class Person(Model):
 class RaceData(Model):
     def __init__(self):
         self.name = ''
-        self.organisation = None
-        self.start_time = None
-        self.end_time = None
+        self.organisation = None  # type: Organization
+        self.start_time = None  # type: datetime
+        self.end_time = None  # type: datetime
         self.url = ''
 
     def __repr__(self):
@@ -509,13 +512,13 @@ class RaceData(Model):
 class Race(Model):
     def __init__(self):
         self.data = RaceData()
-        self.courses = []  # type: list[Course]
-        self.groups = []  # type: list[Group]
-        self.persons = []  # type: list[Person]
-        self.results = []  # type: list[Result]
-        self.organizations = []  # type: list[Organization]
-        self.sportident_cards = []
-        self.settings = {}
+        self.courses = []  # type: List[Course]
+        self.groups = []  # type: List[Group]
+        self.persons = []  # type: List[Person]
+        self.results = []  # type: List[Result]
+        self.organizations = []  # type: List[Organization]
+        self.sportident_cards = []  # type: List[SportidentCard]
+        self.settings = {}  # type: Dict[str, Any]
 
     def __repr__(self):
         return repr(self.data)
