@@ -18,7 +18,10 @@ class GroupRankingDialog(QDialog):
     def __init__(self, group=None):
         super().__init__()
         self.group = group
+
+    def exec(self):
         self.init_ui()
+        return super().exec()
 
     def close_dialog(self):
         self.close()

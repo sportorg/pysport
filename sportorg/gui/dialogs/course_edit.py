@@ -21,9 +21,19 @@ def get_course_types():
 class CourseEditDialog(QDialog):
     def __init__(self, table=None, index=None):
         super().__init__()
-        self.init_ui()
         if table is not None:
-            self.set_values_from_table(table, index)
+            self.table = table
+            self.current_index = index
+
+            assert (isinstance(index, QModelIndex))
+            current_object = race().courses[index.row()]
+            assert (isinstance(current_object, Course))
+            self.current_object = current_object
+
+    def exec(self):
+        self.init_ui()
+        self.set_values_from_table()
+        return super().exec()
 
     def close_dialog(self):
         self.close()
@@ -85,35 +95,25 @@ class CourseEditDialog(QDialog):
 
         self.show()
 
-    def set_values_from_table(self, table, index):
-        self.table = table
-        self.current_index = index
+    def set_values_from_table(self):
 
-        assert (isinstance(index, QModelIndex))
-        orig_index_int = index.row()
+        self.item_name.setText(self.current_object.name)
 
-        current_object = race().courses[orig_index_int]
-        assert (isinstance(current_object, Course))
-        self.current_object = current_object
-
-        self.item_name.setText(current_object.name)
-
-        if current_object.type:
-            self.item_type.setCurrentText(str(current_object.type))
-        if current_object.length:
-            self.item_length.setValue(current_object.length)
-        if current_object.climb:
-            self.item_climb.setValue(current_object.climb)
-        if current_object.controls:
-            self.item_control_qty.setValue(len(current_object.controls))
-        for i in current_object.controls:
+        if self.current_object.type:
+            self.item_type.setCurrentText(str(self.current_object.type))
+        if self.current_object.length:
+            self.item_length.setValue(self.current_object.length)
+        if self.current_object.climb:
+            self.item_climb.setValue(self.current_object.climb)
+        if self.current_object.controls:
+            self.item_control_qty.setValue(len(self.current_object.controls))
+        for i in self.current_object.controls:
             assert isinstance(i, CourseControl)
             self.item_controls.append('{} {}'.format(i.code, i.length if i.length else ''))
 
     def apply_changes_impl(self):
         changed = False
         course = self.current_object
-        assert (isinstance(course, Course))
 
         if course.name != self.item_name.text():
             course.name = self.item_name.text()

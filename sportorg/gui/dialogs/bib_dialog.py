@@ -14,7 +14,10 @@ class BibDialog(QDialog):
         self.bib = 0
         self.text = text
         self.person = None
+
+    def exec(self):
         self.init_ui()
+        return super().exec()
 
     def close_dialog(self):
         self.close()

@@ -26,9 +26,19 @@ def get_regions():
 class OrganizationEditDialog(QDialog):
     def __init__(self, table=None, index=None):
         super().__init__()
-        self.init_ui()
         if table is not None:
-            self.set_values_from_table(table, index)
+            self.table = table
+            self.current_index = index
+
+            assert (isinstance(index, QModelIndex))
+            current_object = race().organizations[index.row()]
+            assert (isinstance(current_object, Organization))
+            self.current_object = current_object
+
+    def exec(self):
+        self.init_ui()
+        self.set_values_from_table()
+        return super().exec()
 
     def close_dialog(self):
         self.close()
@@ -81,27 +91,18 @@ class OrganizationEditDialog(QDialog):
 
         self.show()
 
-    def set_values_from_table(self, table, index):
-        self.table = table
-        self.current_index = index
+    def set_values_from_table(self):
 
-        assert (isinstance(index, QModelIndex))
-        orig_index_int = index.row()
+        self.item_name.setText(self.current_object.name)
 
-        current_object = race().organizations[orig_index_int]
-        assert (isinstance(current_object, Organization))
-        self.current_object = current_object
-
-        self.item_name.setText(current_object.name)
-
-        if current_object.country is not None:
-            self.item_country.setCurrentText(current_object.country.name)
-        if current_object.region:
-            self.item_region.setCurrentText(current_object.region)
-        if current_object.contact is not None:
-            self.item_contact.setText(current_object.contact.value)
-        if current_object.address is not None:
-            self.item_address.setText(current_object.address.street)
+        if self.current_object.country is not None:
+            self.item_country.setCurrentText(self.current_object.country.name)
+        if self.current_object.region:
+            self.item_region.setCurrentText(self.current_object.region)
+        if self.current_object.contact is not None:
+            self.item_contact.setText(self.current_object.contact.value)
+        if self.current_object.address is not None:
+            self.item_address.setText(self.current_object.address.street)
 
     def apply_changes_impl(self):
         changed = False

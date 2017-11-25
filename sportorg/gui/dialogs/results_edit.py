@@ -29,7 +29,7 @@ class ResultEditDialog(QDialog):
     def exec(self):
         self.init_ui()
         self.set_values_from_table()
-        super().exec()
+        return super().exec()
 
     def close_dialog(self):
         self.close()

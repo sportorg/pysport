@@ -34,9 +34,20 @@ def get_sexes():
 class GroupEditDialog(QDialog):
     def __init__(self, table=None, index=None):
         super().__init__()
-        self.init_ui()
         if table is not None:
-            self.set_values_from_table(table, index)
+            self.table = table
+            self.current_index = index
+
+            assert (isinstance(index, QModelIndex))
+            current_object = race().groups[index.row()]
+            assert (isinstance(current_object, Group))
+
+            self.current_object = current_object
+
+    def exec(self):
+        self.init_ui()
+        self.set_values_from_table()
+        return super().exec()
 
     def close_dialog(self):
         self.close()
@@ -121,44 +132,35 @@ class GroupEditDialog(QDialog):
 
         self.show()
 
-    def set_values_from_table(self, table, index):
-        self.table = table
-        self.current_index = index
+    def set_values_from_table(self):
 
-        assert (isinstance(index, QModelIndex))
-        orig_index_int = index.row()
+        self.item_name.setText(self.current_object.name)
 
-        current_object = race().groups[orig_index_int]
-        assert (isinstance(current_object, Group))
-        self.current_object = current_object
+        if self.current_object.long_name:
+            self.item_full_name.setText(self.current_object.long_name)
+        if self.current_object.course:
+            self.item_course.setCurrentText(self.current_object.course.name)
+        if self.current_object.sex:
+            self.item_sex.setCurrentText(self.current_object.sex.get_title())
+        if self.current_object.min_age:
+            self.item_age_min.setValue(self.current_object.min_age)
+        if self.current_object.max_age:
+            self.item_age_max.setValue(self.current_object.max_age)
+        if self.current_object.max_time:
+            self.item_max_time.setTime(time_to_qtime(self.current_object.max_time))
+        if self.current_object.start_interval:
+            self.item_start_interval.setTime(time_to_qtime(self.current_object.start_interval))
+        if self.current_object.start_corridor:
+            self.item_corridor.setValue(self.current_object.start_corridor)
+        if self.current_object.order_in_corridor:
+            self.item_corridor_order.setValue(self.current_object.order_in_corridor)
+        if self.current_object.price:
+            self.item_price.setValue(self.current_object.price)
 
-        self.item_name.setText(current_object.name)
-
-        if current_object.long_name:
-            self.item_full_name.setText(current_object.long_name)
-        if current_object.course:
-            self.item_course.setCurrentText(current_object.course.name)
-        if current_object.sex:
-            self.item_sex.setCurrentText(current_object.sex.get_title())
-        if current_object.min_age:
-            self.item_age_min.setValue(current_object.min_age)
-        if current_object.max_age:
-            self.item_age_max.setValue(current_object.max_age)
-        if current_object.max_time:
-            self.item_max_time.setTime(time_to_qtime(current_object.max_time))
-        if current_object.start_interval:
-            self.item_start_interval.setTime(time_to_qtime(current_object.start_interval))
-        if current_object.start_corridor:
-            self.item_corridor.setValue(current_object.start_corridor)
-        if current_object.order_in_corridor:
-            self.item_corridor_order.setValue(current_object.order_in_corridor)
-        if current_object.price:
-            self.item_price.setValue(current_object.price)
-
-        self.rank_checkbox.setChecked(current_object.ranking.is_active)
+        self.rank_checkbox.setChecked(self.current_object.ranking.is_active)
 
         def rank_configuration():
-            group = current_object
+            group = self.current_object
             GroupRankingDialog(group).exec()
 
         self.rank_button.clicked.connect(rank_configuration)

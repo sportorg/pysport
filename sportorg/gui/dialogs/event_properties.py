@@ -27,7 +27,10 @@ def get_types():
 class EventPropertiesDialog(QDialog):
     def __init__(self, table=None, index=None):
         super().__init__()
+
+    def exec(self):
         self.init_ui()
+        return super().exec()
 
     def close_dialog(self):
         self.close()

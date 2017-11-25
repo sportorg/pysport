@@ -18,9 +18,8 @@ from sportorg.utils.time import time_to_otime
 class StartPreparationDialog(QDialog):
     def __init__(self):
         super().__init__()
-        self.show()
 
-    def show(self):
+    def exec(self):
         self.setup_ui()
 
     def setup_ui(self):

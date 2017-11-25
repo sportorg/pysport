@@ -13,7 +13,10 @@ from sportorg import config
 class AboutDialog(QDialog):
     def __init__(self):
         super().__init__()
+
+    def exec(self):
         self.init_ui()
+        return super().exec()
 
     def close_dialog(self):
         self.close()

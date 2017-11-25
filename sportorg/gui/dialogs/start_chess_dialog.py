@@ -15,7 +15,10 @@ from sportorg.models.start.start_calculation import get_chess_list
 class StartChessDialog(QDialog):
     def __init__(self):
         super().__init__()
+
+    def exec(self):
         self.init_ui()
+        return super().exec()
 
     def close_dialog(self):
         self.close()

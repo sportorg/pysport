@@ -14,7 +14,10 @@ from sportorg.models.memory import race, Config
 class SportidentPropertiesDialog(QDialog):
     def __init__(self):
         super().__init__()
+
+    def exec(self):
         self.init_ui()
+        return super().exec()
 
     def close_dialog(self):
         self.close()

@@ -275,7 +275,7 @@ def set_property(person, key, value):
         if result:
             result.finish_time = hhmmss_to_time(value)
     elif key == _('Result'):
-        None
+        pass
     elif key == _('Penalty time'):
         result = find_person_result(person)
         if result:
@@ -287,11 +287,11 @@ def set_property(person, key, value):
     elif key == _('Card number'):
         race().person_sportident_card(person, int(value))
     elif key == _('Group'):
-        None
+        pass
     elif key == _('Team'):
-        None
+        pass
     elif key == _('Qualification'):
-        None
+        pass
 
 
 def main(argv):

@@ -166,9 +166,19 @@ class EntryEditDialog(QDialog):
     def __init__(self, table=None, index=None):
         super().__init__()
         self.is_ok = {}
-        self.init_ui()
         if table is not None:
-            self.set_values_from_table(table, index)
+            self.table = table
+            self.current_index = index
+
+            assert (isinstance(index, QModelIndex))
+            current_object = race().persons[index.row()]
+            assert (isinstance(current_object, Person))
+            self.current_object = current_object
+
+    def exec(self):
+        self.init_ui()
+        self.set_values_from_table()
+        return super().exec()
 
     def close_dialog(self):
         self.close()
@@ -354,40 +364,31 @@ class EntryEditDialog(QDialog):
         else:
             self.button_ok.setEnabled(True)
 
-    def set_values_from_table(self, table, index):
-        self.table = table
-        self.current_index = index
-
-        assert (isinstance(index, QModelIndex))
-        orig_index_int = index.row()
-
-        current_object = race().persons[orig_index_int]
-        assert (isinstance(current_object, Person))
-        self.current_object = current_object
-        self.item_surname.setText(current_object.surname)
-        self.item_name.setCurrentText(current_object.name)
-        if current_object.group is not None:
-            self.item_group.setCurrentText(current_object.group.name)
-        if current_object.organization is not None:
-            self.item_team.setCurrentText(current_object.organization.name)
-        if current_object.year:
-            self.item_year.setValue(int(current_object.year))
-        if current_object.qual:
-            self.item_qual.setCurrentText(current_object.qual.get_title())
-        if current_object.bib:
-            self.item_bib.setValue(int(current_object.bib))
-        if current_object.start_time is not None:
-            time = time_to_qtime(current_object.start_time)
+    def set_values_from_table(self):
+        self.item_surname.setText(self.current_object.surname)
+        self.item_name.setCurrentText(self.current_object.name)
+        if self.current_object.group is not None:
+            self.item_group.setCurrentText(self.current_object.group.name)
+        if self.current_object.organization is not None:
+            self.item_team.setCurrentText(self.current_object.organization.name)
+        if self.current_object.year:
+            self.item_year.setValue(int(self.current_object.year))
+        if self.current_object.qual:
+            self.item_qual.setCurrentText(self.current_object.qual.get_title())
+        if self.current_object.bib:
+            self.item_bib.setValue(int(self.current_object.bib))
+        if self.current_object.start_time is not None:
+            time = time_to_qtime(self.current_object.start_time)
             self.item_start.setTime(time)
-        if current_object.start_group is not None:
-            self.item_start_group.setValue(int(current_object.start_group))
+        if self.current_object.start_group is not None:
+            self.item_start_group.setValue(int(self.current_object.start_group))
 
-        if current_object.sportident_card is not None:
-            self.item_card.setValue(int(current_object.sportident_card))
+        if self.current_object.sportident_card is not None:
+            self.item_card.setValue(int(self.current_object.sportident_card))
 
-        self.item_out_of_competition.setChecked(current_object.is_out_of_competition)
+        self.item_out_of_competition.setChecked(self.current_object.is_out_of_competition)
 
-        self.item_comment.setText(current_object.comment)
+        self.item_comment.setText(self.current_object.comment)
 
     def apply_changes_impl(self):
         changed = False

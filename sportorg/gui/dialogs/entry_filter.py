@@ -16,9 +16,12 @@ class DialogFilter(QDialog):
 
     def __init__(self, table=None):
         super().__init__()
-        self.init_ui()
         if table is not None:
             self.table = table
+
+    def exec(self):
+        self.init_ui()
+        return super().exec()
 
     def close_dialog(self):
         self.destroy()
