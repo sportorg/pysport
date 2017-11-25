@@ -1,6 +1,6 @@
 from sportorg.libs.winorient.wdb import WDB, WDBMan, WDBTeam, WDBGroup, WDBDistance, WDBPunch, WDBFinish, WDBChip
-from sportorg.models.memory import Race, Organization, Group, Person, Result, race, find, Course, \
-    CourseControl, Country, Contact, Address, ResultStatus, Qualification, find_person_result, SystemType
+from sportorg.models.memory import Race, Organization, Group, Person, race, find, Course, \
+    CourseControl, Country, Contact, Address, ResultStatus, Qualification, find_person_result, ResultSportident
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.utils.time import int_to_otime, time_to_int
 
@@ -129,8 +129,7 @@ class WinOrientBinary:
             # result
             fin = man.get_finish()
             if fin is not None:
-                result = Result()
-                result.system_type = SystemType.MANUAL
+                result = ResultSportident()
                 result.person = new_person
 
                 result.sportident_card = race().new_sportident_card(man.si_card)
@@ -146,7 +145,6 @@ class WinOrientBinary:
                 # punches
                 chip = man.get_chip()
                 if chip is not None:
-                    result.system_type = SystemType.SPORTIDENT
                     result.punches = []
                     for i in range(chip.quantity):
                         p = chip.punch[i]

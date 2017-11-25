@@ -1,11 +1,7 @@
 import struct
 import unittest
 
-from sportorg.modules.winorient.wdb import WinOrientBinary
-from sportorg.libs.winorient.wdb import WDBPunch, WDBFinish, WDBChip, WDBTeam, WDBDistance, WDBGroup, WDBMan, \
-    parse_wdb, WDB
-
-from sportorg.config import base_dir
+from sportorg.libs.winorient.wdb import WDBPunch, WDBFinish, WDBChip, WDBTeam, WDBDistance, WDBGroup, WDBMan, WDB
 
 
 class TestWDBStringMethods(unittest.TestCase):

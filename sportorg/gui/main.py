@@ -15,6 +15,7 @@ from sportorg.modules.ocad import ocad
 from sportorg.modules.ocad.ocad import OcadImportException
 from sportorg.modules.printing.model import NoResultToPrintException, split_printout
 from sportorg.modules.sportident import sportident
+from sportorg.modules import testing
 from sportorg.modules.winorient import winorient
 from sportorg.core import event
 from sportorg.gui.dialogs.about import AboutDialog
@@ -588,6 +589,13 @@ class MainWindow(QMainWindow):
                 QMessageBox.question(self, _('Error'), _('Import error') + ': ' + file_name)
 
             self.init_model()
+
+    @staticmethod
+    def testing():
+        try:
+            testing.test()
+        except Exception as e:
+            logging.exception(str(e))
 
     @staticmethod
     def about_dialog():

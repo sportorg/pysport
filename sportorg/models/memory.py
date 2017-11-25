@@ -371,6 +371,7 @@ class Result(Model):
             return self.penalty_time
         return OTime()
 
+
 class ResultObject(Result):
     def __init__(self):
         super().__init__()

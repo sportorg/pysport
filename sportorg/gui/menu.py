@@ -249,6 +249,11 @@ def menu_list():
                     'title': _('About'),
                     'shortcut': 'F1',
                     'action': GlobalAccess().get_main_window().about_dialog
+                },
+                {
+                    'title': _('Testing'),
+                    'shortcut': 'F10',
+                    'action': GlobalAccess().get_main_window().testing
                 }
             ]
         },
