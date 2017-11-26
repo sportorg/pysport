@@ -3,7 +3,7 @@ import logging
 from sportorg.modules.printing.model import split_printout, NoResultToPrintException
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.models.result.result_checker import ResultChecker
-from sportorg.models.memory import ResultObject
+from sportorg.models.result.result_object import ResultObject
 from sportorg.models.memory import race, Person
 
 

@@ -152,7 +152,7 @@ class ResultEditDialog(QDialog):
         changed = False
 
         if result.system_type == SystemType.SPORTIDENT:
-            if int(result.sportident_card) != self.item_sportident_card.value():
+            if result.sportident_card is None or int(result.sportident_card) != self.item_sportident_card.value():
                 result.sportident_card = race().new_sportident_card(self.item_sportident_card.value())
                 changed = True
 
@@ -188,14 +188,16 @@ class ResultEditDialog(QDialog):
             if new_person is not None:
                 assert isinstance(new_person, Person)
                 if result.person:
-                    result.person.sportident_card = None
+                    if result.system_type == SystemType.SPORTIDENT:
+                        result.person.sportident_card = None
                 recheck = True
                 result.person = new_person
-                result.person.sportident_card = result.sportident_card
+                if result.system_type == SystemType.SPORTIDENT:
+                    result.person.sportident_card = result.sportident_card
 
-                logging.info('Old status {}'.format(result.status))
-                ResultChecker.checking(result)
-                logging.info('New status {}'.format(result.status))
+                    logging.info('Old status {}'.format(result.status))
+                    ResultChecker.checking(result)
+                    logging.info('New status {}'.format(result.status))
 
             GlobalAccess().get_result_table().model().init_cache()
             changed = True

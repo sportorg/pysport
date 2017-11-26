@@ -45,7 +45,7 @@ def start():
                 bib_dialog = BibDialog()
                 bib_dialog.exec()
                 person = bib_dialog.get_person()
-                person.sportident_card = memory.race().new_sportident_card(card_data['card_number'])
+                memory.race().person_sportident_card(person, card_data['card_number'])
             except Exception as e:
                 logging.exception(str(e))
         GlobalAccess().get_main_window().init_model()

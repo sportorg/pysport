@@ -1,6 +1,6 @@
 import unittest
 
-from sportorg.models.memory import race, ResultObject, Person, SportidentCard, Group, Course, Organization
+from sportorg.models.memory import race, Result, Person, SportidentCard, Group, Course, Organization
 
 
 class TestMemoryData(unittest.TestCase):
@@ -9,7 +9,7 @@ class TestMemoryData(unittest.TestCase):
         return '{} not is {}'.format(obj.__class__.__name__, t.__class__.__name__)
 
     def result_equal(self, result):
-        self.assertIsInstance(result, ResultObject, self.class_not_equal_msg(result, ResultObject))
+        self.assertIsInstance(result, Result, self.class_not_equal_msg(result, Result))
         if result.sportident_card is not None:
             self.sportident_card_equal(result.sportident_card)
 

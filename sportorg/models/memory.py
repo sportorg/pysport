@@ -1,6 +1,6 @@
 from abc import abstractmethod
 from enum import IntEnum, Enum
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Union
 
 import datetime
 
@@ -278,33 +278,31 @@ class SportidentCard(Model):
         return self.number == other.number
 
 
-class Result(Model):
-    system_type = SystemType.NONE
-
+class Result:
     def __init__(self):
-        super().__init__()
-        self.sportident_card = None  # type: SportidentCard
-        self.start_time = None
-        self.finish_time = None
-        self.punches = []
-        self.penalty_time = None
-        self.penalty_laps = None
-        self.status = ResultStatus.OK
-        self.result = None  # time in seconds * 100 (int)
-        self.place = 0
-
+        if type(self) == Result:
+            raise Exception("<Result> must be subclassed.")
+        self.start_time = None  # type: OTime
+        self.finish_time = None  # type: OTime
+        self.result = None  # type: OTime
         self.person = None  # type: Person
-        self.assigned_rank = Qualification.NOT_QUALIFIED  # type: Qualification
+        self.status = ResultStatus.OK
+        self.penalty_time = None  # type: OTime
+        self.penalty_laps = None  # count of penalty legs (marked route)
+        self.place = None  # type: Union[int, str]
+
+    def __str__(self):
+        return str(self.system_type)
+
+    def __repr__(self):
+        return 'Result {} {}'.format(self.system_type, self.status)
 
     def __eq__(self, other):
-        eq = self.sportident_card == other.sportident_card
+        eq = self.system_type and other.system_type
         if self.start_time and other.start_time:
             eq = eq and time_to_sec(self.start_time) == time_to_sec(other.start_time)
         if self.finish_time and other.finish_time:
             eq = eq and time_to_sec(self.finish_time) == time_to_sec(other.finish_time)
-        if len(self.punches) == len(other.punches):
-            for i in range(len(self.punches)):
-                eq = eq and self.punches[i][0] == other.punches[i][0] and time_to_sec(self.punches[i][1]) == time_to_sec(other.punches[i][1])
         else:
             return False
         return eq
@@ -319,6 +317,11 @@ class Result(Model):
             return False
 
         return self.result > other.result
+
+    @property
+    @abstractmethod
+    def system_type(self) -> SystemType:
+        pass
 
     def get_result(self):
         if self.status != ResultStatus.OK:
@@ -342,30 +345,13 @@ class Result(Model):
         return OTime(msec=self.get_result_for_sort()*10)
 
     def get_start_time(self):
-        obj = race()
-        start_source = obj.get_setting('sportident_start_source', 'protocol')
-        if start_source == 'protocol':
-            if self.person:
-                return self.person.start_time
-        elif start_source == 'station':
-            return self.start_time
-        elif start_source == 'cp':
-            pass
-        elif start_source == 'gate':
-            pass
-
+        if self.person:
+            return self.person.start_time
         return int_to_otime(0)
 
     def get_finish_time(self):
-        obj = race()
-        finish_source = obj.get_setting('sportident_finish_source', 'station')
-        if finish_source == 'station':
-            if self.finish_time:
-                return self.finish_time
-        elif finish_source == 'cp':
-            pass
-        elif finish_source == 'beam':
-            pass
+        if self.finish_time:
+            return self.finish_time
 
         return OTime.now()
 
@@ -375,35 +361,11 @@ class Result(Model):
         return OTime()
 
 
-class ResultObject(Result):
-    def __init__(self):
-        super().__init__()
-        self.start_time = None  # type: OTime
-        self.finish_time = None  # type: OTime
-        self.result = None  # type: OTime
-        self.person = None  # type: Person
-        self.status = ResultStatus.OK
-        self.penalty_time = None  # type: OTime
-        self.penalty_laps = None  # count of penalty legs (marked route)
-        self.place = 0
-
-    def __str__(self):
-        return str(self.system_type)
-
-    def __repr__(self):
-        return 'Result {} {}'.format(self.system_type, self.status)
-
-    @property
-    @abstractmethod
-    def system_type(self) -> SystemType:
-        pass
-
-
-class ResultManual(ResultObject):
+class ResultManual(Result):
     system_type = SystemType.MANUAL
 
 
-class ResultSportident(ResultObject):
+class ResultSportident(Result):
     system_type = SystemType.SPORTIDENT
 
     def __init__(self):
@@ -418,6 +380,15 @@ class ResultSportident(ResultObject):
         person = self.person.full_name if self.person is not None else ''
         return "Card: {}\nStart: {}\nFinish: {}\nPerson: {}\nPunches:\n{}".format(
             self.sportident_card, self.start_time, self.finish_time, person, punches)
+
+    def __eq__(self, other):
+        eq = self.sportident_card == other.sportident_card and super().__eq__(other)
+        if len(self.punches) == len(other.punches):
+            for i in range(len(self.punches)):
+                eq = eq and self.punches[i][0] == other.punches[i][0] and time_to_sec(self.punches[i][1]) == time_to_sec(other.punches[i][1])
+        else:
+            return False
+        return eq
 
     def get_start_time(self):
         obj = race()
@@ -448,11 +419,11 @@ class ResultSportident(ResultObject):
         return OTime.now()
 
 
-class ResultAlt(ResultObject):
+class ResultAlt(Result):
     system_type = SystemType.ALT
 
 
-class ResultSFR(ResultObject):
+class ResultSFR(Result):
     system_type = SystemType.SFR
 
     def __init__(self):
@@ -682,7 +653,7 @@ class Race(Model):
         assert isinstance(result, Result)
         add = True
         for r in self.results:
-            if r is Result:
+            if r is result:
                 add = False
                 break
         if add:

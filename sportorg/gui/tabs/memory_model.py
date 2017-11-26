@@ -4,7 +4,7 @@ import re
 from PyQt5.QtCore import QVariant, QAbstractTableModel, Qt, QSortFilterProxyModel
 
 from sportorg.language import _
-from sportorg.models.memory import race, Result, Group, Course, Organization
+from sportorg.models.memory import race, Result, Group, Course, Organization, SystemType
 from sportorg.utils.time import time_to_hhmmss
 
 
@@ -224,7 +224,9 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
         first_name = ''
         last_name = ''
         bib = 0
-        sportident_card = str(result.sportident_card) if result.sportident_card is not None else ''
+        sportident_card = ''
+        if i.system_type == SystemType.SPORTIDENT:
+            sportident_card = str(result.sportident_card) if result.sportident_card is not None else ''
         if person:
             first_name = person.name
             last_name = person.surname
@@ -244,7 +246,6 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
         if i.finish_time:
             finish = str(i.finish_time)
 
-
         return list([
             last_name,
             first_name,
@@ -257,7 +258,7 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
             i.get_result(),
             i.status.get_title(),
             time_to_hhmmss(i.get_penalty_time()),
-            i.place,
+            i.place if i.place is not None else '',
             str(i.system_type)
         ])
 

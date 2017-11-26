@@ -10,7 +10,7 @@ from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.tabs.memory_model import ResultMemoryModel
 from sportorg.gui.tabs.table import TableView
 from sportorg.language import _
-from sportorg.models.memory import race, Result, Course, CourseControl
+from sportorg.models.memory import race, Result, Course, CourseControl, SystemType
 from sportorg.utils.time import time_to_hhmmss
 
 
@@ -145,7 +145,7 @@ class Widget(QtWidgets.QWidget):
         assert (isinstance(hor_header, QHeaderView))
         hor_header.setSectionsMovable(True)
         hor_header.setDropIndicatorShown(True)
-        hor_header.setSectionResizeMode(QHeaderView.Interactive)
+        hor_header.setSectionResizeMode(QHeaderView.ResizeToContents)
         event_handler.add_event('refresh', lambda: hor_header.setSectionResizeMode(QHeaderView.ResizeToContents))
 
         self.gridLayout.addWidget(self.ResultSplitter)
@@ -167,6 +167,12 @@ class Widget(QtWidgets.QWidget):
         self.ResultChipDetails.clear()
         self.ResultChipFinishEdit.setText('')
         self.ResultChipStartEdit.setText('')
+
+        self.ResultCourseDetails.clear()
+        self.ResultCourseNameEdit.setText('')
+        self.ResultCourseLengthEdit.setText('')
+        if result.system_type != SystemType.SPORTIDENT:
+            return
         index = 1
         for i in result.punches:
             time = i[1]
@@ -179,9 +185,6 @@ class Widget(QtWidgets.QWidget):
         if result.start_time:
             self.ResultChipStartEdit.setText(time_to_hhmmss(result.start_time))
 
-        self.ResultCourseDetails.clear()
-        self.ResultCourseNameEdit.setText('')
-        self.ResultCourseLengthEdit.setText('')
         index = 1
         if result.person and result.person.group and result.person.group.course:
             course = result.person.group.course

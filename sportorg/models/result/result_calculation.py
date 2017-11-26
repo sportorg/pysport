@@ -16,6 +16,7 @@ class ResultCalculation(object):
     def set_times(self):
         for i in race().results:
             assert isinstance(i, Result)
+            # FIXME
             person = i.person
             if person:
                 i.start_time = person.start_time
