@@ -109,7 +109,8 @@ LOG_CONFIG = {
         'console': {
             'class': 'logging.StreamHandler',
             'level': logging.DEBUG,
-            'formatter': 'cls'
+            'formatter': 'cls',
+            'stream': sys.stdout
         },
         'file': {
             'class': 'logging.FileHandler',
