@@ -3,6 +3,8 @@ import logging
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import QItemSelectionModel, QModelIndex
 from PyQt5.QtWidgets import QTableView, QMessageBox
+
+from sportorg.core.singleton import Singleton
 from sportorg.models.memory import race, NotEmptyException
 from sportorg.models.result.result_checker import ResultChecker
 
@@ -11,14 +13,8 @@ from sportorg.language import _
 from sportorg.models.result.result_calculation import ResultCalculation
 
 
-class GlobalAccess(object):
-    __instance = None
+class GlobalAccess(metaclass=Singleton):
     main_window = None
-
-    def __new__(cls):
-        if GlobalAccess.__instance is None:
-            GlobalAccess.__instance = object.__new__(cls)
-        return GlobalAccess.__instance
 
     def set_main_window(self, window):
         self.main_window = window
@@ -130,8 +126,7 @@ class GlobalAccess(object):
                 race().add_new_person()
                 self.get_person_table().model().init_cache()
             elif tab == 1:
-                race().add_new_result()
-                self.get_result_table().model().init_cache()
+                self.get_main_window().manual_finish()
             elif tab == 2:
                 race().add_new_group()
                 self.get_person_table().model().init_cache()

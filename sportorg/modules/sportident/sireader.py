@@ -10,7 +10,7 @@ from sportorg.libs.sportident import sireader
 class SIReaderThread(threading.Thread):
     def __init__(self, port, func=lambda card_data: card_data, start_time=None, debug=False):
         super().__init__()
-        self.setName('SportidentThread')
+        self.setName(self.__class__.__name__)
         self.port = port
         self.readers = [func]
         self.cards = []

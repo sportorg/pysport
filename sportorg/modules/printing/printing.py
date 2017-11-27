@@ -11,6 +11,7 @@ from PyQt5.QtWidgets import QApplication
 class PrintThread(Thread):
     def __init__(self, printer_name, html):
         super().__init__()
+        self.setName(self.__class__.__name__)
         self.printer_name = printer_name
         self.html = html
 

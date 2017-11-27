@@ -571,40 +571,36 @@ class Race(Model):
         return True
 
     @staticmethod
-    def add_new_person():
-        new_person = Person()
-        new_person.name = '_new'
-        race().persons.insert(0, new_person)
-
-    @staticmethod
-    def add_new_result():
+    def new_result():
         new_result = ResultManual()
         new_result.finish_time = OTime.now()
-        race().results.insert(0, new_result)
+        return new_result
 
     @staticmethod
-    def add_new_sportident_result():
+    def new_sportident_result():
         new_result = ResultSportident()
         new_result.finish_time = OTime.now()
-        race().results.insert(0, new_result)
+        return new_result
 
-    @staticmethod
-    def add_new_group():
+    def add_new_person(self):
+        new_person = Person()
+        new_person.name = '_new'
+        self.persons.insert(0, new_person)
+
+    def add_new_group(self):
         new_group = Group()
         new_group.name = '_new'
-        race().groups.insert(0, new_group)
+        self.groups.insert(0, new_group)
 
-    @staticmethod
-    def add_new_course():
+    def add_new_course(self):
         new_course = Course()
         new_course.name = '_new'
-        race().courses.insert(0, new_course)
+        self.courses.insert(0, new_course)
 
-    @staticmethod
-    def add_new_organization():
+    def add_new_organization(self):
         new_organization = Organization()
         new_organization.name = '_new'
-        race().organizations.insert(0, new_organization)
+        self.organizations.insert(0, new_organization)
 
     def update_counters(self):
         # recalculate group counters
@@ -649,6 +645,9 @@ class Race(Model):
                     ret.append(person)
         return ret
 
+    def add_new_result(self, result):
+        self.results.insert(0, result)
+
     def add_result(self, result):
         assert isinstance(result, Result)
         add = True
@@ -657,7 +656,7 @@ class Race(Model):
                 add = False
                 break
         if add:
-            self.results.insert(0, result)
+            self.add_new_result(result)
 
 
 class Config(object):
