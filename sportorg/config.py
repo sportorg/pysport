@@ -1,5 +1,6 @@
 import os
 import sys
+import logging.config
 
 from sportorg.core.version import Version
 
@@ -79,6 +80,19 @@ CONFIG_INI = data_dir('config.ini')
 
 LOCALE_DIR = base_dir('languages')
 
+DIRS = [
+    IMG_DIR,
+    ICON_DIR,
+    DATA_DIR,
+    LOCALE_DIR,
+    LOG_DIR,
+    TEMPLATE_DIR
+]
+
+for _DIR in DIRS:
+    if not os.path.exists(_DIR):
+        os.makedirs(_DIR)
+
 LOG_CONFIG = {
     'version': 1,
     'formatters': {
@@ -94,7 +108,7 @@ LOG_CONFIG = {
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
-            'level': 'DEBUG',
+            'level': logging.DEBUG,
             'formatter': 'cls'
         },
         'file': {
@@ -107,7 +121,7 @@ LOG_CONFIG = {
             'class': 'logging.FileHandler',
             'filename': log_dir(NAME.lower() + '-errors.log'),
             'mode': 'a',
-            'level': 'ERROR',
+            'level': logging.ERROR,
             'formatter': 'detailed'
         },
     },
@@ -117,10 +131,12 @@ LOG_CONFIG = {
         }
     },
     'root': {
-        'level': 'DEBUG',
+        'level': logging.DEBUG,
         'handlers': ['console', 'file', 'errors']
     },
 }
+
+logging.config.dictConfig(LOG_CONFIG)
 
 VERSION_INFO = {
     'FixedFileInfo':
@@ -166,16 +182,3 @@ VERSION_INFO = {
             }
         }
 }
-
-DIRS = [
-    IMG_DIR,
-    ICON_DIR,
-    DATA_DIR,
-    LOCALE_DIR,
-    LOG_DIR,
-    TEMPLATE_DIR
-]
-
-for _DIR in DIRS:
-    if not os.path.exists(_DIR):
-        os.makedirs(_DIR)

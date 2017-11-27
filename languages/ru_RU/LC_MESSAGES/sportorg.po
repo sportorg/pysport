@@ -826,9 +826,6 @@ msgstr "Сохранить все версии"
 msgid "Assignment mode"
 msgstr "Режим присвоения"
 
-msgid "Refresh"
-msgstr "Обновить"
-
 msgid "Number already exists"
 msgstr "Номер уже существует"
 
@@ -840,3 +837,51 @@ msgstr "Номер чипа уже существует"
 
 msgid "Card number is unique"
 msgstr "Номер чипа уникален"
+
+msgid "Text exchange"
+msgstr "Текстовый импорт/экспорт"
+
+msgid "Penalty time"
+msgstr "Штраф, время"
+
+msgid "Penalty legs"
+msgstr "Штраф, круги"
+
+msgid "Card number"
+msgstr "Номер чипа"
+
+msgid "Value"
+msgstr "Значение"
+
+msgid "Values"
+msgstr "Значения"
+
+msgid "Identifier"
+msgstr "Идентификатор"
+
+msgid "Person name"
+msgstr "Имя спортсмена"
+
+msgid "Separator"
+msgstr "Разделитель"
+
+msgid "space"
+msgstr "пробел"
+
+msgid "tab"
+msgstr "табуляция"
+
+msgid "semicolon"
+msgstr "точка с запятой"
+
+msgid "custom"
+msgstr "пользовательский"
+
+msgid "Refresh"
+msgstr "Обновить"
+
+msgid "Add SPORTident result"
+msgstr "Добавить SPORTident результат"
+
+msgid "Logs"
+msgstr "Логи"

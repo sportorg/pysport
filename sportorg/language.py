@@ -10,6 +10,7 @@ def _get_conf_locale():
     conf.read(config.CONFIG_INI)
     return conf.get('locale', 'current', fallback='ru_RU')
 
+
 locale_current = _get_conf_locale()
 
 
@@ -17,10 +18,15 @@ if config.DEBUG:
     import polib
 
     def _generate():
+        logging.debug('Translating start {}'.format(locale_current))
         name = config.NAME.lower()
         path = config.base_dir(config.LOCALE_DIR, locale_current, 'LC_MESSAGES', name)
-        po = polib.pofile(path + '.po')
-        po.save_as_mofile(path + '.mo')
+        try:
+            po = polib.pofile(path + '.po')
+            po.save_as_mofile(path + '.mo')
+        except Exception as e:
+            logging.exception(str(e))
+        logging.debug('Translating end')
 
     _generate()
 

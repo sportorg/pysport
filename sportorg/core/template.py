@@ -1,6 +1,6 @@
 import os
 
-from sportorg.lib.template import template
+from sportorg.libs.template import template
 from sportorg import config
 
 
