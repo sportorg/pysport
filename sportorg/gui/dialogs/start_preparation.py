@@ -21,6 +21,7 @@ class StartPreparationDialog(QDialog):
 
     def exec(self):
         self.setup_ui()
+        return super().exec()
 
     def setup_ui(self):
         self.setObjectName("StartPreparationDialog")
@@ -103,8 +104,6 @@ class StartPreparationDialog(QDialog):
         self.draw_layout.setWidget(4, QtWidgets.QFormLayout.LabelRole, self.draw_mix_groups_check_box)
 
         self.draw_check_box.stateChanged.connect(self.draw_activate)
-
-
 
         self.start_group_box = QtWidgets.QGroupBox(self)
         self.start_group_box.setGeometry(QtCore.QRect(8, 120, 311, 121))
@@ -208,7 +207,6 @@ class StartPreparationDialog(QDialog):
         self.recover_state()
 
     def retranslateUi(self):
-        _translate = QtCore.QCoreApplication.translate
         self.setWindowTitle(_("Start Preparation"))
         self.reserve_group_box.setTitle(_("Reserves insert"))
         self.reserve_prefix_label.setText(_("Reserve prefix"))
