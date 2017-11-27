@@ -83,7 +83,6 @@ class MainWindow(QMainWindow):
 
     def close(self):
         self.conf_write()
-
         """
         :event: close
         """
@@ -437,7 +436,8 @@ class MainWindow(QMainWindow):
     @staticmethod
     def manual_finish():
         try:
-            race().add_new_result()
+            result = race().new_result()
+            race().add_new_result(result)
             logging.info('Manual finish')
             GlobalAccess().get_result_table().model().init_cache()
             GlobalAccess().get_main_window().refresh()
@@ -448,7 +448,8 @@ class MainWindow(QMainWindow):
     @staticmethod
     def sportident_result():
         try:
-            race().add_new_sportident_result()
+            result = race().new_sportident_result()
+            race().add_new_result(result)
             logging.info('SPORTident result')
             GlobalAccess().get_result_table().model().init_cache()
             GlobalAccess().get_main_window().refresh()
