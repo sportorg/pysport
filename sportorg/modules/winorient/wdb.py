@@ -193,7 +193,10 @@ class WinOrientBinary:
                     new_course.point.append(0)
                     new_course.leg.append(0)
 
-                new_course.point[i] = int(course.controls[i].code)
+                if str(course.controls[i].code).isdigit():
+                    new_course.point[i] = int(course.controls[i].code)
+                else:
+                    new_course.point[i] = 0
                 leg = course.controls[i].length
 
                 if leg:
