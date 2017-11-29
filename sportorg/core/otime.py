@@ -68,6 +68,9 @@ class OTime:
             self.sec if self.sec > 9 else '0' + str(self.sec)
         )
 
+    def __repr__(self):
+        return self.__str__()
+
     def __truediv__(self, fl):
         return OTime(msec=(int(self.to_msec() / fl)))
 

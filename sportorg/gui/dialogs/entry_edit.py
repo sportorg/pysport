@@ -433,7 +433,7 @@ class EntryEditDialog(QDialog):
 
         if (person.sportident_card is None or int(person.sportident_card) != self.item_card.value()) \
                 and self.item_card.value:
-            person.sportident_card = race().new_sportident_card(self.item_card.value())
+            race().person_sportident_card(person, self.item_card.value())
             changed = True
 
         if person.is_out_of_competition != self.item_out_of_competition.isChecked():
