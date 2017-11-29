@@ -55,19 +55,18 @@ class Punches:
                     int(item[1].text()),
                     time_to_otime(item[2].time())
                 ))
-
-            return self._punches
         else:
             self._punches = punches
+        return self._punches
 
     def _add(self):
         if self._add_index.value():
-            self._punches.insert(self._add_index.value()-1, (0, OTime.now()))
+            self.punches().insert(self._add_index.value()-1, (0, OTime.now()))
             self.show()
 
     def _delete(self):
         if 0 < self._delete_index.value() <= len(self._punches):
-            self._punches.pop(self._delete_index.value()-1)
+            self.punches().pop(self._delete_index.value()-1)
             self.show()
 
     def _clear(self):
