@@ -1,19 +1,103 @@
 import logging
 import sys
+from typing import List, Tuple
 
 from PyQt5.QtCore import QModelIndex
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QLabel, \
     QLineEdit, QApplication, QDialog, \
-    QPushButton, QTimeEdit, QRadioButton, QSpinBox
+    QPushButton, QTimeEdit, QRadioButton, QSpinBox, QGroupBox, QScrollArea, QGridLayout
 
 from sportorg import config
+from sportorg.core.otime import OTime
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import _
 from sportorg.models.memory import race, Result, find, ResultStatus, Person, Limit, SystemType
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.result_checker import ResultChecker
 from sportorg.utils.time import time_to_qtime, time_to_otime
+
+
+class Punches:
+    def __init__(self, punches=None):
+        self._punches = punches  # type: List[Tuple[int, OTime]]
+        self._scroll = QScrollArea()
+        self._box = QGroupBox(_('Punches'))
+        self._punches_layout = QGridLayout()
+        self._punches_layout.setSpacing(0)
+        self._add_index = QSpinBox()
+        self._delete_index = QSpinBox()
+        self._add_button = QPushButton(_('Add'))
+        self._delete_button = QPushButton(_('Delete'))
+        layout = QFormLayout()
+        layout.addRow(self._punches_layout)
+        layout.addRow(self._add_index, self._add_button)
+        layout.addRow(self._delete_index, self._delete_button)
+        self._box.setLayout(layout)
+        self._scroll.setWidget(self._box)
+        self._scroll.setWidgetResizable(True)
+        self._scroll.setFixedHeight(200)
+        self._scroll.setMinimumWidth(250)
+        self._punches_item = []  # type: List[Tuple[QLabel, QLineEdit, QTimeEdit]]
+
+        self._add_button.clicked.connect(self._add)
+        self._delete_button.clicked.connect(self._delete)
+
+    @property
+    def widget(self):
+        return self._scroll
+
+    def punches(self, punches=None):
+        if punches is None:
+            self._punches = []
+            for item in self._punches_item:
+                self._punches.append((
+                    int(item[1].text()),
+                    time_to_otime(item[2].time())
+                ))
+
+            return self._punches
+        else:
+            self._punches = punches
+
+    def _add(self):
+        if self._add_index.value():
+            self._punches.insert(self._add_index.value()-1, (0, OTime.now()))
+            self.show()
+
+    def _delete(self):
+        if 0 < self._delete_index.value() <= len(self._punches):
+            self._punches.pop(self._delete_index.value()-1)
+            self.show()
+
+    def _clear(self):
+        for item in self._punches_item:
+            for j, widget in enumerate(item):
+                self._punches_layout.removeWidget(widget)
+                widget.setParent(None)
+        self._punches_item = []
+
+    def show(self):
+        self._clear()
+        punches = self._punches if self._punches is not None else []
+        for i, p in enumerate(punches):
+            code = QLineEdit()
+            code.setText(str(p[0]))
+            time = QTimeEdit()
+            time.setDisplayFormat("hh:mm:ss")
+            time.setTime(time_to_qtime(p[1]))
+            item = (QLabel(str(i+1)), code, time)
+            for j, widget in enumerate(item):
+                self._punches_layout.addWidget(widget, i, j)
+            self._punches_item.insert(i, item)
+        self._add_index.setMaximum(len(punches)+1)
+        self._add_index.setValue(len(punches)+1)
+        self._delete_index.setMaximum(len(punches))
+        self._delete_index.setValue(0)
+        if len(punches) == 0:
+            self._delete_button.setDisabled(True)
+        else:
+            self._delete_button.setDisabled(False)
 
 
 class ResultEditDialog(QDialog):
@@ -71,6 +155,8 @@ class ResultEditDialog(QDialog):
         self.radio_dsq = QRadioButton(_('DSQ'))
         self.text_dsq = QLineEdit()
 
+        self.punches = Punches()
+
         if self.current_object.system_type == SystemType.SPORTIDENT:
             self.layout.addRow(QLabel(_('Card')), self.item_sportident_card)
         self.layout.addRow(QLabel(_('Bib')), self.item_bib)
@@ -85,6 +171,9 @@ class ResultEditDialog(QDialog):
         self.layout.addRow(self.radio_dnf)
         self.layout.addRow(self.radio_overtime)
         self.layout.addRow(self.radio_dsq, self.text_dsq)
+
+        if self.current_object.system_type == SystemType.SPORTIDENT:
+            self.layout.addRow(self.punches.widget)
 
         def cancel_changes():
             self.close()
@@ -125,6 +214,8 @@ class ResultEditDialog(QDialog):
         if self.current_object.system_type == SystemType.SPORTIDENT:
             if self.current_object.sportident_card is not None:
                 self.item_sportident_card.setValue(int(self.current_object.sportident_card))
+            self.punches.punches(self.current_object.punches)
+            self.punches.show()
         if self.current_object.finish_time is not None:
             self.item_finish.setTime(time_to_qtime(self.current_object.finish_time))
         if self.current_object.start_time is not None:
@@ -154,7 +245,9 @@ class ResultEditDialog(QDialog):
         if result.system_type == SystemType.SPORTIDENT:
             if result.sportident_card is None or int(result.sportident_card) != self.item_sportident_card.value():
                 result.sportident_card = race().new_sportident_card(self.item_sportident_card.value())
-                changed = True
+
+            result.punches = self.punches.punches()
+            changed = True
 
         time = time_to_otime(self.item_finish.time())
         if result.finish_time != time:
