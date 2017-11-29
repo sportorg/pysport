@@ -1,6 +1,7 @@
 import threading
 import time
 import serial
+import os
 from sportorg.lib.sportident import sireader
 
 
@@ -63,6 +64,8 @@ def get_ports():
     for i in range(32):
         try:
             p = 'COM' + str(i)
+            if os.name == 'posix':
+                p = '/dev/ttyUSB' + str(i)
             com = serial.Serial(p, 38400, timeout=5)
             com.close()
             ports.append(p)
