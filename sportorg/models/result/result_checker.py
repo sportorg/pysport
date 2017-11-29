@@ -13,10 +13,10 @@ class ResultChecker:
     @staticmethod
     def check(punches, controls):
         """
-        
+
         :param punches: [(code, otime()), ...]
         :param controls: [model.CourseControl, ...]
-        :return: 
+        :return:
         """
         i = 0
         count_controls = len(controls)
@@ -25,9 +25,51 @@ class ResultChecker:
 
         for punch in punches:
             try:
-                is_equal = int(punch[0]) == int(controls[i].code)
-                if is_equal:
-                    i += 1
+                template = str(controls[i].code)
+                cur_code = int(punch[0])
+
+                list_exists = False
+                list_contains = False
+                ind_begin = template.find('(')
+                ind_end = template.find(')')
+                if ind_begin > 0 and ind_end > 0:
+                    list_exists = True
+                    # any control from the list e.g. '%(31,32,33)'
+                    arr = template[ind_begin + 1:ind_end].split(',')
+                    if str(cur_code) in arr:
+                        list_contains = True
+
+                if template.startswith('%'):
+                    # non-unique control
+                    if not list_exists or list_contains:
+                        # any control '%' or '%(31,32,33)'
+                        i += 1
+
+                elif template.startswith('*'):
+                    # unique control '*' or '*(31,32,33)'
+                    if list_exists and not list_contains:
+                        # not in list
+                        continue
+                    # test previous punches
+                    is_unique = True
+                    for prev_punch in punches[0:i]:
+                        if int(prev_punch[0]) == cur_code:
+                            is_unique = False
+                            break
+                    if is_unique:
+                        i += 1
+
+                else:
+                    # simple pre-ordered control '31 989' or '31(31,32,33) 989'
+                    if list_exists:
+                        # control with optional codes '31(31,32,33) 989'
+                        if list_contains:
+                            i += 1
+                    else:
+                        # just cp '31 989'
+                        is_equal = cur_code == int(controls[i].code)
+                        if is_equal:
+                            i += 1
 
                 if i == count_controls:
                     return True

@@ -154,6 +154,7 @@ class GlobalAccess(metaclass=Singleton):
                 if result.person is not None:
                     ResultChecker.checking(result)
             logging.debug('Rechecking finish')
+            ResultCalculation().process_results()
             self.get_main_window().refresh()
         except Exception as e:
             logging.exception(str(e))
