@@ -1,12 +1,12 @@
 import logging
 import sys
+from abc import abstractmethod
 from typing import List, Tuple
 
 from PyQt5.QtCore import QModelIndex
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QFormLayout, QLabel, \
-    QLineEdit, QApplication, QDialog, \
-    QPushButton, QTimeEdit, QRadioButton, QSpinBox, QGroupBox, QScrollArea, QGridLayout
+from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit, QApplication, QDialog, \
+    QPushButton, QTimeEdit, QRadioButton, QSpinBox, QGroupBox, QScrollArea, QGridLayout, QTextEdit
 
 from sportorg import config
 from sportorg.core.otime import OTime
@@ -15,10 +15,25 @@ from sportorg.language import _
 from sportorg.models.memory import race, Result, find, ResultStatus, Person, Limit, SystemType, Split
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.result_checker import ResultChecker
-from sportorg.utils.time import time_to_qtime, time_to_otime
+from sportorg.utils.time import time_to_qtime, time_to_otime, hhmmss_to_time
 
 
-class Splits:
+class SplitsObject:
+    @property
+    @abstractmethod
+    def widget(self):
+        pass
+
+    @abstractmethod
+    def splits(self, splits=None):
+        pass
+
+    @abstractmethod
+    def show(self):
+        pass
+
+
+class Splits(SplitsObject):
     def __init__(self, splits=None):
         self._splits = splits  # type: List[Split]
         self._scroll = QScrollArea()
@@ -54,8 +69,8 @@ class Splits:
             for item in self._splits_item:
                 split = Split()
                 split.time = time_to_otime(item[2].time())
-                if item[1].text().isdigit():
-                    split.code = int(item[1].text())
+                if item[1].text().strip().isdigit():
+                    split.code = int(item[1].text().strip())
                 else:
                     if self._splits is not None and len(self._splits) > i:
                         split.code = self._splits[i].code
@@ -107,6 +122,55 @@ class Splits:
             self._delete_button.setDisabled(True)
         else:
             self._delete_button.setDisabled(False)
+
+
+class SplitsText(SplitsObject):
+    def __init__(self, splits=None):
+        self._splits = splits
+        self._box = QGroupBox(_('Splits'))
+        self._layout = QFormLayout()
+        self._text = QTextEdit()
+        self._text.setMinimumHeight(200)
+        self._layout.addRow(QLabel(self._get_example_text()), self._text)
+        self._box.setLayout(self._layout)
+
+    @property
+    def widget(self):
+        return self._box
+
+    def splits(self, splits=None):
+        if splits is None:
+            text_row = self._text.toPlainText().split('\n')
+            splits = []
+            for row in text_row:
+                if not row.strip():
+                    continue
+                item = row.split()
+                if len(item) >= 2:
+                    split = Split()
+                    split.time = hhmmss_to_time(item[1])
+                    if item[0].isdigit():
+                        split.code = int(item[0])
+                    else:
+                        logging.error('{} not number'.format(item[0]))
+                    splits.append(split)
+                else:
+                    logging.error('In "{}" no code and no time'.format(row))
+            self._splits = splits
+        else:
+            self._splits = splits
+        return self._splits
+
+    def show(self):
+        splits = self._splits if self._splits is not None else []
+        text = ''
+        for split in splits:
+            text += '{} {}\n'.format(split.code, str(split.time))
+        self._text.setText(text)
+
+    @staticmethod
+    def _get_example_text():
+        return '31 12:45:00\n32 12:46:32\n33 12:49:12\n...'
 
 
 class ResultEditDialog(QDialog):
@@ -164,7 +228,7 @@ class ResultEditDialog(QDialog):
         self.radio_dsq = QRadioButton(_('DSQ'))
         self.text_dsq = QLineEdit()
 
-        self.splits = Splits()
+        self.splits = SplitsText()
 
         if self.current_object.system_type == SystemType.SPORTIDENT:
             self.layout.addRow(QLabel(_('Card')), self.item_sportident_card)
