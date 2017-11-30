@@ -20,11 +20,13 @@ def get_result(card_data):
     result = memory.ResultSportident()
     result.sportident_card = memory.race().new_sportident_card(card_data['card_number'])
 
-    result.splits = card_data['punches']
-    for i in range(len(result.splits)):
-        time = result.splits[i][1]
+    for i in range(len(card_data['punches'])):
+        time = card_data['punches'][i][1]
         if time:
-            result.splits[i] = (result.splits[i][0], time_to_otime(time))
+            split = memory.Split()
+            split.code = card_data['punches'][i][0]
+            split.time = time_to_otime(time)
+            result.splits.append(split)
 
     result.start_time = time_to_otime(card_data['start'])
     result.finish_time = time_to_otime(card_data['finish'])

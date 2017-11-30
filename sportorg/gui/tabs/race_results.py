@@ -174,10 +174,10 @@ class Widget(QtWidgets.QWidget):
         if result.system_type != SystemType.SPORTIDENT:
             return
         index = 1
-        for i in result.splits:
-            time = i[1]
+        for split in result.splits:
+            time = split.time
             
-            s = '{} {} {}'.format(index, i[0], time_to_hhmmss(time))
+            s = '{} {} {}'.format(index, split.code, time_to_hhmmss(time))
             self.ResultChipDetails.append(s)
             index += 1
         if result.finish_time:
@@ -190,9 +190,9 @@ class Widget(QtWidgets.QWidget):
             course = result.person.group.course
             assert isinstance(course, Course)
             if course.controls is not None:
-                for i in course.controls:
-                    assert isinstance(i, CourseControl)
-                    s = '{} {} {}'.format(index, i.code, i.length if i.length else '')
+                for control in course.controls:
+                    assert isinstance(control, CourseControl)
+                    s = '{} {} {}'.format(index, control.code, control.length if control.length else '')
                     self.ResultCourseDetails.append(s)
                     index += 1
             self.ResultCourseNameEdit.setText(course.name)

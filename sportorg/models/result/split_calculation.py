@@ -80,14 +80,14 @@ class PersonSplits(object):
         if len(course.controls) > course_index:
             course_code = course.controls[course_index].code
             if str(course_code).strip().isdigit():
-                course_code = int(course_code.strip())
+                course_code = int(str(course_code).strip())
         leg_start_time = result.get_start_time()
         start_time = result.get_start_time()
 
         while person_index < len(result.splits):
             cur_split = result.splits[person_index]
-            cur_code = cur_split[0]
-            cur_time = cur_split[1]
+            cur_code = cur_split.code
+            cur_time = cur_split.time
 
             leg = LegSplit()
             leg.code = cur_code
@@ -114,7 +114,7 @@ class PersonSplits(object):
                 else:
                     course_code = course.controls[course_index].code
                     if str(course_code).strip().isdigit():
-                        course_code = int(course_code.strip())
+                        course_code = int(str(course_code).strip())
 
             else:
                 leg.status = 'extra'

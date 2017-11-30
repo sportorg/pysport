@@ -340,8 +340,8 @@ def get_splits_data_printout(person):
 
     while person_index < len(result.splits):
         cur_split = result.splits[person_index]
-        cur_code = cur_split[0]
-        cur_time = cur_split[1]
+        cur_code = cur_split.code
+        cur_time = cur_split.time
 
         leg = {}
         leg['code'] = cur_code

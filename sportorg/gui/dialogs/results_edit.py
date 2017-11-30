@@ -12,7 +12,7 @@ from sportorg import config
 from sportorg.core.otime import OTime
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import _
-from sportorg.models.memory import race, Result, find, ResultStatus, Person, Limit, SystemType
+from sportorg.models.memory import race, Result, find, ResultStatus, Person, Limit, SystemType, Split
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.result_checker import ResultChecker
 from sportorg.utils.time import time_to_qtime, time_to_otime
@@ -20,7 +20,7 @@ from sportorg.utils.time import time_to_qtime, time_to_otime
 
 class Splits:
     def __init__(self, splits=None):
-        self._splits = splits  # type: List[Tuple[int, OTime]]
+        self._splits = splits  # type: List[Split]
         self._scroll = QScrollArea()
         self._box = QGroupBox(_('Splits'))
         self._splits_layout = QGridLayout()
@@ -49,25 +49,29 @@ class Splits:
 
     def splits(self, splits=None):
         if splits is None:
-            self._splits = []
+            splits = []
+            i = 0
             for item in self._splits_item:
-                try:
-                    code = int(item[1].text())
-                except ValueError as e:
-                    code = 0
-                    logging.error(str(e))
+                split = Split()
+                split.time = time_to_otime(item[2].time())
+                if item[1].text().isdigit():
+                    split.code = int(item[1].text())
+                else:
+                    if self._splits is not None and len(self._splits) > i:
+                        split.code = self._splits[i].code
                     logging.error('{} not number'.format(item[1].text()))
-                self._splits.append((
-                    code,
-                    time_to_otime(item[2].time())
-                ))
+                splits.append(split)
+                i += 1
+            self._splits = splits
         else:
             self._splits = splits
         return self._splits
 
     def _add(self):
         if self._add_index.value():
-            self.splits().insert(self._add_index.value()-1, (0, OTime.now()))
+            split = Split()
+            split.time = OTime.now()
+            self.splits().insert(self._add_index.value()-1, split)
             self.show()
 
     def _delete(self):
@@ -85,12 +89,12 @@ class Splits:
     def show(self):
         self._clear()
         splits = self._splits if self._splits is not None else []
-        for i, p in enumerate(splits):
+        for i, split in enumerate(splits):
             code = QLineEdit()
-            code.setText(str(p[0]))
+            code.setText(str(split.code))
             time = QTimeEdit()
             time.setDisplayFormat("hh:mm:ss")
-            time.setTime(time_to_qtime(p[1]))
+            time.setTime(time_to_qtime(split.time))
             item = (QLabel(str(i+1)), code, time)
             for j, widget in enumerate(item):
                 self._splits_layout.addWidget(widget, i, j)

@@ -1,6 +1,6 @@
 from sportorg.libs.winorient.wdb import WDB, WDBMan, WDBTeam, WDBGroup, WDBDistance, WDBPunch, WDBFinish, WDBChip
 from sportorg.models.memory import Race, Organization, Group, Person, race, find, Course, \
-    CourseControl, Country, Contact, Address, ResultStatus, Qualification, find_person_result, ResultSportident
+    CourseControl, Country, Contact, Address, ResultStatus, Qualification, find_person_result, ResultSportident, Split
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.utils.time import int_to_otime, time_to_int
 
@@ -151,9 +151,11 @@ class WinOrientBinary:
                         assert isinstance(p, WDBPunch)
                         code = p.code
                         time = int_to_otime(p.time)
-                        punch = (code, time)
+                        split = Split()
+                        split.code = code
+                        split.time = time
                         if code > 0:
-                            result.splits.append(punch)
+                            result.splits.append(split)
 
         ResultCalculation().process_results()
 
@@ -279,10 +281,10 @@ class WinOrientBinary:
                     new_chip.finish = WDBPunch(time=time_to_int(result.finish_time))
 
                     new_chip.quantity = len(result.splits)
-                    for i in result.splits:
+                    for split in result.splits:
                         new_punch = WDBPunch()
-                        new_punch.code = i[0]
-                        new_punch.time = time_to_int(i[1])
+                        new_punch.code = split.code
+                        new_punch.time = time_to_int(split.time)
                         new_chip.punch.append(new_punch)
 
                     wdb_object.chip.append(new_chip)

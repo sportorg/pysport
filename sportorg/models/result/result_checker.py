@@ -14,8 +14,8 @@ class ResultChecker:
     def check(splits, controls):
         """
 
-        :param splits: [(code, otime()), ...]
-        :param controls: [model.CourseControl, ...]
+        :param splits: [Split, ...]
+        :param controls: [CourseControl, ...]
         :return:
         """
         i = 0
@@ -26,7 +26,7 @@ class ResultChecker:
         for split in splits:
             try:
                 template = str(controls[i].code)
-                cur_code = int(split[0])
+                cur_code = int(split.code)
 
                 list_exists = False
                 list_contains = False
@@ -53,7 +53,7 @@ class ResultChecker:
                     # test previous splits
                     is_unique = True
                     for prev_split in splits[0:i]:
-                        if int(prev_split[0]) == cur_code:
+                        if int(prev_split.code) == cur_code:
                             is_unique = False
                             break
                     if is_unique:
@@ -79,7 +79,7 @@ class ResultChecker:
 
         return False
 
-    def check_result(self, result: Result):
+    def check_result(self, result):
         if self.person is None:
             return True
         if self.person.group is None:
