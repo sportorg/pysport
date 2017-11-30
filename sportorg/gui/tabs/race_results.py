@@ -34,11 +34,11 @@ class ResultTable(TableView):
             (_('Delete'), GlobalAccess().get_main_window().delete_object)
         ]
 
-        event_handler.add_event('refresh', self.update_punches)
+        event_handler.add_event('refresh', self.update_splits)
 
-    def update_punches(self):
+    def update_splits(self):
         if -1 < self.currentIndex().row() < len(race().results):
-            self.parent_widget.show_punches(self.currentIndex())
+            self.parent_widget.show_splits(self.currentIndex())
 
     def keyPressEvent(self, event):
         super().keyPressEvent(event)
@@ -51,9 +51,9 @@ class ResultTable(TableView):
     def entry_single_clicked(self, index):
         try:
             logging.debug('Single result clicked on ' + str(index.row()))
-            #  show punches in the left area
+            #  show splits in the left area
             if -1 < index.row() < len(race().results):
-                self.parent_widget.show_punches(index)
+                self.parent_widget.show_splits(index)
         except Exception as e:
             logging.exception(str(e))
 
@@ -160,7 +160,7 @@ class Widget(QtWidgets.QWidget):
 
         event_handler.add_event('resize', self.resize_event)
 
-    def show_punches(self, index):
+    def show_splits(self, index):
         assert (isinstance(index, QModelIndex))
         result = race().results[index.row()]
         assert isinstance(result, Result)
@@ -174,7 +174,7 @@ class Widget(QtWidgets.QWidget):
         if result.system_type != SystemType.SPORTIDENT:
             return
         index = 1
-        for i in result.punches:
+        for i in result.splits:
             time = i[1]
             
             s = '{} {} {}'.format(index, i[0], time_to_hhmmss(time))

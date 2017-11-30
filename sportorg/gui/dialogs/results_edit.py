@@ -18,19 +18,19 @@ from sportorg.models.result.result_checker import ResultChecker
 from sportorg.utils.time import time_to_qtime, time_to_otime
 
 
-class Punches:
-    def __init__(self, punches=None):
-        self._punches = punches  # type: List[Tuple[int, OTime]]
+class Splits:
+    def __init__(self, splits=None):
+        self._splits = splits  # type: List[Tuple[int, OTime]]
         self._scroll = QScrollArea()
-        self._box = QGroupBox(_('Punches'))
-        self._punches_layout = QGridLayout()
-        self._punches_layout.setSpacing(0)
+        self._box = QGroupBox(_('Splits'))
+        self._splits_layout = QGridLayout()
+        self._splits_layout.setSpacing(0)
         self._add_index = QSpinBox()
         self._delete_index = QSpinBox()
         self._add_button = QPushButton(_('Add'))
         self._delete_button = QPushButton(_('Delete'))
         layout = QFormLayout()
-        layout.addRow(self._punches_layout)
+        layout.addRow(self._splits_layout)
         layout.addRow(self._add_index, self._add_button)
         layout.addRow(self._delete_index, self._delete_button)
         self._box.setLayout(layout)
@@ -38,7 +38,7 @@ class Punches:
         self._scroll.setWidgetResizable(True)
         self._scroll.setFixedHeight(200)
         self._scroll.setMinimumWidth(250)
-        self._punches_item = []  # type: List[Tuple[QLabel, QLineEdit, QTimeEdit]]
+        self._splits_item = []  # type: List[Tuple[QLabel, QLineEdit, QTimeEdit]]
 
         self._add_button.clicked.connect(self._add)
         self._delete_button.clicked.connect(self._delete)
@@ -47,39 +47,45 @@ class Punches:
     def widget(self):
         return self._scroll
 
-    def punches(self, punches=None):
-        if punches is None:
-            self._punches = []
-            for item in self._punches_item:
-                self._punches.append((
-                    int(item[1].text()),
+    def splits(self, splits=None):
+        if splits is None:
+            self._splits = []
+            for item in self._splits_item:
+                try:
+                    code = int(item[1].text())
+                except ValueError as e:
+                    code = 0
+                    logging.error(str(e))
+                    logging.error('{} not number'.format(item[1].text()))
+                self._splits.append((
+                    code,
                     time_to_otime(item[2].time())
                 ))
         else:
-            self._punches = punches
-        return self._punches
+            self._splits = splits
+        return self._splits
 
     def _add(self):
         if self._add_index.value():
-            self.punches().insert(self._add_index.value()-1, (0, OTime.now()))
+            self.splits().insert(self._add_index.value()-1, (0, OTime.now()))
             self.show()
 
     def _delete(self):
-        if 0 < self._delete_index.value() <= len(self._punches):
-            self.punches().pop(self._delete_index.value()-1)
+        if 0 < self._delete_index.value() <= len(self._splits):
+            self.splits().pop(self._delete_index.value()-1)
             self.show()
 
     def _clear(self):
-        for item in self._punches_item:
+        for item in self._splits_item:
             for j, widget in enumerate(item):
-                self._punches_layout.removeWidget(widget)
+                self._splits_layout.removeWidget(widget)
                 widget.setParent(None)
-        self._punches_item = []
+        self._splits_item = []
 
     def show(self):
         self._clear()
-        punches = self._punches if self._punches is not None else []
-        for i, p in enumerate(punches):
+        splits = self._splits if self._splits is not None else []
+        for i, p in enumerate(splits):
             code = QLineEdit()
             code.setText(str(p[0]))
             time = QTimeEdit()
@@ -87,13 +93,13 @@ class Punches:
             time.setTime(time_to_qtime(p[1]))
             item = (QLabel(str(i+1)), code, time)
             for j, widget in enumerate(item):
-                self._punches_layout.addWidget(widget, i, j)
-            self._punches_item.insert(i, item)
-        self._add_index.setMaximum(len(punches)+1)
-        self._add_index.setValue(len(punches)+1)
-        self._delete_index.setMaximum(len(punches))
+                self._splits_layout.addWidget(widget, i, j)
+            self._splits_item.insert(i, item)
+        self._add_index.setMaximum(len(splits)+1)
+        self._add_index.setValue(len(splits)+1)
+        self._delete_index.setMaximum(len(splits))
         self._delete_index.setValue(0)
-        if len(punches) == 0:
+        if len(splits) == 0:
             self._delete_button.setDisabled(True)
         else:
             self._delete_button.setDisabled(False)
@@ -154,7 +160,7 @@ class ResultEditDialog(QDialog):
         self.radio_dsq = QRadioButton(_('DSQ'))
         self.text_dsq = QLineEdit()
 
-        self.punches = Punches()
+        self.splits = Splits()
 
         if self.current_object.system_type == SystemType.SPORTIDENT:
             self.layout.addRow(QLabel(_('Card')), self.item_sportident_card)
@@ -172,7 +178,7 @@ class ResultEditDialog(QDialog):
         self.layout.addRow(self.radio_dsq, self.text_dsq)
 
         if self.current_object.system_type == SystemType.SPORTIDENT:
-            self.layout.addRow(self.punches.widget)
+            self.layout.addRow(self.splits.widget)
 
         def cancel_changes():
             self.close()
@@ -213,8 +219,8 @@ class ResultEditDialog(QDialog):
         if self.current_object.system_type == SystemType.SPORTIDENT:
             if self.current_object.sportident_card is not None:
                 self.item_sportident_card.setValue(int(self.current_object.sportident_card))
-            self.punches.punches(self.current_object.punches)
-            self.punches.show()
+            self.splits.splits(self.current_object.splits)
+            self.splits.show()
         if self.current_object.finish_time is not None:
             self.item_finish.setTime(time_to_qtime(self.current_object.finish_time))
         if self.current_object.start_time is not None:
@@ -245,7 +251,7 @@ class ResultEditDialog(QDialog):
             if result.sportident_card is None or int(result.sportident_card) != self.item_sportident_card.value():
                 result.sportident_card = race().new_sportident_card(self.item_sportident_card.value())
 
-            result.punches = self.punches.punches()
+            result.splits = self.splits.splits()
             changed = True
 
         time = time_to_otime(self.item_finish.time())

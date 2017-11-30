@@ -84,10 +84,10 @@ class PersonSplits(object):
         leg_start_time = result.get_start_time()
         start_time = result.get_start_time()
 
-        while person_index < len(result.punches):
-            cur_punch = result.punches[person_index]
-            cur_code = cur_punch[0]
-            cur_time = cur_punch[1]
+        while person_index < len(result.splits):
+            cur_split = result.splits[person_index]
+            cur_code = cur_split[0]
+            cur_time = cur_split[1]
 
             leg = LegSplit()
             leg.code = cur_code

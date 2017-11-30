@@ -142,10 +142,10 @@ class WinOrientBinary:
 
                 my_race.add_result(result)
 
-                # punches
+                # splits
                 chip = man.get_chip()
                 if chip is not None:
-                    result.punches = []
+                    result.splits = []
                     for i in range(chip.quantity):
                         p = chip.punch[i]
                         assert isinstance(p, WDBPunch)
@@ -153,7 +153,7 @@ class WinOrientBinary:
                         time = int_to_otime(p.time)
                         punch = (code, time)
                         if code > 0:
-                            result.punches.append(punch)
+                            result.splits.append(punch)
 
         ResultCalculation().process_results()
 
@@ -270,16 +270,16 @@ class WinOrientBinary:
 
                 wdb_object.fin.append(new_finish)
 
-                # punches
+                # splits
 
-                if result.punches:
+                if result.splits:
                     new_chip = WDBChip()
                     new_chip.id = int(man.sportident_card)
                     new_chip.start = WDBPunch(time=time_to_int(result.start_time))
                     new_chip.finish = WDBPunch(time=time_to_int(result.finish_time))
 
-                    new_chip.quantity = len(result.punches)
-                    for i in result.punches:
+                    new_chip.quantity = len(result.splits)
+                    for i in result.splits:
                         new_punch = WDBPunch()
                         new_punch.code = i[0]
                         new_punch.time = time_to_int(i[1])
