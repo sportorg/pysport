@@ -278,6 +278,13 @@ class SportidentCard(Model):
         return self.number == other.number
 
 
+class Split(Model):
+    def __init__(self):
+        self.code = 0  # type: int
+        self.time = None  # type: OTime
+        self.pace = None  # type: OTime
+
+
 class Result:
     def __init__(self):
         if type(self) == Result:
@@ -371,21 +378,21 @@ class ResultSportident(Result):
     def __init__(self):
         super().__init__()
         self.sportident_card = None  # type: SportidentCard
-        self.punches = []
+        self.splits = []  # type: List[Split]
 
     def __repr__(self):
-        punches = ''
-        for punch in self.punches:
-            punches += '{} — {}\n'.format(punch[0], punch[1])
+        splits = ''
+        for split in self.splits:
+            splits += '{} — {}\n'.format(split[0], split[1])
         person = self.person.full_name if self.person is not None else ''
-        return "Card: {}\nStart: {}\nFinish: {}\nPerson: {}\nPunches:\n{}".format(
-            self.sportident_card, self.start_time, self.finish_time, person, punches)
+        return "Card: {}\nStart: {}\nFinish: {}\nPerson: {}\nSplits:\n{}".format(
+            self.sportident_card, self.start_time, self.finish_time, person, splits)
 
     def __eq__(self, other):
         eq = self.sportident_card == other.sportident_card and super().__eq__(other)
-        if len(self.punches) == len(other.punches):
-            for i in range(len(self.punches)):
-                eq = eq and self.punches[i][0] == other.punches[i][0] and time_to_sec(self.punches[i][1]) == time_to_sec(other.punches[i][1])
+        if len(self.splits) == len(other.splits):
+            for i in range(len(self.splits)):
+                eq = eq and self.splits[i][0] == other.splits[i][0] and time_to_sec(self.splits[i][1]) == time_to_sec(other.splits[i][1])
         else:
             return False
         return eq
@@ -428,7 +435,7 @@ class ResultSFR(Result):
 
     def __init__(self):
         super().__init__()
-        self.punches = []
+        self.splits = []  # type: List[Split]
 
 
 class Person(Model):

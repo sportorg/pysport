@@ -38,7 +38,7 @@ class ResultSportidentGeneration(ResultObject):
             pass  # bib
         self._add_result()
 
-    def check_punches(self):
+    def check_splits(self):
         if self._find_person_by_result():
             return ResultChecker(self._person).check_result(self._result)
         return False

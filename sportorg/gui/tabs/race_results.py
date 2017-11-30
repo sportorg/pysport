@@ -34,11 +34,11 @@ class ResultTable(TableView):
             (_('Delete'), GlobalAccess().get_main_window().delete_object)
         ]
 
-        event_handler.add_event('refresh', self.update_punches)
+        event_handler.add_event('refresh', self.update_splits)
 
-    def update_punches(self):
+    def update_splits(self):
         if -1 < self.currentIndex().row() < len(race().results):
-            self.parent_widget.show_punches(self.currentIndex())
+            self.parent_widget.show_splits(self.currentIndex())
 
     def keyPressEvent(self, event):
         super().keyPressEvent(event)
@@ -51,9 +51,9 @@ class ResultTable(TableView):
     def entry_single_clicked(self, index):
         try:
             logging.debug('Single result clicked on ' + str(index.row()))
-            #  show punches in the left area
+            #  show splits in the left area
             if -1 < index.row() < len(race().results):
-                self.parent_widget.show_punches(index)
+                self.parent_widget.show_splits(index)
         except Exception as e:
             logging.exception(str(e))
 
@@ -160,7 +160,7 @@ class Widget(QtWidgets.QWidget):
 
         event_handler.add_event('resize', self.resize_event)
 
-    def show_punches(self, index):
+    def show_splits(self, index):
         assert (isinstance(index, QModelIndex))
         result = race().results[index.row()]
         assert isinstance(result, Result)
@@ -174,10 +174,10 @@ class Widget(QtWidgets.QWidget):
         if result.system_type != SystemType.SPORTIDENT:
             return
         index = 1
-        for i in result.punches:
-            time = i[1]
+        for split in result.splits:
+            time = split.time
             
-            s = '{} {} {}'.format(index, i[0], time_to_hhmmss(time))
+            s = '{} {} {}'.format(index, split.code, time_to_hhmmss(time))
             self.ResultChipDetails.append(s)
             index += 1
         if result.finish_time:
@@ -190,9 +190,9 @@ class Widget(QtWidgets.QWidget):
             course = result.person.group.course
             assert isinstance(course, Course)
             if course.controls is not None:
-                for i in course.controls:
-                    assert isinstance(i, CourseControl)
-                    s = '{} {} {}'.format(index, i.code, i.length if i.length else '')
+                for control in course.controls:
+                    assert isinstance(control, CourseControl)
+                    s = '{} {} {}'.format(index, control.code, control.length if control.length else '')
                     self.ResultCourseDetails.append(s)
                     index += 1
             self.ResultCourseNameEdit.setText(course.name)

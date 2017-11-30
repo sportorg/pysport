@@ -11,11 +11,11 @@ class ResultChecker:
         self.person = person
 
     @staticmethod
-    def check(punches, controls):
+    def check(splits, controls):
         """
 
-        :param punches: [(code, otime()), ...]
-        :param controls: [model.CourseControl, ...]
+        :param splits: [Split, ...]
+        :param controls: [CourseControl, ...]
         :return:
         """
         i = 0
@@ -23,10 +23,10 @@ class ResultChecker:
         if count_controls == 0:
             return True
 
-        for punch in punches:
+        for split in splits:
             try:
                 template = str(controls[i].code)
-                cur_code = int(punch[0])
+                cur_code = int(split.code)
 
                 list_exists = False
                 list_contains = False
@@ -50,10 +50,10 @@ class ResultChecker:
                     if list_exists and not list_contains:
                         # not in list
                         continue
-                    # test previous punches
+                    # test previous splits
                     is_unique = True
-                    for prev_punch in punches[0:i]:
-                        if int(prev_punch[0]) == cur_code:
+                    for prev_split in splits[0:i]:
+                        if int(prev_split.code) == cur_code:
                             is_unique = False
                             break
                     if is_unique:
@@ -79,7 +79,7 @@ class ResultChecker:
 
         return False
 
-    def check_result(self, result: Result):
+    def check_result(self, result):
         if self.person is None:
             return True
         if self.person.group is None:
@@ -90,7 +90,7 @@ class ResultChecker:
         if not hasattr(controls, '__iter__'):
             return True
 
-        return self.check(result.punches, controls)
+        return self.check(result.splits, controls)
 
     @classmethod
     def checking(cls, result):
