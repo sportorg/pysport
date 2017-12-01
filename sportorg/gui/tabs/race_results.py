@@ -5,6 +5,7 @@ from PyQt5.QtCore import QModelIndex
 from PyQt5.QtWidgets import QAbstractItemView, QHeaderView
 
 from sportorg.core import event as event_handler
+from sportorg.core.otime import OTime
 from sportorg.gui.dialogs.results_edit import ResultEditDialog
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.tabs.memory_model import ResultMemoryModel
@@ -174,15 +175,21 @@ class Widget(QtWidgets.QWidget):
         if result.system_type != SystemType.SPORTIDENT:
             return
         index = 1
+        prev_time = result.start_time if result.start_time is not None else OTime()
         for split in result.splits:
             time = split.time
             
-            s = '{} {} {}'.format(index, split.code, time_to_hhmmss(time))
+            s = '{index} ({code}) {time} {diff}'.format(
+                index=index,
+                code=split.code,
+                time=time_to_hhmmss(time),
+                diff=time_to_hhmmss(time-prev_time))
             self.ResultChipDetails.append(s)
             index += 1
-        if result.finish_time:
+            prev_time = time
+        if result.finish_time is not None:
             self.ResultChipFinishEdit.setText(time_to_hhmmss(result.finish_time))
-        if result.start_time:
+        if result.start_time is not None:
             self.ResultChipStartEdit.setText(time_to_hhmmss(result.start_time))
 
         index = 1
@@ -192,7 +199,10 @@ class Widget(QtWidgets.QWidget):
             if course.controls is not None:
                 for control in course.controls:
                     assert isinstance(control, CourseControl)
-                    s = '{} {} {}'.format(index, control.code, control.length if control.length else '')
+                    s = '{index} {code} {length}'.format(
+                        index=index,
+                        code=control.code,
+                        length=control.length if control.length else '')
                     self.ResultCourseDetails.append(s)
                     index += 1
             self.ResultCourseNameEdit.setText(course.name)
