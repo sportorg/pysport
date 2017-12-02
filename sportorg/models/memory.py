@@ -352,6 +352,8 @@ class Result:
         return OTime(msec=self.get_result_for_sort()*10)
 
     def get_start_time(self):
+        if self.start_time:
+            return self.start_time
         if self.person:
             return self.person.start_time
         return int_to_otime(0)
