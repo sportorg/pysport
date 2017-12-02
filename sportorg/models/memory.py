@@ -666,55 +666,6 @@ class Race(Model):
             self.add_new_result(result)
 
 
-class Config(object):
-    _configurations = {
-        'autosave': False,
-        'autoconnect': False,
-        'open_recent_file': False,
-    }
-
-    @classmethod
-    def set(cls, config, value):
-        cls._configurations[config] = value
-
-    @classmethod
-    def get(cls, config, nvl_value=None):
-        if config in cls._configurations:
-            return cls._configurations[config]
-        else:
-            return nvl_value
-
-    @classmethod
-    def get_all(cls):
-        return cls._configurations
-
-    @classmethod
-    def set_parse(cls, option, param):
-        def is_bool(val):
-            return val in ['True', 'False', '0', '1', True, False, 0, 1, 'true', 'false']
-
-        def is_int(s):
-            try:
-                int(s)
-                return True
-            except ValueError:
-                return False
-
-        def is_float(s):
-            try:
-                float(s)
-                return True
-            except ValueError:
-                return False
-        if is_bool(param):
-            param = param in ['True', '1', True, 1, 'true']
-        elif is_int(param):
-            param = int(param)
-        elif is_float(param):
-            param = float(param)
-        cls.set(option, param)
-
-
 class Qualification(IntEnum):
     NOT_QUALIFIED = 0
     I_Y = 1

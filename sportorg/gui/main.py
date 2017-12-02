@@ -1,5 +1,4 @@
 import ast
-import configparser
 import logging
 import time
 
@@ -7,7 +6,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets, Qt
 from PyQt5.QtWidgets import QMainWindow, QTableView, QMessageBox
 
 from sportorg.libs.winorient.wdb import write_wdb
-from sportorg.models.memory import Race, event as races, race, Config as Configuration
+from sportorg.models.memory import Race, event as races, race
 
 from sportorg import config
 from sportorg.modules.backup.file import File
@@ -16,6 +15,7 @@ from sportorg.modules.ocad.ocad import OcadImportException
 from sportorg.modules.printing.model import NoResultToPrintException, split_printout
 from sportorg.modules.sportident import sportident
 from sportorg.modules import testing
+from sportorg.modules.configs.configs import Config as Configuration, ConfigFile
 from sportorg.modules.winorient import winorient
 from sportorg.core import event
 from sportorg.gui.dialogs.about import AboutDialog
@@ -61,7 +61,6 @@ class MainWindow(QMainWindow):
             self.add_recent_file(self.file)
         except IndexError:
             self.file = None
-        self.conf = configparser.ConfigParser()
         GlobalAccess().set_main_window(self)
 
         handler = ConsolePanelHandler(self)
@@ -101,49 +100,42 @@ class MainWindow(QMainWindow):
         })
 
     def conf_read(self):
-        self.conf.read(config.CONFIG_INI)
-        if self.conf.has_section(config.ConfigFile.CONFIGURATION):
-            for option in self.conf.options(config.ConfigFile.CONFIGURATION):
-                Configuration.set_parse(
-                    option, self.conf.get(config.ConfigFile.CONFIGURATION, option, fallback=Configuration.get(option)))
-
-        if self.conf.has_section(config.ConfigFile.PATH):
-            recent_files = ast.literal_eval(self.conf.get(config.ConfigFile.PATH, 'recent_files', fallback='[]'))
+        Configuration().read()
+        if Configuration().parser.has_section(ConfigFile.PATH):
+            recent_files = ast.literal_eval(Configuration().parser.get(ConfigFile.PATH, 'recent_files', fallback='[]'))
             if isinstance(recent_files, list):
                 self.recent_files = recent_files
 
     def conf_write(self):
-        self.conf[config.ConfigFile.GEOMETRY] = {
+        Configuration().parser[ConfigFile.GEOMETRY] = {
             'x': self.x() + 8,
             'y': self.y() + 30,
             'width': self.width(),
             'height': self.height(),
         }
-        self.conf[config.ConfigFile.CONFIGURATION] = Configuration.get_all()
-        self.conf[config.ConfigFile.PATH] = {
+        Configuration().parser[ConfigFile.PATH] = {
             'recent_files': self.recent_files
         }
-        with open(config.CONFIG_INI, 'w') as configfile:
-            self.conf.write(configfile)
+        Configuration().save()
 
     def post_show(self):
         if self.file:
             self.open_file(self.file)
-        elif Configuration.get('open_recent_file'):
+        elif Configuration().configuration.get('open_recent_file'):
             if len(self.recent_files):
                 self.open_file(self.recent_files[0])
 
-        if Configuration.get('autoconnect'):
+        if Configuration().configuration.get('autoconnect'):
             self.sportident_connect()
 
         sportident.toolbar_sportident()
 
     def _setup_ui(self):
-        geometry = config.ConfigFile.GEOMETRY
-        x = self.conf.getint('%s' % geometry, 'x', fallback=480)
-        y = self.conf.getint(geometry, 'y', fallback=320)
-        width = self.conf.getint(geometry, 'width', fallback=880)
-        height = self.conf.getint(geometry, 'height', fallback=474)
+        geometry = ConfigFile.GEOMETRY
+        x = Configuration().parser.getint(geometry, 'x', fallback=480)
+        y = Configuration().parser.getint(geometry, 'y', fallback=320)
+        width = Configuration().parser.getint(geometry, 'width', fallback=880)
+        height = Configuration().parser.getint(geometry, 'height', fallback=474)
 
         self.setMinimumSize(QtCore.QSize(480, 320))
         self.setGeometry(x, y, 480, 320)

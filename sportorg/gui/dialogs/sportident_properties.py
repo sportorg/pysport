@@ -8,7 +8,8 @@ from PyQt5.QtWidgets import QFormLayout, QLabel, QDialog, \
 from sportorg.config import icon_dir
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import _
-from sportorg.models.memory import race, Config
+from sportorg.models.memory import race
+from sportorg.modules.configs.configs import Config
 
 
 class SportidentPropertiesDialog(QDialog):
@@ -170,7 +171,7 @@ class SportidentPropertiesDialog(QDialog):
             self.repeated_reading_keep_all_version.setChecked(True)
 
         self.assignment_mode.setChecked(assignment_mode)
-        self.auto_connect.setChecked(Config.get('autoconnect'))
+        self.auto_connect.setChecked(Config().configuration.get('autoconnect'))
 
     def apply_changes_impl(self):
         changed = False
@@ -219,7 +220,7 @@ class SportidentPropertiesDialog(QDialog):
 
         obj.set_setting('sportident_assignment_mode', self.assignment_mode.isChecked())
 
-        Config.set('autoconnect', self.auto_connect.isChecked())
+        Config().configuration.set('autoconnect', self.auto_connect.isChecked())
 
         if changed:
             win = GlobalAccess().get_main_window()
