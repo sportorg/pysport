@@ -9,13 +9,6 @@ VERSION = Version(0, 9, 0, 0, 'v', 'beta')
 DEBUG = True
 
 
-class ConfigFile(object):
-    GEOMETRY = 'geometry'
-    CONFIGURATION = 'configuration'
-    DIRECTORY = 'directory'
-    PATH = 'path'
-
-
 def module_path():
     if hasattr(sys, 'frozen'):
         return os.path.dirname(

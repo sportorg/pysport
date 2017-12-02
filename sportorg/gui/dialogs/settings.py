@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QFormLayout, QDialog, QCheckBox, QPushButton
 
 from sportorg import config
 from sportorg.language import _
-from sportorg.models.memory import Config
+from sportorg.modules.configs.configs import Config
 
 
 class SettingsDialog(QDialog):
@@ -29,15 +29,15 @@ class SettingsDialog(QDialog):
         self.layout = QFormLayout(self)
 
         self.auto_save = QCheckBox(_('Auto save'))
-        self.auto_save.setChecked(Config.get('autosave'))
+        self.auto_save.setChecked(Config().configuration.get('autosave'))
         self.layout.addRow(self.auto_save)
 
         self.auto_connect = QCheckBox(_('Auto connect to station'))
-        self.auto_connect.setChecked(Config.get('autoconnect'))
+        self.auto_connect.setChecked(Config().configuration.get('autoconnect'))
         self.layout.addRow(self.auto_connect)
 
         self.open_recent_file = QCheckBox(_('Open recent file'))
-        self.open_recent_file.setChecked(Config.get('open_recent_file'))
+        self.open_recent_file.setChecked(Config().configuration.get('open_recent_file'))
         self.layout.addRow(self.open_recent_file)
 
         def cancel_changes():
@@ -59,6 +59,6 @@ class SettingsDialog(QDialog):
         self.show()
 
     def apply_changes_impl(self):
-        Config.set('autosave', self.auto_save.isChecked())
-        Config.set('autoconnect', self.auto_connect.isChecked())
-        Config.set('open_recent_file', self.open_recent_file.isChecked())
+        Config().configuration.set('autosave', self.auto_save.isChecked())
+        Config().configuration.set('autoconnect', self.auto_connect.isChecked())
+        Config().configuration.set('open_recent_file', self.open_recent_file.isChecked())

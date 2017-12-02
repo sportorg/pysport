@@ -2,8 +2,7 @@ import os
 
 from PyQt5.QtWidgets import QFileDialog
 
-from sportorg import config
-from sportorg.gui.global_access import GlobalAccess
+from sportorg.modules.configs.configs import ConfigFile, Config
 
 
 def get_open_file_name(caption='', filter_text=''):
@@ -21,17 +20,17 @@ def get_save_file_name(caption='', filter_text='', file_name=''):
 
 
 def get_default_dir():
-    if get_conf().has_section(config.ConfigFile.DIRECTORY):
-        return get_conf().get(config.ConfigFile.DIRECTORY, 'dialog_default_dir', fallback='')
+    if get_conf().has_section(ConfigFile.DIRECTORY):
+        return get_conf().get(ConfigFile.DIRECTORY, 'dialog_default_dir', fallback='')
     return ''
 
 
 def set_default_dir(directory):
     # FIXME
-    get_conf()[config.ConfigFile.DIRECTORY] = {
+    get_conf()[ConfigFile.DIRECTORY] = {
         'dialog_default_dir': directory
     }
 
 
 def get_conf():
-    return GlobalAccess().get_main_window().conf
+    return Config().parser
