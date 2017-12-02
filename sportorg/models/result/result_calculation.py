@@ -16,9 +16,8 @@ class ResultCalculation(object):
     def set_times(self):
         for i in race().results:
             assert isinstance(i, Result)
-            # FIXME
             person = i.person
-            if person:
+            if person and (i.start_time is None or (i.start_time is not None and i.start_time.to_sec() == 0)):
                 i.start_time = person.start_time
             i.result = i.get_result_for_sort()
 

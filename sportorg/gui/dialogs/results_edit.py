@@ -6,7 +6,7 @@ from typing import List, Tuple
 from PyQt5.QtCore import QModelIndex
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit, QApplication, QDialog, \
-    QPushButton, QTimeEdit, QRadioButton, QSpinBox, QGroupBox, QScrollArea, QGridLayout, QTextEdit
+    QPushButton, QTimeEdit, QRadioButton, QSpinBox, QGroupBox, QScrollArea, QGridLayout, QTextEdit, QCheckBox
 
 from sportorg import config
 from sportorg.core.otime import OTime
@@ -228,6 +228,9 @@ class ResultEditDialog(QDialog):
         self.radio_dsq = QRadioButton(_('DSQ'))
         self.text_dsq = QLineEdit()
 
+        self.item_change_start = QCheckBox(_('Change start time (when changing the bib)'))
+        self.item_change_start.setChecked(True)
+
         self.splits = SplitsText()
 
         if self.current_object.system_type == SystemType.SPORTIDENT:
@@ -244,6 +247,7 @@ class ResultEditDialog(QDialog):
         self.layout.addRow(self.radio_dnf)
         self.layout.addRow(self.radio_overtime)
         self.layout.addRow(self.radio_dsq, self.text_dsq)
+        self.layout.addRow(self.item_change_start)
 
         if self.current_object.system_type == SystemType.SPORTIDENT:
             self.layout.addRow(self.splits.widget)
@@ -358,6 +362,13 @@ class ResultEditDialog(QDialog):
                         result.person.sportident_card = None
                 recheck = True
                 result.person = new_person
+                if self.item_change_start.isChecked():
+                    logging.info('Changed start time {} to {} participants under the number {}'.format(
+                        result.start_time,
+                        new_person.start_time,
+                        new_bib
+                    ))
+                    result.start_time = new_person.start_time
                 if result.system_type == SystemType.SPORTIDENT:
                     result.person.sportident_card = result.sportident_card
 
