@@ -1,8 +1,65 @@
+from enum import Enum
+
 from sportorg.models.memory import race
 from sportorg.utils.time import if_none, time_to_hhmmss
 
 
-class GroupsStartList(object):
+class SortType(Enum):
+    BIB = 0
+    ORGANIZATION = 1
+    GROUP = 2
+    START = 3
+
+    def __str__(self):
+        return "%s" % self._name_
+
+    def __repr__(self):
+        return self.__str__()
+
+
+class PersonSort:
+    def __init__(self, persons):
+        self._persons = persons
+        self._sorting = SortType.BIB
+
+    def set_sorting(self, sorting=None):
+        if sorting is not None:
+            self._sorting = sorting
+        return self
+
+    def sort(self, sorting=None, reverse=False):
+        if sorting is not None:
+            self._sorting = sorting
+        if self._sorting == SortType.BIB:
+            self._persons.sort(key=lambda person: (person.bib == 0, person.bib), reverse=reverse)
+        elif self._sorting == SortType.ORGANIZATION:
+            self._persons.sort(key=lambda person: person.organization.name if person.organization is not None else '',
+                               reverse=reverse)
+        elif self._sorting == SortType.GROUP:
+            self._persons.sort(key=lambda person: person.group.name if person.group is not None else '',
+                               reverse=reverse)
+        elif self._sorting == SortType.GROUP:
+            self._persons.sort(key=lambda person: (person.start_time is None, person.start_time),
+                               reverse=reverse)
+
+
+class StartGenerator:
+    @staticmethod
+    def get_person_data(person):
+        return {
+            'name': person.full_name,
+            'bib': person.bib,
+            'team': person.organization.name if person.organization is not None else '',
+            'group': person.group.name if person.group is not None else '',
+            'qual': person.qual.get_title(),
+            'year': if_none(person.year, ''),
+            'sportident_card': str(person.sportident_card) if person.sportident_card is not None else '',
+            'start': time_to_hhmmss(person.start_time)
+
+        }
+
+
+class GroupsStartList:
     def __init__(self, persons):
         self._group = {}
         self._noname_group = []
@@ -62,20 +119,20 @@ class GroupsStartList(object):
 
         return self
 
-    def get_group_list(self, name_noname=None):
+    def get_list(self):
         """
 
         :return: [
             {
                 "name": str,
                 "persons": [
-                    self._get_person_data,
+                    StartGenerator._get_person_data,
                     ...
                 ]
             }
         ]
         """
-        result = []
+        ret = []
         group_names = list(self._groups_generate()._sort_persons()._group.keys())
         group_names.sort()
         for group_name in group_names:
@@ -84,52 +141,29 @@ class GroupsStartList(object):
                 'persons': []
             }
             for person in self._group[group_name]:
-                group['persons'].append(self._get_person_data(person))
-            result.append(group)
+                group['persons'].append(StartGenerator.get_person_data(person))
+            ret.append(group)
 
-        if name_noname is not None:
-            if len(self._noname_group) == 0:
-                return result
-            noname_group = {
-                'name': name_noname,
-                'persons': []
-            }
-            for person in self._sort_noname_group()._noname_group:
-                noname_group['persons'].append(self._get_person_data(person))
-
-        return result
+        return ret
 
     def get_person_list(self):
         """
 
         :return: [
-            self._get_person_data,
+            StartGenerator._get_person_data,
             ...
         ]
         """
-        result = []
+        persons_data = []
         self._persons.sort(key=self._sort_func)
         for person in self._persons:
-            result.append(self._get_person_data(person))
+            persons_data.append(StartGenerator.get_person_data(person))
 
-        return result
+        return persons_data
 
     @staticmethod
     def _sort_func(person):
         return person.start_time is None, person.start_time
-
-    @staticmethod
-    def _get_person_data(person):
-        return {
-            'name': person.full_name,
-            'bib': person.bib,
-            'team': person.organization.name if person.organization is not None else '',
-            'qual': person.qual.get_title(),
-            'year': if_none(person.year, ''),
-            'sportident_card': str(person.sportident_card) if person.sportident_card is not None else '',
-            'start': time_to_hhmmss(person.start_time)
-
-        }
 
 
 class ChessGenerator(GroupsStartList):
@@ -142,9 +176,9 @@ class ChessGenerator(GroupsStartList):
                 continue
             time = time_to_hhmmss(person.start_time)
             if time not in cache:
-                data[time] = [self._get_person_data(person)]
+                data[time] = [StartGenerator.get_person_data(person)]
             else:
-                data[time].append(self._get_person_data(person))
+                data[time].append(StartGenerator.get_person_data(person))
             cache.add(time)
 
         for time in data.keys():
@@ -153,16 +187,37 @@ class ChessGenerator(GroupsStartList):
         return data
 
 
+class PersonsGenerator:
+    def __init__(self, persons, sorting=None):
+        self._persons = persons
+        self._sorting = sorting
+
+    def get_list(self):
+        """
+
+        :return: [
+            StartGenerator._get_person_data,
+            ...
+        ]
+        """
+        persons_data = []
+        PersonSort(self._persons).sort(self._sorting)
+        for person in self._persons:
+            persons_data.append(StartGenerator.get_person_data(person))
+
+        return persons_data
+
+
 def get_start_data():
     """
 
     :return: {
-        "title": str,
+        "race": {"title": str, "sub_title": str},
         "groups": [
             {
                 "name": str,
                 "persons": [
-                    GroupsStartList _get_person_data
+                    StartGenerator _get_person_data
                     ...
                 ]
             }
@@ -170,16 +225,28 @@ def get_start_data():
     }
     """
     start_list = GroupsStartList(race().persons)
-    groups = start_list.get_group_list()
-    result = {
-        'title': race().get_setting('sub_title'),
+    groups = start_list.get_list()
+    ret = {
+        'race': {
+            'title': race().get_setting('main_title'),
+            'sub_title': race().get_setting('sub_title')
+        },
         'groups': groups
     }
 
-    return result
+    return ret
 
 
 def get_chess_list():
     start_list = ChessGenerator(race().persons)
     return start_list.get_list()
 
+
+def get_persons_data(sorting=None):
+    return {
+        'race': {
+            'title': race().get_setting('main_title'),
+            'sub_title': race().get_setting('sub_title')
+        },
+        'persons': PersonsGenerator(race().persons, sorting).get_list()
+    }
