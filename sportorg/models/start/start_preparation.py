@@ -149,7 +149,7 @@ class DrawManager(object):
 
                     if j == i:
                         # no solution found
-                        print ('no solution found')
+                        print('no solution found')
                         return False
                     else:
                         # insert j after checked_index i

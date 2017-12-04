@@ -301,7 +301,7 @@ def get_splits_data():
     """
 
     :return: {
-        "title": str,
+        "race": {"title": str, "sub_title": str},
         "groups": [
             {
                 "name": str,
@@ -333,7 +333,10 @@ def get_splits_data():
             'ranking': ranking_data
         })
     ret['groups'] = data
-    ret['title'] = race().get_setting('sub_title')
+    ret['race'] = {
+        'title': race().get_setting('main_title'),
+        'sub_title': race().get_setting('sub_title')
+    }
     return ret
 
 

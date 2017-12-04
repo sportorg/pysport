@@ -5,6 +5,7 @@ import time
 from PyQt5 import QtCore, QtGui, QtWidgets, Qt
 from PyQt5.QtWidgets import QMainWindow, QTableView, QMessageBox
 
+from sportorg.gui.dialogs.bib_report_dialog import BibReportDialog
 from sportorg.libs.winorient.wdb import write_wdb
 from sportorg.models.memory import Race, event as races, race
 
@@ -461,6 +462,14 @@ class MainWindow(QMainWindow):
     def create_chess_dialog():
         try:
             ex = StartChessDialog()
+            ex.exec()
+        except Exception as e:
+            logging.exception(str(e))
+
+    @staticmethod
+    def bib_report_dialog():
+        try:
+            ex = BibReportDialog()
             ex.exec()
         except Exception as e:
             logging.exception(str(e))

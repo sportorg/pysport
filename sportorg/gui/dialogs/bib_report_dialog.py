@@ -5,17 +5,17 @@ import time
 import webbrowser
 
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QFormLayout, QLabel, QApplication, QDialog, QPushButton
+from PyQt5.QtWidgets import QFormLayout, QLabel, QApplication, QDialog, QPushButton, QGroupBox, QRadioButton
 
 from sportorg import config
 from sportorg.core.template import get_templates, get_text_from_file
 from sportorg.gui.dialogs.file_dialog import get_open_file_name, get_save_file_name
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
-from sportorg.models.result.split_calculation import get_splits_data
+from sportorg.models.start.start_calculation import get_persons_data, SortType
 
 
-class ReportDialog(QDialog):
+class BibReportDialog(QDialog):
     def __init__(self):
         super().__init__()
 
@@ -27,7 +27,7 @@ class ReportDialog(QDialog):
         self.close()
 
     def init_ui(self):
-        self.setWindowTitle(_('Report creating'))
+        self.setWindowTitle(_('Bib'))
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(True)
@@ -36,7 +36,7 @@ class ReportDialog(QDialog):
 
         self.label_template = QLabel(_('Template'))
         self.item_template = AdvComboBox()
-        self.item_template.addItems(get_templates(config.template_dir('result')))
+        self.item_template.addItems(get_templates(config.template_dir('bib')))
         self.layout.addRow(self.label_template, self.item_template)
 
         self.item_custom_path = QPushButton('Choose template')
@@ -47,6 +47,18 @@ class ReportDialog(QDialog):
 
         self.item_custom_path.clicked.connect(select_custom_path)
         self.layout.addRow(self.item_custom_path)
+
+        self.sorting_type_box = QGroupBox(_('Sorting by'))
+        self.sorting_type_layout = QFormLayout()
+        self.sorting_type_bib = QRadioButton(_('Bib'))
+        self.sorting_type_bib.setChecked(True)
+        self.sorting_type_layout.addRow(self.sorting_type_bib)
+        self.sorting_type_org = QRadioButton(_('Team'))
+        self.sorting_type_layout.addRow(self.sorting_type_org)
+        self.sorting_type_group = QRadioButton(_('Group'))
+        self.sorting_type_layout.addRow(self.sorting_type_group)
+        self.sorting_type_box.setLayout(self.sorting_type_layout)
+        self.layout.addRow(self.sorting_type_box)
 
         def cancel_changes():
             self.close()
@@ -68,12 +80,18 @@ class ReportDialog(QDialog):
         self.button_ok.setFocus()
 
     def apply_changes_impl(self):
+        sorting = SortType.BIB
+        if self.sorting_type_org.isChecked():
+            sorting = SortType.ORGANIZATION
+        elif self.sorting_type_group.isChecked():
+            sorting = SortType.GROUP
+
         template_path = self.item_template.currentText()
 
-        template = get_text_from_file(template_path, **get_splits_data())
+        template = get_text_from_file(template_path, **get_persons_data(sorting))
 
-        file_name = get_save_file_name(_('Save As HTML file'),
-                                       _("HTML file (*.html)"), '{}_report'.format(time.strftime("%Y%m%d")))
+        file_name = get_save_file_name(_('Save As HTML file'), _("HTML file (*.html)"),
+                                       '{}_bib'.format(time.strftime("%Y%m%d")))
         if file_name:
             with codecs.open(file_name, 'w', 'utf-8') as file:
                 file.write(template)
@@ -81,9 +99,3 @@ class ReportDialog(QDialog):
 
             # Open file in your browser
             webbrowser.open('file://' + file_name, new=2)
-
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    ex = ReportDialog()
-    sys.exit(app.exec_())

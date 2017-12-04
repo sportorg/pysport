@@ -186,6 +186,10 @@ def menu_list():
                 {
                     'title': _('Start times'),
                     'action': GlobalAccess().get_main_window().create_chess_dialog
+                },
+                {
+                    'title': _('Print Bib'),
+                    'action': GlobalAccess().get_main_window().bib_report_dialog
                 }
             ]
         },

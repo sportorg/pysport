@@ -168,7 +168,7 @@
 <body>
 {% macro view_groups() -%}{% for group in groups %}<a href="#{{group.name}}">{{group.name}}</a> {% endfor %}{%- endmacro %}
 <div>
-    <h1>{{ title }}</h1>
+    <h1>{{ race.sub_title }}</h1>
     {% for group in groups %}
     {% if group.persons|length %}
     <h2 id="{{group.name}}">{{group.name}}</h2>
