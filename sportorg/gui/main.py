@@ -182,7 +182,6 @@ class MainWindow(QMainWindow):
         self._create_menu(self.menubar, menu_list())
 
     def _setup_toolbar(self):
-        layout = QtWidgets.QVBoxLayout()
         self.toolbar = self.addToolBar(_('Toolbar'))
         self.toolbar_property = {}
         for tb in toolbar_list():
@@ -192,14 +191,13 @@ class MainWindow(QMainWindow):
                 self.toolbar_property[tb[3]] = tb_action
             self.toolbar.addAction(tb_action)
 
-        self.setLayout(layout)
-
     def _setup_statusbar(self):
         self.statusbar = QtWidgets.QStatusBar()
         self.setStatusBar(self.statusbar)
 
     def _setup_system_tray_icon(self):
         self.system_tray_icon = Qt.QSystemTrayIcon(self)
+        self.system_tray_icon.setIcon(QtGui.QIcon(config.ICON))
         self.system_tray_icon.show()
 
     def _setup_tab(self):
