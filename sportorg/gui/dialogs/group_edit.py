@@ -1,11 +1,8 @@
 import logging
-import sys
 
 from PyQt5.QtCore import QModelIndex
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QFormLayout, QLabel, \
-    QLineEdit, QApplication, QDialog, \
-    QPushButton, QSpinBox, QTimeEdit, QCheckBox
+from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, QPushButton, QSpinBox, QTimeEdit, QCheckBox
 
 from sportorg import config
 from sportorg.gui.dialogs.group_ranking import GroupRankingDialog
@@ -33,7 +30,7 @@ def get_sexes():
 
 class GroupEditDialog(QDialog):
     def __init__(self, table=None, index=None):
-        super().__init__()
+        super().__init__(GlobalAccess().get_main_window())
         if table is not None:
             self.table = table
             self.current_index = index
@@ -48,9 +45,6 @@ class GroupEditDialog(QDialog):
         self.init_ui()
         self.set_values_from_table()
         return super().exec()
-
-    def close_dialog(self):
-        self.close()
 
     def init_ui(self):
         self.setWindowTitle(_('Group properties'))
@@ -225,9 +219,3 @@ class GroupEditDialog(QDialog):
         if changed:
             ResultCalculation().set_rank(org)
             GlobalAccess().get_main_window().refresh()
-
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    ex = GroupEditDialog()
-    sys.exit(app.exec_())

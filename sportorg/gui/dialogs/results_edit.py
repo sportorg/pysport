@@ -1,11 +1,11 @@
 import logging
-import sys
+
 from abc import abstractmethod
 from typing import List, Tuple
 
 from PyQt5.QtCore import QModelIndex
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit, QApplication, QDialog, \
+from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, \
     QPushButton, QTimeEdit, QRadioButton, QSpinBox, QGroupBox, QScrollArea, QGridLayout, QTextEdit, QCheckBox
 
 from sportorg import config
@@ -175,7 +175,7 @@ class SplitsText(SplitsObject):
 
 class ResultEditDialog(QDialog):
     def __init__(self, table=None, index=None):
-        super().__init__()
+        super().__init__(GlobalAccess().get_main_window())
         if table is not None:
             self.table = table
             self.current_index = index
@@ -187,9 +187,6 @@ class ResultEditDialog(QDialog):
         self.init_ui()
         self.set_values_from_table()
         return super().exec()
-
-    def close_dialog(self):
-        self.close()
 
     def init_ui(self):
         self.setWindowTitle(_('Result'))
@@ -397,9 +394,3 @@ class ResultEditDialog(QDialog):
         if changed:
             ResultCalculation().process_results()
             GlobalAccess().get_main_window().refresh()
-
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    ex = ResultEditDialog()
-    sys.exit(app.exec_())

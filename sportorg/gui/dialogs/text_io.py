@@ -1,9 +1,9 @@
 import logging
-import sys
 
 from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtWidgets import QApplication, QDialog, QPushButton
+from PyQt5.QtWidgets import QDialog, QPushButton
 
+from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import _
 from sportorg.models.memory import race, Person, find_person_result
 from sportorg.utils.time import time_to_hhmmss, hhmmss_to_time
@@ -15,9 +15,8 @@ def get_value_options():
 
 
 class TextExchangeDialog(QDialog):
-
     def __init__(self):
-        super().__init__()
+        super().__init__(GlobalAccess().get_main_window())
         self.setObjectName("text_io")
         self.setWindowModality(QtCore.Qt.WindowModal)
         self.resize(319, 462)
@@ -292,12 +291,3 @@ def set_property(person, key, value):
         pass
     elif key == _('Qualification'):
         pass
-
-
-def main(argv):
-    app = QApplication(argv)
-    TextExchangeDialog().exec()
-    sys.exit(app.exec())
-
-if __name__ == '__main__':
-    main(sys.argv)

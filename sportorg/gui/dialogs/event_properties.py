@@ -1,11 +1,8 @@
 import logging
-import sys
 from datetime import datetime
 
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QFormLayout, QLabel, \
-    QLineEdit, QApplication, QDialog, \
-    QPushButton, QTextEdit, QDateEdit
+from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, QPushButton, QTextEdit, QDateEdit
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
@@ -26,14 +23,11 @@ def get_types():
 
 class EventPropertiesDialog(QDialog):
     def __init__(self, table=None, index=None):
-        super().__init__()
+        super().__init__(GlobalAccess().get_main_window())
 
     def exec(self):
         self.init_ui()
         return super().exec()
-
-    def close_dialog(self):
-        self.close()
 
     def init_ui(self):
         self.setFixedWidth(500)
@@ -132,9 +126,3 @@ class EventPropertiesDialog(QDialog):
 
         if changed:
             win = GlobalAccess().get_main_window()
-
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    ex = EventPropertiesDialog()
-    sys.exit(app.exec_())

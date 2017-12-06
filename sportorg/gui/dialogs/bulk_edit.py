@@ -1,6 +1,4 @@
-import sys
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QDialog, QApplication
+from PyQt5 import QtCore, QtWidgets
 
 
 class Ui_bulk_edit(object):
@@ -107,16 +105,3 @@ class Ui_bulk_edit(object):
         self.not_classified_check_box.setText(_translate("bulk_edit", "not classified"))
         self.without_team_check_box.setText(_translate("bulk_edit", "without a team"))
         self.chip_rented_check_box.setText(_translate("bulk_edit", "chip rented"))
-
-
-def main(argv):
-    app = QApplication(argv)
-    mw = QDialog()
-    obj = Ui_bulk_edit()
-    obj.setupUi(mw)
-    mw.show()
-    sys.exit(app.exec())
-
-
-if __name__ == '__main__':
-    main(sys.argv)

@@ -1,11 +1,8 @@
 import logging
-import sys
 
 from PyQt5.QtCore import QModelIndex
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QFormLayout, QLabel, \
-    QLineEdit, QApplication, QDialog, \
-    QPushButton
+from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, QPushButton
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
@@ -25,7 +22,7 @@ def get_regions():
 
 class OrganizationEditDialog(QDialog):
     def __init__(self, table=None, index=None):
-        super().__init__()
+        super().__init__(GlobalAccess().get_main_window())
         if table is not None:
             self.table = table
             self.current_index = index
@@ -39,9 +36,6 @@ class OrganizationEditDialog(QDialog):
         self.init_ui()
         self.set_values_from_table()
         return super().exec()
-
-    def close_dialog(self):
-        self.close()
 
     def init_ui(self):
         self.setWindowTitle(_('Team properties'))
@@ -133,10 +127,3 @@ class OrganizationEditDialog(QDialog):
         if changed:
             GlobalAccess().get_main_window().refresh()
             # table.model().sourceModel().update_one_object(part, table.model().mapToSource(self.current_index).row())
-
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    ex = OrganizationEditDialog()
-    sys.exit(app.exec_())
-

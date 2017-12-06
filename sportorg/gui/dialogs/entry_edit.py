@@ -1,11 +1,9 @@
 import logging
-import sys
 from datetime import date
 
 from PyQt5.QtCore import QModelIndex
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QFormLayout, QLabel, \
-    QLineEdit, QSpinBox, QApplication, QTimeEdit, QTextEdit, QCheckBox, QDialog, \
+from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit, QSpinBox, QTimeEdit, QTextEdit, QCheckBox, QDialog, \
     QPushButton
 
 from sportorg import config
@@ -164,7 +162,7 @@ def get_names():
 
 class EntryEditDialog(QDialog):
     def __init__(self, table=None, index=None):
-        super().__init__()
+        super().__init__(GlobalAccess().get_main_window())
         self.is_ok = {}
         if table is not None:
             self.table = table
@@ -179,9 +177,6 @@ class EntryEditDialog(QDialog):
         self.init_ui()
         self.set_values_from_table()
         return super().exec()
-
-    def close_dialog(self):
-        self.close()
 
     def init_ui(self):
         self.setWindowTitle(_('Entry properties'))
@@ -448,9 +443,3 @@ class EntryEditDialog(QDialog):
             ResultCalculation().process_results()
             GlobalAccess().get_main_window().refresh()
             # table.model().sourceModel().update_one_object(part, table.model().mapToSource(self.current_index).row())
-
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    ex = EntryEditDialog()
-    sys.exit(app.exec_())

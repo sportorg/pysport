@@ -1,9 +1,8 @@
 import logging
-import sys
 
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QApplication, QDialog, QTableView
+from PyQt5.QtWidgets import QDialog, QTableView
 
 from sportorg import config
 from sportorg.gui.dialogs import entry_edit
@@ -15,16 +14,13 @@ from sportorg.language import _
 class DialogFilter(QDialog):
 
     def __init__(self, table=None):
-        super().__init__()
+        super().__init__(GlobalAccess().get_main_window())
         if table is not None:
             self.table = table
 
     def exec(self):
         self.init_ui()
         return super().exec()
-
-    def close_dialog(self):
-        self.destroy()
 
     def init_ui(self):
         self.setObjectName("filter_dialog")
@@ -94,23 +90,12 @@ class DialogFilter(QDialog):
         except Exception as e:
             logging.exception(str(e))
 
-        self.close_dialog()
+        self.destroy()
 
     def reject(self):
-        self.close_dialog()
+        self.destroy()
 
     def retranslate_ui(self):
         self.setWindowTitle(_("Filter Dialog"))
         self.group_label.setText(_("Group"))
         self.team_label.setText(_("Team"))
-
-
-def main(argv):
-    app = QApplication(argv)
-    ex = DialogFilter()
-    ex.show()
-    sys.exit(app.exec())
-
-
-if __name__ == '__main__':
-    main(sys.argv)

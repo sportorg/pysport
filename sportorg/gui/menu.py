@@ -111,7 +111,7 @@ def menu_list():
                 },
                 {
                     'title': _('Text exchange'),
-                    'action': GlobalAccess().text_exchange
+                    'action': GlobalAccess().get_main_window().text_exchange
                 }
             ]
         },
