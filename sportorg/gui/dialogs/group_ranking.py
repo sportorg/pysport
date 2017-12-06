@@ -1,30 +1,25 @@
 import logging
-import sys
 
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QFormLayout, \
-    QApplication, QDialog, \
-    QPushButton, QCheckBox, QSpinBox, QTimeEdit, QHBoxLayout
+from PyQt5.QtWidgets import QFormLayout, QDialog, QPushButton, QCheckBox, QSpinBox, QTimeEdit, QHBoxLayout
 
 from sportorg import config
+from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
-from sportorg.models.memory import Group, RankingItem, Qualification
+from sportorg.models.memory import RankingItem, Qualification
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.utils.time import time_to_otime, time_to_qtime
 
 
 class GroupRankingDialog(QDialog):
     def __init__(self, group=None):
-        super().__init__()
+        super().__init__(GlobalAccess().get_main_window())
         self.group = group
 
     def exec(self):
         self.init_ui()
         return super().exec()
-
-    def close_dialog(self):
-        self.close()
 
     def init_ui(self):
         self.setWindowTitle(_('Rank calculation'))
@@ -127,9 +122,3 @@ def get_widget_from_ranking(ranking):
     layout.addWidget(max_place)
     layout.addWidget(max_time)
     return layout
-
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    ex = GroupRankingDialog(group=Group())
-    sys.exit(app.exec_())

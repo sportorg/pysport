@@ -1,28 +1,23 @@
 import logging
-import sys
 
 from PyQt5 import QtPrintSupport
 from PyQt5.QtGui import QIcon
 from PyQt5.QtPrintSupport import QPrinter, QPrintDialog, QAbstractPrintDialog
-from PyQt5.QtWidgets import QFormLayout, QLabel, \
-    QApplication, QDialog, \
-    QPushButton, QCheckBox
+from PyQt5.QtWidgets import QFormLayout, QLabel, QDialog, QPushButton, QCheckBox
 
 from sportorg import config
+from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import _
 from sportorg.models.memory import race
 
 
 class PrintPropertiesDialog(QDialog):
     def __init__(self):
-        super().__init__()
+        super().__init__(GlobalAccess().get_main_window())
 
     def exec(self):
         self.init_ui()
         return super().exec()
-
-    def close_dialog(self):
-        self.close()
 
     def init_ui(self):
         self.setWindowTitle(_('Printer settings'))
@@ -119,9 +114,3 @@ class PrintPropertiesDialog(QDialog):
         split_printer = self.selected_split_printer.text()
         obj.set_setting('split_printer', split_printer)
         obj.set_setting('split_printout', self.print_splits_checkbox.isChecked())
-
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    ex = PrintPropertiesDialog()
-    sys.exit(app.exec_())

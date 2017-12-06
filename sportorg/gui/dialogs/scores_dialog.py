@@ -1,25 +1,21 @@
 import logging
-import sys
 
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QApplication, QDialog, \
-    QPushButton, QFormLayout, QRadioButton, QCheckBox, QSpinBox, QLineEdit, QLabel
+from PyQt5.QtWidgets import QDialog, QPushButton, QFormLayout, QRadioButton, QCheckBox, QSpinBox, QLineEdit, QLabel
 
 from sportorg import config
+from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import _
 from sportorg.models.memory import race
 
 
 class ScoresDialog(QDialog):
     def __init__(self):
-        super().__init__()
+        super().__init__(GlobalAccess().get_main_window())
 
     def exec(self):
         self.init_ui()
         return super().exec()
-
-    def close_dialog(self):
-        self.close()
 
     def init_ui(self):
         self.setWindowTitle(_('Scores assign'))
@@ -73,9 +69,3 @@ class ScoresDialog(QDialog):
         cur_race.set_setting('score_formula', self.item_formula.text())
         cur_race.set_setting('score_team_limit', self.item_limit.value())
         cur_race.set_setting('score_use_team_limit', self.item_limit.value())
-
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    ex = ScoresDialog()
-    sys.exit(app.exec_())

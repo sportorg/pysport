@@ -4,13 +4,14 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QLabel, QDialog, QPushButton, QSpinBox
 
 from sportorg import config
+from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import _
 from sportorg.models import memory
 
 
 class BibDialog(QDialog):
     def __init__(self, text=''):
-        super().__init__()
+        super().__init__(GlobalAccess().get_main_window())
         self.bib = 0
         self.text = text
         self.person = None
@@ -18,9 +19,6 @@ class BibDialog(QDialog):
     def exec(self):
         self.init_ui()
         return super().exec()
-
-    def close_dialog(self):
-        self.close()
 
     def init_ui(self):
         self.setWindowTitle(_('Bib'))

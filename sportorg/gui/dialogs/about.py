@@ -1,25 +1,21 @@
-import sys
-
 import datetime
 from PyQt5.QtCore import Qt
 
 from PyQt5.QtGui import QIcon, QPixmap, QFont
-from PyQt5.QtWidgets import QFormLayout, QApplication, QDialog, QLabel, QTextEdit
+from PyQt5.QtWidgets import QFormLayout, QDialog, QLabel, QTextEdit
 
+from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import _
 from sportorg import config
 
 
 class AboutDialog(QDialog):
     def __init__(self):
-        super().__init__()
+        super().__init__(GlobalAccess().get_main_window())
 
     def exec(self):
         self.init_ui()
         return super().exec()
-
-    def close_dialog(self):
-        self.close()
 
     def init_ui(self):
         self.setWindowTitle(_('About'))
@@ -27,7 +23,6 @@ class AboutDialog(QDialog):
         self.setSizeGripEnabled(False)
         self.setModal(True)
         self.setStyleSheet("background:white")
-        # self.setFixedSize(640, 400)
         self.setMinimumWidth(540)
         self.setMaximumWidth(640)
         self.layout = QFormLayout(self)
@@ -48,7 +43,6 @@ class AboutDialog(QDialog):
         home_page_text.setText(
             '\n{0}: <a href="{1}">{1}</a>'.format(_('Home page'), 'https://sportorg.github.io/pysport/')
         )
-        # home_page_text.setTextInteractionFlags(Qt.TextBrowserInteraction)
         home_page_text.setOpenExternalLinks(True)
 
         self.layout.addRow(home_page_text)
@@ -86,16 +80,4 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.""")
         self.layout.addRow(licence_text)
-
-        # licence_group_box = QtWidgets.QGroupBox()
-        # licence_group_box.setTitle(_('MIT'))
-        # licence_group_box.setAlignment(Qt.AlignCenter)
-        # self.layout.addRow(licence_group_box)
-
         self.show()
-
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    ex = AboutDialog()
-    sys.exit(app.exec_())

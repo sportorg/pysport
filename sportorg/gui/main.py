@@ -6,6 +6,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets, Qt
 from PyQt5.QtWidgets import QMainWindow, QTableView, QMessageBox
 
 from sportorg.gui.dialogs.bib_report_dialog import BibReportDialog
+from sportorg.gui.dialogs.text_io import TextExchangeDialog
 from sportorg.libs.winorient.wdb import write_wdb
 from sportorg.models.memory import Race, event as races, race
 
@@ -318,7 +319,7 @@ class MainWindow(QMainWindow):
 
     @staticmethod
     def get_configuration():
-        return Configuration
+        return Configuration().configuration
 
     def add_recent_file(self, file):
         self.delete_from_recent_files(file)
@@ -591,6 +592,11 @@ class MainWindow(QMainWindow):
                 QMessageBox.question(self, _('Error'), _('Import error') + ': ' + file_name)
 
             self.init_model()
+
+    @staticmethod
+    def text_exchange():
+        TextExchangeDialog().exec()
+        GlobalAccess().refresh()
 
     @staticmethod
     def testing():

@@ -8,7 +8,6 @@ from sportorg.core.singleton import Singleton
 from sportorg.models.memory import race, NotEmptyException
 from sportorg.models.result.result_checker import ResultChecker
 
-from sportorg.gui.dialogs.text_io import TextExchangeDialog
 from sportorg.language import _
 from sportorg.models.result.result_calculation import ResultCalculation
 
@@ -177,10 +176,6 @@ class GlobalAccess(metaclass=Singleton):
             logging.info(_('Auto save'))
         else:
             logging.warning(_('No file to auto save'))
-
-    def text_exchange(self):
-        TextExchangeDialog().exec()
-        self.refresh()
 
     def refresh(self):
         self.get_main_window().refresh()

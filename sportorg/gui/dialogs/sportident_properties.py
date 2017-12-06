@@ -14,14 +14,11 @@ from sportorg.modules.configs.configs import Config
 
 class SportidentPropertiesDialog(QDialog):
     def __init__(self):
-        super().__init__()
+        super().__init__(GlobalAccess().get_main_window())
 
     def exec(self):
         self.init_ui()
         return super().exec()
-
-    def close_dialog(self):
-        self.close()
 
     def init_ui(self):
         # self.setFixedWidth(500)

@@ -1,27 +1,24 @@
 import codecs
 import logging
-import sys
 import time
 
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QFormLayout, QApplication, QDialog, QPushButton, QTextEdit
+from PyQt5.QtWidgets import QFormLayout, QDialog, QPushButton, QTextEdit
 
 from sportorg import config
 from sportorg.gui.dialogs.file_dialog import get_save_file_name
+from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import _
 from sportorg.models.start.start_calculation import get_chess_list
 
 
 class StartChessDialog(QDialog):
     def __init__(self):
-        super().__init__()
+        super().__init__(GlobalAccess().get_main_window())
 
     def exec(self):
         self.init_ui()
         return super().exec()
-
-    def close_dialog(self):
-        self.close()
 
     def init_ui(self):
         self.setWindowTitle(_('Start times'))
@@ -75,9 +72,3 @@ class StartChessDialog(QDialog):
             with codecs.open(file_name, 'w', 'utf-8') as file:
                 file.write(self.text.toPlainText())
                 file.close()
-
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    ex = StartChessDialog()
-    sys.exit(app.exec_())

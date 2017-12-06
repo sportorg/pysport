@@ -1,7 +1,6 @@
-import sys
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QDialog, QApplication
+from PyQt5.QtWidgets import QDialog
 
 from sportorg import config
 from sportorg.language import _
@@ -78,15 +77,3 @@ class NumberChangeDialog(QDialog):
         self.target_info_label.setText(_("Reserve M60 11:40:00"))
         self.remove_radio_button.setText(_("Remove source"))
         self.replace_radio_button.setText(_("Replace source with reserve"))
-
-
-def main(argv):
-
-    NumberChangeDialog().show()
-
-    app = QApplication(argv)
-    sys.exit(app.exec())
-
-
-if __name__ == '__main__':
-    main(sys.argv)

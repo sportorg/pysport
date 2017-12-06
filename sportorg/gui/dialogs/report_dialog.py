@@ -1,15 +1,15 @@
 import codecs
 import logging
-import sys
 import time
 import webbrowser
 
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QFormLayout, QLabel, QApplication, QDialog, QPushButton
+from PyQt5.QtWidgets import QFormLayout, QLabel, QDialog, QPushButton
 
 from sportorg import config
 from sportorg.core.template import get_templates, get_text_from_file
 from sportorg.gui.dialogs.file_dialog import get_open_file_name, get_save_file_name
+from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
 from sportorg.models.result.split_calculation import get_splits_data
@@ -17,14 +17,11 @@ from sportorg.models.result.split_calculation import get_splits_data
 
 class ReportDialog(QDialog):
     def __init__(self):
-        super().__init__()
+        super().__init__(GlobalAccess().get_main_window())
 
     def exec(self):
         self.init_ui()
         return super().exec()
-
-    def close_dialog(self):
-        self.close()
 
     def init_ui(self):
         self.setWindowTitle(_('Report creating'))
@@ -81,9 +78,3 @@ class ReportDialog(QDialog):
 
             # Open file in your browser
             webbrowser.open('file://' + file_name, new=2)
-
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    ex = ReportDialog()
-    sys.exit(app.exec_())

@@ -1,10 +1,9 @@
 import logging
-import sys
 from time import sleep
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QTime
-from PyQt5.QtWidgets import QApplication, QDialog
+from PyQt5.QtWidgets import QDialog
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
@@ -17,7 +16,7 @@ from sportorg.utils.time import time_to_otime
 
 class StartPreparationDialog(QDialog):
     def __init__(self):
-        super().__init__()
+        super().__init__(GlobalAccess().get_main_window())
 
     def exec(self):
         self.setup_ui()
@@ -370,14 +369,3 @@ def guess_courses_for_groups():
                     logging.debug('Connecting: group ' + group_name + ' with course ' + course_name)
                     break
     GlobalAccess().get_main_window().refresh()
-
-
-def main(argv):
-    app = QApplication(argv)
-    mw = StartPreparationDialog()
-    mw.show()
-    sys.exit(app.exec())
-
-
-if __name__ == '__main__':
-    main(sys.argv)
