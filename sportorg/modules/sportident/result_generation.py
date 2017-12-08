@@ -3,15 +3,27 @@ import logging
 from sportorg.modules.printing.model import split_printout, NoResultToPrintException
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.models.result.result_checker import ResultChecker
-from sportorg.models.result.result_object import ResultObject
-from sportorg.models.memory import race, Person
+from sportorg.models.memory import race, Person, Result, ResultSportident
 
 
-class ResultSportidentGeneration(ResultObject):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+class ResultSportidentGeneration:
+    def __init__(self, result: ResultSportident):
+        assert result, Result
+        self._result = result
+        self._person = None
         self.assign_chip_reading = race().get_setting('sportident_assign_chip_reading', 'off')
         self.repeated_reading = race().get_setting('sportident_repeated_reading', 'rewrite')
+
+    def _add_result_to_race(self):
+        race().add_result(self._result)
+
+    def _has_result(self):
+        for result in race().results:
+            if result is None:
+                continue
+            if result == self._result:
+                return True
+        return False
 
     def _find_person_by_result(self):
         if self._person is not None:

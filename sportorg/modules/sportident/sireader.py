@@ -60,7 +60,7 @@ class SIReaderThread(threading.Thread):
                 logging.exception(str(e))
 
     def check_data(self, card_data):
-        if self.start_time and card_data['card_type'] == 'SI5':
+        if self.start_time is not None and card_data['card_type'] == 'SI5':
             start_time = self.time_to_sec(self.start_time)
             for i in range(len(card_data['punches'])):
                 if self.time_to_sec(card_data['punches'][i][1]) < start_time:

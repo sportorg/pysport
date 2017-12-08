@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  Start list for a relay event containing one class with three legs. The second leg may be run by one to three 
+  competitors per team, of which the fastest one exchanges to the third leg competitor. 
+-->
+<StartList xmlns="http://www.orienteering.org/datastandard/3.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            iofVersion="3.0"
+            createTime="2011-07-31T22:16:31+01:00"
+            creator="Example Software">
+  <Event>
+    <Name>Example event</Name>
+    <StartTime>
+      <Date>2011-07-31</Date>
+      <Time>10:00:00+01:00</Time>
+    </StartTime>
+  </Event>
+  
+  <ClassStart>
+    <Class>
+      <Id>1</Id>
+      <Name>Open</Name>
+    </Class>
+
+    <TeamStart>
+      <!-- the name of the team, usually including an ordinal number if the club has many teams entered to the same class -->
+      <Name>Forest Vagabonds 1</Name>
+      <!-- if the team consists of competitors representing multiple clubs, use one Organisation element for each club -->
+      <Organisation>
+        <Id>4</Id>
+        <Name>Forest Vagabonds</Name>
+        <Country code="GB">Great Britain</Country>
+      </Organisation>
+      <BibNumber>1</BibNumber>
+      <!-- start times are expressed in ISO 8601 format, optionally including time zone information: YYYY-MM-DDThh:mm:ss[.s[s[s]]][((+|-)hh:mm)|Z] -->
+      <!-- for a detailed specification, see http://www.w3.org/TR/xmlschema-2/#dateTime -->
+      <StartTime>2011-07-31T14:00:00+01:00</StartTime>
+
+      <PersonStart>
+        <Person>
+          <Id>3</Id>
+          <Name>
+            <Family>Reid</Family>
+            <Given>Samuel</Given>
+          </Name>
+        </Person>
+        <Leg>1</Leg>
+        <BibNumber>1-1</BibNumber>
+        <!-- the ControlCard element is to be omitted if the competitor wishes to rent a control card -->
+        <ControlCard>54321</ControlCard>
+      </PersonStart>
+
+      <PersonStart>
+        <Person>
+          <Id>4</Id>
+          <Name>
+            <Family>Fisher</Family>
+            <Given>Penny</Given>
+          </Name>
+        </Person>
+        <Leg>2</Leg>
+        <!-- LegOrder is used only when the relay contains parallel legs or when a particular leg allows multiple competitors -->
+        <LegOrder>1</LegOrder>
+        <BibNumber>1-2A</BibNumber>
+        <ControlCard>59476</ControlCard>
+      </PersonStart>
+
+      <PersonStart>
+        <Person>
+          <Id>5</Id>
+          <Name>
+            <Family>Collins</Family>
+            <Given>Anne</Given>
+          </Name>
+        </Person>
+        <Leg>2</Leg>
+        <LegOrder>2</LegOrder>
+        <BibNumber>1-2B</BibNumber>
+        <ControlCard>96463</ControlCard>
+      </PersonStart>
+
+      <PersonStart>
+        <Person>
+          <Id>6</Id>
+          <Name>
+            <Family>Hall</Family>
+            <Given>Brent</Given>
+          </Name>
+        </Person>
+        <Leg>2</Leg>
+        <LegOrder>3</LegOrder>
+        <BibNumber>1-2C</BibNumber>
+        <ControlCard>10583</ControlCard>
+      </PersonStart>
+
+      <PersonStart>
+        <Person>
+          <Id>7</Id>
+          <Name>
+            <Family>Jenkins</Family>
+            <Given>Allison</Given>
+          </Name>
+        </Person>
+        <Leg>3</Leg>
+        <BibNumber>1-3</BibNumber>
+        <ControlCard>68490</ControlCard>
+      </PersonStart>
+    </TeamStart>
+
+    <!-- an example of a team where the team members represent different clubs, known as a combination team -->
+    <TeamStart>
+      <!-- all clubs making up the combination team are normally present in the team's name -->
+      <Name>Super Fast Orienteers / Unintentional Navigators</Name>
+      <!-- one Organisation element for each club -->
+      <Organisation>
+        <Id>1</Id>
+        <Name>Super Fast Orienteers</Name>
+        <Country code="GB">Great Britain</Country>
+      </Organisation>
+      <Organisation>
+        <Id>3</Id>
+        <Name>Unintentional Navigators</Name>
+        <Country code="GB">Great Britain</Country>
+      </Organisation>
+      <BibNumber>2</BibNumber>
+      <StartTime>2011-07-31T14:00:00+01:00</StartTime>
+
+      <PersonStart>
+        <Person>
+          <Id>8</Id>
+          <Name>
+            <Family>Parker</Family>
+            <Given>Jeffrey</Given>
+          </Name>
+        </Person>
+        <!-- if a combination team member's club membership is known, it should be expressed by using the Organisation element -->
+        <Organisation>
+          <Id>1</Id>
+          <Name>Super Fast Orienteers</Name>
+          <Country code="GB">Great Britain</Country>
+        </Organisation>
+        <Leg>1</Leg>
+        <BibNumber>2-1</BibNumber>
+        <ControlCard>33354</ControlCard>
+      </PersonStart>
+
+      <PersonStart>
+        <Person>
+          <Id>9</Id>
+          <Name>
+            <Family>Simmons</Family>
+            <Given>Nicole</Given>
+          </Name>
+        </Person>
+        <Organisation>
+          <Id>3</Id>
+          <Name>Unintentional Navigators</Name>
+          <Country code="GB">Great Britain</Country>
+        </Organisation>
+        <Leg>2</Leg>
+        <LegOrder>1</LegOrder>
+        <BibNumber>2-2A</BibNumber>
+        <ControlCard>19930</ControlCard>
+      </PersonStart>
+
+      <PersonStart>
+        <Person>
+          <Id>10</Id>
+          <Name>
+            <Family>Hughes</Family>
+            <Given>Jim</Given>
+          </Name>
+        </Person>
+        <Organisation>
+          <Id>1</Id>
+          <Name>Super Fast Orienteers</Name>
+          <Country code="GB">Great Britain</Country>
+        </Organisation>
+        <Leg>3</Leg>
+        <BibNumber>2-3</BibNumber>
+        <ControlCard>67942</ControlCard>
+      </PersonStart>
+    </TeamStart>
+  </ClassStart>
+</StartList>

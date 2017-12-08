@@ -125,6 +125,7 @@ class GroupEditDialog(QDialog):
         self.layout.addRow(self.button_ok, self.button_cancel)
 
         self.show()
+        self.button_ok.setFocus()
 
     def set_values_from_table(self):
 

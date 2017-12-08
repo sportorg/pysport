@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  Result list for an individual event where one of the classes use multiple courses (butterfly-loop style).
+-->
+<ResultList xmlns="http://www.orienteering.org/datastandard/3.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            iofVersion="3.0" 
+            createTime="2011-07-31T22:46:33+01:00" 
+            creator="Example Software"
+            status="Complete">
+  <Event>
+    <Name>Example event</Name>
+    <StartTime>
+      <Date>2011-07-31</Date>
+      <Time>10:00:00+01:00</Time>
+    </StartTime>
+  </Event>
+  <ClassResult>
+    <Class>
+      <Id>1</Id>
+      <Name>Men Elite</Name>
+    </Class>
+    <!-- if there are multiple courses per class, a Course element without any id may be included to express the properties of an average pseudo course -->
+    <Course>
+      <!-- course length is expressed in meters -->
+      <Length>4650</Length>
+      <!-- course climb is expressed in meters; omit the Climb element if the course climb is not known -->
+      <Climb>160</Climb>
+    </Course>
+    <PersonResult>
+      <Person>
+        <Id>1</Id>
+        <Name>
+          <Family>Wood</Family>
+          <Given>George</Given>
+        </Name>
+      </Person>
+      <!-- the Organisation element is to be omitted if the competitor does not represent a club -->
+      <Organisation>
+        <Id>5</Id>
+        <Name>OC Back and Forth</Name>
+        <Country code="GB">Great Britain</Country>
+      </Organisation>
+      <Result>
+        <BibNumber>102</BibNumber>
+        <!-- start and finish times are expressed in ISO 8601 format, optionally including time zone information: YYYY-MM-DDThh:mm:ss[.s[s[s]]][((+|-)hh:mm)|Z] -->
+        <!-- for a detailed specification, see http://www.w3.org/TR/xmlschema-2/#dateTime -->
+        <StartTime>2011-07-30T10:00:00+01:00</StartTime>
+        <FinishTime>2011-07-30T10:33:21+01:00</FinishTime>
+        <!-- times are expressed in seconds, use period as decimal separator for fractions of seconds -->
+        <Time>2001</Time>
+        <!-- the position in the result list -->
+        <Position>1</Position>
+        <!-- the result status, see the xml schema file for all status codes -->
+        <Status>OK</Status>
+      </Result>
+      <!-- the Course element may be used on person result level when not all competitors in the class have been assigned the same course, e.g. when butterfly loops are used -->
+      <Course>
+        <Id>1</Id>
+        <Name>Men Elite-1</Name>
+        <Length>4650</Length>
+        <Climb>160</Climb>
+      </Course>
+      <!-- split times may be omitted, but if they are present all controls of the course that is assigned to the competitor must be included in the correct order, even if they have not been visited -->
+      <!-- start and finish punches must not be included; use StartTime and FinishTime of the Result element instead -->
+      <SplitTime>
+        <ControlCode>31</ControlCode>
+        <!-- if the control has been visited but the time is not known (e.g. due to a failing punching unit), omit the Time element -->
+        <Time>501</Time>
+      </SplitTime>
+      <SplitTime>
+        <ControlCode>32</ControlCode>
+        <Time>720</Time>
+      </SplitTime>
+      <SplitTime>
+        <ControlCode>31</ControlCode>
+        <Time>818</Time>
+      </SplitTime>
+      <SplitTime>
+        <ControlCode>33</ControlCode>
+        <Time>1136</Time>
+      </SplitTime>
+      <SplitTime>
+        <ControlCode>31</ControlCode>
+        <Time>1593</Time>
+      </SplitTime>
+      <!-- 
+        route with two waypoints as base64-encoded binary data, see the schema file for the format specification
+        the base64-encoded string 'CAMzzEOigAOP4ikBDddJAAJEfBOI/9YAUOw=' below translates to the following binary data (shown in hexadecimal):
+        
+        08 03 33 CC 43 A2 80 03 8F E2 29 01 0D D7 49 00 02 44 7C 13 88 FF D6 00 50 EC
+        
+        broken down inte waypoints according to the specification, we get
+        
+        waypoint 1: 
+        08                  waypoint header byte      normal waypoint; time, latitude and longitude in full storage mode; altitude present; altitude in full storage mode
+        03 33 CC 43 A2 80   time byte sequence        2011-07-30 09:00:00 UTC
+        03 8F E2 29         latitude byte sequence    N 59.761193° (N 59°45'40.2948")
+        01 0D D7 49         longitude byte sequence   E 17.684297° (E 17°41'03.4692")
+        00 02 44            altitude byte sequence    58 meters above sea level
+                
+        waypoint 2:
+        7C                  waypoint header byte      normal waypoint; time, latitude and longitude in delta storage mode; altitude present; altitude in delta storage mode
+        13 88               time byte sequence        delta value 5000 milliseconds, time is 2011-07-30 09:00:05 UTC
+        FF D6               latitude byte sequence    delta value -0.000042°, latitude is N 59.761151° (N 59°45'40.1436")
+        00 50               longitude byte sequence   delta value +0.000080°, langitude is E 17.684377° (E 17°41'03.7572")
+        EC                  altitude byte sequence    delta value -2 meters, altitude is 56 meters above sea level
+      -->
+      <Route>CAMzzEOigAOP4ikBDddJAAJEfBOI/9YAUOw=</Route>
+      <!-- competitor fees defined on general level; for example entry fees -->
+      <!-- this competitor has been assigned one fee -->
+      <AssignedFee>
+        <Fee>
+          <Id>1</Id>
+          <Name>Adult entry fee</Name>
+          <Amount currency="EUR">10</Amount>
+          <TaxableAmount currency="EUR">8</TaxableAmount>
+        </Fee>
+      </AssignedFee>
+      <!-- ordered services and fees related to these; for example rental card fee -->
+      <!-- this competitor has requested a rental card -->
+      <ServiceRequest>
+        <Service>
+          <Id>1</Id>
+          <Name>Rental card</Name>
+        </Service>
+        <RequestedQuantity>1</RequestedQuantity>
+        <AssignedFee>
+          <Fee>
+            <Id>4</Id>
+            <Name>Rental card fee</Name>
+            <Amount currency="EUR">2</Amount>
+          </Fee>
+        </AssignedFee>
+      </ServiceRequest>
+
+    </PersonResult>
+    <!-- example of a competitor that has mispunched, in this case running butterfly loops in the wrong order (the course's control code sequence is S-31-33-31-32-31-F, but the competitor punched S-31-32-31-33-31-F) -->
+    <PersonResult>
+      <Person>
+        <Id>2</Id>
+        <Name>
+          <Family>Martin</Family>
+          <Given>Edgar</Given>
+        </Name>
+      </Person>
+      <Organisation>
+        <Id>2</Id>
+        <Name>Bushmen OC</Name>
+        <Country code="GB">Great Britain</Country>
+      </Organisation>
+      <Result>
+        <BibNumber>102</BibNumber>
+        <StartTime>2011-07-30T10:03:00+01:00</StartTime>
+        <!-- the finish time is included even if the competitor has not completed his course -->
+        <FinishTime>2011-07-30T10:39:42+01:00</FinishTime>
+        <Status>MissingPunch</Status>
+      </Result>
+      <Course>
+        <Id>2</Id>
+        <Name>Men Elite-2</Name>
+        <Length>4650</Length>
+        <Climb>160</Climb>
+      </Course>
+      <SplitTime>
+        <ControlCode>31</ControlCode>
+        <Time>693</Time>
+      </SplitTime>
+      <SplitTime>
+        <ControlCode>33</ControlCode>
+        <Time>1581</Time>
+      </SplitTime>
+      <SplitTime>
+        <ControlCode>31</ControlCode>
+        <Time>1920</Time>
+      </SplitTime>
+      <!-- controls that have not been visited (or - as in this case - punched but not in the correct order) must still be included, but with the status attribute set to Missing -->
+      <SplitTime status="Missing">
+        <ControlCode>32</ControlCode>
+      </SplitTime>
+      <SplitTime status="Missing">
+        <ControlCode>31</ControlCode>
+      </SplitTime>
+      <!-- additional punches that do not belong to the course or are not in the correct order may be expressed using the Additional status -->
+      <SplitTime status="Additional">
+        <ControlCode>32</ControlCode>
+        <Time>966</Time>
+      </SplitTime>
+      <SplitTime status="Additional">
+        <ControlCode>31</ControlCode>
+        <Time>1379</Time>
+      </SplitTime>
+      <AssignedFee>
+        <Fee>
+          <Id>2</Id>
+          <Name>Youth entry fee</Name>
+          <Amount currency="EUR">5</Amount>
+          <TaxableAmount currency="EUR">4</TaxableAmount>
+        </Fee>
+      </AssignedFee>
+    </PersonResult>
+  </ClassResult>
+  <ClassResult>
+    <Class>
+      <Id>2</Id>
+      <Name>Open</Name>
+    </Class>
+    <Course>
+      <Id>3</Id>
+      <Name>Open</Name>
+      <Length>2990</Length>
+      <Climb>120</Climb>
+    </Course>
+    <PersonResult>
+      <Person>
+        <Id>3</Id>
+        <Name>
+          <Family>Lawson</Family>
+          <Given>Toni</Given>
+        </Name>
+      </Person>
+      <Organisation>
+        <Id>6</Id>
+        <Name>Doubtful Direction</Name>
+        <Country code="GB">Great Britain</Country>
+      </Organisation>
+      <Result>
+        <StartTime>2011-07-30T10:15:00+01:00</StartTime>
+        <Status>DidNotStart</Status>
+      </Result>
+      <!-- this competitor has been assigned two fees - adult entry fee and late entry fee - and both of them have been paid -->
+      <AssignedFee>
+        <Fee>
+          <Id>1</Id>
+          <Name>Adult entry fee</Name>
+          <Amount currency="EUR">10</Amount>
+          <TaxableAmount currency="EUR">8</TaxableAmount>
+        </Fee>
+        <PaidAmount currency="EUR">10</PaidAmount>
+      </AssignedFee>
+      <AssignedFee>
+        <Fee>
+          <Id>3</Id>
+          <Name>Late entry fee</Name>
+          <Amount currency="EUR">4</Amount>
+        </Fee>
+        <PaidAmount currency="EUR">4</PaidAmount>
+      </AssignedFee>
+    </PersonResult>
+  </ClassResult>
+</ResultList>

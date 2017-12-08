@@ -83,6 +83,15 @@ def menu_list():
                             'title': _('WDB Winorient'),
                             'action': GlobalAccess().get_main_window().export_wo_wdb
                         },
+                        {
+                            'title': 'IOF xml',
+                            'actions': [
+                                {
+                                    'title': 'ResultList',
+                                    'action': GlobalAccess().get_main_window().export_iof_result_list
+                                }
+                            ]
+                        },
                     ]
                 },
                 {

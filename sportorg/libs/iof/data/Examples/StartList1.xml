@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  Start list for an individual event.
+-->
+<StartList xmlns="http://www.orienteering.org/datastandard/3.0"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           iofVersion="3.0"
+           createTime="2011-07-20T12:16:31+02:00"
+           creator="Example Software">  
+  <Event>
+    <Name>Example event</Name>
+    <StartTime>
+      <Date>2011-07-31</Date>
+      <Time>10:00:00+01:00</Time>
+    </StartTime>
+  </Event>
+  <ClassStart>
+    <Class>
+      <Id>1</Id>
+      <Name>Men Elite</Name>
+    </Class>
+    <!-- if there are multiple courses per class, a Course element without any id may be included to express the properties of an average pseudo course -->
+    <Course>
+      <!-- course length is expressed in meters -->
+      <Length>4650</Length>
+      <!-- course climb is expressed in meters; omit the Climb element if the course climb is not known -->
+      <Climb>160</Climb>
+    </Course>
+    <StartName>Start 1</StartName>
+    <PersonStart>
+      <Person>
+        <Id>1</Id>
+        <Name>
+          <Family>Wood</Family>
+          <Given>George</Given>
+        </Name>
+      </Person>
+      <!-- the Organisation element is to be omitted if the competitor does not represent a club -->
+      <Organisation>
+        <Id>5</Id>
+        <Name>OC Back and Forth</Name>
+        <Country code="GB">Great Britain</Country>
+      </Organisation>
+      <!-- omit the BibNumber element if the competitor does not wear a number bib -->
+      <BibNumber>101</BibNumber>
+      <!-- start times are expressed in ISO 8601 format, optionally including time zone information: YYYY-MM-DDThh:mm:ss[.s[s[s]]][((+|-)hh:mm)|Z] -->
+      <!-- for a detailed specification, see http://www.w3.org/TR/xmlschema-2/#dateTime -->
+      <!-- omit the StartTime element if free start times are used (e.g. punching start) -->
+      <StartTime>2011-07-30T10:00:00+01:00</StartTime>
+      <ControlCard>794021</ControlCard>
+    </PersonStart>
+    <PersonStart>
+      <Person>
+        <Id>2</Id>
+        <Name>
+          <Family>Martin</Family>
+          <Given>Edgar</Given>
+        </Name>
+      </Person>
+      <Organisation>
+        <Id>2</Id>
+        <Name>Bushmen OC</Name>
+        <Country code="GB">Great Britain</Country>
+      </Organisation>
+      <BibNumber>102</BibNumber>
+      <StartTime>2011-07-30T10:03:00+01:00</StartTime>
+      <ControlCard>299482</ControlCard>
+    </PersonStart>
+  </ClassStart>
+  <ClassStart>
+    <Class>
+      <Id>2</Id>
+      <Name>Open</Name>
+    </Class>
+    <Course>
+      <Id>3</Id>
+      <Length>2990</Length>
+      <Climb>120</Climb>
+    </Course>
+    <StartName>Start 2</StartName>
+    <PersonStart>
+      <Person>
+        <Id>3</Id>
+        <Name>
+          <Family>Lawson</Family>
+          <Given>Toni</Given>
+        </Name>
+      </Person>
+      <Organisation>
+        <Id>6</Id>
+        <Name>Doubtful Direction</Name>
+        <Country code="GB">Great Britain</Country>
+      </Organisation>
+      <StartTime>2011-07-30T10:20:00+01:00</StartTime>
+      <ControlCard>973078</ControlCard>
+    </PersonStart>
+  </ClassStart>
+</StartList>
