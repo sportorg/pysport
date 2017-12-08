@@ -2,7 +2,7 @@ import logging
 from datetime import datetime
 
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, QPushButton, QTextEdit, QDateEdit
+from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, QPushButton, QTextEdit, QDateTimeEdit
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
@@ -48,12 +48,12 @@ class EventPropertiesDialog(QDialog):
         self.layout.addRow(self.label_sub_title, self.item_sub_title)
 
         self.label_start_date = QLabel(_('Start date'))
-        self.item_start_date = QDateEdit()
+        self.item_start_date = QDateTimeEdit()
         self.layout.addRow(self.label_start_date, self.item_start_date)
 
         self.label_end_date = QLabel(_('End date'))
         # self.item_end_date = QCalendarWidget()
-        self.item_end_date = QDateEdit()
+        self.item_end_date = QDateTimeEdit()
         self.layout.addRow(self.label_end_date, self.item_end_date)
 
         self.label_location = QLabel(_('Location'))
@@ -105,8 +105,8 @@ class EventPropertiesDialog(QDialog):
         self.item_location.setText(str(obj.get_setting('location')))
         self.item_refery.setText(str(obj.get_setting('chief_referee')))
         self.item_secretary.setText(str(obj.get_setting('secretary')))
-        self.item_start_date.setDateTime(obj.get_setting('start_date', datetime.now()))
-        self.item_end_date.setDateTime(obj.get_setting('end_date', datetime.now()))
+        self.item_start_date.setDateTime(obj.get_setting('start_date', datetime.now().replace(second=0, microsecond=0)))
+        self.item_end_date.setDateTime(obj.get_setting('end_date', datetime.now().replace(second=0, microsecond=0)))
         self.item_sport.setCurrentIndex(obj.get_setting('sport_kind_index', 0))
         self.item_type.setCurrentIndex(obj.get_setting('course_type_index', 0))
 
@@ -119,10 +119,14 @@ class EventPropertiesDialog(QDialog):
         obj.set_setting('location', self.item_location.text())
         obj.set_setting('chief_referee', self.item_refery.text())
         obj.set_setting('secretary', self.item_secretary.text())
-        obj.set_setting('start_date', self.item_start_date.dateTime())
-        obj.set_setting('end_date', self.item_end_date.dateTime())
+        obj.set_setting('start_date', self.item_start_date.dateTime().toPyDateTime())
+        obj.set_setting('end_date', self.item_end_date.dateTime().toPyDateTime())
         obj.set_setting('sport_kind_index', self.item_sport.currentIndex())
         obj.set_setting('course_type_index', self.item_type.currentIndex())
+
+        obj.data.name = self.item_main_title.text()
+        obj.data.start_time = self.item_start_date.dateTime().toPyDateTime()
+        obj.data.end_time = self.item_end_date.dateTime().toPyDateTime()
 
         if changed:
             win = GlobalAccess().get_main_window()

@@ -12,6 +12,7 @@ from sportorg.models.memory import Race, event as races, race
 
 from sportorg import config
 from sportorg.modules.backup.file import File
+from sportorg.modules.iof import iof_xml
 from sportorg.modules.ocad import ocad
 from sportorg.modules.ocad.ocad import OcadImportException
 from sportorg.modules.printing.model import NoResultToPrintException, split_printout
@@ -609,3 +610,13 @@ class MainWindow(QMainWindow):
             AboutDialog().exec()
         except Exception as e:
             logging.exception(str(e))
+
+    def export_iof_result_list(self):
+        file_name = get_save_file_name(_('Save As IOF xml'), _("IOF xml (*.xml)"),
+                                       '{}_resultList'.format(time.strftime("%Y%m%d")))
+        if file_name is not '':
+            try:
+                iof_xml.export_result_list(file_name)
+            except Exception as e:
+                logging.exception(str(e))
+                QMessageBox.warning(self, _('Error'), _('Export error') + ': ' + file_name)
