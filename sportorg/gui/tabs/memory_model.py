@@ -8,7 +8,7 @@ from sportorg.models.memory import race, Result, Group, Course, Organization, Sy
 from sportorg.utils.time import time_to_hhmmss
 
 
-class AbstractSportOrgMemoryModel (QAbstractTableModel):
+class AbstractSportOrgMemoryModel(QAbstractTableModel):
     """
     Used to specify common table behavior
     """
@@ -34,9 +34,12 @@ class AbstractSportOrgMemoryModel (QAbstractTableModel):
         pass
 
     def headerData(self, index, orientation, role=None):
-        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
-            columns = self.get_headers()
-            return _(columns[index])
+        if role == Qt.DisplayRole:
+            if orientation == Qt.Horizontal:
+                columns = self.get_headers()
+                return _(columns[index])
+            if orientation == Qt.Vertical:
+                return str(index+1)
 
     def init_cache(self):
         pass
@@ -117,6 +120,9 @@ class AbstractSportOrgMemoryModel (QAbstractTableModel):
         except Exception as e:
             logging.exception(str(e))
 
+    def update_one_object(self, part, index):
+        self.values[index] = self.get_values_from_object(part)
+
     def get_values_from_object(self, obj):
         pass
 
@@ -192,9 +198,6 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
     def set_source_array(self, array):
         race().persons = array
 
-    def update_one_object(self, part, index):
-        self.values[index] = self.get_values_from_object(part)
-
 
 class ResultMemoryModel(AbstractSportOrgMemoryModel):
     def __init__(self):
@@ -268,9 +271,6 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
     def set_source_array(self, array):
         race().results = array
 
-    def update_one_object(self, part, index):
-        self.values[index] = self.get_values_from_object(part)
-
 
 class GroupMemoryModel(AbstractSportOrgMemoryModel):
     def __init__(self):
@@ -321,9 +321,6 @@ class GroupMemoryModel(AbstractSportOrgMemoryModel):
     def set_source_array(self, array):
         race().groups = array
 
-    def update_one_object(self, part, index):
-        self.values[index] = self.get_values_from_object(part)
-
 
 class CourseMemoryModel(AbstractSportOrgMemoryModel):
     def __init__(self):
@@ -361,9 +358,6 @@ class CourseMemoryModel(AbstractSportOrgMemoryModel):
     def set_source_array(self, array):
         race().courses = array
 
-    def update_one_object(self, part, index):
-        self.values[index] = self.get_values_from_object(part)
-
 
 class TeamMemoryModel(AbstractSportOrgMemoryModel):
     def __init__(self):
@@ -400,9 +394,6 @@ class TeamMemoryModel(AbstractSportOrgMemoryModel):
 
     def set_source_array(self, array):
         race().organizations = array
-
-    def update_one_object(self, part, index):
-        self.values[index] = self.get_values_from_object(part)
 
 
 class PersonProxyModel(QSortFilterProxyModel):

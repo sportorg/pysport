@@ -62,11 +62,11 @@ class WinOrientBinary:
             assert (isinstance(team, WDBTeam))
             new_team = Organization()
             new_team.name = team.name
-            new_team.region = str(team.region)
+            # new_team.region = str(team.region)
             new_team.country = Country()
             new_team.address = Address()
             new_team.contact = Contact()
-            new_team.country.name = str(team.country)
+            # new_team.country.name = str(team.country)
             my_race.organizations.append(new_team)
 
         for course in self.wdb_object.dist:
@@ -76,7 +76,7 @@ class WinOrientBinary:
             new_course.name = course.name
             new_course.climb = course.elevation
             new_course.length = course.length
-            new_course.type = self.wdb_object.info.type  # TODO parse type
+            # new_course.type = self.wdb_object.info.type  # TODO parse type
 
             # controls
             for i in range(course.point_quantity):
