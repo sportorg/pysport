@@ -1,6 +1,6 @@
 import logging
 
-from sportorg.modules.printing.model import split_printout, NoResultToPrintException
+from sportorg.modules.printing.model import split_printout, NoResultToPrintException, NoPrinterSelectedException
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.models.result.result_checker import ResultChecker
 from sportorg.models.memory import race, Person, Result, ResultSportident
@@ -77,6 +77,10 @@ class ResultSportidentGeneration:
                 try:
                     split_printout(self._result)
                 except NoResultToPrintException as e:
+                    logging.error(str(e))
+                except NoPrinterSelectedException as e:
+                    logging.error(str(e))
+                except Exception as e:
                     logging.error(str(e))
         else:
             if self._find_person_by_result():

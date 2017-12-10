@@ -15,7 +15,7 @@ from sportorg.modules.backup.file import File
 from sportorg.modules.iof import iof_xml
 from sportorg.modules.ocad import ocad
 from sportorg.modules.ocad.ocad import OcadImportException
-from sportorg.modules.printing.model import NoResultToPrintException, split_printout
+from sportorg.modules.printing.model import NoResultToPrintException, split_printout, NoPrinterSelectedException
 from sportorg.modules.sportident import sportident
 from sportorg.modules import testing
 from sportorg.modules.configs.configs import Config as Configuration, ConfigFile
@@ -380,6 +380,11 @@ class MainWindow(QMainWindow):
             logging.warning(str(e))
             mes = QMessageBox(self)
             mes.setText(_('No results to print'))
+            mes.exec()
+        except NoPrinterSelectedException as e:
+            logging.warning(str(e))
+            mes = QMessageBox(self)
+            mes.setText(_('No printer selected'))
             mes.exec()
 
     @staticmethod

@@ -6,7 +6,10 @@ from PyQt5.QtPrintSupport import QPrinter, QPrintDialog, QAbstractPrintDialog
 from PyQt5.QtWidgets import QFormLayout, QLabel, QDialog, QPushButton, QCheckBox
 
 from sportorg import config
+from sportorg.core.template import get_templates
+from sportorg.gui.dialogs.file_dialog import get_open_file_name
 from sportorg.gui.global_access import GlobalAccess
+from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
 from sportorg.models.memory import race
 
@@ -54,6 +57,21 @@ class PrintPropertiesDialog(QDialog):
         self.layout.addRow(self.label_split_printer, self.split_printer_selector)
         self.layout.addRow(self.selected_split_printer)
 
+        self.label_template = QLabel(_('Template'))
+        self.item_template = AdvComboBox()
+        self.item_template.setMaximumWidth(200)
+        self.item_template.addItems(get_templates(config.template_dir('split')))
+        self.layout.addRow(self.label_template, self.item_template)
+
+        self.item_custom_path = QPushButton(_('Choose template'))
+
+        def select_custom_path():
+            file_name = get_open_file_name(_('Open HTML template'), _("HTML file (*.html)"))
+            self.item_template.setCurrentText(file_name)
+
+        self.item_custom_path.clicked.connect(select_custom_path)
+        self.layout.addRow(self.item_custom_path)
+
         self.print_splits_checkbox = QCheckBox(_('Print splits'))
         self.layout.addRow(self.print_splits_checkbox)
 
@@ -79,22 +97,27 @@ class PrintPropertiesDialog(QDialog):
 
     def set_values(self):
         obj = race()
-        printer_name = obj.get_setting('main_printer', QPrinter().printerName())
+        default_printer_name = QPrinter().printerName()
+        printer_name = obj.get_setting('main_printer', default_printer_name)
         try:
             QPrinter().setPrinterName(printer_name)
         except Exception as e:
-            printer_name = QPrinter().printerName()
+            printer_name = default_printer_name
         self.selected_printer.setText(printer_name)
 
-        printer_name = obj.get_setting('split_printer', QPrinter().printerName())
+        printer_name = obj.get_setting('split_printer', default_printer_name)
         try:
             QPrinter().setPrinterName(printer_name)
         except Exception as e:
             logging.exception(str(e))
-            printer_name = QPrinter().printerName()
+            printer_name = default_printer_name
         self.selected_split_printer.setText(printer_name)
 
         self.print_splits_checkbox.setChecked(obj.get_setting('split_printout', False))
+
+        template = obj.get_setting('split_template')
+        if template:
+            self.item_template.setCurrentText(template)
 
     def select_printer(self):
         try:
@@ -114,3 +137,4 @@ class PrintPropertiesDialog(QDialog):
         split_printer = self.selected_split_printer.text()
         obj.set_setting('split_printer', split_printer)
         obj.set_setting('split_printout', self.print_splits_checkbox.isChecked())
+        obj.set_setting('split_template', self.item_template.currentText())

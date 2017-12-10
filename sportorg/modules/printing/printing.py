@@ -1,5 +1,5 @@
 import logging
-from threading import Thread
+from multiprocessing import Process
 
 from PyQt5.QtCore import QSizeF
 from PyQt5.QtGui import QTextDocument
@@ -8,10 +8,9 @@ from PyQt5.QtWebEngineWidgets import QWebEnginePage
 from PyQt5.QtWidgets import QApplication
 
 
-class PrintThread(Thread):
+class PrintProcess(Process):
     def __init__(self, printer_name, html):
         super().__init__()
-        self.setName(self.__class__.__name__)
         self.printer_name = printer_name
         self.html = html
 
@@ -44,9 +43,9 @@ class PrintThread(Thread):
 
 
 def print_html(printer_name, html):
-    thread = PrintThread(printer_name, html)
+    thread = PrintProcess(printer_name, html)
     thread.start()
-    logging.info('printing thread started')
+    logging.info('printing poccess started')
 
 
 def print_html_webengine(printer_name, html):
