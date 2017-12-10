@@ -10,15 +10,21 @@ class NoResultToPrintException(Exception):
     pass
 
 
+class NoPrinterSelectedException(Exception):
+    pass
+
+
 def split_printout(result):
     person = result.person
 
     if not person or not person.group:
         raise NoResultToPrintException('No results to print')
 
-    template_path = template_dir('split_printout.html')
+    obj = race()
+    printer = obj.get_setting('split_printer')
+    template_path = obj.get_setting('split_template', template_dir('split_printout2.html'))
     spl = GroupSplits(person.group)
     template = get_text_from_file(template_path, **spl.get_json(person))
-
-    obj = race()
-    print_html(obj.get_setting('split_printer'), template)
+    if not printer:
+        raise NoPrinterSelectedException('No printer selected')
+    print_html(printer, template)

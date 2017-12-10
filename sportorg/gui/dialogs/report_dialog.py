@@ -36,7 +36,7 @@ class ReportDialog(QDialog):
         self.item_template.addItems(get_templates(config.template_dir('result')))
         self.layout.addRow(self.label_template, self.item_template)
 
-        self.item_custom_path = QPushButton('Choose template')
+        self.item_custom_path = QPushButton(_('Choose template'))
 
         def select_custom_path():
             file_name = get_open_file_name(_('Open HTML template'), _("HTML file (*.html)"))

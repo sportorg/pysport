@@ -1,6 +1,6 @@
 from sportorg.models.memory import race, Person, Course, Group, Qualification
 from sportorg.models.result.result_calculation import ResultCalculation
-from sportorg.utils.time import time_to_hhmmss, get_speed_min_per_km, if_none
+from sportorg.utils.time import time_to_hhmmss, get_speed_min_per_km, if_none, hhmmss_to_time
 
 
 class LegSplit(object):
@@ -62,7 +62,7 @@ class PersonSplits(object):
         self.start = time_to_hhmmss(person.start_time)
         self.finish = time_to_hhmmss(result.finish_time)
         self.result = result.get_result()
-        self.status = result.status
+        self.status = result.status.value
         self.place = result.place
         self.group_count_all = person.group.get_count_all()
         self.group_count_finished = person.group.get_count_finished()
@@ -185,6 +185,7 @@ class GroupSplits(object):
         self.cp_count = len(group.course.controls)
         self.length = group.course.length
         self.climb = group.course.climb
+        self.controls = group.course.controls
 
         self.leader = {}
 
@@ -257,6 +258,7 @@ class GroupSplits(object):
         group_json['count_all'] = self.count_all
         group_json['count_finished'] = self.count_finished
         group_json['cp_count'] = self.cp_count
+        group_json['controls'] = self.controls
         group_json['length'] = self.length
 
         persons = []
@@ -279,16 +281,23 @@ class GroupSplits(object):
             person_json['result'] = i.result
             person_json['status'] = i.status
             legs = []
+            last_time = None
             for j in i.legs:
                 assert (isinstance(j, LegSplit))
                 leg_json = j.get_json()
                 if j.course_index + 1:
                     leg_json['leader_name'] = self.get_leg_leader(j.course_index)[0]
                     leg_json['leader_time'] = self.get_leg_leader(j.course_index)[1]
+                    last_time = hhmmss_to_time(leg_json['absolute_time'])
 
                 legs.append(leg_json)
 
             person_json['legs'] = legs
+            finish = hhmmss_to_time(i.finish)
+            if last_time is not None and last_time != finish:
+                person_json['finish_time'] = time_to_hhmmss(finish - last_time)
+            else:
+                person_json['finish_time'] = ''
             persons.append(person_json)
 
         group_json['persons'] = persons

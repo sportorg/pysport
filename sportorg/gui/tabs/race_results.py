@@ -32,6 +32,7 @@ class ResultTable(TableView):
         self.popup_items = [
             (_('Manual finish'), GlobalAccess().get_main_window().manual_finish),
             (_('Add SPORTident result'), GlobalAccess().get_main_window().sportident_result),
+            (_('Split printout'), GlobalAccess().get_main_window().split_printout_selected),
             (_('Delete'), GlobalAccess().get_main_window().delete_object)
         ]
 
