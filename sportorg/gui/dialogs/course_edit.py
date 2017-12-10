@@ -12,7 +12,7 @@ from sportorg.models.memory import race, Course, CourseControl
 
 
 def get_course_types():
-    return [_('order'), _('free'), _('marked route')]
+    return ['', _('order'), _('free'), _('marked route')]
 
 
 class CourseEditDialog(QDialog):
@@ -65,6 +65,7 @@ class CourseEditDialog(QDialog):
 
         self.label_control_qty = QLabel(_('Point count'))
         self.item_control_qty = QSpinBox()
+        self.item_control_qty.setDisabled(True)
         self.layout.addRow(self.label_control_qty, self.item_control_qty)
 
         self.label_controls = QLabel('{}\n\n31 150\n32 200\n33\n34 500\n...\n90 150'.format(_('Controls')))

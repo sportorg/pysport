@@ -12,11 +12,11 @@ from sportorg.models.memory import race, Organization
 
 
 def get_countries():
-    return ['Russia', 'Finland', 'Norway', 'Germany', 'France', 'Austria', 'Kazakhstan', 'Ukraine', 'Poland', 'Estonia']
+    return ['', 'Russia', 'Finland', 'Norway', 'Germany', 'France', 'Austria', 'Kazakhstan', 'Ukraine', 'Poland', 'Estonia']
 
 
 def get_regions():
-    return ['Тюменская обл.', 'Курганская обл.', 'Свердловская обл.', 'Челябинская обл.', 'Республика Коми', 'г.Москва',
+    return ['', 'Тюменская обл.', 'Курганская обл.', 'Свердловская обл.', 'Челябинская обл.', 'Республика Коми', 'г.Москва',
             'ХМАО-Югра']
 
 
