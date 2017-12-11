@@ -87,7 +87,7 @@ def menu_list():
                             'title': 'IOF xml',
                             'actions': [
                                 {
-                                    'title': 'ResultList',
+                                    'title': _('ResultList'),
                                     'action': GlobalAccess().get_main_window().export_iof_result_list
                                 }
                             ]
