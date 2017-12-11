@@ -885,3 +885,30 @@ msgstr "Добавить SPORTident результат"
 
 msgid "Logs"
 msgstr "Логи"
+
+msgid "Print Bib"
+msgstr "Печать номеров"
+
+msgid "Testing"
+msgstr "Тестирование"
+
+msgid "Choose template"
+msgstr "Выберете шаблон"
+
+msgid "Save As IOF xml"
+msgstr "Сохранение IOF xml"
+
+msgid "IOF xml (*.xml)"
+msgstr "Файл IOF xml (*.xml)"
+
+msgid "Splits"
+msgstr "Сплиты"
+
+msgid "Change start time (when changing the bib)"
+msgstr "Изменять время старта при смене номера"
+
+msgid "Sorting by"
+msgstr "Сортировка по"
+
+msgid "ResultList"
+msgstr "Протокол результатов"
