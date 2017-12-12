@@ -8,7 +8,7 @@
 - [polib](http://polib.readthedocs.io/en/latest/quickstart.html)
 
 Install packages
-```
+```commandline
 pip install package-name
 
 pip install sireader
@@ -16,8 +16,14 @@ pip install sireader
 
 or
 
+```commandline
+pip install -r requirements.txt
 ```
-pip install -t lib -r requirements.txt
+
+Run
+
+```commandline
+python SportOrg.pyw
 ```
 
 ### Struct
@@ -28,8 +34,7 @@ pip install -t lib -r requirements.txt
     docs/
     log/
     templates/
-    python/
-    lib/
+    test/
     img/
         icon/
     languages/
@@ -41,13 +46,15 @@ pip install -t lib -r requirements.txt
         gui/
         models/
         modules/
-        lib/
+        libs/
         utils/
 ```
 
 ![Mainwindow sportorg](img/mainwindow.png)
 
 ![Dialogedit sportorg](img/dialogedit.png)
+![Result sportorg](img/result.png)
+![Bibprintout sportorg](img/bibprintout.png)
 
 ### build `go`
 

@@ -12,10 +12,6 @@ func getGlobalPython() string {
 	return "pythonw"
 }
 
-func getLocalPython() string {
-	return "python/pythonw.exe"
-}
-
 func baseDir(p string) string {
 	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
     if err != nil {
@@ -35,12 +31,7 @@ func hasPython(p string) bool {
 func main() {
     argsWithoutProg := os.Args[1:]
 
-    var pythonName string
-    if hasPython(getLocalPython()) {
-    	pythonName = baseDir(getLocalPython())
-	} else {
-		pythonName = getGlobalPython()
-	}
+    var pythonName = getGlobalPython()
 
 	cmd := exec.Command(
         pythonName,

@@ -1,3 +1,14 @@
+### 2017-12-12 v0.10.0-beta
++ Added the ability to edit splits
++ Support for multiple marking systems at the model level
++ Printing of bib
++ Numbering rows in tables
++ Ability to select templates for separation
++ New template for split
+- Taking into account the change in the starting time of the result
+* Changed the project structure
+
+
 ### 2017-11-15 v0.9.0-beta
 + Assigning of card for athlete while result editing
 + Result editing - interactive number change
@@ -29,5 +40,4 @@
 
 
 ### 2017-10-17 v0.7.2-beta
-
 * Init
