@@ -7,11 +7,10 @@ log/
 
 data/*
 /languages/**/*.mo
-/python/
-/lib/
 /*.exe
+*.bat
+*.cmd
 SportOrg.spec
-SportOrg.bat
 
 resource.syso
 versioninfo.json
