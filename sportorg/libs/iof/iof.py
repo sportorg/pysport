@@ -74,14 +74,42 @@ class IOF30(object):
         }
 
 
-class StartTime(BaseElement):
+class StrValue(BaseElement):
     def __init__(self):
+        self._tag_name = 'Tag'
+        self.value = ''
+
+    def to_elem(self):
+        return self.get_elem(self._tag_name, self.value)
+
+
+class Id(StrValue):
+    def __init__(self):
+        super().__init__()
+        self._tag_name = 'Id'
+
+
+class EntryId(StrValue):
+    def __init__(self):
+        super().__init__()
+        self._tag_name = 'EntryId'
+
+
+class Name(StrValue):
+    def __init__(self):
+        super().__init__()
+        self._tag_name = 'Name'
+
+
+class Time(BaseElement):
+    def __init__(self):
+        self._tag_name = 'Time'
         self.date = ''  # yyyy-mm-dd
         self.time = ''  # 10:00:00+01:00
 
     def to_elem(self):
         return self.get_elem(
-            'StartTime',
+            self._tag_name,
             childs=[
                 self.get_elem('Date', self.date),
                 self.get_elem('Time', self.time),
@@ -89,17 +117,37 @@ class StartTime(BaseElement):
         )
 
 
+class StartTime(Time):
+    def __init__(self):
+        super().__init__()
+        self._tag_name = 'StartTime'
+
+
+class EndTime(Time):
+    def __init__(self):
+        super().__init__()
+        self._tag_name = 'EndTime'
+
+
+class ControlCard(Time):
+    def __init__(self):
+        super().__init__()
+        self._tag_name = 'ControlCard'
+
+
 class Event(BaseElement):
     def __init__(self):
-        self.name = ''
+        self.name = Name()
         self.start_time = StartTime()
+        self.end_time = EndTime()
 
     def to_elem(self):
         return self.get_elem(
             'Event',
             childs=[
-                self.get_elem('Name', self.name),
+                self.name,
                 self.start_time,
+                self.end_time
             ]
         )
 
@@ -146,16 +194,16 @@ class Country(BaseElement):
 
 class Organisation(BaseElement):
     def __init__(self):
-        self.id = ''
-        self.name = ''
+        self.id = Id()
+        self.name = Name()
         self.country = Country()
 
     def to_elem(self):
         return self.get_elem(
             'Organisation',
             childs=[
-                self.get_elem('Id', self.id),
-                self.get_elem('Name', self.name),
+                self.id,
+                self.name,
                 self.country,
             ]
         )
@@ -163,23 +211,23 @@ class Organisation(BaseElement):
 
 class Class(BaseElement):
     def __init__(self):
-        self.id = ''
-        self.name = ''
+        self.id = Id()
+        self.name = Name()
 
     def to_elem(self):
         return self.get_elem(
             'Class',
             childs=[
-                self.get_elem('Id', self.id),
-                self.get_elem('Name', self.name)
+                self.id,
+                self.name
             ]
         )
 
 
 class Course(BaseElement):
     def __init__(self):
-        self.id = ''
-        self.name = ''
+        self.id = Id()
+        self.name = Name()
         self.length = 0.0
         self.climb = 0.0
 
@@ -187,8 +235,8 @@ class Course(BaseElement):
         return self.get_elem(
             'Course',
             childs=[
-                self.get_elem('Id', self.id),
-                self.get_elem('Name', self.name),
+                self.id,
+                self.name,
                 self.get_elem('Length', str(self.length)),
                 self.get_elem('climb', str(self.climb)),
             ]
@@ -199,21 +247,21 @@ class PersonEntry(BaseElement):
     def __init__(self):
         self.person = Person()
         self.organisation = Organisation()
-        self.control_card = ''
-        self.class_ = Class()
+        self.control_card = []  # type: List[ControlCard]
+        self.class_ = []  # type: List[Class]
         self.entry_time = ''  # 2011-07-12T05:33:17+01:00
 
     def to_elem(self):
-        return self.get_elem(
-            'PersonEntry',
-            childs=[
-                self.person,
-                self.organisation,
-                self.get_elem('ControlCard', self.control_card),
-                self.class_,
-                self.get_elem('EntryTime', str(self.entry_time)),
-            ]
-        )
+        childs = [
+            self.person,
+            self.organisation,
+            self.get_elem('EntryTime', str(self.entry_time)),
+        ]
+        for card in self.control_card:
+            childs.append(card)
+        for class_ in self.class_:
+            childs.append(class_)
+        return self.get_elem('PersonEntry', childs=childs)
 
 
 class EntryList(BaseElement):
@@ -234,42 +282,40 @@ class EntryList(BaseElement):
 class TeamEntryPerson(BaseElement):
     def __init__(self):
         self.person = Person()
+        self.organisation = Organisation()
         self.leg = 0
-        self.leg_order = 0
-        self.control_card = ''
+        self.control_card = []  # type: List[ControlCard]
 
     def to_elem(self):
-        return self.get_elem(
-            'TeamEntryPerson',
-            childs=[
-                self.person,
-                self.get_elem('Leg', str(self.leg)),
-                self.get_elem('LegOrder', str(self.leg_order)),
-                self.get_elem('ControlCard', self.control_card)
-            ]
-        )
+        childs = [
+            self.person,
+            self.organisation,
+            self.get_elem('Leg', str(self.leg))
+        ]
+        for card in self.control_card:
+            childs.append(card)
+        return self.get_elem('TeamEntryPerson', childs=childs)
 
 
 class TeamEntry(BaseElement):
     def __init__(self):
-        self.name = ''
+        self.id = Id
+        self.name = Name()
         self.organisation = Organisation()
         self.team_entry_person = []  # type: List[TeamEntryPerson]
         self.class_ = Class()
         self.entry_time = ''  # 2011-07-12T21:05:58+01:00
 
     def to_elem(self):
-        childs = [self.get_elem('Name', self.name),
+        childs = [self.id,
+                  self.name,
                   self.organisation]
         for team in self.team_entry_person:
             childs.append(team)
         childs.append(self.class_)
         childs.append(self.get_elem('EntryTime', self.entry_time))
 
-        return self.get_elem(
-            'TeamEntry',
-            childs=childs
-        )
+        return self.get_elem('TeamEntry', childs=childs)
 
 
 class TeamEntryList(BaseElement):
@@ -286,47 +332,59 @@ class TeamEntryList(BaseElement):
         return self.get_elem('EntryList', attr=self.iof.to_attr(), childs=childs)
 
 
-class PersonStart(BaseElement):
+class Start(BaseElement):
     def __init__(self):
-        self.person = Person()
-        self.organisation = Organisation()
         self.bib_number = ''
         self.start_time = ''  # 2011-07-30T10:00:00+01:00
-        self.control_card = ''
+        self.control_card = []  # type: List[ControlCard]
+
+    def to_elem(self):
+        childs = [
+            self.get_elem('BibNumber', self.bib_number),
+            self.get_elem('StartTime', self.start_time),
+        ]
+        for card in self.control_card:
+            childs.append(card)
+        return self.get_elem('Start', childs=childs)
+
+
+class PersonStart(BaseElement):
+    def __init__(self):
+        self.entry_id = EntryId
+        self.person = Person()
+        self.organisation = Organisation()
+        self.start = Start()
 
     def to_elem(self):
         return self.get_elem(
             'PersonStart',
             childs=[
+                self.entry_id,
                 self.person,
                 self.organisation,
-                self.get_elem('BibNumber', self.bib_number),
-                self.get_elem('StartTime', self.start_time),
-                self.get_elem('ControlCard', self.control_card)
+                self.start
             ]
         )
 
 
 class ClassStart(BaseElement):
     def __init__(self):
-        self.start_name = ''
+        self.start_name = []
         self.class_ = Class()
         self.person_start = []  # type: List[PersonStart]
         self.course = Course()
 
     def to_elem(self):
         childs = [
-            self.get_elem('StartName', self.start_name),
             self.class_,
             self.course
         ]
+        for start_name in self.start_name:
+            childs.append(self.get_elem('StartName', start_name))
         for person_start in self.person_start:
             childs.append(person_start)
 
-        return self.get_elem(
-            'ClassStart',
-            childs=childs
-        )
+        return self.get_elem('ClassStart', childs=childs)
 
 
 class StartList(BaseElement):
@@ -364,11 +422,18 @@ class ResultStatus:
 class Result(BaseElement):
     def __init__(self):
         self.bib_number = ''
+        self.control_card = []  # type: List[ControlCard]
         self.start_time = ''  # 2011-07-30T10:03:00+01:00
         self.finish_time = ''  # 2011-07-30T10:39:42+01:00
         self.time = 0.0
-        self.position = []
+        self.time_behind = 0.0
+        self.position = 0
+        self.course = Course()
         self.status = ResultStatus.OK
+        self.split_time = []  # type: List[SplitTime]
+        self.route = ''
+        self.assigned_fee = []  # type: List[AssignedFee]
+        self.service_request = ServiceRequest()
 
     def to_elem(self):
         childs = [
@@ -377,13 +442,18 @@ class Result(BaseElement):
             self.get_elem('FinishTime', self.finish_time),
             self.get_elem('Time', str(self.time)),
             self.get_elem('Status', self.status),
+            self.get_elem('Position', str(self.position)),
+            self.course,
+            self.service_request,
+            self.get_elem('Route', self.route)
         ]
-        for pos in self.position:
-            childs.append(self.get_elem('Position', str(pos)))
-        return self.get_elem(
-            'Result',
-            childs=childs
-        )
+        for card in self.control_card:
+            childs.append(card)
+        for split in self.split_time:
+            childs.append(split)
+        for assigned_fee in self.assigned_fee:
+            childs.append(assigned_fee)
+        return self.get_elem('Result', childs=childs)
 
 
 class SplitTime(BaseElement):
@@ -412,21 +482,20 @@ class Amount(BaseElement):
 
 class Fee(BaseElement):
     def __init__(self):
-        self.id = ''
-        self.name = ''
+        self.id = Id()
+        self.name = []  # type: List[Name]
         self.amount = Amount()
         self.taxable_amount = Amount()
 
     def to_elem(self):
-        return self.get_elem(
-            'Fee',
-            childs=[
-                self.get_elem('Id', self.id),
-                self.get_elem('Name', self.name),
-                self.amount,
-                self.taxable_amount
-            ]
-        )
+        childs = [
+            self.id,
+            self.amount,
+            self.taxable_amount
+        ]
+        for name in self.name:
+            childs.append(name)
+        return self.get_elem('Fee', childs=childs)
 
 
 class AssignedFee(BaseElement):
@@ -446,13 +515,13 @@ class AssignedFee(BaseElement):
 
 class Service(BaseElement):
     def __init__(self):
-        self.id = ''
-        self.name = []
+        self.id = Id()
+        self.name = []  # type: List[Name]
 
     def to_elem(self):
-        childs = [self.get_elem('Id', self.id)]
+        childs = [self.id]
         for name in self.name:
-            childs.append(self.get_elem('Name', name))
+            childs.append(name)
         return self.get_elem('Service', childs=childs)
 
 
@@ -477,25 +546,13 @@ class PersonResult(BaseElement):
         self.person = Person()
         self.organisation = Organisation()
         self.result = Result()
-        self.course = Course()
-        self.split_time = []  # type: List[SplitTime]
-        self.route = ''
-        self.assigned_fee = []  # type: List[AssignedFee]
-        self.service_request = ServiceRequest()
 
     def to_elem(self):
         childs = [
             self.person,
             self.organisation,
             self.result,
-            self.course,
-            self.service_request,
-            self.get_elem('Route', self.route)
         ]
-        for split in self.split_time:
-            childs.append(split)
-        for assigned_fee in self.assigned_fee:
-            childs.append(assigned_fee)
         return self.get_elem('PersonResult', childs=childs)
 
 

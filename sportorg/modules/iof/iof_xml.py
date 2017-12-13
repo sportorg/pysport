@@ -10,7 +10,7 @@ def export_result_list(file):
     result_list = ResultList()
     result_list.iof.creator = config.NAME
     result_list.iof.create_time = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
-    result_list.event.name = obj.data.name
+    result_list.event.name.value = obj.data.name
     if obj.data.start_time is not None:
         result_list.event.start_time.date = obj.data.start_time.strftime("%Y-%m-%d")
         result_list.event.start_time.time = obj.data.start_time.strftime("%H:%M:%S")
