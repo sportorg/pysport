@@ -6,17 +6,7 @@ import xmlschema
 iof_schema = xmlschema.XMLSchema('data/IOF.xsd')
 
 
-files = [
-    # 'data/Examples/CompetitorList.xml',
-    # 'data/Examples/CourseData.xml',
-    # 'data/Examples/EntryList1.xml',
-    # 'data/Examples/EntryList2.xml',
-    # 'data/Examples/OrganisationList.xml',
-    # 'data/Examples/ResultList1.xml',
-    # 'data/Examples/ResultList2.xml',
-    # 'data/Examples/StartList1.xml',
-    # 'data/Examples/StartList2.xml',
-]
+files = []
 
 for file in files:
     try:
