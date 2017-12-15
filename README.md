@@ -6,6 +6,8 @@
 - [sireader](https://pypi.python.org/pypi/sireader/1.0.1)
 - jinja2
 - [polib](http://polib.readthedocs.io/en/latest/quickstart.html)
+- xmlschema
+- cx_Freeze
 
 Install packages
 ```commandline
@@ -56,7 +58,14 @@ python SportOrg.pyw
 ![Result sportorg](img/result.png)
 ![Bibprintout sportorg](img/bibprintout.png)
 
-### build `go`
+
+### build
+
+#### cx_Freeze
+
+`python setup.py build`
+
+#### go
 
 [josephspurrier](https://github.com/josephspurrier/goversioninfo) for build `.syso`
 
@@ -64,4 +73,8 @@ python SportOrg.pyw
 ./goversioninfo -icon=img/icon/sportorg.ico
 
 go build -ldflags="-H windowsgui" -o SportOrg.exe
+
+or 
+
+python build.py
 ```
