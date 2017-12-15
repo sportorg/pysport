@@ -169,13 +169,13 @@ class PersonName(BaseElement):
 
 class Person(BaseElement):
     def __init__(self):
-        self.id = []  # type: List[str]
+        self.id = []  # type: List[Id]
         self.name = PersonName()
 
     def to_elem(self):
         childs = []
         for i in self.id:
-            childs.append(self.get_elem('Id', i))
+            childs.append(i)
         childs.append(self.name)
         return self.get_elem(
             'Person',
@@ -350,7 +350,7 @@ class Start(BaseElement):
 
 class PersonStart(BaseElement):
     def __init__(self):
-        self.entry_id = EntryId
+        self.entry_id = EntryId()
         self.person = Person()
         self.organisation = Organisation()
         self.start = Start()
