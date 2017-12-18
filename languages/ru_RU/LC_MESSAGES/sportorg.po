@@ -912,3 +912,6 @@ msgstr "Сортировка по"
 
 msgid "ResultList"
 msgstr "Протокол результатов"
+
+msgid "Show toolbar"
+msgstr "Показать панель инструментов"

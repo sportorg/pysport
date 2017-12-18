@@ -29,14 +29,7 @@ def start_reader():
             reader = None
             message(_('Closing port' + ' ' + port))
 
-    toolbar_sportident()
-
 
 def message(msg):
     logging.info(msg)
     GlobalAccess().get_main_window().statusbar.showMessage(msg, 5000)
-
-
-def toolbar_sportident():
-    GlobalAccess().get_main_window().toolbar_property['sportident'].setStatusTip(
-        _('SPORTident readout activated') if is_readout() else _('SPORTident readout not activated'))

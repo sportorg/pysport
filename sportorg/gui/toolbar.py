@@ -14,4 +14,5 @@ def toolbar_list():
         (config.icon_dir('save.png'), _('Save'), GlobalAccess().get_main_window().save_file),
         (config.icon_dir('sportident.png'), _('SPORTident readout'),
          GlobalAccess().get_main_window().sportident_connect, 'sportident'),
+        (config.icon_dir('flag.png'), _('Manual finish'), GlobalAccess().get_main_window().manual_finish),
     ]

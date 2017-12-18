@@ -1,7 +1,7 @@
 import logging
 
 from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtWidgets import QDialog, QPushButton
+from PyQt5.QtWidgets import QDialog, QPushButton, QDialogButtonBox, QVBoxLayout, QWidget
 
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import _
@@ -17,87 +17,86 @@ def get_value_options():
 class TextExchangeDialog(QDialog):
     def __init__(self):
         super().__init__(GlobalAccess().get_main_window())
-        self.setObjectName("text_io")
         self.setWindowModality(QtCore.Qt.WindowModal)
         self.resize(319, 462)
         self.setSizeGripEnabled(False)
         self.setModal(True)
-        self.gridLayout_3 = QtWidgets.QGridLayout(self)
-        self.gridLayout_3.setObjectName("gridLayout_3")
+
+        self.layout = QVBoxLayout(self)
+
+        self.grid_layout = QtWidgets.QGridLayout()
+        widget = QWidget(self)
+        widget.setLayout(self.grid_layout)
+
         self.value_group_box = QtWidgets.QGroupBox(self)
-        self.value_group_box.setObjectName("value_group_box")
-        self.gridLayout_2 = QtWidgets.QGridLayout(self.value_group_box)
-        self.gridLayout_2.setObjectName("gridLayout_2")
+
+        self.grid_layout_child = QtWidgets.QGridLayout(self.value_group_box)
+
         self.id_label = QtWidgets.QLabel(self.value_group_box)
-        self.id_label.setObjectName("id_label")
-        self.gridLayout_2.addWidget(self.id_label, 0, 0, 1, 1)
+
+        self.grid_layout_child.addWidget(self.id_label, 0, 0, 1, 1)
         self.id_layout = QtWidgets.QVBoxLayout()
-        self.id_layout.setObjectName("id_layout")
+
         self.bib_radio_button = QtWidgets.QRadioButton(self.value_group_box)
         self.bib_radio_button.setChecked(True)
-        self.bib_radio_button.setObjectName("bib_radio_button")
+
         self.id_layout.addWidget(self.bib_radio_button)
         self.name_radio_button = QtWidgets.QRadioButton(self.value_group_box)
-        self.name_radio_button.setObjectName("name_radio_button")
+
         self.id_layout.addWidget(self.name_radio_button)
-        self.gridLayout_2.addLayout(self.id_layout, 0, 1, 1, 1)
+        self.grid_layout_child.addLayout(self.id_layout, 0, 1, 1, 1)
         self.value_label = QtWidgets.QLabel(self.value_group_box)
-        self.value_label.setObjectName("value_label")
-        self.gridLayout_2.addWidget(self.value_label, 1, 0, 1, 1)
+
+        self.grid_layout_child.addWidget(self.value_label, 1, 0, 1, 1)
         self.value_combo_box = QtWidgets.QComboBox(self.value_group_box)
-        self.value_combo_box.setObjectName("value_combo_box")
+
         self.value_combo_box.addItems(get_value_options())
-        self.gridLayout_2.addWidget(self.value_combo_box, 1, 1, 1, 1)
+        self.grid_layout_child.addWidget(self.value_combo_box, 1, 1, 1, 1)
         self.id_label.raise_()
         self.bib_radio_button.raise_()
         self.value_label.raise_()
         self.value_combo_box.raise_()
-        self.gridLayout_3.addWidget(self.value_group_box, 0, 0, 1, 1)
+        self.grid_layout.addWidget(self.value_group_box, 0, 0, 1, 1)
         self.separator_group_box = QtWidgets.QGroupBox(self)
-        self.separator_group_box.setObjectName("separator_group_box")
+
         self.gridLayout = QtWidgets.QGridLayout(self.separator_group_box)
-        self.gridLayout.setObjectName("gridLayout")
+
         self.space_radio_button = QtWidgets.QRadioButton(self.separator_group_box)
         self.space_radio_button.setChecked(True)
-        self.space_radio_button.setObjectName("space_radio_button")
+
         self.gridLayout.addWidget(self.space_radio_button, 0, 0, 1, 1)
         self.tab_radio_button = QtWidgets.QRadioButton(self.separator_group_box)
-        self.tab_radio_button.setObjectName("tab_radio_button")
+
         self.gridLayout.addWidget(self.tab_radio_button, 1, 0, 1, 1)
         self.semicolon_radio_button = QtWidgets.QRadioButton(self.separator_group_box)
-        self.semicolon_radio_button.setObjectName("semicolon_radio_button")
+
         self.gridLayout.addWidget(self.semicolon_radio_button, 2, 0, 1, 1)
         self.custom_layout = QtWidgets.QHBoxLayout()
-        self.custom_layout.setObjectName("custom_layout")
+
         self.custom_radio_button = QtWidgets.QRadioButton(self.separator_group_box)
-        self.custom_radio_button.setObjectName("custom_radio_button")
+
         self.custom_layout.addWidget(self.custom_radio_button)
         self.custom_edit = QtWidgets.QLineEdit(self.separator_group_box)
-        self.custom_edit.setObjectName("custom_edit")
+
         self.custom_layout.addWidget(self.custom_edit)
         self.gridLayout.addLayout(self.custom_layout, 3, 0, 1, 1)
-        self.gridLayout_3.addWidget(self.separator_group_box, 0, 1, 1, 1)
+        self.grid_layout.addWidget(self.separator_group_box, 0, 1, 1, 1)
         self.text_edit = QtWidgets.QPlainTextEdit(self)
-        self.text_edit.setObjectName("text_edit")
-        self.gridLayout_3.addWidget(self.text_edit, 1, 0, 1, 2)
-        self.button_box = QtWidgets.QDialogButtonBox(self)
-        self.button_box.setOrientation(QtCore.Qt.Horizontal)
 
-        self.button_ok = QPushButton(_('OK'))
-        self.button_ok.setMaximumWidth(100)
-        self.button_cancel = QPushButton(_('Cancel'))
-        self.button_cancel.setMaximumWidth(100)
+        self.grid_layout.addWidget(self.text_edit, 1, 0, 1, 2)
 
-        # self.button_save = QPushButton(_('Save'))
-        # self.button_load = QPushButton(_('Load'))
+        button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        self.button_ok = button_box.button(QDialogButtonBox.Ok)
+        self.button_ok.setText(_('OK'))
+        self.button_ok.clicked.connect(self.accept)
+        self.button_cancel = button_box.button(QDialogButtonBox.Cancel)
+        self.button_cancel.setText(_('Cancel'))
+        self.button_cancel.clicked.connect(self.reject)
 
-        self.gridLayout_3.addWidget(self.button_ok)
-        self.gridLayout_3.addWidget(self.button_cancel)
+        self.layout.addWidget(widget)
+        self.layout.addWidget(button_box)
 
         self.retranslate_ui(self)
-        self.button_ok.clicked.connect(self.accept)
-        self.button_cancel.clicked.connect(self.reject)
-        QtCore.QMetaObject.connectSlotsByName(self)
 
     def retranslate_ui(self, text_io):
         text_io.setWindowTitle(_("Dialog"))

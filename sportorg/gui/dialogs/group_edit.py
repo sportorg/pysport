@@ -2,7 +2,8 @@ import logging
 
 from PyQt5.QtCore import QModelIndex
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, QPushButton, QSpinBox, QTimeEdit, QCheckBox
+from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, QPushButton, QSpinBox, QTimeEdit, QCheckBox, \
+    QDialogButtonBox
 
 from sportorg import config
 from sportorg.gui.dialogs.group_ranking import GroupRankingDialog
@@ -118,11 +119,14 @@ class GroupEditDialog(QDialog):
                 logging.exception(str(e))
             self.close()
 
-        self.button_ok = QPushButton(_('OK'))
+        button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        self.button_ok = button_box.button(QDialogButtonBox.Ok)
+        self.button_ok.setText(_('OK'))
         self.button_ok.clicked.connect(apply_changes)
-        self.button_cancel = QPushButton(_('Cancel'))
+        self.button_cancel = button_box.button(QDialogButtonBox.Cancel)
+        self.button_cancel.setText(_('Cancel'))
         self.button_cancel.clicked.connect(cancel_changes)
-        self.layout.addRow(self.button_ok, self.button_cancel)
+        self.layout.addRow(button_box)
 
         self.show()
         self.button_ok.setFocus()

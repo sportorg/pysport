@@ -210,7 +210,12 @@ def menu_list():
                     'shortcut': 'F3',
                     'icon': config.icon_dir('flag.png'),
                     'action': GlobalAccess().get_main_window().manual_finish
-                }
+                },
+                {
+                    'title': _('on/off SPORTident readout'),
+                    'icon': config.icon_dir('sportident.png'),
+                    'action': GlobalAccess().get_main_window().sportident_connect
+                },
             ]
         },
         {
@@ -265,6 +270,7 @@ def menu_list():
                 },
                 {
                     'title': _('Testing'),
+                    'show': config.DEBUG and not config.is_executable(),
                     'shortcut': 'F10',
                     'action': GlobalAccess().get_main_window().testing
                 }

@@ -67,6 +67,7 @@ class Config(metaclass=Singleton):
         self._config_parser = configparser.ConfigParser()
         self._configurations = {
             ConfigFile.CONFIGURATION: Configurations({
+                'show_toolbar': True,
                 'autosave': False,
                 'autoconnect': False,
                 'open_recent_file': False,

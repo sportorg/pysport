@@ -3,7 +3,7 @@ import logging
 import time
 
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QFormLayout, QDialog, QPushButton, QTextEdit
+from PyQt5.QtWidgets import QFormLayout, QDialog, QPushButton, QTextEdit, QDialogButtonBox
 
 from sportorg import config
 from sportorg.gui.dialogs.file_dialog import get_save_file_name
@@ -46,11 +46,14 @@ class StartChessDialog(QDialog):
                 logging.exception(str(e))
             self.close()
 
-        self.button_ok = QPushButton(_('Save to file'))
+        button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        self.button_ok = button_box.button(QDialogButtonBox.Ok)
+        self.button_ok.setText(_('Save to file'))
         self.button_ok.clicked.connect(apply_changes)
-        self.button_cancel = QPushButton(_('Cancel'))
+        self.button_cancel = button_box.button(QDialogButtonBox.Cancel)
+        self.button_cancel.setText(_('Cancel'))
         self.button_cancel.clicked.connect(cancel_changes)
-        self.layout.addRow(self.button_ok, self.button_cancel)
+        self.layout.addRow(button_box)
 
         self.show()
 
