@@ -101,18 +101,58 @@ class Name(StrValue):
         self._tag_name = 'Name'
 
 
+class Family(StrValue):
+    def __init__(self):
+        super().__init__()
+        self._tag_name = 'Family'
+
+
+class Given(StrValue):
+    def __init__(self):
+        super().__init__()
+        self._tag_name = 'Given'
+
+
+class DateStr(StrValue):
+    """yyyy-mm-dd"""
+    def __init__(self):
+        super().__init__()
+        self._tag_name = 'Date'
+
+
+class TimeStr(StrValue):
+    """10:00:00+01:00"""
+    def __init__(self):
+        super().__init__()
+        self._tag_name = 'Time'
+
+
+class StartTimeStr(StrValue):
+    """2011-07-12T05:33:17+01:00"""
+    def __init__(self):
+        super().__init__()
+        self._tag_name = 'StartTime'
+
+
+class EntryTime(StrValue):
+    """2011-07-12T05:33:17+01:00"""
+    def __init__(self):
+        super().__init__()
+        self._tag_name = 'EntryTime'
+
+
 class Time(BaseElement):
     def __init__(self):
         self._tag_name = 'Time'
-        self.date = ''  # yyyy-mm-dd
-        self.time = ''  # 10:00:00+01:00
+        self.date = DateStr()
+        self.time = TimeStr()
 
     def to_elem(self):
         return self.get_elem(
             self._tag_name,
             childs=[
-                self.get_elem('Date', self.date),
-                self.get_elem('Time', self.time),
+                self.date,
+                self.time,
             ]
         )
 
@@ -154,17 +194,11 @@ class Event(BaseElement):
 
 class PersonName(BaseElement):
     def __init__(self):
-        self.family = ''
-        self.given = ''
+        self.family = Family()
+        self.given = Given()
 
     def to_elem(self):
-        return self.get_elem(
-            'Name',
-            childs=[
-                self.get_elem('Family', self.family),
-                self.get_elem('Given', self.given)
-            ]
-        )
+        return self.get_elem('Name', childs=[self.family, self.given])
 
 
 class Person(BaseElement):
@@ -177,10 +211,7 @@ class Person(BaseElement):
         for i in self.id:
             childs.append(i)
         childs.append(self.name)
-        return self.get_elem(
-            'Person',
-            childs=childs
-        )
+        return self.get_elem('Person', childs=childs)
 
 
 class Country(BaseElement):
@@ -238,7 +269,7 @@ class Course(BaseElement):
                 self.id,
                 self.name,
                 self.get_elem('Length', str(self.length)),
-                self.get_elem('climb', str(self.climb)),
+                self.get_elem('Climb', str(self.climb)),
             ]
         )
 
@@ -249,13 +280,13 @@ class PersonEntry(BaseElement):
         self.organisation = Organisation()
         self.control_card = []  # type: List[ControlCard]
         self.class_ = []  # type: List[Class]
-        self.entry_time = ''  # 2011-07-12T05:33:17+01:00
+        self.entry_time = EntryTime()
 
     def to_elem(self):
         childs = [
             self.person,
             self.organisation,
-            self.get_elem('EntryTime', str(self.entry_time)),
+            self.entry_time,
         ]
         for card in self.control_card:
             childs.append(card)
@@ -304,7 +335,7 @@ class TeamEntry(BaseElement):
         self.organisation = Organisation()
         self.team_entry_person = []  # type: List[TeamEntryPerson]
         self.class_ = Class()
-        self.entry_time = ''  # 2011-07-12T21:05:58+01:00
+        self.entry_time = EntryTime()
 
     def to_elem(self):
         childs = [self.id,
@@ -313,7 +344,7 @@ class TeamEntry(BaseElement):
         for team in self.team_entry_person:
             childs.append(team)
         childs.append(self.class_)
-        childs.append(self.get_elem('EntryTime', self.entry_time))
+        childs.append(self.entry_time)
 
         return self.get_elem('TeamEntry', childs=childs)
 
@@ -335,13 +366,13 @@ class TeamEntryList(BaseElement):
 class Start(BaseElement):
     def __init__(self):
         self.bib_number = ''
-        self.start_time = ''  # 2011-07-30T10:00:00+01:00
+        self.start_time = StartTimeStr()
         self.control_card = []  # type: List[ControlCard]
 
     def to_elem(self):
         childs = [
             self.get_elem('BibNumber', self.bib_number),
-            self.get_elem('StartTime', self.start_time),
+            self.start_time,
         ]
         for card in self.control_card:
             childs.append(card)
@@ -423,7 +454,7 @@ class Result(BaseElement):
     def __init__(self):
         self.bib_number = ''
         self.control_card = []  # type: List[ControlCard]
-        self.start_time = ''  # 2011-07-30T10:03:00+01:00
+        self.start_time = StartTimeStr()
         self.finish_time = ''  # 2011-07-30T10:39:42+01:00
         self.time = 0.0
         self.time_behind = 0.0
@@ -438,7 +469,7 @@ class Result(BaseElement):
     def to_elem(self):
         childs = [
             self.get_elem('BibNumber', self.bib_number),
-            self.get_elem('StartTime', self.start_time),
+            self.start_time,
             self.get_elem('FinishTime', self.finish_time),
             self.get_elem('Time', str(self.time)),
             self.get_elem('Status', self.status),

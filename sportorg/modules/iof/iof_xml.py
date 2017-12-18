@@ -12,7 +12,7 @@ def export_result_list(file):
     result_list.iof.create_time = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
     result_list.event.name.value = obj.data.name
     if obj.data.start_time is not None:
-        result_list.event.start_time.date = obj.data.start_time.strftime("%Y-%m-%d")
-        result_list.event.start_time.time = obj.data.start_time.strftime("%H:%M:%S")
+        result_list.event.start_time.date.value = obj.data.start_time.strftime("%Y-%m-%d")
+        result_list.event.start_time.time.value = obj.data.start_time.strftime("%H:%M:%S")
     # TODO
     result_list.write(open(file, 'wb'), xml_declaration=True, encoding='UTF-8')
