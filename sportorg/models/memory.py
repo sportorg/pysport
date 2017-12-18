@@ -1,3 +1,4 @@
+import uuid
 from abc import abstractmethod
 from enum import IntEnum, Enum
 from typing import Dict, List, Any, Union
@@ -131,6 +132,7 @@ class Contact(Model):
 
 class Organization(Model):
     def __init__(self):
+        self.id = uuid.uuid4()
         self.name = ''
         self.address = Address()
         self.contact = Contact()
@@ -171,6 +173,7 @@ class CoursePart(Model):
 
 class Course(Model):
     def __init__(self):
+        self.id = uuid.uuid4()
         self.name = ''
         self.type = ''
         self.bib = 0
@@ -204,6 +207,7 @@ class Course(Model):
 
 class Group(Model):
     def __init__(self):
+        self.id = uuid.uuid4()
         self.name = ''
         self.course = Course()
         self.price = 0
@@ -284,11 +288,20 @@ class Split(Model):
         self.time = None  # type: OTime
         self.pace = None  # type: OTime
 
+    def __eq__(self, other):
+        assert isinstance(other, Split)
+        if self.code == 0 or other.code == 0:
+            return False
+        if self.time is None or other.time is None:
+            return False
+        return self.code == other.code and self.time == other.time
+
 
 class Result:
     def __init__(self):
         if type(self) == Result:
             raise Exception("<Result> must be subclassed.")
+        self.id = uuid.uuid4()
         self.start_time = None  # type: OTime
         self.finish_time = None  # type: OTime
         self.result = None  # type: OTime
@@ -442,6 +455,7 @@ class ResultSFR(Result):
 
 class Person(Model):
     def __init__(self):
+        self.id = uuid.uuid4()
         self.name = ''
         self.surname = ''
         self.sex = Sex.MF
@@ -491,6 +505,7 @@ class RaceData(Model):
 
 class Race(Model):
     def __init__(self):
+        self.id = uuid.uuid4()
         self.data = RaceData()
         self.courses = []  # type: List[Course]
         self.groups = []  # type: List[Group]

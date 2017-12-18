@@ -168,9 +168,17 @@ class ResultEditDialog(QDialog):
         if result.system_type == SystemType.SPORTIDENT:
             if result.sportident_card is None or int(result.sportident_card) != self.item_sportident_card.value():
                 result.sportident_card = race().new_sportident_card(self.item_sportident_card.value())
+                changed = True
 
-            result.splits = self.splits.splits()
-            changed = True
+            new_splits = self.splits.splits()
+            if len(result.splits) == len(new_splits):
+                for i, split in enumerate(result.splits):
+                    if split != new_splits[i]:
+                        changed = True
+                        break
+            else:
+                changed = True
+            result.splits = new_splits
 
         time = time_to_otime(self.item_finish.time())
         if result.finish_time != time:
