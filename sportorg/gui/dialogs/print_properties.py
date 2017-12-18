@@ -3,7 +3,7 @@ import logging
 from PyQt5 import QtPrintSupport
 from PyQt5.QtGui import QIcon
 from PyQt5.QtPrintSupport import QPrinter, QPrintDialog, QAbstractPrintDialog
-from PyQt5.QtWidgets import QFormLayout, QLabel, QDialog, QPushButton, QCheckBox
+from PyQt5.QtWidgets import QFormLayout, QLabel, QDialog, QPushButton, QCheckBox, QDialogButtonBox
 
 from sportorg import config
 from sportorg.core.template import get_templates
@@ -87,11 +87,14 @@ class PrintPropertiesDialog(QDialog):
                 logging.exception(str(e))
             self.close()
 
-        self.button_ok = QPushButton(_('OK'))
+        button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        self.button_ok = button_box.button(QDialogButtonBox.Ok)
+        self.button_ok.setText(_('OK'))
         self.button_ok.clicked.connect(apply_changes)
-        self.button_cancel = QPushButton(_('Cancel'))
+        self.button_cancel = button_box.button(QDialogButtonBox.Cancel)
+        self.button_cancel.setText(_('Cancel'))
         self.button_cancel.clicked.connect(cancel_changes)
-        self.layout.addRow(self.button_ok, self.button_cancel)
+        self.layout.addRow(button_box)
 
         self.show()
 

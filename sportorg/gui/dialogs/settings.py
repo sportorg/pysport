@@ -1,7 +1,7 @@
 import logging
 
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QFormLayout, QDialog, QCheckBox, QPushButton
+from PyQt5.QtWidgets import QFormLayout, QDialog, QCheckBox, QPushButton, QDialogButtonBox
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
@@ -26,6 +26,10 @@ class SettingsDialog(QDialog):
         # self.setMinimumHeight(250)
         self.layout = QFormLayout(self)
 
+        self.show_toolbar = QCheckBox(_('Show toolbar'))
+        self.show_toolbar.setChecked(Config().configuration.get('show_toolbar'))
+        self.layout.addRow(self.show_toolbar)
+
         self.auto_save = QCheckBox(_('Auto save'))
         self.auto_save.setChecked(Config().configuration.get('autosave'))
         self.layout.addRow(self.auto_save)
@@ -48,15 +52,19 @@ class SettingsDialog(QDialog):
                 logging.exception(str(e))
             self.close()
 
-        self.button_ok = QPushButton(_('OK'))
+        button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        self.button_ok = button_box.button(QDialogButtonBox.Ok)
+        self.button_ok.setText(_('OK'))
         self.button_ok.clicked.connect(apply_changes)
-        self.button_cancel = QPushButton(_('Cancel'))
+        self.button_cancel = button_box.button(QDialogButtonBox.Cancel)
+        self.button_cancel.setText(_('Cancel'))
         self.button_cancel.clicked.connect(cancel_changes)
-        self.layout.addRow(self.button_ok, self.button_cancel)
+        self.layout.addRow(button_box)
 
         self.show()
 
     def apply_changes_impl(self):
+        Config().configuration.set('show_toolbar', self.show_toolbar.isChecked())
         Config().configuration.set('autosave', self.auto_save.isChecked())
         Config().configuration.set('autoconnect', self.auto_connect.isChecked())
         Config().configuration.set('open_recent_file', self.open_recent_file.isChecked())

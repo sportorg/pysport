@@ -9,8 +9,12 @@ VERSION = Version(0, 10, 0, 0, 'v', 'beta')
 DEBUG = True
 
 
+def is_executable():
+    return hasattr(sys, 'frozen')
+
+
 def module_path():
-    if hasattr(sys, 'frozen'):
+    if is_executable():
         return os.path.dirname(
             sys.executable
         )

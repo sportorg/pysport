@@ -2,7 +2,7 @@ import logging
 
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QDialog, QTableView
+from PyQt5.QtWidgets import QDialog, QTableView, QDialogButtonBox, QVBoxLayout, QWidget
 
 from sportorg import config
 from sportorg.gui.dialogs import entry_edit
@@ -23,45 +23,46 @@ class DialogFilter(QDialog):
         return super().exec()
 
     def init_ui(self):
-        self.setObjectName("filter_dialog")
         self.setWindowModality(QtCore.Qt.WindowModal)
         self.setWindowIcon(QIcon(config.ICON))
         self.resize(300, 200)
         self.setSizeGripEnabled(False)
         self.setModal(True)
-        self.grid_layout = QtWidgets.QGridLayout(self)
-        self.grid_layout.setObjectName("gridLayout")
+
+        self.layout = QVBoxLayout(self)
+
+        self.grid_layout = QtWidgets.QGridLayout()
+        widget = QWidget(self)
+        widget.setLayout(self.grid_layout)
         
         self.group_label = QtWidgets.QLabel(self)
-        self.group_label.setObjectName("group_label")
         self.grid_layout.addWidget(self.group_label, 0, 0, 1, 4)
 
         self.group_combo = AdvComboBox(self)
-        self.group_combo.setObjectName("group_combo")
         self.group_combo.addItem('')
         self.group_combo.addItems(entry_edit.get_groups())
         self.grid_layout.addWidget(self.group_combo, 0, 1, 1, 4)
 
         self.team_label = QtWidgets.QLabel(self)
-        self.team_label.setObjectName("team_label")
         self.grid_layout.addWidget(self.team_label, 1, 0, 1, 4)
 
         self.team_combo = AdvComboBox(self)
-        self.team_combo.setObjectName("team_combo")
         self.team_combo.addItem('')
         self.team_combo.addItems(entry_edit.get_teams())
         self.grid_layout.addWidget(self.team_combo, 1, 1, 1, 4)
 
-        self.button_box = QtWidgets.QDialogButtonBox(self)
-        self.button_box.setOrientation(QtCore.Qt.Horizontal)
-        self.button_box.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel | QtWidgets.QDialogButtonBox.Ok)
-        self.button_box.setObjectName("button_box")
-        self.grid_layout.addWidget(self.button_box, 2, 0, 1, 2)
+        button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        self.button_ok = button_box.button(QDialogButtonBox.Ok)
+        self.button_ok.setText(_('OK'))
+        self.button_ok.clicked.connect(self.accept)
+        self.button_cancel = button_box.button(QDialogButtonBox.Cancel)
+        self.button_cancel.setText(_('Cancel'))
+        self.button_cancel.clicked.connect(self.reject)
+
+        self.layout.addWidget(widget)
+        self.layout.addWidget(button_box)
 
         self.retranslate_ui()
-        self.button_box.accepted.connect(self.accept)
-        self.button_box.rejected.connect(self.reject)
-        QtCore.QMetaObject.connectSlotsByName(self)
 
         self.show()
 

@@ -3,7 +3,7 @@ import logging
 from PyQt5.QtCore import QTime
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QLabel, QDialog, \
-    QPushButton, QTimeEdit, QSpinBox, QRadioButton, QGroupBox, QCheckBox, QGridLayout
+    QPushButton, QTimeEdit, QSpinBox, QRadioButton, QGroupBox, QCheckBox, QGridLayout, QDialogButtonBox
 
 from sportorg.config import icon_dir
 from sportorg.gui.global_access import GlobalAccess
@@ -104,14 +104,14 @@ class SportidentPropertiesDialog(QDialog):
                 logging.exception(str(e))
             self.close()
 
-        bottom = QGridLayout()
-        self.button_ok = QPushButton(_('OK'))
+        button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        self.button_ok = button_box.button(QDialogButtonBox.Ok)
+        self.button_ok.setText(_('OK'))
         self.button_ok.clicked.connect(apply_changes)
-        self.button_cancel = QPushButton(_('Cancel'))
+        self.button_cancel = button_box.button(QDialogButtonBox.Cancel)
+        self.button_cancel.setText(_('Cancel'))
         self.button_cancel.clicked.connect(cancel_changes)
-        bottom.addWidget(self.button_ok, 0, 0)
-        bottom.addWidget(self.button_cancel, 0, 1)
-        self.layout.addRow(bottom)
+        self.layout.addRow(button_box)
 
         self.set_values_from_model()
 

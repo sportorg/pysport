@@ -59,6 +59,8 @@ class MainWindow(QMainWindow):
     def __init__(self, argv=None):
         super().__init__()
         self.recent_files = []
+        self.menu_property = {}
+        self.toolbar_property = {}
         try:
             self.file = argv[1]
             self.add_recent_file(self.file)
@@ -76,7 +78,8 @@ class MainWindow(QMainWindow):
             logging.error(e)
         self._setup_ui()
         self._setup_menu()
-        self._setup_toolbar()
+        if Configuration().configuration.get('show_toolbar'):
+            self._setup_toolbar()
         self._setup_tab()
         self._setup_statusbar()
         self._setup_system_tray_icon()
@@ -131,8 +134,6 @@ class MainWindow(QMainWindow):
         if Configuration().configuration.get('autoconnect'):
             self.sportident_connect()
 
-        sportident.toolbar_sportident()
-
     def _setup_ui(self):
         geometry = ConfigFile.GEOMETRY
         x = Configuration().parser.getint(geometry, 'x', fallback=480)
@@ -153,6 +154,8 @@ class MainWindow(QMainWindow):
 
     def _create_menu(self, parent, actions_list):
         for action_item in actions_list:
+            if 'show' in action_item and not action_item['show']:
+                return
             if 'type' in action_item:
                 if action_item['type'] == 'separator':
                     parent.addSeparator()
@@ -176,7 +179,6 @@ class MainWindow(QMainWindow):
                 parent.addAction(menu.menuAction())
 
     def _setup_menu(self):
-        self.menu_property = {}
         self.menubar = QtWidgets.QMenuBar(self)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 880, 21))
         self.setMenuBar(self.menubar)
@@ -184,7 +186,6 @@ class MainWindow(QMainWindow):
 
     def _setup_toolbar(self):
         self.toolbar = self.addToolBar(_('Toolbar'))
-        self.toolbar_property = {}
         for tb in toolbar_list():
             tb_action = QtWidgets.QAction(QtGui.QIcon(tb[0]), tb[1], self)
             tb_action.triggered.connect(tb[2])
