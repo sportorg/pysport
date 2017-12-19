@@ -134,6 +134,17 @@ def menu_list():
                     'action': GlobalAccess().get_main_window().refresh
                 },
                 {
+                    'title': _('Filter'),
+                    'shortcut': 'F2',
+                    'icon': config.icon_dir('filter.png'),
+                    'action': GlobalAccess().get_main_window().filter_dialog
+                },
+                {
+                    'title': _('Search'),
+                    'shortcut': 'Ctrl+F',
+                    'action': GlobalAccess().get_main_window().search_dialog
+                },
+                {
                     'type': 'separator',
                 },
                 {
@@ -166,12 +177,6 @@ def menu_list():
         {
             'title': _('Start Preparation'),
             'actions': [
-                {
-                    'title': _('Filter'),
-                    'shortcut': 'F2',
-                    'icon': config.icon_dir('filter.png'),
-                    'action': GlobalAccess().get_main_window().filter_dialog
-                },
                 {
                     'title': _('Start Preparation'),
                     'action': GlobalAccess().get_main_window().start_preparation_dialog

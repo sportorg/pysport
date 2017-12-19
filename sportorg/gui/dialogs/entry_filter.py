@@ -53,10 +53,8 @@ class DialogFilter(QDialog):
 
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         self.button_ok = button_box.button(QDialogButtonBox.Ok)
-        self.button_ok.setText(_('OK'))
         self.button_ok.clicked.connect(self.accept)
         self.button_cancel = button_box.button(QDialogButtonBox.Cancel)
-        self.button_cancel.setText(_('Cancel'))
         self.button_cancel.clicked.connect(self.reject)
 
         self.layout.addWidget(widget)
@@ -100,3 +98,5 @@ class DialogFilter(QDialog):
         self.setWindowTitle(_("Filter Dialog"))
         self.group_label.setText(_("Group"))
         self.team_label.setText(_("Team"))
+        self.button_ok.setText(_('OK'))
+        self.button_cancel.setText(_('Cancel'))
