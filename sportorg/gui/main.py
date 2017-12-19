@@ -6,6 +6,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets, Qt
 from PyQt5.QtWidgets import QMainWindow, QTableView, QMessageBox
 
 from sportorg.gui.dialogs.bib_report_dialog import BibReportDialog
+from sportorg.gui.dialogs.search_dialog import SearchDialog
 from sportorg.gui.dialogs.text_io import TextExchangeDialog
 from sportorg.libs.winorient.wdb import write_wdb
 from sportorg.models.memory import Race, event as races, race
@@ -336,11 +337,22 @@ class MainWindow(QMainWindow):
         except Exception as e:
             logging.exception(str(e))
 
-    @staticmethod
-    def filter_dialog():
+    def filter_dialog(self):
         try:
+            if self.current_tab not in range(2):
+                return
             table = GlobalAccess().get_current_table()
             ex = DialogFilter(table)
+            ex.exec()
+        except Exception as e:
+            logging.exception(str(e))
+
+    def search_dialog(self):
+        try:
+            if self.current_tab not in range(5):
+                return
+            table = GlobalAccess().get_current_table()
+            ex = SearchDialog(table)
             ex.exec()
         except Exception as e:
             logging.exception(str(e))

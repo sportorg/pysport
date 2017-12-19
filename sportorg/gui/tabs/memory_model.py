@@ -1,7 +1,9 @@
 import logging
 import re
+from abc import abstractmethod
 
 from PyQt5.QtCore import QVariant, QAbstractTableModel, Qt, QSortFilterProxyModel
+from typing import List
 
 from sportorg.language import _
 from sportorg.models.memory import race, Result, Group, Course, Organization, SystemType
@@ -23,15 +25,35 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
         # while clearing of filter list is recovered from backup
         self.filter_backup = []
 
+        self.search = ''
+        self.search_backup = []
+
+    @abstractmethod
+    def init_cache(self):
+        pass
+
+    @abstractmethod
+    def get_values_from_object(self, obj):
+        pass
+
+    @abstractmethod
+    def get_source_array(self) -> List:
+        pass
+
+    @abstractmethod
+    def set_source_array(self, array):
+        pass
+
+    @abstractmethod
+    def get_headers(self) -> List:
+        pass
+
     def columnCount(self, parent=None, *args, **kwargs):
         return len(self.get_headers())
 
     def rowCount(self, parent=None, *args, **kwargs):
         ret = len(self.cache)
         return ret
-
-    def get_headers(self):
-        pass
 
     def headerData(self, index, orientation, role=None):
         if role == Qt.DisplayRole:
@@ -40,9 +62,6 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
                 return _(columns[index])
             if orientation == Qt.Vertical:
                 return str(index+1)
-
-    def init_cache(self):
-        pass
 
     def data(self, index, role=None):
         if role == Qt.DisplayRole:
@@ -97,7 +116,38 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
         self.set_source_array(current_array)
         self.init_cache()
 
-    def sort(self, Ncol, order):
+    def clear_search(self, remove_condition=True):
+        if remove_condition:
+            self.search = ''
+        if self.search_backup is not None and len(self.search_backup):
+            whole_list = self.get_source_array()
+            whole_list.extend(self.search_backup)
+            self.set_source_array(whole_list)
+            self.search_backup = []
+
+    def apply_search(self):
+        current_array = self.get_source_array()
+        current_array.extend(self.search_backup)
+        check_regexp = self.search
+        check = re.compile(check_regexp)
+
+        count_columns = len(self.get_headers())
+        columns = range(count_columns)
+        i = 0
+        while i < len(current_array):
+            obj = self.get_values_from_object(current_array[i])
+            for column in columns:
+                value = str(obj[column])
+                if check.match(value):
+                    i += 1
+                    break
+            else:
+                self.search_backup.append(current_array.pop(i))
+
+        self.set_source_array(current_array)
+        self.init_cache()
+
+    def sort(self, p_int, order=None):
         """Sort table by given column number.
         """
         try:
@@ -107,9 +157,9 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
 
             if len(source_array):
                 source_array = sorted(source_array,
-                                      key=lambda x: (self.get_item(x, Ncol) is None,
-                                                     str(type(self.get_item(x, Ncol))),
-                                                     self.get_item(x, Ncol)))
+                                      key=lambda x: (self.get_item(x, p_int) is None,
+                                                     str(type(self.get_item(x, p_int))),
+                                                     self.get_item(x, p_int)))
                 if order == Qt.DescendingOrder:
                     source_array = source_array[::-1]
 
@@ -123,17 +173,8 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
     def update_one_object(self, part, index):
         self.values[index] = self.get_values_from_object(part)
 
-    def get_values_from_object(self, obj):
-        pass
-
     def get_item(self, obj, n_col):
         return self.get_values_from_object(obj)[n_col]
-
-    def get_source_array(self):
-        pass
-
-    def set_source_array(self, array):
-        pass
 
 
 class PersonMemoryModel(AbstractSportOrgMemoryModel):
@@ -159,7 +200,7 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
 
         ret.append(person.surname)
         ret.append(person.name)
-        ret.append(person.sex)
+        ret.append(person.sex.get_title())
         if person.qual:
             ret.append(person.qual.get_title())
         else:
@@ -172,18 +213,18 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
             ret.append(person.organization.name)
         else:
             ret.append('')
-        ret.append(person.year)
-        ret.append(person.bib)
+        ret.append(str(person.year))
+        ret.append(str(person.bib))
         if person.start_time:
             ret.append(time_to_hhmmss(person.start_time))
         else:
             ret.append('')
-        ret.append(person.start_group)
-        ret.append(int(person.sportident_card) if person.sportident_card is not None else 0)
+        ret.append(str(person.start_group))
+        ret.append(str(person.sportident_card) if person.sportident_card is not None else '')
         ret.append(_('rented stub'))
         ret.append(person.comment)
-        ret.append(person.world_code)
-        ret.append(person.national_code)
+        ret.append(str(person.world_code) if person.world_code else '')
+        ret.append(str(person.national_code) if person.national_code else '')
 
         out_of_comp_status = ''
         if person.is_out_of_competition:
@@ -249,21 +290,21 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
         if i.finish_time:
             finish = str(i.finish_time)
 
-        return list([
+        return [
             last_name,
             first_name,
             group,
             team,
-            bib,
+            str(bib),
             sportident_card,
             start,
             finish,
             i.get_result(),
             i.status.get_title(),
             time_to_hhmmss(i.get_penalty_time()),
-            i.place if i.place is not None else '',
+            str(i.place) if i.place is not None else '',
             str(i.system_type)
-        ])
+        ]
 
     def get_source_array(self):
         return race().results
@@ -299,21 +340,21 @@ class GroupMemoryModel(AbstractSportOrgMemoryModel):
         if course.controls is not None:
             control_count = len(course.controls)
 
-        return list([
+        return [
             group.name,
             group.long_name,
             course.name,
             course.type,
-            course.length,
-            control_count,
-            course.climb,
+            str(course.length),
+            str(control_count),
+            str(course.climb),
             group.sex.get_title(),
-            group.min_age,
-            group.max_age,
-            group.start_interval,
-            group.start_corridor,
-            group.order_in_corridor,
-        ])
+            str(group.min_age),
+            str(group.max_age),
+            str(group.start_interval),
+            str(group.start_corridor),
+            str(group.order_in_corridor),
+        ]
 
     def get_source_array(self):
         return race().groups
@@ -343,14 +384,14 @@ class CourseMemoryModel(AbstractSportOrgMemoryModel):
         if course is None:
             course = Course()
 
-        return list([
+        return [
             course.name,
             course.type,
-            course.length,
-            len(course.controls),
-            course.climb,
+            str(course.length),
+            str(len(course.controls)),
+            str(course.climb),
             ' '.join(course.get_code_list()),
-        ])
+        ]
 
     def get_source_array(self):
         return race().courses
@@ -380,14 +421,14 @@ class TeamMemoryModel(AbstractSportOrgMemoryModel):
         if team is None:
             team = Organization()
 
-        return list([
+        return [
             team.name,
             team.address.street,
             team.country.name,
             team.region,
             team.city,
             team.contact.value
-        ])
+        ]
 
     def get_source_array(self):
         return race().organizations
