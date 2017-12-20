@@ -10,154 +10,10 @@ from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
+from sportorg.models.constant import get_names, get_race_groups, get_race_teams
 from sportorg.models.memory import race, Person, find, Qualification, Limit
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.utils.time import time_to_qtime, time_to_otime
-
-
-def get_groups():
-    ret = []
-    try:
-        for i in race().groups:
-            ret.append(i.name)
-        return ret
-    except Exception as e:
-        logging.exception(str(e))
-        return ['', 'M12', 'M14', 'M16', 'M21', 'D12', 'D14', 'M16', 'D21']
-
-
-def get_teams():
-    ret = ['']
-    try:
-        for i in race().organizations:
-            ret.append(i.name)
-        return ret
-    except Exception as e:
-        logging.exception(str(e))
-        return ['', 'Тюменская обл.', 'Курганская обл.', 'Челябинская обл.', 'Республика Коми', 'г.Москва',
-                'ХМАО-Югра']
-
-
-def get_names():
-    names = [
-        '',
-        'Адик',
-        'Азамат',
-        'Александр',
-        'Александра',
-        'Алексей',
-        'Алена',
-        'Алина',
-        'Альберт',
-        'Анастасия',
-        'Андрей',
-        'Анна',
-        'Антон',
-        'Арина',
-        'Аркадий',
-        'Артем',
-        'Артём',
-        'Артур',
-        'Боймат',
-        'Вадим',
-        'Валентина',
-        'Валерий',
-        'Валерия',
-        'Варвара',
-        'Василий',
-        'Василина',
-        'Вениамин',
-        'Вера',
-        'Вероника',
-        'Виктор',
-        'Виктория',
-        'Виталий',
-        'Влада',
-        'Владимир',
-        'Владислав',
-        'Всеволод',
-        'Вячеслав',
-        'Галина',
-        'Георгий',
-        'Григорий',
-        'Даниил',
-        'Данил',
-        'Данила',
-        'Данис',
-        'Дания',
-        'Дарья',
-        'Денис',
-        'Диана',
-        'Дмитрий',
-        'Евангелина',
-        'Евгений',
-        'Евгения',
-        'Егор',
-        'Екатерина',
-        'Елена',
-        'Елизавета',
-        'Заур',
-        'Иван',
-        'Игорь',
-        'Илья',
-        'Ирина',
-        'Карина',
-        'Кирилл',
-        'Константин',
-        'Кристина',
-        'Ксения',
-        'Лариса',
-        'Лев',
-        'Леонид',
-        'Лидия',
-        'Любовь',
-        'Людмила',
-        'Макар',
-        'Максим',
-        'Маргарита',
-        'Марина',
-        'Мария',
-        'Матвей',
-        'Михаил',
-        'Надежда',
-        'Наталья',
-        'Никит',
-        'Никита',
-        'Николай',
-        'Нина',
-        'Оксана',
-        'Олег',
-        'Олеся',
-        'Ольга',
-        'Павел',
-        'Полина',
-        'Равиль',
-        'Раиса',
-        'Рамзия',
-        'Роман',
-        'Руслан',
-        'Савелий',
-        'Светлана',
-        'Святослав',
-        'Семён',
-        'Сергей',
-        'Софья',
-        'Станислав',
-        'Степан',
-        'Тамара',
-        'Татьяна',
-        'Тимофей',
-        'Тимур',
-        'Ульяна',
-        'Филипп',
-        'Шойра',
-        'Эльза',
-        'Юлия',
-        'Юрий',
-        'Ярослав',
-        'Ярослава'
-    ]
-    return names
 
 
 class EntryEditDialog(QDialog):
@@ -196,12 +52,12 @@ class EntryEditDialog(QDialog):
 
         self.label_group = QLabel(_('Group'))
         self.item_group = AdvComboBox()
-        self.item_group.addItems(get_groups())
+        self.item_group.addItems(get_race_groups())
         self.layout.addRow(self.label_group, self.item_group)
 
         self.label_team = QLabel(_('Team'))
         self.item_team = AdvComboBox()
-        self.item_team.addItems(get_teams())
+        self.item_team.addItems(get_race_teams())
         self.layout.addRow(self.label_team, self.item_team)
 
         self.label_year = QLabel(_('Year of birth'))

@@ -5,10 +5,10 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QDialog, QTableView, QDialogButtonBox, QVBoxLayout, QWidget
 
 from sportorg import config
-from sportorg.gui.dialogs import entry_edit
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
+from sportorg.models.constant import get_race_teams, get_race_groups
 
 
 class DialogFilter(QDialog):
@@ -40,7 +40,7 @@ class DialogFilter(QDialog):
 
         self.group_combo = AdvComboBox(self)
         self.group_combo.addItem('')
-        self.group_combo.addItems(entry_edit.get_groups())
+        self.group_combo.addItems(get_race_groups())
         self.grid_layout.addWidget(self.group_combo, 0, 1, 1, 4)
 
         self.team_label = QtWidgets.QLabel(self)
@@ -48,7 +48,7 @@ class DialogFilter(QDialog):
 
         self.team_combo = AdvComboBox(self)
         self.team_combo.addItem('')
-        self.team_combo.addItems(entry_edit.get_teams())
+        self.team_combo.addItems(get_race_teams())
         self.grid_layout.addWidget(self.team_combo, 1, 1, 1, 4)
 
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)

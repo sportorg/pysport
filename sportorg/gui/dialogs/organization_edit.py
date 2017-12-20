@@ -8,16 +8,8 @@ from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
+from sportorg.models.constant import get_countries, get_regions
 from sportorg.models.memory import race, Organization
-
-
-def get_countries():
-    return ['', 'Russia', 'Finland', 'Norway', 'Germany', 'France', 'Austria', 'Kazakhstan', 'Ukraine', 'Poland', 'Estonia']
-
-
-def get_regions():
-    return ['', 'Тюменская обл.', 'Курганская обл.', 'Свердловская обл.', 'Челябинская обл.', 'Республика Коми', 'г.Москва',
-            'ХМАО-Югра']
 
 
 class OrganizationEditDialog(QDialog):
@@ -59,13 +51,17 @@ class OrganizationEditDialog(QDialog):
         self.item_region.addItems(get_regions())
         self.layout.addRow(self.label_region, self.item_region)
 
-        self.label_contact = QLabel(_('Contact'))
-        self.item_contact = QLineEdit()
-        self.layout.addRow(self.label_contact, self.item_contact)
+        self.label_city = QLabel(_('City'))
+        self.item_city = QLineEdit()
+        self.layout.addRow(self.label_city, self.item_city)
 
         self.label_address = QLabel(_('Address'))
         self.item_address = QLineEdit()
         self.layout.addRow(self.label_address, self.item_address)
+
+        self.label_contact = QLabel(_('Contact'))
+        self.item_contact = QLineEdit()
+        self.layout.addRow(self.label_contact, self.item_contact)
 
         def cancel_changes():
             self.close()
@@ -91,11 +87,12 @@ class OrganizationEditDialog(QDialog):
     def set_values_from_table(self):
 
         self.item_name.setText(self.current_object.name)
+        self.item_city.setText(self.current_object.address.city)
 
-        if self.current_object.country is not None:
-            self.item_country.setCurrentText(self.current_object.country.name)
-        if self.current_object.region:
-            self.item_region.setCurrentText(self.current_object.region)
+        if self.current_object.address.country is not None:
+            self.item_country.setCurrentText(self.current_object.address.country.name)
+        if self.current_object.address.state:
+            self.item_region.setCurrentText(self.current_object.address.state)
         if self.current_object.contact is not None:
             self.item_contact.setText(self.current_object.contact.value)
         if self.current_object.address is not None:
@@ -110,21 +107,25 @@ class OrganizationEditDialog(QDialog):
             org.name = self.item_name.text()
             changed = True
 
-        if org.country.name != self.item_country.currentText():
-            org.country.name = self.item_country.currentText()
+        if org.address.country.name != self.item_country.currentText():
+            org.address.country.name = self.item_country.currentText()
             changed = True
 
-        if org.region != self.item_region.currentText():
-            org.region = self.item_region.currentText()
+        if org.address.state != self.item_region.currentText():
+            org.address.state = self.item_region.currentText()
+            changed = True
+
+        if org.address.city != self.item_city.text():
+            org.address.city = self.item_city.text()
+            changed = True
+
+        if org.address.street != self.item_address.text():
+            org.address.street = self.item_address.text()
             changed = True
 
         if org.contact.value != self.item_contact.text():
             org.contact.value = self.item_contact.text()
             org.contact.name = 'phone'
-            changed = True
-
-        if org.address != self.item_address.text():
-            org.address.street = self.item_address.text()
             changed = True
 
         if changed:

@@ -424,9 +424,9 @@ class TeamMemoryModel(AbstractSportOrgMemoryModel):
         return [
             team.name,
             team.address.street,
-            team.country.name,
-            team.region,
-            team.city,
+            team.address.country.name,
+            team.address.state,
+            team.address.city,
             team.contact.value
         ]
 
