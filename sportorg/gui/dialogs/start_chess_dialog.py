@@ -3,7 +3,7 @@ import logging
 import time
 
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QFormLayout, QDialog, QPushButton, QTextEdit, QDialogButtonBox
+from PyQt5.QtWidgets import QFormLayout, QDialog, QTextEdit, QDialogButtonBox
 
 from sportorg import config
 from sportorg.gui.dialogs.file_dialog import get_save_file_name

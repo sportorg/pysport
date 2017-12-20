@@ -348,9 +348,9 @@ class MainWindow(QMainWindow):
             logging.exception(str(e))
 
     def search_dialog(self):
+        if self.current_tab not in range(5):
+            return
         try:
-            if self.current_tab not in range(5):
-                return
             table = GlobalAccess().get_current_table()
             ex = SearchDialog(table)
             ex.exec()
@@ -496,8 +496,9 @@ class MainWindow(QMainWindow):
     def create_object():
         GlobalAccess().add_object()
 
-    @staticmethod
-    def delete_object():
+    def delete_object(self):
+        if self.current_tab not in range(5):
+            return
         try:
             GlobalAccess().delete_object()
         except Exception as e:

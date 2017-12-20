@@ -136,9 +136,6 @@ class Organization(Model):
         self.name = ''
         self.address = Address()
         self.contact = Contact()
-        self.country = Country()
-        self.city = ''
-        self.region = ''
         self.count_person = 0
 
     def __str__(self):

@@ -23,7 +23,7 @@ def get_types():
 
 
 class EventPropertiesDialog(QDialog):
-    def __init__(self, table=None, index=None):
+    def __init__(self):
         super().__init__(GlobalAccess().get_main_window())
 
     def exec(self):

@@ -10,19 +10,10 @@ from sportorg.gui.dialogs.group_ranking import GroupRankingDialog
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
+from sportorg.models.constant import get_race_courses
 from sportorg.models.memory import race, Group, find, Sex, Limit
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.utils.time import time_to_qtime, time_to_otime
-
-
-def get_courses():
-    ret = []
-    try:
-        for i in race().courses:
-            ret.append(i.name)
-        return ret
-    except Exception as e:
-        logging.exception(str(e))
 
 
 def get_sexes():
@@ -65,7 +56,7 @@ class GroupEditDialog(QDialog):
 
         self.label_course = QLabel(_('Course'))
         self.item_course = AdvComboBox()
-        self.item_course.addItems(get_courses())
+        self.item_course.addItems(get_race_courses())
         self.layout.addRow(self.label_course, self.item_course)
 
         self.label_sex = QLabel(_('Sex'))

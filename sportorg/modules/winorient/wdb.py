@@ -62,11 +62,8 @@ class WinOrientBinary:
             assert (isinstance(team, WDBTeam))
             new_team = Organization()
             new_team.name = team.name
-            # new_team.region = str(team.region)
-            new_team.country = Country()
             new_team.address = Address()
             new_team.contact = Contact()
-            # new_team.country.name = str(team.country)
             my_race.organizations.append(new_team)
 
         for course in self.wdb_object.dist:
@@ -172,12 +169,7 @@ class WinOrientBinary:
         for team in my_race.organizations:
             new_team = WDBTeam()
             new_team.name = team.name
-            if team.region:
-                if isinstance(team.region, int):
-                    new_team.region = team.region
 
-            # TODO decode country id
-            new_team.country = 0
             wdb_object.team.append(new_team)
             new_team.id = len(wdb_object.team)
 
