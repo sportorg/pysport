@@ -9,7 +9,7 @@ from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
 from sportorg.models.constant import get_countries, get_regions
-from sportorg.models.memory import race, Organization
+from sportorg.models.memory import race, Organization, find
 
 
 class OrganizationEditDialog(QDialog):
@@ -39,6 +39,7 @@ class OrganizationEditDialog(QDialog):
 
         self.label_name = QLabel(_('Name'))
         self.item_name = QLineEdit()
+        self.item_name.textChanged.connect(self.check_name)
         self.layout.addRow(self.label_name, self.item_name)
 
         self.label_country = QLabel(_('Country'))
@@ -83,6 +84,14 @@ class OrganizationEditDialog(QDialog):
         self.layout.addRow(button_box)
 
         self.show()
+
+    def check_name(self):
+        name = self.item_name.text()
+        self.button_ok.setDisabled(False)
+        if name:
+            org = find(race().organizations, name=name)
+            if org:
+                self.button_ok.setDisabled(True)
 
     def set_values_from_table(self):
 

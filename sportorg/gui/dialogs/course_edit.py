@@ -8,7 +8,7 @@ from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
-from sportorg.models.memory import race, Course, CourseControl
+from sportorg.models.memory import race, Course, CourseControl, find
 
 
 def get_course_types():
@@ -42,6 +42,7 @@ class CourseEditDialog(QDialog):
 
         self.label_name = QLabel(_('Name'))
         self.item_name = QLineEdit()
+        self.item_name.textChanged.connect(self.check_name)
         self.layout.addRow(self.label_name, self.item_name)
 
         self.label_type = QLabel(_('Type'))
@@ -92,6 +93,14 @@ class CourseEditDialog(QDialog):
         self.layout.addRow(button_box)
 
         self.show()
+
+    def check_name(self):
+        name = self.item_name.text()
+        self.button_ok.setDisabled(False)
+        if name:
+            org = find(race().courses, name=name)
+            if org:
+                self.button_ok.setDisabled(True)
 
     def set_values_from_table(self):
 

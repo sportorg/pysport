@@ -605,22 +605,18 @@ class Race(Model):
 
     def add_new_person(self):
         new_person = Person()
-        new_person.name = '_new'
         self.persons.insert(0, new_person)
 
     def add_new_group(self):
         new_group = Group()
-        new_group.name = '_new'
         self.groups.insert(0, new_group)
 
     def add_new_course(self):
         new_course = Course()
-        new_course.name = '_new'
         self.courses.insert(0, new_course)
 
     def add_new_organization(self):
         new_organization = Organization()
-        new_organization.name = '_new'
         self.organizations.insert(0, new_organization)
 
     def update_counters(self):
