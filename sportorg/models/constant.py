@@ -191,10 +191,11 @@ def get_groups():
 
 
 def get_race_groups():
-    ret = []
+    ret = ['']
     try:
         for i in race().groups:
-            ret.append(i.name)
+            if i.name:
+                ret.append(i.name)
         return ret
     except Exception as e:
         logging.exception(str(e))
@@ -202,14 +203,16 @@ def get_race_groups():
 
 
 def get_teams():
-    return ['', 'Тюменская обл.', 'Курганская обл.', 'Челябинская обл.', 'Республика Коми', 'г.Москва', 'ХМАО-Югра']
+    return ['', 'Тюменская обл.', 'Курганская обл.', 'Челябинская обл.', 'Республика Коми', 'г.Москва',
+            'ХМАО-Югра']
 
 
 def get_race_teams():
     ret = ['']
     try:
         for i in race().organizations:
-            ret.append(i.name)
+            if i.name:
+                ret.append(i.name)
         return ret
     except Exception as e:
         logging.exception(str(e))
@@ -217,13 +220,15 @@ def get_race_teams():
 
 
 def get_race_courses():
-    ret = []
+    ret = ['']
     try:
         for i in race().courses:
-            ret.append(i.name)
+            if i.name:
+                ret.append(i.name)
         return ret
     except Exception as e:
         logging.exception(str(e))
+        return []
 
 
 def get_names():

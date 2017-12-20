@@ -48,6 +48,7 @@ class GroupEditDialog(QDialog):
 
         self.label_name = QLabel(_('Name'))
         self.item_name = QLineEdit()
+        self.item_name.textChanged.connect(self.check_name)
         self.layout.addRow(self.label_name, self.item_name)
 
         self.label_full_name = QLabel(_('Full name'))
@@ -121,6 +122,14 @@ class GroupEditDialog(QDialog):
 
         self.show()
         self.button_ok.setFocus()
+
+    def check_name(self):
+        name = self.item_name.text()
+        self.button_ok.setDisabled(False)
+        if name:
+            org = find(race().groups, name=name)
+            if org:
+                self.button_ok.setDisabled(True)
 
     def set_values_from_table(self):
 

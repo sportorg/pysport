@@ -11,7 +11,7 @@ from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
 from sportorg.models.constant import get_names, get_race_groups, get_race_teams
-from sportorg.models.memory import race, Person, find, Qualification, Limit
+from sportorg.models.memory import race, Person, find, Qualification, Limit, Organization
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.utils.time import time_to_qtime, time_to_otime
 
@@ -264,7 +264,12 @@ class EntryEditDialog(QDialog):
             changed = True
         if (person.organization is not None and person.organization.name != self.item_team.currentText()) or \
                 (person.organization is None and len(self.item_team.currentText()) > 0):
-            person.organization = find(race().organizations, name=self.item_team.currentText())
+            organization = find(race().organizations, name=self.item_team.currentText())
+            if organization is None:
+                organization = Organization()
+                organization.name = self.item_team.currentText()
+                race().organizations.append(organization)
+            person.organization = organization
             changed = True
         if person.year != self.item_year.value():
             person.year = self.item_year.value()
