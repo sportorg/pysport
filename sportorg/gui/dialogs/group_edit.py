@@ -126,7 +126,7 @@ class GroupEditDialog(QDialog):
     def check_name(self):
         name = self.item_name.text()
         self.button_ok.setDisabled(False)
-        if name:
+        if name and name != self.current_object.name:
             org = find(race().groups, name=name)
             if org:
                 self.button_ok.setDisabled(True)
