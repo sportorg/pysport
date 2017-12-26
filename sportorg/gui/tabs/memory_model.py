@@ -213,8 +213,8 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
             ret.append(person.organization.name)
         else:
             ret.append('')
-        ret.append(str(person.year))
-        ret.append(str(person.bib))
+        ret.append(person.year)
+        ret.append(person.bib)
         if person.start_time:
             ret.append(time_to_hhmmss(person.start_time))
         else:
@@ -295,14 +295,14 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
             first_name,
             group,
             team,
-            str(bib),
+            bib,
             sportident_card,
             start,
             finish,
             i.get_result(),
             i.status.get_title(),
             time_to_hhmmss(i.get_penalty_time()),
-            str(i.place) if i.place is not None else '',
+            i.place if i.place is not None else '',
             str(i.system_type)
         ]
 
@@ -345,15 +345,15 @@ class GroupMemoryModel(AbstractSportOrgMemoryModel):
             group.long_name,
             course.name,
             course.type,
-            str(course.length),
-            str(control_count),
-            str(course.climb),
+            course.length,
+            control_count,
+            course.climb,
             group.sex.get_title(),
-            str(group.min_age),
-            str(group.max_age),
-            str(group.start_interval),
-            str(group.start_corridor),
-            str(group.order_in_corridor),
+            group.min_age,
+            group.max_age,
+            group.start_interval,
+            group.start_corridor,
+            group.order_in_corridor,
         ]
 
     def get_source_array(self):
@@ -387,9 +387,9 @@ class CourseMemoryModel(AbstractSportOrgMemoryModel):
         return [
             course.name,
             course.type,
-            str(course.length),
-            str(len(course.controls)),
-            str(course.climb),
+            course.length,
+            len(course.controls),
+            course.climb,
             ' '.join(course.get_code_list()),
         ]
 
