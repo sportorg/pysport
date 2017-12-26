@@ -241,6 +241,10 @@ class EntryEditDialog(QDialog):
             self.item_card.setValue(int(self.current_object.sportident_card))
 
         self.item_out_of_competition.setChecked(self.current_object.is_out_of_competition)
+        self.item_paid.setChecked(self.current_object.is_paid)
+        self.item_paid.setChecked(self.current_object.is_paid)
+        self.item_personal.setChecked(self.current_object.is_personal)
+        self.item_rented.setChecked(self.current_object.is_rented_sportident_card)
 
         self.item_comment.setText(self.current_object.comment)
 
@@ -297,6 +301,18 @@ class EntryEditDialog(QDialog):
 
         if person.is_out_of_competition != self.item_out_of_competition.isChecked():
             person.is_out_of_competition = self.item_out_of_competition.isChecked()
+            changed = True
+
+        if person.is_paid != self.item_paid.isChecked():
+            person.is_paid = self.item_paid.isChecked()
+            changed = True
+
+        if person.is_rented_sportident_card != self.item_rented.isChecked():
+            person.is_rented_sportident_card = self.item_rented.isChecked()
+            changed = True
+
+        if person.is_personal != self.item_personal.isChecked():
+            person.is_personal = self.item_personal.isChecked()
             changed = True
 
         if person.comment != self.item_comment.toPlainText():
