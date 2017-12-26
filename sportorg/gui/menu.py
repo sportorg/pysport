@@ -198,6 +198,10 @@ def menu_list():
                     'action': GlobalAccess().get_main_window().create_start_protocol_dialog
                 },
                 {
+                    'title': _('Team list'),
+                    'action': GlobalAccess().get_main_window().create_team_protocol_dialog
+                },
+                {
                     'title': _('Start times'),
                     'action': GlobalAccess().get_main_window().create_chess_dialog
                 },

@@ -12,10 +12,10 @@ from sportorg.gui.dialogs.file_dialog import get_open_file_name, get_save_file_n
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
-from sportorg.models.start.start_calculation import get_start_data
+from sportorg.models.start.start_calculation import get_teams_data
 
 
-class StartReportDialog(QDialog):
+class TeamReportDialog(QDialog):
     def __init__(self):
         super().__init__(GlobalAccess().get_main_window())
 
@@ -24,7 +24,7 @@ class StartReportDialog(QDialog):
         return super().exec()
 
     def init_ui(self):
-        self.setWindowTitle(_('Start list'))
+        self.setWindowTitle(_('Team list'))
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(True)
@@ -33,7 +33,7 @@ class StartReportDialog(QDialog):
 
         self.label_template = QLabel(_('Template'))
         self.item_template = AdvComboBox()
-        self.item_template.addItems(get_templates(config.template_dir('start')))
+        self.item_template.addItems(get_templates(config.template_dir('team')))
         self.layout.addRow(self.label_template, self.item_template)
 
         self.item_custom_path = QPushButton(_('Choose template'))
@@ -70,7 +70,7 @@ class StartReportDialog(QDialog):
     def apply_changes_impl(self):
         template_path = self.item_template.currentText()
 
-        template = get_text_from_file(template_path, **get_start_data())
+        template = get_text_from_file(template_path, **get_teams_data())
 
         file_name = get_save_file_name(_('Save As HTML file'), _("HTML file (*.html)"),
                                        '{}_start'.format(time.strftime("%Y%m%d")))

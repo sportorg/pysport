@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import QMainWindow, QTableView, QMessageBox
 
 from sportorg.gui.dialogs.bib_report_dialog import BibReportDialog
 from sportorg.gui.dialogs.search_dialog import SearchDialog
+from sportorg.gui.dialogs.team_report_dialog import TeamReportDialog
 from sportorg.gui.dialogs.text_io import TextExchangeDialog
 from sportorg.libs.winorient.wdb import write_wdb
 from sportorg.models.memory import Race, event as races, race
@@ -229,8 +230,11 @@ class MainWindow(QMainWindow):
 
         # TODO: save changes in current file
 
-        file_name = get_save_file_name(_('Create SportOrg file'), _("SportOrg file (*.sportorg)"),
-                                       str(time.strftime("%Y%m%d")))
+        file_name = get_save_file_name(
+            _('Create SportOrg file'),
+            _('SportOrg file (*.sportorg)'),
+            '{}.{}'.format(time.strftime("%Y%m%d"), config.VERSION)
+        )
         if file_name is not '':
             try:
                 GlobalAccess().clear_filters(remove_condition=False)
@@ -472,6 +476,14 @@ class MainWindow(QMainWindow):
     def create_start_protocol_dialog():
         try:
             ex = StartReportDialog()
+            ex.exec()
+        except Exception as e:
+            logging.exception(str(e))
+
+    @staticmethod
+    def create_team_protocol_dialog():
+        try:
+            ex = TeamReportDialog()
             ex.exec()
         except Exception as e:
             logging.exception(str(e))

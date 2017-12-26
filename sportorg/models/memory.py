@@ -472,6 +472,9 @@ class Person(Model):
         self.rank = None  # position/scores in word ranking
         self.qual = Qualification.NOT_QUALIFIED  # type: Qualification 'qualification, used in Russia only'
         self.is_out_of_competition = False  # e.g. 20-years old person, running in M12
+        self.is_paid = False
+        self.is_rented_sportident_card = False
+        self.is_personal = False
         self.comment = ''
 
         self.start_time = None  # type: OTime

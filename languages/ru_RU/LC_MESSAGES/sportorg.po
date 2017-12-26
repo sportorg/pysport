@@ -788,6 +788,9 @@ msgid "CANCELLED"
 msgstr "Заявка отменена"
 
 msgid "rented stub"
+msgstr "свой чип"
+
+msgid "Rented stub"
 msgstr "Свой чип"
 
 msgid "MF"
@@ -915,3 +918,6 @@ msgstr "Протокол результатов"
 
 msgid "Show toolbar"
 msgstr "Показать панель инструментов"
+
+msgid "Team list"
+msgstr "Выписка по командам"
