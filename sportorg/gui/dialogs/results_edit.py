@@ -61,7 +61,7 @@ class ResultEditDialog(QDialog):
         self.item_result.setEnabled(False)
 
         self.item_penalty = QTimeEdit()
-        self.item_penalty.setDisplayFormat("mm:ss")
+        self.item_penalty.setDisplayFormat("hh:mm:ss")
 
         self.radio_ok = QRadioButton(_('OK'))
         self.radio_ok.setChecked(True)

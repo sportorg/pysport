@@ -79,7 +79,7 @@ class DrawManager(object):
             region = ''
             if current_person.organization is not None:
                 team = current_person.organization.name
-                region = current_person.organization.region
+                region = current_person.organization.address.state
 
             self.person_array.append([index, group, start_group, team, region])
 

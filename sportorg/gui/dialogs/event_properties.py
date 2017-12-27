@@ -50,11 +50,13 @@ class EventPropertiesDialog(QDialog):
 
         self.label_start_date = QLabel(_('Start date'))
         self.item_start_date = QDateTimeEdit()
+        self.item_start_date.setDisplayFormat('yyyy.MM.dd HH:mm:ss')
         self.layout.addRow(self.label_start_date, self.item_start_date)
 
         self.label_end_date = QLabel(_('End date'))
         # self.item_end_date = QCalendarWidget()
         self.item_end_date = QDateTimeEdit()
+        self.item_end_date.setDisplayFormat('yyyy.MM.dd HH:mm:ss')
         self.layout.addRow(self.label_end_date, self.item_end_date)
 
         self.label_location = QLabel(_('Location'))
@@ -118,19 +120,28 @@ class EventPropertiesDialog(QDialog):
         changed = False
         obj = race()
 
+        start_date = self.item_start_date.dateTime().toPyDateTime()
+        end_date = self.item_end_date.dateTime().toPyDateTime()
+
         obj.set_setting('main_title', self.item_main_title.text())
         obj.set_setting('sub_title', self.item_sub_title.toPlainText())
         obj.set_setting('location', self.item_location.text())
         obj.set_setting('chief_referee', self.item_refery.text())
         obj.set_setting('secretary', self.item_secretary.text())
-        obj.set_setting('start_date', self.item_start_date.dateTime().toPyDateTime())
-        obj.set_setting('end_date', self.item_end_date.dateTime().toPyDateTime())
+        obj.set_setting('start_date', start_date)
+        obj.set_setting('end_date', end_date)
         obj.set_setting('sport_kind_index', self.item_sport.currentIndex())
         obj.set_setting('course_type_index', self.item_type.currentIndex())
 
         obj.data.name = self.item_main_title.text()
-        obj.data.start_time = self.item_start_date.dateTime().toPyDateTime()
-        obj.data.end_time = self.item_end_date.dateTime().toPyDateTime()
+        obj.data.start_time = start_date
+        obj.data.end_time = end_date
+
+        obj.set_setting('sportident_zero_time', (
+            start_date.hour,
+            start_date.minute,
+            0
+        ))
 
         if changed:
             win = GlobalAccess().get_main_window()

@@ -33,6 +33,7 @@ class SportidentPropertiesDialog(QDialog):
         self.item_zero_time = QTimeEdit()
         self.item_zero_time.setDisplayFormat("HH:mm")
         self.item_zero_time.setMaximumSize(60, 20)
+        self.item_zero_time.setDisabled(True)
         self.layout.addRow(self.label_zero_time, self.item_zero_time)
 
         self.start_group_box = QGroupBox(_('Start time'))
