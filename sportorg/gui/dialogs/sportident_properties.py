@@ -8,7 +8,8 @@ from PyQt5.QtWidgets import QFormLayout, QLabel, QDialog, \
 from sportorg.config import icon_dir
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import _
-from sportorg.models.memory import race
+from sportorg.models.memory import race, SystemType
+from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.modules.configs.configs import Config
 
 
@@ -44,10 +45,10 @@ class SportidentPropertiesDialog(QDialog):
         self.start_layout.addRow(self.item_start_station)
         self.item_start_cp = QRadioButton(_('Control point'))
         self.item_start_cp_value = QSpinBox()
-        self.item_start_cp_value.setValue(31)
         self.item_start_cp_value.setMaximumSize(60, 20)
         self.start_layout.addRow(self.item_start_cp, self.item_start_cp_value)
         self.item_start_gate = QRadioButton(_('Start gate'))
+        self.item_start_gate.setDisabled(True)
         self.start_layout.addRow(self.item_start_gate)
         self.start_group_box.setLayout(self.start_layout)
         self.layout.addRow(self.start_group_box)
@@ -58,10 +59,10 @@ class SportidentPropertiesDialog(QDialog):
         self.finish_layout.addRow(self.item_finish_station)
         self.item_finish_cp = QRadioButton(_('Control point'))
         self.item_finish_cp_value = QSpinBox()
-        self.item_finish_cp_value.setValue(90)
         self.item_finish_cp_value.setMaximumSize(60, 20)
         self.finish_layout.addRow(self.item_finish_cp, self.item_finish_cp_value)
         self.item_finish_beam = QRadioButton(_('Light beam'))
+        self.item_finish_beam.setDisabled(True)
         self.finish_layout.addRow(self.item_finish_beam)
         self.finish_group_box.setLayout(self.finish_layout)
         self.layout.addRow(self.finish_group_box)
@@ -131,7 +132,9 @@ class SportidentPropertiesDialog(QDialog):
         cur_race = race()
         zero_time = cur_race.get_setting('sportident_zero_time', (8, 0, 0))
         start_source = cur_race.get_setting('sportident_start_source', 'protocol')
+        start_cp_number = cur_race.get_setting('sportident_start_cp_number', 31)
         finish_source = cur_race.get_setting('sportident_finish_source', 'station')
+        finish_cp_number = cur_race.get_setting('sportident_finish_cp_number', 90)
         assign_chip_reading = cur_race.get_setting('sportident_assign_chip_reading', 'off')
         repeated_reading = cur_race.get_setting('sportident_repeated_reading', 'rewrite')
         assignment_mode = cur_race.get_setting('sportident_assignment_mode', False)
@@ -147,12 +150,16 @@ class SportidentPropertiesDialog(QDialog):
         elif start_source == 'gate':
             self.item_start_gate.setChecked(True)
 
+        self.item_start_cp_value.setValue(start_cp_number)
+
         if finish_source == 'station':
             self.item_finish_station.setChecked(True)
         elif finish_source == 'cp':
             self.item_finish_cp.setChecked(True)
         elif finish_source == 'beam':
             self.item_finish_beam.setChecked(True)
+
+        self.item_finish_cp_value.setValue(finish_cp_number)
 
         if assign_chip_reading == 'off':
             self.chip_reading_off.setChecked(True)
@@ -207,11 +214,27 @@ class SportidentPropertiesDialog(QDialog):
             0
         ))
 
-        obj.set_setting('sportident_finish_source', finish_source)
-        obj.set_setting('sportident_start_source', start_source)
+        start_cp_number = self.item_start_cp_value.value()
+        finish_cp_number = self.item_finish_cp_value.value()
 
-        obj.set_setting('sportident_start_cp_number', self.item_start_cp_value.value())
-        obj.set_setting('sportident_finish_cp_number', self.item_finish_cp_value.value())
+        old_start_source = obj.get_setting('sportident_start_source', 'protocol')
+        old_start_cp_number = obj.get_setting('sportident_start_cp_number', 31)
+        old_finish_source = obj.get_setting('sportident_finish_source', 'station')
+        old_finish_cp_number = obj.get_setting('sportident_finish_cp_number', 90)
+
+        if old_start_source != start_source or old_finish_source != finish_source:
+            changed = True
+        if old_start_cp_number != start_cp_number or old_finish_cp_number != finish_cp_number:
+            changed = True
+            for result in race().results:
+                if result.system_type == SystemType.SPORTIDENT:
+                    result.clear()
+
+        obj.set_setting('sportident_start_source', start_source)
+        obj.set_setting('sportident_finish_source', finish_source)
+
+        obj.set_setting('sportident_start_cp_number', start_cp_number)
+        obj.set_setting('sportident_finish_cp_number', finish_cp_number)
 
         obj.set_setting('sportident_assign_chip_reading', assign_chip_reading)
         obj.set_setting('sportident_repeated_reading', repeated_reading)
@@ -221,4 +244,5 @@ class SportidentPropertiesDialog(QDialog):
         Config().configuration.set('autoconnect', self.auto_connect.isChecked())
 
         if changed:
-            win = GlobalAccess().get_main_window()
+            ResultCalculation().process_results()
+            GlobalAccess().get_main_window().refresh()

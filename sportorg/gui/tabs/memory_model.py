@@ -283,12 +283,12 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
                 team = person.organization.name
 
         start = ''
-        if i.start_time:
-            start = str(i.start_time)
+        if i.get_start_time():
+            start = str(i.get_start_time())
 
         finish = ''
-        if i.finish_time:
-            finish = str(i.finish_time)
+        if i.get_finish_time():
+            finish = str(i.get_finish_time())
 
         return [
             last_name,
