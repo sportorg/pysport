@@ -16,9 +16,6 @@ class ResultCalculation(object):
     def set_times(self):
         for i in race().results:
             assert isinstance(i, Result)
-            person = i.person
-            if person and (i.start_time is None or (i.start_time is not None and i.start_time.to_sec() == 0)):
-                i.start_time = person.start_time
             i.result = i.get_result_for_sort()
 
     def get_group_finishes(self, group):
@@ -323,7 +320,7 @@ def get_splits_data_printout(person):
     person_json['sportident_card'] = int(person.sportident_card)
 
     result_json['start'] = time_to_hhmmss(person.start_time)
-    result_json['finish'] = time_to_hhmmss(result.finish_time)
+    result_json['finish'] = time_to_hhmmss(result.get_finish_time())
     result_json['result'] = result.get_result()
     result_json['penalty_time'] = time_to_hhmmss(result.get_penalty_time())
     result_json['status'] = result.status

@@ -60,7 +60,7 @@ class PersonSplits(object):
         self.year = person.year
 
         self.start = time_to_hhmmss(person.start_time)
-        self.finish = time_to_hhmmss(result.finish_time)
+        self.finish = time_to_hhmmss(result.get_finish_time())
         self.result = result.get_result()
         self.status = result.status.value
         self.place = result.place

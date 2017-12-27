@@ -80,10 +80,10 @@ class ResultEditDialog(QDialog):
             self.layout.addRow(QLabel(_('Card')), self.item_sportident_card)
         self.layout.addRow(QLabel(_('Bib')), self.item_bib)
         self.layout.addRow(QLabel(''), self.label_person_info)
-        self.layout.addRow(QLabel(_('Finish')), self.item_finish)
         self.layout.addRow(QLabel(_('Start')), self.item_start)
-        self.layout.addRow(QLabel(_('Result')), self.item_result)
+        self.layout.addRow(QLabel(_('Finish')), self.item_finish)
         self.layout.addRow(QLabel(_('Penalty')), self.item_penalty)
+        self.layout.addRow(QLabel(_('Result')), self.item_result)
 
         self.layout.addRow(self.radio_ok)
         self.layout.addRow(self.radio_dns)
@@ -93,6 +93,12 @@ class ResultEditDialog(QDialog):
         self.layout.addRow(self.item_change_start)
 
         if self.current_object.system_type == SystemType.SPORTIDENT:
+            start_source = race().get_setting('sportident_start_source', 'protocol')
+            finish_source = race().get_setting('sportident_finish_source', 'station')
+            if start_source == 'protocol' or start_source == 'cp':
+                self.item_start.setDisabled(True)
+            if finish_source == 'cp':
+                self.item_finish.setDisabled(True)
             self.layout.addRow(self.splits.widget)
 
         def cancel_changes():
@@ -202,7 +208,7 @@ class ResultEditDialog(QDialog):
 
         recheck = False
         if new_bib == 0:
-            if result.person:
+            if result.person and result.system_type == SystemType.SPORTIDENT:
                 if result.person.sportident_card == result.sportident_card:
                     result.person.sportident_card = None
             result.person = None
@@ -222,7 +228,6 @@ class ResultEditDialog(QDialog):
                         new_person.start_time,
                         new_bib
                     ))
-                    result.start_time = new_person.start_time
                 if result.system_type == SystemType.SPORTIDENT:
                     result.person.sportident_card = result.sportident_card
 

@@ -362,9 +362,9 @@ class Result:
         return OTime(msec=self.get_result_for_sort()*10)
 
     def get_start_time(self):
-        if self.start_time:
+        if self.start_time and self.start_time.to_msec():
             return self.start_time
-        if self.person:
+        if self.person and self.person.start_time and self.person.start_time.to_msec():
             return self.person.start_time
         return int_to_otime(0)
 
@@ -391,6 +391,8 @@ class ResultSportident(Result):
         super().__init__()
         self.sportident_card = None  # type: SportidentCard
         self.splits = []  # type: List[Split]
+        self.__start_time = None
+        self.__finish_time = None
 
     def __repr__(self):
         splits = ''
@@ -413,12 +415,21 @@ class ResultSportident(Result):
         obj = race()
         start_source = obj.get_setting('sportident_start_source', 'protocol')
         if start_source == 'protocol':
-            if self.person:
+            if self.person and self.person.start_time and self.person.start_time.to_msec():
                 return self.person.start_time
         elif start_source == 'station':
-            return self.start_time
+            if self.start_time and self.start_time.to_msec():
+                return self.start_time
+            elif self.person and self.person.start_time and self.person.start_time.to_msec():
+                return self.person.start_time
         elif start_source == 'cp':
-            pass
+            if self.__start_time is not None:
+                return self.__start_time
+            start_cp_number = obj.get_setting('sportident_start_cp_number', 31)
+            for split in self.splits:
+                if split.code == start_cp_number:
+                    self.__start_time = split.time
+                    return self.__start_time
         elif start_source == 'gate':
             pass
 
@@ -431,11 +442,21 @@ class ResultSportident(Result):
             if self.finish_time:
                 return self.finish_time
         elif finish_source == 'cp':
-            pass
+            if self.__finish_time is not None:
+                return self.__finish_time
+            finish_cp_number = obj.get_setting('sportident_finish_cp_number', 90)
+            for split in reversed(self.splits):
+                if split.code == finish_cp_number:
+                    self.__finish_time = split.time
+                    return self.__finish_time
         elif finish_source == 'beam':
             pass
 
         return OTime.now()
+
+    def clear(self):
+        self.__start_time = None
+        self.__finish_time = None
 
 
 class ResultAlt(Result):
@@ -521,7 +542,7 @@ class Race(Model):
     def set_setting(self, setting, value):
         self.settings[setting] = value
 
-    def get_setting(self, setting, nvl_value=''):
+    def get_setting(self, setting, nvl_value=None):
         if setting in self.settings:
             return self.settings[setting]
         else:
