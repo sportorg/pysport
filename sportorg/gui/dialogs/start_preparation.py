@@ -103,7 +103,7 @@ class StartPreparationDialog(QDialog):
         self.start_layout.setWidget(2, QtWidgets.QFormLayout.LabelRole, self.start_interval_radio_button)
         self.start_interval_time_edit = QtWidgets.QTimeEdit(self.widget2)
         self.start_interval_time_edit.setEnabled(False)
-        self.start_interval_time_edit.setDisplayFormat("mm:ss")
+        self.start_interval_time_edit.setDisplayFormat("HH:mm:ss")
         self.start_layout.setWidget(2, QtWidgets.QFormLayout.FieldRole, self.start_interval_time_edit)
         self.start_group_settings_radion_button = QtWidgets.QRadioButton(self.widget2)
         self.start_group_settings_radion_button.setEnabled(False)

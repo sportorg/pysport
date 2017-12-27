@@ -242,12 +242,15 @@ def get_property(person, key):
         result = find_person_result(person)
         if result:
             return time_to_hhmmss(result.get_penalty_time())
+        else:
+            return '00:00:00'
     elif key == _('Penalty legs'):
         result = find_person_result(person)
-        if result:
+        if result and result.penalty_laps:
             return str(result.penalty_laps)
     elif key == _('Card number'):
-        return str(person.sportident_card)
+        if person.sportident_card:
+            return str(person.sportident_card)
     elif key == _('Group'):
         if person.group:
             return person.group.name

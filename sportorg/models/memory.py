@@ -305,7 +305,7 @@ class Result:
         self.person = None  # type: Person
         self.status = ResultStatus.OK
         self.penalty_time = None  # type: OTime
-        self.penalty_laps = None  # count of penalty legs (marked route)
+        self.penalty_laps = 0  # count of penalty legs (marked route)
         self.place = None  # type: Union[int, str]
 
     def __str__(self):
