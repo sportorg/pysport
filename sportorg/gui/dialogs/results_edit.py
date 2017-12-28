@@ -254,6 +254,8 @@ class ResultEditDialog(QDialog):
             changed = True
 
         if changed:
+            if result.system_type == SystemType.SPORTIDENT:
+                result.clear()
             ResultCalculation().process_results()
             GlobalAccess().get_main_window().refresh()
 
