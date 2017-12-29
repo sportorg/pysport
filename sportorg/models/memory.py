@@ -59,6 +59,32 @@ class Sex(Enum):
         return Sex.MF
 
 
+class CourseType(Enum):
+    NONE = 0
+    ORDER = 1
+    FREE = 2
+    MARKED_ROUTE = 3
+
+    def __str__(self):
+        return "%s" % self._name_
+
+    def __repr__(self):
+        return self.__str__()
+
+    def get_title(self):
+        return _(self.__str__())
+
+    @staticmethod
+    def get_by_title(title):
+        items = [CourseType.ORDER, CourseType.FREE, CourseType.MARKED_ROUTE]
+        reverse = {}
+        for item in items:
+            reverse[_(str(item))] = item
+        if title in reverse:
+            return reverse[title]
+        return CourseType.NONE
+
+
 class ResultStatus(Enum):
     NONE = 0
     OK = 1
@@ -172,7 +198,7 @@ class Course(Model):
     def __init__(self):
         self.id = uuid.uuid4()
         self.name = ''
-        self.type = ''
+        self.type = CourseType.NONE
         self.bib = 0
         self.length = 0
         self.climb = 0

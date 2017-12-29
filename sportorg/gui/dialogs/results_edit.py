@@ -15,7 +15,7 @@ from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import _
 from sportorg.models.memory import race, Result, find, ResultStatus, Person, Limit, SystemType, Split
 from sportorg.models.result.result_calculation import ResultCalculation
-from sportorg.models.result.result_checker import ResultChecker
+from sportorg.models.result.result_checker import ResultChecker, ResultCheckerException
 from sportorg.utils.time import time_to_qtime, time_to_otime, hhmmss_to_time
 
 
@@ -232,7 +232,10 @@ class ResultEditDialog(QDialog):
                     result.person.sportident_card = result.sportident_card
 
                     logging.info('Old status {}'.format(result.status))
-                    ResultChecker.checking(result)
+                    try:
+                        ResultChecker.checking(result)
+                    except ResultCheckerException as e:
+                        logging.error(str(e))
                     logging.info('New status {}'.format(result.status))
 
             GlobalAccess().get_result_table().model().init_cache()

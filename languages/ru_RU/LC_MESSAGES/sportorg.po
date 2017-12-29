@@ -670,6 +670,15 @@ msgstr "выбор"
 msgid "marked route"
 msgstr "маркированная дистанция"
 
+msgid "ORDER"
+msgstr "Заданное направление"
+
+msgid "FREE"
+msgstr "Выбор"
+
+msgid "MARKED_ROUTE"
+msgstr "Маркированная дистанция"
+
 msgid "Auto save"
 msgstr "Автосохранение"
 
