@@ -63,6 +63,9 @@ class ResultEditDialog(QDialog):
         self.item_penalty = QTimeEdit()
         self.item_penalty.setDisplayFormat("hh:mm:ss")
 
+        self.item_penalty_laps = QSpinBox()
+        self.item_penalty_laps.setMaximum(1000000)
+
         self.radio_ok = QRadioButton(_('OK'))
         self.radio_ok.setChecked(True)
         self.radio_dns = QRadioButton(_('DNS'))
@@ -70,9 +73,6 @@ class ResultEditDialog(QDialog):
         self.radio_overtime = QRadioButton(_('Overtime'))
         self.radio_dsq = QRadioButton(_('DSQ'))
         self.text_dsq = QLineEdit()
-
-        self.item_change_start = QCheckBox(_('Change start time (when changing the bib)'))
-        self.item_change_start.setChecked(True)
 
         self.splits = SplitsText()
 
@@ -83,6 +83,7 @@ class ResultEditDialog(QDialog):
         self.layout.addRow(QLabel(_('Start')), self.item_start)
         self.layout.addRow(QLabel(_('Finish')), self.item_finish)
         self.layout.addRow(QLabel(_('Penalty')), self.item_penalty)
+        self.layout.addRow(QLabel(_('Penalty legs')), self.item_penalty_laps)
         self.layout.addRow(QLabel(_('Result')), self.item_result)
 
         self.layout.addRow(self.radio_ok)
@@ -90,7 +91,6 @@ class ResultEditDialog(QDialog):
         self.layout.addRow(self.radio_dnf)
         self.layout.addRow(self.radio_overtime)
         self.layout.addRow(self.radio_dsq, self.text_dsq)
-        self.layout.addRow(self.item_change_start)
 
         if self.current_object.system_type == SystemType.SPORTIDENT:
             start_source = race().get_setting('sportident_start_source', 'protocol')
@@ -153,6 +153,8 @@ class ResultEditDialog(QDialog):
             self.item_result.setText(str(self.current_object.get_result()))
         if self.current_object.penalty_time is not None:
             self.item_penalty.setTime(time_to_qtime(self.current_object.penalty_time))
+        if self.current_object.penalty_laps:
+            self.item_penalty_laps.setValue(self.current_object.penalty_laps)
         if self.current_object.person:
             self.item_bib.setValue(self.current_object.person.bib)
 
@@ -201,6 +203,10 @@ class ResultEditDialog(QDialog):
             result.penalty_time = time
             changed = True
 
+        if result.penalty_laps != self.item_penalty_laps.value():
+            result.penalty_laps = self.item_penalty_laps.value()
+            changed = True
+
         cur_bib = -1
         new_bib = self.item_bib.value()
         if result.person:
@@ -222,12 +228,6 @@ class ResultEditDialog(QDialog):
                         result.person.sportident_card = None
                 recheck = True
                 result.person = new_person
-                if self.item_change_start.isChecked():
-                    logging.info('Changed start time {} to {} participants under the number {}'.format(
-                        result.start_time,
-                        new_person.start_time,
-                        new_bib
-                    ))
                 if result.system_type == SystemType.SPORTIDENT:
                     result.person.sportident_card = result.sportident_card
 

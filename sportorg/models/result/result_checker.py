@@ -1,4 +1,4 @@
-from sportorg.models.memory import Person, ResultStatus
+from sportorg.models.memory import Person, ResultStatus, SystemType
 
 
 class ResultCheckerException(Exception):
@@ -88,6 +88,9 @@ class ResultChecker:
         controls = self.person.group.course.controls
 
         if not hasattr(controls, '__iter__'):
+            return True
+
+        if result.system_type != SystemType.SPORTIDENT:
             return True
 
         return self.check(result.splits, controls)
