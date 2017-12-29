@@ -2,7 +2,7 @@ import logging
 
 from sportorg.modules.printing.model import split_printout, NoResultToPrintException, NoPrinterSelectedException
 from sportorg.gui.global_access import GlobalAccess
-from sportorg.models.result.result_checker import ResultChecker
+from sportorg.models.result.result_checker import ResultChecker, ResultCheckerException
 from sportorg.models.memory import race, Person, Result, ResultSportident
 
 
@@ -65,7 +65,10 @@ class ResultSportidentGeneration:
     def _add_result(self):
         if isinstance(self._result.person, Person):
             self._find_person_by_result()
-            ResultChecker.checking(self._result)
+            try:
+                ResultChecker.checking(self._result)
+            except ResultCheckerException as e:
+                logging.error(str(e))
 
             self._add_result_to_race()
 

@@ -2,17 +2,22 @@ import logging
 
 from PyQt5.QtCore import QModelIndex
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, QPushButton, QSpinBox, QTextEdit, QDialogButtonBox
+from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, QSpinBox, QTextEdit, QDialogButtonBox
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
-from sportorg.models.memory import race, Course, CourseControl, find
+from sportorg.models.memory import race, Course, CourseControl, find, CourseType
 
 
 def get_course_types():
-    return ['', _('order'), _('free'), _('marked route')]
+    return [
+        CourseType.NONE.get_title(),
+        CourseType.ORDER.get_title(),
+        CourseType.FREE.get_title(),
+        CourseType.MARKED_ROUTE.get_title()
+    ]
 
 
 class CourseEditDialog(QDialog):
@@ -107,7 +112,7 @@ class CourseEditDialog(QDialog):
         self.item_name.setText(self.current_object.name)
 
         if self.current_object.type:
-            self.item_type.setCurrentText(str(self.current_object.type))
+            self.item_type.setCurrentText(self.current_object.type.get_title())
         if self.current_object.length:
             self.item_length.setValue(self.current_object.length)
         if self.current_object.climb:
@@ -126,8 +131,8 @@ class CourseEditDialog(QDialog):
             course.name = self.item_name.text()
             changed = True
 
-        if str(course.type) != self.item_type.currentText():
-            course.type = self.item_type.currentText()
+        if course.type.get_title() != self.item_type.currentText():
+            course.type = CourseType.get_by_title(self.item_type.currentText())
             changed = True
 
         if course.length != self.item_length.value():

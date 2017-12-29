@@ -386,7 +386,7 @@ class CourseMemoryModel(AbstractSportOrgMemoryModel):
 
         return [
             course.name,
-            course.type,
+            course.type.get_title(),
             course.length,
             len(course.controls),
             course.climb,

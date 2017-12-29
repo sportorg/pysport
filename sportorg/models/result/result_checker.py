@@ -1,4 +1,4 @@
-from sportorg.models.memory import Person, Result, ResultStatus
+from sportorg.models.memory import Person, ResultStatus
 
 
 class ResultCheckerException(Exception):

@@ -182,7 +182,7 @@ class GroupEditDialog(QDialog):
             org.course = find(race().courses, name=self.item_course.currentText())
             changed = True
 
-        if str(org.sex) != self.item_sex.currentText():
+        if org.sex.get_title() != self.item_sex.currentText():
             org.sex = Sex.get_by_title(self.item_sex.currentText())
             changed = True
 
