@@ -248,7 +248,7 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
 
     def get_headers(self):
         return ['Last name', 'First name', 'Group', 'Team', 'Bib', 'Card', 'Start', 'Finish', 'Result',
-                'Status', 'Penalty', 'Place', 'Type']
+                'Status', 'Penalty', 'Penalty legs', 'Place', 'Type']
 
     def init_cache(self):
         self.cache.clear()
@@ -302,6 +302,7 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
             i.get_result(),
             i.status.get_title(),
             time_to_hhmmss(i.get_penalty_time()),
+            i.penalty_laps,
             i.place if i.place is not None else '',
             str(i.system_type)
         ]
