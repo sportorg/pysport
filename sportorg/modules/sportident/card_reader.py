@@ -8,6 +8,7 @@ from sportorg.gui.global_access import GlobalAccess
 from sportorg.models import memory
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.modules.sportident import sireader
+from sportorg.modules.sportident import backup
 from sportorg.modules.sportident.result_generation import ResultSportidentGeneration
 from sportorg.utils.time import time_to_otime
 
@@ -44,6 +45,7 @@ def start():
         if not assignment_mode:
             ResultSportidentGeneration(get_result(card_data)).add_result()
             ResultCalculation().process_results()
+            backup.backup_data(card_data)
         else:
             try:
                 bib_dialog = BibDialog()

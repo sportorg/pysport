@@ -432,7 +432,8 @@ class ResultSportident(Result):
         eq = self.sportident_card == other.sportident_card and super().__eq__(other)
         if len(self.splits) == len(other.splits):
             for i in range(len(self.splits)):
-                eq = eq and self.splits[i][0] == other.splits[i][0] and time_to_sec(self.splits[i][1]) == time_to_sec(other.splits[i][1])
+                eq = eq and self.splits[i].code == other.splits[i].code
+                eq = eq and time_to_sec(self.splits[i].time) == time_to_sec(other.splits[i].time)
         else:
             return False
         return eq
