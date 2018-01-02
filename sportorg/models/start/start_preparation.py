@@ -368,3 +368,12 @@ def guess_corridors_for_groups():
         assert isinstance(cur_group, Group)
         if cur_group.course:
             cur_group.start_corridor = cur_group.course.corridor
+
+
+def change_start_time(if_add, time_offset):
+    obj = race()
+    for person in obj.persons:
+        if if_add:
+            person.start_time = person.start_time + time_offset
+        else:
+            person.start_time = person.start_time - time_offset

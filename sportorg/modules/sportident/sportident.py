@@ -27,7 +27,7 @@ def start_reader():
         if not reader.reading:
             port = reader.port
             reader = None
-            message(_('Closing port' + ' ' + port))
+            message(_('Closing port') + ' ' + port)
 
 
 def message(msg):

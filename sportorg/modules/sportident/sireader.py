@@ -53,7 +53,8 @@ class SIReaderThread(threading.Thread):
                 logging.debug(str(e))
             except sireader.SIReaderCardChanged as e:
                 logging.debug(str(e))
-            except serial.serialutil.SerialException:
+            except serial.serialutil.SerialException as e:
+                logging.debug(str(e))
                 self.stop()
                 return
             except Exception as e:

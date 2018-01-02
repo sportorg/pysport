@@ -845,6 +845,24 @@ class SIReader(object):
         ret['punches'] = []
         p = 0
         i = card['P1']
+
+        if 7000000 < ret['card_number'] < 9999999:
+            i += 128 * 3 # strange behavior of BSM-7 station, reads 8 blocks for SIAC??? Please test with another BSM-7
+        """
+By using parameter BN = 8 the five most relevant data blocks 0, 4...7 are read out at once.
+<<== command 'e8', len 6, station 001e, data 0f 83 a6 db, crc 9188, etx 03
+==>> command 'ef', parameters 08, crc ea09
+<<== command 'ef', len 131, station 001e, data 00 61 44 42 99 ea ea ea ea 1c 0f 40 20 ee ee ee ee 1c 0a 40 2a 00 ...
+<<== command 'ef', len 131, station 001e, data 01 6f 62 65 64 79 20 31 31 39 3b 36 32 35 30 34 36 3b 52 55 53 3b ...
+<<== command 'ef', len 131, station 001e, data 02 ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee ...
+<<== command 'ef', len 131, station 001e, data 03 ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee ...
+<<== command 'ef', len 131, station 001e, data 04 06 1f 14 ad ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee ...
+<<== command 'ef', len 131, station 001e, data 05 ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee ...
+<<== command 'ef', len 131, station 001e, data 06 ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee ...
+<<== command 'ef', len 131, station 001e, data 07 ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee ee ...
+<<== command 'e7', len 6, station 001e, data 00 83 a6 db, crc adaa, etx 03
+        """
+
         while p < punch_count:
             if card_type == 'SI5' and i % 16 == 0:
                 # first byte of each block is reserved for punches 31-36
@@ -1009,6 +1027,10 @@ class SIReaderReadout(SIReader):
             raw_data = self._send_command(SIReader.C_GET_SI9,
                                           SIReader.P_SI6_CB)[1][1:]
             raw_data += self._read_command()[1][1:]
+            raw_data += self._read_command()[1][1:]
+            raw_data += self._read_command()[1][1:]
+            raw_data += self._read_command()[1][1:]
+
             raw_data += self._read_command()[1][1:]
             raw_data += self._read_command()[1][1:]
             raw_data += self._read_command()[1][1:]

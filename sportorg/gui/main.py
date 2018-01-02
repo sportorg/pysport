@@ -3,10 +3,12 @@ import logging
 import time
 
 from PyQt5 import QtCore, QtGui, QtWidgets, Qt
-from PyQt5.QtWidgets import QMainWindow, QTableView, QMessageBox
+from PyQt5.QtWidgets import QMainWindow, QTableView, QMessageBox, QApplication
 
 from sportorg.gui.dialogs.bib_report_dialog import BibReportDialog
+from sportorg.gui.dialogs.relay_number_dialog import RelayNumberDialog
 from sportorg.gui.dialogs.search_dialog import SearchDialog
+from sportorg.gui.dialogs.start_time_change_dialog import StartTimeChangeDialog
 from sportorg.gui.dialogs.team_report_dialog import TeamReportDialog
 from sportorg.gui.dialogs.text_io import TextExchangeDialog
 from sportorg.libs.winorient.wdb import write_wdb
@@ -445,6 +447,26 @@ class MainWindow(QMainWindow):
         try:
             guess_corridors_for_groups()
             self.refresh()
+        except Exception as e:
+            logging.exception(str(e))
+
+    def relay_number_assign(self):
+        try:
+            obj = race()
+            if obj.get_setting('relay_number_assign', False):
+                obj.set_setting('relay_number_assign', False)
+                QApplication.restoreOverrideCursor()
+            else:
+                obj.set_setting('relay_number_assign', True)
+                QApplication.setOverrideCursor(QtCore.Qt.PointingHandCursor)
+                RelayNumberDialog().exec()
+            self.refresh()
+        except Exception as e:
+            logging.exception(str(e))
+
+    def start_time_change(self):
+        try:
+            StartTimeChangeDialog().exec()
         except Exception as e:
             logging.exception(str(e))
 

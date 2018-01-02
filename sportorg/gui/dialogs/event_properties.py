@@ -3,7 +3,7 @@ from datetime import datetime
 
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, QPushButton, QTextEdit, QDateTimeEdit, \
-    QDialogButtonBox
+    QDialogButtonBox, QSpinBox
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
@@ -73,6 +73,15 @@ class EventPropertiesDialog(QDialog):
         self.item_type.addItems(get_types())
         self.layout.addRow(self.label_type, self.item_type)
 
+        self.label_relay_legs = QLabel(_('Relay legs'))
+        self.item_relay_legs = QSpinBox()
+        self.item_relay_legs.setMinimum(1)
+        self.item_relay_legs.setMaximum(20)
+        self.item_relay_legs.setValue(3)
+        self.layout.addRow(self.label_relay_legs, self.item_relay_legs)
+
+        self.item_type.currentTextChanged.connect(self.change_type)
+
         self.label_refery = QLabel(_('Chief referee'))
         self.item_refery = QLineEdit()
         self.layout.addRow(self.label_refery, self.item_refery)
@@ -104,6 +113,11 @@ class EventPropertiesDialog(QDialog):
 
         self.show()
 
+    def change_type(self):
+        flag = self.item_type.currentIndex() == 5
+        self.label_relay_legs.setVisible(flag)
+        self.item_relay_legs.setVisible(flag)
+
     def set_values_from_model(self):
         obj = race()
         self.item_main_title.setText(str(obj.get_setting('main_title')))
@@ -115,6 +129,8 @@ class EventPropertiesDialog(QDialog):
         self.item_end_date.setDateTime(obj.get_setting('end_date', datetime.now().replace(second=0, microsecond=0)))
         self.item_sport.setCurrentIndex(obj.get_setting('sport_kind_index', 0))
         self.item_type.setCurrentIndex(obj.get_setting('course_type_index', 0))
+        self.item_relay_legs.setValue(obj.get_setting('relay_legs_count', 3))
+        self.change_type()
 
     def apply_changes_impl(self):
         changed = False
@@ -132,6 +148,7 @@ class EventPropertiesDialog(QDialog):
         obj.set_setting('end_date', end_date)
         obj.set_setting('sport_kind_index', self.item_sport.currentIndex())
         obj.set_setting('course_type_index', self.item_type.currentIndex())
+        obj.set_setting('relay_legs_count', self.item_relay_legs.value())
 
         obj.data.name = self.item_main_title.text()
         obj.data.start_time = start_date

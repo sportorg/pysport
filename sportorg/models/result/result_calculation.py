@@ -1,6 +1,7 @@
 from sportorg.core.otime import OTime
 from sportorg.language import _
-from sportorg.models.memory import race, Result, Person, ResultStatus, Course, Group, Qualification, RankingItem
+from sportorg.models.memory import race, Result, Person, ResultStatus, Course, Group, Qualification, RankingItem, \
+    RelayTeam
 from sportorg.utils.time import time_to_hhmmss
 
 
@@ -8,10 +9,17 @@ from sportorg.utils.time import time_to_hhmmss
 class ResultCalculation(object):
     def process_results(self):
         self.set_times()
+        race().relay_teams.clear()
         for i in race().groups:
-            array = self.get_group_finishes(i)
-            self.set_places(array)
-            self.set_rank(i)
+            if not i.is_relay:
+                #single race
+                array = self.get_group_finishes(i)
+                self.set_places(array)
+                self.set_rank(i)
+            else:
+                #relay
+                new_relays = self.process_relay_results(i)
+                race().relay_teams.append(new_relays)
 
     def set_times(self):
         for i in race().results:
@@ -67,6 +75,34 @@ class ResultCalculation(object):
 
                 res.place = last_place
                 current_place += 1
+
+    def process_relay_results(self, group):
+        if group and isinstance(group, Group):
+            results = self.get_group_finishes(group)
+
+            relay_teams = {}
+            for res in results:
+                assert isinstance(res, Result)
+                bib = res.person.bib
+
+                team_number = bib % 1000
+                if not str(team_number) in relay_teams:
+                    new_team = RelayTeam()
+                    new_team.group = group
+                    new_team.bib_number = team_number
+                    relay_teams[str(team_number)] = new_team
+
+                team = relay_teams[str(team_number)]
+                assert isinstance(team, RelayTeam)
+                team.add_result(res)
+            teams_sorted = sorted(relay_teams.values())
+            place = 1
+            for cur_team in teams_sorted:
+                cur_team.set_place(place)
+                place += 1
+
+            return relay_teams.values()
+
 
     def set_rank(self, group):
         assert isinstance(group, Group)

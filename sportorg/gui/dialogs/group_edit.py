@@ -97,6 +97,12 @@ class GroupEditDialog(QDialog):
         self.item_price.setMaximum(Limit.PRICE)
         self.layout.addRow(self.label_price, self.item_price)
 
+        self.relay_checkbox =  QCheckBox(_('Relay'))
+        self.relay_leg_count = QSpinBox()
+        self.relay_leg_count.setSingleStep(1)
+        self.relay_leg_count.setMaximum(20)
+        self.layout.addRow(self.relay_checkbox, self.relay_leg_count)
+
         self.rank_checkbox = QCheckBox(_('Rank calculation'))
         self.rank_button = QPushButton(_('Configuration'))
         self.layout.addRow(self.rank_checkbox, self.rank_button)
@@ -155,8 +161,11 @@ class GroupEditDialog(QDialog):
             self.item_corridor_order.setValue(self.current_object.order_in_corridor)
         if self.current_object.price:
             self.item_price.setValue(self.current_object.price)
+        if self.current_object.relay_legs:
+            self.relay_leg_count.setValue(self.current_object.relay_legs)
 
         self.rank_checkbox.setChecked(self.current_object.ranking.is_active)
+        self.relay_checkbox.setChecked(self.current_object.is_relay)
 
         def rank_configuration():
             group = self.current_object
@@ -220,6 +229,15 @@ class GroupEditDialog(QDialog):
         if org.ranking.is_active != self.rank_checkbox.isChecked():
             org.ranking.is_active = self.rank_checkbox.isChecked()
             changed = True
+
+        if org.is_relay != self.relay_checkbox.isChecked():
+            org.is_relay = self.relay_checkbox.isChecked()
+            changed = True
+
+        if org.relay_legs != self.relay_leg_count.value():
+            org.relay_legs = self.relay_leg_count.value()
+            changed = True
+
 
         if changed:
             ResultCalculation().set_rank(org)

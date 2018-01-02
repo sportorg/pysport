@@ -158,6 +158,7 @@ class PersonSplits(object):
             'team': self.team,
             'qual': self.qual,
             'year': self.year,
+            'bib':  self.bib,
             'result': if_none(self.result, ''),
             'penalty_time': self.penalty_time,
             'place': self.place,
