@@ -10,6 +10,7 @@ from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
 from sportorg.models.memory import race, RaceType
+from sportorg.models.result.result_calculation import ResultCalculation
 
 
 def get_sport_kinds():
@@ -109,7 +110,7 @@ class EventPropertiesDialog(QDialog):
         self.show()
 
     def change_type(self):
-        flag = self.item_type.currentText() == str(RaceType.RELAY)
+        flag = self.item_type.currentText() == RaceType.RELAY.get_title()
         self.label_relay_legs.setVisible(flag)
         self.item_relay_legs.setVisible(flag)
 
@@ -128,7 +129,7 @@ class EventPropertiesDialog(QDialog):
         self.change_type()
 
     def apply_changes_impl(self):
-        changed = False
+        changed = True
         obj = race()
 
         start_date = self.item_start_date.dateTime().toPyDateTime()
@@ -156,4 +157,5 @@ class EventPropertiesDialog(QDialog):
         ))
 
         if changed:
-            win = GlobalAccess().get_main_window()
+            ResultCalculation().process_results()
+            GlobalAccess().get_main_window().refresh()

@@ -228,7 +228,7 @@ class GroupEditDialog(QDialog):
             changed = True
 
         if org.get_type() != RaceType(self.type_combo.currentIndex()):
-            org.type = RaceType(self.type_combo.currentIndex())
+            org._type = RaceType(self.type_combo.currentIndex())
             changed = True
 
         if changed:

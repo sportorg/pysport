@@ -275,7 +275,7 @@ class Group(Model):
         self.count_finished = 0
 
         self.ranking = Ranking()
-        self.type = None # type: RaceType
+        self._type = None # type: RaceType
         self.relay_legs = 0
 
     def __repr__(self):
@@ -288,8 +288,8 @@ class Group(Model):
         return self.count_person
 
     def get_type(self):
-        if self.type:
-            return self.type
+        if self._type:
+            return self._type
         obj = race()
         return obj.get_setting('race_type', RaceType.INDIVIDUAL_RACE)
 
