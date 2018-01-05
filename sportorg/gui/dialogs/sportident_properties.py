@@ -59,6 +59,7 @@ class SportidentPropertiesDialog(QDialog):
         self.finish_layout.addRow(self.item_finish_station)
         self.item_finish_cp = QRadioButton(_('Control point'))
         self.item_finish_cp_value = QSpinBox()
+        self.item_finish_cp_value.setMinimum(-1)
         self.item_finish_cp_value.setMaximumSize(60, 20)
         self.finish_layout.addRow(self.item_finish_cp, self.item_finish_cp_value)
         self.item_finish_beam = QRadioButton(_('Light beam'))

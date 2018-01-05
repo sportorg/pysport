@@ -137,18 +137,6 @@ class ResultStatus(Enum):
         return _(self.__str__())
 
 
-class CompetitionType(Enum):
-    PREDETERMINED = 1
-    SELECTION = 2
-    MARKING = 3
-
-    def __str__(self):
-        return "%s" % self._name_
-
-    def __repr__(self):
-        return self.__str__()
-
-
 class Country(Model):
     def __init__(self):
         self.name = ''
@@ -295,6 +283,7 @@ class Group(Model):
 
     def set_type(self, new_type):
         self.__type = new_type
+
 
 class SportidentCardModel(Enum):
     NONE = 0
@@ -486,11 +475,15 @@ class ResultSportident(Result):
         elif start_source == 'cp':
             if self.__start_time is not None:
                 return self.__start_time
-            start_cp_number = obj.get_setting('sportident_start_cp_number', 31)
-            for split in self.splits:
-                if split.code == start_cp_number:
-                    self.__start_time = split.time
+            if len(self.splits):
+                start_cp_number = obj.get_setting('sportident_start_cp_number', 31)
+                if start_cp_number == 0:
+                    self.__start_time = self.splits[0].time
                     return self.__start_time
+                for split in self.splits:
+                    if split.code == start_cp_number:
+                        self.__start_time = split.time
+                        return self.__start_time
         elif start_source == 'gate':
             pass
 
@@ -505,11 +498,15 @@ class ResultSportident(Result):
         elif finish_source == 'cp':
             if self.__finish_time is not None:
                 return self.__finish_time
-            finish_cp_number = obj.get_setting('sportident_finish_cp_number', 90)
-            for split in reversed(self.splits):
-                if split.code == finish_cp_number:
-                    self.__finish_time = split.time
+            if len(self.splits):
+                finish_cp_number = obj.get_setting('sportident_finish_cp_number', 90)
+                if finish_cp_number == -1:
+                    self.__finish_time = self.splits[-1].time
                     return self.__finish_time
+                for split in reversed(self.splits):
+                    if split.code == finish_cp_number:
+                        self.__finish_time = split.time
+                        return self.__finish_time
         elif finish_source == 'beam':
             pass
 
@@ -1125,6 +1122,7 @@ class RelayTeam(object):
         for i in self.legs:
             i.set_place(place)
 
+
 def create(obj, **kwargs):
     return obj.create(**kwargs)
 
@@ -1157,7 +1155,7 @@ def find(iterable: list, **kwargs):
 def find_person_result(person):
     for i in race().results:
         if i.person is person:
-            return  i
+            return i
     return None
 
 
