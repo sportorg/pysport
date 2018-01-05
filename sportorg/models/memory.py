@@ -275,7 +275,7 @@ class Group(Model):
         self.count_finished = 0
 
         self.ranking = Ranking()
-        self._type = None # type: RaceType
+        self.__type = None # type: RaceType
         self.relay_legs = 0
 
     def __repr__(self):
@@ -288,11 +288,13 @@ class Group(Model):
         return self.count_person
 
     def get_type(self):
-        if self._type:
-            return self._type
+        if self.__type:
+            return self.__type
         obj = race()
         return obj.get_setting('race_type', RaceType.INDIVIDUAL_RACE)
 
+    def set_type(self, new_type):
+        self.__type = new_type
 
 class SportidentCardModel(Enum):
     NONE = 0
