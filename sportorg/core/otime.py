@@ -92,7 +92,7 @@ class OTime:
         return OTime(msec=self.to_msec())
 
     def to_sec(self, n=0):
-        return round(self.to_msec()/1000, n)
+        return int(round(self.to_msec()/1000, n))
 
     def to_msec(self):
         return self._msec

@@ -400,12 +400,12 @@ class WDBMan:
         self.is_checked = False
         self.is_not_qualified = False
         self.is_without_team = False
-        self.round = 0
         self.unknown0 = 0
         self.is_own_card = 0
         self.unknown2 = 0
         self.status = 0
         self.start_group = 0
+        self.penalty_second = 0
         self.wdb = wdb
 
     def parse_bytes(self, byte_array):
@@ -428,7 +428,7 @@ class WDBMan:
         self.finish = int.from_bytes(byte_array[64:68], byteorder)
         self.result = int.from_bytes(byte_array[68:72], byteorder)
 
-        self.start_group = int.from_bytes(byte_array[80:81], byteorder)
+        self.penalty_second = int.from_bytes(byte_array[80:82], byteorder)
         self.finished = int.from_bytes(byte_array[82:83], byteorder)
 
         self.si_card = int.from_bytes(byte_array[88:92], byteorder)
@@ -443,7 +443,7 @@ class WDBMan:
 
         self.status = int.from_bytes(byte_array[108:109], byteorder)
 
-        self.round = int.from_bytes(byte_array[156:160], byteorder)
+        self.start_group = int.from_bytes(byte_array[156:160], byteorder)
 
     def get_bytes(self):
         byteorder = get_wdb_byteorder()
@@ -465,8 +465,7 @@ class WDBMan:
         ret[64:68] = self.finish.to_bytes(4, byteorder)
         ret[68:72] = self.result.to_bytes(4, byteorder)
 
-        ret[80:81] = self.start_group.to_bytes(1, byteorder)
-
+        ret[80:82] = self.penalty_second.to_bytes(2, byteorder)
         ret[82:83] = self.finished.to_bytes(1, byteorder)
 
         if self.si_card:
@@ -482,7 +481,7 @@ class WDBMan:
 
         ret[108:109] = self.status.to_bytes(1, byteorder)
 
-        ret[156:160] = self.round.to_bytes(4, byteorder)
+        ret[156:160] = self.start_group.to_bytes(4, byteorder)
 
         return ret
 
@@ -1128,9 +1127,10 @@ class WDB:
             ret += i.get_bytes()
 
         if is_new_format:  # format changing of 2009/03-2010/09: 64 -> 200 punches + added Adventure block
+            # ret += len(self.chip).to_bytes(4, byteorder)
             ret += int(0).to_bytes(4, byteorder)
+            # ret += int(257).to_bytes(4, byteorder)
 
-            #ret += int(257).to_bytes(4, byteorder)
             ret += len(self.adv).to_bytes(4, byteorder)
 
             for i in self.adv:

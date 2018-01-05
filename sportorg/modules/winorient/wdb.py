@@ -1,3 +1,4 @@
+from sportorg.core.otime import OTime
 from sportorg.libs.winorient.wdb import WDB, WDBMan, WDBTeam, WDBGroup, WDBDistance, WDBPunch, WDBFinish, WDBChip
 from sportorg.models.memory import Race, Organization, Group, Person, race, find, Course, \
     CourseControl, Country, Contact, Address, ResultStatus, Qualification, find_person_result, ResultSportident, Split
@@ -132,6 +133,7 @@ class WinOrientBinary:
                 result.sportident_card = race().new_sportident_card(man.si_card)
                 result.start_time = int_to_otime(man.start)
                 result.finish_time = int_to_otime(fin.time)
+                result.penalty_time = OTime(sec = man.penalty_second)
 
                 if man.status in self.status:
                     result.status = self.status[man.status]
@@ -263,6 +265,9 @@ class WinOrientBinary:
                     new_person.status = self.status_reverse[result.status]
 
                 wdb_object.fin.append(new_finish)
+
+                if result.penalty_time:
+                    new_person.penalty_second = result.penalty_time.to_sec()
 
                 # splits
 

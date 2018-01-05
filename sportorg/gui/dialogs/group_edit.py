@@ -11,7 +11,7 @@ from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
 from sportorg.models.constant import get_race_courses
-from sportorg.models.memory import race, Group, find, Sex, Limit
+from sportorg.models.memory import race, Group, find, Sex, Limit, RaceType
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.utils.time import time_to_qtime, time_to_otime
 
@@ -97,11 +97,10 @@ class GroupEditDialog(QDialog):
         self.item_price.setMaximum(Limit.PRICE)
         self.layout.addRow(self.label_price, self.item_price)
 
-        self.relay_checkbox =  QCheckBox(_('Relay'))
-        self.relay_leg_count = QSpinBox()
-        self.relay_leg_count.setSingleStep(1)
-        self.relay_leg_count.setMaximum(20)
-        self.layout.addRow(self.relay_checkbox, self.relay_leg_count)
+        self.type_label = QLabel(_('Type'))
+        self.type_combo = AdvComboBox()
+        self.type_combo.addItems(RaceType.get_race_types())
+        self.layout.addRow(self.type_label, self.type_combo)
 
         self.rank_checkbox = QCheckBox(_('Rank calculation'))
         self.rank_button = QPushButton(_('Configuration'))
@@ -161,11 +160,9 @@ class GroupEditDialog(QDialog):
             self.item_corridor_order.setValue(self.current_object.order_in_corridor)
         if self.current_object.price:
             self.item_price.setValue(self.current_object.price)
-        if self.current_object.relay_legs:
-            self.relay_leg_count.setValue(self.current_object.relay_legs)
 
         self.rank_checkbox.setChecked(self.current_object.ranking.is_active)
-        self.relay_checkbox.setChecked(self.current_object.is_relay)
+        self.type_combo.setCurrentText(self.current_object.get_type().get_title())
 
         def rank_configuration():
             group = self.current_object
@@ -230,14 +227,9 @@ class GroupEditDialog(QDialog):
             org.ranking.is_active = self.rank_checkbox.isChecked()
             changed = True
 
-        if org.is_relay != self.relay_checkbox.isChecked():
-            org.is_relay = self.relay_checkbox.isChecked()
+        if org.get_type() != RaceType(self.type_combo.currentIndex()):
+            org.type = RaceType(self.type_combo.currentIndex())
             changed = True
-
-        if org.relay_legs != self.relay_leg_count.value():
-            org.relay_legs = self.relay_leg_count.value()
-            changed = True
-
 
         if changed:
             ResultCalculation().set_rank(org)

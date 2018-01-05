@@ -60,6 +60,29 @@ class Sex(Enum):
         return Sex.MF
 
 
+class RaceType(Enum):
+    INDIVIDUAL_RACE = 0
+    MASS_START = 1
+    PURSUIT = 2
+    RELAY = 3
+    ONE_MAN_RELAY = 4
+    SPRINT_RELAY = 5
+
+    def __str__(self):
+        return "%s" % self._name_
+
+    def __repr__(self):
+        return self.__str__()
+
+    def get_title(self):
+        return _(self.__str__())
+
+    @staticmethod
+    def get_race_types():
+        ret = [obj.get_title() for obj in RaceType]
+        return ret
+
+
 class CourseType(Enum):
     NONE = 0
     ORDER = 1
@@ -252,7 +275,7 @@ class Group(Model):
         self.count_finished = 0
 
         self.ranking = Ranking()
-        self.is_relay = False
+        self.type = None # type: RaceType
         self.relay_legs = 0
 
     def __repr__(self):
@@ -263,6 +286,12 @@ class Group(Model):
 
     def get_count_all(self):
         return self.count_person
+
+    def get_type(self):
+        if self.type:
+            return self.type
+        obj = race()
+        return obj.get_setting('race_type', RaceType.INDIVIDUAL_RACE)
 
 
 class SportidentCardModel(Enum):
@@ -785,6 +814,7 @@ class Qualification(IntEnum):
         return qual[self.value]
 
     # see https://www.minsport.gov.ru/sportorentir.xls - Russian orienteering only!
+    # http://www.minsport.gov.ru/2017/doc/Sportivnoe-orentirovanie-evsk2021.xls
     def get_scores(self):
         scores = {
             '': 0,

@@ -1,7 +1,7 @@
 from sportorg.core.otime import OTime
 from sportorg.language import _
 from sportorg.models.memory import race, Result, Person, ResultStatus, Course, Group, Qualification, RankingItem, \
-    RelayTeam
+    RelayTeam, RaceType
 from sportorg.utils.time import time_to_hhmmss
 
 
@@ -11,7 +11,7 @@ class ResultCalculation(object):
         self.set_times()
         race().relay_teams.clear()
         for i in race().groups:
-            if not i.is_relay:
+            if not i.get_type() == RaceType.RELAY:
                 #single race
                 array = self.get_group_finishes(i)
                 self.set_places(array)
@@ -234,7 +234,12 @@ class ResultCalculation(object):
             ]
         elif qual == Qualification.I_Y:
             table = [
-                 (250, 0),
+                 (650, 0),
+                 (500, 192),
+                 (425, 188),
+                 (375, 184),
+                 (325, 180),
+                 (250, 176),
                  (211, 172),
                  (185, 168),
                  (159, 164),
@@ -257,29 +262,33 @@ class ResultCalculation(object):
             ]
         elif qual == Qualification.II_Y:
             table = [
-                 (250, 0),
-                 (211, 205),
-                 (185, 200),
-                 (159, 195),
-                 (120, 190),
-                 (102, 185),
-                 (90, 180),
-                 (78, 175),
-                 (60, 170),
-                 (51, 165),
-                 (45, 160),
-                 (39, 155),
-                 (30, 150),
-                 (27, 145),
-                 (25, 140),
-                 (23, 135),
-                 (20, 130),
-                 (17, 125),
-                 (15, 120),
-                 (13, 115),
-                 (11, 110),
+                 (425, 0),
+                 (375, 215),
+                 (325, 210),
+                 (250, 205),
+                 (211, 200),
+                 (185, 195),
+                 (159, 190),
+                 (120, 185),
+                 (102, 180),
+                 (90, 175),
+                 (78, 170),
+                 (60, 165),
+                 (51, 160),
+                 (45, 155),
+                 (39, 150),
+                 (30, 145),
+                 (27, 140),
+                 (25, 135),
+                 (23, 130),
+                 (20, 125),
+                 (17, 120),
+                 (15, 116),
+                 (13, 112),
+                 (11, 108),
                  (10, 105),
-                 (7, 100)
+                 (7, 102),
+                 (5, 100)
             ]
 
         for i in range(len(table)):

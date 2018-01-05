@@ -957,3 +957,21 @@ msgstr "Количество этапов"
 
 msgid "Reduce"
 msgstr "Отнять"
+
+msgid "INDIVIDUAL_RACE"
+msgstr "Индивидуальная гонка"
+
+msgid "MASS_START"
+msgstr "Масс-старт"
+
+msgid "PURSUIT"
+msgstr "Гонка преследования"
+
+msgid "RELAY"
+msgstr "Эстафета"
+
+msgid "ONE_MAN_RELAY"
+msgstr "Эстафета одного участника"
+
+msgid "SPRINT_RELAY"
+msgstr "Смешанная эстафета"

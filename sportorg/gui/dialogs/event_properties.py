@@ -2,23 +2,18 @@ import logging
 from datetime import datetime
 
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, QPushButton, QTextEdit, QDateTimeEdit, \
+from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, QTextEdit, QDateTimeEdit, \
     QDialogButtonBox, QSpinBox
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
-from sportorg.models.memory import race
+from sportorg.models.memory import race, RaceType
 
 
 def get_sport_kinds():
     ret = [_('orienteering'), _('running'), _('cross country')]
-    return ret
-
-
-def get_types():
-    ret = [_('individual'), _('free order'), _('pursuit'), _('mass start'), _('one-man-relay'), _('relay')]
     return ret
 
 
@@ -70,7 +65,7 @@ class EventPropertiesDialog(QDialog):
 
         self.label_type = QLabel(_('Event type'))
         self.item_type = AdvComboBox()
-        self.item_type.addItems(get_types())
+        self.item_type.addItems(RaceType.get_race_types())
         self.layout.addRow(self.label_type, self.item_type)
 
         self.label_relay_legs = QLabel(_('Relay legs'))
@@ -114,7 +109,7 @@ class EventPropertiesDialog(QDialog):
         self.show()
 
     def change_type(self):
-        flag = self.item_type.currentIndex() == 5
+        flag = self.item_type.currentText() == str(RaceType.RELAY)
         self.label_relay_legs.setVisible(flag)
         self.item_relay_legs.setVisible(flag)
 
@@ -128,8 +123,8 @@ class EventPropertiesDialog(QDialog):
         self.item_start_date.setDateTime(obj.get_setting('start_date', datetime.now().replace(second=0, microsecond=0)))
         self.item_end_date.setDateTime(obj.get_setting('end_date', datetime.now().replace(second=0, microsecond=0)))
         self.item_sport.setCurrentIndex(obj.get_setting('sport_kind_index', 0))
-        self.item_type.setCurrentIndex(obj.get_setting('course_type_index', 0))
-        self.item_relay_legs.setValue(obj.get_setting('relay_legs_count', 3))
+        self.item_type.setCurrentIndex(obj.get_setting('race_type', RaceType.INDIVIDUAL_RACE).value)
+        self.item_relay_legs.setValue(obj.get_setting('relay_leg_count', 3))
         self.change_type()
 
     def apply_changes_impl(self):
@@ -147,8 +142,8 @@ class EventPropertiesDialog(QDialog):
         obj.set_setting('start_date', start_date)
         obj.set_setting('end_date', end_date)
         obj.set_setting('sport_kind_index', self.item_sport.currentIndex())
-        obj.set_setting('course_type_index', self.item_type.currentIndex())
-        obj.set_setting('relay_legs_count', self.item_relay_legs.value())
+        obj.set_setting('race_type', RaceType(self.item_type.currentIndex()))
+        obj.set_setting('relay_leg_count', self.item_relay_legs.value())
 
         obj.data.name = self.item_main_title.text()
         obj.data.start_time = start_date
