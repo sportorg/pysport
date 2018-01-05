@@ -930,3 +930,48 @@ msgstr "Показать панель инструментов"
 
 msgid "Team list"
 msgstr "Выписка по командам"
+
+msgid "on/off SPORTident readout"
+msgstr "Запустить/остановить чтение чипов SPORTident"
+
+msgid "Search"
+msgstr "Поиск"
+
+msgid "Relay number assign mode"
+msgstr "Режим присвоения номеров для эстафет"
+
+msgid "Start time change"
+msgstr "Смещение времени старта"
+
+msgid "Relay"
+msgstr "Эстафета"
+
+msgid "Relay number"
+msgstr "Эстафетные номера"
+
+msgid "First relay number"
+msgstr "Первый эстафетный номер"
+
+msgid "Relay legs"
+msgstr "Количество этапов"
+
+msgid "Reduce"
+msgstr "Отнять"
+
+msgid "INDIVIDUAL_RACE"
+msgstr "Индивидуальная гонка"
+
+msgid "MASS_START"
+msgstr "Масс-старт"
+
+msgid "PURSUIT"
+msgstr "Гонка преследования"
+
+msgid "RELAY"
+msgstr "Эстафета"
+
+msgid "ONE_MAN_RELAY"
+msgstr "Эстафета одного участника"
+
+msgid "SPRINT_RELAY"
+msgstr "Смешанная эстафета"

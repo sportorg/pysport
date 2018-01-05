@@ -1,6 +1,7 @@
 from sportorg.core.otime import OTime
 from sportorg.language import _
-from sportorg.models.memory import race, Result, Person, ResultStatus, Course, Group, Qualification, RankingItem
+from sportorg.models.memory import race, Result, Person, ResultStatus, Course, Group, Qualification, RankingItem, \
+    RelayTeam, RaceType
 from sportorg.utils.time import time_to_hhmmss
 
 
@@ -8,10 +9,17 @@ from sportorg.utils.time import time_to_hhmmss
 class ResultCalculation(object):
     def process_results(self):
         self.set_times()
+        race().relay_teams.clear()
         for i in race().groups:
-            array = self.get_group_finishes(i)
-            self.set_places(array)
-            self.set_rank(i)
+            if not i.get_type() == RaceType.RELAY:
+                #single race
+                array = self.get_group_finishes(i)
+                self.set_places(array)
+                self.set_rank(i)
+            else:
+                #relay
+                new_relays = self.process_relay_results(i)
+                race().relay_teams.append(new_relays)
 
     def set_times(self):
         for i in race().results:
@@ -67,6 +75,34 @@ class ResultCalculation(object):
 
                 res.place = last_place
                 current_place += 1
+
+    def process_relay_results(self, group):
+        if group and isinstance(group, Group):
+            results = self.get_group_finishes(group)
+
+            relay_teams = {}
+            for res in results:
+                assert isinstance(res, Result)
+                bib = res.person.bib
+
+                team_number = bib % 1000
+                if not str(team_number) in relay_teams:
+                    new_team = RelayTeam()
+                    new_team.group = group
+                    new_team.bib_number = team_number
+                    relay_teams[str(team_number)] = new_team
+
+                team = relay_teams[str(team_number)]
+                assert isinstance(team, RelayTeam)
+                team.add_result(res)
+            teams_sorted = sorted(relay_teams.values())
+            place = 1
+            for cur_team in teams_sorted:
+                cur_team.set_place(place)
+                place += 1
+
+            return relay_teams.values()
+
 
     def set_rank(self, group):
         assert isinstance(group, Group)
@@ -198,7 +234,12 @@ class ResultCalculation(object):
             ]
         elif qual == Qualification.I_Y:
             table = [
-                 (250, 0),
+                 (650, 0),
+                 (500, 192),
+                 (425, 188),
+                 (375, 184),
+                 (325, 180),
+                 (250, 176),
                  (211, 172),
                  (185, 168),
                  (159, 164),
@@ -221,29 +262,33 @@ class ResultCalculation(object):
             ]
         elif qual == Qualification.II_Y:
             table = [
-                 (250, 0),
-                 (211, 205),
-                 (185, 200),
-                 (159, 195),
-                 (120, 190),
-                 (102, 185),
-                 (90, 180),
-                 (78, 175),
-                 (60, 170),
-                 (51, 165),
-                 (45, 160),
-                 (39, 155),
-                 (30, 150),
-                 (27, 145),
-                 (25, 140),
-                 (23, 135),
-                 (20, 130),
-                 (17, 125),
-                 (15, 120),
-                 (13, 115),
-                 (11, 110),
+                 (425, 0),
+                 (375, 215),
+                 (325, 210),
+                 (250, 205),
+                 (211, 200),
+                 (185, 195),
+                 (159, 190),
+                 (120, 185),
+                 (102, 180),
+                 (90, 175),
+                 (78, 170),
+                 (60, 165),
+                 (51, 160),
+                 (45, 155),
+                 (39, 150),
+                 (30, 145),
+                 (27, 140),
+                 (25, 135),
+                 (23, 130),
+                 (20, 125),
+                 (17, 120),
+                 (15, 116),
+                 (13, 112),
+                 (11, 108),
                  (10, 105),
-                 (7, 100)
+                 (7, 102),
+                 (5, 100)
             ]
 
         for i in range(len(table)):

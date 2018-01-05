@@ -1,4 +1,6 @@
-from sportorg.models.memory import Person, ResultStatus, SystemType
+from gettext import find
+
+from sportorg.models.memory import Person, ResultStatus, SystemType, find, race
 
 
 class ResultCheckerException(Exception):
@@ -85,12 +87,16 @@ class ResultChecker:
         if self.person.group is None:
             return True
 
-        controls = self.person.group.course.controls
-
-        if not hasattr(controls, '__iter__'):
+        if result.system_type != SystemType.SPORTIDENT:
             return True
 
-        if result.system_type != SystemType.SPORTIDENT:
+        course = find_course(self.person)
+        if not course:
+            return True
+
+        controls = course.controls
+
+        if not hasattr(controls, '__iter__'):
             return True
 
         return self.check(result.splits, controls)
@@ -107,3 +113,18 @@ class ResultChecker:
             result.status = ResultStatus.DID_NOT_FINISH
 
         return o
+
+
+def find_course(person):
+    #first get course by number
+    bib = person.bib
+    obj = race()
+    ret = find(obj.courses, name=str(bib))
+    if not ret and bib > 1000:
+        course_name = "{}.{}".format(bib % 1000, bib // 1000)
+        ret = find(obj.courses, name=course_name)
+    #usual connection via group
+    if not ret:
+        if person.group:
+            ret = person.group.course
+    return ret

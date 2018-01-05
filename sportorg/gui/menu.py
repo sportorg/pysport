@@ -194,6 +194,14 @@ def menu_list():
                     'action': GlobalAccess().get_main_window().guess_corridors
                 },
                 {
+                    'title': _('Relay number assign mode'),
+                    'action': GlobalAccess().get_main_window().relay_number_assign
+                },
+                {
+                    'title': _('Start time change'),
+                    'action': GlobalAccess().get_main_window().start_time_change
+                },
+                {
                     'title': _('Start list'),
                     'action': GlobalAccess().get_main_window().create_start_protocol_dialog
                 },

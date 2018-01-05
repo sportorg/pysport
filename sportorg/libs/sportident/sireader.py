@@ -845,6 +845,12 @@ class SIReader(object):
         ret['punches'] = []
         p = 0
         i = card['P1']
+
+        """if 192 punches mode for SI6 is activated, station sends 8 blocks"""
+        if len(data) == 128 * 8:
+            i += 128 * 3 # strange behavior of BSM-7 station, reads 8 blocks for SIAC??? Please test with another BSM-7
+
+
         while p < punch_count:
             if card_type == 'SI5' and i % 16 == 0:
                 # first byte of each block is reserved for punches 31-36
@@ -1011,7 +1017,16 @@ class SIReaderReadout(SIReader):
             raw_data += self._read_command()[1][1:]
             raw_data += self._read_command()[1][1:]
             raw_data += self._read_command()[1][1:]
-            raw_data += self._read_command()[1][1:]
+
+            last_data = self._read_command()[1]
+            block_flag = last_data[0]
+            raw_data += last_data[1:]
+
+            """if 192 punches mode for SI6 is activated, station sends 8 blocks"""
+            if block_flag != 7:
+                raw_data += self._read_command()[1][1:]
+                raw_data += self._read_command()[1][1:]
+                raw_data += self._read_command()[1][1:]
         else:
             raise SIReaderException('No card in the device.')
 

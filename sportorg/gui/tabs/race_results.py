@@ -12,6 +12,7 @@ from sportorg.gui.tabs.memory_model import ResultMemoryModel
 from sportorg.gui.tabs.table import TableView
 from sportorg.language import _
 from sportorg.models.memory import race, Result, Course, CourseControl, SystemType
+from sportorg.models.result.result_checker import find_course
 from sportorg.utils.time import time_to_hhmmss
 
 
@@ -194,8 +195,8 @@ class Widget(QtWidgets.QWidget):
             self.ResultChipStartEdit.setText(time_to_hhmmss(result.start_time))
 
         index = 1
-        if result.person and result.person.group and result.person.group.course:
-            course = result.person.group.course
+        if result.person:
+            course = find_course(result.person)
             assert isinstance(course, Course)
             if course.controls is not None:
                 for control in course.controls:

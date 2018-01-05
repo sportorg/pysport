@@ -9,6 +9,7 @@ from sportorg.gui.tabs.memory_model import PersonMemoryModel
 from sportorg.gui.tabs.table import TableView
 from sportorg.language import _
 from sportorg.models.memory import race
+from sportorg.models.start.relay import set_next_relay_number_to_person
 
 
 class StartPreparationTableView(TableView):
@@ -46,7 +47,7 @@ class Widget(QtWidgets.QWidget):
         hor_header.setSectionResizeMode(QHeaderView.Interactive)
 
         def entry_double_clicked(index):
-            logging.debug('Clicked on ' + str(index.row()))
+            logging.debug('Entered ' + str(index.row()))
             # show_edit_dialog(index)
             try:
                 if index.row() < len(race().persons):
@@ -55,7 +56,19 @@ class Widget(QtWidgets.QWidget):
             except Exception as e:
                 logging.exception(str(e))
 
+        def entry_single_clicked(index):
+            logging.debug('Clicked ' + str(index.row()))
+            try:
+                obj = race()
+                if obj.get_setting('relay_number_assign', False):
+                    if index.row() < len(obj.persons):
+                        set_next_relay_number_to_person(obj.persons[index.row()])
+
+            except Exception as e:
+                logging.exception(str(e))
+
         self.EntryTable.activated.connect(entry_double_clicked)
+        self.EntryTable.clicked.connect(entry_single_clicked)
         self.entry_layout.addWidget(self.EntryTable)
 
     def get_table(self):

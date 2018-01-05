@@ -11,7 +11,7 @@ from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
 from sportorg.models.constant import get_race_courses
-from sportorg.models.memory import race, Group, find, Sex, Limit
+from sportorg.models.memory import race, Group, find, Sex, Limit, RaceType
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.utils.time import time_to_qtime, time_to_otime
 
@@ -97,6 +97,11 @@ class GroupEditDialog(QDialog):
         self.item_price.setMaximum(Limit.PRICE)
         self.layout.addRow(self.label_price, self.item_price)
 
+        self.type_label = QLabel(_('Type'))
+        self.type_combo = AdvComboBox()
+        self.type_combo.addItems(RaceType.get_race_types())
+        self.layout.addRow(self.type_label, self.type_combo)
+
         self.rank_checkbox = QCheckBox(_('Rank calculation'))
         self.rank_button = QPushButton(_('Configuration'))
         self.layout.addRow(self.rank_checkbox, self.rank_button)
@@ -157,6 +162,7 @@ class GroupEditDialog(QDialog):
             self.item_price.setValue(self.current_object.price)
 
         self.rank_checkbox.setChecked(self.current_object.ranking.is_active)
+        self.type_combo.setCurrentText(self.current_object.get_type().get_title())
 
         def rank_configuration():
             group = self.current_object
@@ -219,6 +225,10 @@ class GroupEditDialog(QDialog):
 
         if org.ranking.is_active != self.rank_checkbox.isChecked():
             org.ranking.is_active = self.rank_checkbox.isChecked()
+            changed = True
+
+        if org.get_type() != RaceType(self.type_combo.currentIndex()):
+            org.set_type(RaceType(self.type_combo.currentIndex()))
             changed = True
 
         if changed:

@@ -1,6 +1,7 @@
 import uuid
 from abc import abstractmethod
 from enum import IntEnum, Enum
+from gettext import find
 from typing import Dict, List, Any, Union
 
 import datetime
@@ -57,6 +58,29 @@ class Sex(Enum):
         if title in sex_reverse:
             return sex_reverse[title]
         return Sex.MF
+
+
+class RaceType(Enum):
+    INDIVIDUAL_RACE = 0
+    MASS_START = 1
+    PURSUIT = 2
+    RELAY = 3
+    ONE_MAN_RELAY = 4
+    SPRINT_RELAY = 5
+
+    def __str__(self):
+        return "%s" % self._name_
+
+    def __repr__(self):
+        return self.__str__()
+
+    def get_title(self):
+        return _(self.__str__())
+
+    @staticmethod
+    def get_race_types():
+        ret = [obj.get_title() for obj in RaceType]
+        return ret
 
 
 class CourseType(Enum):
@@ -251,6 +275,8 @@ class Group(Model):
         self.count_finished = 0
 
         self.ranking = Ranking()
+        self.__type = None # type: RaceType
+        self.relay_legs = 0
 
     def __repr__(self):
         return 'Group {}'.format(self.name)
@@ -261,6 +287,14 @@ class Group(Model):
     def get_count_all(self):
         return self.count_person
 
+    def get_type(self):
+        if self.__type:
+            return self.__type
+        obj = race()
+        return obj.get_setting('race_type', RaceType.INDIVIDUAL_RACE)
+
+    def set_type(self, new_type):
+        self.__type = new_type
 
 class SportidentCardModel(Enum):
     NONE = 0
@@ -559,6 +593,7 @@ class Race(Model):
         self.groups = []  # type: List[Group]
         self.persons = []  # type: List[Person]
         self.results = []  # type: List[Result]
+        self.relay_teams = []  # type: List[RelayTeam]
         self.organizations = []  # type: List[Organization]
         self.sportident_cards = []  # type: List[SportidentCard]
         self.settings = {}  # type: Dict[str, Any]
@@ -781,6 +816,7 @@ class Qualification(IntEnum):
         return qual[self.value]
 
     # see https://www.minsport.gov.ru/sportorentir.xls - Russian orienteering only!
+    # http://www.minsport.gov.ru/2017/doc/Sportivnoe-orentirovanie-evsk2021.xls
     def get_scores(self):
         scores = {
             '': 0,
@@ -857,6 +893,237 @@ class Ranking(object):
             ret['rank'] = rank_array
         return ret
 
+
+class RelayLeg(object):
+    """
+    Describes one leg of relay team
+    Has the distribution of relay variant
+    example of file to import here - should generate teams and team legs:
+    101.1: CB
+    101.2: AC
+    101.3: BA
+    """
+    def __init__(self, team=None):
+        self.number = 0
+        self.leg = 0
+        self.variant = ''
+        self.person = None
+        self.result = None
+        self.course = None  # optional link to the course, prefer to use variant and bib to find course
+        self.team = team
+
+    def get_course(self):
+        """Get the course to check control order. Try to use bib and variant to find course"""
+        bib = self.get_bib()
+        obj = race()
+        course = find(obj.courses, name=str(bib))
+        if course:
+            return course
+
+        # get course via group
+        person = self.get_person()
+        if person and isinstance(person, Person):
+            if person.group:
+                return person.group.course
+
+        return None
+
+    def get_relay_team(self):
+        """:return relay team object"""
+        return self.team
+
+    def get_next_leg(self):
+        """:return next leg of relay team, None if this leg is last"""
+        team = self.get_relay_team()
+        if team and isinstance(team, RelayTeam):
+            if len(team.legs) > self.leg + 1:
+                return team.legs[self.leg + 1]
+        return None
+
+    def get_prev_leg(self):
+        """:return previous leg of relay team, None if this leg is first"""
+        if self.leg > 1:
+            team = self.get_relay_team()
+            if team and isinstance(team, RelayTeam):
+                return team.legs[self.leg - 1]
+        return None
+
+    def get_bib(self):
+        """:return person bib, e.g. 1.1 or 1001 depending on settings"""
+        if self.number < 1000:
+            return 1000 * self.leg + self.number
+        return "{}.{}".format(self.number, self.leg)
+
+    def get_variant(self):
+        """:return person distribution variant e.g. ABCA"""
+        return self.variant
+
+    def parse_variant_text(self, text):
+        """parse text like '101.1: CB'"""
+        arr = str(text).split(':')
+        if len(arr) == 2:
+            bib_array = arr[0].split('.')
+            if len(bib_array) == 2:
+                if bib_array[0].strip().isdigit() and bib_array[1].strip().isdigit():
+                    self.variant = arr[1].strip()
+                    self.number = bib_array[0].strip()
+                    self.leg = bib_array[1].strip()
+                    return 1
+        return 0
+
+    def get_variant_text(self):
+        return "{}.{}: {}".format(self.number, self.leg, self.variant)
+
+    def is_finished(self):
+        res = self.get_result()
+        if res:
+            return True
+        return False
+
+    def is_correct(self):
+        res = self.get_result()
+        if res:
+            assert isinstance(res, Result)
+            return res.status == ResultStatus.OK
+        return True
+
+    def set_bib(self):
+        if self.person:
+            assert isinstance(self.person, Person)
+            self.person.bib = self.get_bib()
+
+    def set_person(self, person):
+        self.person = person
+
+    def get_person(self):
+        return self.person
+
+    def set_result(self, result):
+        self.result = result
+
+    def get_result(self):
+        return self.result
+
+    def set_start_time(self, time):
+        person = self.get_person()
+        if person and isinstance(person, Person):
+            person.start_time = time
+
+    def get_finish_time(self):
+        res = self.get_result()
+        if res:
+            assert isinstance(res, Result)
+            return res.get_finish_time()
+        return None
+
+    def get_start_time(self):
+        res = self.get_result()
+        if res:
+            assert isinstance(res, Result)
+            return res.get_start_time()
+        return None
+
+    def set_start_time_from_previous(self):
+        if self.leg > 1:
+            prev_leg = self.get_prev_leg()
+            if prev_leg:
+                assert isinstance(prev_leg, RelayLeg)
+                if prev_leg.is_finished():
+                    self.set_start_time(prev_leg.get_finish_time())
+                    return 1
+        return 0
+
+    def set_place(self, place):
+        res = self.get_result()
+        if res and isinstance(res, Result):
+            res.place = place
+
+
+class RelayTeam(object):
+    def __init__(self):
+        self.group = None # type:Group
+        self.legs = [] # type:list[RelayLeg]
+        self.description = '' # Name of team, optional
+        self.bib_number = None # bib
+        self.last_finished_leg = 0
+        self.last_correct_leg = 0
+
+    def __eq__(self, other):
+        if self.get_is_status_ok() == self.get_is_status_ok():
+            if self.get_lap_finished() == other.get_lap_finished():
+                if self.get_time() == other.get_time():
+                    return True
+        return False
+
+    def __gt__(self, other):
+        if self.get_is_status_ok() and not other.get_is_status_ok():
+            return False
+
+        if not self.get_is_status_ok() and other.get_is_status_ok():
+            return True
+
+        if self.get_lap_finished() != other.get_lap_finished():
+            return self.get_lap_finished() < other.get_lap_finished()
+
+        return self.get_time() > other.get_time()
+
+
+    def get_all_results(self):
+        """return: all results of persons, connected with team"""
+        pass
+
+    def add_result(self, result):
+        """Add new result to the team"""
+        leg = RelayLeg(team=self)
+        leg.set_result(result)
+        leg.set_person(result.person)
+        self.legs.append(leg)
+
+    def set_leg_for_person(self, person, leg):
+        """Set leg for person"""
+        pass
+
+    def set_bibs(self, number):
+        """Set bibs for all members, e.g. 1001, 2001, 3001 for 1,2,3 legs of team #1"""
+
+    def set_start_times(self):
+        """Set start time as finish of previous leg for all members"""
+        for i in self.legs:
+            assert isinstance(i, RelayLeg)
+            i.set_start_time_from_previous()
+
+    def get_time(self):
+        if len(self.legs):
+            last_finish = self.legs[-1].get_finish_time()
+            start = self.legs[0].get_start_time()
+            return last_finish - start
+        return None
+
+    def get_lap_finished(self):
+        """quantity of already finished laps"""
+        finished_qty = 0
+        for leg in self.legs:
+            assert isinstance(leg, RelayLeg)
+            if leg.is_finished():
+                finished_qty += 1
+            else:
+                return finished_qty
+        return finished_qty
+
+    def get_correct_lap_count(self):
+        """quantity of successfully finished laps"""
+
+    def get_is_status_ok(self):
+        """get the whole status of team - OK if all laps are OK"""
+        for leg in self.legs:
+            assert isinstance(leg, RelayLeg)
+            if not leg.is_correct():
+                return False
+        return True
+
+    def set_place(self, place):
+        for i in self.legs:
+            i.set_place(place)
 
 def create(obj, **kwargs):
     return obj.create(**kwargs)
