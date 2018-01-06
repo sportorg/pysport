@@ -11,15 +11,6 @@ from sportorg.language import _
 from sportorg.models.memory import race, Course, CourseControl, find, CourseType
 
 
-def get_course_types():
-    return [
-        CourseType.NONE.get_title(),
-        CourseType.ORDER.get_title(),
-        CourseType.FREE.get_title(),
-        CourseType.MARKED_ROUTE.get_title()
-    ]
-
-
 class CourseEditDialog(QDialog):
     def __init__(self, table=None, index=None):
         super().__init__(GlobalAccess().get_main_window())
@@ -52,7 +43,7 @@ class CourseEditDialog(QDialog):
 
         self.label_type = QLabel(_('Type'))
         self.item_type = AdvComboBox()
-        self.item_type.addItems(get_course_types())
+        self.item_type.addItems(CourseType.get_titles())
         self.layout.addRow(self.label_type, self.item_type)
 
         self.label_length = QLabel(_('Length'))
@@ -132,7 +123,7 @@ class CourseEditDialog(QDialog):
             changed = True
 
         if course.type.get_title() != self.item_type.currentText():
-            course.type = CourseType.get_by_title(self.item_type.currentText())
+            course.type = CourseType(self.item_type.currentIndex())
             changed = True
 
         if course.length != self.item_length.value():
