@@ -35,10 +35,7 @@ class SystemType(Enum):
         return self.__str__()
 
 
-class Sex(Enum):
-    MF = 0
-    M = 1
-    F = 2
+class _TitleType(Enum):
 
     def __str__(self):
         return "%s" % self._name_
@@ -49,18 +46,19 @@ class Sex(Enum):
     def get_title(self):
         return _(self.__str__())
 
-    @staticmethod
-    def get_by_title(title):
-        sex_reverse = {
-            _(str(Sex.M)): Sex.M,
-            _(str(Sex.F)): Sex.F,
-        }
-        if title in sex_reverse:
-            return sex_reverse[title]
-        return Sex.MF
+    @classmethod
+    def get_titles(cls):
+        ret = [obj.get_title() for obj in cls]
+        return ret
 
 
-class RaceType(Enum):
+class Sex(_TitleType):
+    MF = 0
+    M = 1
+    F = 2
+
+
+class RaceType(_TitleType):
     INDIVIDUAL_RACE = 0
     MASS_START = 1
     PURSUIT = 2
@@ -68,48 +66,15 @@ class RaceType(Enum):
     ONE_MAN_RELAY = 4
     SPRINT_RELAY = 5
 
-    def __str__(self):
-        return "%s" % self._name_
 
-    def __repr__(self):
-        return self.__str__()
-
-    def get_title(self):
-        return _(self.__str__())
-
-    @staticmethod
-    def get_race_types():
-        ret = [obj.get_title() for obj in RaceType]
-        return ret
-
-
-class CourseType(Enum):
+class CourseType(_TitleType):
     NONE = 0
     ORDER = 1
     FREE = 2
     MARKED_ROUTE = 3
 
-    def __str__(self):
-        return "%s" % self._name_
 
-    def __repr__(self):
-        return self.__str__()
-
-    def get_title(self):
-        return _(self.__str__())
-
-    @staticmethod
-    def get_by_title(title):
-        items = [CourseType.ORDER, CourseType.FREE, CourseType.MARKED_ROUTE]
-        reverse = {}
-        for item in items:
-            reverse[_(str(item))] = item
-        if title in reverse:
-            return reverse[title]
-        return CourseType.NONE
-
-
-class ResultStatus(Enum):
+class ResultStatus(_TitleType):
     NONE = 0
     OK = 1
     FINISHED = 2
@@ -126,15 +91,6 @@ class ResultStatus(Enum):
     DID_NOT_START = 13
     DID_NOT_ENTER = 14
     CANCELLED = 15
-
-    def __str__(self):
-        return "%s" % self._name_
-
-    def __repr__(self):
-        return self.__str__()
-
-    def get_title(self):
-        return _(self.__str__())
 
 
 class Country(Model):

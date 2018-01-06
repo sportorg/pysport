@@ -16,10 +16,6 @@ from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.utils.time import time_to_qtime, time_to_otime
 
 
-def get_sexes():
-    return [Sex.MF.get_title(), Sex.M.get_title(), Sex.F.get_title()]
-
-
 class GroupEditDialog(QDialog):
     def __init__(self, table=None, index=None):
         super().__init__(GlobalAccess().get_main_window())
@@ -62,7 +58,7 @@ class GroupEditDialog(QDialog):
 
         self.label_sex = QLabel(_('Sex'))
         self.item_sex = AdvComboBox()
-        self.item_sex.addItems(get_sexes())
+        self.item_sex.addItems(Sex.get_titles())
         self.layout.addRow(self.label_sex, self.item_sex)
 
         self.label_age_min = QLabel(_('Min age'))
@@ -99,7 +95,7 @@ class GroupEditDialog(QDialog):
 
         self.type_label = QLabel(_('Type'))
         self.type_combo = AdvComboBox()
-        self.type_combo.addItems(RaceType.get_race_types())
+        self.type_combo.addItems(RaceType.get_titles())
         self.layout.addRow(self.type_label, self.type_combo)
 
         self.rank_checkbox = QCheckBox(_('Rank calculation'))
@@ -189,7 +185,7 @@ class GroupEditDialog(QDialog):
             changed = True
 
         if org.sex.get_title() != self.item_sex.currentText():
-            org.sex = Sex.get_by_title(self.item_sex.currentText())
+            org.sex = Sex(self.item_sex.currentIndex())
             changed = True
 
         if org.min_age != self.item_age_min.value():

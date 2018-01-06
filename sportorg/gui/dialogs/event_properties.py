@@ -66,7 +66,7 @@ class EventPropertiesDialog(QDialog):
 
         self.label_type = QLabel(_('Event type'))
         self.item_type = AdvComboBox()
-        self.item_type.addItems(RaceType.get_race_types())
+        self.item_type.addItems(RaceType.get_titles())
         self.layout.addRow(self.label_type, self.item_type)
 
         self.label_relay_legs = QLabel(_('Relay legs'))
