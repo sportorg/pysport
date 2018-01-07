@@ -86,7 +86,6 @@ class MainWindow(QMainWindow):
             self._setup_toolbar()
         self._setup_tab()
         self._setup_statusbar()
-        self._setup_system_tray_icon()
         self.show()
         self.post_show()
 
@@ -201,11 +200,6 @@ class MainWindow(QMainWindow):
         self.statusbar = QtWidgets.QStatusBar()
         self.setStatusBar(self.statusbar)
 
-    def _setup_system_tray_icon(self):
-        self.system_tray_icon = Qt.QSystemTrayIcon(self)
-        self.system_tray_icon.setIcon(QtGui.QIcon(config.ICON))
-        self.system_tray_icon.show()
-
     def _setup_tab(self):
         self.centralwidget = QtWidgets.QWidget(self)
         layout = QtWidgets.QVBoxLayout(self.centralwidget)
@@ -283,22 +277,6 @@ class MainWindow(QMainWindow):
     def open_file_dialog(self):
         file_name = get_open_file_name(_('Open SportOrg file'), _("SportOrg file (*.sportorg)"))
         self.open_file(file_name)
-
-    def system_message(self, title, content, icon=None, msecs=5000):
-        if icon is None:
-            icon = 0
-        icon_val = {
-            'context': Qt.QSystemTrayIcon.Context,
-            'critical': Qt.QSystemTrayIcon.Critical,
-            'doubleclick': Qt.QSystemTrayIcon.DoubleClick,
-            'information': Qt.QSystemTrayIcon.Information,
-            'middleclick': Qt.QSystemTrayIcon.MiddleClick,
-            'noicon': Qt.QSystemTrayIcon.NoIcon,
-            'trigger': Qt.QSystemTrayIcon.Trigger,
-            'unknown': Qt.QSystemTrayIcon.Unknown,
-            'warning': Qt.QSystemTrayIcon.Warning
-        }
-        self.system_tray_icon.showMessage(title, content, icon_val[icon] if icon in icon_val else icon, msecs)
 
     def statusbar_message(self, msg, msecs=5000):
         if hasattr(self, 'statusbar'):
