@@ -4,7 +4,7 @@ from datetime import date
 from PyQt5.QtCore import QModelIndex
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit, QSpinBox, QTimeEdit, QTextEdit, QCheckBox, QDialog, \
-    QPushButton, QDialogButtonBox
+    QDialogButtonBox
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess

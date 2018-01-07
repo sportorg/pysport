@@ -146,7 +146,7 @@ class CourseControl(Model):
         self.order = 0
 
     def __str__(self):
-        return '{} {}'.format(self.code, self.length)
+        return '{} {}'.format(self.code, self.length)   
 
     def __repr__(self):
         return self.__str__()
