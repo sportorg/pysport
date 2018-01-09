@@ -1011,3 +1011,12 @@ msgstr "Определение результата"
 
 msgid "Marked route"
 msgstr "Маркированная трасса"
+
+msgid "Enabled"
+msgstr "Включить"
+
+msgid "Online"
+msgstr "Онлайн"
+
+msgid "URL not valid"
+msgstr "URL недействителен"

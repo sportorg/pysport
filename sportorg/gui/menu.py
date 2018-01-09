@@ -270,6 +270,10 @@ def menu_list():
                     'title': _('Printer settings'),
                     'icon': config.icon_dir('print.png'),
                     'action': GlobalAccess().get_main_window().print_settings_dialog
+                },
+                {
+                    'title': _('Live'),
+                    'action': GlobalAccess().get_main_window().live_dialog
                 }
             ]
         },

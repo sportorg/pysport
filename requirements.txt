@@ -4,3 +4,4 @@ sireader==1.1.1
 jinja2==2.8
 polib==1.0.8
 cx_Freeze==5.0.2
+requests==2.18.4

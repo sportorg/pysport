@@ -6,6 +6,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets, Qt
 from PyQt5.QtWidgets import QMainWindow, QTableView, QMessageBox, QApplication
 
 from sportorg.gui.dialogs.bib_report_dialog import BibReportDialog
+from sportorg.gui.dialogs.live_dialog import LiveDialog
 from sportorg.gui.dialogs.relay_number_dialog import RelayNumberDialog
 from sportorg.gui.dialogs.search_dialog import SearchDialog
 from sportorg.gui.dialogs.start_time_change_dialog import StartTimeChangeDialog
@@ -500,6 +501,14 @@ class MainWindow(QMainWindow):
     def bib_report_dialog():
         try:
             ex = BibReportDialog()
+            ex.exec()
+        except Exception as e:
+            logging.exception(str(e))
+
+    @staticmethod
+    def live_dialog():
+        try:
+            ex = LiveDialog()
             ex.exec()
         except Exception as e:
             logging.exception(str(e))
