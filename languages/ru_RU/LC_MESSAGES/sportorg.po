@@ -975,3 +975,39 @@ msgstr "Эстафета одного участника"
 
 msgid "SPRINT_RELAY"
 msgstr "Смешанная эстафета"
+
+msgid "Timekeeping settings"
+msgstr "Настройки хронометража"
+
+msgid "by time"
+msgstr "по времени"
+
+msgid "by scores"
+msgstr "по баллам"
+
+msgid "rogain scores"
+msgstr "рогейн (45КП = 4балла, 78КП = 7баллов)"
+
+msgid "fixed scores"
+msgstr "фиксированные баллы за КП"
+
+msgid "minute penalty"
+msgstr "Штраф за каждую просроченную минуту"
+
+msgid "penalty time"
+msgstr "штрафное время"
+
+msgid "penalty laps"
+msgstr "штрафные круги"
+
+msgid "counting lap"
+msgstr "оценочный круг"
+
+msgid "lap station"
+msgstr "станция на штрафном круге"
+
+msgid "Result processing"
+msgstr "Определение результата"
+
+msgid "Marked route"
+msgstr "Маркированная трасса"

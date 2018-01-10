@@ -1,19 +1,20 @@
 import logging
 
 from PyQt5.QtCore import QTime
-from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QLabel, QDialog, \
-    QPushButton, QTimeEdit, QSpinBox, QRadioButton, QGroupBox, QCheckBox, QGridLayout, QDialogButtonBox
+     QTimeEdit, QSpinBox, QRadioButton, QCheckBox, QDialogButtonBox, QWidget, QTabWidget, \
+     QGroupBox
 
-from sportorg.config import icon_dir
+from sportorg.core.otime import OTime
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import _
 from sportorg.models.memory import race, SystemType
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.modules.configs.configs import Config
+from sportorg.utils.time import time_to_otime
 
 
-class SportidentPropertiesDialog(QDialog):
+class TimekeepingPropertiesDialog(QDialog):
     def __init__(self):
         super().__init__(GlobalAccess().get_main_window())
 
@@ -23,19 +24,23 @@ class SportidentPropertiesDialog(QDialog):
 
     def init_ui(self):
         # self.setFixedWidth(500)
-        self.setWindowTitle(_('SPORTident settings'))
-        self.setWindowIcon(QIcon(icon_dir('sportident.png')))
+        self.setWindowTitle(_('Timekeeping settings'))
+        # self.setWindowIcon(QIcon(icon_dir('sportident.png')))
         self.setSizeGripEnabled(False)
         self.setModal(True)
 
-        self.layout = QFormLayout(self)
+        self.tab_widget = QTabWidget()
+
+        # timekeeping tab
+        self.timekeeping_tab = QWidget()
+        self.tk_layout = QFormLayout()
 
         self.label_zero_time = QLabel(_('Zero time'))
         self.item_zero_time = QTimeEdit()
         self.item_zero_time.setDisplayFormat("HH:mm")
         self.item_zero_time.setMaximumSize(60, 20)
         self.item_zero_time.setDisabled(True)
-        self.layout.addRow(self.label_zero_time, self.item_zero_time)
+        self.tk_layout.addRow(self.label_zero_time, self.item_zero_time)
 
         self.start_group_box = QGroupBox(_('Start time'))
         self.start_layout = QFormLayout()
@@ -51,7 +56,7 @@ class SportidentPropertiesDialog(QDialog):
         self.item_start_gate.setDisabled(True)
         self.start_layout.addRow(self.item_start_gate)
         self.start_group_box.setLayout(self.start_layout)
-        self.layout.addRow(self.start_group_box)
+        self.tk_layout.addRow(self.start_group_box)
 
         self.finish_group_box = QGroupBox(_('Finish time'))
         self.finish_layout = QFormLayout()
@@ -66,7 +71,7 @@ class SportidentPropertiesDialog(QDialog):
         self.item_finish_beam.setDisabled(True)
         self.finish_layout.addRow(self.item_finish_beam)
         self.finish_group_box.setLayout(self.finish_layout)
-        self.layout.addRow(self.finish_group_box)
+        self.tk_layout.addRow(self.finish_group_box)
 
         self.chip_reading_box = QGroupBox(_('Assigning a chip when reading'))
         self.chip_reading_layout = QFormLayout()
@@ -77,7 +82,7 @@ class SportidentPropertiesDialog(QDialog):
         self.chip_reading_always = QRadioButton(_('Always'))
         self.chip_reading_layout.addRow(self.chip_reading_always)
         self.chip_reading_box.setLayout(self.chip_reading_layout)
-        # self.layout.addRow(self.chip_reading_box)
+        # self.tk_layout.addRow(self.chip_reading_box)
 
         self.repeated_reading_box = QGroupBox(_('Repeated reading'))
         self.repeated_reading_layout = QFormLayout()
@@ -88,14 +93,60 @@ class SportidentPropertiesDialog(QDialog):
         self.repeated_reading_keep_all_version = QRadioButton(_('Keep all versions'))
         self.repeated_reading_layout.addRow(self.repeated_reading_keep_all_version)
         self.repeated_reading_box.setLayout(self.repeated_reading_layout)
-        # self.layout.addRow(self.repeated_reading_box)
+        # self.tk_layout.addRow(self.repeated_reading_box)
 
         self.assignment_mode = QCheckBox(_('Assignment mode'))
         # self.assignment_mode.stateChanged.connect(self.on_assignment_mode)
         # self.layout.addRow(self.assignment_mode)
 
         self.auto_connect = QCheckBox(_('Auto connect to station'))
-        self.layout.addRow(self.auto_connect)
+        self.tk_layout.addRow(self.auto_connect)
+
+        self.timekeeping_tab.setLayout(self.tk_layout)
+
+        # result processing tab
+        self.result_proc_tab = QWidget()
+        self.result_proc_layout = QFormLayout()
+        self.rp_time_radio = QRadioButton(_('by time'))
+        self.result_proc_layout.addRow(self.rp_time_radio)
+        self.rp_scores_radio = QRadioButton(_('by scores'))
+        self.result_proc_layout.addRow(self.rp_scores_radio)
+
+        self.rp_scores_group = QGroupBox()
+        self.rp_scores_layout = QFormLayout(self.rp_scores_group)
+        self.rp_rogain_scores_radio = QRadioButton(_('rogain scores'))
+        self.rp_scores_layout.addRow(self.rp_rogain_scores_radio)
+        self.rp_fixed_scores_radio = QRadioButton(_('fixed scores'))
+        self.rp_fixed_scores_edit = QSpinBox()
+        self.rp_fixed_scores_edit.setMaximumWidth(50)
+        self.rp_scores_layout.addRow(self.rp_fixed_scores_radio, self.rp_fixed_scores_edit)
+        self.rp_scores_minute_penalty_label = QLabel(_('minute penalty'))
+        self.rp_scores_minute_penalty_edit = QSpinBox()
+        self.rp_scores_minute_penalty_edit.setMaximumWidth(50)
+        self.rp_scores_layout.addRow(self.rp_scores_minute_penalty_label, self.rp_scores_minute_penalty_edit)
+        self.result_proc_layout.addRow(self.rp_scores_group)
+        self.result_proc_tab.setLayout(self.result_proc_layout)
+
+        # marked route settings
+        self.marked_route_tab = QWidget()
+        self.mr_layout = QFormLayout()
+        self.mr_time_radio = QRadioButton(_('penalty time'))
+        self.mr_time_edit = QTimeEdit()
+        self.mr_time_edit.setDisplayFormat('hh:mm:ss')
+        self.mr_layout.addRow(self.mr_time_radio, self.mr_time_edit)
+        self.mr_laps_radio = QRadioButton(_('penalty laps'))
+        self.mr_layout.addRow(self.mr_laps_radio)
+        self.mr_counting_lap_check = QCheckBox(_('counting lap'))
+        self.mr_layout.addRow(self.mr_counting_lap_check)
+        self.mr_lap_station_check = QCheckBox(_('lap station'))
+        self.mr_lap_station_edit = QSpinBox()
+        self.mr_lap_station_edit.setMaximumWidth(50)
+        self.mr_layout.addRow(self.mr_lap_station_check, self.mr_lap_station_edit)
+        self.marked_route_tab.setLayout(self.mr_layout)
+
+        self.tab_widget.addTab(self.timekeeping_tab, _('SPORTident settings'))
+        self.tab_widget.addTab(self.result_proc_tab, _('Result processing'))
+        self.tab_widget.addTab(self.marked_route_tab, _('Marked route'))
 
         def cancel_changes():
             self.close()
@@ -114,6 +165,9 @@ class SportidentPropertiesDialog(QDialog):
         self.button_cancel = button_box.button(QDialogButtonBox.Cancel)
         self.button_cancel.setText(_('Cancel'))
         self.button_cancel.clicked.connect(cancel_changes)
+
+        self.layout = QFormLayout(self)
+        self.layout.addRow(self.tab_widget)
         self.layout.addRow(button_box)
 
         self.set_values_from_model()
@@ -179,6 +233,44 @@ class SportidentPropertiesDialog(QDialog):
         self.assignment_mode.setChecked(assignment_mode)
         self.auto_connect.setChecked(Config().configuration.get('autoconnect'))
 
+        # result processing
+        obj = cur_race
+        rp_mode = obj.get_setting('result_processing_mode', 'time')
+        rp_score_mode = obj.get_setting('result_processing_score_mode', 'rogain')
+        rp_fixed_scores_value = obj.get_setting('result_processing_fixed_score_value', 1)
+        rp_scores_minute_penalty = obj.get_setting('result_processing_scores_minute_penalty', 1)
+
+        if rp_mode == 'time':
+            self.rp_time_radio.setChecked(True)
+        else:
+            self.rp_scores_radio.setChecked(True)
+
+        if rp_score_mode == 'rogain':
+            self.rp_rogain_scores_radio.setChecked(True)
+        else:
+            self.rp_fixed_scores_radio.setChecked(True)
+
+        self.rp_fixed_scores_edit.setValue(rp_fixed_scores_value)
+        self.rp_scores_minute_penalty_edit.setValue(rp_scores_minute_penalty)
+
+        # marked route
+
+        mr_mode = obj.get_setting('marked_route_mode', 'time')
+        mr_penalty_time = obj.get_setting('marked_route_penalty_time', OTime(sec=60))
+        mr_if_counting_lap = obj.get_setting('marked_route_if_counting_lap', True)
+        mr_if_station_check = obj.get_setting('marked_route_if_station_check', False)
+        mr_station_code = obj.get_setting('marked_route_station_code', 80)
+
+        if mr_mode == 'time':
+            self.mr_time_radio.setChecked(True)
+        else:
+            self.mr_laps_radio.setChecked(True)
+
+        self.mr_time_edit.setTime(mr_penalty_time.to_time())
+        self.mr_counting_lap_check.setChecked(mr_if_counting_lap)
+        self.mr_lap_station_check.setChecked(mr_if_station_check)
+        self.mr_lap_station_edit.setValue(mr_station_code)
+
     def apply_changes_impl(self):
         changed = False
         obj = race()
@@ -243,6 +335,42 @@ class SportidentPropertiesDialog(QDialog):
         obj.set_setting('sportident_assignment_mode', self.assignment_mode.isChecked())
 
         Config().configuration.set('autoconnect', self.auto_connect.isChecked())
+
+        # result processing
+        rp_mode = 'time'
+        if self.rp_scores_radio.isChecked():
+            rp_mode = 'scores'
+
+        rp_score_mode = 'rogain'
+        if self.rp_fixed_scores_radio.isChecked():
+            rp_score_mode = 'fixed'
+
+        rp_fixed_scores_value = self.rp_fixed_scores_edit.value()
+
+        rp_scores_minute_penalty = self.rp_scores_minute_penalty_edit.value()
+
+        obj.set_setting('result_processing_mode', rp_mode)
+        obj.set_setting('result_processing_score_mode', rp_score_mode)
+        obj.set_setting('result_processing_fixed_score_value', rp_fixed_scores_value)
+        obj.set_setting('result_processing_scores_minute_penalty', rp_scores_minute_penalty)
+
+        # marked route
+        mr_mode = 'time'
+        if self.mr_laps_radio.isChecked():
+            mr_mode = 'laps'
+        obj.set_setting('marked_route_mode', mr_mode)
+        mr_penalty_time = time_to_otime(self.mr_time_edit.time())
+        mr_if_counting_lap = self.mr_counting_lap_check.isChecked()
+        mr_if_station_check = self.mr_lap_station_check.isChecked()
+        mr_station_code = self.mr_lap_station_edit.value()
+
+        obj.set_setting('marked_route_mode', mr_mode)
+        obj.set_setting('marked_route_penalty_time', mr_penalty_time)
+        obj.set_setting('marked_route_if_counting_lap', mr_if_counting_lap)
+        obj.set_setting('marked_route_if_station_check', mr_if_station_check)
+        obj.set_setting('marked_route_station_code', mr_station_code)
+
+        changed = True
 
         if changed:
             ResultCalculation().process_results()
