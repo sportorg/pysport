@@ -33,7 +33,7 @@ from sportorg.gui.dialogs.number_change import NumberChangeDialog
 from sportorg.gui.dialogs.print_properties import PrintPropertiesDialog
 from sportorg.gui.dialogs.report_dialog import ReportDialog
 from sportorg.gui.dialogs.settings import SettingsDialog
-from sportorg.gui.dialogs.sportident_properties import SportidentPropertiesDialog
+from sportorg.gui.dialogs.timekeeping_properties import TimekeepingPropertiesDialog
 from sportorg.gui.dialogs.start_chess_dialog import StartChessDialog
 from sportorg.gui.dialogs.start_preparation import StartPreparationDialog
 from sportorg.gui.dialogs.start_report_dialog import StartReportDialog
@@ -563,9 +563,9 @@ class MainWindow(QMainWindow):
             logging.exception(str(e))
 
     @staticmethod
-    def sportident_settings_dialog():
+    def timekeeping_settings_dialog():
         try:
-            SportidentPropertiesDialog().exec()
+            TimekeepingPropertiesDialog().exec()
         except Exception as e:
             logging.exception(str(e))
 

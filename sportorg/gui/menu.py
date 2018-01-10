@@ -262,9 +262,9 @@ def menu_list():
             'title': _('Options'),
             'actions': [
                 {
-                    'title': _('SPORTident settings'),
-                    'icon': config.icon_dir('sportident.png'),
-                    'action': GlobalAccess().get_main_window().sportident_settings_dialog
+                    'title': _('Timekeeping settings'),
+                    # 'icon': config.icon_dir('sportident.png'),
+                    'action': GlobalAccess().get_main_window().timekeeping_settings_dialog
                 },
                 {
                     'title': _('Printer settings'),
