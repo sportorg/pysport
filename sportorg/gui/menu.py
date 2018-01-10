@@ -93,13 +93,6 @@ def menu_list():
                             ]
                         },
                     ]
-                },
-                {
-                    'type': 'separator',
-                },
-                {
-                    'title': _('Exit'),
-                    'action': lambda: exit(0)
                 }
             ]
         },

@@ -20,7 +20,7 @@ class SIReaderThread(threading.Thread):
 
     @property
     def reading(self):
-        return self._reading
+        return self._reading and threading.main_thread().is_alive()
 
     def add_card_data(self, card_data):
         for f in self.readers:
