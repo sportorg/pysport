@@ -1,14 +1,18 @@
 import logging
 from queue import Queue
 from threading import Thread, main_thread
+import time
 
 import requests
+from requests.exceptions import MissingSchema, ConnectionError
 
 from sportorg import config
+from sportorg.language import _
 from sportorg.core.singleton import Singleton
+from sportorg.models.memory import race, Person, Result, SystemType
 
 
-class Command:
+class OrgeoCommand:
     def __init__(self, command, url='', data=None):
         self.command = command
         self.url = url
@@ -16,10 +20,10 @@ class Command:
 
 
 class Orgeo:
-    def __init__(self, user_agent=None, logger=None):
+    def __init__(self, url, user_agent=None, logger=None):
         if not user_agent:
             user_agent = 'Orgeo client'
-        self._url = ''
+        self._url = url
         self._headers = {
             'User-Agent': user_agent
         }
@@ -27,10 +31,6 @@ class Orgeo:
 
     def _get_url(self, text=''):
         return '{}{}'.format(self._url, text)
-
-    def set_url(self, url):
-        self._url = url
-        return self
 
     def send(self, data):
         response = requests.post(
@@ -49,15 +49,26 @@ class OrgeoThread(Thread):
         self._logger = logger
 
     def run(self):
-        orgeo = Orgeo(self._user_agent, self._logger)
         while True:
             try:
                 command = self._queue.get()
+
                 if command.command == 'stop':
                     break
                 if not main_thread().is_alive():
                     break
-                # orgeo.set_url(command.url).send(command.data)
+
+                try:
+                    orgeo = Orgeo(command.url, self._user_agent, self._logger)
+                    response = orgeo.send(command.data)
+                    self._logger.info('status {}'.format(response.status_code))
+                    self._logger.info(response.text)
+                except ConnectionError as e:
+                    self._logger.error(str(e))
+                    time.sleep(10)
+                except MissingSchema as e:
+                    self._logger.error(str(e))
+
                 # if not self._queue.qsize():
                 #     break
             except Exception as e:
@@ -69,6 +80,77 @@ class OrgeoClient(metaclass=Singleton):
         self._queue = Queue()
         self._thread = None
         self._i = 0
+        self._result_ids = []
+
+    @staticmethod
+    def is_enabled():
+        obj = race()
+        live_enabled = obj.get_setting('live_enabled', False)
+        return live_enabled
+
+    @staticmethod
+    def get_url():
+        obj = race()
+        url = obj.get_setting('live_url', '')
+        return url
+
+    @staticmethod
+    def get_data(person, result=None):
+        assert person, Person
+        data = {
+            "ref_id": str(person.id),
+            "bib": person.bib,
+            "lap": None,
+            "group_name": person.group.name,
+            "name": person.full_name,
+            "organization": person.organization.name if person.organization else '',
+            # "country_code": "RUS",
+            "card_number": int(person.sportident_card) if person.sportident_card is not None else 0,
+            "national_code": None,
+            "world_code": None,
+            "out_of_competition": person.is_out_of_competition,
+            "start": person.start_time.to_minute() if person.start_time else 0
+        }
+        if result is not None:
+            assert result, Result
+            data['result_ms'] = result.get_result_for_sort()
+            data['result_status'] = str(result.status)
+            if result.system_type == SystemType.SPORTIDENT:
+                if len(result.splits):
+                    data['splits'] = []
+                    for split in result.splits:
+                        data['splits'].append({
+                            'code': str(split.code),
+                            'time': split.time.to_minute()
+                        })
+
+        return data
+
+    def get_result_data(self):
+        obj = race()
+        persons = []
+        for result in obj.results:
+            if not result.person:
+                continue
+            person = result.person
+            if person.group and person.group.name and result.id not in self._result_ids:
+                persons.append(self.get_data(person, result))
+                self._result_ids.append(result.id)
+        return {'persons': persons}
+
+    def get_start_list_data(self):
+        obj = race()
+        persons = []
+        for person in obj.persons:
+            if person.group and person.group.name:
+                persons.append(self.get_data(person))
+        self.clear()
+        return {
+            'params': {
+                'start_list': True
+            },
+            'persons': persons
+        }
 
     def _start_thread(self):
         if self._thread is None:
@@ -84,8 +166,20 @@ class OrgeoClient(metaclass=Singleton):
                 self._i += 1
                 self._start_thread()
             else:
-                print('Thread can not started')
+                logging.error(_('Thread can not started'))
 
-    def send_result(self):
-        self._start_thread()
-        self._queue.put(Command('result', 'url', {}))
+    def send_results(self):
+        if self.is_enabled():
+            self._start_thread()
+            self._queue.put(OrgeoCommand('result', self.get_url(), self.get_result_data()))
+
+    def send_start_list(self):
+        if self.is_enabled():
+            self._start_thread()
+            self._queue.put(OrgeoCommand('start_list', self.get_url(), self.get_start_list_data()))
+
+    def clear(self):
+        self._result_ids.clear()
+
+    def stop(self):
+        self._queue.put(OrgeoCommand('stop'))

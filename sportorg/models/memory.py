@@ -360,7 +360,7 @@ class Result:
             ret += 24 * 3600 * 100
 
         delta = self.get_finish_time() - self.get_start_time() + self.get_penalty_time()
-        ret += delta.to_sec() * 100
+        ret += round(delta.to_msec()/10)
         return ret
 
     def get_result_otime(self):

@@ -41,7 +41,7 @@ class LiveDialog(QDialog):
 
         self.label_token = QLabel(_('Token'))
         self.item_token = QLineEdit()
-        self.layout.addRow(self.label_token, self.item_token)
+        # self.layout.addRow(self.label_token, self.item_token)
 
         self.label_valid_url = QLabel('')
         self.layout.addRow(QLabel(''), self.label_valid_url)
