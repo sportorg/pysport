@@ -113,6 +113,7 @@ class OrgeoClient(metaclass=Singleton):
         }
         if result is not None:
             assert result, Result
+            data['start'] = result.get_start_time().to_minute()
             data['result_ms'] = result.get_result_for_sort()
             data['result_status'] = str(result.status)
             if result.system_type == SystemType.SPORTIDENT:

@@ -1,3 +1,5 @@
+import logging
+
 from sportorg.core.otime import OTime
 from sportorg.language import _
 from sportorg.models.memory import race, Result, Person, ResultStatus, Course, Group, Qualification, RankingItem, \
@@ -8,16 +10,17 @@ from sportorg.utils.time import time_to_hhmmss
 # FIXME: does not work sorting
 class ResultCalculation(object):
     def process_results(self):
+        logging.debug('Process results')
         self.set_times()
         race().relay_teams.clear()
         for i in race().groups:
             if not i.get_type() == RaceType.RELAY:
-                #single race
+                # single race
                 array = self.get_group_finishes(i)
                 self.set_places(array)
                 self.set_rank(i)
             else:
-                #relay
+                # relay
                 new_relays = self.process_relay_results(i)
                 race().relay_teams.append(new_relays)
 
