@@ -18,6 +18,7 @@ from sportorg.models.memory import Race, event as races, race
 from sportorg import config
 from sportorg.modules.backup.file import File
 from sportorg.modules.iof import iof_xml
+from sportorg.modules.live.orgeo import OrgeoClient
 from sportorg.modules.ocad import ocad
 from sportorg.modules.ocad.ocad import OcadImportException
 from sportorg.modules.printing.model import NoResultToPrintException, split_printout, NoPrinterSelectedException
@@ -95,6 +96,7 @@ class MainWindow(QMainWindow):
         """
         :event: close
         """
+        OrgeoClient().stop()
         event.event('close')
 
     def closeEvent(self, _event):
@@ -510,6 +512,28 @@ class MainWindow(QMainWindow):
         try:
             ex = LiveDialog()
             ex.exec()
+        except Exception as e:
+            logging.exception(str(e))
+
+    @staticmethod
+    def live_send_start_list():
+        try:
+            OrgeoClient().send_start_list()
+        except Exception as e:
+            logging.exception(str(e))
+
+    @staticmethod
+    def live_send_results():
+        try:
+            OrgeoClient().send_results()
+        except Exception as e:
+            logging.exception(str(e))
+
+    @staticmethod
+    def live_resend_results():
+        try:
+            OrgeoClient().clear()
+            OrgeoClient().send_results()
         except Exception as e:
             logging.exception(str(e))
 

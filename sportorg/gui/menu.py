@@ -266,7 +266,24 @@ def menu_list():
                 },
                 {
                     'title': _('Live'),
-                    'action': GlobalAccess().get_main_window().live_dialog
+                    'actions': [
+                        {
+                            'title': _('Settings'),
+                            'action': GlobalAccess().get_main_window().live_dialog
+                        },
+                        {
+                            'title': _('Send start list'),
+                            'action': GlobalAccess().get_main_window().live_send_start_list
+                        },
+                        {
+                            'title': _('Send results'),
+                            'action': GlobalAccess().get_main_window().live_send_results
+                        },
+                        {
+                            'title': _('Resend results'),
+                            'action': GlobalAccess().get_main_window().live_resend_results
+                        },
+                    ]
                 }
             ]
         },

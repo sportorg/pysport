@@ -185,4 +185,3 @@ class GlobalAccess(metaclass=Singleton):
 
     def refresh(self):
         self.get_main_window().refresh()
-

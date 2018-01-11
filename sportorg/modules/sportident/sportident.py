@@ -1,6 +1,5 @@
 import logging
 
-from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import _
 from . import card_reader
 
@@ -14,11 +13,11 @@ def is_readout():
 def start_reader():
     global reader
     if not is_readout():
-        reader = card_reader.read()
+        reader = card_reader.start()
         if is_readout():
-            message(_('Opening port') + ' ' + reader.port)
+            logging.info(_('Opening port') + ' ' + reader.port)
         else:
-            message(_('Cannot open port'))
+            logging.info(_('Cannot open port'))
     elif not reader.reading:
         reader = None
         start_reader()
@@ -27,9 +26,4 @@ def start_reader():
         if not reader.reading:
             port = reader.port
             reader = None
-            message(_('Closing port') + ' ' + port)
-
-
-def message(msg):
-    logging.info(msg)
-    GlobalAccess().get_main_window().statusbar.showMessage(msg, 5000)
+            logging.info(_('Closing port') + ' ' + port)
