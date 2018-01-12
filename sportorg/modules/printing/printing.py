@@ -8,13 +8,7 @@ from PyQt5.QtPrintSupport import QPrinter
 from PyQt5.QtWebEngineWidgets import QWebEnginePage
 from PyQt5.QtWidgets import QApplication
 
-
-class FakeStd:
-    def write(self, string):
-        pass
-
-    def flush(self):
-        pass
+from sportorg.core.fake_std import FakeStd
 
 
 class PrintProcess(Process):
