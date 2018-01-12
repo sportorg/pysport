@@ -22,9 +22,9 @@ from sportorg.modules.live.orgeo import OrgeoClient
 from sportorg.modules.ocad import ocad
 from sportorg.modules.ocad.ocad import OcadImportException
 from sportorg.modules.printing.model import NoResultToPrintException, split_printout, NoPrinterSelectedException
-from sportorg.modules.sportident import sportident
 from sportorg.modules import testing
 from sportorg.modules.configs.configs import Config as Configuration, ConfigFile
+from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.modules.winorient import winorient
 from sportorg.core import event
 from sportorg.gui.dialogs.about import AboutDialog
@@ -96,7 +96,6 @@ class MainWindow(QMainWindow):
         """
         :event: close
         """
-        OrgeoClient().stop()
         event.event('close')
 
     def closeEvent(self, _event):
@@ -605,7 +604,7 @@ class MainWindow(QMainWindow):
     @staticmethod
     def sportident_connect():
         try:
-            sportident.start_reader()
+            SIReaderClient().start()
         except Exception as e:
             logging.exception(str(e))
 

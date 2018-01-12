@@ -16,7 +16,7 @@ class ResultThread(threading.Thread, metaclass=Singleton):
         super().__init__()
         self.setName(self.__class__.__name__)
         if True:
-            raise Exception('"{}" can not use!'.format(self.name))
+            raise Exception('"{}" can notuse!'.format(self.name))
         self._queue = queue.Queue()
 
     def put_queue(self, data):
