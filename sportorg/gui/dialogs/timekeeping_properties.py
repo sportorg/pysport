@@ -130,6 +130,8 @@ class TimekeepingPropertiesDialog(QDialog):
         # marked route settings
         self.marked_route_tab = QWidget()
         self.mr_layout = QFormLayout()
+        self.mr_off_radio = QRadioButton(_('no penalty'))
+        self.mr_layout.addRow(self.mr_off_radio)
         self.mr_time_radio = QRadioButton(_('penalty time'))
         self.mr_time_edit = QTimeEdit()
         self.mr_time_edit.setDisplayFormat('hh:mm:ss')
@@ -146,7 +148,7 @@ class TimekeepingPropertiesDialog(QDialog):
 
         self.tab_widget.addTab(self.timekeeping_tab, _('SPORTident settings'))
         self.tab_widget.addTab(self.result_proc_tab, _('Result processing'))
-        self.tab_widget.addTab(self.marked_route_tab, _('Marked route'))
+        self.tab_widget.addTab(self.marked_route_tab, _('Penalty calculation'))
 
         def cancel_changes():
             self.close()
@@ -253,15 +255,17 @@ class TimekeepingPropertiesDialog(QDialog):
         self.rp_fixed_scores_edit.setValue(rp_fixed_scores_value)
         self.rp_scores_minute_penalty_edit.setValue(rp_scores_minute_penalty)
 
-        # marked route
+        # penalty calculation
 
-        mr_mode = obj.get_setting('marked_route_mode', 'time')
+        mr_mode = obj.get_setting('marked_route_mode', 'off')
         mr_penalty_time = obj.get_setting('marked_route_penalty_time', OTime(sec=60))
         mr_if_counting_lap = obj.get_setting('marked_route_if_counting_lap', True)
         mr_if_station_check = obj.get_setting('marked_route_if_station_check', False)
         mr_station_code = obj.get_setting('marked_route_station_code', 80)
 
-        if mr_mode == 'time':
+        if mr_mode == 'off':
+            self.mr_off_radio.setChecked(True)
+        elif mr_mode == 'time':
             self.mr_time_radio.setChecked(True)
         else:
             self.mr_laps_radio.setChecked(True)
@@ -355,9 +359,12 @@ class TimekeepingPropertiesDialog(QDialog):
         obj.set_setting('result_processing_scores_minute_penalty', rp_scores_minute_penalty)
 
         # marked route
-        mr_mode = 'time'
+        mr_mode = 'off'
         if self.mr_laps_radio.isChecked():
             mr_mode = 'laps'
+        if self.mr_time_radio.isChecked():
+            mr_mode = 'time'
+
         obj.set_setting('marked_route_mode', mr_mode)
         mr_penalty_time = time_to_otime(self.mr_time_edit.time())
         mr_if_counting_lap = self.mr_counting_lap_check.isChecked()

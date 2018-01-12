@@ -102,18 +102,18 @@ class PrintPropertiesDialog(QDialog):
         obj = race()
         default_printer_name = QPrinter().printerName()
         printer_name = obj.get_setting('main_printer', default_printer_name)
-        try:
-            QPrinter().setPrinterName(printer_name)
-        except Exception as e:
-            printer_name = default_printer_name
+        # try:
+        #     QPrinter().setPrinterName(printer_name)
+        # except Exception as e:
+        #     printer_name = default_printer_name
         self.selected_printer.setText(printer_name)
 
         printer_name = obj.get_setting('split_printer', default_printer_name)
-        try:
-            QPrinter().setPrinterName(printer_name)
-        except Exception as e:
-            logging.exception(str(e))
-            printer_name = default_printer_name
+        # try:
+        #     QPrinter().setPrinterName(printer_name)
+        # except Exception as e:
+        #     logging.exception(str(e))
+        #     printer_name = default_printer_name
         self.selected_split_printer.setText(printer_name)
 
         self.print_splits_checkbox.setChecked(obj.get_setting('split_printout', False))

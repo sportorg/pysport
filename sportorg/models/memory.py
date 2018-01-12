@@ -154,6 +154,32 @@ class CourseControl(Model):
     def __eq__(self, other):
         return self.code == other.code
 
+    def get_int_code(self):
+        """ Get int code
+        31 933 -> 31
+        31(31,32,33) 933 -> 31
+        * -> 0
+        % -> 0
+        """
+        if not self.code:
+            return 0
+
+        if isinstance(self.code, int):
+            return self.code
+
+        tmp = str(self.code)
+        char = tmp[0]
+        if char == '*' or char == '%':
+            return 0
+        res = ''
+
+        index = 0
+        while char.isdigit() and index < len(tmp) - 1:
+            res += char
+            index += 1
+            char = tmp[index]
+        return int(res)
+
 
 class CoursePart(Model):
     def __init__(self):

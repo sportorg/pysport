@@ -246,6 +246,14 @@ def menu_list():
                     'action': GlobalAccess().rechecking
                 },
                 {
+                    'title': _('Penalty calculation'),
+                    'action': GlobalAccess().penalty_calculation
+                },
+                {
+                    'title': _('Penalty removing'),
+                    'action': GlobalAccess().penalty_removing
+                },
+                {
                     'title': _('Add SPORTident result'),
                     'action': GlobalAccess().get_main_window().sportident_result
                 }

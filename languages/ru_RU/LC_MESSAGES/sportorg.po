@@ -1029,3 +1029,12 @@ msgstr "Отправить результаты"
 
 msgid "Resend results"
 msgstr "Переотправить результаты"
+
+msgid "no penalty"
+msgstr "штрафа не начисляется"
+
+msgid "Penalty calculation"
+msgstr "Рассчет штрафа из сплитов"
+
+msgid "Penalty removing"
+msgstr "Обнуление штрафа"
