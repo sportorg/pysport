@@ -1012,6 +1012,24 @@ msgstr "Определение результата"
 msgid "Marked route"
 msgstr "Маркированная трасса"
 
+msgid "Enabled"
+msgstr "Включить"
+
+msgid "Online"
+msgstr "Онлайн"
+
+msgid "URL not valid"
+msgstr "URL недействителен"
+
+msgid "Send start list"
+msgstr "Отправить стартовый протокол"
+
+msgid "Send results"
+msgstr "Отправить результаты"
+
+msgid "Resend results"
+msgstr "Переотправить результаты"
+
 msgid "no penalty"
 msgstr "штрафа не начисляется"
 

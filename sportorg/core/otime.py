@@ -97,8 +97,11 @@ class OTime:
     def copy(self):
         return OTime(msec=self.to_msec())
 
-    def to_sec(self, n=0):
-        return int(round(self.to_msec()/1000, n))
+    def to_minute(self):
+        return round(self.to_msec()/(1000*60))
+
+    def to_sec(self):
+        return round(self.to_msec()/1000)
 
     def to_msec(self):
         return self._msec

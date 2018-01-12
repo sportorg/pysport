@@ -3,18 +3,16 @@ import logging
 
 from sportorg import config
 from sportorg.core.event import add_event
-from sportorg.gui.dialogs.bib_dialog import BibDialog
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.models import memory
+from sportorg.models.memory import race
+from sportorg.modules.printing.model import split_printout, NoResultToPrintException, NoPrinterSelectedException
 from sportorg.models.result.result_calculation import ResultCalculation
+from sportorg.modules.live.orgeo import OrgeoClient
 from sportorg.modules.sportident import sireader
 from sportorg.modules.sportident import backup
 from sportorg.modules.sportident.result_generation import ResultSportidentGeneration
 from sportorg.utils.time import time_to_otime
-
-
-def read():
-    return start()
 
 
 def get_result(card_data):
@@ -43,17 +41,22 @@ def start():
     def event_finish(card_data):
         assignment_mode = memory.race().get_setting('sportident_assignment_mode', False)
         if not assignment_mode:
-            ResultSportidentGeneration(get_result(card_data)).add_result()
+            result = get_result(card_data)
+            ResultSportidentGeneration(result).add_result()
             ResultCalculation().process_results()
+            if race().get_setting('split_printout', False):
+                try:
+                    split_printout(result)
+                except NoResultToPrintException as e:
+                    logging.error(str(e))
+                except NoPrinterSelectedException as e:
+                    logging.error(str(e))
+                except Exception as e:
+                    logging.error(str(e))
+
+            GlobalAccess().auto_save()
             backup.backup_data(card_data)
-        else:
-            try:
-                bib_dialog = BibDialog()
-                bib_dialog.exec()
-                person = bib_dialog.get_person()
-                memory.race().person_sportident_card(person, card_data['card_number'])
-            except Exception as e:
-                logging.exception(str(e))
+            OrgeoClient().send_results()
         GlobalAccess().get_main_window().init_model()
 
     if port is not None:

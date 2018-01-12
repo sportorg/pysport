@@ -1,9 +1,19 @@
+import sys
 import logging
 from datetime import datetime
 from multiprocessing import Process
 
+
 from sportorg import config
 from sportorg.utils.time import time_to_hhmmss
+
+
+class FakeStd:
+    def write(self, string):
+        pass
+
+    def flush(self):
+        pass
 
 
 class BackupProcess(Process):
@@ -13,6 +23,8 @@ class BackupProcess(Process):
 
     def run(self):
         try:
+            sys.stdout = FakeStd()
+            sys.stderr = FakeStd()
             with open(config.log_dir('si{}.log'.format(datetime.now().strftime('%Y%m%d'))), 'a') as f:
                 f.write(self.data)
         except Exception as e:

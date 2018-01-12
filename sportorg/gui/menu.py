@@ -93,13 +93,6 @@ def menu_list():
                             ]
                         },
                     ]
-                },
-                {
-                    'type': 'separator',
-                },
-                {
-                    'title': _('Exit'),
-                    'action': lambda: exit(0)
                 }
             ]
         },
@@ -278,6 +271,27 @@ def menu_list():
                     'title': _('Printer settings'),
                     'icon': config.icon_dir('print.png'),
                     'action': GlobalAccess().get_main_window().print_settings_dialog
+                },
+                {
+                    'title': _('Live'),
+                    'actions': [
+                        {
+                            'title': _('Settings'),
+                            'action': GlobalAccess().get_main_window().live_dialog
+                        },
+                        {
+                            'title': _('Send start list'),
+                            'action': GlobalAccess().get_main_window().live_send_start_list
+                        },
+                        {
+                            'title': _('Send results'),
+                            'action': GlobalAccess().get_main_window().live_send_results
+                        },
+                        {
+                            'title': _('Resend results'),
+                            'action': GlobalAccess().get_main_window().live_resend_results
+                        },
+                    ]
                 }
             ]
         },

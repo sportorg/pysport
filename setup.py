@@ -15,6 +15,7 @@ options = {
     'build_exe': {
         'includes': includes,
         'excludes': excludes,
+        "packages": ['idna', 'requests'],
         'include_files': include_files
     }
 }
