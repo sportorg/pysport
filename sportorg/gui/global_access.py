@@ -4,6 +4,7 @@ from PyQt5 import QtWidgets
 from PyQt5.QtCore import QItemSelectionModel, QModelIndex
 from PyQt5.QtWidgets import QTableView, QMessageBox
 
+from sportorg.core.otime import OTime
 from sportorg.core.singleton import Singleton
 from sportorg.models.memory import race, NotEmptyException
 from sportorg.models.result.result_checker import ResultChecker
@@ -159,6 +160,30 @@ class GlobalAccess(metaclass=Singleton):
                 if result.person is not None:
                     ResultChecker.checking(result)
             logging.debug('Rechecking finish')
+            ResultCalculation().process_results()
+            self.get_main_window().refresh()
+        except Exception as e:
+            logging.exception(str(e))
+
+    def penalty_calculation(self):
+        try:
+            logging.debug('Penalty calculation start')
+            for result in race().results:
+                if result.person is not None:
+                    ResultChecker.calculate_penalty(result)
+            logging.debug('Penalty calculation finish')
+            ResultCalculation().process_results()
+            self.get_main_window().refresh()
+        except Exception as e:
+            logging.exception(str(e))
+
+    def penalty_removing(self):
+        try:
+            logging.debug('Penalty removing start')
+            for result in race().results:
+                result.penalty_time = OTime(msec=0)
+                result.penalty_laps = 0
+            logging.debug('Penalty removing finish')
             ResultCalculation().process_results()
             self.get_main_window().refresh()
         except Exception as e:

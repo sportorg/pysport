@@ -58,6 +58,12 @@ class OTime:
     def __sub__(self, other):
         return OTime(msec=(self.to_msec() - other.to_msec()))
 
+    def __mul__(self, mlt):
+        return OTime(msec=int(self.to_msec() * mlt))
+
+    def __truediv__(self, div):
+        return OTime(msec=int(self.to_msec() / div))
+
     def __int__(self):
         return self.to_msec()
 

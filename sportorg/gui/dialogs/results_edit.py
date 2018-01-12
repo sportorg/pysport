@@ -233,6 +233,7 @@ class ResultEditDialog(QDialog):
 
                     logging.info('Old status {}'.format(result.status))
                     try:
+                        ResultChecker.calculate_penalty(result)
                         ResultChecker.checking(result)
                     except ResultCheckerException as e:
                         logging.error(str(e))

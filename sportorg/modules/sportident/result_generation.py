@@ -66,6 +66,7 @@ class ResultSportidentGeneration:
         if isinstance(self._result.person, Person):
             self._find_person_by_result()
             try:
+                ResultChecker.calculate_penalty(self._result)
                 ResultChecker.checking(self._result)
             except ResultCheckerException as e:
                 logging.error(str(e))
