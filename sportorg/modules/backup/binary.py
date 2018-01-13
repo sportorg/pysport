@@ -5,12 +5,9 @@ from sportorg.gui.global_access import GlobalAccess
 from sportorg.models import memory
 
 
-def dump(file, create=False):
+def dump(file):
     data = {'version': config.VERSION}
-    if create:
-        race = memory.Race()
-    else:
-        race = memory.race()
+    race = memory.race()
 
     data['data'] = race.data
     data['courses'] = race.courses

@@ -13,7 +13,7 @@ class File:
 
     def create(self):
         self._logger.info('Create ' + self._file_name)
-        self.backup(self._file_name, lambda f: binary.dump(f, True))
+        self.backup(self._file_name, binary.dump)
 
     def save(self):
         self._logger.info('Save ' + self._file_name)

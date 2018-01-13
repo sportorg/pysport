@@ -1038,3 +1038,9 @@ msgstr "Рассчет штрафа из сплитов"
 
 msgid "Penalty removing"
 msgstr "Обнуление штрафа"
+
+msgid "Open in browser"
+msgstr "Открыть в браузере"
+
+msgid "Save to last file"
+msgstr "Сохранить в последний файл"
