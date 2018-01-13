@@ -4,7 +4,7 @@ import time
 import webbrowser
 
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QFormLayout, QLabel, QDialog, QPushButton, QDialogButtonBox
+from PyQt5.QtWidgets import QFormLayout, QLabel, QDialog, QPushButton, QDialogButtonBox, QCheckBox
 
 from sportorg import config
 from sportorg.core.template import get_templates, get_text_from_file
@@ -13,6 +13,14 @@ from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
 from sportorg.models.start.start_calculation import get_teams_data
+
+
+_settings = {
+    'last_template': None,
+    'open_in_browser': True,
+    'last_file': None,
+    'save_to_last_file': False,
+}
 
 
 class TeamReportDialog(QDialog):
@@ -35,6 +43,8 @@ class TeamReportDialog(QDialog):
         self.item_template = AdvComboBox()
         self.item_template.addItems(get_templates(config.template_dir('team')))
         self.layout.addRow(self.label_template, self.item_template)
+        if _settings['last_template'] is not None:
+            self.item_template.setCurrentText(_settings['last_template'])
 
         self.item_custom_path = QPushButton(_('Choose template'))
 
@@ -44,6 +54,16 @@ class TeamReportDialog(QDialog):
 
         self.item_custom_path.clicked.connect(select_custom_path)
         self.layout.addRow(self.item_custom_path)
+
+        self.item_open_in_browser = QCheckBox(_('Open in browser'))
+        self.item_open_in_browser.setChecked(_settings['open_in_browser'])
+        self.layout.addRow(self.item_open_in_browser)
+
+        self.item_save_to_last_file = QCheckBox(_('Save to last file'))
+        self.item_save_to_last_file.setChecked(_settings['save_to_last_file'])
+        self.layout.addRow(self.item_save_to_last_file)
+        if _settings['last_file'] is None:
+            self.item_save_to_last_file.setDisabled(True)
 
         def cancel_changes():
             self.close()
@@ -70,14 +90,23 @@ class TeamReportDialog(QDialog):
     def apply_changes_impl(self):
         template_path = self.item_template.currentText()
 
+        _settings['last_template'] = template_path
+        _settings['open_in_browser'] = self.item_open_in_browser.isChecked()
+        _settings['save_to_last_file'] = self.item_save_to_last_file.isChecked()
+
         template = get_text_from_file(template_path, **get_teams_data())
 
-        file_name = get_save_file_name(_('Save As HTML file'), _("HTML file (*.html)"),
-                                       '{}_start'.format(time.strftime("%Y%m%d")))
+        if _settings['save_to_last_file']:
+            file_name = _settings['last_file']
+        else:
+            file_name = get_save_file_name(_('Save As HTML file'), _("HTML file (*.html)"),
+                                           '{}_team_start'.format(time.strftime("%Y%m%d")))
         if file_name:
+            _settings['last_file'] = file_name
             with codecs.open(file_name, 'w', 'utf-8') as file:
                 file.write(template)
                 file.close()
 
             # Open file in your browser
-            webbrowser.open('file://' + file_name, new=2)
+            if _settings['open_in_browser']:
+                webbrowser.open('file://' + file_name, new=2)

@@ -1,7 +1,6 @@
 import uuid
 from abc import abstractmethod
 from enum import IntEnum, Enum
-from gettext import find
 from typing import Dict, List, Any, Union
 
 import datetime
