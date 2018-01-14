@@ -53,9 +53,13 @@ class StartGenerator:
         sportident_card = ''
         if person.sportident_card is not None and int(person.sportident_card):
             sportident_card = str(person.sportident_card)
+        course_name = ''
+        if person.group is not None and person.group.course is not None:
+            course_name = person.group.course.name
         return {
             'name': person.full_name,
             'bib': person.bib,
+            'course': course_name,
             'team': person.organization.name if person.organization is not None else '',
             'group': person.group.name if person.group is not None else '',
             'price': person.group.price if person.group is not None else 0,

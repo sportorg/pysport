@@ -225,7 +225,7 @@ class Group(Model):
     def __init__(self):
         self.id = uuid.uuid4()
         self.name = ''
-        self.course = Course()
+        self.course = None  # type: Course
         self.price = 0
         self.long_name = ''
         self.sex = Sex.MF
