@@ -150,8 +150,6 @@ class PersonSplits(object):
             return leg.relative_time
         return None
 
-    # draft split generation - array basis
-    # ['name', 'team', 'qual', 'year', 'result', 'place']
     def get_person_split_data(self):
         ret = {
             'name': self.name,
@@ -168,10 +166,7 @@ class PersonSplits(object):
 
         for i in self.legs:
             assert isinstance(i, LegSplit)
-            leg_info = str(i.code) + ':' + i.absolute_time
-            if i.leg_place:
-                leg_info += "(" + str(i.leg_place) + ")"
-            ret['legs'].append(leg_info)
+            ret['legs'].append(i.get_json())
 
         return ret
 
@@ -342,6 +337,7 @@ def get_splits_data():
             'persons': group_data,
             'ranking': ranking_data
         })
+    data.sort(key=lambda x: x['name'])
     ret['groups'] = data
     ret['race'] = {
         'title': race().get_setting('main_title'),
