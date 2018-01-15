@@ -338,6 +338,7 @@ class Result:
         self.penalty_time = None  # type: OTime
         self.penalty_laps = 0  # count of penalty legs (marked route)
         self.place = None  # type: Union[int, str]
+        self.scores = 0
 
     def __str__(self):
         return str(self.system_type)
