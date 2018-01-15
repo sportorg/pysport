@@ -2,7 +2,7 @@ import ast
 import logging
 import time
 
-from PyQt5 import QtCore, QtGui, QtWidgets, Qt
+from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow, QTableView, QMessageBox, QApplication
 
 from sportorg.gui.dialogs.bib_report_dialog import BibReportDialog
@@ -648,7 +648,7 @@ class MainWindow(QMainWindow):
                 ocad.import_txt_v8(file_name)
             except OcadImportException as e:
                 logging.exception(str(e))
-                QMessageBox.question(self, _('Error'), _('Import error') + ': ' + file_name)
+                QMessageBox.warning(self, _('Error'), _('Import error') + ': ' + file_name)
 
             self.init_model()
 

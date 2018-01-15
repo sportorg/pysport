@@ -6,9 +6,8 @@ from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, QSpinBox, Q
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
-from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
-from sportorg.models.memory import race, Course, CourseControl, find, CourseType
+from sportorg.models.memory import race, Course, CourseControl, find
 
 
 class CourseEditDialog(QDialog):
@@ -40,11 +39,6 @@ class CourseEditDialog(QDialog):
         self.item_name = QLineEdit()
         self.item_name.textChanged.connect(self.check_name)
         self.layout.addRow(self.label_name, self.item_name)
-
-        self.label_type = QLabel(_('Type'))
-        self.item_type = AdvComboBox()
-        self.item_type.addItems(CourseType.get_titles())
-        self.layout.addRow(self.label_type, self.item_type)
 
         self.label_length = QLabel(_('Length'))
         self.item_length = QSpinBox()
@@ -102,8 +96,6 @@ class CourseEditDialog(QDialog):
 
         self.item_name.setText(self.current_object.name)
 
-        if self.current_object.type:
-            self.item_type.setCurrentText(self.current_object.type.get_title())
         if self.current_object.length:
             self.item_length.setValue(self.current_object.length)
         if self.current_object.climb:
@@ -120,10 +112,6 @@ class CourseEditDialog(QDialog):
 
         if course.name != self.item_name.text():
             course.name = self.item_name.text()
-            changed = True
-
-        if course.type.get_title() != self.item_type.currentText():
-            course.type = CourseType(self.item_type.currentIndex())
             changed = True
 
         if course.length != self.item_length.value():

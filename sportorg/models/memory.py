@@ -66,13 +66,6 @@ class RaceType(_TitleType):
     SPRINT_RELAY = 5
 
 
-class CourseType(_TitleType):
-    NONE = 0
-    ORDER = 1
-    FREE = 2
-    MARKED_ROUTE = 3
-
-
 class ResultStatus(_TitleType):
     NONE = 0
     OK = 1
@@ -191,7 +184,6 @@ class Course(Model):
     def __init__(self):
         self.id = uuid.uuid4()
         self.name = ''
-        self.type = CourseType.NONE
         self.bib = 0
         self.length = 0
         self.climb = 0
@@ -202,7 +194,7 @@ class Course(Model):
         self.corridor = 0
 
     def __repr__(self):
-        return 'Course {} {}'.format(self.name, self.type)
+        return 'Course {}'.format(self.name)
 
     def __eq__(self, other):
         if len(self.controls) != len(other.controls):
