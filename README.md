@@ -8,6 +8,7 @@
 - [polib](http://polib.readthedocs.io/en/latest/quickstart.html)
 - xmlschema
 - cx_Freeze
+- requests
 
 Install packages
 ```commandline
