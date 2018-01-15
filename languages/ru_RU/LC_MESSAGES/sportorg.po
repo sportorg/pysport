@@ -1038,3 +1038,51 @@ msgstr "Рассчет штрафа из сплитов"
 
 msgid "Penalty removing"
 msgstr "Обнуление штрафа"
+
+msgid "scores off"
+msgstr "очки не рассчитываются"
+
+msgid "scores array"
+msgstr "список значений"
+
+msgid "scores formula"
+msgstr "рассчет очков по формуле"
+
+msgid "scores formula hint"
+msgstr "Составьте произвольную формулу. Поддерживаются переменные: \n leader - результат победителя группы; \n time - результат участника"
+
+msgid "Grouping"
+msgstr "Группировка"
+
+msgid "organization grouping"
+msgstr "группировка по коллективам"
+
+msgid "region grouping"
+msgstr "группировка по регионам"
+
+msgid "Sum"
+msgstr "Сумма"
+
+msgid "scores"
+msgstr "очки"
+
+msgid "Scores"
+msgstr "Очки"
+
+msgid "time"
+msgstr "время"
+
+msgid "places"
+msgstr "места"
+
+msgid "Team results"
+msgstr "Командные результаты"
+
+msgid "Create team results report"
+msgstr "Создать командный протокол"
+
+msgid "Persons in team"
+msgstr "Количество человек для командного зачета"
+
+msgid "Live"
+msgstr "Онлайн"

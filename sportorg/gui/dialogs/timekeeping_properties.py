@@ -350,7 +350,7 @@ class TimekeepingPropertiesDialog(QDialog):
         scores_mode = obj.get_setting('scores_mode', 'off')
         scores_array = obj.get_setting('scores_array', '40,37,35,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,'
                                                        '16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1')
-        scores_formula = obj.get_setting('scores_formula', '100 - 100 * time / leader')
+        scores_formula = obj.get_setting('scores_formula', '200 - 100 * time / leader')
 
         if scores_mode == 'off':
             self.scores_off.setChecked(True)
@@ -497,7 +497,6 @@ class TimekeepingPropertiesDialog(QDialog):
         obj.set_setting('scores_mode', scores_mode)
         obj.set_setting('scores_array', scores_array)
         obj.set_setting('scores_formula', scores_formula)
-
 
         # team result
         team_group_mode = 'organization'
