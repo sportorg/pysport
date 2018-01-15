@@ -369,7 +369,7 @@ class CourseMemoryModel(AbstractSportOrgMemoryModel):
         super().__init__()
 
     def get_headers(self):
-        return ['Name', 'Course type', 'Length', 'Point count', 'Climb', 'Controls']
+        return ['Name', 'Length', 'Point count', 'Climb', 'Controls']
 
     def init_cache(self):
         self.cache.clear()
@@ -387,7 +387,6 @@ class CourseMemoryModel(AbstractSportOrgMemoryModel):
 
         return [
             course.name,
-            course.type.get_title(),
             course.length,
             len(course.controls),
             course.climb,
