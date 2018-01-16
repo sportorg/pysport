@@ -3,5 +3,5 @@ PyQt5==5.8.2
 sireader==1.1.1
 jinja2==2.10
 polib==1.0.8
-cx_Freeze==5.0.2
+cx_Freeze==5.1.1
 requests==2.18.4

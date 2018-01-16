@@ -5,15 +5,8 @@ from multiprocessing import Process
 
 
 from sportorg import config
+from sportorg.core.fake_std import FakeStd
 from sportorg.utils.time import time_to_hhmmss
-
-
-class FakeStd:
-    def write(self, string):
-        pass
-
-    def flush(self):
-        pass
 
 
 class BackupProcess(Process):

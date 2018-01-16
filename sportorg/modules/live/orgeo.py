@@ -51,11 +51,16 @@ class OrgeoThread(Thread):
     def run(self):
         while True:
             try:
+                while True:
+                    if not main_thread().is_alive():
+                        return
+                    if not self._queue.empty():
+                        break
+                    time.sleep(0.5)
+
                 command = self._queue.get()
 
                 if command.command == 'stop':
-                    break
-                if not main_thread().is_alive():
                     break
 
                 try:
@@ -79,7 +84,6 @@ class OrgeoClient(metaclass=Singleton):
     def __init__(self):
         self._queue = Queue()
         self._thread = None
-        self._i = 0
         self._result_ids = []
 
     @staticmethod
@@ -162,17 +166,15 @@ class OrgeoClient(metaclass=Singleton):
             )
             self._thread.start()
         elif not self._thread.is_alive():
-            if self._i < 5:
-                self._thread = None
-                self._i += 1
-                self._start_thread()
-            else:
-                logging.error(_('Thread can not started'))
+            self._thread = None
+            self._start_thread()
 
     def send_results(self):
         if self.is_enabled():
             self._start_thread()
-            self._queue.put(OrgeoCommand('result', self.get_url(), self.get_result_data()))
+            data = self.get_result_data()
+            if len(data['persons']):
+                self._queue.put(OrgeoCommand('result', self.get_url(), data))
 
     def send_start_list(self):
         if self.is_enabled():

@@ -23,9 +23,9 @@ from sportorg.modules.live.orgeo import OrgeoClient
 from sportorg.modules.ocad import ocad
 from sportorg.modules.ocad.ocad import OcadImportException
 from sportorg.modules.printing.model import NoResultToPrintException, split_printout, NoPrinterSelectedException
-from sportorg.modules.sportident import sportident
 from sportorg.modules import testing
 from sportorg.modules.configs.configs import Config as Configuration, ConfigFile
+from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.modules.winorient import winorient
 from sportorg.core import event
 from sportorg.gui.dialogs.about import AboutDialog
@@ -97,7 +97,6 @@ class MainWindow(QMainWindow):
         """
         :event: close
         """
-        OrgeoClient().stop()
         event.event('close')
 
     def closeEvent(self, _event):
@@ -226,10 +225,7 @@ class MainWindow(QMainWindow):
         else:
             self.setWindowTitle(main_title)
 
-    def create_file(self, update_data=True):
-
-        # TODO: save changes in current file
-
+    def create_file(self, *args, update_data=True):
         file_name = get_save_file_name(
             _('Create SportOrg file'),
             _('SportOrg file (*.sportorg)'),
@@ -237,21 +233,21 @@ class MainWindow(QMainWindow):
         )
         if file_name is not '':
             try:
+                if update_data:
+                    races[0] = Race()
                 GlobalAccess().clear_filters(remove_condition=False)
                 File(file_name, logging.root).create()
                 self.file = file_name
                 self.add_recent_file(self.file)
                 self.set_title(file_name)
+                self.init_model()
             except Exception as e:
                 logging.exception(str(e))
                 QMessageBox.warning(self, _('Error'), _('Cannot create file') + ': ' + file_name)
-            # remove data
-            if update_data:
-                races[0] = Race()
             self.refresh()
 
     def save_file_as(self):
-        self.create_file(False)
+        self.create_file(update_data=False)
         if self.file is not None:
             self.save_file()
 
@@ -614,7 +610,7 @@ class MainWindow(QMainWindow):
     @staticmethod
     def sportident_connect():
         try:
-            sportident.start_reader()
+            SIReaderClient().start()
         except Exception as e:
             logging.exception(str(e))
 
@@ -661,7 +657,7 @@ class MainWindow(QMainWindow):
                 ocad.import_txt_v8(file_name)
             except OcadImportException as e:
                 logging.exception(str(e))
-                QMessageBox.question(self, _('Error'), _('Import error') + ': ' + file_name)
+                QMessageBox.warning(self, _('Error'), _('Import error') + ': ' + file_name)
 
             self.init_model()
 

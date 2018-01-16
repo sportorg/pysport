@@ -1086,3 +1086,10 @@ msgstr "Количество человек для командного заче
 
 msgid "Live"
 msgstr "Онлайн"
+
+msgid "Open in browser"
+msgstr "Открыть в браузере"
+
+msgid "Save to last file"
+msgstr "Сохранить в последний файл"
+

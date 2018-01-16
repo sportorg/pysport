@@ -195,6 +195,9 @@ def menu_list():
                     'action': GlobalAccess().get_main_window().start_time_change
                 },
                 {
+                    'type': 'separator',
+                },
+                {
                     'title': _('Start list'),
                     'action': GlobalAccess().get_main_window().create_start_protocol_dialog
                 },
@@ -243,6 +246,9 @@ def menu_list():
                 {
                     'title': _('Split printout'),
                     'action': GlobalAccess().get_main_window().split_printout_selected
+                },
+                {
+                    'type': 'separator',
                 },
                 {
                     'title': _('Rechecking'),
