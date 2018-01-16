@@ -184,17 +184,13 @@
             <td>Очки</td>
             <td>Кол-во зачетных участников</td>
         </tr>
-        {% set count = [1] %}
         {% for team in group.teams %}
-            {% if team.member_qty %}
-                <tr>
-                    <td>{{ count|length}}</td>
-                    <td>{{ team.name }}</td>
-                    <td>{{ team.scores }}</td>
-                    <td>{{ team.member_qty }}</td>
-                </tr>
-                {% if count.append(1) %} {% endif %} {# increment count length by 1 #}
-            {% endif %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ team.name }}</td>
+                <td>{{ team.scores }}</td>
+                <td>{{ team.member_qty }}</td>
+            </tr>
         {% endfor %}
     {% endif %}
     {% endfor %}

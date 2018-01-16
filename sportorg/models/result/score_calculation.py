@@ -1,4 +1,4 @@
-from sportorg.models.memory import Result, race
+from sportorg.models.memory import Result, race, Organization
 from sportorg.models.result.result_calculation import ResultCalculation
 
 
@@ -65,6 +65,15 @@ class ScoreCalculation(object):
         return ret
 
     @staticmethod
+    def get_group_region_results(group, region):
+        ret = []
+        for result in race().results:
+            if result.person and result.person.group == group:
+                if ScoreCalculation.get_region_for_organization(result.person.organization) == region:
+                    ret.append(result)
+        return ret
+
+    @staticmethod
     def get_team_results_data():
         """
         :return: {
@@ -93,22 +102,50 @@ class ScoreCalculation(object):
         for group in race().groups:
 
             group_teams = []
-            for team in race().organizations:
-                results = ScoreCalculation.get_group_team_results(group, team)
-                if results:
-                    results = sorted(results, reverse=True, key=lambda item: item.scores)
-                    sum_scores = 0
 
-                    # apply limit
-                    limit = race().get_setting('team_qty', 0)
-                    if len(results) > limit > 0:
-                        results = results[:limit]
+            team_group_mode = race().get_setting('team_group_mode', 'organization')
+
+            if team_group_mode == 'organization':
+                # organization grouping
+                for team in race().organizations:
+                    results = ScoreCalculation.get_group_team_results(group, team)
+                    if results:
+                        results = sorted(results, reverse=True, key=lambda item: item.scores)
+
+                        # apply limit
+                        limit = race().get_setting('team_qty', 0)
+                        if len(results) > limit > 0:
+                            results = results[:limit]
+
+                    sum_scores = 0
 
                     for result in results:
                         sum_scores += result.scores
 
                     group_teams.append({
                         'name': team.name,
+                        'member_qty': len(results),
+                        'scores': sum_scores
+                    })
+            else:
+                # region grouping
+                for team in ScoreCalculation.get_all_regions():
+                    results = ScoreCalculation.get_group_region_results(group, team)
+                    if results:
+                        results = sorted(results, reverse=True, key=lambda item: item.scores)
+
+                        # apply limit
+                        limit = race().get_setting('team_qty', 0)
+                        if len(results) > limit > 0:
+                            results = results[:limit]
+
+                    sum_scores = 0
+
+                    for result in results:
+                        sum_scores += result.scores
+
+                    group_teams.append({
+                        'name': team,
                         'member_qty': len(results),
                         'scores': sum_scores
                     })
@@ -121,4 +158,22 @@ class ScoreCalculation(object):
             'title': race().get_setting('main_title'),
             'sub_title': race().get_setting('sub_title')
         }
+        return ret
+
+    @staticmethod
+    def get_region_for_organization(org):
+        if org:
+            assert isinstance(org, Organization)
+            if org.address:
+                if org.address.state:
+                    return org.address.state
+        return None
+
+    @staticmethod
+    def get_all_regions():
+        ret = []
+        for i in race().organizations:
+            region = ScoreCalculation.get_region_for_organization(i)
+            if region and not region in ret:
+                ret.append(region)
         return ret
