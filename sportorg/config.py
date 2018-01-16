@@ -5,8 +5,8 @@ import logging.config
 from sportorg.core.version import Version
 
 NAME = 'SportOrg'
-VERSION = Version(0, 10, 0, 0, 'v', 'beta')
-DEBUG = True
+VERSION = Version(0, 11, 0, 0, 'v', 'rc1')
+DEBUG = False
 
 
 def is_executable():
