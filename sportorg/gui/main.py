@@ -11,6 +11,7 @@ from sportorg.gui.dialogs.relay_number_dialog import RelayNumberDialog
 from sportorg.gui.dialogs.search_dialog import SearchDialog
 from sportorg.gui.dialogs.start_time_change_dialog import StartTimeChangeDialog
 from sportorg.gui.dialogs.team_report_dialog import TeamReportDialog
+from sportorg.gui.dialogs.team_results_report_dialog import TeamResultsReportDialog
 from sportorg.gui.dialogs.text_io import TextExchangeDialog
 from sportorg.libs.winorient.wdb import write_wdb
 from sportorg.models.memory import Race, event as races, race
@@ -344,6 +345,14 @@ class MainWindow(QMainWindow):
     def report_dialog():
         try:
             ex = ReportDialog()
+            ex.exec()
+        except Exception as e:
+            logging.exception(str(e))
+
+    @staticmethod
+    def team_results_report_dialog():
+        try:
+            ex = TeamResultsReportDialog()
             ex.exec()
         except Exception as e:
             logging.exception(str(e))

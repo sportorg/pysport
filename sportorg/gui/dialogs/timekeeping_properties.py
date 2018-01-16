@@ -3,7 +3,7 @@ import logging
 from PyQt5.QtCore import QTime
 from PyQt5.QtWidgets import QFormLayout, QLabel, QDialog, \
      QTimeEdit, QSpinBox, QRadioButton, QCheckBox, QDialogButtonBox, QWidget, QTabWidget, \
-     QGroupBox
+     QGroupBox, QLineEdit, QTextEdit
 
 from sportorg.core.otime import OTime
 from sportorg.gui.global_access import GlobalAccess
@@ -146,8 +146,79 @@ class TimekeepingPropertiesDialog(QDialog):
         self.mr_layout.addRow(self.mr_lap_station_check, self.mr_lap_station_edit)
         self.marked_route_tab.setLayout(self.mr_layout)
 
+        # scores
+        """
+        Scores
+            [ x ] scores array
+                40, 37, 35, 33, ... 2, 1 [ Edit ]
+            [   ] scores formula
+                1000 -  1000 * result / leader [ Edit ]
+        """
+        self.scores_tab = QWidget()
+        self.scores_layout = QFormLayout()
+        self.scores_off = QRadioButton(_('scores off'))
+        self.scores_array = QRadioButton(_('scores array'))
+        self.scores_array_edit = QLineEdit()
+        self.scores_formula = QRadioButton(_('scores formula'))
+        self.scores_formula_edit = QLineEdit()
+        self.scores_formula_hint = QLabel(_('scores formula hint'))
+        self.scores_formula_hint.setWordWrap(True)
+        self.scores_layout.addRow(self.scores_off)
+        self.scores_layout.addRow(self.scores_array)
+        self.scores_layout.addRow(self.scores_array_edit)
+        self.scores_layout.addRow(self.scores_formula)
+        self.scores_layout.addRow(self.scores_formula_edit)
+        self.scores_layout.addRow(self.scores_formula_hint)
+        self.scores_tab.setLayout(self.scores_layout)
+
+        # team results
+        """
+        Team result calculation
+           quantity of persons[ Edit ]
+           grouping
+             [ x ] organization grouping
+             [   ] region grouping
+           sum
+             [ x ] scores
+             [   ] time
+             [   ] places
+        """
+        self.team_result_tab = QWidget()
+        self.team_layout = QFormLayout()
+        self.team_qty_label = QLabel(_('Persons in team'))
+        self.team_qty_edit = QSpinBox()
+        self.team_qty_edit.setMaximumWidth(50)
+        self.team_layout.addRow(self.team_qty_label, self.team_qty_edit)
+
+        self.team_group = QGroupBox()
+        self.team_group.setTitle(_('Grouping'))
+        self.team_group_organization = QRadioButton(_('organization grouping'))
+        self.team_group_region = QRadioButton(_('region grouping'))
+        self.team_group_layout = QFormLayout()
+        self.team_group_layout.addRow(self.team_group_organization)
+        self.team_group_layout.addRow(self.team_group_region)
+        self.team_group.setLayout(self.team_group_layout)
+        self.team_layout.addRow(self.team_group)
+
+        self.team_sum = QGroupBox()
+        self.team_sum.setTitle(_('Sum'))
+        self.team_sum_scores = QRadioButton(_('scores'))
+        self.team_sum_time = QRadioButton(_('time'))
+        self.team_sum_places = QRadioButton(_('places'))
+        self.team_sum_layout = QFormLayout()
+        self.team_sum_layout.addRow(self.team_sum_scores)
+        self.team_sum_layout.addRow(self.team_sum_time)
+        self.team_sum_layout.addRow(self.team_sum_places)
+        self.team_sum.setLayout(self.team_sum_layout)
+        self.team_layout.addRow(self.team_sum)
+
+        self.team_result_tab.setLayout(self.team_layout)
+
+
         self.tab_widget.addTab(self.timekeeping_tab, _('SPORTident settings'))
         self.tab_widget.addTab(self.result_proc_tab, _('Result processing'))
+        self.tab_widget.addTab(self.team_result_tab, _('Team results'))
+        self.tab_widget.addTab(self.scores_tab, _('Scores'))
         self.tab_widget.addTab(self.marked_route_tab, _('Penalty calculation'))
 
         def cancel_changes():
@@ -275,6 +346,42 @@ class TimekeepingPropertiesDialog(QDialog):
         self.mr_lap_station_check.setChecked(mr_if_station_check)
         self.mr_lap_station_edit.setValue(mr_station_code)
 
+        # score settings
+
+        scores_mode = obj.get_setting('scores_mode', 'off')
+        scores_array = obj.get_setting('scores_array', '40,37,35,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,'
+                                                       '16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1')
+        scores_formula = obj.get_setting('scores_formula', '200 - 100 * time / leader')
+
+        if scores_mode == 'off':
+            self.scores_off.setChecked(True)
+        elif scores_mode == 'array':
+            self.scores_array.setChecked(True)
+        elif scores_mode == 'formula':
+            self.scores_formula.setChecked(True)
+
+        self.scores_array_edit.setText(scores_array)
+        self.scores_formula_edit.setText(scores_formula)
+
+        # team results
+        team_group_mode = obj.get_setting('team_group_mode', 'organization')
+        team_sum_mode = obj.get_setting('team_sum_mode', 'scores')
+        team_qty = obj.get_setting('team_qty', 4)
+
+        if team_group_mode == 'organization':
+            self.team_group_organization.setChecked(True)
+        else:
+            self.team_group_region.setChecked(True)
+
+        if team_sum_mode == 'scores':
+            self.team_sum_scores.setChecked(True)
+        elif team_sum_mode == 'time':
+            self.team_sum_time.setChecked(True)
+        else:
+            self.team_sum_places.setChecked(True)
+
+        self.team_qty_edit.setValue(team_qty)
+
     def apply_changes_impl(self):
         changed = False
         obj = race()
@@ -376,6 +483,38 @@ class TimekeepingPropertiesDialog(QDialog):
         obj.set_setting('marked_route_if_counting_lap', mr_if_counting_lap)
         obj.set_setting('marked_route_if_station_check', mr_if_station_check)
         obj.set_setting('marked_route_station_code', mr_station_code)
+
+        # score settings
+
+        scores_mode = 'off'
+        if self.scores_array.isChecked():
+            scores_mode = 'array'
+        elif self.scores_formula.isChecked():
+            scores_mode = 'formula'
+
+        scores_array = self.scores_array_edit.text()
+        scores_formula = self.scores_formula_edit.text()
+
+        obj.set_setting('scores_mode', scores_mode)
+        obj.set_setting('scores_array', scores_array)
+        obj.set_setting('scores_formula', scores_formula)
+
+        # team result
+        team_group_mode = 'organization'
+        if self.team_group_region.isChecked():
+            team_group_mode = 'region'
+
+        team_sum_mode = 'scores'
+        if self.team_sum_places.isChecked():
+            team_sum_mode = 'places'
+        elif self.team_sum_time.isChecked():
+            team_sum_mode = 'time'
+
+        team_qty = self.team_qty_edit.value()
+
+        obj.set_setting('team_group_mode', team_group_mode)
+        obj.set_setting('team_sum_mode', team_sum_mode)
+        obj.set_setting('team_qty', team_qty)
 
         changed = True
 

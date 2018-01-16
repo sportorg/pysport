@@ -240,6 +240,10 @@ def menu_list():
                     'action': GlobalAccess().get_main_window().report_dialog
                 },
                 {
+                    'title': _('Create team results report'),
+                    'action': GlobalAccess().get_main_window().team_results_report_dialog
+                },
+                {
                     'title': _('Split printout'),
                     'action': GlobalAccess().get_main_window().split_printout_selected
                 },

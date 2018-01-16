@@ -236,7 +236,7 @@ class Group(Model):
         self.count_finished = 0
 
         self.ranking = Ranking()
-        self.__type = None # type: RaceType
+        self.__type = None  # type: RaceType
         self.relay_legs = 0
 
     def __repr__(self):
@@ -329,6 +329,7 @@ class Result:
         self.penalty_time = None  # type: OTime
         self.penalty_laps = 0  # count of penalty legs (marked route)
         self.place = None  # type: Union[int, str]
+        self.scores = 0  # type: int
 
     def __str__(self):
         return str(self.system_type)

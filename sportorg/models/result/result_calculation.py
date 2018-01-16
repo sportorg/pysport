@@ -29,7 +29,8 @@ class ResultCalculation(object):
             assert isinstance(i, Result)
             i.result = i.get_result_for_sort()
 
-    def get_group_finishes(self, group):
+    @staticmethod
+    def get_group_finishes(group):
         ret = []
         for i in race().results:
             assert isinstance(i, Result)
@@ -42,7 +43,8 @@ class ResultCalculation(object):
         group.count_finished = len(ret)
         return ret
 
-    def get_group_persons(self, group):
+    @staticmethod
+    def get_group_persons(group):
         assert isinstance(group, Group)
         ret = []
         for i in race().persons:
