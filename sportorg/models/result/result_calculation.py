@@ -156,15 +156,27 @@ class ResultCalculation(object):
         :return: rank of group, -1 if we have < 10 successfull results
         """
         scores = []
-        for i in self.get_group_finishes(group):
+        array = self.get_group_finishes(group)
+
+        if len(array) < 10:
+            # less than 10 started
+            return -1
+
+        for i in array:
             assert isinstance(i, Result)
             if i.status == ResultStatus.OK:
                 person = i.person
                 if not person.is_out_of_competition:
                     qual = person.qual
                     scores.append(qual.get_scores())
-        if len(scores) < 10:
+
+        if len(scores) < 5:
+            # less than 5 finished and not disqualified
             return -1
+
+        if len(scores) <= 10:
+            # get rank sum of 10 best finished
+            return sum(scores)
 
         scores = sorted(scores)
         return sum(scores[-10:])
