@@ -1,3 +1,18 @@
+### 2018-01-16 v0.11.0-rc1
++ Added new field - id (uuid4)
++ Search tool - search text in all columns of current table
++ Creation organization while athlete editing
++ Team lists with start fee
++ Taking of start and finish time from any punch (by code)
++ Taking of start and finish from first and last punches
++ Live translation (to orgeo.ru)
++ Score calculation (formula and array)
++ Team result calculation by organization and region
++ Basic relay support (number assigning mode, place calculation)
++ Penalty calculation for marked route (Rus)
++ New Russian ranking ESVK 2018-2021 (Rus)
+- Fixed the error of concurrent SI readout and split printing
+
 ### 2017-12-12 v0.10.0-beta
 + Added the ability to edit splits
 + Support for multiple marking systems at the model level
