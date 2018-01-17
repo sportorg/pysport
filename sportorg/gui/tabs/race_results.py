@@ -197,18 +197,19 @@ class Widget(QtWidgets.QWidget):
         index = 1
         if result.person:
             course = find_course(result.person)
-            assert isinstance(course, Course)
-            if course.controls is not None:
-                for control in course.controls:
-                    assert isinstance(control, CourseControl)
-                    s = '{index} {code} {length}'.format(
-                        index=index,
-                        code=control.code,
-                        length=control.length if control.length else '')
-                    self.ResultCourseDetails.append(s)
-                    index += 1
-            self.ResultCourseNameEdit.setText(course.name)
-            self.ResultCourseLengthEdit.setText(str(course.length))
+            if course:
+                assert isinstance(course, Course)
+                if course.controls is not None:
+                    for control in course.controls:
+                        assert isinstance(control, CourseControl)
+                        s = '{index} {code} {length}'.format(
+                            index=index,
+                            code=control.code,
+                            length=control.length if control.length else '')
+                        self.ResultCourseDetails.append(s)
+                        index += 1
+                self.ResultCourseNameEdit.setText(course.name)
+                self.ResultCourseLengthEdit.setText(str(course.length))
 
     def resize_event(self, koor):
         self.ResultCourseGroupBox.setGeometry(QtCore.QRect(1, 1, 120, koor['height']-140))
