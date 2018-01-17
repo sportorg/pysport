@@ -50,10 +50,12 @@ class SIReaderThread(Thread):
                         si.disconnect()
                         self._logger.debug('Stop sireader')
                         return
+                time.sleep(0.5)
                 card_data = si.read_sicard()
-                si.ack_sicard()
                 card_data['card_type'] = si.cardtype
                 self._queue.put(SIReaderCommand('card_data', card_data), timeout=1)
+                time.sleep(0.2)
+                si.ack_sicard()
             except sireader.SIReaderException as e:
                 self._logger.debug(str(e))
             except sireader.SIReaderCardChanged as e:

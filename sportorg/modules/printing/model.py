@@ -23,8 +23,9 @@ def split_printout(result):
     obj = race()
     printer = obj.get_setting('split_printer')
     template_path = obj.get_setting('split_template', template_dir('split', 'split_printout2.html'))
-    spl = GroupSplits(person.group)
-    template = get_text_from_file(template_path, **spl.get_json(person))
-    if not printer:
-        raise NoPrinterSelectedException('No printer selected')
-    print_html(printer, template)
+    if person.group and person.group.course:
+        spl = GroupSplits(person.group)
+        template = get_text_from_file(template_path, **spl.get_json(person))
+        if not printer:
+            raise NoPrinterSelectedException('No printer selected')
+        print_html(printer, template)
