@@ -9,25 +9,34 @@ def import_csv(source):
     race = memory.race()
 
     for group_name in wo_csv.groups:
-        group = memory.create(memory.Group, name=group_name, long_name=group_name)
+        group = memory.Group()
+        group.name = group_name
+        group.long_name = group_name
         race.groups.append(group)
 
     for team_name in wo_csv.teams:
-        org = memory.create(memory.Organization, name=team_name)
+        org = memory.Organization()
+        org.name = team_name
         race.organizations.append(org)
 
     for person_dict in wo_csv.data:
         if person_dict['qual_id'].isdigit():
-            qual = Qualification(int(person_dict['qual_id']))
+            qual_id = int(person_dict['qual_id'])
         else:
-            qual = 0
-        person = memory.create(
-            memory.Person,
-            **person_dict,
-            group=memory.find(race.groups, name=person_dict['group_name']),
-            organization=memory.find(race.organizations, name=person_dict['team_name']),
-            qual=qual
-        )
+            qual_id = 0
+        person_org = memory.find(race.organizations, name=person_dict['team_name'])
+        person_org.contact.value = person_dict['representative']
+
+        person = memory.Person()
+        person.name = person_dict['name']
+        person.surname = person_dict['surname']
+        person.bib = person_dict['bib']
+        person.year = person_dict['year']
+        person.sportident_card = memory.SportidentCard(person_dict['sportident_card'])
+        person.group = memory.find(race.groups, name=person_dict['group_name'])
+        person.organization = person_org
+        person.qual = Qualification(qual_id)
+        person.comment = person_dict['comment']
         race.persons.append(person)
 
 

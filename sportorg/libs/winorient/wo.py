@@ -25,21 +25,15 @@ class CSVReader:
         return self._data
 
     def append(self, person):
-        def ifempty(o, default=None):
-            if len(o):
-                return 0
-            if default is not None:
-                return default
-            return None
-
         person_dict = {
             'group_name': person[0],
             'team_name': person[2],
-            'qual_id': person[3],
-            'bib': ifempty(person[4]),
-            'year': int(person[5]) if len(person[5]) else None,
-            'sportident_card': int(person[6]) if len(person[6]) else None,
-            'comment': person[7]
+            'representative': person[3],
+            'qual_id': person[4],
+            'bib': int(person[5]) if len(person[5]) else 0,
+            'year': int(person[6]) if len(person[6]) else 0,
+            'sportident_card': int(person[7]) if len(person[7]) else 0,
+            'comment': person[8]
         }
         if len(str(person[1]).split(' ')) == 2:
             person_dict['name'] = str(person[1]).split(' ')[1]
