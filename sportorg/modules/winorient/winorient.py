@@ -20,7 +20,7 @@ def import_csv(source):
         race.organizations.append(org)
 
     for person_dict in wo_csv.data:
-        if person_dict['qual_id'].isdigit():
+        if person_dict['qual_id'] and person_dict['qual_id'].isdigit():
             qual_id = int(person_dict['qual_id'])
         else:
             qual_id = 0
