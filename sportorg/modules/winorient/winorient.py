@@ -17,12 +17,16 @@ def import_csv(source):
         race.organizations.append(org)
 
     for person_dict in wo_csv.data:
+        if person_dict['qual_id'].isdigit():
+            qual = Qualification(int(person_dict['qual_id']))
+        else:
+            qual = 0
         person = memory.create(
             memory.Person,
             **person_dict,
             group=memory.find(race.groups, name=person_dict['group_name']),
             organization=memory.find(race.organizations, name=person_dict['team_name']),
-            qual=Qualification(int(person_dict['qual_id']))
+            qual=qual
         )
         race.persons.append(person)
 
