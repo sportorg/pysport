@@ -1,3 +1,4 @@
+from datetime import datetime
 from enum import Enum
 
 from sportorg.models.memory import race
@@ -272,9 +273,12 @@ class TeamStartList:
 
 
 def get_race_data():
+    start_date = race().get_setting('start_date', datetime.now().replace(second=0, microsecond=0))
     return {
-        'title': race().get_setting('main_title'),
-        'sub_title': race().get_setting('sub_title')
+        'title': race().get_setting('main_title', ''),
+        'sub_title': race().get_setting('sub_title', ''),
+        'url': race().get_setting('url', ''),
+        'date': start_date.strftime("%d.%m.%Y")
     }
 
 

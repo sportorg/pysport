@@ -196,7 +196,7 @@
     {% if persons|length %}
     {% for person in persons %}
     <div class="bib-item">
-        <div class="bib-title">{{ race.title }}</div>
+        <div class="bib-title">{{ race.title }}<br>{{ race.date }}</div>
         <div class="bib-number">{{ person.bib }}</div>
         <div class="bib-info">
             <div class="left-info">

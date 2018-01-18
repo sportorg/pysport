@@ -245,6 +245,7 @@ def menu_list():
                 },
                 {
                     'title': _('Split printout'),
+                    'shortcut': 'Ctrl+L',
                     'action': GlobalAccess().get_main_window().split_printout_selected
                 },
                 {

@@ -42,14 +42,14 @@ class ResultChecker:
                     if str(cur_code) in arr:
                         list_contains = True
 
-                if template.startswith('%'):
+                if template.find('%') > -1:
                     # non-unique control
                     if not list_exists or list_contains:
-                        # any control '%' or '%(31,32,33)'
+                        # any control '%' or '%(31,32,33)' or '31%'
                         i += 1
 
-                elif template.startswith('*'):
-                    # unique control '*' or '*(31,32,33)'
+                elif template.find('*') > -1:
+                    # unique control '*' or '*(31,32,33)' or '31*'
                     if list_exists and not list_contains:
                         # not in list
                         continue

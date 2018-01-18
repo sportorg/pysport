@@ -166,10 +166,11 @@ class CourseControl(Model):
         res = ''
 
         index = 0
-        while char.isdigit() and index < len(tmp) - 1:
+        while char.isdigit() and index <= len(tmp) - 1:
             res += char
             index += 1
-            char = tmp[index]
+            if index < len(tmp):
+                char = tmp[index]
         return int(res)
 
 

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sportorg.models.memory import race, Person, Course, Group, Qualification
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.utils.time import time_to_hhmmss, get_speed_min_per_km, if_none, hhmmss_to_time
@@ -62,7 +64,9 @@ class PersonSplits(object):
         self.start = time_to_hhmmss(person.start_time)
         self.finish = time_to_hhmmss(result.get_finish_time())
         self.result = result.get_result()
+        self.race_result = time_to_hhmmss(result.get_finish_time() - result.get_start_time())
         self.status = result.status.value
+        self.status_title = result.status.get_title()
         self.place = result.place
         self.group_count_all = person.group.get_count_all()
         self.group_count_finished = person.group.get_count_finished()
@@ -156,7 +160,7 @@ class PersonSplits(object):
             'team': self.team,
             'qual': self.qual,
             'year': self.year,
-            'bib':  self.bib,
+            'bib': self.bib,
             'result': if_none(self.result, ''),
             'penalty_time': self.penalty_time,
             'place': self.place,
@@ -256,10 +260,9 @@ class GroupSplits(object):
         group_json['cp_count'] = self.cp_count
         group_json['controls'] = self.controls
         group_json['length'] = self.length
-
         persons = []
         for i in self.person_splits:
-            assert(isinstance(i, PersonSplits))
+            assert (isinstance(i, PersonSplits))
 
             if person_to_export:
                 if not person_to_export == i.person:
@@ -275,7 +278,10 @@ class GroupSplits(object):
             person_json['start'] = i.start
             person_json['finish'] = i.finish
             person_json['result'] = i.result
+            person_json['race_result'] = i.race_result
             person_json['status'] = i.status
+            person_json['status_title'] = i.status_title
+            person_json['penalty_time'] = i.penalty_time
             legs = []
             last_time = None
             for j in i.legs:
@@ -299,6 +305,15 @@ class GroupSplits(object):
         group_json['persons'] = persons
         groups = [group_json]
         ret['groups'] = groups
+
+        start_date = race().get_setting('start_date', datetime.now().replace(second=0, microsecond=0))
+        ret['race'] = {
+            'title': race().get_setting('main_title', ''),
+            'sub_title': race().get_setting('sub_title', ''),
+            'location': race().get_setting('location', ''),
+            'url': race().get_setting('url', ''),
+            'date': start_date.strftime("%d.%m.%Y")
+        }
         return ret
 
 
@@ -340,8 +355,9 @@ def get_splits_data():
     data.sort(key=lambda x: x['name'])
     ret['groups'] = data
     ret['race'] = {
-        'title': race().get_setting('main_title'),
-        'sub_title': race().get_setting('sub_title')
+        'title': race().get_setting('main_title', ''),
+        'sub_title': race().get_setting('sub_title', ''),
+        'url': race().get_setting('url', ''),
     }
     return ret
 

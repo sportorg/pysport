@@ -319,7 +319,7 @@ class GroupMemoryModel(AbstractSportOrgMemoryModel):
         super().__init__()
 
     def get_headers(self):
-        return ['Name', 'Full name', 'Course name', 'Type', 'Length', 'Point count', 'Climb', 'Sex', 'Min age',
+        return ['Name', 'Full name', 'Course name', 'Start fee', 'Type', 'Length', 'Point count', 'Climb', 'Sex', 'Min age',
                 'Max age', 'Start interval', 'Start corridor', 'Order in corridor']
 
     def init_cache(self):
@@ -345,6 +345,7 @@ class GroupMemoryModel(AbstractSportOrgMemoryModel):
             group.name,
             group.long_name,
             course.name,
+            group.price,
             group.get_type().get_title(),
             course.length,
             control_count,

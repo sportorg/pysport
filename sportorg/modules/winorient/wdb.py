@@ -162,11 +162,11 @@ class WinOrientBinary:
         wdb_object = WDB()
         my_race = race()
 
-        title = my_race.get_setting('sub_title')
+        title = my_race.get_setting('sub_title', '')
         wdb_object.info.title = title.split('\n')
-        wdb_object.info.place = my_race.get_setting('location')
-        wdb_object.info.referee = my_race.get_setting('chief_referee')
-        wdb_object.info.secretary = my_race.get_setting('secretary')
+        wdb_object.info.place = my_race.get_setting('location', '')
+        wdb_object.info.referee = my_race.get_setting('chief_referee', '')
+        wdb_object.info.secretary = my_race.get_setting('secretary', '')
 
         for team in my_race.organizations:
             new_team = WDBTeam()

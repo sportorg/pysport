@@ -163,6 +163,7 @@
             {% endif %}
         {% endfor %}
         </table>
+        <!--<br> штраф: {{person.penalty_time}}-->
         <br> Финиш: {{person.finish}} {{person.finish_time}}
         <br> Результат: {{person.result}}
         {% if person.place %}
@@ -174,6 +175,7 @@
                 {{control.code}}
             {% endfor %}
         {% endif %}
+        {{ race.url }}
     {% endfor %}
     {% endfor %}
 </code>
