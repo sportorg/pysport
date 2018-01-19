@@ -265,6 +265,15 @@ def menu_list():
                     'action': GlobalAccess().penalty_removing
                 },
                 {
+                    'title': _('Change status'),
+                    'shortcut': 'F4',
+                    'action': GlobalAccess().get_main_window().change_status
+                },
+                {
+                    'title': _('Set DNS numbers'),
+                    'action': GlobalAccess().get_main_window().not_start_dialog
+                },
+                {
                     'title': _('Add SPORTident result'),
                     'action': GlobalAccess().get_main_window().sportident_result
                 }

@@ -107,11 +107,10 @@ class ResultChecker:
         if result.person is None:
             raise ResultCheckerException('Not person')
         o = cls(result.person)
-        result.status = ResultStatus.OK
-        if not o.check_result(result):
-            result.status = ResultStatus.DISQUALIFIED
-        if not result.finish_time:
-            result.status = ResultStatus.DID_NOT_FINISH
+        if result.status == ResultStatus.OK or result.status == ResultStatus.DISQUALIFIED:
+            result.status = ResultStatus.OK
+            if not o.check_result(result):
+                result.status = ResultStatus.DISQUALIFIED
 
         return o
 

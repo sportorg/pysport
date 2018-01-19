@@ -119,6 +119,7 @@ class Contact(Model):
 class Organization(Model):
     def __init__(self):
         self.id = uuid.uuid4()
+        self.is_hidden = False
         self.name = ''
         self.address = Address()
         self.contact = Contact()
@@ -184,6 +185,7 @@ class CoursePart(Model):
 class Course(Model):
     def __init__(self):
         self.id = uuid.uuid4()
+        self.is_hidden = False
         self.name = ''
         self.bib = 0
         self.length = 0
@@ -217,6 +219,7 @@ class Course(Model):
 class Group(Model):
     def __init__(self):
         self.id = uuid.uuid4()
+        self.is_hidden = False
         self.name = ''
         self.course = None  # type: Course
         self.price = 0
@@ -322,6 +325,7 @@ class Result:
         if type(self) == Result:
             raise Exception("<Result> must be subclassed.")
         self.id = uuid.uuid4()
+        self.is_hidden = False
         self.start_time = None  # type: OTime
         self.finish_time = None  # type: OTime
         self.result = None  # type: OTime
@@ -507,6 +511,7 @@ class ResultSFR(Result):
 class Person(Model):
     def __init__(self):
         self.id = uuid.uuid4()
+        self.is_hidden = False
         self.name = ''
         self.surname = ''
         self.sex = Sex.MF

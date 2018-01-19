@@ -79,7 +79,7 @@ class WinOrientBinary:
             # controls
             for i in range(course.point_quantity):
                 control = CourseControl()
-                control.code = course.point[i]
+                control.code = str(course.point[i])
                 if i < len(course.leg):
                     control.length = course.leg[i]
                 new_course.controls.append(control)
@@ -273,7 +273,8 @@ class WinOrientBinary:
 
                 if result.splits:
                     new_chip = WDBChip()
-                    new_chip.id = int(man.sportident_card)
+                    if man.sportident_card:
+                        new_chip.id = int(man.sportident_card)
                     new_chip.start = WDBPunch(time=time_to_int(result.start_time))
                     new_chip.finish = WDBPunch(time=time_to_int(result.finish_time))
 

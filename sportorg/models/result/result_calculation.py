@@ -108,7 +108,6 @@ class ResultCalculation(object):
 
             return relay_teams.values()
 
-
     def set_rank(self, group):
         assert isinstance(group, Group)
         ranking = group.ranking

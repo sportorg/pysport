@@ -229,15 +229,11 @@
             <td>{{ person.year }}</td>
             <td>{{ person.result }}</td>
             <td>{{ person.place }}</td>
-            {% for leg in person.legs %}
-                {% if leg.relative_place %}
-                <td class="nowrap no-padding">
-                    <table class="table-leg" title="{{leg.speed}} {{leg.length_leg}}">
-                        <tr><td>{{ leg.code }}</td><td class="result-{{leg.relative_place}}">{{ leg.relative_time }} ({{leg.relative_place}})</td></tr>
-                        <tr><td></td><td class="result-{{leg.leg_place}}">{{ leg.leg_time }} ({{ leg.leg_place }})</td></tr>
-                    </table>
+            {% for split in person.splits %}
+                <td>
+                    {{ split.code }}
+                    {{ split.time }}
                 </td>
-                {% endif %}
             {% endfor %}
         </tr>
         {% endfor %}

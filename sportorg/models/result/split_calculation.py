@@ -64,6 +64,7 @@ class PersonSplits(object):
         self.start = time_to_hhmmss(person.start_time)
         self.finish = time_to_hhmmss(result.get_finish_time())
         self.result = result.get_result()
+        self.splits = result.splits
         self.race_result = time_to_hhmmss(result.get_finish_time() - result.get_start_time())
         self.status = result.status.value
         self.status_title = result.status.get_title()
@@ -160,13 +161,20 @@ class PersonSplits(object):
             'team': self.team,
             'qual': self.qual,
             'year': self.year,
-            'bib': self.bib,
-            'result': if_none(self.result, ''),
+            'bib': self.bib if self.bib else '',
+            'result': self.result,
             'penalty_time': self.penalty_time,
             'place': self.place,
             'assigned_rank': if_none(self.assigned_rank, ''),
-            'legs': []
+            'legs': [],
+            'splits': []
         }
+
+        for split in self.splits:
+            ret['splits'].append({
+                'code': split.code,
+                'time': str(split.time)
+            })
 
         for i in self.legs:
             assert isinstance(i, LegSplit)
@@ -354,10 +362,12 @@ def get_splits_data():
         })
     data.sort(key=lambda x: x['name'])
     ret['groups'] = data
+    start_date = race().get_setting('start_date', datetime.now().replace(second=0, microsecond=0))
     ret['race'] = {
         'title': race().get_setting('main_title', ''),
         'sub_title': race().get_setting('sub_title', ''),
         'url': race().get_setting('url', ''),
+        'date': start_date.strftime("%d.%m.%Y")
     }
     return ret
 
