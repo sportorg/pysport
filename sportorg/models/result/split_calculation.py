@@ -2,6 +2,7 @@ from datetime import datetime
 
 from sportorg.models.memory import race, Person, Course, Group, Qualification
 from sportorg.models.result.result_calculation import ResultCalculation
+from sportorg.models.result.result_checker import find_course
 from sportorg.utils.time import time_to_hhmmss, get_speed_min_per_km, if_none, hhmmss_to_time
 
 
@@ -44,7 +45,8 @@ class PersonSplits(object):
         person = result.person
         assert isinstance(person, Person)
         group = person.group
-        course = group.course
+        # course = group.course
+        course = find_course(person)
         assert isinstance(course, Course)
 
         self.person = person
@@ -75,16 +77,19 @@ class PersonSplits(object):
         self.place = result.place
         self.group_count_all = person.group.get_count_all()
         self.group_count_finished = person.group.get_count_finished()
+        self.scores = result.scores
+        self.controls = [control.code for control in find_course(person).controls]
         self.speed = ''
         if course.length:
             self.speed = get_speed_min_per_km(race_result, course.length)
 
         self.penalty_time = time_to_hhmmss(result.get_penalty_time())
 
-        if result.assigned_rank == Qualification.NOT_QUALIFIED:
-            self.assigned_rank = ''
-        else:
-            self.assigned_rank = result.assigned_rank.get_title()
+        if hasattr(result, 'assigned_rank'):
+            if result.assigned_rank == Qualification.NOT_QUALIFIED:
+                self.assigned_rank = ''
+            else:
+                self.assigned_rank = result.assigned_rank.get_title()
 
         person_index = 0
         course_index = 0
@@ -175,7 +180,8 @@ class PersonSplits(object):
             'place': self.place,
             'assigned_rank': if_none(self.assigned_rank, ''),
             'legs': [],
-            'splits': []
+            'splits': [],
+            'scores': self.scores
         }
 
         for split in self.splits:
@@ -299,6 +305,7 @@ class GroupSplits(object):
             person_json['status'] = i.status
             person_json['status_title'] = i.status_title
             person_json['penalty_time'] = i.penalty_time
+            person_json['controls'] = i.controls
             legs = []
             last_time = None
             for j in i.legs:
