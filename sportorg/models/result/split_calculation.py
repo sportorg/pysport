@@ -12,6 +12,7 @@ class LegSplit(object):
         self.code = 0
         self.absolute_time = None
         self.leg_time = None
+        self.leg_minute_time = None
         self.relative_time = None
         self.leg_place = 0
         self.relative_place = 0
@@ -27,6 +28,7 @@ class LegSplit(object):
             'absolute_time': self.absolute_time,
             'relative_time': self.relative_time,
             'leg_time': self.leg_time,
+            'leg_minute_time': self.leg_minute_time,
             'leg_place': self.leg_place,
             'relative_place': self.relative_place,
             'status': self.status,
@@ -61,16 +63,21 @@ class PersonSplits(object):
             self.qual = person.qual.get_title()
         self.year = person.year
 
+        race_result = result.get_finish_time() - result.get_start_time()
+
         self.start = time_to_hhmmss(person.start_time)
         self.finish = time_to_hhmmss(result.get_finish_time())
         self.result = result.get_result()
         self.splits = result.splits
-        self.race_result = time_to_hhmmss(result.get_finish_time() - result.get_start_time())
+        self.race_result = time_to_hhmmss(race_result)
         self.status = result.status.value
         self.status_title = result.status.get_title()
         self.place = result.place
         self.group_count_all = person.group.get_count_all()
         self.group_count_finished = person.group.get_count_finished()
+        self.speed = ''
+        if course.length:
+            self.speed = get_speed_min_per_km(race_result, course.length)
 
         self.penalty_time = time_to_hhmmss(result.get_penalty_time())
 
@@ -104,6 +111,7 @@ class PersonSplits(object):
             if course_code == cur_code:
                 leg_time = cur_time - leg_start_time
                 leg.leg_time = time_to_hhmmss(leg_time)
+                leg.leg_minute_time = leg_time.to_minute_str()
                 leg_start_time = cur_time
 
                 leg.course_index = course_index
@@ -287,6 +295,7 @@ class GroupSplits(object):
             person_json['finish'] = i.finish
             person_json['result'] = i.result
             person_json['race_result'] = i.race_result
+            person_json['speed'] = i.speed
             person_json['status'] = i.status
             person_json['status_title'] = i.status_title
             person_json['penalty_time'] = i.penalty_time
@@ -305,12 +314,23 @@ class GroupSplits(object):
             person_json['legs'] = legs
             finish = hhmmss_to_time(i.finish)
             if last_time is not None and last_time != finish:
-                person_json['finish_time'] = time_to_hhmmss(finish - last_time)
+                person_json['finish_time'] = (finish - last_time).to_minute_str()
             else:
                 person_json['finish_time'] = ''
             persons.append(person_json)
 
         group_json['persons'] = persons
+
+        group_persons = []
+        for i in self.person_splits:
+            group_persons.append({
+                'name': i.name,
+                'bib': i.bib,
+                'place': i.place,
+                'result': i.result,
+            })
+        group_json['group_persons'] = group_persons
+
         groups = [group_json]
         ret['groups'] = groups
 

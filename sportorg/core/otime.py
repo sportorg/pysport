@@ -109,6 +109,13 @@ class OTime:
     def to_time(self):
         return datetime.time(self.hour, self.minute, self.sec, self.msec*1000)
 
+    def to_minute_str(self):
+        minute = int(self.to_msec()/(1000*60))
+        return '{}:{}'.format(
+            minute if minute > 9 else '0' + str(minute),
+            self.sec if self.sec > 9 else '0' + str(self.sec)
+        )
+
     @staticmethod
     def get_msec(day=0, hour=0, minute=0, sec=0, msec=0):
         return day*86400000 + hour*3600000 + minute*60000 + sec*1000 + msec
