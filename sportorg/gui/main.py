@@ -219,12 +219,6 @@ class MainWindow(QMainWindow):
         self.logging_tab = log.Widget()
         self.tabwidget.addTab(self.logging_tab, _("Logs"))
 
-    def keyPressEvent(self, e):
-        print('pressed: ' + str(e.key()))
-
-    def keyReleaseEvent(self, e):
-        pass
-
     def set_title(self, title=None):
         main_title = '{} {}'.format(_(config.NAME), config.VERSION)
         if title:
