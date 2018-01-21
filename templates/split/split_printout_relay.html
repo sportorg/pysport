@@ -5,11 +5,11 @@
     <title>Sportorg Results - {{ title }}</title>
 {% raw %}
     <style>
-        body {
-            font-weight: bold;
-        }
         td {
             padding-right: 7px;
+        }
+        body {
+            font-weight: bold;
         }
 
         .small-text {
@@ -96,7 +96,7 @@
                 margin: 0.5cm;
             }
             body {
-                /*font-size: 85%;*/
+                font-size: 85%;
             }
             pre {
                 margin-bottom: 1px;
@@ -139,19 +139,43 @@
 <code>
     {% for group in groups %}
     {% for person in group.persons %}
-        <b>{{ person.name }} - {{ group.name }}</b>
+        <h4>{{ person.name }} - {{ group.name }}</h4>
         <br> Команда: {{person.team}}
         <br> Номер: {{person.bib}} SI-card: {{person.sportident_card}}
-        <br> ---------------------------------------
         <br> Старт: {{person.start}}
-        <br> Финиш: {{person.finish}}
-        <br> Время без штрафа: {{person.race_result}}
-        <br> <b>{{person.status_title}}</b>
-        <br> ---------------------------------------
+        <table>
+        {% for leg in person.legs %}
+            {% if leg.status == 'correct' %}
+                <tr>
+                    <td>{{leg.course_index}}</td>
+                    <td>{{leg.code}}</td>
+                    <td>{{leg.absolute_time}}</td>
+                    <td>{{leg.leg_time}}</td>
+                    <td>{{leg.speed}}</td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td></td>
+                    <td>{{leg.code}}</td>
+                    <td>{{leg.absolute_time}}</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+        </table>
+        <br> Финиш: {{person.finish}} {{person.finish_time}}
+        <br> Результат команды: {{person.result}}
+        <br>
+        {% if person.status != 1 %}
+            {% for control in person.controls %}
+                {{control}}
+            {% endfor %}
+        {% endif %}
         <br> {{ race.title }}
         <br> {{ race.date }}
         <br> {{ race.location }}
-        <br> <span class="small-text">{{ race.url }}</span>
+        <br> {{ race.url }}
     {% endfor %}
     {% endfor %}
 </code>

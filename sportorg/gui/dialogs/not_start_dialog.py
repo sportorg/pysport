@@ -25,7 +25,7 @@ class NotStartDialog(QDialog):
 
         self.layout = QFormLayout(self)
 
-        self.label_controls = QLabel('\n\n1\n58\n33\n34\n...\n150')
+        self.label_controls = QLabel('\n\n1 4 15 25\n58 32\n33\n34\n...\n150')
         self.item_numbers = QTextEdit()
 
         self.layout.addRow(self.label_controls, self.item_numbers)
@@ -58,10 +58,9 @@ class NotStartDialog(QDialog):
         for item in text.split('\n'):
             if not len(item):
                 continue
-            for n_item in item.split(','):
-                bib = ''.join(n_item.split())
-                if bib.isdigit():
-                    numbers.append(int(bib))
+            for n_item in item.split():
+                if n_item.isdigit():
+                    numbers.append(int(n_item))
         old_numbers = []
         obj = race()
         for number in numbers:

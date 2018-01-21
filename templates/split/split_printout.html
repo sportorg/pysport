@@ -5,9 +5,15 @@
     <title>Sportorg Results - {{ title }}</title>
 {% raw %}
     <style>
-        table {
-            border-collapse: collapse;
-            border-spacing: 0;
+        td {
+            padding-right: 7px;
+        }
+        body {
+            font-weight: bold;
+        }
+
+        .small-text {
+            font-size: 75%;
         }
 
         p,
@@ -15,37 +21,9 @@
         ul,
         ol,
         dl,
-        table,
         pre {
             margin-top: 0;
             margin-bottom: 16px;
-        }
-
-        table {
-            display: block;
-            width: 100%;
-            overflow: auto;
-            word-break: normal;
-            word-break: keep-all;
-        }
-
-        table th {
-            font-weight: bold;
-        }
-
-        table th,
-        table td {
-            padding: 3px 13px;
-            border: 1px solid #ddd;
-        }
-
-        table tr {
-            background-color: #fff;
-            border-top: 1px solid #ccc;
-        }
-
-        table tr:nth-child(2n) {
-            background-color: #f8f8f8;
         }
 
         hr {
@@ -120,15 +98,6 @@
             body {
                 font-size: 85%;
             }
-            table {
-                display: table;
-                width: 100%;
-            }
-            table th,
-            table td {
-                padding: 1px 10px;
-            }
-            table,
             pre {
                 margin-bottom: 1px;
             }
@@ -169,24 +138,63 @@
 <article class="markdown-body">
 <code>
     {% for group in groups %}
-    <!--<h3>{{ group.name }}</h3>-->
     {% for person in group.persons %}
         <h4>{{ person.name }} - {{ group.name }}</h4>
         <br> Команда: {{person.team}}
         <br> Номер: {{person.bib}} SI-card: {{person.sportident_card}}
-        <br> Финиш:.......{{person.finish}}
-        <br> Старт:.......{{person.start}}
-        <br> Результат:...{{person.result}}
-        <br> Место: {{person.place}} из {{group.count_finished}} (всего {{group.count_all}})
+        <br> Старт: {{person.start}}
+        <table>
         {% for leg in person.legs %}
-            <br>
             {% if leg.status == 'correct' %}
-                {{"{:02}".format(leg.course_index)}}.<b>{{"{:>3}".format(leg.code)}}</b>: <b>{{leg.leg_time}}</b> {{leg.absolute_time}} {{leg.speed}} ({{leg.leg_place}})
-                <br>лидер : {{leg.leader_time}} ({{leg.leader_name}})
+                <tr>
+                    <td>{{leg.course_index}}</td>
+                    <td>{{leg.code}}</td>
+                    <td>{{leg.relative_time}}</td>
+                    <td>{{leg.leg_minute_time}}</td>
+                    <td>{{leg.speed}}</td>
+                    <td>{{leg.leg_place}}</td>
+                    <td>{{leg.leader_name[0:5]}}</td>
+                </tr>
             {% else %}
-                ---{{"{:>3}".format(leg.code)}} --- {{leg.absolute_time}} --- нарушен порядок
+                <tr>
+                    <td></td>
+                    <td>{{leg.code}}</td>
+                    <td>{{leg.absolute_time}}</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
             {% endif %}
         {% endfor %}
+        </table>
+        <!--<br> штраф: {{person.penalty_time}}-->
+        <br> Финиш: {{person.finish}} {{person.finish_time}} {{person.speed}}
+        <br> Результат: {{person.result}}
+        {% if person.place %}
+            <br> Место: {{person.place}} из {{group.count_finished}} (всего {{group.count_all}})
+        {% endif %}
+        <br>
+        {% if person.status != 1 %}
+            {% for control in group.controls %}
+                {{control.code}}
+            {% endfor %}<br>
+        {% endif %}
+        <table>
+            {% for item in group.group_persons %}
+            {% if item.place == 1 or item.place == 2 or item.place == 3 %}
+            <tr>
+                <td>{{item.place}}</td>
+                <td>{{item.name}}</td>
+                <td>{{item.bib}}</td>
+                <td>{{item.result}}</td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </table>
+        <br><br> {{ race.title }}
+        <br> {{ race.date }}
+        <br> {{ race.location }}
+        <br> {{ race.url }}
     {% endfor %}
     {% endfor %}
 </code>

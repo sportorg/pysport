@@ -5,11 +5,11 @@
     <title>Sportorg Results - {{ title }}</title>
 {% raw %}
     <style>
-        td {
-            padding-right: 7px;
-        }
         body {
             font-weight: bold;
+        }
+        td {
+            padding-right: 7px;
         }
 
         .small-text {
@@ -96,7 +96,7 @@
                 margin: 0.5cm;
             }
             body {
-                font-size: 85%;
+                /*font-size: 85%;*/
             }
             pre {
                 margin-bottom: 1px;
@@ -139,59 +139,16 @@
 <code>
     {% for group in groups %}
     {% for person in group.persons %}
-        <h4>{{ person.name }} - {{ group.name }}</h4>
+        <b>{{ person.name }} - {{ group.name }}</b>
         <br> Команда: {{person.team}}
         <br> Номер: {{person.bib}} SI-card: {{person.sportident_card}}
+        <br> ---------------------------------------
         <br> Старт: {{person.start}}
-        <table>
-        {% for leg in person.legs %}
-            {% if leg.status == 'correct' %}
-                <tr>
-                    <td>{{leg.course_index}}</td>
-                    <td>{{leg.code}}</td>
-                    <td>{{leg.relative_time}}</td>
-                    <td>{{leg.leg_minute_time}}</td>
-                    <td>{{leg.speed}}</td>
-                    <td>{{leg.leg_place}}</td>
-                    <td>{{leg.leader_name[0:5]}}</td>
-                </tr>
-            {% else %}
-                <tr>
-                    <td></td>
-                    <td>{{leg.code}}</td>
-                    <td>{{leg.absolute_time}}</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-            {% endif %}
-        {% endfor %}
-        </table>
-        <!--<br> штраф: {{person.penalty_time}}-->
-        <br> Финиш: {{person.finish}} {{person.finish_time}} {{person.speed}}
-        <br> Результат: {{person.result}}
-        {% if person.place %}
-            <br> Место: {{person.place}} из {{group.count_finished}} (всего {{group.count_all}})
-        {% endif %}
-        <br>
-        {% if person.status != 1 %}
-            {% for control in group.controls %}
-                {{control.code}}
-            {% endfor %}<br>
-        {% endif %}
-        <table>
-            {% for item in group.group_persons %}
-            {% if item.place == 1 or item.place == 2 or item.place == 3 %}
-            <tr>
-                <td>{{item.place}}</td>
-                <td>{{item.name}}</td>
-                <td>{{item.bib}}</td>
-                <td>{{item.result}}</td>
-            </tr>
-            {% endif %}
-            {% endfor %}
-        </table>
-        <br><br> {{ race.title }}
+        <br> Финиш: {{person.finish}}
+        <br> Время без штрафа: {{person.race_result}}
+        <br> <b>{{person.status_title}}</b>
+        <br> ---------------------------------------
+        <br> {{ race.title }}
         <br> {{ race.date }}
         <br> {{ race.location }}
         <br> {{ race.url }}

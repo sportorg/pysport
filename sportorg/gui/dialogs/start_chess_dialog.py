@@ -60,14 +60,14 @@ class StartChessDialog(QDialog):
         self.show()
 
     def set_text(self):
-        course = get_race_courses()
-        course.sort()
+        # course = get_race_courses()
+        # course.sort()
 
-        # groups = get_race_groups()
-        # groups.sort()
+        groups = get_race_groups()
+        groups.sort()
 
-        col_data = course
-        col_text = 'course'
+        col_data = groups
+        col_text = 'group'
 
         data = get_chess_list()
 

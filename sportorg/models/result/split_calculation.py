@@ -85,11 +85,9 @@ class PersonSplits(object):
 
         self.penalty_time = time_to_hhmmss(result.get_penalty_time())
 
-        if hasattr(result, 'assigned_rank'):
-            if result.assigned_rank == Qualification.NOT_QUALIFIED:
-                self.assigned_rank = ''
-            else:
-                self.assigned_rank = result.assigned_rank.get_title()
+        self.assigned_rank = ''
+        if hasattr(result, 'assigned_rank') and result.assigned_rank != Qualification.NOT_QUALIFIED:
+            self.assigned_rank = result.assigned_rank.get_title()
 
         person_index = 0
         course_index = 0
