@@ -1,11 +1,12 @@
 import datetime
 import logging
 from queue import Queue
-from threading import Thread, main_thread, Event
+from threading import main_thread, Event
 
 import time
 
 import serial
+from PyQt5.QtCore import QThread
 
 from sportorg.core.singleton import Singleton
 from sportorg.language import _
@@ -26,11 +27,12 @@ class SIReaderCommand:
         self.data = data
 
 
-class SIReaderThread(Thread):
+class SIReaderThread(QThread):
     def __init__(self, port, queue, stop_event, logger, debug=False):
         self.port = port
         super().__init__()
-        self.setName(self.__class__.__name__)
+        # self.setName(self.__class__.__name__)
+        self.setObjectName(self.__class__.__name__)
         self._queue = queue
         self._stop_event = stop_event
         self._logger = logger
@@ -50,11 +52,9 @@ class SIReaderThread(Thread):
                         si.disconnect()
                         self._logger.debug('Stop sireader')
                         return
-                time.sleep(0.5)
                 card_data = si.read_sicard()
                 card_data['card_type'] = si.cardtype
                 self._queue.put(SIReaderCommand('card_data', card_data), timeout=1)
-                time.sleep(0.2)
                 si.ack_sicard()
             except sireader.SIReaderException as e:
                 self._logger.debug(str(e))
@@ -67,16 +67,18 @@ class SIReaderThread(Thread):
                 self._logger.exception(str(e))
 
 
-class ResultThread(Thread):
+class ResultThread(QThread):
     def __init__(self, queue, stop_event, logger, start_time=None):
         super().__init__()
-        self.setName(self.__class__.__name__)
+        # self.setName(self.__class__.__name__)
+        self.setObjectName(self.__class__.__name__)
         self._queue = queue
         self._stop_event = stop_event
         self._logger = logger
         self.start_time = start_time
 
     def run(self):
+        time.sleep(5)
         while True:
             try:
                 while True:
@@ -92,6 +94,7 @@ class ResultThread(Thread):
                     assignment_mode = memory.race().get_setting('sportident_assignment_mode', False)
                     if not assignment_mode:
                         result = self._get_result(self._check_data(cmd.data))
+                        GlobalAccess().clear_filters(remove_condition=False)
                         ResultSportidentGeneration(result).add_result()
                         ResultCalculation().process_results()
                         if memory.race().get_setting('split_printout', False):
@@ -106,7 +109,7 @@ class ResultThread(Thread):
                         GlobalAccess().auto_save()
                         backup.backup_data(cmd.data)
                         OrgeoClient().send_results()
-                    GlobalAccess().get_main_window().init_model()
+                    # GlobalAccess().get_main_window().init_model()
             except Exception as e:
                 self._logger.exception(str(e))
 
@@ -177,7 +180,8 @@ class SIReaderClient(metaclass=Singleton):
                 self._logger
             )
             self._si_reader_thread.start()
-        elif not self._si_reader_thread.is_alive():
+        # elif not self._si_reader_thread.is_alive():
+        elif self._si_reader_thread.isFinished():
             self._si_reader_thread = None
             self._start_si_reader_thread()
 
@@ -190,13 +194,15 @@ class SIReaderClient(metaclass=Singleton):
                 self._start_time
             )
             self._result_thread.start()
-        elif not self._result_thread.is_alive():
+        # elif not self._result_thread.is_alive():
+        elif self._result_thread.isFinished():
             self._result_thread = None
             self._start_result_thread()
 
     def is_alive(self):
         if self._si_reader_thread is not None and self._result_thread is not None:
-            return self._si_reader_thread.is_alive() and self._result_thread.is_alive()
+            # return self._si_reader_thread.is_alive() and self._result_thread.is_alive()
+            return not self._si_reader_thread.isFinished() and not self._result_thread.isFinished()
 
         return False
 
@@ -205,7 +211,7 @@ class SIReaderClient(metaclass=Singleton):
             self.stop()
             return
         self.port = self.choose_port()
-        if self.port is not None:
+        if self.port:
             self._stop_event.clear()
             self._start_si_reader_thread()
             self._start_result_thread()
