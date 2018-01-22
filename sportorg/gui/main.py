@@ -230,7 +230,7 @@ class MainWindow(QMainWindow):
         file_name = get_save_file_name(
             _('Create SportOrg file'),
             _('SportOrg file (*.sportorg)'),
-            '{}.{}'.format(time.strftime("%Y%m%d"), config.VERSION)
+            time.strftime("%Y%m%d")
         )
         if file_name is not '':
             try:
