@@ -32,7 +32,7 @@ class Widget(QtWidgets.QWidget):
         self.setup_ui()
 
     def keyPressEvent(self, e):
-        key_numbers = [i for i in range(48, 57)]
+        key_numbers = [i for i in range(48, 58)]
         key = e.key()
         try:
             if key in key_numbers:
