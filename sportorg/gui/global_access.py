@@ -1,5 +1,6 @@
 import logging
 
+import time
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import QItemSelectionModel, QModelIndex
 from PyQt5.QtWidgets import QTableView, QMessageBox
@@ -210,3 +211,27 @@ class GlobalAccess(metaclass=Singleton):
 
     def refresh(self):
         self.get_main_window().refresh()
+
+
+class NumberClicker(metaclass=Singleton):
+    def __init__(self):
+        self.key = ''
+        self.time = time.time()
+        self.is_work = False
+
+    def toggle(self):
+        self.is_work = not self.is_work
+
+    def is_work(self):
+        return self.is_work
+
+    def click(self, number):
+        t = time.time()
+        if t - self.time < 0.5:
+            self.time = t
+            self.key += str(number)
+            return int(self.key)
+        else:
+            self.key = ''
+            self.time = t
+        return int(number)

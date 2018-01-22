@@ -89,7 +89,7 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
             whole_list = self.get_source_array()
             whole_list.extend(self.filter_backup)
             self.set_source_array(whole_list)
-            self.filter_backup = []
+            self.filter_backup.clear()
 
     def set_filter_for_column(self, column_num, filter_regexp):
         self.filter.update({column_num: filter_regexp})
@@ -98,7 +98,7 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
         # get initial list and filter it
         current_array = self.get_source_array()
         current_array.extend(self.filter_backup)
-
+        self.filter_backup.clear()
         for column in self.filter.keys():
             check_regexp = self.filter.get(column)
             check = re.compile(check_regexp)
@@ -123,7 +123,7 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
             whole_list = self.get_source_array()
             whole_list.extend(self.search_backup)
             self.set_source_array(whole_list)
-            self.search_backup = []
+            self.search_backup.clear()
 
     def apply_search(self):
         current_array = self.get_source_array()
@@ -219,7 +219,7 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
             ret.append(time_to_hhmmss(person.start_time))
         else:
             ret.append('')
-        ret.append(str(person.start_group))
+        ret.append(person.start_group)
         ret.append(str(person.sportident_card) if person.sportident_card is not None else '')
         ret.append(_('Rented card') if person.is_rented_sportident_card else _('Rented stub'))
         ret.append(person.comment)
@@ -319,7 +319,7 @@ class GroupMemoryModel(AbstractSportOrgMemoryModel):
         super().__init__()
 
     def get_headers(self):
-        return ['Name', 'Full name', 'Course name', 'Type', 'Length', 'Point count', 'Climb', 'Sex', 'Min age',
+        return ['Name', 'Full name', 'Course name', 'Start fee', 'Type', 'Length', 'Point count', 'Climb', 'Sex', 'Min age',
                 'Max age', 'Start interval', 'Start corridor', 'Order in corridor']
 
     def init_cache(self):
@@ -345,6 +345,7 @@ class GroupMemoryModel(AbstractSportOrgMemoryModel):
             group.name,
             group.long_name,
             course.name,
+            group.price,
             group.get_type().get_title(),
             course.length,
             control_count,
@@ -435,40 +436,3 @@ class TeamMemoryModel(AbstractSportOrgMemoryModel):
 
     def set_source_array(self, array):
         race().organizations = array
-
-
-class PersonProxyModel(QSortFilterProxyModel):
-
-    def __init__(self, parent):
-        super(PersonProxyModel, self).__init__(parent)
-        self.filter_map = None
-        self.filter_applied = False
-
-    def clear_filter(self):
-        self.filter_map = []
-        for i in range(self.sourceModel().columnCount()):
-            self.filter_map.append('')
-        self.filter_applied = False
-
-    def set_filter_for_column(self, column, filter_string):
-        if self.filter_map is None:
-            self.clear_filter()
-        self.filter_map[column] = filter_string
-        self.invalidateFilter()
-        self.filter_applied = True
-
-    def filterAcceptsRow(self, row, index):
-        if not self.filter_applied:
-            return True
-        try:
-            source_model = self.sourceModel()
-            size = source_model.columnCount()
-            for i in range(size):
-                if self.filter_map is not None and self.filter_map[i] is not None and self.filter_map[i] != '':
-                    filter_string = self.filter_map[i]
-                    cell = source_model.data(source_model.index(row, i), Qt.DisplayRole)
-                    if str(cell.value()).find(filter_string) == -1:
-                        return False
-        except Exception as e:
-            logging.exception(str(e))
-        return True

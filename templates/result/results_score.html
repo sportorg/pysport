@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Sportorg Start List - {{ title }}</title>
+    <title>Sportorg Results - {{ title }}</title>
 {% raw %}
     <style>
         table {
@@ -168,12 +168,12 @@
 <body>
 {% macro view_groups() -%}{% for group in groups %}<a href="#{{group.name}}">{{group.name}}</a> {% endfor %}{%- endmacro %}
 <div>
-    <h1>{{ race.sub_title }}<br> {{ race.date }}</h1>
+    <h1>{{ race.sub_title }} <br>{{ race.date }}</h1>
     <table>
     {% for group in groups %}
     {% if group.persons|length %}
         <tr style="background: white; border: 0">
-        <td colspan="8" style="border: 0">
+        <td colspan="7" style="border: 0">
             <h2 id="{{group.name}}">{{group.name}}</h2>
             <div class="no-print">{{ view_groups() }}</div>
         </td>
@@ -185,8 +185,12 @@
             <td>Разряд</td>
             <td>ГР</td>
             <td>Номер</td>
-            <td>Номер чипа</td>
-            <td>Время старта</td>
+            <td>Результат</td>
+            <td>Место</td>
+            <td>Очки</td>
+            {% if group.ranking.rank_scores and group.ranking.rank_scores > 0 %}
+                <td>Вып.</td>
+            {% endif %}
         </tr>
         {% for person in group.persons %}
         <tr>
@@ -196,10 +200,31 @@
             <td>{{ person.qual }}</td>
             <td>{{ person.year }}</td>
             <td>{{ person.bib }}</td>
-            <td>{{ person.sportident_card }}</td>
-            <td>{{ person.start }}</td>
+            <td>{{ person.result }}</td>
+            <td>{{ person.place }}</td>
+            <td>{{ person.scores }}</td>
+            {% if group.ranking.rank_scores and group.ranking.rank_scores > 0 %}
+                <td>{{ person.assigned_rank }}</td>
+            {% endif %}
         </tr>
         {% endfor %}
+        <tr style="background: white; border: 0">
+            <td colspan="7" style="border: 0">
+                {% if group.ranking.rank_scores and group.ranking.rank_scores > 0 %}
+                    Квалификационный уровень (баллы): {{group.ranking.rank_scores}}<br>
+                    Класс дистанции: {{group.ranking.max_qual}}<br>
+                    {% for rank in group.ranking.rank %}
+                        {{"{}".format(rank.qual)}} --
+                        {% if rank.max_place %}
+                            до {{rank.max_place}} места
+                        {% else %}
+                            {{rank.max_time}} ({{rank.percent}}%)
+                        {% endif %}
+                        <br>
+                    {% endfor %}
+                {% endif %}
+            </td>
+        </tr>
     {% endif %}
     {% endfor %}
     </table>

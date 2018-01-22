@@ -155,8 +155,8 @@ class ScoreCalculation(object):
             })
         ret['groups'] = data
         ret['race'] = {
-            'title': race().get_setting('main_title'),
-            'sub_title': race().get_setting('sub_title')
+            'title': race().get_setting('main_title', ''),
+            'sub_title': race().get_setting('sub_title', '')
         }
         return ret
 

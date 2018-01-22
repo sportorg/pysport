@@ -1093,3 +1093,12 @@ msgstr "Открыть в браузере"
 msgid "Save to last file"
 msgstr "Сохранить в последний файл"
 
+msgid "Change status"
+msgstr "Изменить статус"
+
+msgid "Not started numbers"
+msgstr "Не стартовавшие участники"
+
+msgid "Set DNS numbers"
+msgstr "Ввести номера со статусом DNS"
+

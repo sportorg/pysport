@@ -81,7 +81,7 @@ class DrawManager(object):
                 team = current_person.organization.name
                 region = current_person.organization.address.state
 
-            self.person_array.append([index, group, start_group, team, region])
+            self.person_array.append([index, group, '{:03}'.format(start_group), team, region])
 
         # shuffle
         random.shuffle(self.person_array)

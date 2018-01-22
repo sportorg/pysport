@@ -4,7 +4,7 @@ from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QAbstractItemView, QHeaderView
 
 from sportorg.gui.dialogs.entry_edit import EntryEditDialog
-from sportorg.gui.global_access import GlobalAccess
+from sportorg.gui.global_access import GlobalAccess, NumberClicker
 from sportorg.gui.tabs.memory_model import PersonMemoryModel
 from sportorg.gui.tabs.table import TableView
 from sportorg.language import _
@@ -20,11 +20,26 @@ class StartPreparationTableView(TableView):
             (_('Delete'), GlobalAccess().get_main_window().delete_object)
         ]
 
+    def set_start_group(self, number):
+        if -1 < self.currentIndex().row() < len(race().persons):
+            person = race().persons[self.currentIndex().row()]
+            person.start_group = number
+
 
 class Widget(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
         self.setup_ui()
+
+    def keyPressEvent(self, e):
+        key_numbers = [i for i in range(48, 57)]
+        key = e.key()
+        try:
+            if key in key_numbers:
+                self.EntryTable.set_start_group(NumberClicker().click(key_numbers.index(key)))
+                GlobalAccess().refresh()
+        except Exception as e:
+            print(str(e))
 
     def setup_ui(self):
         self.setAcceptDrops(False)

@@ -166,10 +166,11 @@ class CourseControl(Model):
         res = ''
 
         index = 0
-        while char.isdigit() and index < len(tmp) - 1:
+        while char.isdigit() and index <= len(tmp) - 1:
             res += char
             index += 1
-            char = tmp[index]
+            if index < len(tmp):
+                char = tmp[index]
         return int(res)
 
 
@@ -1012,10 +1013,10 @@ class RelayLeg(object):
 
 class RelayTeam(object):
     def __init__(self):
-        self.group = None # type:Group
-        self.legs = [] # type:list[RelayLeg]
-        self.description = '' # Name of team, optional
-        self.bib_number = None # bib
+        self.group = None  # type:Group
+        self.legs = []  # type:list[RelayLeg]
+        self.description = ''  # Name of team, optional
+        self.bib_number = None  # bib
         self.last_finished_leg = 0
         self.last_correct_leg = 0
 
@@ -1037,7 +1038,6 @@ class RelayTeam(object):
             return self.get_lap_finished() < other.get_lap_finished()
 
         return self.get_time() > other.get_time()
-
 
     def get_all_results(self):
         """return: all results of persons, connected with team"""

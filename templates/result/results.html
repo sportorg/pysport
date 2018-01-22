@@ -168,7 +168,7 @@
 <body>
 {% macro view_groups() -%}{% for group in groups %}<a href="#{{group.name}}">{{group.name}}</a> {% endfor %}{%- endmacro %}
 <div>
-    <h1>{{ race.sub_title }}</h1>
+    <h1>{{ race.sub_title }} <br>{{ race.date }}</h1>
     <table>
     {% for group in groups %}
     {% if group.persons|length %}
@@ -185,7 +185,6 @@
             <td>Разряд</td>
             <td>ГР</td>
             <td>Номер</td>
-            <td>Штраф</td>
             <td>Результат</td>
             <td>Место</td>
             {% if group.ranking.rank_scores and group.ranking.rank_scores > 0 %}
@@ -200,7 +199,6 @@
             <td>{{ person.qual }}</td>
             <td>{{ person.year }}</td>
             <td>{{ person.bib }}</td>
-            <td>{{ person.penalty_time }}</td>
             <td>{{ person.result }}</td>
             <td>{{ person.place }}</td>
             {% if group.ranking.rank_scores and group.ranking.rank_scores > 0 %}

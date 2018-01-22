@@ -121,6 +121,7 @@ class ResultEditDialog(QDialog):
         self.layout.addRow(button_box)
 
         self.show()
+        self.item_bib.setFocus()
 
     def show_person_info(self):
         bib = self.item_bib.value()
@@ -253,7 +254,7 @@ class ResultEditDialog(QDialog):
             status = ResultStatus.DID_NOT_FINISH
         elif self.radio_dns.isChecked():
             status = ResultStatus.DID_NOT_START
-        if result.status != status and not recheck:
+        if result.status != status:
             result.status = status
             changed = True
 

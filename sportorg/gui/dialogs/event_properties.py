@@ -13,11 +13,6 @@ from sportorg.models.memory import race, RaceType
 from sportorg.models.result.result_calculation import ResultCalculation
 
 
-def get_sport_kinds():
-    ret = [_('orienteering'), _('running'), _('cross country')]
-    return ret
-
-
 class EventPropertiesDialog(QDialog):
     def __init__(self):
         super().__init__(GlobalAccess().get_main_window())
@@ -59,11 +54,6 @@ class EventPropertiesDialog(QDialog):
         self.item_location = QLineEdit()
         self.layout.addRow(self.label_location, self.item_location)
 
-        self.label_sport = QLabel(_('Sport kind'))
-        self.item_sport = AdvComboBox()
-        self.item_sport.addItems(get_sport_kinds())
-        self.layout.addRow(self.label_sport, self.item_sport)
-
         self.label_type = QLabel(_('Event type'))
         self.item_type = AdvComboBox()
         self.item_type.addItems(RaceType.get_titles())
@@ -85,6 +75,10 @@ class EventPropertiesDialog(QDialog):
         self.label_secretary = QLabel(_('Secretary'))
         self.item_secretary = QLineEdit()
         self.layout.addRow(self.label_secretary, self.item_secretary)
+
+        self.label_url = QLabel(_('URL'))
+        self.item_url = QLineEdit()
+        self.layout.addRow(self.label_url, self.item_url)
 
         def cancel_changes():
             self.close()
@@ -116,14 +110,14 @@ class EventPropertiesDialog(QDialog):
 
     def set_values_from_model(self):
         obj = race()
-        self.item_main_title.setText(str(obj.get_setting('main_title')))
-        self.item_sub_title.setText(str(obj.get_setting('sub_title')))
-        self.item_location.setText(str(obj.get_setting('location')))
-        self.item_refery.setText(str(obj.get_setting('chief_referee')))
-        self.item_secretary.setText(str(obj.get_setting('secretary')))
+        self.item_main_title.setText(str(obj.get_setting('main_title', '')))
+        self.item_sub_title.setText(str(obj.get_setting('sub_title', '')))
+        self.item_location.setText(str(obj.get_setting('location', '')))
+        self.item_url.setText(str(obj.get_setting('url', '')))
+        self.item_refery.setText(str(obj.get_setting('chief_referee', '')))
+        self.item_secretary.setText(str(obj.get_setting('secretary', '')))
         self.item_start_date.setDateTime(obj.get_setting('start_date', datetime.now().replace(second=0, microsecond=0)))
         self.item_end_date.setDateTime(obj.get_setting('end_date', datetime.now().replace(second=0, microsecond=0)))
-        self.item_sport.setCurrentIndex(obj.get_setting('sport_kind_index', 0))
         self.item_type.setCurrentIndex(obj.get_setting('race_type', RaceType.INDIVIDUAL_RACE).value)
         self.item_relay_legs.setValue(obj.get_setting('relay_leg_count', 3))
         self.change_type()
@@ -138,11 +132,11 @@ class EventPropertiesDialog(QDialog):
         obj.set_setting('main_title', self.item_main_title.text())
         obj.set_setting('sub_title', self.item_sub_title.toPlainText())
         obj.set_setting('location', self.item_location.text())
+        obj.set_setting('url', self.item_url.text())
         obj.set_setting('chief_referee', self.item_refery.text())
         obj.set_setting('secretary', self.item_secretary.text())
         obj.set_setting('start_date', start_date)
         obj.set_setting('end_date', end_date)
-        obj.set_setting('sport_kind_index', self.item_sport.currentIndex())
         obj.set_setting('race_type', RaceType(self.item_type.currentIndex()))
         obj.set_setting('relay_leg_count', self.item_relay_legs.value())
 

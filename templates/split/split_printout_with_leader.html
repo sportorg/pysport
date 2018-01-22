@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Sportorg Start List - {{ title }}</title>
+    <title>Sportorg Results - {{ title }}</title>
 {% raw %}
     <style>
         table {
@@ -166,43 +166,30 @@
 {% endraw %}
 </head>
 <body>
-{% macro view_groups() -%}{% for group in groups %}<a href="#{{group.name}}">{{group.name}}</a> {% endfor %}{%- endmacro %}
-<div>
-    <h1>{{ race.sub_title }}<br> {{ race.date }}</h1>
-    <table>
+<article class="markdown-body">
+<code>
     {% for group in groups %}
-    {% if group.persons|length %}
-        <tr style="background: white; border: 0">
-        <td colspan="8" style="border: 0">
-            <h2 id="{{group.name}}">{{group.name}}</h2>
-            <div class="no-print">{{ view_groups() }}</div>
-        </td>
-        </tr>
-        <tr>
-            <td>№</td>
-            <td>Фамилия, имя</td>
-            <td>Коллектив</td>
-            <td>Разряд</td>
-            <td>ГР</td>
-            <td>Номер</td>
-            <td>Номер чипа</td>
-            <td>Время старта</td>
-        </tr>
-        {% for person in group.persons %}
-        <tr>
-            <td>{{ loop.index }}</td>
-            <td>{{ person.name }}</td>
-            <td>{{ person.team }}</td>
-            <td>{{ person.qual }}</td>
-            <td>{{ person.year }}</td>
-            <td>{{ person.bib }}</td>
-            <td>{{ person.sportident_card }}</td>
-            <td>{{ person.start }}</td>
-        </tr>
+    <!--<h3>{{ group.name }}</h3>-->
+    {% for person in group.persons %}
+        <h4>{{ person.name }} - {{ group.name }}</h4>
+        <br> Команда: {{person.team}}
+        <br> Номер: {{person.bib}} SI-card: {{person.sportident_card}}
+        <br> Финиш:.......{{person.finish}}
+        <br> Старт:.......{{person.start}}
+        <br> Результат:...{{person.result}}
+        <br> Место: {{person.place}} из {{group.count_finished}} (всего {{group.count_all}})
+        {% for leg in person.legs %}
+            <br>
+            {% if leg.status == 'correct' %}
+                {{"{:02}".format(leg.course_index)}}.<b>{{"{:>3}".format(leg.code)}}</b>: <b>{{leg.leg_time}}</b> {{leg.absolute_time}} {{leg.speed}} ({{leg.leg_place}})
+                <br>лидер : {{leg.leader_time}} ({{leg.leader_name}})
+            {% else %}
+                ---{{"{:>3}".format(leg.code)}} --- {{leg.absolute_time}} --- нарушен порядок
+            {% endif %}
         {% endfor %}
-    {% endif %}
     {% endfor %}
-    </table>
-</div>
+    {% endfor %}
+</code>
+</article>
 </body>
 </html>

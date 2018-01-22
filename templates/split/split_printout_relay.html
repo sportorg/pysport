@@ -8,6 +8,9 @@
         td {
             padding-right: 7px;
         }
+        body {
+            font-weight: bold;
+        }
 
         .small-text {
             font-size: 75%;
@@ -149,7 +152,6 @@
                     <td>{{leg.absolute_time}}</td>
                     <td>{{leg.leg_time}}</td>
                     <td>{{leg.speed}}</td>
-                    <td>{{leg.leg_place}}</td>
                 </tr>
             {% else %}
                 <tr>
@@ -158,22 +160,22 @@
                     <td>{{leg.absolute_time}}</td>
                     <td></td>
                     <td></td>
-                    <td></td>
                 </tr>
             {% endif %}
         {% endfor %}
         </table>
         <br> Финиш: {{person.finish}} {{person.finish_time}}
-        <br> Результат: {{person.result}}
-        {% if person.place %}
-            <br> Место: {{person.place}} из {{group.count_finished}} (всего {{group.count_all}})
-        {% endif %}
+        <br> Результат команды: {{person.result}}
         <br>
         {% if person.status != 1 %}
-            {% for control in group.controls %}
-                {{control.code}}
+            {% for control in person.controls %}
+                {{control}}
             {% endfor %}
         {% endif %}
+        <br> {{ race.title }}
+        <br> {{ race.date }}
+        <br> {{ race.location }}
+        <br> {{ race.url }}
     {% endfor %}
     {% endfor %}
 </code>

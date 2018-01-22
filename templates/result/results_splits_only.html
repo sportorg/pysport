@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Sportorg Start List - {{ title }}</title>
+    <title>Sportorg Results - {{ title }}</title>
 {% raw %}
     <style>
         table {
@@ -25,7 +25,6 @@
             display: block;
             width: 100%;
             overflow: auto;
-            word-break: normal;
             word-break: keep-all;
         }
 
@@ -33,18 +32,23 @@
             font-weight: bold;
         }
 
-        table th,
-        table td {
+        .table-result th,
+        .table-result td {
             padding: 3px 13px;
             border: 1px solid #ddd;
         }
 
-        table tr {
+        .no-padding th,
+        .no-padding td         {
+            padding: 1px;
+        }
+
+        .table-result .tr-result {
             background-color: #fff;
             border-top: 1px solid #ccc;
         }
 
-        table tr:nth-child(2n) {
+        .table-result .tr-result:nth-child(2n) {
             background-color: #f8f8f8;
         }
 
@@ -113,6 +117,39 @@
             display: block;
         }
 
+        .nowrap {
+            white-space: nowrap;
+        }
+
+        .table-leg {
+            padding: 0;
+            margin: 0;
+        }
+        .table-leg th,
+        .table-leg td {
+            border: 0;
+        }
+
+        .table-leg tr {
+            border-top: 0;
+        }
+
+        .result-1,
+        .result-2,
+        .result-3 {
+            font-weight: bold;
+        }
+
+        .result-1 {
+            /*background: gold;*/
+        }
+        .result-2 {
+            /*background: silver;*/
+        }
+        .result-3 {
+            /*background: #cd7f32;*/
+        }
+
         @media print {
             @page {
                 margin: 0.5cm;
@@ -168,41 +205,41 @@
 <body>
 {% macro view_groups() -%}{% for group in groups %}<a href="#{{group.name}}">{{group.name}}</a> {% endfor %}{%- endmacro %}
 <div>
-    <h1>{{ race.sub_title }}<br> {{ race.date }}</h1>
-    <table>
+    <h1>{{ race.sub_title }} <br>{{ race.date }}</h1>
     {% for group in groups %}
     {% if group.persons|length %}
-        <tr style="background: white; border: 0">
-        <td colspan="8" style="border: 0">
-            <h2 id="{{group.name}}">{{group.name}}</h2>
-            <div class="no-print">{{ view_groups() }}</div>
-        </td>
-        </tr>
+    <h2 id="{{group.name}}">{{group.name}}</h2>
+    <div class="no-print">{{ view_groups() }}</div>
+    <table class="table-result">
         <tr>
             <td>№</td>
             <td>Фамилия, имя</td>
             <td>Коллектив</td>
             <td>Разряд</td>
             <td>ГР</td>
-            <td>Номер</td>
-            <td>Номер чипа</td>
-            <td>Время старта</td>
+            <td>Результат</td>
+            <td>Место</td>
         </tr>
         {% for person in group.persons %}
-        <tr>
+        <tr class="tr-result">
             <td>{{ loop.index }}</td>
-            <td>{{ person.name }}</td>
-            <td>{{ person.team }}</td>
+            <td class="nowrap">{{ person.name }}</td>
+            <td class="nowrap">{{ person.team }}</td>
             <td>{{ person.qual }}</td>
             <td>{{ person.year }}</td>
-            <td>{{ person.bib }}</td>
-            <td>{{ person.sportident_card }}</td>
-            <td>{{ person.start }}</td>
+            <td>{{ person.result }}</td>
+            <td>{{ person.place }}</td>
+            {% for split in person.splits %}
+                <td>
+                    {{ split.code }}
+                    {{ split.time }}
+                </td>
+            {% endfor %}
         </tr>
         {% endfor %}
+    </table>
     {% endif %}
     {% endfor %}
-    </table>
 </div>
 </body>
 </html>

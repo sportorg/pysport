@@ -4,6 +4,7 @@ from sportorg.core.otime import OTime
 from sportorg.language import _
 from sportorg.models.memory import race, Result, Person, ResultStatus, Course, Group, Qualification, RankingItem, \
     RelayTeam, RaceType
+from sportorg.models.result.result_checker import find_course
 from sportorg.utils.time import time_to_hhmmss
 
 
@@ -107,7 +108,6 @@ class ResultCalculation(object):
                 place += 1
 
             return relay_teams.values()
-
 
     def set_rank(self, group):
         assert isinstance(group, Group)
@@ -371,7 +371,8 @@ def get_splits_data_printout(person):
 
     assert isinstance(person, Person)
     group = person.group
-    course = group.course
+    # course = group.course
+    course = find_course(person)
     assert isinstance(course, Course)
     result = person.result
 

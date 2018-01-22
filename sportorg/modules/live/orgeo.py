@@ -113,11 +113,11 @@ class OrgeoClient(metaclass=Singleton):
             "national_code": None,
             "world_code": None,
             "out_of_competition": person.is_out_of_competition,
-            "start": person.start_time.to_minute() if person.start_time else 0
+            "start": person.start_time.to_sec() if person.start_time else 0
         }
         if result is not None:
             assert result, Result
-            data['start'] = result.get_start_time().to_minute()
+            data['start'] = result.get_start_time().to_sec()
             data['result_ms'] = result.get_result_for_sort()
             data['result_status'] = str(result.status)
             if result.system_type == SystemType.SPORTIDENT:
@@ -126,7 +126,7 @@ class OrgeoClient(metaclass=Singleton):
                     for split in result.splits:
                         data['splits'].append({
                             'code': str(split.code),
-                            'time': split.time.to_minute()
+                            'time': split.time.to_sec()
                         })
 
         return data
@@ -179,7 +179,8 @@ class OrgeoClient(metaclass=Singleton):
     def send_start_list(self):
         if self.is_enabled():
             self._start_thread()
-            self._queue.put(OrgeoCommand('start_list', self.get_url(), self.get_start_list_data()))
+            data = self.get_start_list_data()
+            self._queue.put(OrgeoCommand('start_list', self.get_url(), data))
 
     def clear(self):
         self._result_ids.clear()

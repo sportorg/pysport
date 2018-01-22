@@ -245,6 +245,7 @@ def menu_list():
                 },
                 {
                     'title': _('Split printout'),
+                    'shortcut': 'Ctrl+L',
                     'action': GlobalAccess().get_main_window().split_printout_selected
                 },
                 {
@@ -262,6 +263,15 @@ def menu_list():
                 {
                     'title': _('Penalty removing'),
                     'action': GlobalAccess().penalty_removing
+                },
+                {
+                    'title': _('Change status'),
+                    'shortcut': 'F4',
+                    'action': GlobalAccess().get_main_window().change_status
+                },
+                {
+                    'title': _('Set DNS numbers'),
+                    'action': GlobalAccess().get_main_window().not_start_dialog
                 },
                 {
                     'title': _('Add SPORTident result'),

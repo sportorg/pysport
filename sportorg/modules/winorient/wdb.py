@@ -79,7 +79,7 @@ class WinOrientBinary:
             # controls
             for i in range(course.point_quantity):
                 control = CourseControl()
-                control.code = course.point[i]
+                control.code = str(course.point[i])
                 if i < len(course.leg):
                     control.length = course.leg[i]
                 new_course.controls.append(control)
@@ -162,11 +162,11 @@ class WinOrientBinary:
         wdb_object = WDB()
         my_race = race()
 
-        title = my_race.get_setting('sub_title')
+        title = my_race.get_setting('sub_title', '')
         wdb_object.info.title = title.split('\n')
-        wdb_object.info.place = my_race.get_setting('location')
-        wdb_object.info.referee = my_race.get_setting('chief_referee')
-        wdb_object.info.secretary = my_race.get_setting('secretary')
+        wdb_object.info.place = my_race.get_setting('location', '')
+        wdb_object.info.referee = my_race.get_setting('chief_referee', '')
+        wdb_object.info.secretary = my_race.get_setting('secretary', '')
 
         for team in my_race.organizations:
             new_team = WDBTeam()
@@ -273,7 +273,8 @@ class WinOrientBinary:
 
                 if result.splits:
                     new_chip = WDBChip()
-                    new_chip.id = int(man.sportident_card)
+                    if man.sportident_card:
+                        new_chip.id = int(man.sportident_card)
                     new_chip.start = WDBPunch(time=time_to_int(result.start_time))
                     new_chip.finish = WDBPunch(time=time_to_int(result.finish_time))
 

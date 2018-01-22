@@ -174,42 +174,64 @@ class Widget(QtWidgets.QWidget):
         self.ResultCourseDetails.clear()
         self.ResultCourseNameEdit.setText('')
         self.ResultCourseLengthEdit.setText('')
+
+        course = None
+        if result.person:
+            course = find_course(result.person)
+
         if result.system_type != SystemType.SPORTIDENT:
             return
+
+        control_codes = []
+        if course:
+            assert isinstance(course, Course)
+            for control in course.controls:
+                control_codes.append(str(control.code))
+
+        prev_time = result.get_start_time()
+        code = -1
         index = 1
-        prev_time = result.start_time if result.start_time is not None else OTime()
         for split in result.splits:
             time = split.time
-            
             s = '{index} ({code}) {time} {diff}'.format(
                 index=index,
                 code=split.code,
                 time=time_to_hhmmss(time),
                 diff=time_to_hhmmss(time-prev_time))
+            if split.code == code:
+                s = '<span style="background: red">{}</span>'.format(s)
+            if len(control_codes) and str(split.code) not in control_codes:
+                s = '<span style="background: yellow">{}</span>'.format(s)
+            code = split.code
             self.ResultChipDetails.append(s)
             index += 1
             prev_time = time
+
         if result.finish_time is not None:
             self.ResultChipFinishEdit.setText(time_to_hhmmss(result.finish_time))
         if result.start_time is not None:
             self.ResultChipStartEdit.setText(time_to_hhmmss(result.start_time))
 
-        index = 1
-        if result.person:
-            course = find_course(result.person)
-            if course:
-                assert isinstance(course, Course)
-                if course.controls is not None:
-                    for control in course.controls:
-                        assert isinstance(control, CourseControl)
-                        s = '{index} {code} {length}'.format(
-                            index=index,
-                            code=control.code,
-                            length=control.length if control.length else '')
-                        self.ResultCourseDetails.append(s)
-                        index += 1
-                self.ResultCourseNameEdit.setText(course.name)
-                self.ResultCourseLengthEdit.setText(str(course.length))
+        split_codes = []
+        for split in result.splits:
+            split_codes.append(str(split.code))
+
+        if course:
+            if course.controls is not None:
+                index = 1
+                for control in course.controls:
+                    assert isinstance(control, CourseControl)
+                    s = '{index} {code} {length}'.format(
+                        index=index,
+                        code=control.code,
+                        length=control.length if control.length else '')
+                    if str(control.code) not in split_codes:
+                        s = '<span style="background: yellow">{}</span>'.format(s)
+                    self.ResultCourseDetails.append(s)
+                    index += 1
+
+            self.ResultCourseNameEdit.setText(course.name)
+            self.ResultCourseLengthEdit.setText(str(course.length))
 
     def resize_event(self, koor):
         self.ResultCourseGroupBox.setGeometry(QtCore.QRect(1, 1, 120, koor['height']-140))
