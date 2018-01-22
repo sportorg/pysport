@@ -217,13 +217,6 @@ class NumberClicker(metaclass=Singleton):
     def __init__(self):
         self.key = ''
         self.time = time.time()
-        self.is_work = False
-
-    def toggle(self):
-        self.is_work = not self.is_work
-
-    def is_work(self):
-        return self.is_work
 
     def click(self, number):
         t = time.time()
@@ -231,7 +224,6 @@ class NumberClicker(metaclass=Singleton):
             self.time = t
             self.key += str(number)
             return int(self.key)
-        else:
-            self.key = ''
-            self.time = t
+        self.time = t
+        self.key = str(number)
         return int(number)
