@@ -18,6 +18,7 @@ from sportorg.libs.winorient.wdb import write_wdb
 from sportorg.models.memory import Race, event as races, race, ResultStatus
 
 from sportorg import config
+from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.modules.backup.file import File
 from sportorg.modules.iof import iof_xml
 from sportorg.modules.live.orgeo import OrgeoClient
@@ -26,6 +27,7 @@ from sportorg.modules.ocad.ocad import OcadImportException
 from sportorg.modules.printing.model import NoResultToPrintException, split_printout, NoPrinterSelectedException
 from sportorg.modules import testing
 from sportorg.modules.configs.configs import Config as Configuration, ConfigFile
+from sportorg.modules.sportident.result_generation import ResultSportidentGeneration
 from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.modules.winorient import winorient
 from sportorg.core import event
@@ -647,12 +649,31 @@ class MainWindow(QMainWindow):
         except Exception as e:
             logging.exception(str(e))
 
-    @staticmethod
-    def sportident_connect():
+    def sportident_connect(self):
         try:
-            SIReaderClient().start()
+            SIReaderClient().set_call(self.add_sportident_result_from_sireader).start()
         except Exception as e:
             logging.exception(str(e))
+
+    @staticmethod
+    def add_sportident_result_from_sireader(result):
+        assignment_mode = race().get_setting('sportident_assignment_mode', False)
+        if not assignment_mode:
+            GlobalAccess().clear_filters(remove_condition=False)
+            ResultSportidentGeneration(result).add_result()
+            ResultCalculation().process_results()
+            if race().get_setting('split_printout', False):
+                try:
+                    split_printout(result)
+                except NoResultToPrintException as e:
+                    logging.error(str(e))
+                except NoPrinterSelectedException as e:
+                    logging.error(str(e))
+                except Exception as e:
+                    logging.exception(str(e))
+            GlobalAccess().auto_save()
+            OrgeoClient().send_results()
+        GlobalAccess().get_main_window().init_model()
 
     def import_wo_csv(self):
         file_name = get_open_file_name(_('Open CSV Winorient file'), _("CSV Winorient (*.csv)"))

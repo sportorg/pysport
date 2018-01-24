@@ -6,18 +6,13 @@ from threading import main_thread, Event
 import time
 
 import serial
-from PyQt5.QtCore import QThread
+from PyQt5.QtCore import QThread, pyqtSignal
 
 from sportorg.core.singleton import Singleton
 from sportorg.language import _
-from sportorg.gui.global_access import GlobalAccess
 from sportorg.libs.sportident import sireader
 from sportorg.models import memory
-from sportorg.models.result.result_calculation import ResultCalculation
-from sportorg.modules.live.orgeo import OrgeoClient
-from sportorg.modules.printing.model import split_printout, NoResultToPrintException, NoPrinterSelectedException
 from sportorg.modules.sportident import backup
-from sportorg.modules.sportident.result_generation import ResultSportidentGeneration
 from sportorg.utils.time import time_to_otime
 
 
@@ -68,6 +63,8 @@ class SIReaderThread(QThread):
 
 
 class ResultThread(QThread):
+    data_sender = pyqtSignal(object)
+
     def __init__(self, queue, stop_event, logger, start_time=None):
         super().__init__()
         # self.setName(self.__class__.__name__)
@@ -78,7 +75,7 @@ class ResultThread(QThread):
         self.start_time = start_time
 
     def run(self):
-        time.sleep(5)
+        time.sleep(3)
         while True:
             try:
                 while True:
@@ -91,25 +88,9 @@ class ResultThread(QThread):
 
                 cmd = self._queue.get()
                 if cmd.command == 'card_data':
-                    assignment_mode = memory.race().get_setting('sportident_assignment_mode', False)
-                    if not assignment_mode:
-                        result = self._get_result(self._check_data(cmd.data))
-                        GlobalAccess().clear_filters(remove_condition=False)
-                        ResultSportidentGeneration(result).add_result()
-                        ResultCalculation().process_results()
-                        if memory.race().get_setting('split_printout', False):
-                            try:
-                                split_printout(result)
-                            except NoResultToPrintException as e:
-                                logging.error(str(e))
-                            except NoPrinterSelectedException as e:
-                                logging.error(str(e))
-                            except Exception as e:
-                                logging.exception(str(e))
-                        GlobalAccess().auto_save()
-                        backup.backup_data(cmd.data)
-                        OrgeoClient().send_results()
-                    # GlobalAccess().get_main_window().init_model()
+                    result = self._get_result(self._check_data(cmd.data))
+                    self.data_sender.emit(result)
+                    backup.backup_data(cmd.data)
             except Exception as e:
                 self._logger.exception(str(e))
 
@@ -162,6 +143,7 @@ class SIReaderClient(metaclass=Singleton):
         self._result_thread = None
         self.port = None
         self._logger = logging.root
+        self._call_back = None
 
         start_time = memory.race().get_setting('sportident_zero_time', (8, 0, 0))
         self._start_time = datetime.datetime.today().replace(
@@ -170,6 +152,11 @@ class SIReaderClient(metaclass=Singleton):
             second=start_time[2],
             microsecond=0
         )
+
+    def set_call(self, value):
+        if self._call_back is None:
+            self._call_back = value
+        return self
 
     def _start_si_reader_thread(self):
         if self._si_reader_thread is None:
@@ -193,6 +180,9 @@ class SIReaderClient(metaclass=Singleton):
                 self._logger,
                 self._start_time
             )
+            if self._call_back is not None:
+                self._logger.info('call back')
+                self._result_thread.data_sender.connect(self._call_back)
             self._result_thread.start()
         # elif not self._result_thread.is_alive():
         elif self._result_thread.isFinished():
@@ -218,7 +208,6 @@ class SIReaderClient(metaclass=Singleton):
             self._logger.info(_('Opening port') + ' ' + self.port)
         else:
             self._logger.info(_('Cannot open port'))
-            self._logger.info(_('SPORTident readout activated'))
 
     def stop(self):
         self._stop_event.set()
