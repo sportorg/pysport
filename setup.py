@@ -7,7 +7,7 @@ if sys.platform == 'win32':
     base = 'Win32GUI'
 
 include_files = [config.LOCALE_DIR, config.TEMPLATE_DIR, config.IMG_DIR, config.base_dir('LICENSE'),
-                 config.base_dir('changelog.md')]
+                 config.base_dir('changelog.md'), config.base_dir('changelog_ru.md')]
 includes = ['atexit', 'codecs']
 excludes = ['Tkinter']
 
