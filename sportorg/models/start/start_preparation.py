@@ -7,6 +7,8 @@ from sportorg.models.memory import race, Group, Person
 
 
 class ReserveManager(object):
+    def __init__(self, r):
+        self.race = r
     """
         Inserts reserve athletes into each group
         You can specify minimum quantity of person or percentage to add in each group
@@ -14,9 +16,8 @@ class ReserveManager(object):
 
         Now effect on all groups, but in future we'll possible implement working with selected groups only
     """
-    @staticmethod
-    def process(reserve_prefix, reserve_count, reserve_percent):
-        current_race = race()
+    def process(self, reserve_prefix, reserve_count, reserve_percent):
+        current_race = self.race
 
         for current_group in current_race.groups:
             assert isinstance(current_group, Group)
@@ -47,7 +48,8 @@ class DrawManager(object):
         Execute draw in each group
         Now effect on all groups, but in future we'll possible implement working with filtered persons
     """
-    def __init__(self):
+    def __init__(self, r):
+        self.race = r
         self.person_array = []
         self.mix_groups = False
         self.split_regions = False
@@ -55,7 +57,7 @@ class DrawManager(object):
         self.split_start_groups = False
 
     def process(self, split_start_groups, split_teams, split_regions, mix_groups=False):
-        current_race = race()
+        current_race = self.race
         current_race.update_counters()
 
         self.mix_groups = mix_groups
@@ -202,6 +204,9 @@ class DrawManager(object):
 
 
 class StartNumberManager(object):
+
+    def __init__(self, r):
+        self.race = r
     """
         Assign new start numbers
 
@@ -226,7 +231,7 @@ class StartNumberManager(object):
                 cur_num = cur_num - (cur_num % 100) + 100
 
     def process_group(self, group, first_number, interval):
-        current_race = race()
+        current_race = self.race
         persons = current_race.get_persons_by_group(group)
         current_num = first_number
         if persons is not None:
@@ -236,7 +241,7 @@ class StartNumberManager(object):
         return current_num
 
     def process_corridor(self, corridor, first_number, interval):
-        current_race = race()
+        current_race = self.race
         persons = current_race.get_persons_by_corridor(corridor)
         current_num = first_number
         if persons is not None:
@@ -246,7 +251,7 @@ class StartNumberManager(object):
         return current_num
 
     def process_group_number_by_minute(self, group, first_number):
-        current_race = race()
+        current_race = self.race
         persons = current_race.get_persons_by_group(group)
         if persons is not None and len(persons) > 0:
             first_start = persons[0].start_time
@@ -266,12 +271,15 @@ class StartNumberManager(object):
 
 
 class StartTimeManager(object):
+
+    def __init__(self, r):
+        self.race = r
     """
         Set new start time for athletes
 
     """
     def process(self, corridor_first_start, is_group_start_interval, fixed_start_interval=None, mix_groups=False):
-        current_race = race()
+        current_race = self.race
         current_race.update_counters()
 
         corridors = get_corridors()
@@ -294,7 +302,7 @@ class StartTimeManager(object):
                     cur_start = self.process_group(cur_group, cur_start, start_interval)
 
     def process_group(self, group, first_start, start_interval):
-        current_race = race()
+        current_race = self.race
         persons = current_race.get_persons_by_group(group)
         current_start = first_start
         if persons is not None:
@@ -304,7 +312,7 @@ class StartTimeManager(object):
         return current_start
 
     def process_corridor(self, corridor, first_start, start_interval):
-        current_race = race()
+        current_race = self.race
         persons = current_race.get_persons_by_corridor(corridor)
         if persons is not None:
             current_start = first_start

@@ -1,11 +1,11 @@
 import logging
 
 from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtWidgets import QDialog, QPushButton, QDialogButtonBox, QVBoxLayout, QWidget
+from PyQt5.QtWidgets import QDialog, QDialogButtonBox, QVBoxLayout, QWidget
 
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import _
-from sportorg.models.memory import race, Person, find_person_result
+from sportorg.models.memory import race, Person
 from sportorg.utils.time import time_to_hhmmss, hhmmss_to_time
 
 
@@ -225,27 +225,27 @@ def get_property(person, key):
     assert isinstance(person, Person)
 
     if key == _('Start'):
-        result = find_person_result(person)
+        result = race().find_person_result(person)
         if result:
             return time_to_hhmmss(result.get_start_time())
         else:
             return time_to_hhmmss(person.start_time)
     elif key == _('Finish'):
-        result = find_person_result(person)
+        result = race().find_person_result(person)
         if result:
             return time_to_hhmmss(result.get_finish_time())
     elif key == _('Result'):
-        result = find_person_result(person)
+        result = race().find_person_result(person)
         if result:
             return result.get_result()
     elif key == _('Penalty time'):
-        result = find_person_result(person)
+        result = race().find_person_result(person)
         if result:
             return time_to_hhmmss(result.get_penalty_time())
         else:
             return '00:00:00'
     elif key == _('Penalty legs'):
-        result = find_person_result(person)
+        result = frace().find_person_result(person)
         if result and result.penalty_laps:
             return str(result.penalty_laps)
     elif key == _('Card number'):
@@ -266,23 +266,23 @@ def get_property(person, key):
 def set_property(person, key, value):
     assert isinstance(person, Person)
     if key == _('Start'):
-        result = find_person_result(person)
+        result = race().find_person_result(person)
         if result:
             result.start_time = hhmmss_to_time(value)
         else:
             person.start_time = hhmmss_to_time(value)
     elif key == _('Finish'):
-        result = find_person_result(person)
+        result = race().find_person_result(person)
         if result:
             result.finish_time = hhmmss_to_time(value)
     elif key == _('Result'):
         pass
     elif key == _('Penalty time'):
-        result = find_person_result(person)
+        result = race().find_person_result(person)
         if result:
             result.penalty_time = hhmmss_to_time(value)
     elif key == _('Penalty legs'):
-        result = find_person_result(person)
+        result = race().find_person_result(person)
         if result:
             result.penalty_laps = int(value)
     elif key == _('Card number'):

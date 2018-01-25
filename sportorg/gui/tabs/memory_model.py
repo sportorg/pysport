@@ -16,6 +16,7 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
     """
     def __init__(self):
         super().__init__()
+        self.race = race()
         self.cache = []
         self.init_cache()
         self.filter = {}
@@ -346,7 +347,7 @@ class GroupMemoryModel(AbstractSportOrgMemoryModel):
             group.long_name,
             course.name,
             group.price,
-            group.get_type().get_title(),
+            self.race.get_type(group).get_title(),
             course.length,
             control_count,
             course.climb,

@@ -130,6 +130,11 @@ class Organization(Model):
     def __repr__(self):
         return 'Organization {}'.format(self.name)
 
+    def to_dict(self):
+        return {
+            'name': self.name
+        }
+
 
 class CourseControl(Model):
     def __init__(self):
@@ -173,6 +178,12 @@ class CourseControl(Model):
                 char = tmp[index]
         return int(res)
 
+    def to_dict(self):
+        return {
+            'code': self.code,
+            'length': self.length
+        }
+
 
 class CoursePart(Model):
     def __init__(self):
@@ -213,6 +224,14 @@ class Course(Model):
             ret.append(str(i.code))
         return ret
 
+    def to_dict(self):
+        return {
+            'name': self.name,
+            'length': self.length,
+            'climb': self.climb,
+            'corridor': self.corridor
+        }
+
 
 class Group(Model):
     def __init__(self):
@@ -252,11 +271,16 @@ class Group(Model):
     def get_type(self):
         if self.__type:
             return self.__type
-        obj = race()
-        return obj.get_setting('race_type', RaceType.INDIVIDUAL_RACE)
 
     def set_type(self, new_type):
         self.__type = new_type
+
+    def to_dict(self):
+        return {
+            'name': self.name,
+            'long_name': self.long_name,
+            'price': self.price,
+        }
 
 
 class SportidentCardModel(Enum):
@@ -544,6 +568,30 @@ class Person(Model):
             surname += ' '
         return '{}{}'.format(surname, self.name)
 
+    def to_dict(self):
+        sportident_card = ''
+        if self.sportident_card is not None and int(self.sportident_card):
+            sportident_card = str(self.sportident_card)
+        course_name = ''
+        if self.group is not None and self.group.course is not None:
+            course_name = self.group.course.name
+        return {
+            'name': self.full_name,
+            'bib': self.bib,
+            'course': course_name,
+            'team': self.organization.name if self.organization is not None else '',
+            'group': self.group.name if self.group is not None else '',
+            'price': self.group.price if self.group is not None else 0,
+            'qual': self.qual.get_title(),
+            'year': self.year if self.year else '',
+            'sportident_card': sportident_card,
+            'start': time_to_hhmmss(self.start_time),
+            'comment': self.comment,
+            'is_out_of_competition': self.is_out_of_competition,
+            'is_rented': self.is_rented_sportident_card,
+            'is_paid': self.is_paid,
+        }
+
 
 class RaceData(Model):
     def __init__(self):
@@ -572,6 +620,20 @@ class Race(Model):
 
     def __repr__(self):
         return repr(self.data)
+
+    def to_dict(self):
+        start_date = self.get_setting('start_date', datetime.datetime.now().replace(second=0, microsecond=0))
+        return {
+            'title': self.get_setting('main_title', ''),
+            'sub_title': self.get_setting('sub_title', ''),
+            'url': self.get_setting('url', ''),
+            'date': start_date.strftime("%d.%m.%Y")
+        }
+
+    def get_type(self, group: Group):
+        if group.get_type():
+            return group.get_type()
+        return self.get_setting('race_type', RaceType.INDIVIDUAL_RACE)
 
     def set_setting(self, setting, value):
         self.settings[setting] = value
@@ -613,7 +675,7 @@ class Race(Model):
             del self.results[i]
 
     def delete_groups(self, indexes):
-        race().update_counters()
+        self.update_counters()
         for i in indexes:
             group = self.groups[i]  # type: Group
             if group.count_person > 0:
@@ -625,7 +687,7 @@ class Race(Model):
         return True
 
     def delete_courses(self, indexes):
-        race().update_counters()
+        self.update_counters()
         for i in indexes:
             course = self.courses[i]  # type: Course
             if course.count_group > 0:
@@ -638,7 +700,7 @@ class Race(Model):
         return True
 
     def delete_organizations(self, indexes):
-        race().update_counters()
+        self.update_counters()
         for i in indexes:
             organization = self.organizations[i]  # type: Organization
             if organization.count_person > 0:
@@ -648,6 +710,12 @@ class Race(Model):
         for i in indexes:
             del self.organizations[i]
         return True
+
+    def find_person_result(self, person):
+        for i in self.results:
+            if i.person is person:
+                return i
+        return None
 
     @staticmethod
     def new_result():
@@ -710,11 +778,9 @@ class Race(Model):
     def get_persons_by_group(self, group):
         return find(self.persons, group=group, return_all=True)
 
-    @staticmethod
-    def get_persons_by_corridor(corridor):
-        obj = race()
+    def get_persons_by_corridor(self, corridor):
         ret = []
-        for person in obj.persons:
+        for person in self.persons:
             if person.group:
                 if person.group.start_corridor == corridor:
                     ret.append(person)
@@ -875,7 +941,7 @@ class RelayLeg(object):
     101.2: AC
     101.3: BA
     """
-    def __init__(self, team=None):
+    def __init__(self, team):
         self.number = 0
         self.leg = 0
         self.variant = ''
@@ -887,8 +953,7 @@ class RelayLeg(object):
     def get_course(self):
         """Get the course to check control order. Try to use bib and variant to find course"""
         bib = self.get_bib()
-        obj = race()
-        course = find(obj.courses, name=str(bib))
+        course = find(self.team.courses, name=str(bib))
         if course:
             return course
 
@@ -1012,7 +1077,8 @@ class RelayLeg(object):
 
 
 class RelayTeam(object):
-    def __init__(self):
+    def __init__(self, r):
+        self.race = r
         self.group = None  # type:Group
         self.legs = []  # type:list[RelayLeg]
         self.description = ''  # Name of team, optional
@@ -1045,7 +1111,7 @@ class RelayTeam(object):
 
     def add_result(self, result):
         """Add new result to the team"""
-        leg = RelayLeg(team=self)
+        leg = RelayLeg(self)
         leg.set_result(result)
         leg.set_person(result.person)
         self.legs.append(leg)
@@ -1124,13 +1190,6 @@ def find(iterable: list, **kwargs):
         return results
     else:
         return None
-
-
-def find_person_result(person):
-    for i in race().results:
-        if i.person is person:
-            return i
-    return None
 
 
 event = [create(Race)]
