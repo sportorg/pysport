@@ -1,8 +1,7 @@
-from datetime import datetime
 from enum import Enum
 
 from sportorg.models.memory import race
-from sportorg.utils.time import if_none, time_to_hhmmss
+from sportorg.utils.time import time_to_hhmmss
 
 
 class SortType(Enum):
@@ -46,33 +45,6 @@ class PersonSort:
         elif self._sorting == SortType.NAME:
             self._persons.sort(key=lambda person: (person.full_name == '', person.full_name),
                                reverse=reverse)
-
-
-class StartGenerator:
-    @staticmethod
-    def get_person_data(person):
-        sportident_card = ''
-        if person.sportident_card is not None and int(person.sportident_card):
-            sportident_card = str(person.sportident_card)
-        course_name = ''
-        if person.group is not None and person.group.course is not None:
-            course_name = person.group.course.name
-        return {
-            'name': person.full_name,
-            'bib': person.bib,
-            'course': course_name,
-            'team': person.organization.name if person.organization is not None else '',
-            'group': person.group.name if person.group is not None else '',
-            'price': person.group.price if person.group is not None else 0,
-            'qual': person.qual.get_title(),
-            'year': if_none(person.year, ''),
-            'sportident_card': sportident_card,
-            'start': time_to_hhmmss(person.start_time),
-            'comment': person.comment,
-            'is_out_of_competition': person.is_out_of_competition,
-            'is_rented': person.is_rented_sportident_card,
-            'is_paid': person.is_paid,
-        }
 
 
 class GroupsStartList:
@@ -136,18 +108,6 @@ class GroupsStartList:
         return self
 
     def get_list(self):
-        """
-        :return: [
-            {
-                "name": str,
-                "persons": [
-                    StartGenerator.get_person_data,
-                    ...
-                ]
-            },
-            ...
-        ]
-        """
         ret = []
         group_names = list(self._groups_generate()._sort_persons()._group.keys())
         group_names.sort()
@@ -157,22 +117,16 @@ class GroupsStartList:
                 'persons': []
             }
             for person in self._group[group_name]:
-                group['persons'].append(StartGenerator.get_person_data(person))
+                group['persons'].append(person.to_dict())
             ret.append(group)
 
         return ret
 
     def _get_person_list(self):
-        """
-        :return: [
-            StartGenerator.get_person_data,
-            ...
-        ]
-        """
         persons_data = []
         self._persons.sort(key=self._sort_func)
         for person in self._persons:
-            persons_data.append(StartGenerator.get_person_data(person))
+            persons_data.append(person.to_dict())
 
         return persons_data
 
@@ -191,9 +145,9 @@ class ChessGenerator(GroupsStartList):
                 continue
             time = time_to_hhmmss(person.start_time)
             if time not in cache:
-                data[time] = [StartGenerator.get_person_data(person)]
+                data[time] = [person.to_dict()]
             else:
-                data[time].append(StartGenerator.get_person_data(person))
+                data[time].append(person.to_dict())
             cache.add(time)
 
         for time in data.keys():
@@ -208,17 +162,10 @@ class PersonsGenerator:
         self._sorting = sorting
 
     def get_list(self):
-        """
-
-        :return: [
-            StartGenerator.get_person_data,
-            ...
-        ]
-        """
         persons_data = []
         PersonSort(self._persons).sort(self._sorting)
         for person in self._persons:
-            persons_data.append(StartGenerator.get_person_data(person))
+            persons_data.append(person.to_dict())
 
         return persons_data
 
@@ -247,7 +194,6 @@ class TeamStartList:
                 "name": str,
                 "price": int,
                 "persons": [
-                    StartGenerator.get_person_data,
                     ...
                 ]
             },
@@ -266,41 +212,17 @@ class TeamStartList:
             for person in team['persons']:
                 if person.group:
                     data_team['price'] += person.group.price
-                data_team['persons'].append(StartGenerator.get_person_data(person))
+                data_team['persons'].append(person.to_dict())
             data.append(data_team)
         data.sort(key=lambda x: x['name'].lower())
         return data
 
 
-def get_race_data():
-    start_date = race().get_setting('start_date', datetime.now().replace(second=0, microsecond=0))
-    return {
-        'title': race().get_setting('main_title', ''),
-        'sub_title': race().get_setting('sub_title', ''),
-        'url': race().get_setting('url', ''),
-        'date': start_date.strftime("%d.%m.%Y")
-    }
-
-
 def get_start_data():
-    """
-    :return: {
-        "race": {"title": str, "sub_title": str},
-        "groups": [
-            {
-                "name": str,
-                "persons": [
-                    StartGenerator _get_person_data
-                    ...
-                ]
-            }
-        ]
-    }
-    """
     start_list = GroupsStartList(race().persons)
     groups = start_list.get_list()
     ret = {
-        'race': get_race_data(),
+        'race': race().to_dict(),
         'groups': groups
     }
 
@@ -314,13 +236,13 @@ def get_chess_list():
 
 def get_persons_data(sorting=None):
     return {
-        'race': get_race_data(),
+        'race': race().to_dict(),
         'persons': PersonsGenerator(race().persons, sorting).get_list()
     }
 
 
 def get_teams_data():
     return {
-        'race': get_race_data(),
+        'race': race().to_dict(),
         'teams': TeamStartList(race().persons, SortType.NAME).get_list()
     }

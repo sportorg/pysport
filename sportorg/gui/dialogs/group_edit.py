@@ -158,7 +158,7 @@ class GroupEditDialog(QDialog):
             self.item_price.setValue(self.current_object.price)
 
         self.rank_checkbox.setChecked(self.current_object.ranking.is_active)
-        self.type_combo.setCurrentText(self.current_object.get_type().get_title())
+        self.type_combo.setCurrentText(race().get_type(self.current_object).get_title())
 
         def rank_configuration():
             group = self.current_object
@@ -223,7 +223,7 @@ class GroupEditDialog(QDialog):
             org.ranking.is_active = self.rank_checkbox.isChecked()
             changed = True
 
-        if org.get_type() != RaceType(self.type_combo.currentIndex()):
+        if race().get_type(org) != RaceType(self.type_combo.currentIndex()):
             org.set_type(RaceType(self.type_combo.currentIndex()))
             changed = True
 

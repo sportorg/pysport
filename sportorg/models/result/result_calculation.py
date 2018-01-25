@@ -13,9 +13,10 @@ class ResultCalculation(object):
     def process_results(self):
         logging.debug('Process results')
         self.set_times()
-        race().relay_teams.clear()
-        for i in race().groups:
-            if not i.get_type() == RaceType.RELAY:
+        obj = race()
+        obj.relay_teams.clear()
+        for i in obj.groups:
+            if not obj.get_type(i) == RaceType.RELAY:
                 # single race
                 array = self.get_group_finishes(i)
                 self.set_places(array)
@@ -23,7 +24,7 @@ class ResultCalculation(object):
             else:
                 # relay
                 new_relays = self.process_relay_results(i)
-                race().relay_teams.append(new_relays)
+                obj.relay_teams.append(new_relays)
 
     def set_times(self):
         for i in race().results:
@@ -93,7 +94,7 @@ class ResultCalculation(object):
 
                 team_number = bib % 1000
                 if not str(team_number) in relay_teams:
-                    new_team = RelayTeam()
+                    new_team = RelayTeam(race())
                     new_team.group = group
                     new_team.bib_number = team_number
                     relay_teams[str(team_number)] = new_team
@@ -361,85 +362,6 @@ def get_result_data():
 
 def get_splits_data():
     pass
-
-
-def get_splits_data_printout(person):
-    ret = {}
-    person_json = {}
-    result_json = {}
-    legs = []
-
-    assert isinstance(person, Person)
-    group = person.group
-    # course = group.course
-    course = find_course(person)
-    assert isinstance(course, Course)
-    result = person.result
-
-    person_json['name'] = person.full_name
-    person_json['group'] = person.group.name
-    person_json['bib'] = person.bib
-    person_json['team'] = person.organization.name
-    person_json['sportident_card'] = int(person.sportident_card)
-
-    result_json['start'] = time_to_hhmmss(person.start_time)
-    result_json['finish'] = time_to_hhmmss(result.get_finish_time())
-    result_json['result'] = result.get_result()
-    result_json['penalty_time'] = time_to_hhmmss(result.get_penalty_time())
-    result_json['status'] = result.status
-    result_json['place'] = result.place
-    result_json['group_count_all'] = person.group.get_count_all()
-    result_json['group_count_finished'] = person.group.get_count_finished()
-
-    person_index = 0
-    course_index = 0
-    course_code = course.controls[course_index].code
-    leg_start_time = result.get_start_time()
-    start_time = result.get_start_time()
-
-    while person_index < len(result.splits):
-        cur_split = result.splits[person_index]
-        cur_code = cur_split.code
-        cur_time = cur_split.time
-
-        leg = {}
-        leg['code'] = cur_code
-        leg['index'] = person_index
-        leg['absolute_time'] = time_to_hhmmss(cur_time)
-        leg['relative_time'] = time_to_hhmmss(cur_time - start_time)
-
-        status = 'correct'
-        if course_code == cur_code:
-            leg_time = cur_time - leg_start_time
-            leg_start_time = cur_time
-
-            leg['leg_time'] = time_to_hhmmss(leg_time)
-            leg['course_index'] = course_index
-
-            leg['leg_speed'] = 'xx m/km'  # TODO calculate speed
-            leg['leg_place'] = '1'  # TODO
-            leg['leg_leader'] = 'John Smith'  # TODO
-            leg['leg_best_time'] = '00:00:21'  # TODO
-
-            course_index += 1
-            if course_index >= len(course.controls):
-                course_code = -1
-            else:
-                course_code = course.controls[course_index].code
-
-        else:
-            status = 'extra'
-
-        leg['status'] = status
-        legs.append(leg)
-
-        person_index += 1
-
-    ret['person'] = person_json
-    ret['result'] = result_json
-    ret['legs'] = legs
-
-    return ret
 
 
 def get_entry_statistics_data():

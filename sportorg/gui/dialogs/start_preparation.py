@@ -228,7 +228,7 @@ class StartPreparationDialog(QDialog):
                 reserve_count = self.reserve_group_count_spin_box.value()
                 reserve_percent = self.reserve_group_percent_spin_box.value()
 
-                ReserveManager.process(reserve_prefix, reserve_count, reserve_percent)
+                ReserveManager(obj).process(reserve_prefix, reserve_count, reserve_percent)
 
             self.progress_bar.setValue(25)
             sleep(progressbar_delay)
@@ -239,7 +239,7 @@ class StartPreparationDialog(QDialog):
                 split_teams = self.draw_teams_check_box.isChecked()
                 split_regions = self.draw_regions_check_box.isChecked()
                 mix_groups = self.draw_mix_groups_check_box.isChecked()
-                DrawManager().process(split_start_groups, split_teams, split_regions, mix_groups)
+                DrawManager(obj).process(split_start_groups, split_teams, split_regions, mix_groups)
 
             self.progress_bar.setValue(50)
             sleep(progressbar_delay)
@@ -249,21 +249,21 @@ class StartPreparationDialog(QDialog):
                 corridor_first_start = time_to_otime(self.start_first_time_edit.time())
                 fixed_start_interval = time_to_otime(self.start_interval_time_edit.time())
                 if self.start_interval_radio_button.isChecked():
-                    StartTimeManager().process(corridor_first_start, False, fixed_start_interval, mix_groups=mix_groups)
+                    StartTimeManager(obj).process(corridor_first_start, False, fixed_start_interval, mix_groups=mix_groups)
 
                 if self.start_group_settings_radion_button.isChecked():
-                    StartTimeManager().process(corridor_first_start, True, fixed_start_interval)
+                    StartTimeManager(obj).process(corridor_first_start, True, fixed_start_interval)
 
             self.progress_bar.setValue(75)
             sleep(progressbar_delay)
 
             if self.numbers_check_box.isChecked():
                 if self.numbers_minute_radio_button.isChecked():
-                    StartNumberManager().process(False)
+                    StartNumberManager(obj).process(False)
                 if self.numbers_interval_radio_button.isChecked():
                     first_number = self.numbers_first_spin_box.value()
                     interval = self.numbers_interval_spin_box.value()
-                    StartNumberManager().process(True, first_number, interval, mix_groups=mix_groups)
+                    StartNumberManager(obj).process(True, first_number, interval, mix_groups=mix_groups)
 
             self.progress_bar.setValue(100)
 

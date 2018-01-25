@@ -1,7 +1,7 @@
 from sportorg.core.otime import OTime
 from sportorg.libs.winorient.wdb import WDB, WDBMan, WDBTeam, WDBGroup, WDBDistance, WDBPunch, WDBFinish, WDBChip
 from sportorg.models.memory import Race, Organization, Group, Person, race, find, Course, \
-    CourseControl, Country, Contact, Address, ResultStatus, Qualification, find_person_result, ResultSportident, Split
+    CourseControl, Contact, Address, ResultStatus, Qualification, ResultSportident, Split
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.utils.time import int_to_otime, time_to_int
 
@@ -253,7 +253,7 @@ class WinOrientBinary:
             new_person.start_group = man.start_group
 
             # result
-            result = find_person_result(man)
+            result = race().find_person_result(man)
 
             if result:
                 new_finish = WDBFinish()
