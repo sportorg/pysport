@@ -1,3 +1,8 @@
+### 2018-01-25 v0.11.0-rc2
+
+* pass
+
+
 ### 2018-01-16 v0.11.0-rc1
 + Added new field - id (uuid4)
 + Search tool - search text in all columns of current table
