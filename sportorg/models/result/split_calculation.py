@@ -2,7 +2,7 @@ from datetime import datetime
 
 from sportorg.models.memory import race, Person, Course, Group, Qualification
 from sportorg.models.result.result_calculation import ResultCalculation
-from sportorg.utils.time import time_to_hhmmss, get_speed_min_per_km, if_none, hhmmss_to_time
+from sportorg.utils.time import time_to_hhmmss, get_speed_min_per_km, hhmmss_to_time
 
 
 class LegSplit(object):
@@ -177,7 +177,7 @@ class PersonSplits(object):
             'result': self.result,
             'penalty_time': self.penalty_time,
             'place': self.place,
-            'assigned_rank': if_none(self.assigned_rank, ''),
+            'assigned_rank': self.assigned_rank,
             'legs': [],
             'splits': [],
             'scores': self.scores

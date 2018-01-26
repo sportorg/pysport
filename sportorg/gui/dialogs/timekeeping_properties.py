@@ -17,6 +17,7 @@ from sportorg.utils.time import time_to_otime
 class TimekeepingPropertiesDialog(QDialog):
     def __init__(self):
         super().__init__(GlobalAccess().get_main_window())
+        self.time_format = 'hh:mm:ss'
 
     def exec(self):
         self.init_ui()
@@ -134,7 +135,7 @@ class TimekeepingPropertiesDialog(QDialog):
         self.mr_layout.addRow(self.mr_off_radio)
         self.mr_time_radio = QRadioButton(_('penalty time'))
         self.mr_time_edit = QTimeEdit()
-        self.mr_time_edit.setDisplayFormat('hh:mm:ss')
+        self.mr_time_edit.setDisplayFormat(self.time_format)
         self.mr_layout.addRow(self.mr_time_radio, self.mr_time_edit)
         self.mr_laps_radio = QRadioButton(_('penalty laps'))
         self.mr_layout.addRow(self.mr_laps_radio)
@@ -214,12 +215,34 @@ class TimekeepingPropertiesDialog(QDialog):
 
         self.team_result_tab.setLayout(self.team_layout)
 
+        # time settings
+        self.time_settings_tab = QWidget()
+        self.time_settings_layout = QFormLayout()
+        self.time_settings_accuracy_label = QLabel(_('Accuracy'))
+        self.time_settings_accuracy_edit = QSpinBox()
+        self.time_settings_accuracy_edit.setMaximumWidth(50)
+        self.time_settings_accuracy_edit.setMaximum(3)
+        self.time_settings_layout.addRow(self.time_settings_accuracy_label, self.time_settings_accuracy_edit)
+
+        self.time_settings_format = QGroupBox()
+        self.time_settings_format.setTitle(_('Format of competitions'))
+        self.time_settings_format_less = QRadioButton(_('< 24'))
+        self.time_settings_format_more = QRadioButton(_('> 24'))
+        self.time_settings_format_more.setDisabled(True)
+        self.time_settings_format_layout = QFormLayout()
+        self.time_settings_format_layout.addRow(self.time_settings_format_less)
+        self.time_settings_format_layout.addRow(self.time_settings_format_more)
+        self.time_settings_format.setLayout(self.time_settings_format_layout)
+        self.time_settings_layout.addRow(self.time_settings_format)
+
+        self.time_settings_tab.setLayout(self.time_settings_layout)
 
         self.tab_widget.addTab(self.timekeeping_tab, _('SPORTident settings'))
         self.tab_widget.addTab(self.result_proc_tab, _('Result processing'))
         self.tab_widget.addTab(self.team_result_tab, _('Team results'))
         self.tab_widget.addTab(self.scores_tab, _('Scores'))
         self.tab_widget.addTab(self.marked_route_tab, _('Penalty calculation'))
+        self.tab_widget.addTab(self.time_settings_tab, _('Time settings'))
 
         def cancel_changes():
             self.close()
@@ -382,6 +405,16 @@ class TimekeepingPropertiesDialog(QDialog):
 
         self.team_qty_edit.setValue(team_qty)
 
+        # time settings
+        time_accuracy = obj.get_setting('time_accuracy', 0)
+        time_format_24 = obj.get_setting('time_format_24', 'less24')
+
+        self.time_settings_accuracy_edit.setValue(time_accuracy)
+        if time_format_24 == 'less24':
+            self.time_settings_format_less.setChecked(True)
+        elif time_format_24 == 'more24':
+            self.time_settings_format_more.setChecked(True)
+
     def apply_changes_impl(self):
         changed = False
         obj = race()
@@ -515,6 +548,15 @@ class TimekeepingPropertiesDialog(QDialog):
         obj.set_setting('team_group_mode', team_group_mode)
         obj.set_setting('team_sum_mode', team_sum_mode)
         obj.set_setting('team_qty', team_qty)
+
+        # time settings
+        time_accuracy = self.time_settings_accuracy_edit.value()
+        time_format_24 = 'less24'
+        if self.time_settings_format_more.isChecked():
+            time_format_24 = 'more24'
+
+        obj.set_setting('time_accuracy', time_accuracy)
+        obj.set_setting('time_format_24', time_format_24)
 
         changed = True
 

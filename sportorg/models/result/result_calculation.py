@@ -30,7 +30,7 @@ class ResultCalculation(object):
     def set_times(self):
         for i in self.race.results:
             assert isinstance(i, Result)
-            i.result = i.get_result_for_sort()
+            i.result = round(i.get_result_for_sort()/10)
 
     def get_group_finishes(self, group):
         ret = []

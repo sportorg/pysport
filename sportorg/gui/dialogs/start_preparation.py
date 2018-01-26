@@ -17,6 +17,7 @@ from sportorg.utils.time import time_to_otime
 class StartPreparationDialog(QDialog):
     def __init__(self):
         super().__init__(GlobalAccess().get_main_window())
+        self.time_format = 'hh:mm:ss'
 
     def exec(self):
         self.setup_ui()
@@ -96,14 +97,14 @@ class StartPreparationDialog(QDialog):
         self.start_layout.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.start_first_label)
         self.start_first_time_edit = QtWidgets.QTimeEdit(self.widget2)
         self.start_first_time_edit.setEnabled(False)
-        self.start_first_time_edit.setDisplayFormat("HH:mm:ss")
+        self.start_first_time_edit.setDisplayFormat(self.time_format)
         self.start_layout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.start_first_time_edit)
         self.start_interval_radio_button = QtWidgets.QRadioButton(self.widget2)
         self.start_interval_radio_button.setChecked(True)
         self.start_layout.setWidget(2, QtWidgets.QFormLayout.LabelRole, self.start_interval_radio_button)
         self.start_interval_time_edit = QtWidgets.QTimeEdit(self.widget2)
         self.start_interval_time_edit.setEnabled(False)
-        self.start_interval_time_edit.setDisplayFormat("HH:mm:ss")
+        self.start_interval_time_edit.setDisplayFormat(self.time_format)
         self.start_layout.setWidget(2, QtWidgets.QFormLayout.FieldRole, self.start_interval_time_edit)
         self.start_group_settings_radion_button = QtWidgets.QRadioButton(self.widget2)
         self.start_group_settings_radion_button.setEnabled(False)

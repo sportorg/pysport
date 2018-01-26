@@ -7,7 +7,7 @@ from sportorg.core.otime import OTime
 
 def time_to_otime(t):
     if isinstance(t, datetime.datetime):
-        return OTime(0, t.hour, t.minute, t.second, t.microsecond // 1000)
+        return OTime(0, t.hour, t.minute, t.second, round(t.microsecond/1000))
     if isinstance(t, QTime):
         return OTime(0, t.hour(), t.minute(), t.second(), t.msec())
     if isinstance(t, datetime.timedelta):
@@ -25,7 +25,7 @@ def time_to_datetime(t):
 def time_to_qtime(t):
     otime = time_to_otime(t)
     time = QTime()
-    time.setHMS(otime.hour, otime.minute, otime.sec)
+    time.setHMS(otime.hour, otime.minute, otime.sec, otime.msec)
     return time
 
 
@@ -57,13 +57,22 @@ def time_to_mmss(value):
 
 def time_to_hhmmss(value):
     time = time_to_datetime(value)
-    return str(time.strftime("%H:%M:%S"))
+    return time.strftime("%H:%M:%S")
 
 
 def hhmmss_to_time(value):
     arr = str(value).split(':')
     if len(arr) == 3:
-        return OTime(0, int(arr[0]), int(arr[1]), int(arr[2]), 0)
+        msec = 0
+        secs = arr[2].split('.')
+        sec = int(secs[0])
+        if len(secs) == 2:
+            msec = int(secs[1])
+        if 0 < msec < 10:
+            msec *= 100
+        elif 0 < msec < 100:
+            msec *= 10
+        return OTime(0, int(arr[0]), int(arr[1]), sec, msec)
     return OTime()
 
 
@@ -104,7 +113,3 @@ def time_to_minutes(value, max_val=24*60):
 def get_speed_min_per_km(time, length_m):
     time_km = time / (length_m / 1000)
     return time_to_mmss(time_km) + "/km"
-
-
-def if_none(val, default):
-    return val if val is not None else default

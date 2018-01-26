@@ -1,14 +1,14 @@
 import logging
 
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QFormLayout, QDialog, QPushButton, QCheckBox, QSpinBox, QTimeEdit, QHBoxLayout, \
+from PyQt5.QtWidgets import QFormLayout, QDialog, QCheckBox, QSpinBox, QTimeEdit, QHBoxLayout, \
     QDialogButtonBox
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
-from sportorg.models.memory import RankingItem, Qualification
+from sportorg.models.memory import RankingItem, Qualification, race
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.utils.time import time_to_otime, time_to_qtime
 
@@ -90,7 +90,7 @@ def get_widget_from_ranking(ranking):
 
     max_time = QTimeEdit()
     max_time.setFixedWidth(70)
-    max_time.setDisplayFormat("HH:mm:ss")
+    max_time.setDisplayFormat("hh:mm:ss")
     max_time.setObjectName(qual + '_time')
 
     def select_type():

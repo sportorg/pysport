@@ -13,6 +13,7 @@ from sportorg.utils.time import time_to_otime
 class StartTimeChangeDialog(QDialog):
     def __init__(self):
         super().__init__(GlobalAccess().get_main_window())
+        self.time_format = 'hh:mm:ss'
 
     def exec(self):
         self.init_ui()
@@ -29,7 +30,7 @@ class StartTimeChangeDialog(QDialog):
         self.time_add.setChecked(True)
         self.time_reduce = QRadioButton(_('Reduce'))
         self.time_value = QTimeEdit()
-        self.time_value.setDisplayFormat('hh:mm:ss')
+        self.time_value.setDisplayFormat(self.time_format)
 
         self.layout.addRow(self.time_add)
         self.layout.addRow(self.time_reduce)

@@ -28,6 +28,7 @@ class GroupEditDialog(QDialog):
             assert (isinstance(current_object, Group))
 
             self.current_object = current_object
+        self.time_format = 'hh:mm:ss'
 
     def exec(self):
         self.init_ui()
@@ -71,7 +72,7 @@ class GroupEditDialog(QDialog):
 
         self.label_max_time = QLabel(_('Max time'))
         self.item_max_time = QTimeEdit()
-        self.item_max_time.setDisplayFormat("hh:mm:ss")
+        self.item_max_time.setDisplayFormat(self.time_format)
         self.layout.addRow(self.label_max_time, self.item_max_time)
 
         self.label_corridor = QLabel(_('Start corridor'))
@@ -84,7 +85,7 @@ class GroupEditDialog(QDialog):
 
         self.label_start_interval = QLabel(_('Start interval'))
         self.item_start_interval = QTimeEdit()
-        self.item_start_interval.setDisplayFormat("hh:mm:ss")
+        self.item_start_interval.setDisplayFormat(self.time_format)
         self.layout.addRow(self.label_start_interval, self.item_start_interval)
 
         self.label_price = QLabel(_('Start fee'))
