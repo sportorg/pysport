@@ -91,7 +91,7 @@ class ResultChecker:
         if not result.is_sportident():
             return True
 
-        course = find_course(self.person)
+        course = race().find_course(self.person)
         if not course:
             return True
 
@@ -131,7 +131,7 @@ class ResultChecker:
         if not result.is_sportident():
             return True
 
-        course = find_course(person)
+        course = race().find_course(person)
         if not course:
             return True
 
@@ -192,19 +192,3 @@ class ResultChecker:
         res += len(user_array)
 
         return res
-
-
-def find_course(person):
-    # first get course by number
-    bib = person.bib
-    obj = race()
-    ret = find(obj.courses, name=str(bib))
-    if not ret and bib > 1000:
-        course_name = "{}.{}".format(bib % 1000, bib // 1000)
-        ret = find(obj.courses, name=course_name)
-    # usual connection via group
-    if not ret:
-        if person.group:
-            ret = person.group.course
-    return ret
-
