@@ -1,7 +1,5 @@
-from gettext import find
-
 from sportorg.core.otime import OTime
-from sportorg.models.memory import Person, ResultStatus, find, race, Result, ResultSportident
+from sportorg.models.memory import Person, ResultStatus, race, Result, ResultSportident
 
 
 class ResultCheckerException(Exception):

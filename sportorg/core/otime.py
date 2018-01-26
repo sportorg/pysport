@@ -68,8 +68,9 @@ class OTime:
         return self.to_msec()
 
     def __str__(self):
+        hour = self.hour + self.day*24
         return '{}:{}:{}'.format(
-            self.hour + self.day*24,
+            hour if hour > 9 else '0' + str(hour),
             self.minute if self.minute > 9 else '0' + str(self.minute),
             self.sec if self.sec > 9 else '0' + str(self.sec)
         )

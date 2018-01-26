@@ -220,7 +220,7 @@ class NumberClicker(metaclass=Singleton):
 
     def click(self, number):
         t = time.time()
-        if t - self.time < 0.5:
+        if t - self.time < 0.8:
             self.time = t
             self.key += str(number)
             return int(self.key)

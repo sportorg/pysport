@@ -75,28 +75,6 @@ class ScoreCalculation(object):
 
     @staticmethod
     def get_team_results_data():
-        """
-        :return: {
-            "race": {"title": str, "sub_title": str},
-            "groups": [
-                {
-                    "name": str,
-                    "teams":
-                    [
-                        {
-                        "name": str,
-                        "scores": int,
-                        "member_qty",
-                        "persons": [
-                            PersonSplits.get_person_split_data,
-                            ...
-                        ]
-                        }
-                    ]
-                }
-            ]
-        }
-        """
         ret = {}
         data = []
         for group in race().groups:
@@ -154,10 +132,7 @@ class ScoreCalculation(object):
                 'teams': group_teams,
             })
         ret['groups'] = data
-        ret['race'] = {
-            'title': race().get_setting('main_title', ''),
-            'sub_title': race().get_setting('sub_title', '')
-        }
+        ret['race'] = race().to_dict()
         return ret
 
     @staticmethod
