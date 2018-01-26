@@ -320,6 +320,6 @@ class EntryEditDialog(QDialog):
             changed = True
 
         if changed:
-            ResultCalculation().process_results()
+            ResultCalculation(race()).process_results()
             GlobalAccess().get_main_window().refresh()
             # table.model().sourceModel().update_one_object(part, table.model().mapToSource(self.current_index).row())

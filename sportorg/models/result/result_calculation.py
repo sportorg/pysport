@@ -9,13 +9,15 @@ from sportorg.utils.time import time_to_hhmmss
 
 # FIXME: does not work sorting
 class ResultCalculation(object):
+    def __init__(self, r):
+        self.race = r
+
     def process_results(self):
         logging.debug('Process results')
         self.set_times()
-        obj = race()
-        obj.relay_teams.clear()
-        for i in obj.groups:
-            if not obj.get_type(i) == RaceType.RELAY:
+        self.race.relay_teams.clear()
+        for i in self.race.groups:
+            if not self.race.get_type(i) == RaceType.RELAY:
                 # single race
                 array = self.get_group_finishes(i)
                 self.set_places(array)
@@ -23,17 +25,16 @@ class ResultCalculation(object):
             else:
                 # relay
                 new_relays = self.process_relay_results(i)
-                obj.relay_teams.append(new_relays)
+                self.race.relay_teams.append(new_relays)
 
     def set_times(self):
-        for i in race().results:
+        for i in self.race.results:
             assert isinstance(i, Result)
             i.result = i.get_result_for_sort()
 
-    @staticmethod
-    def get_group_finishes(group):
+    def get_group_finishes(self, group):
         ret = []
-        for i in race().results:
+        for i in self.race.results:
             assert isinstance(i, Result)
             person = i.person
             if person:
@@ -44,11 +45,10 @@ class ResultCalculation(object):
         group.count_finished = len(ret)
         return ret
 
-    @staticmethod
-    def get_group_persons(group):
+    def get_group_persons(self, group):
         assert isinstance(group, Group)
         ret = []
-        for i in race().persons:
+        for i in self.race.persons:
             person = i
             assert isinstance(person, Person)
             if person.group == group:
@@ -93,7 +93,7 @@ class ResultCalculation(object):
 
                 team_number = bib % 1000
                 if not str(team_number) in relay_teams:
-                    new_team = RelayTeam(race())
+                    new_team = RelayTeam(self.race)
                     new_team.group = group
                     new_team.bib_number = team_number
                     relay_teams[str(team_number)] = new_team
@@ -344,7 +344,7 @@ def get_result_data():
     """
     data = []
     for group in race().groups:
-        array = ResultCalculation().get_group_finishes(group)
+        array = ResultCalculation(race()).get_group_finishes(group)
         group_data = {
             'name': group.name,
             'persons': []

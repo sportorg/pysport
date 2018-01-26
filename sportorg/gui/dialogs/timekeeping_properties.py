@@ -519,5 +519,5 @@ class TimekeepingPropertiesDialog(QDialog):
         changed = True
 
         if changed:
-            ResultCalculation().process_results()
+            ResultCalculation(race()).process_results()
             GlobalAccess().get_main_window().refresh()

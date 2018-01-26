@@ -260,7 +260,7 @@ class ResultEditDialog(QDialog):
         if changed:
             if result.is_sportident():
                 result.clear()
-            ResultCalculation().process_results()
+            ResultCalculation(race()).process_results()
             GlobalAccess().get_main_window().refresh()
 
 

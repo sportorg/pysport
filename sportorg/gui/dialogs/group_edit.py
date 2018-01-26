@@ -228,5 +228,5 @@ class GroupEditDialog(QDialog):
             changed = True
 
         if changed:
-            ResultCalculation().set_rank(org)
+            ResultCalculation(race()).set_rank(org)
             GlobalAccess().get_main_window().refresh()
