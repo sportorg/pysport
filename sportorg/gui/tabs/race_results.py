@@ -10,7 +10,7 @@ from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.tabs.memory_model import ResultMemoryModel
 from sportorg.gui.tabs.table import TableView
 from sportorg.language import _
-from sportorg.models.memory import race, Result, Course, CourseControl
+from sportorg.models.memory import race, Result, Course, CourseControl, ResultSportident
 from sportorg.utils.time import time_to_hhmmss
 
 
@@ -180,6 +180,8 @@ class Widget(QtWidgets.QWidget):
         if not result.is_sportident():
             return
 
+        assert isinstance(result, ResultSportident)
+
         control_codes = []
         if course:
             assert isinstance(course, Course)
@@ -195,7 +197,7 @@ class Widget(QtWidgets.QWidget):
                 index=index,
                 code=split.code,
                 time=time_to_hhmmss(time),
-                diff=time_to_hhmmss(time-prev_time))
+                diff=(time-prev_time).to_minute_str())
             if split.code == code:
                 s = '<span style="background: red">{}</span>'.format(s)
             if len(control_codes) and str(split.code) not in control_codes:
@@ -219,7 +221,7 @@ class Widget(QtWidgets.QWidget):
                 index = 1
                 for control in course.controls:
                     assert isinstance(control, CourseControl)
-                    s = '{index} {code} {length}'.format(
+                    s = '{index} ({code}) {length}'.format(
                         index=index,
                         code=control.code,
                         length=control.length if control.length else '')

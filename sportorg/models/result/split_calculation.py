@@ -79,7 +79,7 @@ class PersonSplits(object):
         self.group_count_all = person.group.get_count_all()
         self.group_count_finished = person.group.get_count_finished()
         self.scores = result.scores
-        self.controls = [control.code for control in obj.find_course(person).controls]
+        self.controls = [control.code for control in self.race.find_course(person).controls]
         self.speed = ''
         if course.length:
             self.speed = get_speed_min_per_km(race_result, course.length)

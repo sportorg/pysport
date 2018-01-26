@@ -327,21 +327,6 @@ def get_start_list_data():
 
 
 def get_result_data():
-    """
-
-    :return: {
-        "title": str,
-        "groups": [
-            {
-                "name": str,
-                "persons": [
-                    get_person_result_data
-                    ...
-                ]
-            }
-        ]
-    }
-    """
     data = []
     for group in race().groups:
         array = ResultCalculation(race()).get_group_finishes(group)
