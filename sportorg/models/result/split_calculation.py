@@ -211,12 +211,12 @@ class GroupSplits(object):
         self.leader = {}
 
         # to have group count
-        ResultCalculation().get_group_persons(group)
+        ResultCalculation(race()).get_group_persons(group)
         self.count_all = group.get_count_all()
 
         self.count_finished = group.get_count_finished()
 
-        for i in ResultCalculation().get_group_finishes(group):
+        for i in ResultCalculation(race()).get_group_finishes(group):
             person = PersonSplits(self.race, i)
             self.person_splits.append(person)
 

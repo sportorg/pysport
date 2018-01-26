@@ -68,7 +68,7 @@ class GroupRankingDialog(QDialog):
                 rank.max_place = self.findChild(QSpinBox, name + '_place').value()
                 rank.max_time = time_to_otime(self.findChild(QTimeEdit, name + '_time').time())
                 rank.use_scores = self.findChild(AdvComboBox, name + '_combo').currentText() == _('Rank')
-        ResultCalculation().set_rank(self.group)
+        ResultCalculation(race()).set_rank(self.group)
 
 
 def get_widget_from_ranking(ranking):

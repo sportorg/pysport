@@ -661,7 +661,7 @@ class MainWindow(QMainWindow):
         if not assignment_mode:
             GlobalAccess().clear_filters(remove_condition=False)
             ResultSportidentGeneration(result).add_result()
-            ResultCalculation().process_results()
+            ResultCalculation(race()).process_results()
             if race().get_setting('split_printout', False):
                 try:
                     split_printout(result)

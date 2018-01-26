@@ -1,7 +1,7 @@
 from gettext import find
 
 from sportorg.core.otime import OTime
-from sportorg.models.memory import Person, ResultStatus, find, race, Result
+from sportorg.models.memory import Person, ResultStatus, find, race, Result, ResultSportident
 
 
 class ResultCheckerException(Exception):
@@ -130,6 +130,8 @@ class ResultChecker:
 
         if not result.is_sportident():
             return True
+
+        assert isinstance(result, ResultSportident)
 
         course = race().find_course(person)
         if not course:

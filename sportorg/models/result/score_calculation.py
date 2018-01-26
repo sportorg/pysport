@@ -45,7 +45,7 @@ class ScoreCalculation(object):
         if result and isinstance(result, Result):
             if result.person and result.person.group:
                 group = result.person.group
-                results = ResultCalculation.get_group_finishes(group)
+                results = ResultCalculation(race()).get_group_finishes(group)
                 best_time = None
                 for cur_result in results:
                     assert isinstance(cur_result, Result)

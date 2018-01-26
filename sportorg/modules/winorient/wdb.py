@@ -156,7 +156,7 @@ class WinOrientBinary:
                         if code > 0:
                             result.splits.append(split)
 
-        ResultCalculation().process_results()
+        ResultCalculation(race()).process_results()
 
     def export(self):
         wdb_object = WDB()

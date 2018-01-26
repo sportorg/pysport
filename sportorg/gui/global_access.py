@@ -85,12 +85,12 @@ class GlobalAccess(metaclass=Singleton):
         if tab == 0:
             race().delete_persons(indexes)
             # recalculate places
-            ResultCalculation().process_results()
+            ResultCalculation(race()).process_results()
             self.get_main_window().refresh()
         elif tab == 1:
             race().delete_results(indexes)
             # recalculate places
-            ResultCalculation().process_results()
+            ResultCalculation(race()).process_results()
             self.get_main_window().refresh()
         elif tab == 2:
             try:
@@ -161,7 +161,7 @@ class GlobalAccess(metaclass=Singleton):
                 if result.person is not None:
                     ResultChecker.checking(result)
             logging.debug('Rechecking finish')
-            ResultCalculation().process_results()
+            ResultCalculation(race()).process_results()
             self.get_main_window().refresh()
         except Exception as e:
             logging.exception(str(e))
@@ -173,7 +173,7 @@ class GlobalAccess(metaclass=Singleton):
                 if result.person is not None:
                     ResultChecker.calculate_penalty(result)
             logging.debug('Penalty calculation finish')
-            ResultCalculation().process_results()
+            ResultCalculation(race()).process_results()
             self.get_main_window().refresh()
         except Exception as e:
             logging.exception(str(e))
@@ -185,7 +185,7 @@ class GlobalAccess(metaclass=Singleton):
                 result.penalty_time = OTime(msec=0)
                 result.penalty_laps = 0
             logging.debug('Penalty removing finish')
-            ResultCalculation().process_results()
+            ResultCalculation(race()).process_results()
             self.get_main_window().refresh()
         except Exception as e:
             logging.exception(str(e))
