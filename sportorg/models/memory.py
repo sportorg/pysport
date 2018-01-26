@@ -309,6 +309,9 @@ class SportidentCard(Model):
     def __int__(self):
         return int(self.number)
 
+    def __bool__(self):
+        return bool(self.number)
+
     def __str__(self):
         return str(self.number)
 
@@ -399,14 +402,14 @@ class Result:
     def get_result_for_sort(self):
         ret = 0
         if self.status != 0 and self.status != ResultStatus.OK:
-            ret += 24 * 3600 * 100
+            ret += 24 * 3600 * 1000
 
         delta = self.get_finish_time() - self.get_start_time() + self.get_penalty_time()
-        ret += round(delta.to_msec()/10)
+        ret += delta.to_msec()
         return ret
 
     def get_result_otime(self):
-        return OTime(msec=self.get_result_for_sort()*10)
+        return OTime(msec=self.get_result_for_sort())
 
     def get_start_time(self):
         if self.start_time and self.start_time.to_msec():

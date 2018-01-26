@@ -1102,3 +1102,18 @@ msgstr "Не стартовавшие участники"
 msgid "Set DNS numbers"
 msgstr "Ввести номера со статусом DNS"
 
+msgid "Time settings"
+msgstr "Настройки времени"
+
+msgid "Format of competitions"
+msgstr "Формат соревнований"
+
+msgid "Accuracy"
+msgstr "Учитывать доли сек. знаков"
+
+msgid "< 24"
+msgstr "< 24 часов"
+
+msgid "> 24"
+msgstr "> 24 часов"
+

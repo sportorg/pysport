@@ -1,15 +1,13 @@
 import logging
 
 from abc import abstractmethod
-from typing import List, Tuple
 
 from PyQt5.QtCore import QModelIndex
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, \
-    QPushButton, QTimeEdit, QRadioButton, QSpinBox, QGroupBox, QScrollArea, QGridLayout, QTextEdit, QDialogButtonBox
+    QTimeEdit, QRadioButton, QSpinBox, QGroupBox, QTextEdit, QDialogButtonBox
 
 from sportorg import config
-from sportorg.core.otime import OTime
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import _
 from sportorg.models.memory import race, Result, find, ResultStatus, Person, Limit, Split
@@ -27,6 +25,11 @@ class ResultEditDialog(QDialog):
             assert (isinstance(self.current_index, QModelIndex))
             self.current_object = race().results[self.current_index.row()]
             assert (isinstance(self.current_object, Result))
+
+        self.time_format = 'hh:mm:ss'
+        time_accuracy = race().get_setting('time_accuracy', 0)
+        if time_accuracy:
+            self.time_format = 'hh:mm:ss.zzz'
 
     def exec(self):
         self.init_ui()
@@ -51,16 +54,16 @@ class ResultEditDialog(QDialog):
         self.label_person_info = QLabel('')
 
         self.item_finish = QTimeEdit()
-        self.item_finish.setDisplayFormat("hh:mm:ss")
+        self.item_finish.setDisplayFormat(self.time_format)
 
         self.item_start = QTimeEdit()
-        self.item_start.setDisplayFormat("hh:mm:ss")
+        self.item_start.setDisplayFormat(self.time_format)
 
         self.item_result = QLineEdit()
         self.item_result.setEnabled(False)
 
         self.item_penalty = QTimeEdit()
-        self.item_penalty.setDisplayFormat("hh:mm:ss")
+        self.item_penalty.setDisplayFormat(self.time_format)
 
         self.item_penalty_laps = QSpinBox()
         self.item_penalty_laps.setMaximum(1000000)
@@ -277,97 +280,6 @@ class SplitsObject:
     @abstractmethod
     def show(self):
         pass
-
-
-class Splits(SplitsObject):
-    def __init__(self, splits=None):
-        self._splits = splits  # type: List[Split]
-        self._scroll = QScrollArea()
-        self._box = QGroupBox(_('Splits'))
-        self._splits_layout = QGridLayout()
-        self._splits_layout.setSpacing(0)
-        self._add_index = QSpinBox()
-        self._delete_index = QSpinBox()
-        self._add_button = QPushButton(_('Add'))
-        self._delete_button = QPushButton(_('Delete'))
-        layout = QFormLayout()
-        layout.addRow(self._splits_layout)
-        layout.addRow(self._add_index, self._add_button)
-        layout.addRow(self._delete_index, self._delete_button)
-        self._box.setLayout(layout)
-        self._scroll.setWidget(self._box)
-        self._scroll.setWidgetResizable(True)
-        self._scroll.setFixedHeight(200)
-        self._scroll.setMinimumWidth(250)
-        self._splits_item = []  # type: List[Tuple[QLabel, QLineEdit, QTimeEdit]]
-
-        self._add_button.clicked.connect(self._add)
-        self._delete_button.clicked.connect(self._delete)
-
-    @property
-    def widget(self):
-        return self._scroll
-
-    def splits(self, splits=None):
-        if splits is None:
-            splits = []
-            i = 0
-            for item in self._splits_item:
-                split = Split()
-                split.time = time_to_otime(item[2].time())
-                if item[1].text().strip().isdigit():
-                    split.code = int(item[1].text().strip())
-                else:
-                    if self._splits is not None and len(self._splits) > i:
-                        split.code = self._splits[i].code
-                    logging.error('{} not number'.format(item[1].text()))
-                splits.append(split)
-                i += 1
-            self._splits = splits
-        else:
-            self._splits = splits
-        return self._splits
-
-    def _add(self):
-        if self._add_index.value():
-            split = Split()
-            split.time = OTime.now()
-            self.splits().insert(self._add_index.value()-1, split)
-            self.show()
-
-    def _delete(self):
-        if 0 < self._delete_index.value() <= len(self._splits):
-            self.splits().pop(self._delete_index.value()-1)
-            self.show()
-
-    def _clear(self):
-        for item in self._splits_item:
-            for j, widget in enumerate(item):
-                self._splits_layout.removeWidget(widget)
-                widget.setParent(None)
-        self._splits_item = []
-
-    def show(self):
-        self._clear()
-        splits = self._splits if self._splits is not None else []
-        for i, split in enumerate(splits):
-            code = QLineEdit()
-            code.setText(str(split.code))
-            time = QTimeEdit()
-            time.setDisplayFormat("hh:mm:ss")
-            time.setTime(time_to_qtime(split.time))
-            item = (QLabel(str(i+1)), code, time)
-            for j, widget in enumerate(item):
-                self._splits_layout.addWidget(widget, i, j)
-            self._splits_item.insert(i, item)
-        self._add_index.setMaximum(len(splits)+1)
-        self._add_index.setValue(len(splits)+1)
-        self._delete_index.setMaximum(len(splits))
-        self._delete_index.setValue(0)
-        if len(splits) == 0:
-            self._delete_button.setDisabled(True)
-        else:
-            self._delete_button.setDisabled(False)
 
 
 class SplitsText(SplitsObject):

@@ -29,6 +29,11 @@ class EntryEditDialog(QDialog):
             assert (isinstance(current_object, Person))
             self.current_object = current_object
 
+        self.time_format = 'hh:mm:ss.zzz'
+        time_accuracy = race().get_setting('time_accuracy', 0)
+        if time_accuracy:
+            self.time_format = 'hh:mm:ss.zzz'
+
     def exec(self):
         self.init_ui()
         self.set_values_from_table()
@@ -86,7 +91,7 @@ class EntryEditDialog(QDialog):
 
         self.label_start = QLabel(_('Start time'))
         self.item_start = QTimeEdit()
-        self.item_start.setDisplayFormat('hh:mm:ss')
+        self.item_start.setDisplayFormat(self.time_format)
         self.layout.addRow(self.label_start, self.item_start)
 
         self.label_start_group = QLabel(_('Start group'))

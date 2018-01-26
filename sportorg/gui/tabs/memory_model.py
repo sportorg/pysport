@@ -221,7 +221,7 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
         else:
             ret.append('')
         ret.append(person.start_group)
-        ret.append(str(person.sportident_card) if person.sportident_card is not None else '')
+        ret.append(str(person.sportident_card) if person.sportident_card else '')
         ret.append(_('Rented card') if person.is_rented_sportident_card else _('Rented stub'))
         ret.append(person.comment)
         ret.append(str(person.world_code) if person.world_code else '')
