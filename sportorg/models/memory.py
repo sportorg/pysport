@@ -709,6 +709,19 @@ class Race(Model):
                 return i
         return None
 
+    def find_course(self, person):
+        # first get course by number
+        bib = person.bib
+        ret = find(self.courses, name=str(bib))
+        if not ret and bib > 1000:
+            course_name = '{}.{}'.format(bib % 1000, bib // 1000)
+            ret = find(self.courses, name=course_name)
+        # usual connection via group
+        if not ret:
+            if person.group:
+                ret = person.group.course
+        return ret
+
     @staticmethod
     def new_result():
         new_result = ResultManual()

@@ -11,7 +11,6 @@ from sportorg.gui.tabs.memory_model import ResultMemoryModel
 from sportorg.gui.tabs.table import TableView
 from sportorg.language import _
 from sportorg.models.memory import race, Result, Course, CourseControl
-from sportorg.models.result.result_checker import find_course
 from sportorg.utils.time import time_to_hhmmss
 
 
@@ -176,7 +175,7 @@ class Widget(QtWidgets.QWidget):
 
         course = None
         if result.person:
-            course = find_course(result.person)
+            course = race().find_course(result.person)
 
         if not result.is_sportident():
             return

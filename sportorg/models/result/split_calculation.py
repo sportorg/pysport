@@ -2,7 +2,6 @@ from datetime import datetime
 
 from sportorg.models.memory import race, Person, Course, Group, Qualification
 from sportorg.models.result.result_calculation import ResultCalculation
-from sportorg.models.result.result_checker import find_course
 from sportorg.utils.time import time_to_hhmmss, get_speed_min_per_km, if_none, hhmmss_to_time
 
 
@@ -40,13 +39,15 @@ class LegSplit(object):
 
 
 class PersonSplits(object):
-    def __init__(self, result):
+    def __init__(self, r, result):
+
+        self.race = r
 
         person = result.person
         assert isinstance(person, Person)
-        group = person.group
+        # group = person.group
         # course = group.course
-        course = find_course(person)
+        course = self.race.find_course(person)
         assert isinstance(course, Course)
 
         self.person = person
@@ -78,7 +79,7 @@ class PersonSplits(object):
         self.group_count_all = person.group.get_count_all()
         self.group_count_finished = person.group.get_count_finished()
         self.scores = result.scores
-        self.controls = [control.code for control in find_course(person).controls]
+        self.controls = [control.code for control in obj.find_course(person).controls]
         self.speed = ''
         if course.length:
             self.speed = get_speed_min_per_km(race_result, course.length)
@@ -196,8 +197,8 @@ class PersonSplits(object):
 
 
 class GroupSplits(object):
-    def __init__(self, group):
-
+    def __init__(self, r, group):
+        self.race = r
         self.person_splits = []
 
         assert isinstance(group, Group)
@@ -216,7 +217,7 @@ class GroupSplits(object):
         self.count_finished = group.get_count_finished()
 
         for i in ResultCalculation().get_group_finishes(group):
-            person = PersonSplits(i)
+            person = PersonSplits(self.race, i)
             self.person_splits.append(person)
 
         self.set_places()
@@ -369,7 +370,7 @@ def get_splits_data():
     ret = {}
     data = []
     for group in race().groups:
-        gs = GroupSplits(group)
+        gs = GroupSplits(race(), group)
         group_data = []
         mv = 0
         for res in gs.person_splits:
@@ -395,10 +396,3 @@ def get_splits_data():
         'date': start_date.strftime("%d.%m.%Y")
     }
     return ret
-
-
-class SplitsCalculation(object):
-    @staticmethod
-    def process_groups():
-        for i in race().groups:
-            GroupSplits(i)
