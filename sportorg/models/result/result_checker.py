@@ -1,7 +1,7 @@
 from gettext import find
 
 from sportorg.core.otime import OTime
-from sportorg.models.memory import Person, ResultStatus, SystemType, find, race, Result, CourseControl
+from sportorg.models.memory import Person, ResultStatus, find, race, Result
 
 
 class ResultCheckerException(Exception):
@@ -88,7 +88,7 @@ class ResultChecker:
         if self.person.group is None:
             return True
 
-        if result.system_type != SystemType.SPORTIDENT:
+        if not result.is_sportident():
             return True
 
         course = find_course(self.person)
@@ -128,7 +128,7 @@ class ResultChecker:
         if person.group is None:
             return True
 
-        if result.system_type != SystemType.SPORTIDENT:
+        if not result.is_sportident():
             return True
 
         course = find_course(person)

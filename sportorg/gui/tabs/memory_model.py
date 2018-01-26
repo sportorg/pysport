@@ -2,11 +2,11 @@ import logging
 import re
 from abc import abstractmethod
 
-from PyQt5.QtCore import QVariant, QAbstractTableModel, Qt, QSortFilterProxyModel
+from PyQt5.QtCore import QVariant, QAbstractTableModel, Qt
 from typing import List
 
 from sportorg.language import _
-from sportorg.models.memory import race, Result, Group, Course, Organization, SystemType
+from sportorg.models.memory import race, Result, Group, Course, Organization
 from sportorg.utils.time import time_to_hhmmss
 
 
@@ -270,7 +270,7 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
         last_name = ''
         bib = 0
         sportident_card = ''
-        if i.system_type == SystemType.SPORTIDENT:
+        if i.is_sportident():
             sportident_card = str(result.sportident_card) if result.sportident_card is not None else ''
         if person:
             first_name = person.name

@@ -5,13 +5,12 @@ from PyQt5.QtCore import QModelIndex
 from PyQt5.QtWidgets import QAbstractItemView, QHeaderView
 
 from sportorg.core import event as event_handler
-from sportorg.core.otime import OTime
 from sportorg.gui.dialogs.results_edit import ResultEditDialog
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.tabs.memory_model import ResultMemoryModel
 from sportorg.gui.tabs.table import TableView
 from sportorg.language import _
-from sportorg.models.memory import race, Result, Course, CourseControl, SystemType
+from sportorg.models.memory import race, Result, Course, CourseControl
 from sportorg.models.result.result_checker import find_course
 from sportorg.utils.time import time_to_hhmmss
 
@@ -179,7 +178,7 @@ class Widget(QtWidgets.QWidget):
         if result.person:
             course = find_course(result.person)
 
-        if result.system_type != SystemType.SPORTIDENT:
+        if not result.is_sportident():
             return
 
         control_codes = []
