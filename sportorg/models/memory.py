@@ -24,8 +24,6 @@ class SystemType(Enum):
     NONE = 0
     MANUAL = 1
     SPORTIDENT = 2
-    ALT = 3
-    SFR = 4
 
     def __str__(self):
         return "%s" % self._name_
@@ -427,6 +425,12 @@ class Result:
             return self.penalty_time
         return OTime()
 
+    def is_sportident(self):
+        return self.system_type == SystemType.SPORTIDENT
+
+    def is_manual(self):
+        return self.system_type == SystemType.MANUAL
+
 
 class ResultManual(Result):
     system_type = SystemType.MANUAL
@@ -514,18 +518,6 @@ class ResultSportident(Result):
     def clear(self):
         self.__start_time = None
         self.__finish_time = None
-
-
-class ResultAlt(Result):
-    system_type = SystemType.ALT
-
-
-class ResultSFR(Result):
-    system_type = SystemType.SFR
-
-    def __init__(self):
-        super().__init__()
-        self.splits = []  # type: List[Split]
 
 
 class Person(Model):

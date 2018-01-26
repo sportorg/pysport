@@ -3,12 +3,12 @@ import logging
 from PyQt5.QtCore import QTime
 from PyQt5.QtWidgets import QFormLayout, QLabel, QDialog, \
      QTimeEdit, QSpinBox, QRadioButton, QCheckBox, QDialogButtonBox, QWidget, QTabWidget, \
-     QGroupBox, QLineEdit, QTextEdit
+     QGroupBox, QLineEdit
 
 from sportorg.core.otime import OTime
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import _
-from sportorg.models.memory import race, SystemType
+from sportorg.models.memory import race
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.modules.configs.configs import Config
 from sportorg.utils.time import time_to_otime
@@ -431,7 +431,7 @@ class TimekeepingPropertiesDialog(QDialog):
         if old_start_cp_number != start_cp_number or old_finish_cp_number != finish_cp_number:
             changed = True
             for result in race().results:
-                if result.system_type == SystemType.SPORTIDENT:
+                if result.is_sportident():
                     result.clear()
 
         obj.set_setting('sportident_start_source', start_source)

@@ -7,9 +7,8 @@ import requests
 from requests.exceptions import MissingSchema, ConnectionError
 
 from sportorg import config
-from sportorg.language import _
 from sportorg.core.singleton import Singleton
-from sportorg.models.memory import race, Person, Result, SystemType
+from sportorg.models.memory import race, Person, Result
 
 
 class OrgeoCommand:
@@ -120,7 +119,7 @@ class OrgeoClient(metaclass=Singleton):
             data['start'] = result.get_start_time().to_sec()
             data['result_ms'] = result.get_result_for_sort()
             data['result_status'] = str(result.status)
-            if result.system_type == SystemType.SPORTIDENT:
+            if result.is_sportident():
                 if len(result.splits):
                     data['splits'] = []
                     for split in result.splits:

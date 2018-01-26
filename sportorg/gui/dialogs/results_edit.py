@@ -6,14 +6,13 @@ from typing import List, Tuple
 from PyQt5.QtCore import QModelIndex
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, \
-    QPushButton, QTimeEdit, QRadioButton, QSpinBox, QGroupBox, QScrollArea, QGridLayout, QTextEdit, QCheckBox, \
-    QDialogButtonBox
+    QPushButton, QTimeEdit, QRadioButton, QSpinBox, QGroupBox, QScrollArea, QGridLayout, QTextEdit, QDialogButtonBox
 
 from sportorg import config
 from sportorg.core.otime import OTime
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import _
-from sportorg.models.memory import race, Result, find, ResultStatus, Person, Limit, SystemType, Split
+from sportorg.models.memory import race, Result, find, ResultStatus, Person, Limit, Split
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.result_checker import ResultChecker, ResultCheckerException
 from sportorg.utils.time import time_to_qtime, time_to_otime, hhmmss_to_time
@@ -76,7 +75,7 @@ class ResultEditDialog(QDialog):
 
         self.splits = SplitsText()
 
-        if self.current_object.system_type == SystemType.SPORTIDENT:
+        if self.current_object.is_sportident():
             self.layout.addRow(QLabel(_('Card')), self.item_sportident_card)
         self.layout.addRow(QLabel(_('Bib')), self.item_bib)
         self.layout.addRow(QLabel(''), self.label_person_info)
@@ -92,7 +91,7 @@ class ResultEditDialog(QDialog):
         self.layout.addRow(self.radio_overtime)
         self.layout.addRow(self.radio_dsq, self.text_dsq)
 
-        if self.current_object.system_type == SystemType.SPORTIDENT:
+        if self.current_object.is_sportident():
             start_source = race().get_setting('sportident_start_source', 'protocol')
             finish_source = race().get_setting('sportident_finish_source', 'station')
             if start_source == 'protocol' or start_source == 'cp':
@@ -141,7 +140,7 @@ class ResultEditDialog(QDialog):
                 self.button_ok.setDisabled(True)
 
     def set_values_from_table(self):
-        if self.current_object.system_type == SystemType.SPORTIDENT:
+        if self.current_object.is_sportident():
             if self.current_object.sportident_card is not None:
                 self.item_sportident_card.setValue(int(self.current_object.sportident_card))
             self.splits.splits(self.current_object.splits)
@@ -174,7 +173,7 @@ class ResultEditDialog(QDialog):
         result = self.current_object
         changed = False
 
-        if result.system_type == SystemType.SPORTIDENT:
+        if result.is_sportident():
             if result.sportident_card is None or int(result.sportident_card) != self.item_sportident_card.value():
                 result.sportident_card = race().new_sportident_card(self.item_sportident_card.value())
                 changed = True
@@ -215,7 +214,7 @@ class ResultEditDialog(QDialog):
 
         recheck = False
         if new_bib == 0:
-            if result.person and result.system_type == SystemType.SPORTIDENT:
+            if result.person and result.is_sportident():
                 if result.person.sportident_card == result.sportident_card:
                     result.person.sportident_card = None
             result.person = None
@@ -225,11 +224,11 @@ class ResultEditDialog(QDialog):
             if new_person is not None:
                 assert isinstance(new_person, Person)
                 if result.person:
-                    if result.system_type == SystemType.SPORTIDENT:
+                    if result.is_sportident():
                         result.person.sportident_card = None
                 recheck = True
                 result.person = new_person
-                if result.system_type == SystemType.SPORTIDENT:
+                if result.is_sportident():
                     result.person.sportident_card = result.sportident_card
 
                     logging.info('Old status {}'.format(result.status))
@@ -259,7 +258,7 @@ class ResultEditDialog(QDialog):
             changed = True
 
         if changed:
-            if result.system_type == SystemType.SPORTIDENT:
+            if result.is_sportident():
                 result.clear()
             ResultCalculation().process_results()
             GlobalAccess().get_main_window().refresh()
