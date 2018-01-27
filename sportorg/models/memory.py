@@ -655,6 +655,7 @@ class Race(Model):
         card = self.new_sportident_card(number)
         if card.person is not None:
             card.person.sportident_card = None
+            card.person.is_rented_sportident_card = False
         card.person = person
         person.sportident_card = card
 

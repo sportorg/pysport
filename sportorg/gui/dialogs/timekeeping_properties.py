@@ -83,22 +83,11 @@ class TimekeepingPropertiesDialog(QDialog):
         self.chip_reading_always = QRadioButton(_('Always'))
         self.chip_reading_layout.addRow(self.chip_reading_always)
         self.chip_reading_box.setLayout(self.chip_reading_layout)
-        # self.tk_layout.addRow(self.chip_reading_box)
-
-        self.repeated_reading_box = QGroupBox(_('Repeated reading'))
-        self.repeated_reading_layout = QFormLayout()
-        self.repeated_reading_rewrite = QRadioButton(_('Rewrite'))
-        self.repeated_reading_layout.addRow(self.repeated_reading_rewrite)
-        self.repeated_reading_add = QRadioButton(_('Add'))
-        self.repeated_reading_layout.addRow(self.repeated_reading_add)
-        self.repeated_reading_keep_all_version = QRadioButton(_('Keep all versions'))
-        self.repeated_reading_layout.addRow(self.repeated_reading_keep_all_version)
-        self.repeated_reading_box.setLayout(self.repeated_reading_layout)
-        # self.tk_layout.addRow(self.repeated_reading_box)
+        self.tk_layout.addRow(self.chip_reading_box)
 
         self.assignment_mode = QCheckBox(_('Assignment mode'))
-        # self.assignment_mode.stateChanged.connect(self.on_assignment_mode)
-        # self.layout.addRow(self.assignment_mode)
+        self.assignment_mode.stateChanged.connect(self.on_assignment_mode)
+        self.tk_layout.addRow(self.assignment_mode)
 
         self.auto_connect = QCheckBox(_('Auto connect to station'))
         self.tk_layout.addRow(self.auto_connect)
@@ -277,7 +266,6 @@ class TimekeepingPropertiesDialog(QDialog):
         self.start_group_box.setDisabled(mode)
         self.finish_group_box.setDisabled(mode)
         self.chip_reading_box.setDisabled(mode)
-        self.repeated_reading_box.setDisabled(mode)
 
     def set_values_from_model(self):
         cur_race = race()
@@ -287,7 +275,6 @@ class TimekeepingPropertiesDialog(QDialog):
         finish_source = cur_race.get_setting('sportident_finish_source', 'station')
         finish_cp_number = cur_race.get_setting('sportident_finish_cp_number', 90)
         assign_chip_reading = cur_race.get_setting('sportident_assign_chip_reading', 'off')
-        repeated_reading = cur_race.get_setting('sportident_repeated_reading', 'rewrite')
         assignment_mode = cur_race.get_setting('sportident_assignment_mode', False)
 
         self.item_zero_time.setTime(QTime(zero_time[0], zero_time[1]))
@@ -318,13 +305,6 @@ class TimekeepingPropertiesDialog(QDialog):
             self.chip_reading_unknown.setChecked(True)
         elif assign_chip_reading == 'always':
             self.chip_reading_always.setChecked(True)
-
-        if repeated_reading == 'rewrite':
-            self.repeated_reading_rewrite.setChecked(True)
-        elif repeated_reading == 'add':
-            self.repeated_reading_add.setChecked(True)
-        elif repeated_reading == 'keep_all_versions':
-            self.repeated_reading_keep_all_version.setChecked(True)
 
         self.assignment_mode.setChecked(assignment_mode)
         self.auto_connect.setChecked(Config().configuration.get('autoconnect'))
@@ -439,12 +419,6 @@ class TimekeepingPropertiesDialog(QDialog):
         elif self.chip_reading_always.isChecked():
             assign_chip_reading = 'always'
 
-        repeated_reading = 'rewrite'
-        if self.repeated_reading_add.isChecked():
-            repeated_reading = 'add'
-        elif self.repeated_reading_keep_all_version.isChecked():
-            repeated_reading = 'keep_all_versions'
-
         obj.set_setting('sportident_zero_time', (
             self.item_zero_time.time().hour(),
             self.item_zero_time.time().minute(),
@@ -474,7 +448,6 @@ class TimekeepingPropertiesDialog(QDialog):
         obj.set_setting('sportident_finish_cp_number', finish_cp_number)
 
         obj.set_setting('sportident_assign_chip_reading', assign_chip_reading)
-        obj.set_setting('sportident_repeated_reading', repeated_reading)
 
         obj.set_setting('sportident_assignment_mode', self.assignment_mode.isChecked())
 

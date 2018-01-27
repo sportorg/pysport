@@ -1,5 +1,6 @@
 import logging
 
+from sportorg.gui.dialogs.bib_dialog import BibDialog
 from sportorg.models.result.result_checker import ResultChecker, ResultCheckerException
 from sportorg.models.memory import race, Person, Result, ResultSportident
 
@@ -10,7 +11,6 @@ class ResultSportidentGeneration:
         self._result = result
         self._person = None
         self.assign_chip_reading = race().get_setting('sportident_assign_chip_reading', 'off')
-        self.repeated_reading = race().get_setting('sportident_repeated_reading', 'rewrite')
 
     def _add_result_to_race(self):
         race().add_result(self._result)
@@ -41,23 +41,29 @@ class ResultSportidentGeneration:
                 return True
         return False
 
+    def _bib_dialog(self):
+        try:
+            bib_dialog = BibDialog('{}'.format(self._result.sportident_card))
+            bib_dialog.exec()
+            self._person = bib_dialog.get_person()
+            if not self._person:
+                self.assign_chip_reading = 'off'
+        except Exception as e:
+            logging.exception(str(e))
+
     def add_result(self):
         if self._has_result():
+            logging.info('Result already exist')
             return
         if self.assign_chip_reading == 'always':
-            pass  # bib
+            self._bib_dialog()
         self._add_result()
-
-    def check_splits(self):
-        if self._find_person_by_result():
-            return ResultChecker(self._person).check_result(self._result)
-        return False
 
     def _no_person(self):
         if self.assign_chip_reading == 'off':
             self._add_result_to_race()
         elif self.assign_chip_reading == 'only_unknown_members':
-            # bib
+            self._bib_dialog()
             self._add_result()
 
     def _add_result(self):
@@ -76,6 +82,7 @@ class ResultSportidentGeneration:
         else:
             if self._find_person_by_result():
                 self._result.person = self._person
+                race().person_sportident_card(self._person, int(self._result.sportident_card))
                 self._add_result()
             else:
                 self._no_person()

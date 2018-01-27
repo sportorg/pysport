@@ -655,25 +655,33 @@ class MainWindow(QMainWindow):
         except Exception as e:
             logging.exception(str(e))
 
-    @staticmethod
-    def add_sportident_result_from_sireader(result):
-        assignment_mode = race().get_setting('sportident_assignment_mode', False)
-        if not assignment_mode:
-            GlobalAccess().clear_filters(remove_condition=False)
-            ResultSportidentGeneration(result).add_result()
-            ResultCalculation(race()).process_results()
-            if race().get_setting('split_printout', False):
-                try:
-                    split_printout(result)
-                except NoResultToPrintException as e:
-                    logging.error(str(e))
-                except NoPrinterSelectedException as e:
-                    logging.error(str(e))
-                except Exception as e:
-                    logging.exception(str(e))
-            GlobalAccess().auto_save()
-            OrgeoClient().send_results()
-        GlobalAccess().get_main_window().init_model()
+    def add_sportident_result_from_sireader(self, result):
+        try:
+            assignment_mode = race().get_setting('sportident_assignment_mode', False)
+            if not assignment_mode:
+                GlobalAccess().clear_filters(remove_condition=False)
+                ResultSportidentGeneration(result).add_result()
+                ResultCalculation(race()).process_results()
+                if race().get_setting('split_printout', False):
+                    try:
+                        split_printout(result)
+                    except NoResultToPrintException as e:
+                        logging.error(str(e))
+                    except NoPrinterSelectedException as e:
+                        logging.error(str(e))
+                    except Exception as e:
+                        logging.exception(str(e))
+                GlobalAccess().auto_save()
+                OrgeoClient().send_results()
+            else:
+                for person in race().persons:
+                    if not person.sportident_card:
+                        race().person_sportident_card(person, int(result.sportident_card))
+                        person.is_rented_sportident_card = True
+                        break
+            self.refresh()
+        except Exception as e:
+            logging.exception(str(e))
 
     def import_wo_csv(self):
         file_name = get_open_file_name(_('Open CSV Winorient file'), _("CSV Winorient (*.csv)"))

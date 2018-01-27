@@ -245,7 +245,7 @@ def get_property(person, key):
         else:
             return '00:00:00'
     elif key == _('Penalty legs'):
-        result = frace().find_person_result(person)
+        result = race().find_person_result(person)
         if result and result.penalty_laps:
             return str(result.penalty_laps)
     elif key == _('Card number'):
