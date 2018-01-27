@@ -1,7 +1,7 @@
 import logging
 
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QFormLayout, QLabel, QDialog, QPushButton, QSpinBox, QDialogButtonBox
+from PyQt5.QtWidgets import QFormLayout, QLabel, QDialog, QSpinBox, QDialogButtonBox
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
