@@ -240,7 +240,7 @@ class ResultEditDialog(QDialog):
                         logging.error(str(e))
                     logging.info('New status {}'.format(result.status))
 
-            GlobalAccess().get_result_table().model().init_cache()
+            GlobalAccess().get_main_window().get_result_table().model().init_cache()
             changed = True
 
         status = ResultStatus.NONE

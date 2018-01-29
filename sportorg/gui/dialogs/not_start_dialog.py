@@ -74,4 +74,4 @@ class NotStartDialog(QDialog):
                 else:
                     logging.info('{} not found'.format(number))
                 old_numbers.append(number)
-        GlobalAccess().refresh()
+        GlobalAccess().get_main_window().refresh()

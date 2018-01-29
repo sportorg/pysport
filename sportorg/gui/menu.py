@@ -254,15 +254,15 @@ def menu_list():
                 {
                     'title': _('Rechecking'),
                     'shortcut': 'Ctrl+R',
-                    'action': GlobalAccess().rechecking
+                    'action': GlobalAccess().get_main_window().rechecking
                 },
                 {
                     'title': _('Penalty calculation'),
-                    'action': GlobalAccess().penalty_calculation
+                    'action': GlobalAccess().get_main_window().penalty_calculation
                 },
                 {
                     'title': _('Penalty removing'),
-                    'action': GlobalAccess().penalty_removing
+                    'action': GlobalAccess().get_main_window().penalty_removing
                 },
                 {
                     'title': _('Change status'),

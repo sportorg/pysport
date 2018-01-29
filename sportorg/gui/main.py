@@ -3,8 +3,10 @@ import logging
 import time
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import QModelIndex, QItemSelectionModel
 from PyQt5.QtWidgets import QMainWindow, QTableView, QMessageBox, QApplication
 
+from sportorg.core.otime import OTime
 from sportorg.gui.dialogs.bib_report_dialog import BibReportDialog
 from sportorg.gui.dialogs.live_dialog import LiveDialog
 from sportorg.gui.dialogs.not_start_dialog import NotStartDialog
@@ -14,11 +16,13 @@ from sportorg.gui.dialogs.start_time_change_dialog import StartTimeChangeDialog
 from sportorg.gui.dialogs.team_report_dialog import TeamReportDialog
 from sportorg.gui.dialogs.team_results_report_dialog import TeamResultsReportDialog
 from sportorg.gui.dialogs.text_io import TextExchangeDialog
+from sportorg.gui.global_access import GlobalAccess
 from sportorg.libs.winorient.wdb import write_wdb
-from sportorg.models.memory import Race, event as races, race, ResultStatus
+from sportorg.models.memory import Race, event as races, race, ResultStatus, NotEmptyException
 
 from sportorg import config
 from sportorg.models.result.result_calculation import ResultCalculation
+from sportorg.models.result.result_checker import ResultChecker
 from sportorg.modules.backup.file import File
 from sportorg.modules.iof import iof_xml
 from sportorg.modules.live.orgeo import OrgeoClient
@@ -43,7 +47,6 @@ from sportorg.gui.dialogs.timekeeping_properties import TimekeepingPropertiesDia
 from sportorg.gui.dialogs.start_chess_dialog import StartChessDialog
 from sportorg.gui.dialogs.start_preparation import StartPreparationDialog
 from sportorg.gui.dialogs.start_report_dialog import StartReportDialog
-from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.menu import menu_list
 from sportorg.gui.tabs import start_preparation, groups, teams, race_results, courses, log
 from sportorg.gui.tabs.memory_model import PersonMemoryModel, ResultMemoryModel, GroupMemoryModel, \
@@ -238,7 +241,7 @@ class MainWindow(QMainWindow):
             try:
                 if update_data:
                     races[0] = Race()
-                GlobalAccess().clear_filters(remove_condition=False)
+                self.clear_filters(remove_condition=False)
                 File(file_name, logging.root).create()
                 self.file = file_name
                 self.add_recent_file(self.file)
@@ -257,7 +260,7 @@ class MainWindow(QMainWindow):
     def save_file(self):
         if self.file is not None:
             try:
-                GlobalAccess().clear_filters(remove_condition=False)
+                self.clear_filters(remove_condition=False)
                 File(self.file, logging.root).save()
             except Exception as e:
                 logging.exception(str(e))
@@ -328,7 +331,7 @@ class MainWindow(QMainWindow):
         try:
             if self.current_tab not in range(2):
                 return
-            table = GlobalAccess().get_current_table()
+            table = self.get_current_table()
             ex = DialogFilter(table)
             ex.exec()
         except Exception as e:
@@ -338,7 +341,7 @@ class MainWindow(QMainWindow):
         if self.current_tab not in range(5):
             return
         try:
-            table = GlobalAccess().get_current_table()
+            table = self.get_current_table()
             ex = SearchDialog(table)
             ex.exec()
         except Exception as e:
@@ -367,7 +370,7 @@ class MainWindow(QMainWindow):
         try:
             obj = race()
 
-            table = GlobalAccess().get_result_table()
+            table = self.get_result_table()
             assert isinstance(table, QTableView)
             index = table.currentIndex().row()
             if index < 0:
@@ -410,7 +413,7 @@ class MainWindow(QMainWindow):
                 ResultStatus.DID_NOT_FINISH: ResultStatus.OK,
             }
 
-            table = GlobalAccess().get_result_table()
+            table = self.get_result_table()
             assert isinstance(table, QTableView)
             index = table.currentIndex().row()
             if index < 0:
@@ -498,27 +501,25 @@ class MainWindow(QMainWindow):
         except Exception as e:
             logging.exception(str(e))
 
-    @staticmethod
-    def manual_finish():
+    def manual_finish(self):
         try:
             result = race().new_result()
             race().add_new_result(result)
             logging.info('Manual finish')
-            GlobalAccess().get_result_table().model().init_cache()
-            GlobalAccess().get_main_window().refresh()
-            GlobalAccess().auto_save()
+            self.get_result_table().model().init_cache()
+            self.refresh()
+            self.auto_save()
         except Exception as e:
             logging.exception(str(e))
 
-    @staticmethod
-    def sportident_result():
+    def sportident_result(self):
         try:
             result = race().new_sportident_result()
             race().add_new_result(result)
             logging.info('SPORTident result')
-            GlobalAccess().get_result_table().model().init_cache()
-            GlobalAccess().get_main_window().refresh()
-            GlobalAccess().auto_save()
+            self.get_result_table().model().init_cache()
+            self.refresh()
+            self.auto_save()
         except Exception as e:
             logging.exception(str(e))
 
@@ -584,58 +585,55 @@ class MainWindow(QMainWindow):
         except Exception as e:
             logging.exception(str(e))
 
-    @staticmethod
-    def create_object():
-        GlobalAccess().add_object()
+    def create_object(self):
+        self.add_object()
 
     def delete_object(self):
         if self.current_tab not in range(5):
             return
         try:
-            GlobalAccess().delete_object()
+            self.delete_object()
         except Exception as e:
             logging.exception(str(e))
 
-    @staticmethod
-    def init_model():
+    def init_model(self):
         try:
-            GlobalAccess().clear_filters()  # clear filters not to loose filtered data
+            self.clear_filters()  # clear filters not to loose filtered data
 
-            table = GlobalAccess().get_person_table()
+            table = self.get_person_table()
             table.setModel(PersonMemoryModel())
-            table = GlobalAccess().get_result_table()
+            table = self.get_result_table()
             table.setModel(ResultMemoryModel())
-            table = GlobalAccess().get_group_table()
+            table = self.get_group_table()
             table.setModel(GroupMemoryModel())
-            table = GlobalAccess().get_course_table()
+            table = self.get_course_table()
             table.setModel(CourseMemoryModel())
-            table = GlobalAccess().get_organization_table()
+            table = self.get_organization_table()
             table.setModel(TeamMemoryModel())
             event.event('init_model')
         except Exception as e:
             logging.exception(str(e))
 
-    @staticmethod
-    def refresh():
+    def refresh(self):
         logging.debug('Refreshing interface')
         try:
-            table = GlobalAccess().get_person_table()
+            table = self.get_person_table()
             table.model().init_cache()
             table.model().layoutChanged.emit()
 
-            table = GlobalAccess().get_result_table()
+            table = self.get_result_table()
             table.model().init_cache()
             table.model().layoutChanged.emit()
 
-            table = GlobalAccess().get_group_table()
+            table = self.get_group_table()
             table.model().init_cache()
             table.model().layoutChanged.emit()
 
-            table = GlobalAccess().get_course_table()
+            table = self.get_course_table()
             table.model().init_cache()
             table.model().layoutChanged.emit()
 
-            table = GlobalAccess().get_organization_table()
+            table = self.get_organization_table()
             table.model().init_cache()
             table.model().layoutChanged.emit()
             event.event('refresh')
@@ -659,7 +657,7 @@ class MainWindow(QMainWindow):
         try:
             assignment_mode = race().get_setting('sportident_assignment_mode', False)
             if not assignment_mode:
-                GlobalAccess().clear_filters(remove_condition=False)
+                self.clear_filters(remove_condition=False)
                 ResultSportidentGeneration(result).add_result()
                 ResultCalculation(race()).process_results()
                 if race().get_setting('split_printout', False):
@@ -671,7 +669,7 @@ class MainWindow(QMainWindow):
                         logging.error(str(e))
                     except Exception as e:
                         logging.exception(str(e))
-                GlobalAccess().auto_save()
+                self.auto_save()
                 OrgeoClient().send_results()
             else:
                 for person in race().persons:
@@ -710,9 +708,9 @@ class MainWindow(QMainWindow):
             try:
                 wb = WinOrientBinary()
 
-                GlobalAccess().clear_filters(False)
+                self.clear_filters(False)
                 wdb_object = wb.export()
-                GlobalAccess().apply_filters()
+                self.apply_filters()
 
                 write_wdb(wdb_object, file_name)
             except Exception as e:
@@ -730,10 +728,9 @@ class MainWindow(QMainWindow):
 
             self.init_model()
 
-    @staticmethod
-    def text_exchange():
+    def text_exchange(self):
         TextExchangeDialog().exec()
-        GlobalAccess().refresh()
+        self.refresh()
 
     @staticmethod
     def testing():
@@ -758,3 +755,178 @@ class MainWindow(QMainWindow):
             except Exception as e:
                 logging.exception(str(e))
                 QMessageBox.warning(self, _('Error'), _('Export error') + ': ' + file_name)
+
+    def get_table_by_name(self, name):
+        return self.findChild(QtWidgets.QTableView, name)
+
+    def get_person_table(self):
+        return self.get_table_by_name('EntryTable')
+
+    def get_result_table(self):
+        return self.get_table_by_name('ResultTable')
+
+    def get_group_table(self):
+        return self.get_table_by_name('GroupTable')
+
+    def get_course_table(self):
+        return self.get_table_by_name('CourseTable')
+
+    def get_organization_table(self):
+        return self.get_table_by_name('TeamTable')
+
+    def get_current_table(self):
+        map_ = ['EntryTable', 'ResultTable', 'GroupTable', 'CourseTable', 'TeamTable']
+        idx = self.current_tab
+        if idx < len(map_):
+            return self.get_table_by_name(map_[idx])
+
+    def get_selected_rows(self):
+        table = self.get_current_table()
+        assert isinstance(table, QTableView)
+        sel_model = table.selectionModel()
+        assert isinstance(sel_model, QItemSelectionModel)
+        indexes = sel_model.selectedRows()
+
+        ret = []
+        for i in indexes:
+            assert isinstance(i, QModelIndex)
+            orig_index_int = i.row()
+            ret.append(orig_index_int)
+        return ret
+
+    def delete_object(self):
+        indexes = self.get_selected_rows()
+        if not len(indexes):
+            return
+
+        confirm = QMessageBox.question(self,
+                                       _('Question'),
+                                       _('Please confirm'),
+                                       QMessageBox.Yes | QMessageBox.No)
+        if confirm == QMessageBox.No:
+            return
+        tab = self.current_tab
+
+        if tab == 0:
+            race().delete_persons(indexes)
+            # recalculate places
+            ResultCalculation(race()).process_results()
+            self.refresh()
+        elif tab == 1:
+            race().delete_results(indexes)
+            # recalculate places
+            ResultCalculation(race()).process_results()
+            self.refresh()
+        elif tab == 2:
+            try:
+                race().delete_groups(indexes)
+            except NotEmptyException as e:
+                logging.warning(str(e))
+                QMessageBox.question(self.get_group_table(),
+                                     _('Error'),
+                                     _('Cannot remove group'))
+            self.refresh()
+        elif tab == 3:
+            try:
+                race().delete_courses(indexes)
+            except NotEmptyException as e:
+                logging.warning(str(e))
+                QMessageBox.question(self.get_course_table(),
+                                     _('Error'),
+                                     _('Cannot remove course'))
+            self.refresh()
+        elif tab == 4:
+            try:
+                race().delete_organizations(indexes)
+            except NotEmptyException as e:
+                logging.warning(str(e))
+                QMessageBox.question(self.get_organization_table(),
+                                     _('Error'),
+                                     _('Cannot remove organization'))
+            self.refresh()
+
+    def add_object(self):
+        try:
+            tab = self.current_tab
+            if tab == 0:
+                race().add_new_person()
+                self.get_person_table().model().init_cache()
+            elif tab == 1:
+                self.manual_finish()
+            elif tab == 2:
+                race().add_new_group()
+                self.get_person_table().model().init_cache()
+            elif tab == 3:
+                race().add_new_course()
+                self.get_course_table().model().init_cache()
+            elif tab == 4:
+                race().add_new_organization()
+                self.get_organization_table().model().init_cache()
+            self.refresh()
+        except Exception as e:
+            logging.exception(str(e))
+
+    def clear_filters(self, remove_condition=True):
+        self.get_person_table().model().clear_filter(remove_condition)
+        self.get_result_table().model().clear_filter(remove_condition)
+        self.get_person_table().model().clear_filter(remove_condition)
+        self.get_course_table().model().clear_filter(remove_condition)
+        self.get_organization_table().model().clear_filter(remove_condition)
+
+        self.get_person_table().model().clear_search(remove_condition)
+        self.get_result_table().model().clear_search(remove_condition)
+        self.get_person_table().model().clear_search(remove_condition)
+        self.get_course_table().model().clear_search(remove_condition)
+        self.get_organization_table().model().clear_search(remove_condition)
+
+    def rechecking(self):
+        try:
+            logging.debug('Rechecking start')
+            for result in race().results:
+                if result.person is not None:
+                    ResultChecker.checking(result)
+            logging.debug('Rechecking finish')
+            ResultCalculation(race()).process_results()
+            self.refresh()
+        except Exception as e:
+            logging.exception(str(e))
+
+    def penalty_calculation(self):
+        try:
+            logging.debug('Penalty calculation start')
+            for result in race().results:
+                if result.person is not None:
+                    ResultChecker.calculate_penalty(result)
+            logging.debug('Penalty calculation finish')
+            ResultCalculation(race()).process_results()
+            self.refresh()
+        except Exception as e:
+            logging.exception(str(e))
+
+    def penalty_removing(self):
+        try:
+            logging.debug('Penalty removing start')
+            for result in race().results:
+                result.penalty_time = OTime(msec=0)
+                result.penalty_laps = 0
+            logging.debug('Penalty removing finish')
+            ResultCalculation(race()).process_results()
+            self.refresh()
+        except Exception as e:
+            logging.exception(str(e))
+
+    def apply_filters(self):
+        self.get_person_table().model().apply_filter()
+        self.get_result_table().model().apply_filter()
+        self.get_person_table().model().apply_filter()
+        self.get_course_table().model().apply_filter()
+        self.get_organization_table().model().apply_filter()
+
+    def auto_save(self):
+        if not self.get_configuration().get('autosave'):
+            return
+        if self.file:
+            self.save_file()
+            logging.info(_('Auto save'))
+        else:
+            logging.warning(_('No file to auto save'))

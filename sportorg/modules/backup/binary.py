@@ -19,7 +19,7 @@ def dump(file):
     pickle.dump(data, file)
 
     # apply filters again
-    GlobalAccess().apply_filters()
+    GlobalAccess().get_main_window().apply_filters()
 
 
 def load(file):

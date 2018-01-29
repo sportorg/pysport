@@ -15,7 +15,7 @@ class GroupsTableView(TableView):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.popup_items = [
-            (_("Add object"), GlobalAccess().add_object),
+            (_("Add object"), GlobalAccess().get_main_window().add_object),
             (_('Delete'), GlobalAccess().get_main_window().delete_object)
         ]
 
