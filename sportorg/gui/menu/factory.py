@@ -1,13 +1,15 @@
 
 
 class Factory:
-    def __init__(self):
+    def __init__(self, app):
         self.actions = [
 
         ]
-        self.map = {}
+        self._map = {}
         for action in self.actions:
-            self.map[action.__class__.name] = action.execute
+            action.app = app
+            self._map[action.__class__.__name__] = action.execute
 
-    def get_actions(self):
-        pass
+    def get_action(self, key):
+        if key in self._map:
+            return self._map[key]
