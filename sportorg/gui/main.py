@@ -676,7 +676,7 @@ class MainWindow(QMainWindow):
             else:
                 for person in race().persons:
                     if not person.sportident_card:
-                        race().person_sportident_card(person, int(result.sportident_card))
+                        race().person_sportident_card(person, result.sportident_card)
                         person.is_rented_sportident_card = True
                         break
             self.refresh()

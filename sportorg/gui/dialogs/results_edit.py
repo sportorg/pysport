@@ -215,7 +215,6 @@ class ResultEditDialog(QDialog):
         if result.person:
             cur_bib = result.person.bib
 
-        recheck = False
         if new_bib == 0:
             if result.person and result.is_sportident():
                 if result.person.sportident_card == result.sportident_card:
@@ -229,10 +228,9 @@ class ResultEditDialog(QDialog):
                 if result.person:
                     if result.is_sportident():
                         result.person.sportident_card = None
-                recheck = True
                 result.person = new_person
                 if result.is_sportident():
-                    result.person.sportident_card = result.sportident_card
+                    race().person_sportident_card(result.person, result.sportident_card)
 
                     logging.info('Old status {}'.format(result.status))
                     try:

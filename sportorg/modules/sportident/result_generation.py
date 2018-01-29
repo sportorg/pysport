@@ -82,7 +82,7 @@ class ResultSportidentGeneration:
         else:
             if self._find_person_by_result():
                 self._result.person = self._person
-                race().person_sportident_card(self._person, int(self._result.sportident_card))
+                race().person_sportident_card(self._person, self._result.sportident_card)
                 self._add_result()
             else:
                 self._no_person()
