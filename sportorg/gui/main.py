@@ -930,3 +930,8 @@ class MainWindow(QMainWindow):
             logging.info(_('Auto save'))
         else:
             logging.warning(_('No file to auto save'))
+
+
+class Application:
+    def __init__(self, args):
+        self.args = args

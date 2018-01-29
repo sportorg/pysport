@@ -101,7 +101,6 @@ class TestWDBStringMethods(unittest.TestCase):
         obj2 = WDBMan(WDB())
         obj2.parse_bytes(byte_array)
         self.assertEqual(obj1.name, obj2.name)
-        self.assertEqual(obj1.round, obj2.round)
         self.assertEqual(obj1.finished, obj2.finished)
         self.assertEqual(len(byte_array), 196)
 
