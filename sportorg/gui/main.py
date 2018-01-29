@@ -47,7 +47,7 @@ from sportorg.gui.dialogs.timekeeping_properties import TimekeepingPropertiesDia
 from sportorg.gui.dialogs.start_chess_dialog import StartChessDialog
 from sportorg.gui.dialogs.start_preparation import StartPreparationDialog
 from sportorg.gui.dialogs.start_report_dialog import StartReportDialog
-from sportorg.gui.menu import menu_list
+from sportorg.gui.menu.menu import menu_list
 from sportorg.gui.tabs import start_preparation, groups, teams, race_results, courses, log
 from sportorg.gui.tabs.memory_model import PersonMemoryModel, ResultMemoryModel, GroupMemoryModel, \
     CourseMemoryModel, TeamMemoryModel
@@ -935,3 +935,6 @@ class MainWindow(QMainWindow):
 class Application:
     def __init__(self, args):
         self.args = args
+
+    def run(self):
+        pass
