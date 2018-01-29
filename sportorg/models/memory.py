@@ -640,7 +640,11 @@ class Race(Model):
         else:
             return nvl_value
 
-    def new_sportident_card(self, number=0):
+    def new_sportident_card(self, number=None):
+        if number is None:
+            number = 0
+        if isinstance(number, SportidentCard):
+            number = int(number)
         assert isinstance(number, int)
         for card in self.sportident_cards:
             if number == int(card):
@@ -649,8 +653,7 @@ class Race(Model):
         self.sportident_cards.append(card)
         return card
 
-    def person_sportident_card(self, person, number=0):
-        assert isinstance(number, int)
+    def person_sportident_card(self, person, number=None):
         assert isinstance(person, Person)
         card = self.new_sportident_card(number)
         if card.person is not None:
