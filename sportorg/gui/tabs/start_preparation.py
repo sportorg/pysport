@@ -7,7 +7,6 @@ from sportorg.gui.dialogs.entry_edit import EntryEditDialog
 from sportorg.gui.global_access import GlobalAccess, NumberClicker
 from sportorg.gui.tabs.memory_model import PersonMemoryModel
 from sportorg.gui.tabs.table import TableView
-from sportorg.language import _
 from sportorg.models.memory import race
 from sportorg.models.start.relay import set_next_relay_number_to_person
 
@@ -15,10 +14,7 @@ from sportorg.models.start.relay import set_next_relay_number_to_person
 class StartPreparationTableView(TableView):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.popup_items = [
-            (_("Add object"), GlobalAccess().get_main_window().add_object),
-            (_('Delete'), GlobalAccess().get_main_window().delete_object)
-        ]
+        self.popup_items = []
 
     def set_start_group(self, number):
         if -1 < self.currentIndex().row() < len(race().persons):
@@ -62,7 +58,6 @@ class Widget(QtWidgets.QWidget):
         hor_header.setSectionResizeMode(QHeaderView.Interactive)
 
         def entry_double_clicked(index):
-            logging.debug('Entered ' + str(index.row()))
             # show_edit_dialog(index)
             try:
                 if index.row() < len(race().persons):
@@ -72,7 +67,6 @@ class Widget(QtWidgets.QWidget):
                 logging.exception(str(e))
 
         def entry_single_clicked(index):
-            logging.debug('Clicked ' + str(index.row()))
             try:
                 obj = race()
                 if obj.get_setting('relay_number_assign', False):

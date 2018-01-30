@@ -4,20 +4,15 @@ from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QAbstractItemView, QHeaderView
 
 from sportorg.gui.dialogs.group_edit import GroupEditDialog
-from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.tabs.memory_model import GroupMemoryModel
 from sportorg.gui.tabs.table import TableView
-from sportorg.language import _
 from sportorg.models.memory import race
 
 
 class GroupsTableView(TableView):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.popup_items = [
-            (_("Add object"), GlobalAccess().get_main_window().add_object),
-            (_('Delete'), GlobalAccess().get_main_window().delete_object)
-        ]
+        self.popup_items = []
 
 
 class Widget(QtWidgets.QWidget):
@@ -45,8 +40,6 @@ class Widget(QtWidgets.QWidget):
         hor_header.setSectionResizeMode(QHeaderView.Interactive)
 
         def group_double_clicked(index):
-            logging.debug('clicked on ' + str(index.row()))
-
             try:
                 if index.row() < len(race().groups):
                     dialog = GroupEditDialog(self.GroupTable, index)

@@ -4,17 +4,17 @@ from sportorg.core.singleton import Singleton
 
 
 class GlobalAccess(metaclass=Singleton):
-    main_window = None
+    def __init__(self):
+        self.app = None
 
-    def set_main_window(self, window):
-        self.main_window = window
+    def set_app(self, app):
+        self.app = app
+
+    def get_app(self):
+        return self.app
 
     def get_main_window(self):
-        """
-
-        :return: MainWindow
-        """
-        return self.main_window
+        return self.app.get_main_window()
 
 
 class NumberClicker(metaclass=Singleton):

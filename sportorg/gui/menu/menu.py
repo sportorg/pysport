@@ -1,7 +1,4 @@
-import os
-
 from sportorg import config
-from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import _
 
 
@@ -14,46 +11,38 @@ def menu_list():
                     'title': _('New'),
                     'shortcut': 'Ctrl+N',
                     'icon': config.icon_dir('file.png'),
-                    'action': GlobalAccess().get_main_window().create_file
+                    'action': 'NewAction'
                 },
                 {
                     'title': _('Save'),
                     'shortcut': 'Ctrl+S',
                     'icon': config.icon_dir('save.png'),
-                    'action': GlobalAccess().get_main_window().save_file
+                    'action': 'SaveAction'
                 },
                 {
                     'title': _('Open'),
                     'shortcut': 'Ctrl+O',
                     'icon': config.icon_dir('folder.png'),
-                    'action': GlobalAccess().get_main_window().open_file_dialog
+                    'action': 'OpenAction'
                 },
                 {
                     'title': _('Save As'),
                     'shortcut': 'Ctrl+Shift+S',
                     'icon': config.icon_dir('save.png'),
-                    'action': GlobalAccess().get_main_window().save_file_as
-                },
-                {
-                    'title': _('Open Recent'),
-                    'actions': menu_recent_files()
+                    'action': 'SaveAsAction'
                 },
                 {
                     'type': 'separator',
                 },
-                # {
-                #     'title': _('New Race'),
-                #     'action': lambda: print('...')
-                # },
                 {
                     'title': _('Settings'),
                     'shortcut': 'Ctrl+Alt+S',
                     'icon': config.icon_dir('settings.png'),
-                    'action': GlobalAccess().get_main_window().settings_dialog
+                    'action': 'SettingsAction'
                 },
                 {
                     'title': _('Event Settings'),
-                    'action': GlobalAccess().get_main_window().event_settings_dialog
+                    'action': 'EventSettingsAction'
                 },
                 {
                     'type': 'separator',
@@ -64,15 +53,15 @@ def menu_list():
                         {
                             'title': _('CSV Winorient'),
                             'icon': config.icon_dir('csv.png'),
-                            'action': GlobalAccess().get_main_window().import_wo_csv
+                            'action': 'CSVWinorientImportAction'
                         },
                         {
                             'title': _('WDB Winorient'),
-                            'action': GlobalAccess().get_main_window().import_wo_wdb
+                            'action': 'WDBWinorientImportAction'
                         },
                         {
                             'title': _('Ocad txt v8'),
-                            'action': GlobalAccess().get_main_window().import_txt_v8
+                            'action': 'OcadTXTv8ImportAction'
                         },
                     ]
                 },
@@ -81,14 +70,14 @@ def menu_list():
                     'actions': [
                         {
                             'title': _('WDB Winorient'),
-                            'action': GlobalAccess().get_main_window().export_wo_wdb
+                            'action': 'WDBWinorientExportAction'
                         },
                         # {
                         #     'title': 'IOF xml',
                         #     'actions': [
                         #         {
                         #             'title': _('ResultList'),
-                        #             'action': GlobalAccess().get_main_window().export_iof_result_list
+                        #             'action': 'IOFResultListExportAction'
                         #         }
                         #     ]
                         # },
@@ -103,17 +92,17 @@ def menu_list():
                     'title': _('Add object'),
                     'shortcut': 'insert',
                     'icon': config.icon_dir('plus.png'),
-                    'action': GlobalAccess().get_main_window().create_object
+                    'action': 'AddObjectAction'
                 },
                 {
                     'title': _('Delete'),
                     'shortcut': 'Del',
                     'icon': config.icon_dir('delete.png'),
-                    'action': GlobalAccess().get_main_window().delete_object
+                    'action': 'DeleteAction'
                 },
                 {
                     'title': _('Text exchange'),
-                    'action': GlobalAccess().get_main_window().text_exchange
+                    'action': 'TextExchangeAction'
                 }
             ]
         },
@@ -124,18 +113,18 @@ def menu_list():
                     'title': _('Refresh'),
                     'icon': config.icon_dir('refresh.png'),
                     'shortcut': 'F5',
-                    'action': GlobalAccess().get_main_window().refresh
+                    'action': 'RefreshAction'
                 },
                 {
                     'title': _('Filter'),
                     'shortcut': 'F2',
                     'icon': config.icon_dir('filter.png'),
-                    'action': GlobalAccess().get_main_window().filter_dialog
+                    'action': 'FilterAction'
                 },
                 {
                     'title': _('Search'),
                     'shortcut': 'Ctrl+F',
-                    'action': GlobalAccess().get_main_window().search_dialog
+                    'action': 'SearchAction'
                 },
                 {
                     'type': 'separator',
@@ -143,27 +132,27 @@ def menu_list():
                 {
                     'title': _('Start Preparation'),
                     'shortcut': 'Ctrl+1',
-                    'action': lambda: GlobalAccess().get_main_window().select_tab(0)
+                    'action': 'ToStartPreparationAction'
                 },
                 {
                     'title': _('Race Results'),
                     'shortcut': 'Ctrl+2',
-                    'action': lambda: GlobalAccess().get_main_window().select_tab(1)
+                    'action': 'ToRaceResultsAction'
                 },
                 {
                     'title': _('Groups'),
                     'shortcut': 'Ctrl+3',
-                    'action': lambda: GlobalAccess().get_main_window().select_tab(2)
+                    'action': 'ToGroupsAction'
                 },
                 {
                     'title': _('Courses'),
                     'shortcut': 'Ctrl+4',
-                    'action': lambda: GlobalAccess().get_main_window().select_tab(3)
+                    'action': 'ToCoursesAction'
                 },
                 {
                     'title': _('Teams'),
                     'shortcut': 'Ctrl+5',
-                    'action': lambda: GlobalAccess().get_main_window().select_tab(4)
+                    'action': 'ToTeamsAction'
                 }
             ]
         },
@@ -172,46 +161,42 @@ def menu_list():
             'actions': [
                 {
                     'title': _('Start Preparation'),
-                    'action': GlobalAccess().get_main_window().start_preparation_dialog
+                    'action': 'StartPreparationAction'
                 },
-                # {
-                #     'title': _('Number Change'),
-                #     'action': GlobalAccess().get_main_window().number_change_dialog
-                # },
                 {
                     'title': _('Guess courses'),
-                    'action': GlobalAccess().get_main_window().guess_courses
+                    'action': 'GuessCoursesAction'
                 },
                 {
                     'title': _('Guess corridors'),
-                    'action': GlobalAccess().get_main_window().guess_corridors
+                    'action': 'GuessCorridorsAction'
                 },
                 {
                     'title': _('Relay number assign mode'),
-                    'action': GlobalAccess().get_main_window().relay_number_assign
+                    'action': 'RelayNumberAction'
                 },
                 {
                     'title': _('Start time change'),
-                    'action': GlobalAccess().get_main_window().start_time_change
+                    'action': 'StartTimeChangeAction'
                 },
                 {
                     'type': 'separator',
                 },
                 {
                     'title': _('Start list'),
-                    'action': GlobalAccess().get_main_window().create_start_protocol_dialog
+                    'action': 'StartListAction'
                 },
                 {
                     'title': _('Team list'),
-                    'action': GlobalAccess().get_main_window().create_team_protocol_dialog
+                    'action': 'TeamListAction'
                 },
                 {
                     'title': _('Start times'),
-                    'action': GlobalAccess().get_main_window().create_chess_dialog
+                    'action': 'StartTimesAction'
                 },
                 {
                     'title': _('Print Bib'),
-                    'action': GlobalAccess().get_main_window().bib_report_dialog
+                    'action': 'PrintBibAction'
                 }
             ]
         },
@@ -222,12 +207,12 @@ def menu_list():
                     'title': _('Manual finish'),
                     'shortcut': 'F3',
                     'icon': config.icon_dir('flag.png'),
-                    'action': GlobalAccess().get_main_window().manual_finish
+                    'action': 'ManualFinishAction'
                 },
                 {
                     'title': _('on/off SPORTident readout'),
                     'icon': config.icon_dir('sportident.png'),
-                    'action': GlobalAccess().get_main_window().sportident_connect
+                    'action': 'SPORTidentReadoutAction'
                 },
             ]
         },
@@ -237,16 +222,16 @@ def menu_list():
                 {
                     'title': _('Create report'),
                     'shortcut': 'Ctrl+P',
-                    'action': GlobalAccess().get_main_window().report_dialog
+                    'action': 'CreateReportAction'
                 },
                 {
                     'title': _('Create team results report'),
-                    'action': GlobalAccess().get_main_window().team_results_report_dialog
+                    'action': 'CreateTeamResultsReportAction'
                 },
                 {
                     'title': _('Split printout'),
                     'shortcut': 'Ctrl+L',
-                    'action': GlobalAccess().get_main_window().split_printout_selected
+                    'action': 'SplitPrintoutAction'
                 },
                 {
                     'type': 'separator',
@@ -254,28 +239,28 @@ def menu_list():
                 {
                     'title': _('Rechecking'),
                     'shortcut': 'Ctrl+R',
-                    'action': GlobalAccess().get_main_window().rechecking
+                    'action': 'RecheckingAction'
                 },
                 {
                     'title': _('Penalty calculation'),
-                    'action': GlobalAccess().get_main_window().penalty_calculation
+                    'action': 'PenaltyCalculationAction'
                 },
                 {
                     'title': _('Penalty removing'),
-                    'action': GlobalAccess().get_main_window().penalty_removing
+                    'action': 'PenaltyRemovingAction'
                 },
                 {
                     'title': _('Change status'),
                     'shortcut': 'F4',
-                    'action': GlobalAccess().get_main_window().change_status
+                    'action': 'ChangeStatusAction'
                 },
                 {
                     'title': _('Set DNS numbers'),
-                    'action': GlobalAccess().get_main_window().not_start_dialog
+                    'action': 'SetDNSNumbersAction'
                 },
                 {
                     'title': _('Add SPORTident result'),
-                    'action': GlobalAccess().get_main_window().sportident_result
+                    'action': 'AddSPORTidentResultAction'
                 }
             ]
         },
@@ -284,32 +269,31 @@ def menu_list():
             'actions': [
                 {
                     'title': _('Timekeeping settings'),
-                    # 'icon': config.icon_dir('sportident.png'),
-                    'action': GlobalAccess().get_main_window().timekeeping_settings_dialog
+                    'action': 'TimekeepingSettingsAction'
                 },
                 {
                     'title': _('Printer settings'),
                     'icon': config.icon_dir('print.png'),
-                    'action': GlobalAccess().get_main_window().print_settings_dialog
+                    'action': 'PrinterSettingsAction'
                 },
                 {
                     'title': _('Live'),
                     'actions': [
                         {
                             'title': _('Settings'),
-                            'action': GlobalAccess().get_main_window().live_dialog
+                            'action': 'LiveSettingsAction'
                         },
                         {
                             'title': _('Send start list'),
-                            'action': GlobalAccess().get_main_window().live_send_start_list
+                            'action': 'LiveSendStartListAction'
                         },
                         {
                             'title': _('Send results'),
-                            'action': GlobalAccess().get_main_window().live_send_results
+                            'action': 'LiveSendResultsAction'
                         },
                         {
                             'title': _('Resend results'),
-                            'action': GlobalAccess().get_main_window().live_resend_results
+                            'action': 'LiveResendResultsAction'
                         },
                     ]
                 }
@@ -318,34 +302,17 @@ def menu_list():
         {
             'title': _('Help'),
             'actions': [
-                # {
-                #     'title': _('Help'),
-                #     'action': lambda: print('...')
-                # },
                 {
                     'title': _('About'),
                     'shortcut': 'F1',
-                    'action': GlobalAccess().get_main_window().about_dialog
+                    'action': 'AboutAction'
                 },
-                {
-                    'title': _('Testing'),
-                    'show': config.DEBUG and not config.is_executable(),
-                    'shortcut': 'F10',
-                    'action': GlobalAccess().get_main_window().testing
-                }
+                # {
+                #     'title': _('Testing'),
+                #     'show': config.DEBUG and not config.is_executable(),
+                #     'shortcut': 'F10',
+                #     'action': 'TestingAction'
+                # }
             ]
         },
     ]
-
-
-def menu_recent_files():
-    def open_file(f):
-        return lambda: GlobalAccess().get_main_window().open_file(f)
-    result = []
-    for file in GlobalAccess().get_main_window().recent_files:
-        result.append({
-            'title': os.path.basename(file),
-            'status_tip': '{} {}'.format(_('Open'), file),
-            'action': open_file(file)
-        })
-    return result
