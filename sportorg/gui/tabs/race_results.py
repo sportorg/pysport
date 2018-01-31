@@ -6,7 +6,6 @@ from PyQt5.QtWidgets import QAbstractItemView, QHeaderView
 
 from sportorg.core import event as event_handler
 from sportorg.gui.dialogs.results_edit import ResultEditDialog
-from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.tabs.memory_model import ResultMemoryModel
 from sportorg.gui.tabs.table import TableView
 from sportorg.language import _
@@ -28,12 +27,7 @@ class ResultTable(TableView):
         self.clicked.connect(self.entry_single_clicked)
         self.activated.connect(self.double_clicked)
 
-        self.popup_items = [
-            (_('Manual finish'), GlobalAccess().get_main_window().manual_finish),
-            (_('Add SPORTident result'), GlobalAccess().get_main_window().sportident_result),
-            (_('Split printout'), GlobalAccess().get_main_window().split_printout_selected),
-            (_('Delete'), GlobalAccess().get_main_window().delete_object)
-        ]
+        self.popup_items = []
 
         event_handler.add_event('refresh', self.update_splits)
 
@@ -51,14 +45,11 @@ class ResultTable(TableView):
 
     def entry_single_clicked(self, index):
         try:
-            logging.debug('Single result clicked on ' + str(index.row()))
             #  show splits in the left area
             if -1 < index.row() < len(race().results):
                 self.parent_widget.show_splits(index)
         except Exception as e:
             logging.exception(str(e))
-
-        logging.debug('Finish single result clicked on ' + str(index.row()))
 
     def double_clicked(self, index):
         try:

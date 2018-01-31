@@ -7,6 +7,7 @@ from sportorg.core.singleton import Singleton
 class ConfigFile(object):
     GEOMETRY = 'geometry'
     CONFIGURATION = 'configuration'
+    LOCALE = 'locale'
     DIRECTORY = 'directory'
     PATH = 'path'
 
@@ -67,6 +68,7 @@ class Config(metaclass=Singleton):
         self._config_parser = configparser.ConfigParser()
         self._configurations = {
             ConfigFile.CONFIGURATION: Configurations({
+                'current_locale': 'ru_RU',
                 'show_toolbar': True,
                 'autosave': False,
                 'autoconnect': False,
@@ -88,8 +90,10 @@ class Config(metaclass=Singleton):
             for option in self.parser.options(ConfigFile.CONFIGURATION):
                 self.configuration.set_parse(
                     option, self.parser.get(ConfigFile.CONFIGURATION, option, fallback=self.configuration.get(option)))
+        self.configuration.set('current_locale', self.parser.get(ConfigFile.LOCALE, 'current', fallback='ru_RU'))
 
     def save(self):
         self.parser[ConfigFile.CONFIGURATION] = self.configuration.get_all()
+        self.parser[ConfigFile.LOCALE] = {'current': self.configuration.get('current_locale')}
         with open(sportorg_config.CONFIG_INI, 'w') as configfile:
             self.parser.write(configfile)

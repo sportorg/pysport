@@ -1117,3 +1117,5 @@ msgstr "< 24 часов"
 msgid "> 24"
 msgstr "> 24 часов"
 
+msgid "Languages"
+msgstr "Язык интерфейса"

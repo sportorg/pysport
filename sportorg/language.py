@@ -18,7 +18,6 @@ if config.DEBUG:
     import polib
 
     def _generate():
-        logging.debug('Translating start {}'.format(locale_current))
         name = config.NAME.lower()
         path = config.base_dir(config.LOCALE_DIR, locale_current, 'LC_MESSAGES', name)
         try:
@@ -26,7 +25,6 @@ if config.DEBUG:
             po.save_as_mofile(path + '.mo')
         except Exception as e:
             logging.exception(str(e))
-        logging.debug('Translating end')
 
     _generate()
 
@@ -36,8 +34,8 @@ def locale():
 
     def get_text(message):
         result = cat.gettext(message)
-        if result == message:
-            logging.debug('No translation "{}"'.format(result))
+        # if result == message:
+        #     logging.debug('No translation "{}"'.format(result))
         return result
 
     return get_text

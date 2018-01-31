@@ -76,7 +76,7 @@ class DialogFilter(QDialog):
                 group_column = 4
                 team_column = 5
 
-                if GlobalAccess().get_current_tab_index() == 1:
+                if GlobalAccess().get_main_window().current_tab == 1:
                     group_column = 2
                     team_column = 3
 
