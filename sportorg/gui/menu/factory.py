@@ -81,3 +81,6 @@ class Factory:
         if key in self._map:
             return self._map[key]
         return lambda: print('...')
+
+    def execute(self, key):
+        self.get_action(key)()

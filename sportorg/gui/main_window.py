@@ -76,30 +76,21 @@ class MainWindow(QMainWindow):
         _event.accept()
 
     def resizeEvent(self, e):
-        event.event('resize', {
-            'x': self.x() + 8,
-            'y': self.y() + 30,
-            'width': self.width(),
-            'height': self.height(),
-        })
+        event.event('resize', self.get_size())
 
     def conf_read(self):
         Configuration().read()
         if Configuration().parser.has_section(ConfigFile.PATH):
-            recent_files = ast.literal_eval(Configuration().parser.get(ConfigFile.PATH, 'recent_files', fallback='[]'))
-            if isinstance(recent_files, list):
-                self.recent_files = recent_files
+            try:
+                recent_files = ast.literal_eval(Configuration().parser.get(
+                    ConfigFile.PATH, 'recent_files', fallback='[]'))
+                if isinstance(recent_files, list):
+                    self.recent_files = recent_files
+            except Exception as e:
+                logging.error(str(e))
 
     def conf_write(self):
-        Configuration().parser[ConfigFile.GEOMETRY] = {
-            'x': self.x() + 8,
-            'y': self.y() + 30,
-            'width': self.width(),
-            'height': self.height(),
-        }
-        Configuration().parser[ConfigFile.PATH] = {
-            'recent_files': self.recent_files
-        }
+        Configuration().parser[ConfigFile.GEOMETRY] = self.get_size()
         Configuration().save()
 
     def post_show(self):
@@ -110,7 +101,7 @@ class MainWindow(QMainWindow):
                 self.open_file(self.recent_files[0])
 
         if Configuration().configuration.get('autoconnect'):
-            self.sportident_connect()
+            self.menu_factory.execute('SPORTidentReadoutAction')
 
     def _setup_ui(self):
         geometry = ConfigFile.GEOMETRY
@@ -189,6 +180,14 @@ class MainWindow(QMainWindow):
         self.tabwidget.addTab(teams.Widget(), _("Teams"))
         self.logging_tab = log.Widget()
         self.tabwidget.addTab(self.logging_tab, _("Logs"))
+
+    def get_size(self):
+        return {
+            'x': self.x() + 8,
+            'y': self.y() + 30,
+            'width': self.width(),
+            'height': self.height(),
+        }
 
     def set_title(self, title=None):
         main_title = '{} {}'.format(_(config.NAME), config.VERSION)
@@ -301,6 +300,9 @@ class MainWindow(QMainWindow):
     def add_recent_file(self, file):
         self.delete_from_recent_files(file)
         self.recent_files.insert(0, file)
+        Configuration().parser[ConfigFile.PATH] = {
+            'recent_files': self.recent_files
+        }
 
     def delete_from_recent_files(self, file):
         if file in self.recent_files:

@@ -171,8 +171,7 @@ class FilterAction(Action):
         if self.app.current_tab not in range(2):
             return
         table = self.app.get_current_table()
-        ex = DialogFilter(table)
-        ex.exec()
+        DialogFilter(table).exec()
 
 
 class SearchAction(Action):
@@ -180,8 +179,7 @@ class SearchAction(Action):
         if self.app.current_tab not in range(5):
             return
         table = self.app.get_current_table()
-        ex = SearchDialog(table)
-        ex.exec()
+        SearchDialog(table).exec()
 
 
 class ToStartPreparationAction(Action):
@@ -364,8 +362,7 @@ class ChangeStatusAction(Action):
 
 class SetDNSNumbersAction(Action):
     def execute(self):
-        ex = NotStartDialog()
-        ex.exec()
+        NotStartDialog().exec()
 
 
 class AddSPORTidentResultAction(Action):
