@@ -577,6 +577,7 @@ class Person(Model):
             'course': course_name,
             'team': self.organization.name if self.organization is not None else '',
             'group': self.group.name if self.group is not None else '',
+            'group_start_corridor': self.group.start_corridor if self.group is not None else 0,
             'price': self.group.price if self.group is not None else 0,
             'qual': self.qual.get_title(),
             'year': self.year if self.year else '',

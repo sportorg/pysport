@@ -1,6 +1,7 @@
 import codecs
 import logging
 import time
+import webbrowser
 
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QDialog, QTextEdit, QDialogButtonBox
@@ -8,14 +9,17 @@ from PyQt5.QtWidgets import QFormLayout, QDialog, QTextEdit, QDialogButtonBox
 from sportorg import config
 from sportorg.gui.dialogs.file_dialog import get_save_file_name
 from sportorg.gui.global_access import GlobalAccess
+from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
 from sportorg.models.constant import get_race_groups, get_race_courses
+from sportorg.models.memory import race
 from sportorg.models.start.start_calculation import get_chess_list
 
 
 class StartChessDialog(QDialog):
     def __init__(self):
         super().__init__(GlobalAccess().get_main_window())
+        self.data = get_chess_list()
 
     def exec(self):
         self.init_ui()
@@ -28,6 +32,11 @@ class StartChessDialog(QDialog):
         self.setModal(True)
 
         self.layout = QFormLayout(self)
+
+        self.item_cols = AdvComboBox()
+        self.item_cols.addItems([_('Start corridor'), _('Course'), _('Group')])
+        self.item_cols.currentTextChanged.connect(self.set_text)
+        self.layout.addRow(self.item_cols)
 
         self.text = QTextEdit()
         self.text.setLineWrapMode(QTextEdit.NoWrap)
@@ -60,16 +69,31 @@ class StartChessDialog(QDialog):
         self.show()
 
     def set_text(self):
-        # course = get_race_courses()
-        # course.sort()
+        index = self.item_cols.currentIndex()
+
+        course = get_race_courses()
+        course.sort()
 
         groups = get_race_groups()
         groups.sort()
 
-        col_data = groups
-        col_text = 'group'
+        group_start_corridors = []
+        for group in race().groups:
+            if group.start_corridor not in group_start_corridors:
+                group_start_corridors.append(group.start_corridor)
+        group_start_corridors.sort()
 
-        data = get_chess_list()
+        col_data = group_start_corridors
+        col_text = 'group_start_corridor'
+
+        if index == 1:
+            col_data = course
+            col_text = 'course'
+        elif index == 2:
+            col_data = groups
+            col_text = 'group'
+
+        data = self.data
 
         text = '<div><table>'
         text += '<tr><td></td>'
@@ -106,3 +130,5 @@ class StartChessDialog(QDialog):
             with codecs.open(file_name, 'w', 'utf-8') as file:
                 file.write(self.text.toHtml())
                 file.close()
+
+            webbrowser.open('file://' + file_name, new=2)
