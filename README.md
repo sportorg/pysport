@@ -65,17 +65,3 @@ python SportOrg.pyw
 #### cx_Freeze
 
 `python setup.py build`
-
-#### go
-
-[josephspurrier](https://github.com/josephspurrier/goversioninfo) for build `.syso`
-
-```
-./goversioninfo -icon=img/icon/sportorg.ico
-
-go build -ldflags="-H windowsgui" -o SportOrg.exe
-
-or 
-
-python build.py
-```
