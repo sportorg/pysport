@@ -29,7 +29,7 @@ class EntryEditDialog(QDialog):
             assert (isinstance(current_object, Person))
             self.current_object = current_object
 
-        self.time_format = 'hh:mm:ss.zzz'
+        self.time_format = 'hh:mm:ss'
         time_accuracy = race().get_setting('time_accuracy', 0)
         if time_accuracy:
             self.time_format = 'hh:mm:ss.zzz'
