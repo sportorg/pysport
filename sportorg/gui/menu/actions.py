@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import QMessageBox, QApplication, QTableView
 from sportorg.core.otime import OTime
 from sportorg.gui.dialogs.about import AboutDialog
 from sportorg.gui.dialogs.bib_report_dialog import BibReportDialog
+from sportorg.gui.dialogs.cp_delete import CPDeleteDialog
 from sportorg.gui.dialogs.entry_filter import DialogFilter
 from sportorg.gui.dialogs.event_properties import EventPropertiesDialog
 from sportorg.gui.dialogs.file_dialog import get_open_file_name, get_save_file_name
@@ -414,3 +415,8 @@ class AboutAction(Action):
 class TestingAction(Action):
     def execute(self):
         testing.test()
+
+
+class CPDeleteAction(Action):
+    def execute(self):
+        CPDeleteDialog().exec()

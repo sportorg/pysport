@@ -259,9 +259,16 @@ def menu_list():
                     'action': 'SetDNSNumbersAction'
                 },
                 {
+                    'title': _('Delete CP'),
+                    'action': 'CPDeleteAction'
+                },
+                {
+                    'type': 'separator',
+                },
+                {
                     'title': _('Add SPORTident result'),
                     'action': 'AddSPORTidentResultAction'
-                }
+                },
             ]
         },
         {

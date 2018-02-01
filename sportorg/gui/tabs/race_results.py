@@ -55,6 +55,7 @@ class ResultTable(TableView):
         try:
             logging.debug('Clicked on ' + str(index.row()))
             if index.row() < len(race().results):
+                # FIXME: ResultEditDialog should take result, not index
                 dialog = ResultEditDialog(self, index)
                 dialog.exec()
         except Exception as e:

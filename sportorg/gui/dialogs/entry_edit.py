@@ -266,10 +266,6 @@ class EntryEditDialog(QDialog):
         if (person.group is not None and person.group.name != self.item_group.currentText()) or\
                 (person.group is None and len(self.item_group.currentText()) > 0):
             person.group = find(race().groups, name=self.item_group.currentText())
-            # if person.result:
-            #     logging.info('Old status {}'.format(person.result.status))
-            #     ResultChecker.checking(person.result)
-            #     logging.info('New status {}'.format(person.result.status))
             changed = True
         if (person.organization is not None and person.organization.name != self.item_team.currentText()) or \
                 (person.organization is None and len(self.item_team.currentText()) > 0):

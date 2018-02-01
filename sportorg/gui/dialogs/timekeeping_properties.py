@@ -437,9 +437,7 @@ class TimekeepingPropertiesDialog(QDialog):
             changed = True
         if old_start_cp_number != start_cp_number or old_finish_cp_number != finish_cp_number:
             changed = True
-            for result in race().results:
-                if result.is_sportident():
-                    result.clear()
+            race().clear_sportident_results()
 
         obj.set_setting('sportident_start_source', start_source)
         obj.set_setting('sportident_finish_source', finish_source)

@@ -813,6 +813,11 @@ class Race(Model):
         if add:
             self.add_new_result(result)
 
+    def clear_sportident_results(self):
+        for result in self.results:
+            if result.is_sportident():
+                result.clear()
+
 
 class Qualification(IntEnum):
     NOT_QUALIFIED = 0
