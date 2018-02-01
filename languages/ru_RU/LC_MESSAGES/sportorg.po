@@ -1119,3 +1119,9 @@ msgstr "> 24 часов"
 
 msgid "Languages"
 msgstr "Язык интерфейса"
+
+msgid "Delete CP"
+msgstr "Удалить КП"
+
+msgid "Number CP"
+msgstr "Номер КП"
