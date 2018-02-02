@@ -39,6 +39,7 @@ class StartChessDialog(QDialog):
         self.layout.addRow(self.item_cols)
 
         self.text = QTextEdit()
+        self.text.setReadOnly(True)
         self.text.setLineWrapMode(QTextEdit.NoWrap)
         self.text.setMinimumHeight(450)
         self.text.setMinimumWidth(450)
@@ -68,7 +69,7 @@ class StartChessDialog(QDialog):
 
         self.show()
 
-    def set_text(self):
+    def get_html(self):
         index = self.item_cols.currentIndex()
 
         course = get_race_courses()
@@ -120,15 +121,21 @@ class StartChessDialog(QDialog):
 
             text += '</tr>'
         text += '</table></div>'
+        return text
 
-        self.text.setText(text)
+    def set_text(self):
+        self.text.setHtml(self.get_html())
 
     def apply_changes_impl(self):
         file_name = get_save_file_name(_('Save As HTML file'), _("HTML file (*.html)"),
                                        '{}_start_times'.format(time.strftime("%Y%m%d")))
         if file_name:
+            html = self.get_html()
+            style = 'table {width:100%}' \
+                    'td {border-bottom:1pt solid gray; text-align:center; padding-top:0.4em; font-weight:bold;}'
+            html = '<html><head><meta charset="UTF-8"><style>{}</style></head><body>{}</body></html>'.format(style, html)
             with codecs.open(file_name, 'w', 'utf-8') as file:
-                file.write(self.text.toHtml())
+                file.write(html)
                 file.close()
 
             webbrowser.open('file://' + file_name, new=2)

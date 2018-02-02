@@ -91,6 +91,10 @@
             display: block;
         }
 
+        .text-center {
+            text-align: center;
+        }
+
         @media print {
             @page {
                 margin: 0.5cm;
@@ -139,7 +143,9 @@
 <code>
     {% for group in groups %}
     {% for person in group.persons %}
-        <h4>{{ person.name }} - {{ group.name }}</h4>
+        {{ race.title }}
+        <br> {{ race.date }}
+        <br>{{ person.name }} - {{ group.name }}
         <br> Команда: {{person.team}}
         <br> Номер: {{person.bib}} SI-card: {{person.sportident_card}}
         <br> Старт: {{person.start}}
@@ -191,9 +197,6 @@
             {% endif %}
             {% endfor %}
         </table>
-        <br><br> {{ race.title }}
-        <br> {{ race.date }}
-        <br> {{ race.location }}
         <br> {{ race.url }}
     {% endfor %}
     {% endfor %}

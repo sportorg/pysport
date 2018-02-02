@@ -113,6 +113,10 @@
             display: block;
         }
 
+        .text-center {
+            text-align: center;
+        }
+
         @media print {
             @page {
                 margin: 0.5cm;
@@ -168,7 +172,10 @@
 <body>
 {% macro view_groups() -%}{% for group in groups %}<a href="#{{group.name}}">{{group.name}}</a> {% endfor %}{%- endmacro %}
 <div>
-    <h1>{{ race.sub_title }} <br>{{ race.date }}</h1>
+    <div class="text-center">
+        <h1>ПРОТОКОЛ РЕЗУЛЬТАТОВ</h1>
+        <h2>{{ race.sub_title }} <br>{{ race.date }}</h2>
+    </div>
     <table>
     {% for group in groups %}
     {% if group.persons|length %}
