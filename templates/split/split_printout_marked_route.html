@@ -139,7 +139,10 @@
 <code>
     {% for group in groups %}
     {% for person in group.persons %}
-        <b>{{ person.name }} - {{ group.name }}</b>
+        {{ race.title }}
+        <br> {{ race.date }}
+        <br> {{ race.url }}
+        <br>{{ person.name }} - {{ group.name }}
         <br> Команда: {{person.team}}
         <br> Номер: {{person.bib}} SI-card: {{person.sportident_card}}
         <br> ---------------------------------------
@@ -148,9 +151,6 @@
         <br> Время без штрафа: {{person.race_result}}
         <br> <b>{{person.status_title}}</b>
         <br> ---------------------------------------
-        <br> {{ race.title }}
-        <br> {{ race.date }}
-        <br> {{ race.location }}
         <br> {{ race.url }}
     {% endfor %}
     {% endfor %}
