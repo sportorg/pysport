@@ -1,7 +1,7 @@
 import logging
 
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QFormLayout, QDialog, QDialogButtonBox, QCheckBox, QSpinBox, QLabel
+from PyQt5.QtWidgets import QFormLayout, QDialog, QDialogButtonBox, QCheckBox, QSpinBox, QLabel, QTextEdit
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
@@ -33,14 +33,17 @@ class CPDeleteDialog(QDialog):
 
         self.item_is_course = QCheckBox(_('Courses'))
         self.item_is_course.setChecked(True)
+        self.item_is_course.stateChanged.connect(self.show_info)
         self.layout.addRow(self.item_is_course)
 
         self.item_is_result = QCheckBox(_('Race Results'))
         self.item_is_result.setChecked(True)
+        self.item_is_result.stateChanged.connect(self.show_info)
         self.layout.addRow(self.item_is_result)
 
-        self.label_info = QLabel('')
-        self.layout.addRow(self.label_info)
+        self.item_info = QTextEdit()
+        self.item_info.setReadOnly(True)
+        self.layout.addRow(self.item_info)
 
         def cancel_changes():
             self.close()
@@ -64,23 +67,43 @@ class CPDeleteDialog(QDialog):
         self.show()
 
     def show_info(self):
-        self.label_info.setText('')
+        self.item_info.setText('')
         number = self.item_number.value()
         if not number:
             return
-        courses = race().courses
-        courses_has_number = []
         try:
-            for course in courses:
-                for control in course.controls:
-                    if str(number) == control.code:
-                        courses_has_number.append(course)
-                        break
-            if len(courses_has_number):
-                self.label_info.setText('{}:\n{}'.format(
-                    _('Groups'),
-                    '\n'.join([course.name for course in courses_has_number])
-                ))
+            text = ''
+            is_course = self.item_is_course.isChecked()
+            if is_course:
+                courses = race().courses
+                courses_has_number = []
+                for course in courses:
+                    for control in course.controls:
+                        if str(number) == control.code:
+                            courses_has_number.append(course)
+                            break
+                if len(courses_has_number):
+                    text += '{}:\n{}\n'.format(
+                        _('Courses'),
+                        '\n'.join([course.name for course in courses_has_number])
+                    )
+            is_result = self.item_is_result.isChecked()
+            if is_result:
+                results = race().results
+                results_has_number = []
+                for result in results:
+                    if not result.is_sportident():
+                        continue
+                    for split in result.splits:
+                        if str(number) == str(split.code):
+                            results_has_number.append(result)
+                            break
+                if len(results_has_number):
+                    text += '{}:\n{}'.format(
+                        _('Results'),
+                        '\n'.join([str(result.sportident_card) for result in results_has_number])
+                    )
+            self.item_info.setText(text)
         except Exception as e:
             logging.error(str(e))
             self.close()
