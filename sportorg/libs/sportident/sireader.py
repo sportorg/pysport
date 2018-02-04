@@ -378,7 +378,7 @@ class SIReader(object):
                         'LTD': None,
                         'LT': None,
                         'RC': 22,
-                        'P1': 196,
+                        'P1': 176,  # 196, fixed by Sergei Kobelev in Feb. 2018
                         'PL': 4,
                         'PM': 20,
                         'PTD': 0,  # Day of week byte, SI6 and newer
