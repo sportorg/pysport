@@ -63,6 +63,8 @@ class SIReader(object):
     BC_TRANS_REC = b'\x33'  # autosend timestamp (online control) in very old stations (BSF3)
     BC_SI5_WRITE = b'\x43'  # write SI-card 5 data page: 02 43 (page: 0x30 to 0x37) (16 bytes) 03
     BC_SI5_DET = b'\x46'  # SI-card 5 inserted (46 49) or removed (46 4F)
+    BC_SI5_DET_INSERT = b'\x49'
+    BC_SI5_DET_REMOVE = b'\x4F'
     BC_TRANS_REC2 = b'\x53'  # autosend timestamp (online control)
     BC_TRANS_TIME = b'\x54'  # autosend timestamp (lightbeam trigger)
     BC_GET_SI6 = b'\x61'  # read out SI-card 6 data (and in compatibility mode: model SI-card 8/9/10/11/SIAC/pCard/tCard as SI-card 6)
@@ -917,15 +919,18 @@ class SIReader(object):
                 self._serial.flushInput()
                 raise SIReaderException('Invalid start byte %s' % hex(byte2int(char)))
 
-            if self.is_legacy_protocol():
-                # Read command, data, ETX
-                cmd = self._serial.read()
+            cmd = self._serial.read()
+            if self.is_legacy_protocol() and cmd < b'\x80':
+                # Read data, ETX
                 station = self._serial.read()
                 self.station_code = SIReader._to_int(station)
+
                 tmp = bytes()
                 etx = self._serial.read()
                 while etx != SIReader.ETX:
-                    tmp += etx
+                    if etx != SIReader.DLE:
+                        # ignore DLE, otherwise append data
+                        tmp += etx
                     etx = self._serial.read()
                     if etx == SIReader.ETX:
                         break
@@ -939,8 +944,7 @@ class SIReader(object):
                         hexlify(etx).decode('ascii'),
                     ))
             else:
-                # Read command, length, data, crc, ETX
-                cmd = self._serial.read()
+                # Read length, data, crc, ETX
                 length = self._serial.read()
                 station = self._serial.read(2)
                 self.station_code = SIReader._to_int(station)
@@ -1106,9 +1110,41 @@ class SIReaderReadout(SIReader):
             else:
                 raise SIReaderException('Unknown cardtype!')
             raise SIReaderCardChanged("SI-Card inserted during command.")
-        elif cmd == SIReader.BC_SI6_DET:
-            self.sicard = self._to_int(data[1:])
 
+        elif cmd == SIReader.BC_SI6_DET:
+            """
+            Legacy protocol - all types besides SI5
+            Card 6/7 detected STX, 66h, CSI, TI, TP, CN3, CN2, CN1, CN0, ETX
+            """
+            self.sicard = self._to_int(data[-3:])
+            if self.sicard >= 2000000 and self.sicard <= 2999999:
+                self.cardtype = 'SI8'
+            elif self.sicard >= 1000000 and self.sicard <= 1999999:
+                self.cardtype = 'SI9'
+            elif self.sicard >= 7000000 and self.sicard <= 9999999:
+                self.cardtype = 'SI10'
+            elif self.sicard >= 6000000 and self.sicard <= 6999999:
+                self.cardtype = 'SItCard'
+            elif self.sicard >= 4000000 and self.sicard <= 4999999:
+                self.cardtype = 'SIpCard'
+            else:
+                raise SIReaderException('Unknown cardtype!')
+            raise SIReaderCardChanged("SI-Card inserted during command.")
+        elif cmd == SIReader.BC_SI5_DET:
+            """
+            Legacy protocol - SI5
+            Card 5 detected STX, F-ASCII, I-ASCII, ETX
+            """
+            if int2byte(self.station_code) == SIReader.BC_SI5_DET_INSERT:
+                self.cardtype = 'SI5'
+
+                # emulate card number change
+                if self.sicard and self.sicard != 1:
+                    self.sicard = 1
+                else:
+                    self.sicard = 2
+
+                raise SIReaderCardChanged("SI-Card inserted during command.")
 
         return (cmd, data)
 

@@ -42,7 +42,7 @@ class SIReaderThread(QThread):
         while True:
             try:
                 while not si.poll_sicard():
-                    time.sleep(0.5)
+                    time.sleep(0.2)
                     if not main_thread().is_alive() or self._stop_event.is_set():
                         si.disconnect()
                         self._logger.debug('Stop sireader')
@@ -84,7 +84,7 @@ class ResultThread(QThread):
                         return
                     if not self._queue.empty():
                         break
-                    time.sleep(0.5)
+                    time.sleep(0.2)
 
                 cmd = self._queue.get()
                 if cmd.command == 'card_data':
