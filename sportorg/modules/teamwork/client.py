@@ -1,6 +1,5 @@
 import socket
-from threading import Thread, Event, main_thread
-from queue import Queue
+from threading import Thread, main_thread
 import json
 
 import time

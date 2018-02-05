@@ -25,6 +25,7 @@ from sportorg.gui.dialogs.start_report_dialog import StartReportDialog
 from sportorg.gui.dialogs.start_time_change_dialog import StartTimeChangeDialog
 from sportorg.gui.dialogs.team_report_dialog import TeamReportDialog
 from sportorg.gui.dialogs.team_results_report_dialog import TeamResultsReportDialog
+from sportorg.gui.dialogs.teamwork_properties import TeamworkPropertiesDialog
 from sportorg.gui.dialogs.text_io import TextExchangeDialog
 from sportorg.gui.dialogs.timekeeping_properties import TimekeepingPropertiesDialog
 from sportorg.gui.menu.action import Action
@@ -39,6 +40,7 @@ from sportorg.modules.live.orgeo import OrgeoClient
 from sportorg.modules.ocad import ocad
 from sportorg.modules.ocad.ocad import OcadImportException
 from sportorg.modules.sportident.sireader import SIReaderClient
+from sportorg.modules.teamwork import Client, Server
 from sportorg.modules.winorient import winorient
 from sportorg.modules.winorient.wdb import WDBImportError, WinOrientBinary
 from sportorg.language import _
@@ -271,6 +273,7 @@ class PrintBibAction(Action):
 class ManualFinishAction(Action):
     def execute(self):
         result = race().new_result()
+        Client().send({"message": 'hello'})
         race().add_new_result(result)
         logging.info('Manual finish')
         self.app.get_result_table().model().init_cache()
@@ -366,6 +369,11 @@ class SetDNSNumbersAction(Action):
         NotStartDialog().exec()
 
 
+class CPDeleteAction(Action):
+    def execute(self):
+        CPDeleteDialog().exec()
+
+
 class AddSPORTidentResultAction(Action):
     def execute(self):
         result = race().new_sportident_result()
@@ -379,6 +387,20 @@ class AddSPORTidentResultAction(Action):
 class TimekeepingSettingsAction(Action):
     def execute(self):
         TimekeepingPropertiesDialog().exec()
+
+
+class TeamworkSettingsAction(Action):
+    def execute(self):
+        TeamworkPropertiesDialog().exec()
+
+
+class TeamworkEnableAction(Action):
+    def execute(self):
+        teamwork_type_connection = race().get_setting('teamwork_type_connection', 'client')
+        if teamwork_type_connection == 'client':
+            Client().start()
+        elif teamwork_type_connection == 'server':
+            Server().start()
 
 
 class PrinterSettingsAction(Action):
@@ -415,8 +437,3 @@ class AboutAction(Action):
 class TestingAction(Action):
     def execute(self):
         testing.test()
-
-
-class CPDeleteAction(Action):
-    def execute(self):
-        CPDeleteDialog().exec()
