@@ -164,7 +164,8 @@ class SIReaderClient(metaclass=Singleton):
                 self.port,
                 self._queue,
                 self._stop_event,
-                self._logger
+                self._logger,
+                debug=True
             )
             self._si_reader_thread.start()
         # elif not self._si_reader_thread.is_alive():
