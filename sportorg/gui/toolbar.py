@@ -9,4 +9,5 @@ def toolbar_list():
         (config.icon_dir('save.png'), _('Save'), 'SaveAction'),
         (config.icon_dir('sportident.png'), _('SPORTident readout'), 'SPORTidentReadoutAction'),
         (config.icon_dir('flag.png'), _('Manual finish'), 'ManualFinishAction'),
+        (config.icon_dir('repeat.png'), _('Teamwork'), 'TeamworkEnableAction'),
     ]

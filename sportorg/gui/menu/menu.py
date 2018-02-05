@@ -279,6 +279,10 @@ def menu_list():
                     'action': 'TimekeepingSettingsAction'
                 },
                 {
+                    'title': _('Teamwork'),
+                    'action': 'TeamworkSettingsAction'
+                },
+                {
                     'title': _('Printer settings'),
                     'icon': config.icon_dir('print.png'),
                     'action': 'PrinterSettingsAction'

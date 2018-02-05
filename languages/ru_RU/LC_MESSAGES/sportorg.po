@@ -1125,3 +1125,27 @@ msgstr "Удалить КП"
 
 msgid "Number CP"
 msgstr "Номер КП"
+
+msgid "Teamwork"
+msgstr "Командная работа"
+
+msgid "Type connection"
+msgstr "Тип соединения"
+
+msgid "Client"
+msgstr "Клиент"
+
+msgid "Server"
+msgstr "Сервер"
+
+msgid "Client/Server"
+msgstr "Клиент/Сервер"
+
+msgid "Host"
+msgstr "Хост"
+
+msgid "Port"
+msgstr "Порт"
+
+msgid "Token"
+msgstr "Токен"

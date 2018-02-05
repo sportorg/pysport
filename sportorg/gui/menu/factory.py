@@ -10,7 +10,8 @@ from sportorg.gui.menu.actions import NewAction, SaveAction, OpenAction, SaveAsA
     SplitPrintoutAction, \
     RecheckingAction, PenaltyCalculationAction, PenaltyRemovingAction, ChangeStatusAction, SetDNSNumbersAction, \
     AddSPORTidentResultAction, TimekeepingSettingsAction, PrinterSettingsAction, LiveSettingsAction, \
-    LiveSendStartListAction, LiveSendResultsAction, LiveResendResultsAction, AboutAction, TestingAction, CPDeleteAction
+    LiveSendStartListAction, LiveSendResultsAction, LiveResendResultsAction, AboutAction, TestingAction, CPDeleteAction, \
+    TeamworkSettingsAction, TeamworkEnableAction
 
 
 class Factory:
@@ -59,8 +60,10 @@ class Factory:
             PenaltyRemovingAction(),
             ChangeStatusAction(),
             SetDNSNumbersAction(),
+            CPDeleteAction(),
             AddSPORTidentResultAction(),
             TimekeepingSettingsAction(),
+            TeamworkSettingsAction(),
             PrinterSettingsAction(),
             LiveSettingsAction(),
             LiveSendStartListAction(),
@@ -68,7 +71,7 @@ class Factory:
             LiveResendResultsAction(),
             AboutAction(),
             TestingAction(),
-            CPDeleteAction(),
+            TeamworkEnableAction(),
         ]
         self._map = {}
         for action in self.actions:

@@ -1,6 +1,5 @@
 import socket
 from threading import Thread, main_thread
-from queue import Queue
 import json
 
 
