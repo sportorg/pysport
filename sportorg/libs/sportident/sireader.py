@@ -20,9 +20,6 @@ sireader.py - Classes to read out si card data from BSM-7/8 stations.
 """
 
 from __future__ import print_function
-
-import logging
-
 from six import int2byte, byte2int, iterbytes, PY3
 
 if PY3:
@@ -403,7 +400,7 @@ class SIReader(object):
     BC_CN = 3
     BC_TIME = 8
 
-    def __init__(self, port=None, debug=False, logfile=None):
+    def __init__(self, port=None, debug=False, logfile=None, logger=None):
         """Initializes communication with si station at port.
         @param port: Serial device for the connection if port is None it
                      scans all available ports and connects to the first
@@ -416,6 +413,7 @@ class SIReader(object):
             self._logfile = open(logfile, 'ab')
         else:
             self._logfile = None
+        self._logger = logger
 
         errors = ''
         if port is not None:
@@ -887,8 +885,8 @@ class SIReader(object):
             command_string = command + int2byte(len(parameters)) + parameters
             crc = SIReader._crc(command_string)
             cmd = SIReader.STX + command_string + crc + SIReader.ETX
-            if self._debug:
-                logging.debug("==>> command '%s', parameters %s, crc %s" % (hexlify(command).decode('ascii'),
+            if self._logger:
+                self._logger.debug("==>> command '%s', parameters %s, crc %s" % (hexlify(command).decode('ascii'),
                                                                     ' '.join(
                                                                         [hexlify(int2byte(c)).decode('ascii') for c in
                                                                          parameters]),
@@ -939,8 +937,8 @@ class SIReader(object):
                         break
                 data = tmp
 
-                if self._debug:
-                    logging.debug("<<== command '%s', station %s, data %s, etx %s" % (
+                if self._logger:
+                    self._logger.debug("<<== command '%s', station %s, data %s, etx %s" % (
                         hexlify(cmd).decode('ascii'),
                         hexlify(station).decode('ascii'),
                         ' '.join([hexlify(int2byte(c)).decode('ascii') for c in data]),
@@ -955,8 +953,8 @@ class SIReader(object):
                 crc = self._serial.read(2)
                 etx = self._serial.read()
 
-                if self._debug:
-                    logging.debug("<<== command '%s', len %i, station %s, data %s, crc %s, etx %s" % (
+                if self._logger:
+                    self._logger.debug("<<== command '%s', len %i, station %s, data %s, crc %s, etx %s" % (
                         hexlify(cmd).decode('ascii'),
                         byte2int(length),
                         hexlify(station).decode('ascii'),

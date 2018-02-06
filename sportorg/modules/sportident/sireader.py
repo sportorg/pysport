@@ -35,7 +35,7 @@ class SIReaderThread(QThread):
 
     def run(self):
         try:
-            si = sireader.SIReaderReadout(port=self.port, debug=self._debug)
+            si = sireader.SIReaderReadout(port=self.port, logger=logging.root)
         except Exception as e:
             self._logger.exception(str(e))
             return
