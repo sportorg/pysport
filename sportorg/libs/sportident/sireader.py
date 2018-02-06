@@ -20,6 +20,9 @@ sireader.py - Classes to read out si card data from BSM-7/8 stations.
 """
 
 from __future__ import print_function
+
+import logging
+
 from six import int2byte, byte2int, iterbytes, PY3
 
 if PY3:
@@ -885,7 +888,7 @@ class SIReader(object):
             crc = SIReader._crc(command_string)
             cmd = SIReader.STX + command_string + crc + SIReader.ETX
             if self._debug:
-                print("==>> command '%s', parameters %s, crc %s" % (hexlify(command).decode('ascii'),
+                logging.debug("==>> command '%s', parameters %s, crc %s" % (hexlify(command).decode('ascii'),
                                                                     ' '.join(
                                                                         [hexlify(int2byte(c)).decode('ascii') for c in
                                                                          parameters]),
@@ -937,7 +940,7 @@ class SIReader(object):
                 data = tmp
 
                 if self._debug:
-                    print("<<== command '%s', station %s, data %s, etx %s" % (
+                    logging.debug("<<== command '%s', station %s, data %s, etx %s" % (
                         hexlify(cmd).decode('ascii'),
                         hexlify(station).decode('ascii'),
                         ' '.join([hexlify(int2byte(c)).decode('ascii') for c in data]),
@@ -953,7 +956,7 @@ class SIReader(object):
                 etx = self._serial.read()
 
                 if self._debug:
-                    print("<<== command '%s', len %i, station %s, data %s, crc %s, etx %s" % (
+                    logging.debug("<<== command '%s', len %i, station %s, data %s, crc %s, etx %s" % (
                         hexlify(cmd).decode('ascii'),
                         byte2int(length),
                         hexlify(station).decode('ascii'),
