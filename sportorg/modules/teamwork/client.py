@@ -4,10 +4,7 @@ import json
 
 import time
 
-
-class ClientCommand:
-    def __init__(self, data=None):
-        self.data = data
+from .server import Command
 
 
 class ClientSenderThread(Thread):
@@ -20,18 +17,23 @@ class ClientSenderThread(Thread):
         self._logger = logger
 
     def run(self):
+        self._logger.debug('Client sender start')
         while True:
             try:
                 while self._in_queue.empty():
                     if not main_thread().is_alive() or self._stop_event.is_set():
                         self.conn.close()
+                        self._logger.debug('Client sender shutdown')
                         return
                     time.sleep(0.5)
                 cmd = self._in_queue.get()
                 data = json.dumps(cmd.data)
                 self.conn.sendall(b'0' + data.encode() + b'1')
             except ConnectionResetError as e:
-                print(str(e))
+                self._logger.debug(str(e))
+                break
+            except Exception as e:
+                self._logger.debug(str(e))
                 break
             time.sleep(1)
 
@@ -47,6 +49,8 @@ class ClientReceiverThread(Thread):
 
     def run(self):
         full_data = b''
+        self.conn.settimeout(5)
+        self._logger.debug('Client receiver start')
         while True:
             try:
                 data = self.conn.recv(1024)
@@ -54,16 +58,22 @@ class ClientReceiverThread(Thread):
                     break
                 full_data += data
                 if data[-2:] == b'}1':
-                    command = ClientCommand(json.loads(full_data[1:-1].decode()))
+                    command = Command(json.loads(full_data[1:-1].decode()))
                     self._out_queue.put(command)  # for local
                     full_data = b''
+            except socket.timeout:
+                if not main_thread().is_alive() or self._stop_event.is_set():
+                    self._logger.debug('Client receiver shutdown')
+                    return
             except ConnectionAbortedError as e:
-                print(str(e))
+                self._logger.debug(str(e))
                 break
             except ConnectionResetError as e:
-                print(str(e))
+                self._logger.debug(str(e))
                 break
-            time.sleep(1)
+            except Exception as e:
+                self._logger.debug(str(e))
+                break
 
 
 class ClientThread(Thread):
@@ -80,6 +90,7 @@ class ClientThread(Thread):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             try:
                 s.connect(self.addr)
+                self._logger.debug('Client start')
                 sender = ClientSenderThread(s, self._in_queue, self._stop_event, self._logger)
                 sender.start()
                 receiver = ClientReceiverThread(s, self._out_queue, self._stop_event, self._logger)
@@ -89,17 +100,11 @@ class ClientThread(Thread):
                 receiver.join()
 
             except ConnectionRefusedError as e:
-                print(str(e))
+                self._logger.debug(str(e))
+                return
+            except Exception as e:
+                self._logger.debug(str(e))
                 return
 
         s.close()
-
-
-# in_q = Queue()
-# out_q = Queue()
-# ClientThread(('localhost', 50010), in_q, out_q, Event()).start()
-#
-# message = ''
-# while message != 'q':
-#     message = input()
-#     in_q.put(ClientCommand({"message": message}))
+        self._logger.debug('Client shutdown')
