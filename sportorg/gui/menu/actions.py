@@ -40,7 +40,7 @@ from sportorg.modules.live.orgeo import OrgeoClient
 from sportorg.modules.ocad import ocad
 from sportorg.modules.ocad.ocad import OcadImportException
 from sportorg.modules.sportident.sireader import SIReaderClient
-from sportorg.modules.teamwork import Client, Server
+from sportorg.modules.teamwork import Teamwork
 from sportorg.modules.winorient import winorient
 from sportorg.modules.winorient.wdb import WDBImportError, WinOrientBinary
 from sportorg.language import _
@@ -273,7 +273,7 @@ class PrintBibAction(Action):
 class ManualFinishAction(Action):
     def execute(self):
         result = race().new_result()
-        Client().send({"message": 'hello'})
+        Teamwork().send({"message": 'hello'})
         race().add_new_result(result)
         logging.info('Manual finish')
         self.app.get_result_table().model().init_cache()
@@ -396,11 +396,10 @@ class TeamworkSettingsAction(Action):
 
 class TeamworkEnableAction(Action):
     def execute(self):
-        teamwork_type_connection = race().get_setting('teamwork_type_connection', 'client')
-        if teamwork_type_connection == 'client':
-            Client().start()
-        elif teamwork_type_connection == 'server':
-            Server().start()
+        if Teamwork().is_alive():
+            Teamwork().stop()
+        else:
+            Teamwork().start()
 
 
 class PrinterSettingsAction(Action):
