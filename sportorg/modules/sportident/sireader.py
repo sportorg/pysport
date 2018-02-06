@@ -35,14 +35,14 @@ class SIReaderThread(QThread):
 
     def run(self):
         try:
-            si = sireader.SIReaderReadout(port=self.port, debug=self._debug)
+            si = sireader.SIReaderReadout(port=self.port, logger=logging.root)
         except Exception as e:
             self._logger.exception(str(e))
             return
         while True:
             try:
                 while not si.poll_sicard():
-                    time.sleep(0.5)
+                    time.sleep(0.2)
                     if not main_thread().is_alive() or self._stop_event.is_set():
                         si.disconnect()
                         self._logger.debug('Stop sireader')
@@ -84,7 +84,7 @@ class ResultThread(QThread):
                         return
                     if not self._queue.empty():
                         break
-                    time.sleep(0.5)
+                    time.sleep(0.2)
 
                 cmd = self._queue.get()
                 if cmd.command == 'card_data':
@@ -164,7 +164,8 @@ class SIReaderClient(metaclass=Singleton):
                 self.port,
                 self._queue,
                 self._stop_event,
-                self._logger
+                self._logger,
+                debug=True
             )
             self._si_reader_thread.start()
         # elif not self._si_reader_thread.is_alive():

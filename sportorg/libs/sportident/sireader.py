@@ -63,6 +63,8 @@ class SIReader(object):
     BC_TRANS_REC = b'\x33'  # autosend timestamp (online control) in very old stations (BSF3)
     BC_SI5_WRITE = b'\x43'  # write SI-card 5 data page: 02 43 (page: 0x30 to 0x37) (16 bytes) 03
     BC_SI5_DET = b'\x46'  # SI-card 5 inserted (46 49) or removed (46 4F)
+    BC_SI5_DET_INSERT = b'\x49'
+    BC_SI5_DET_REMOVE = b'\x4F'
     BC_TRANS_REC2 = b'\x53'  # autosend timestamp (online control)
     BC_TRANS_TIME = b'\x54'  # autosend timestamp (lightbeam trigger)
     BC_GET_SI6 = b'\x61'  # read out SI-card 6 data (and in compatibility mode: model SI-card 8/9/10/11/SIAC/pCard/tCard as SI-card 6)
@@ -398,7 +400,7 @@ class SIReader(object):
     BC_CN = 3
     BC_TIME = 8
 
-    def __init__(self, port=None, debug=False, logfile=None):
+    def __init__(self, port=None, debug=False, logfile=None, logger=None):
         """Initializes communication with si station at port.
         @param port: Serial device for the connection if port is None it
                      scans all available ports and connects to the first
@@ -411,6 +413,7 @@ class SIReader(object):
             self._logfile = open(logfile, 'ab')
         else:
             self._logfile = None
+        self._logger = logger
 
         errors = ''
         if port is not None:
@@ -537,6 +540,11 @@ class SIReader(object):
         """Close the serial port and reopen again."""
         self.disconnect()
         self._connect_reader(self._serial.port)
+
+    def is_legacy_protocol(self):
+        if hasattr(self, 'proto_config'):
+            return not self.proto_config['ext_proto']
+        return False
 
     def _connect_reader(self, port):
         """Connect to SI Reader.
@@ -678,11 +686,13 @@ class SIReader(object):
 
         # truncate to 16 bit and convert to char
         crc &= 0xFFFF
-        return int2byte(crc >> 8) + int2byte(crc & 0xFF)
+        ret = int2byte(crc >> 8) + int2byte(crc & 0xFF)
+        return ret
 
     @staticmethod
     def _crc_check(s, crc):
-        return SIReader._crc(s) == crc
+        ret = SIReader._crc(s) == crc
+        return ret
 
     @staticmethod
     def _decode_cardnr(number):
@@ -875,8 +885,8 @@ class SIReader(object):
             command_string = command + int2byte(len(parameters)) + parameters
             crc = SIReader._crc(command_string)
             cmd = SIReader.STX + command_string + crc + SIReader.ETX
-            if self._debug:
-                print("==>> command '%s', parameters %s, crc %s" % (hexlify(command).decode('ascii'),
+            if self._logger:
+                self._logger.debug("==>> command '%s', parameters %s, crc %s" % (hexlify(command).decode('ascii'),
                                                                     ' '.join(
                                                                         [hexlify(int2byte(c)).decode('ascii') for c in
                                                                          parameters]),
@@ -910,36 +920,62 @@ class SIReader(object):
                 self._serial.flushInput()
                 raise SIReaderException('Invalid start byte %s' % hex(byte2int(char)))
 
-            # Read command, length, data, crc, ETX
             cmd = self._serial.read()
-            length = self._serial.read()
-            station = self._serial.read(2)
-            self.station_code = SIReader._to_int(station)
-            data = self._serial.read(byte2int(length) - 2)
-            crc = self._serial.read(2)
-            etx = self._serial.read()
+            if self.is_legacy_protocol() and cmd < b'\x80':
+                # Read data, ETX
+                station = self._serial.read()
+                self.station_code = SIReader._to_int(station)
 
-            if self._debug:
-                print("<<== command '%s', len %i, station %s, data %s, crc %s, etx %s" % (hexlify(cmd).decode('ascii'),
-                                                                                          byte2int(length),
-                                                                                          hexlify(station).decode(
-                                                                                              'ascii'),
-                                                                                          ' '.join([hexlify(
-                                                                                              int2byte(c)).decode(
-                                                                                              'ascii') for c in data]),
-                                                                                          hexlify(crc).decode('ascii'),
-                                                                                          hexlify(etx).decode('ascii'),
-                                                                                          ))
+                tmp = bytes()
+                etx = self._serial.read()
+                while etx != SIReader.ETX:
+                    if etx != SIReader.DLE:
+                        # ignore DLE, otherwise append data
+                        tmp += etx
+                    etx = self._serial.read()
+                    if etx == SIReader.ETX:
+                        break
+                data = tmp
 
-            if etx != SIReader.ETX:
-                raise SIReaderException('No ETX byte received.')
-            if not SIReader._crc_check(cmd + length + station + data, crc):
-                raise SIReaderException('CRC check failed')
+                if self._logger:
+                    self._logger.debug("<<== command '%s', station %s, data %s, etx %s" % (
+                        hexlify(cmd).decode('ascii'),
+                        hexlify(station).decode('ascii'),
+                        ' '.join([hexlify(int2byte(c)).decode('ascii') for c in data]),
+                        hexlify(etx).decode('ascii'),
+                    ))
+            else:
+                # Read length, data, crc, ETX
+                length = self._serial.read()
+                station = self._serial.read(2)
+                self.station_code = SIReader._to_int(station)
+                data = self._serial.read(byte2int(length) - 2)
+                crc = self._serial.read(2)
+                etx = self._serial.read()
 
-            if self._logfile:
-                self._logfile.write('r %s %s\n' % (datetime.now(), char + cmd + length + station + data + crc + etx))
-                self._logfile.flush()
-                os.fsync(self._logfile)
+                if self._logger:
+                    self._logger.debug("<<== command '%s', len %i, station %s, data %s, crc %s, etx %s" % (
+                        hexlify(cmd).decode('ascii'),
+                        byte2int(length),
+                        hexlify(station).decode('ascii'),
+                        ' '.join([hexlify(int2byte(c)).decode('ascii') for c in data]),
+                        hexlify(crc).decode('ascii'),
+                        hexlify(etx).decode('ascii'),
+                        ))
+
+                if etx != SIReader.ETX:
+                    raise SIReaderException('No ETX byte received.')
+
+                if not SIReader._crc_check(cmd + length + station + data, crc):
+                    raise SIReaderException('CRC check failed')
+
+                if self._logfile:
+                    self._logfile.write('r %s %s\n' % (datetime.now(), char + cmd + length + station + data + crc + etx))
+                    self._logfile.flush()
+                    os.fsync(self._logfile)
+
+                if cmd == SIReader.C_SET_MS:
+                    pass
 
         except (SerialException, OSError) as msg:
             raise SIReaderException('Error reading command: %s' % msg)
@@ -962,9 +998,9 @@ class SIReaderReadout(SIReader):
         Returns true on state changes and false otherwise. If other commands
         are received an Exception is raised."""
 
-        if not self.proto_config['ext_proto']:
-            raise SIReaderException('This command only supports stations in "Extended Protocol" '
-                                    'mode. Switch mode first')
+        # if not self.proto_config['ext_proto']:
+        #     raise SIReaderException('This command only supports stations in "Extended Protocol" '
+        #                             'mode. Switch mode first')
 
         if not self.proto_config['mode'] == SIReader.M_READOUT:
             raise SIReaderException("Station must be in 'Read SI cards' operating mode! Change operating mode first.")
@@ -987,9 +1023,9 @@ class SIReaderReadout(SIReader):
         """Reads out the SI Card currently inserted into the station. The card must be
         detected with poll_sicard before."""
 
-        if not self.proto_config['ext_proto']:
-            raise SIReaderException('This command only supports stations in "Extended Protocol" '
-                                    'mode. Switch mode first')
+        # if not self.proto_config['ext_proto']:
+        #     raise SIReaderException('This command only supports stations in "Extended Protocol" '
+        #                             'mode. Switch mode first')
 
         if not self.proto_config['mode'] == SIReader.M_READOUT:
             raise SIReaderException("Station must be in 'Read SI cards' operating mode! Change operating mode first.")
@@ -1076,6 +1112,41 @@ class SIReaderReadout(SIReader):
                 raise SIReaderException('Unknown cardtype!')
             raise SIReaderCardChanged("SI-Card inserted during command.")
 
+        elif cmd == SIReader.BC_SI6_DET:
+            """
+            Legacy protocol - all types besides SI5
+            Card 6/7 detected STX, 66h, CSI, TI, TP, CN3, CN2, CN1, CN0, ETX
+            """
+            self.sicard = self._to_int(data[-3:])
+            if self.sicard >= 2000000 and self.sicard <= 2999999:
+                self.cardtype = 'SI8'
+            elif self.sicard >= 1000000 and self.sicard <= 1999999:
+                self.cardtype = 'SI9'
+            elif self.sicard >= 7000000 and self.sicard <= 9999999:
+                self.cardtype = 'SI10'
+            elif self.sicard >= 6000000 and self.sicard <= 6999999:
+                self.cardtype = 'SItCard'
+            elif self.sicard >= 4000000 and self.sicard <= 4999999:
+                self.cardtype = 'SIpCard'
+            else:
+                raise SIReaderException('Unknown cardtype!')
+            raise SIReaderCardChanged("SI-Card inserted during command.")
+        elif cmd == SIReader.BC_SI5_DET:
+            """
+            Legacy protocol - SI5
+            Card 5 detected STX, F-ASCII, I-ASCII, ETX
+            """
+            if int2byte(self.station_code) == SIReader.BC_SI5_DET_INSERT:
+                self.cardtype = 'SI5'
+
+                # emulate card number change
+                if self.sicard and self.sicard != 1:
+                    self.sicard = 1
+                else:
+                    self.sicard = 2
+
+                raise SIReaderCardChanged("SI-Card inserted during command.")
+
         return (cmd, data)
 
 
@@ -1091,9 +1162,9 @@ class SIReaderControl(SIReader):
         @return: list of (cardnr, punchtime) tuples, empty list if no new punches are available
         """
 
-        if not self.proto_config['ext_proto']:
-            raise SIReaderException('This command only supports stations in "Extended Protocol" '
-                                    'mode. Switch mode first')
+        # if not self.proto_config['ext_proto']:
+        #     raise SIReaderException('This command only supports stations in "Extended Protocol" '
+        #                             'mode. Switch mode first')
 
         if not self.proto_config['auto_send']:
             raise SIReaderException('This command only supports stations in "Autosend" '
