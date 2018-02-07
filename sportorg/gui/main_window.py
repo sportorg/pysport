@@ -24,6 +24,8 @@ from sportorg.gui.tabs.memory_model import PersonMemoryModel, ResultMemoryModel,
     CourseMemoryModel, TeamMemoryModel
 from sportorg.gui.toolbar import toolbar_list
 from sportorg.language import _
+from sportorg.modules.sportident.sireader import SIReaderClient
+from sportorg.modules.teamwork import Teamwork
 
 
 class ConsolePanelHandler(logging.Handler):
@@ -102,6 +104,9 @@ class MainWindow(QMainWindow):
 
         if Configuration().configuration.get('autoconnect'):
             self.menu_factory.execute('SPORTidentReadoutAction')
+
+        Teamwork().set_call(self.teamwork)
+        SIReaderClient().set_call(self.add_sportident_result_from_sireader)
 
     def _setup_ui(self):
         geometry = ConfigFile.GEOMETRY
@@ -371,6 +376,12 @@ class MainWindow(QMainWindow):
                         person.is_rented_sportident_card = True
                         break
             self.refresh()
+        except Exception as e:
+            logging.exception(str(e))
+
+    def teamwork(self, command):
+        try:
+            logging.info(repr(command.data))
         except Exception as e:
             logging.exception(str(e))
 

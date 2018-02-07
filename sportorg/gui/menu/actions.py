@@ -283,7 +283,7 @@ class ManualFinishAction(Action):
 
 class SPORTidentReadoutAction(Action):
     def execute(self):
-        SIReaderClient().set_call(self.app.add_sportident_result_from_sireader).start()
+        SIReaderClient().start()
 
 
 class CreateReportAction(Action):
@@ -396,10 +396,11 @@ class TeamworkSettingsAction(Action):
 
 class TeamworkEnableAction(Action):
     def execute(self):
-        if Teamwork().is_alive():
-            Teamwork().stop()
-        else:
-            Teamwork().start()
+        host = race().get_setting('teamwork_host', 'localhost')
+        port = race().get_setting('teamwork_port', 50010)
+        connection_type = race().get_setting('teamwork_type_connection', 'client')
+        Teamwork().set_options(host, port, connection_type)
+        Teamwork().toggle()
 
 
 class PrinterSettingsAction(Action):
