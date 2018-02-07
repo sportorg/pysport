@@ -1,8 +1,7 @@
+import queue
 import socket
 from threading import Thread, main_thread
 import json
-
-import time
 
 from .server import Command
 
@@ -20,22 +19,20 @@ class ClientSenderThread(Thread):
         self._logger.debug('Client sender start')
         while True:
             try:
-                while self._in_queue.empty():
-                    if not main_thread().is_alive() or self._stop_event.is_set():
-                        self.conn.close()
-                        self._logger.debug('Client sender shutdown')
-                        return
-                    time.sleep(0.5)
-                cmd = self._in_queue.get()
+                cmd = self._in_queue.get(timeout=5)
                 data = json.dumps(cmd.data)
                 self.conn.sendall(b'0' + data.encode() + b'1')
+            except queue.Empty:
+                if not main_thread().is_alive() or self._stop_event.is_set():
+                    break
             except ConnectionResetError as e:
                 self._logger.debug(str(e))
                 break
             except Exception as e:
                 self._logger.debug(str(e))
                 break
-            time.sleep(1)
+        self.conn.close()
+        self._logger.debug('Client sender shutdown')
 
 
 class ClientReceiverThread(Thread):
@@ -63,8 +60,7 @@ class ClientReceiverThread(Thread):
                     full_data = b''
             except socket.timeout:
                 if not main_thread().is_alive() or self._stop_event.is_set():
-                    self._logger.debug('Client receiver shutdown')
-                    return
+                    break
             except ConnectionAbortedError as e:
                 self._logger.debug(str(e))
                 break
@@ -74,6 +70,7 @@ class ClientReceiverThread(Thread):
             except Exception as e:
                 self._logger.debug(str(e))
                 break
+        self._logger.debug('Client receiver shutdown')
 
 
 class ClientThread(Thread):
