@@ -1,6 +1,5 @@
 import socket
-import queue
-from queue import Queue
+from queue import Queue, Empty
 from threading import Thread, Event, main_thread
 import json
 
@@ -96,7 +95,7 @@ class ServerSenderThread(Thread):
                     except OSError as e:
                         self._logger.debug(str(e))
                         connect.died()
-            except queue.Empty:
+            except Empty:
                 while not self._connections_queue.empty():
                     self._connections.append(self._connections_queue.get())
                 if not main_thread().is_alive() or self._stop_event.is_set():
@@ -134,19 +133,25 @@ class ServerThread(Thread):
             sender = ServerSenderThread(self._in_queue, conns_queue, self._stop_event, self._logger)
             sender.start()
 
+            connections = []
+
             while True:
                 try:
                     conn, addr = s.accept()
                     connect = Connect(conn, addr)
                     conns_queue.put(connect)
-                    ServerReceiverThread(connect, self._in_queue,
-                                         self._out_queue, self._stop_event, self._logger).start()
+                    srt = ServerReceiverThread(connect, self._in_queue, self._out_queue, self._stop_event, self._logger)
+                    srt.start()
+                    connections.append(srt)
                 except socket.timeout:
                     if not main_thread().is_alive() or self._stop_event.is_set():
-                        self._logger.debug('Server shutdown')
-                        return
+                        break
                 except Exception as e:
                     self._logger.debug(str(e))
+            sender.join()
+            for srt in connections:
+                srt.join()
+            self._logger.debug('Server shutdown')
 
 
 if __name__ == '__main__':
@@ -175,5 +180,5 @@ if __name__ == '__main__':
         try:
             cmd = out_q.get(timeout=5)
             print(cmd.data, cmd.addr)
-        except queue.Empty:
+        except Empty:
             pass
