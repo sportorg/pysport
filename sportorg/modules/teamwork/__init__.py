@@ -1,6 +1,6 @@
 import logging
-from queue import Queue
-from threading import Event
+from queue import Queue, Empty
+from threading import Event, main_thread
 
 from PyQt5.QtCore import QThread, pyqtSignal
 
@@ -20,9 +20,15 @@ class ResultThread(QThread):
         self._logger = logger
 
     def run(self):
+        self._logger.debug('Teamwork result start')
         while True:
-            cmd = self._queue.get()
-            self.data_sender.emit(cmd)
+            try:
+                cmd = self._queue.get(timeout=5)
+                self.data_sender.emit(cmd)
+            except Empty:
+                if not main_thread().is_alive() or self._stop_event.is_set():
+                    break
+        self._logger.debug('Teamwork result shutdown')
 
 
 @singleton
@@ -103,8 +109,10 @@ class Teamwork(object):
     def toggle(self):
         if self.is_alive():
             self.stop()
+            self._logger.info('{} stopping'.format(self.connection_type.upper()))
         else:
             self.start()
+            self._logger.info('{} starting'.format(self.connection_type.upper()))
 
     def send(self, data):
         if self.is_alive():
