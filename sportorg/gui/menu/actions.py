@@ -283,7 +283,7 @@ class ManualFinishAction(Action):
 
 class SPORTidentReadoutAction(Action):
     def execute(self):
-        SIReaderClient().start()
+        SIReaderClient().toggle()
 
 
 class CreateReportAction(Action):

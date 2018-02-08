@@ -2,6 +2,9 @@ class Singleton(type):
     """
     Define an Instance operation that lets clients access its unique
     instance.
+
+    >>>class SomeClass(metaclass=Singleton):
+    >>>    pass
     """
 
     def __init__(cls, name, bases, attrs, **kwargs):
