@@ -1,9 +1,10 @@
 import time
 
-from sportorg.core.singleton import Singleton
+from sportorg.core.singleton import singleton
 
 
-class GlobalAccess(metaclass=Singleton):
+@singleton
+class GlobalAccess(object):
     def __init__(self):
         self.app = None
 
@@ -17,7 +18,8 @@ class GlobalAccess(metaclass=Singleton):
         return self.app.get_main_window()
 
 
-class NumberClicker(metaclass=Singleton):
+@singleton
+class NumberClicker(object):
     def __init__(self):
         self.key = ''
         self.time = time.time()

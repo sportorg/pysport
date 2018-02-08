@@ -1,6 +1,6 @@
 import datetime
 import logging
-from queue import Queue
+from queue import Queue, Empty
 from threading import main_thread, Event
 
 import time
@@ -8,7 +8,7 @@ import time
 import serial
 from PyQt5.QtCore import QThread, pyqtSignal
 
-from sportorg.core.singleton import Singleton
+from sportorg.core.singleton import singleton
 from sportorg.language import _
 from sportorg.libs.sportident import sireader
 from sportorg.models import memory
@@ -78,21 +78,17 @@ class ResultThread(QThread):
         time.sleep(3)
         while True:
             try:
-                while True:
-                    if not main_thread().is_alive() or self._stop_event.is_set():
-                        self._logger.debug('Stop adder result')
-                        return
-                    if not self._queue.empty():
-                        break
-                    time.sleep(0.2)
-
-                cmd = self._queue.get()
+                cmd = self._queue.get(timeout=5)
                 if cmd.command == 'card_data':
                     result = self._get_result(self._check_data(cmd.data))
                     self.data_sender.emit(result)
                     backup.backup_data(cmd.data)
+            except Empty:
+                if not main_thread().is_alive() or self._stop_event.is_set():
+                    break
             except Exception as e:
                 self._logger.exception(str(e))
+        self._logger.debug('Stop adder result')
 
     def _check_data(self, card_data):
         if self.start_time is not None and card_data['card_type'] == 'SI5':
@@ -135,7 +131,8 @@ class ResultThread(QThread):
         return 0
 
 
-class SIReaderClient(metaclass=Singleton):
+@singleton
+class SIReaderClient(object):
     def __init__(self):
         self._queue = Queue()
         self._stop_event = Event()
@@ -144,14 +141,6 @@ class SIReaderClient(metaclass=Singleton):
         self.port = None
         self._logger = logging.root
         self._call_back = None
-
-        start_time = memory.race().get_setting('sportident_zero_time', (8, 0, 0))
-        self._start_time = datetime.datetime.today().replace(
-            hour=start_time[0],
-            minute=start_time[1],
-            second=start_time[2],
-            microsecond=0
-        )
 
     def set_call(self, value):
         if self._call_back is None:
@@ -179,10 +168,9 @@ class SIReaderClient(metaclass=Singleton):
                 self._queue,
                 self._stop_event,
                 self._logger,
-                self._start_time
+                self.get_start_time()
             )
             if self._call_back is not None:
-                self._logger.info('call back')
                 self._result_thread.data_sender.connect(self._call_back)
             self._result_thread.start()
         # elif not self._result_thread.is_alive():
@@ -198,9 +186,6 @@ class SIReaderClient(metaclass=Singleton):
         return False
 
     def start(self):
-        if self.is_alive():
-            self.stop()
-            return
         self.port = self.choose_port()
         if self.port:
             self._stop_event.clear()
@@ -213,6 +198,12 @@ class SIReaderClient(metaclass=Singleton):
     def stop(self):
         self._stop_event.set()
         self._logger.info(_('Closing port'))
+
+    def toggle(self):
+        if self.is_alive():
+            self.stop()
+            return
+        self.start()
 
     @staticmethod
     def get_ports():
@@ -236,5 +227,15 @@ class SIReaderClient(metaclass=Singleton):
                 self._logger.debug("{} - {}".format(i, p))
             return ports[0]
         else:
-            self._logger.debug("No ports available")
+            self._logger.debug('No ports available')
             return None
+
+    @staticmethod
+    def get_start_time():
+        start_time = memory.race().get_setting('sportident_zero_time', (8, 0, 0))
+        return datetime.datetime.today().replace(
+            hour=start_time[0],
+            minute=start_time[1],
+            second=start_time[2],
+            microsecond=0
+        )

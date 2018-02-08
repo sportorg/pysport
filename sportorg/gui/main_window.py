@@ -1,11 +1,13 @@
 import ast
 import logging
 import time
+from threading import main_thread
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import QModelIndex, QItemSelectionModel
+from PyQt5.QtCore import QModelIndex, QItemSelectionModel, QThread, pyqtSignal
 from PyQt5.QtWidgets import QMainWindow, QTableView, QMessageBox
 
+from sportorg.core.singleton import singleton
 from sportorg.gui.menu.factory import Factory
 from sportorg.models.memory import Race, event as races, race, NotEmptyException
 
@@ -26,6 +28,18 @@ from sportorg.gui.toolbar import toolbar_list
 from sportorg.language import _
 from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.modules.teamwork import Teamwork
+
+
+@singleton
+class ServiceListenerThread(QThread):
+    interval = pyqtSignal()
+
+    def run(self):
+        while True:
+            time.sleep(5)
+            self.interval.emit()
+            if not main_thread().is_alive():
+                break
 
 
 class ConsolePanelHandler(logging.Handler):
@@ -107,6 +121,9 @@ class MainWindow(QMainWindow):
 
         Teamwork().set_call(self.teamwork)
         SIReaderClient().set_call(self.add_sportident_result_from_sireader)
+
+        ServiceListenerThread().interval.connect(self.log_print)
+        ServiceListenerThread().start()
 
     def _setup_ui(self):
         geometry = ConfigFile.GEOMETRY
@@ -384,6 +401,11 @@ class MainWindow(QMainWindow):
             logging.info(repr(command.data))
         except Exception as e:
             logging.exception(str(e))
+
+    def log_print(self):
+        logging.info('SIReader {}'.format(SIReaderClient().is_alive()))
+        time.sleep(1)
+        logging.info('Teamwork {}'.format(Teamwork().is_alive()))
 
     # Actions
     def create_file(self, *args, update_data=True):
