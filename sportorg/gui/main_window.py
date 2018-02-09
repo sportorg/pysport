@@ -122,7 +122,7 @@ class MainWindow(QMainWindow):
         Teamwork().set_call(self.teamwork)
         SIReaderClient().set_call(self.add_sportident_result_from_sireader)
 
-        ServiceListenerThread().interval.connect(self.log_print)
+        ServiceListenerThread().interval.connect(self.interval)
         ServiceListenerThread().start()
 
     def _setup_ui(self):
@@ -402,10 +402,26 @@ class MainWindow(QMainWindow):
         except Exception as e:
             logging.exception(str(e))
 
-    def log_print(self):
-        logging.info('SIReader {}'.format(SIReaderClient().is_alive()))
-        time.sleep(1)
-        logging.info('Teamwork {}'.format(Teamwork().is_alive()))
+    sportident_status = False
+    sportident_icon = {
+        True: 'sportident-on.svg',
+        False: 'sportident.svg',
+    }
+    teamwork_status = False
+    teamwork_icon = {
+        True: 'network.svg',
+        False: 'network-off.svg',
+    }
+
+    def interval(self):
+        if SIReaderClient().is_alive() != self.sportident_status:
+            self.toolbar_property['sportident'].setIcon(
+                QtGui.QIcon(config.icon_dir(self.sportident_icon[SIReaderClient().is_alive()])))
+            self.sportident_status = SIReaderClient().is_alive()
+        if Teamwork().is_alive() != self.teamwork_status:
+            self.toolbar_property['teamwork'].setIcon(
+                QtGui.QIcon(config.icon_dir(self.teamwork_icon[Teamwork().is_alive()])))
+            self.teamwork_status = Teamwork().is_alive()
 
     # Actions
     def create_file(self, *args, update_data=True):

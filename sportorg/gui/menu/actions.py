@@ -284,6 +284,8 @@ class ManualFinishAction(Action):
 class SPORTidentReadoutAction(Action):
     def execute(self):
         SIReaderClient().toggle()
+        time.sleep(1)
+        self.app.interval()
 
 
 class CreateReportAction(Action):
@@ -401,6 +403,8 @@ class TeamworkEnableAction(Action):
         connection_type = race().get_setting('teamwork_type_connection', 'client')
         Teamwork().set_options(host, port, connection_type)
         Teamwork().toggle()
+        time.sleep(1)
+        self.app.interval()
 
 
 class PrinterSettingsAction(Action):
