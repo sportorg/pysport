@@ -225,6 +225,7 @@ class EntryEditDialog(QDialog):
 
     def set_values_from_table(self):
         self.item_surname.setText(self.current_object.surname)
+        self.item_surname.selectAll()
         self.item_name.setCurrentText(self.current_object.name)
         if self.current_object.group is not None:
             self.item_group.setCurrentText(self.current_object.group.name)

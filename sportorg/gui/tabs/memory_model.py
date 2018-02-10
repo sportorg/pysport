@@ -27,7 +27,8 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
         self.filter_backup = []
 
         self.search = ''
-        self.search_backup = []
+        self.search_old = ''
+        self.search_offset = 0
 
     @abstractmethod
     def init_cache(self):
@@ -117,36 +118,29 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
         self.set_source_array(current_array)
         self.init_cache()
 
-    def clear_search(self, remove_condition=True):
-        if remove_condition:
-            self.search = ''
-        if self.search_backup is not None and len(self.search_backup):
-            whole_list = self.get_source_array()
-            whole_list.extend(self.search_backup)
-            self.set_source_array(whole_list)
-            self.search_backup.clear()
-
     def apply_search(self):
+        if not self.search:
+            return
+        if self.search != self.search_old:
+            self.search_offset = 0
+        else:
+            self.search_offset += 1
         current_array = self.get_source_array()
-        current_array.extend(self.search_backup)
-        check_regexp = self.search
-        check = re.compile(check_regexp)
+        check = re.compile(self.search, re.IGNORECASE)
 
         count_columns = len(self.get_headers())
         columns = range(count_columns)
-        i = 0
+        i = self.search_offset
         while i < len(current_array):
             obj = self.get_values_from_object(current_array[i])
             for column in columns:
                 value = str(obj[column])
                 if check.match(value):
-                    i += 1
-                    break
-            else:
-                self.search_backup.append(current_array.pop(i))
-
-        self.set_source_array(current_array)
-        self.init_cache()
+                    self.search_offset = i
+                    self.search_old = self.search
+                    return
+            i += 1
+        self.search_offset = -1
 
     def sort(self, p_int, order=None):
         """Sort table by given column number.

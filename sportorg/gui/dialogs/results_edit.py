@@ -160,6 +160,7 @@ class ResultEditDialog(QDialog):
             self.item_penalty_laps.setValue(self.current_object.penalty_laps)
         if self.current_object.person:
             self.item_bib.setValue(self.current_object.person.bib)
+            self.item_bib.selectAll()
 
         if self.current_object.status == ResultStatus.OK:
             self.radio_ok.setChecked(True)
