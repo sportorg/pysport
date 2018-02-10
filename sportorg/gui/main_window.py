@@ -404,8 +404,8 @@ class MainWindow(QMainWindow):
 
     sportident_status = False
     sportident_icon = {
-        True: 'sportident-on.svg',
-        False: 'sportident.svg',
+        True: 'sportident-on.png',
+        False: 'sportident.png',
     }
     teamwork_status = False
     teamwork_icon = {
@@ -478,19 +478,14 @@ class MainWindow(QMainWindow):
             logging.warning(_('No result selected'))
             return
         try:
+            indexes = self.get_selected_rows()
             obj = race()
-
-            table = self.get_result_table()
-            assert isinstance(table, QTableView)
-            index = table.currentIndex().row()
-            if index < 0:
-                index = 0
-            if index >= len(obj.results):
-                mes = QMessageBox()
-                mes.setText(_('No results to print'))
-                mes.exec()
-                return
-            self.split_printout(obj.results[index])
+            for index in indexes:
+                if index < 0:
+                    continue
+                if index >= len(obj.results):
+                    pass
+                self.split_printout(obj.results[index])
         except Exception as e:
             logging.exception(str(e))
 
@@ -515,7 +510,7 @@ class MainWindow(QMainWindow):
                 race().add_new_person()
                 self.get_person_table().model().init_cache()
             elif tab == 1:
-                self.manual_finish()
+                self.menu_factory.execute('ManualFinishAction')
             elif tab == 2:
                 race().add_new_group()
                 self.get_person_table().model().init_cache()
