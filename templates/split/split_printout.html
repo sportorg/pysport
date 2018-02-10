@@ -175,7 +175,7 @@
         </table>
         <!--<br> штраф: {{person.penalty_time}}-->
         <br> Финиш: {{person.finish}} {{person.finish_time}} {{person.speed}}
-        <br> Результат: {{person.result}}
+        <br> Результат: {{person.result}} {% if person.status_title != person.result %}{{person.status_title}}{% endif %}
         {% if person.place %}
             <br> Место: {{person.place}} из {{group.count_finished}} (всего {{group.count_all}})
         {% endif %}

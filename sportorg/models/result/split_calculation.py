@@ -61,6 +61,8 @@ class PersonSplits(object):
         if person.organization:
             self.team = person.organization.name
         self.sportident_card = person.sportident_card
+        if result.is_sportident() and result.sportident_card:
+            self.sportident_card = result.sportident_card
         self.qual = ''
         if person.qual:
             self.qual = person.qual.get_title()
@@ -73,8 +75,7 @@ class PersonSplits(object):
         self.result = result.get_result()
         self.splits = result.splits
         self.race_result = time_to_hhmmss(race_result)
-        self.status = result.status.value
-        self.status_title = result.status.get_title()
+        self.status = result.status
         self.place = result.place
         self.group_count_all = person.group.get_count_all()
         self.group_count_finished = person.group.get_count_finished()
@@ -293,7 +294,7 @@ class GroupSplits(object):
             person_json['name'] = i.name
             person_json['bib'] = i.bib
             person_json['team'] = i.team
-            person_json['sportident_card'] = int(i.sportident_card)
+            person_json['sportident_card'] = int(i.sportident_card) if i.sportident_card is not None else ''
             person_json['last_correct_index'] = i.last_correct_index
             person_json['place'] = i.place
             person_json['start'] = i.start
@@ -301,8 +302,8 @@ class GroupSplits(object):
             person_json['result'] = i.result
             person_json['race_result'] = i.race_result
             person_json['speed'] = i.speed
-            person_json['status'] = i.status
-            person_json['status_title'] = i.status_title
+            person_json['status'] = i.status.value
+            person_json['status_title'] = i.status.get_title()
             person_json['penalty_time'] = i.penalty_time
             person_json['controls'] = i.controls
             legs = []
