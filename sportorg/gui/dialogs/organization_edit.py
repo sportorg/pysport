@@ -96,6 +96,7 @@ class OrganizationEditDialog(QDialog):
     def set_values_from_table(self):
 
         self.item_name.setText(self.current_object.name)
+        self.item_name.selectAll()
         self.item_city.setText(self.current_object.address.city)
 
         if self.current_object.address.country is not None:

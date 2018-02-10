@@ -36,6 +36,7 @@ class BibDialog(QDialog):
         self.item_bib = QSpinBox()
         self.item_bib.setMaximum(memory.Limit.BIB)
         self.item_bib.setValue(self.bib)
+        self.item_bib.selectAll()
         self.item_bib.valueChanged.connect(self.show_person_info)
         self.layout.addRow(self.label_bib, self.item_bib)
 

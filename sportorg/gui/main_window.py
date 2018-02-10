@@ -297,12 +297,6 @@ class MainWindow(QMainWindow):
         self.get_course_table().model().clear_filter(remove_condition)
         self.get_organization_table().model().clear_filter(remove_condition)
 
-        self.get_person_table().model().clear_search(remove_condition)
-        self.get_result_table().model().clear_search(remove_condition)
-        self.get_person_table().model().clear_search(remove_condition)
-        self.get_course_table().model().clear_search(remove_condition)
-        self.get_organization_table().model().clear_search(remove_condition)
-
     def apply_filters(self):
         self.get_person_table().model().apply_filter()
         self.get_result_table().model().apply_filter()
