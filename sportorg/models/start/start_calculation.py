@@ -1,6 +1,6 @@
 from enum import Enum
 
-from sportorg.models.memory import race
+from sportorg.models.memory import race, Group, RaceType, find
 from sportorg.utils.time import time_to_hhmmss
 
 
@@ -112,8 +112,10 @@ class GroupsStartList:
         group_names = list(self._groups_generate()._sort_persons()._group.keys())
         group_names.sort()
         for group_name in group_names:
+            group_obj = find(race().groups, name=group_name)
             group = {
                 'name': group_name,
+                'type': race().get_type(group_obj).name,
                 'persons': []
             }
             for person in self._group[group_name]:
@@ -132,7 +134,13 @@ class GroupsStartList:
 
     @staticmethod
     def _sort_func(person):
-        return person.start_time is None, person.start_time
+        group = person.group
+        assert isinstance(group, Group)
+        if race().get_type(group) == RaceType.RELAY:
+            return person.bib is None, person.bib % 1000 * 10 + person.bib // 1000
+        else:
+            return person.start_time is None, person.start_time
+
 
 
 class ChessGenerator(GroupsStartList):

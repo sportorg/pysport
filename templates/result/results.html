@@ -194,14 +194,12 @@
             <td>Номер</td>
             <td>Результат</td>
             <td>Место</td>
-            {% if group.ranking.rank_scores and group.ranking.rank_scores > 0 %}
-                <td>Вып.</td>
-            {% endif %}
         </tr>
+        {% set index = [1] %}
         {% for person in group.persons %}
             {% if person.relay_leg == 1 and group.type == 'RELAY' %}
                 <tr>
-                    <td>{{person.place}}</td>
+                    <td>{{index|length}}</td>
                     <td></td>
                     <td></td>
                     <td></td>
@@ -209,10 +207,8 @@
                     <td></td>
                     <td></td>
                     <td></td>
-                    {% if group.ranking.rank_scores and group.ranking.rank_scores > 0 %}
-                       <td></td>
-                    {% endif %}
                 </tr>
+                {% if index.append(1) %} {% endif %} {# increment index length by 1 #}
             {% endif %}
             <tr>
                 {% if group.type == 'RELAY' %}
@@ -227,9 +223,6 @@
                 <td>{{ person.bib }}</td>
                 <td>{{ person.result }}</td>
                 <td>{{ person.place }}</td>
-                {% if group.ranking.rank_scores and group.ranking.rank_scores > 0 %}
-                    <td>{{ person.assigned_rank }}</td>
-                {% endif %}
             </tr>
         {% endfor %}
         <tr style="background: white; border: 0">

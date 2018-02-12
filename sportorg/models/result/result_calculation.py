@@ -4,6 +4,7 @@ from sportorg.core.otime import OTime
 from sportorg.language import _
 from sportorg.models.memory import race, Result, Person, ResultStatus, Group, Qualification, RankingItem, \
     RelayTeam, RaceType
+from sportorg.models.start.relay import get_team_result
 from sportorg.utils.time import time_to_hhmmss
 
 
@@ -106,7 +107,7 @@ class ResultCalculation(object):
             for cur_team in teams_sorted:
                 cur_team.set_place(place)
                 place += 1
-
+            # race().relay_teams = relay_teams
             return relay_teams.values()
 
     def set_rank(self, group):
@@ -124,7 +125,10 @@ class ResultCalculation(object):
             if rank > 0:
                 leader_result = results[0]
                 assert isinstance(leader_result, Result)
-                leader_time = leader_result.get_result_otime()
+                if race().get_type(group) == RaceType.RELAY:
+                    leader_time = get_team_result(leader_result.person)
+                else:
+                    leader_time = leader_result.get_result_otime()
                 for i in ranking.rank.values():
                     assert isinstance(i, RankingItem)
                     if i.is_active and i.use_scores:
@@ -160,9 +164,14 @@ class ResultCalculation(object):
         scores = []
         array = self.get_group_finishes(group)
 
-        if len(array) < 10:
-            # less than 10 started
-            return -1
+        if race().get_type(group) != RaceType.RELAY:
+            if len(array) < 10:
+                # less than 10 started
+                return -1
+        else:
+            if len(array) < 6 * 3:
+                # less than 6 started in relay
+                return -1
 
         for i in array:
             assert isinstance(i, Result)
@@ -172,9 +181,14 @@ class ResultCalculation(object):
                     qual = person.qual
                     scores.append(qual.get_scores())
 
-        if len(scores) < 5:
-            # less than 5 finished and not disqualified
-            return -1
+        if race().get_type(group) != RaceType.RELAY:
+            if len(scores) < 5:
+                # less than 5 finished and not disqualified
+                return -1
+        else:
+            if len(scores) < 4 * 3:
+                # less than 4 finished and not disqualified
+                return -1
 
         if len(scores) <= 10:
             # get rank sum of 10 best finished
@@ -316,11 +330,12 @@ class ResultCalculation(object):
 
     def get_time_for_rank(self, leader_time, qual, rank):
         percent = self.get_percent_for_rank(qual, rank)
-        assert isinstance(leader_time, OTime)
-        msec_new = round(leader_time.to_msec() * percent / 100)
-        ret = OTime(msec=msec_new)
-        return ret
-
+        if leader_time:
+            assert isinstance(leader_time, OTime)
+            msec_new = round(leader_time.to_msec() * percent / 100)
+            ret = OTime(msec=msec_new)
+            return ret
+        return None
 
 def get_start_list_data():
     pass
