@@ -44,7 +44,7 @@ class Widget(QtWidgets.QWidget):
         def course_double_clicked(index):
             try:
                 if index.row() < len(race().courses):
-                    dialog = CourseEditDialog(self.CourseTable, index)
+                    dialog = CourseEditDialog(race().courses[index.row()])
                     dialog.exec()
             except Exception as e:
                 logging.exception(str(e))

@@ -17,22 +17,15 @@ from sportorg.utils.time import time_to_qtime, time_to_otime
 
 
 class GroupEditDialog(QDialog):
-    def __init__(self, table=None, index=None):
+    def __init__(self, group):
         super().__init__(GlobalAccess().get_main_window())
-        if table is not None:
-            self.table = table
-            self.current_index = index
-
-            assert (isinstance(index, QModelIndex))
-            current_object = race().groups[index.row()]
-            assert (isinstance(current_object, Group))
-
-            self.current_object = current_object
+        assert (isinstance(group, Group))
+        self.current_object = group
         self.time_format = 'hh:mm:ss'
 
     def exec(self):
         self.init_ui()
-        self.set_values_from_table()
+        self.set_values_from_model()
         return super().exec()
 
     def init_ui(self):
@@ -133,7 +126,7 @@ class GroupEditDialog(QDialog):
             if org:
                 self.button_ok.setDisabled(True)
 
-    def set_values_from_table(self):
+    def set_values_from_model(self):
 
         self.item_name.setText(self.current_object.name)
 

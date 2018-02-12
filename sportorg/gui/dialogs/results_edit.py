@@ -2,7 +2,6 @@ import logging
 
 from abc import abstractmethod
 
-from PyQt5.QtCore import QModelIndex
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, \
     QTimeEdit, QRadioButton, QSpinBox, QGroupBox, QTextEdit, QDialogButtonBox
@@ -17,14 +16,10 @@ from sportorg.utils.time import time_to_qtime, time_to_otime, hhmmss_to_time
 
 
 class ResultEditDialog(QDialog):
-    def __init__(self, table=None, index=None):
+    def __init__(self, result):
         super().__init__(GlobalAccess().get_main_window())
-        if table is not None:
-            self.table = table
-            self.current_index = index
-            assert (isinstance(self.current_index, QModelIndex))
-            self.current_object = race().results[self.current_index.row()]
-            assert (isinstance(self.current_object, Result))
+        assert (isinstance(result, Result))
+        self.current_object = result
 
         self.time_format = 'hh:mm:ss'
         time_accuracy = race().get_setting('time_accuracy', 0)
@@ -33,7 +28,7 @@ class ResultEditDialog(QDialog):
 
     def exec(self):
         self.init_ui()
-        self.set_values_from_table()
+        self.set_values_from_model()
         return super().exec()
 
     def init_ui(self):
@@ -142,7 +137,7 @@ class ResultEditDialog(QDialog):
                 self.label_person_info.setText(_('not found'))
                 self.button_ok.setDisabled(True)
 
-    def set_values_from_table(self):
+    def set_values_from_model(self):
         if self.current_object.is_sportident():
             if self.current_object.sportident_card is not None:
                 self.item_sportident_card.setValue(int(self.current_object.sportident_card))
