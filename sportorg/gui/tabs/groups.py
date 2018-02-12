@@ -42,7 +42,7 @@ class Widget(QtWidgets.QWidget):
         def group_double_clicked(index):
             try:
                 if index.row() < len(race().groups):
-                    dialog = GroupEditDialog(self.GroupTable, index)
+                    dialog = GroupEditDialog(race().groups[index.row()])
                     dialog.exec()
             except Exception as e:
                 logging.exception(str(e))

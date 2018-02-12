@@ -61,7 +61,7 @@ class Widget(QtWidgets.QWidget):
             # show_edit_dialog(index)
             try:
                 if index.row() < len(race().persons):
-                    dialog = EntryEditDialog(self.EntryTable, index)
+                    dialog = EntryEditDialog(race().persons[index.row()])
                     dialog.exec()
             except Exception as e:
                 logging.exception(str(e))

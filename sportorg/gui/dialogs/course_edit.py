@@ -1,6 +1,5 @@
 import logging
 
-from PyQt5.QtCore import QModelIndex
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, QSpinBox, QTextEdit, QDialogButtonBox
 
@@ -11,20 +10,14 @@ from sportorg.models.memory import race, Course, CourseControl, find
 
 
 class CourseEditDialog(QDialog):
-    def __init__(self, table=None, index=None):
+    def __init__(self, course):
         super().__init__(GlobalAccess().get_main_window())
-        if table is not None:
-            self.table = table
-            self.current_index = index
-
-            assert (isinstance(index, QModelIndex))
-            current_object = race().courses[index.row()]
-            assert (isinstance(current_object, Course))
-            self.current_object = current_object
+        assert (isinstance(course, Course))
+        self.current_object = course
 
     def exec(self):
         self.init_ui()
-        self.set_values_from_table()
+        self.set_values_from_model()
         return super().exec()
 
     def init_ui(self):
@@ -92,7 +85,7 @@ class CourseEditDialog(QDialog):
             if org:
                 self.button_ok.setDisabled(True)
 
-    def set_values_from_table(self):
+    def set_values_from_model(self):
 
         self.item_name.setText(self.current_object.name)
 
