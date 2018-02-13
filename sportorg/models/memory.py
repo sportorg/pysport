@@ -273,6 +273,9 @@ class Group(Model):
     def set_type(self, new_type):
         self.__type = new_type
 
+    def is_relay(self):
+        return self.get_type() == RaceType.RELAY
+
     def to_dict(self):
         return {
             'name': self.name,
@@ -726,10 +729,30 @@ class Race(Model):
             course_name = '{}.{}'.format(bib % 1000, bib // 1000)
             ret = find(self.courses, name=course_name)
         # usual connection via group
-        if not ret:
-            if person.group:
-                ret = person.group.course
+        if not ret and person.group:
+            ret = person.group.course
         return ret
+
+    def get_course_splits(self, result):
+        """List[Split] or None"""
+        if not result.is_sportident():
+            return
+        if not result.person:
+            return result.splits
+        course = self.find_course(result.person)  # type: Course
+        if not course:
+            return result.splits
+        result_splits = []
+        for i, split in enumerate(result.splits):
+            if not i or split.code != result.splits[i-1].code:
+                result_splits.append(split)
+        splits = []
+        i = 0
+        for control in course.controls:
+            if str(result_splits[i].code) in control.code:
+                splits.append(result_splits[i])
+                i += 1
+        return splits
 
     @staticmethod
     def new_result():

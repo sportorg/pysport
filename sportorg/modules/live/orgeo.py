@@ -89,7 +89,8 @@ class OrgeoClient(metaclass=Singleton):
     def is_enabled():
         obj = race()
         live_enabled = obj.get_setting('live_enabled', False)
-        return live_enabled
+        url = obj.get_setting('live_url', '')
+        return live_enabled and bool(url)
 
     @staticmethod
     def get_url():
@@ -101,28 +102,30 @@ class OrgeoClient(metaclass=Singleton):
     def get_data(person, result=None):
         assert person, Person
         data = {
-            "ref_id": str(person.id),
-            "bib": person.bib,
-            "lap": None,
-            "group_name": person.group.name,
-            "name": person.full_name,
-            "organization": person.organization.name if person.organization else '',
-            # "country_code": "RUS",
-            "card_number": int(person.sportident_card) if person.sportident_card is not None else 0,
-            "national_code": None,
-            "world_code": None,
-            "out_of_competition": person.is_out_of_competition,
-            "start": person.start_time.to_sec() if person.start_time else 0
+            'id': str(person.id),
+            'ref_id': str(person.id),
+            'bib': person.bib,
+            # 'relay_team': None,
+            # 'lap': None,
+            'group_name': person.group.name if person.group else '',
+            'name': person.full_name,
+            'organization': person.organization.name if person.organization else '',
+            # 'country_code': 'RUS',
+            'card_number': int(person.sportident_card) if person.sportident_card is not None else 0,
+            'national_code': None,
+            'world_code': None,
+            'out_of_competition': person.is_out_of_competition,
+            'start': person.start_time.to_sec() if person.start_time else 0
         }
         if result is not None:
             assert result, Result
             data['start'] = result.get_start_time().to_sec()
-            data['result_ms'] = round(result.get_result_for_sort()/10)
+            data['result_ms'] = round(result.get_result_for_sort() / 10)
             data['result_status'] = str(result.status)
             if result.is_sportident():
                 if len(result.splits):
                     data['splits'] = []
-                    for split in result.splits:
+                    for split in race().get_course_splits(result.splits):
                         data['splits'].append({
                             'code': str(split.code),
                             'time': split.time.to_sec()
