@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, \
     QTimeEdit, QRadioButton, QSpinBox, QGroupBox, QTextEdit, QDialogButtonBox
 
 from sportorg import config
+from sportorg.gui.dialogs.entry_edit import EntryEditDialog
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import _
 from sportorg.models.memory import race, Result, find, ResultStatus, Person, Limit, Split
@@ -115,6 +116,11 @@ class ResultEditDialog(QDialog):
         self.button_cancel = button_box.button(QDialogButtonBox.Cancel)
         self.button_cancel.setText(_('Cancel'))
         self.button_cancel.clicked.connect(cancel_changes)
+
+        if self.current_object.person:
+            button_person = button_box.addButton(_('Entry properties'), QDialogButtonBox.ActionRole)
+            button_person.clicked.connect(self.open_person)
+
         self.layout.addRow(button_box)
 
         self.show()
@@ -167,6 +173,12 @@ class ResultEditDialog(QDialog):
             self.radio_dnf.setChecked(True)
         elif self.current_object.status == ResultStatus.DID_NOT_START:
             self.radio_dns.setChecked(True)
+
+    def open_person(self):
+        try:
+            EntryEditDialog(self.current_object.person).exec()
+        except Exception as e:
+            logging.error(str(e))
 
     def apply_changes_impl(self):
         result = self.current_object
