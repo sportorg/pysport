@@ -183,20 +183,21 @@ class Widget(QtWidgets.QWidget):
         code = -1
         index = 1
         for split in result.splits:
-            time = split.time
             s = '{index} ({code}) {time} {diff}'.format(
                 index=index,
                 code=split.code,
-                time=time_to_hhmmss(time),
-                diff=(time-prev_time).to_minute_str())
+                time=time_to_hhmmss(split.time),
+                diff=(split.time-prev_time).to_minute_str())
+            index += 1
+
             if split.code == code:
                 s = '<span style="background: red">{}</span>'.format(s)
             if len(control_codes) and str(split.code) not in control_codes:
                 s = '<span style="background: yellow">{}</span>'.format(s)
-            code = split.code
+
             self.ResultChipDetails.append(s)
-            index += 1
-            prev_time = time
+            code = split.code
+            prev_time = split.time
 
         if result.finish_time is not None:
             self.ResultChipFinishEdit.setText(time_to_hhmmss(result.finish_time))
