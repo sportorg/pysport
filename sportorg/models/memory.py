@@ -215,6 +215,13 @@ class Course(Model):
 
         return True
 
+    def is_unknown(self):
+        for control in self.controls:
+            if '*' in control.code or '%' in control.code:
+                return True
+
+        return False
+
     def get_code_list(self):
         ret = []
         for i in self.controls:
@@ -432,6 +439,12 @@ class Result:
             return self.penalty_time
         return OTime()
 
+    def get_course_splits(self, course=None):
+        return []
+
+    def check(self, course=None):
+        return True
+
     def is_sportident(self):
         return self.system_type == SystemType.SPORTIDENT
 
@@ -526,6 +539,89 @@ class ResultSportident(Result):
         self.__start_time = None
         self.__finish_time = None
 
+    def get_course_splits(self, course=None):
+        result_splits = []
+        for i, split in enumerate(self.splits):
+            if not i or split.code != self.splits[i-1].code:
+                result_splits.append(split)
+        if not course or course.is_unknown():
+            return result_splits
+        max_len = len(result_splits)
+        splits = []
+        i = 0
+        for control in course.controls:
+            if max_len == i:
+                break
+            if str(result_splits[i].code) in control.code:
+                splits.append(result_splits[i])
+                i += 1
+        return splits
+
+    def check(self, course=None):
+        if not course:
+            return super().check()
+        controls = course.controls
+        i = 0
+        count_controls = len(controls)
+        if count_controls == 0:
+            return True
+
+        for split in self.splits:
+            try:
+                template = str(controls[i].code)
+                cur_code = int(split.code)
+
+                list_exists = False
+                list_contains = False
+                ind_begin = template.find('(')
+                ind_end = template.find(')')
+                if ind_begin > 0 and ind_end > 0:
+                    list_exists = True
+                    # any control from the list e.g. '%(31,32,33)'
+                    arr = template[ind_begin + 1:ind_end].split(',')
+                    if str(cur_code) in arr:
+                        list_contains = True
+
+                if template.find('%') > -1:
+                    # non-unique control
+                    if not list_exists or list_contains:
+                        # any control '%' or '%(31,32,33)' or '31%'
+                        i += 1
+
+                elif template.find('*') > -1:
+                    # unique control '*' or '*(31,32,33)' or '31*'
+                    if list_exists and not list_contains:
+                        # not in list
+                        continue
+                    # test previous splits
+                    is_unique = True
+                    for prev_split in self.splits[0:i]:
+                        if int(prev_split.code) == cur_code:
+                            is_unique = False
+                            break
+                    if is_unique:
+                        i += 1
+
+                else:
+                    # simple pre-ordered control '31 989' or '31(31,32,33) 989'
+                    if list_exists:
+                        # control with optional codes '31(31,32,33) 989'
+                        if list_contains:
+                            i += 1
+                    else:
+                        # just cp '31 989'
+                        is_equal = cur_code == int(controls[i].code)
+                        if is_equal:
+                            i += 1
+
+                if i == count_controls:
+                    return True
+
+            except KeyError:
+                return False
+
+        return False
+
 
 class Person(Model):
     def __init__(self):
@@ -567,13 +663,15 @@ class Person(Model):
             surname += ' '
         return '{}{}'.format(surname, self.name)
 
-    def to_dict(self):
+    def to_dict(self, course=None):
         sportident_card = ''
         if self.sportident_card is not None and int(self.sportident_card):
             sportident_card = str(self.sportident_card)
         course_name = ''
         if self.group is not None and self.group.course is not None:
             course_name = self.group.course.name
+        if course:
+            course_name = course.name
         return {
             'name': self.full_name,
             'bib': self.bib,
@@ -734,25 +832,11 @@ class Race(Model):
         return ret
 
     def get_course_splits(self, result):
-        """List[Split] or None"""
-        if not result.is_sportident():
-            return
+        """List[Split]"""
         if not result.person:
-            return result.splits
+            return result.get_course_splits()
         course = self.find_course(result.person)  # type: Course
-        if not course:
-            return result.splits
-        result_splits = []
-        for i, split in enumerate(result.splits):
-            if not i or split.code != result.splits[i-1].code:
-                result_splits.append(split)
-        splits = []
-        i = 0
-        for control in course.controls:
-            if str(result_splits[i].code) in control.code:
-                splits.append(result_splits[i])
-                i += 1
-        return splits
+        return result.get_course_splits(course)
 
     @staticmethod
     def new_result():

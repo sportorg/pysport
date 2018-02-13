@@ -332,9 +332,7 @@ class GroupMemoryModel(AbstractSportOrgMemoryModel):
         if course is None:
             course = Course()
 
-        control_count = 0
-        if course.controls is not None:
-            control_count = len(course.controls)
+        control_count = len(course.controls)
 
         return [
             group.name,

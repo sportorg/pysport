@@ -174,8 +174,10 @@ class Widget(QtWidgets.QWidget):
         assert isinstance(result, ResultSportident)
 
         control_codes = []
+        is_highlight = True
         if course:
             assert isinstance(course, Course)
+            is_highlight = not course.is_unknown()
             for control in course.controls:
                 control_codes.append(str(control.code))
 
@@ -192,7 +194,7 @@ class Widget(QtWidgets.QWidget):
 
             if split.code == code:
                 s = '<span style="background: red">{}</span>'.format(s)
-            if len(control_codes) and str(split.code) not in control_codes:
+            if is_highlight and len(control_codes) and str(split.code) not in control_codes:
                 s = '<span style="background: yellow">{}</span>'.format(s)
 
             self.ResultChipDetails.append(s)
@@ -209,18 +211,17 @@ class Widget(QtWidgets.QWidget):
             split_codes.append(str(split.code))
 
         if course:
-            if course.controls is not None:
-                index = 1
-                for control in course.controls:
-                    assert control, CourseControl
-                    s = '{index} ({code}) {length}'.format(
-                        index=index,
-                        code=control.code,
-                        length=control.length if control.length else '')
-                    if str(control.code) not in split_codes:
-                        s = '<span style="background: yellow">{}</span>'.format(s)
-                    self.ResultCourseDetails.append(s)
-                    index += 1
+            index = 1
+            for control in course.controls:
+                assert control, CourseControl
+                s = '{index} ({code}) {length}'.format(
+                    index=index,
+                    code=control.code,
+                    length=control.length if control.length else '')
+                if is_highlight and str(control.code) not in split_codes:
+                    s = '<span style="background: yellow">{}</span>'.format(s)
+                self.ResultCourseDetails.append(s)
+                index += 1
 
             self.ResultCourseNameEdit.setText(course.name)
             self.ResultCourseLengthEdit.setText(str(course.length))
