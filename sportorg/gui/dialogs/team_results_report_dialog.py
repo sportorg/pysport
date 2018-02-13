@@ -70,6 +70,8 @@ class TeamResultsReportDialog(QDialog):
         def apply_changes():
             try:
                 self.apply_changes_impl()
+            except FileNotFoundError as e:
+                logging.error(str(e))
             except Exception as e:
                 logging.exception(str(e))
             self.close()
