@@ -43,7 +43,7 @@ class Widget(QtWidgets.QWidget):
         def team_double_clicked(index):
             try:
                 if index.row() < len(race().organizations):
-                    dialog = OrganizationEditDialog(self.TeamTable, index)
+                    dialog = OrganizationEditDialog(race().organizations[index.row()])
                     dialog.exec()
             except Exception as e:
                 logging.exception(str(e))

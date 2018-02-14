@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sportorg.models.memory import race, Person, Course, Group, Qualification, RaceType
+from sportorg.models.memory import race, Person, Course, Group, Qualification
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.utils.time import time_to_hhmmss, get_speed_min_per_km, hhmmss_to_time
 
@@ -63,6 +63,8 @@ class PersonSplits(object):
         if person.organization:
             self.team = person.organization.name
         self.sportident_card = person.sportident_card
+        if result.is_sportident() and result.sportident_card:
+            self.sportident_card = result.sportident_card
         self.qual = ''
         if person.qual:
             self.qual = person.qual.get_title()
@@ -78,7 +80,7 @@ class PersonSplits(object):
         self.status = result.status.value
         self.status_title = result.status.get_title()
         self.place = result.place
-        self.group_count_all = person.group.get_count_all()
+        self.group_count_alll = person.group.get_count_all()
         self.group_count_finished = person.group.get_count_finished()
         self.scores = result.scores
         self.controls = [control.code for control in self.race.find_course(person).controls]
@@ -182,7 +184,7 @@ class PersonSplits(object):
         person_json['name'] = self.name
         person_json['bib'] = self.bib if self.bib else ''
         person_json['team'] = self.team
-        person_json['sportident_card'] = int(self.sportident_card)
+        person_json['sportident_card'] = int(self.sportident_card) if self.sportident_card is not None else ''
         person_json['last_correct_index'] = self.last_correct_index
         person_json['place'] = self.place
         person_json['start'] = self.start

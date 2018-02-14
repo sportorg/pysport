@@ -10,25 +10,25 @@ def menu_list():
                 {
                     'title': _('New'),
                     'shortcut': 'Ctrl+N',
-                    'icon': config.icon_dir('file.png'),
+                    'icon': config.icon_dir('file.svg'),
                     'action': 'NewAction'
                 },
                 {
                     'title': _('Save'),
                     'shortcut': 'Ctrl+S',
-                    'icon': config.icon_dir('save.png'),
+                    'icon': config.icon_dir('save.svg'),
                     'action': 'SaveAction'
                 },
                 {
                     'title': _('Open'),
                     'shortcut': 'Ctrl+O',
-                    'icon': config.icon_dir('folder.png'),
+                    'icon': config.icon_dir('folder.svg'),
                     'action': 'OpenAction'
                 },
                 {
                     'title': _('Save As'),
                     'shortcut': 'Ctrl+Shift+S',
-                    'icon': config.icon_dir('save.png'),
+                    'icon': config.icon_dir('save.svg'),
                     'action': 'SaveAsAction'
                 },
                 {
@@ -37,11 +37,12 @@ def menu_list():
                 {
                     'title': _('Settings'),
                     'shortcut': 'Ctrl+Alt+S',
-                    'icon': config.icon_dir('settings.png'),
+                    'icon': config.icon_dir('settings.svg'),
                     'action': 'SettingsAction'
                 },
                 {
                     'title': _('Event Settings'),
+                    'icon': config.icon_dir('form.svg'),
                     'action': 'EventSettingsAction'
                 },
                 {
@@ -52,7 +53,7 @@ def menu_list():
                     'actions': [
                         {
                             'title': _('CSV Winorient'),
-                            'icon': config.icon_dir('csv.png'),
+                            'icon': config.icon_dir('csv.svg'),
                             'action': 'CSVWinorientImportAction'
                         },
                         {
@@ -91,13 +92,13 @@ def menu_list():
                 {
                     'title': _('Add object'),
                     'shortcut': 'insert',
-                    'icon': config.icon_dir('plus.png'),
+                    'icon': config.icon_dir('add.svg'),
                     'action': 'AddObjectAction'
                 },
                 {
                     'title': _('Delete'),
                     'shortcut': 'Del',
-                    'icon': config.icon_dir('delete.png'),
+                    'icon': config.icon_dir('delete.svg'),
                     'action': 'DeleteAction'
                 },
                 {
@@ -111,19 +112,20 @@ def menu_list():
             'actions': [
                 {
                     'title': _('Refresh'),
-                    'icon': config.icon_dir('refresh.png'),
+                    'icon': config.icon_dir('refresh.svg'),
                     'shortcut': 'F5',
                     'action': 'RefreshAction'
                 },
                 {
                     'title': _('Filter'),
                     'shortcut': 'F2',
-                    'icon': config.icon_dir('filter.png'),
+                    'icon': config.icon_dir('filter.svg'),
                     'action': 'FilterAction'
                 },
                 {
                     'title': _('Search'),
                     'shortcut': 'Ctrl+F',
+                    'icon': config.icon_dir('search.svg'),
                     'action': 'SearchAction'
                 },
                 {
@@ -206,7 +208,7 @@ def menu_list():
                 {
                     'title': _('Manual finish'),
                     'shortcut': 'F3',
-                    'icon': config.icon_dir('flag.png'),
+                    'icon': config.icon_dir('flag.svg'),
                     'action': 'ManualFinishAction'
                 },
                 {
@@ -276,15 +278,17 @@ def menu_list():
             'actions': [
                 {
                     'title': _('Timekeeping settings'),
+                    'icon': config.icon_dir('stopwatch.svg'),
                     'action': 'TimekeepingSettingsAction'
                 },
                 {
                     'title': _('Teamwork'),
+                    'icon': config.icon_dir('network.svg'),
                     'action': 'TeamworkSettingsAction'
                 },
                 {
                     'title': _('Printer settings'),
-                    'icon': config.icon_dir('print.png'),
+                    'icon': config.icon_dir('printer.svg'),
                     'action': 'PrinterSettingsAction'
                 },
                 {

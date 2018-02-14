@@ -13,20 +13,14 @@ from sportorg.models.memory import race, Organization, find
 
 
 class OrganizationEditDialog(QDialog):
-    def __init__(self, table=None, index=None):
+    def __init__(self, organization):
         super().__init__(GlobalAccess().get_main_window())
-        if table is not None:
-            self.table = table
-            self.current_index = index
-
-            assert (isinstance(index, QModelIndex))
-            current_object = race().organizations[index.row()]
-            assert (isinstance(current_object, Organization))
-            self.current_object = current_object
+        assert (isinstance(organization, Organization))
+        self.current_object = organization
 
     def exec(self):
         self.init_ui()
-        self.set_values_from_table()
+        self.set_values_from_model()
         return super().exec()
 
     def init_ui(self):
@@ -93,9 +87,10 @@ class OrganizationEditDialog(QDialog):
             if org:
                 self.button_ok.setDisabled(True)
 
-    def set_values_from_table(self):
+    def set_values_from_model(self):
 
         self.item_name.setText(self.current_object.name)
+        self.item_name.selectAll()
         self.item_city.setText(self.current_object.address.city)
 
         if self.current_object.address.country is not None:

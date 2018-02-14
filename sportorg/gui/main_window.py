@@ -1,11 +1,13 @@
 import ast
 import logging
 import time
+from threading import main_thread
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import QModelIndex, QItemSelectionModel
+from PyQt5.QtCore import QModelIndex, QItemSelectionModel, QThread, pyqtSignal
 from PyQt5.QtWidgets import QMainWindow, QTableView, QMessageBox
 
+from sportorg.core.singleton import singleton
 from sportorg.gui.menu.factory import Factory
 from sportorg.models.memory import Race, event as races, race, NotEmptyException
 
@@ -26,6 +28,18 @@ from sportorg.gui.toolbar import toolbar_list
 from sportorg.language import _
 from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.modules.teamwork import Teamwork
+
+
+@singleton
+class ServiceListenerThread(QThread):
+    interval = pyqtSignal()
+
+    def run(self):
+        while True:
+            time.sleep(5)
+            self.interval.emit()
+            if not main_thread().is_alive():
+                break
 
 
 class ConsolePanelHandler(logging.Handler):
@@ -107,6 +121,9 @@ class MainWindow(QMainWindow):
 
         Teamwork().set_call(self.teamwork)
         SIReaderClient().set_call(self.add_sportident_result_from_sireader)
+
+        ServiceListenerThread().interval.connect(self.interval)
+        ServiceListenerThread().start()
 
     def _setup_ui(self):
         geometry = ConfigFile.GEOMETRY
@@ -280,12 +297,6 @@ class MainWindow(QMainWindow):
         self.get_course_table().model().clear_filter(remove_condition)
         self.get_organization_table().model().clear_filter(remove_condition)
 
-        self.get_person_table().model().clear_search(remove_condition)
-        self.get_result_table().model().clear_search(remove_condition)
-        self.get_person_table().model().clear_search(remove_condition)
-        self.get_course_table().model().clear_search(remove_condition)
-        self.get_organization_table().model().clear_search(remove_condition)
-
     def apply_filters(self):
         self.get_person_table().model().apply_filter()
         self.get_result_table().model().apply_filter()
@@ -385,6 +396,27 @@ class MainWindow(QMainWindow):
         except Exception as e:
             logging.exception(str(e))
 
+    sportident_status = False
+    sportident_icon = {
+        True: 'sportident-on.png',
+        False: 'sportident.png',
+    }
+    teamwork_status = False
+    teamwork_icon = {
+        True: 'network.svg',
+        False: 'network-off.svg',
+    }
+
+    def interval(self):
+        if SIReaderClient().is_alive() != self.sportident_status:
+            self.toolbar_property['sportident'].setIcon(
+                QtGui.QIcon(config.icon_dir(self.sportident_icon[SIReaderClient().is_alive()])))
+            self.sportident_status = SIReaderClient().is_alive()
+        if Teamwork().is_alive() != self.teamwork_status:
+            self.toolbar_property['teamwork'].setIcon(
+                QtGui.QIcon(config.icon_dir(self.teamwork_icon[Teamwork().is_alive()])))
+            self.teamwork_status = Teamwork().is_alive()
+
     # Actions
     def create_file(self, *args, update_data=True):
         file_name = get_save_file_name(
@@ -440,19 +472,14 @@ class MainWindow(QMainWindow):
             logging.warning(_('No result selected'))
             return
         try:
+            indexes = self.get_selected_rows()
             obj = race()
-
-            table = self.get_result_table()
-            assert isinstance(table, QTableView)
-            index = table.currentIndex().row()
-            if index < 0:
-                index = 0
-            if index >= len(obj.results):
-                mes = QMessageBox()
-                mes.setText(_('No results to print'))
-                mes.exec()
-                return
-            self.split_printout(obj.results[index])
+            for index in indexes:
+                if index < 0:
+                    continue
+                if index >= len(obj.results):
+                    pass
+                self.split_printout(obj.results[index])
         except Exception as e:
             logging.exception(str(e))
 
@@ -477,7 +504,7 @@ class MainWindow(QMainWindow):
                 race().add_new_person()
                 self.get_person_table().model().init_cache()
             elif tab == 1:
-                self.manual_finish()
+                self.menu_factory.execute('ManualFinishAction')
             elif tab == 2:
                 race().add_new_group()
                 self.get_person_table().model().init_cache()

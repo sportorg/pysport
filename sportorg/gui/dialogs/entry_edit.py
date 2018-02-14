@@ -17,17 +17,11 @@ from sportorg.utils.time import time_to_qtime, time_to_otime
 
 
 class EntryEditDialog(QDialog):
-    def __init__(self, table=None, index=None):
+    def __init__(self, person):
         super().__init__(GlobalAccess().get_main_window())
         self.is_ok = {}
-        if table is not None:
-            self.table = table
-            self.current_index = index
-
-            assert (isinstance(index, QModelIndex))
-            current_object = race().persons[index.row()]
-            assert (isinstance(current_object, Person))
-            self.current_object = current_object
+        assert (isinstance(person, Person))
+        self.current_object = person
 
         self.time_format = 'hh:mm:ss'
         time_accuracy = race().get_setting('time_accuracy', 0)
@@ -36,7 +30,7 @@ class EntryEditDialog(QDialog):
 
     def exec(self):
         self.init_ui()
-        self.set_values_from_table()
+        self.set_values_from_model()
         return super().exec()
 
     def init_ui(self):
@@ -223,8 +217,9 @@ class EntryEditDialog(QDialog):
         else:
             self.button_ok.setEnabled(True)
 
-    def set_values_from_table(self):
+    def set_values_from_model(self):
         self.item_surname.setText(self.current_object.surname)
+        self.item_surname.selectAll()
         self.item_name.setCurrentText(self.current_object.name)
         if self.current_object.group is not None:
             self.item_group.setCurrentText(self.current_object.group.name)
@@ -323,4 +318,3 @@ class EntryEditDialog(QDialog):
         if changed:
             ResultCalculation(race()).process_results()
             GlobalAccess().get_main_window().refresh()
-            # table.model().sourceModel().update_one_object(part, table.model().mapToSource(self.current_index).row())
