@@ -1,5 +1,6 @@
-from sportorg.models.memory import Result, race, Organization
+from sportorg.models.memory import Result, race, Organization, RaceType
 from sportorg.models.result.result_calculation import ResultCalculation
+from sportorg.models.start.relay import get_leg_count, get_team_result
 
 
 class ScoreCalculation(object):
@@ -49,7 +50,10 @@ class ScoreCalculation(object):
                 best_time = None
                 for cur_result in results:
                     assert isinstance(cur_result, Result)
-                    cur_time = cur_result.get_result_otime()
+                    if race().get_type(group) == RaceType.RELAY:
+                        cur_time = get_team_result(result.person)
+                    else:
+                        cur_time = cur_result.get_result_otime()
                     if not best_time or cur_time < best_time:
                         best_time = cur_time
                 return best_time

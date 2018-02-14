@@ -924,7 +924,7 @@ class RankingItem(object):
         self.is_active = is_active
         self.percent = 0
 
-    def get_json_data(self):
+    def get_dict_data(self):
         ret = {}
         ret['qual'] = self.qual.get_title()
         ret['max_place'] = self.max_place
@@ -957,7 +957,7 @@ class Ranking(object):
                         max_qual = i.qual
         return max_qual
 
-    def get_json_data(self):
+    def get_dict_data(self):
         ret = {}
         ret['is_active'] = self.is_active
         if self.is_active:
@@ -968,7 +968,7 @@ class Ranking(object):
             for i in self.rank.values():
                 if i.is_active:
                     if i.max_place or (i.max_time and i.max_time.to_msec() > 0):
-                        rank_array.append(i.get_json_data())
+                        rank_array.append(i.get_dict_data())
 
             ret['rank'] = rank_array
         return ret
@@ -1127,6 +1127,7 @@ class RelayTeam(object):
         self.bib_number = None  # bib
         self.last_finished_leg = 0
         self.last_correct_leg = 0
+        self.place = 0
 
     def __eq__(self, other):
         if self.get_is_status_ok() == self.get_is_status_ok():
@@ -1201,6 +1202,7 @@ class RelayTeam(object):
         return True
 
     def set_place(self, place):
+        self.place = place
         for i in self.legs:
             i.set_place(place)
 

@@ -3,7 +3,8 @@ import logging
 from sportorg.core.otime import OTime
 from sportorg.language import _
 from sportorg.models.memory import race, Result, Person, ResultStatus, Group, Qualification, RankingItem, \
-    RelayTeam, RaceType
+    RelayTeam, RaceType, find
+from sportorg.models.start.relay import get_team_result
 from sportorg.utils.time import time_to_hhmmss
 
 
@@ -25,7 +26,8 @@ class ResultCalculation(object):
             else:
                 # relay
                 new_relays = self.process_relay_results(i)
-                self.race.relay_teams.append(new_relays)
+                for a in new_relays:
+                    self.race.relay_teams.append(a)
 
     def set_times(self):
         for i in self.race.results:
@@ -106,7 +108,6 @@ class ResultCalculation(object):
             for cur_team in teams_sorted:
                 cur_team.set_place(place)
                 place += 1
-
             return relay_teams.values()
 
     def set_rank(self, group):
@@ -122,9 +123,7 @@ class ResultCalculation(object):
             rank = self.get_group_rank(group)
             ranking.rank_scores = rank
             if rank > 0:
-                leader_result = results[0]
-                assert isinstance(leader_result, Result)
-                leader_time = leader_result.get_result_otime()
+                leader_time = self.get_group_leader_time(group)
                 for i in ranking.rank.values():
                     assert isinstance(i, RankingItem)
                     if i.is_active and i.use_scores:
@@ -151,6 +150,17 @@ class ResultCalculation(object):
                             i.assigned_rank = j.qual
                             break
 
+    def get_group_leader_time(self, group):
+        if race().get_type(group) == RaceType.RELAY:
+            team_result = find(race().relay_teams, group=group, place=1)
+            assert isinstance(team_result, RelayTeam)
+            leader_time = team_result.get_time()
+        else:
+            results = self.get_group_finishes(group)
+            leader_result = results[0]
+            leader_time = leader_result.get_result_otime()
+        return leader_time
+
     def get_group_rank(self, group):
         """
         Rank calculation, takes sums or scores from qualification of best 10 athletes, who have OK result and not o/c
@@ -160,9 +170,14 @@ class ResultCalculation(object):
         scores = []
         array = self.get_group_finishes(group)
 
-        if len(array) < 10:
-            # less than 10 started
-            return -1
+        if race().get_type(group) != RaceType.RELAY:
+            if len(array) < 10:
+                # less than 10 started
+                return -1
+        else:
+            if len(array) < 6 * 3:
+                # less than 6 started in relay
+                return -1
 
         for i in array:
             assert isinstance(i, Result)
@@ -172,9 +187,14 @@ class ResultCalculation(object):
                     qual = person.qual
                     scores.append(qual.get_scores())
 
-        if len(scores) < 5:
-            # less than 5 finished and not disqualified
-            return -1
+        if race().get_type(group) != RaceType.RELAY:
+            if len(scores) < 5:
+                # less than 5 finished and not disqualified
+                return -1
+        else:
+            if len(scores) < 4 * 3:
+                # less than 4 finished and not disqualified
+                return -1
 
         if len(scores) <= 10:
             # get rank sum of 10 best finished
@@ -316,32 +336,15 @@ class ResultCalculation(object):
 
     def get_time_for_rank(self, leader_time, qual, rank):
         percent = self.get_percent_for_rank(qual, rank)
-        assert isinstance(leader_time, OTime)
-        msec_new = round(leader_time.to_msec() * percent / 100)
-        ret = OTime(msec=msec_new)
-        return ret
-
+        if leader_time:
+            assert isinstance(leader_time, OTime)
+            msec_new = round(leader_time.to_msec() * percent / 100)
+            ret = OTime(msec=msec_new)
+            return ret
+        return None
 
 def get_start_list_data():
     pass
-
-
-def get_result_data():
-    data = []
-    for group in race().groups:
-        array = ResultCalculation(race()).get_group_finishes(group)
-        group_data = {
-            'name': group.name,
-            'persons': []
-        }
-        for res in array:
-            assert isinstance(res, Result)
-            person_data = get_person_result_data(res)
-            group_data['persons'].append(person_data)
-        data.append(group_data)
-    ret = {'groups': data, 'title': 'Competition title'}
-
-    return ret
 
 
 def get_splits_data():
@@ -355,18 +358,3 @@ def get_entry_statistics_data():
 def get_team_statistics_data():
     pass
 
-
-def get_person_result_data(res):
-    person = res.person
-    assert isinstance(person, Person)
-    ret = {
-        'name': person.full_name,
-        'team': person.organization.name,
-        'qual': person.qual.get_title(),
-        'year': person.year,
-        'penalty_time': time_to_hhmmss(res.get_penalty_time()),
-        'result': res.get_result(),
-        'place': res.place,
-        'assigned_rank': res.assigned_rank.get_title()
-    }
-    return ret

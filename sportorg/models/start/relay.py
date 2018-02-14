@@ -1,5 +1,5 @@
 from sportorg.gui.global_access import GlobalAccess
-from sportorg.models.memory import race, Person
+from sportorg.models.memory import race, Person, find
 
 
 def get_last_relay_number_protocol():
@@ -54,3 +54,10 @@ def set_next_relay_number_to_person(person):
     set_next_relay_number(get_next_relay_number(person.bib))
     GlobalAccess().get_main_window().refresh()
 
+
+def get_team_result(person):
+    bib = person.bib % 1000
+    relay_team = find(race().relay_teams, bib_number=bib)
+    if relay_team:
+        if relay_team.get_lap_finished() == get_leg_count():
+            return relay_team.get_time()

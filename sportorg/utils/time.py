@@ -35,13 +35,13 @@ def _int_to_time(value):
     today = datetime.datetime.now()
     assert (isinstance(today, datetime.datetime))
     ret = datetime.datetime(today.year, today.month, today.day, value // 360000 % 24, (value % 360000) // 6000,
-                            (value % 6000) // 100, (value % 100) * 10000)
+                            (value % 6000) // 100, (value % 100) * 10)
     return ret
 
 
 def int_to_otime(value):
     """ convert value from 1/100 s to otime """
-    ret = OTime(0, value // 360000 % 24, (value % 360000) // 6000, (value % 6000) // 100, (value % 100) * 10000)
+    ret = OTime(0, value // 360000 % 24, (value % 360000) // 6000, (value % 6000) // 100, (value % 100) * 10)
     return ret
 
 

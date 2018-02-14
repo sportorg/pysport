@@ -212,7 +212,7 @@ class Widget(QtWidgets.QWidget):
             if course.controls is not None:
                 index = 1
                 for control in course.controls:
-                    assert isinstance(control, CourseControl)
+                    assert control, CourseControl
                     s = '{index} ({code}) {length}'.format(
                         index=index,
                         code=control.code,
