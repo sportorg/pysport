@@ -347,24 +347,6 @@ def get_start_list_data():
     pass
 
 
-def get_result_data():
-    data = []
-    for group in race().groups:
-        array = ResultCalculation(race()).get_group_finishes(group)
-        group_data = {
-            'name': group.name,
-            'persons': []
-        }
-        for res in array:
-            assert isinstance(res, Result)
-            person_data = get_person_result_data(res)
-            group_data['persons'].append(person_data)
-        data.append(group_data)
-    ret = {'groups': data, 'title': 'Competition title'}
-
-    return ret
-
-
 def get_splits_data():
     pass
 
@@ -376,18 +358,3 @@ def get_entry_statistics_data():
 def get_team_statistics_data():
     pass
 
-
-def get_person_result_data(res):
-    person = res.person
-    assert isinstance(person, Person)
-    ret = {
-        'name': person.full_name,
-        'team': person.organization.name,
-        'qual': person.qual.get_title(),
-        'year': person.year,
-        'penalty_time': time_to_hhmmss(res.get_penalty_time()),
-        'result': res.get_result(),
-        'place': res.place,
-        'assigned_rank': res.assigned_rank.get_title()
-    }
-    return ret

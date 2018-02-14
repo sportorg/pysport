@@ -21,7 +21,7 @@ class LegSplit(object):
         self.length_leg = 0
         self.leader_name = ''
 
-    def get_json(self):
+    def get_dict(self):
         ret = {
             'index': self.index,
             'course_index': self.course_index + 1,
@@ -177,53 +177,53 @@ class PersonSplits(object):
         return None
 
     def get_person_split_data(self):
-        return self.get_json()
+        return self.get_dict()
 
-    def get_json(self):
-        person_json = {}
-        person_json['name'] = self.name
-        person_json['bib'] = self.bib if self.bib else ''
-        person_json['team'] = self.team
-        person_json['sportident_card'] = int(self.sportident_card) if self.sportident_card is not None else ''
-        person_json['last_correct_index'] = self.last_correct_index
-        person_json['place'] = self.place
-        person_json['start'] = self.start
-        person_json['finish'] = self.finish
-        person_json['result'] = self.result
-        person_json['race_result'] = self.race_result
-        person_json['speed'] = self.speed
-        person_json['status'] = self.status
-        person_json['status_title'] = self.status_title
-        person_json['penalty_time'] = self.penalty_time
-        person_json['penalty_laps'] = self.penalty_laps
-        person_json['controls'] = self.controls
-        person_json['qual'] = self.qual
-        person_json['year'] = self.year
-        person_json['assigned_rank'] = self.assigned_rank
-        person_json['scores'] = self.scores
-        person_json['relay_leg'] = self.relay_leg
+    def get_dict(self):
+        person_dict = {}
+        person_dict['name'] = self.name
+        person_dict['bib'] = self.bib if self.bib else ''
+        person_dict['team'] = self.team
+        person_dict['sportident_card'] = int(self.sportident_card) if self.sportident_card is not None else ''
+        person_dict['last_correct_index'] = self.last_correct_index
+        person_dict['place'] = self.place
+        person_dict['start'] = self.start
+        person_dict['finish'] = self.finish
+        person_dict['result'] = self.result
+        person_dict['race_result'] = self.race_result
+        person_dict['speed'] = self.speed
+        person_dict['status'] = self.status
+        person_dict['status_title'] = self.status_title
+        person_dict['penalty_time'] = self.penalty_time
+        person_dict['penalty_laps'] = self.penalty_laps
+        person_dict['controls'] = self.controls
+        person_dict['qual'] = self.qual
+        person_dict['year'] = self.year
+        person_dict['assigned_rank'] = self.assigned_rank
+        person_dict['scores'] = self.scores
+        person_dict['relay_leg'] = self.relay_leg
 
-        person_json['legs'] = []
-        person_json['splits'] = []
+        person_dict['legs'] = []
+        person_dict['splits'] = []
 
         for split in self.splits:
-            person_json['splits'].append({
+            person_dict['splits'].append({
                 'code': split.code,
                 'time': str(split.time)
             })
 
         for i in self.legs:
             assert isinstance(i, LegSplit)
-            person_json['legs'].append(i.get_json())
+            person_dict['legs'].append(i.get_dict())
 
-        person_json['finish_time'] = ''
-        if len(person_json['splits']):
+        person_dict['finish_time'] = ''
+        if len(person_dict['splits']):
             finish = hhmmss_to_time(self.finish)
-            last_time = hhmmss_to_time(person_json['splits'][-1]['time'])
+            last_time = hhmmss_to_time(person_dict['splits'][-1]['time'])
             if last_time != finish:
-                person_json['finish_time'] = (finish - last_time).to_minute_str()
+                person_dict['finish_time'] = (finish - last_time).to_minute_str()
 
-        return person_json
+        return person_dict
 
 
 class GroupSplits(object):
@@ -315,16 +315,16 @@ class GroupSplits(object):
             self.sort_by_leg(i, True)
             self.set_places_for_leg(i, True)
 
-    def get_json(self, person_to_export=None):
-        group_json = {}
-        group_json['name'] = self.name
-        group_json['climb'] = self.climb
-        group_json['count_all'] = self.count_all
-        group_json['count_finished'] = self.count_finished
-        group_json['cp_count'] = self.cp_count
-        group_json['controls'] = self.controls
-        group_json['length'] = self.length
-        group_json['type'] = self.type
+    def get_dict(self, person_to_export=None):
+        group_dict = {}
+        group_dict['name'] = self.name
+        group_dict['climb'] = self.climb
+        group_dict['count_all'] = self.count_all
+        group_dict['count_finished'] = self.count_finished
+        group_dict['cp_count'] = self.cp_count
+        group_dict['controls'] = self.controls
+        group_dict['length'] = self.length
+        group_dict['type'] = self.type
         persons = []
         for i in self.person_splits:
             assert (isinstance(i, PersonSplits))
@@ -333,15 +333,15 @@ class GroupSplits(object):
                 if not person_to_export == i.person:
                     continue
 
-            person_json = i.get_json()
-            persons.append(person_json)
+            person_dict = i.get_dict()
+            persons.append(person_dict)
 
-        group_json['persons'] = persons
-        return group_json
+        group_dict['persons'] = persons
+        return group_dict
 
-    def get_json_printout(self, person_to_export=None):
+    def get_dict_printout(self, person_to_export=None):
         ret = {}
-        group_json = self.get_json(person_to_export)
+        group_dict = self.get_dict(person_to_export)
 
         # list of athletes
         group_persons = []
@@ -352,9 +352,9 @@ class GroupSplits(object):
                 'place': i.place,
                 'result': i.result,
             })
-        group_json['group_persons'] = group_persons
+        group_dict['group_persons'] = group_persons
 
-        groups = [group_json]
+        groups = [group_dict]
         ret['groups'] = groups
 
         start_date = race().get_setting('start_date', datetime.now().replace(second=0, microsecond=0))
@@ -388,9 +388,9 @@ def get_splits_data():
     data = []
     for group in race().groups:
         gs = GroupSplits(race(), group)
-        group_data = gs.get_json()
+        group_data = gs.get_dict()
 
-        ranking_data = group.ranking.get_json_data()
+        ranking_data = group.ranking.get_dict_data()
         group_data['ranking'] = ranking_data
 
         data.append(group_data)

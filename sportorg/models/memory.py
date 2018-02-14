@@ -924,7 +924,7 @@ class RankingItem(object):
         self.is_active = is_active
         self.percent = 0
 
-    def get_json_data(self):
+    def get_dict_data(self):
         ret = {}
         ret['qual'] = self.qual.get_title()
         ret['max_place'] = self.max_place
@@ -957,7 +957,7 @@ class Ranking(object):
                         max_qual = i.qual
         return max_qual
 
-    def get_json_data(self):
+    def get_dict_data(self):
         ret = {}
         ret['is_active'] = self.is_active
         if self.is_active:
@@ -968,7 +968,7 @@ class Ranking(object):
             for i in self.rank.values():
                 if i.is_active:
                     if i.max_place or (i.max_time and i.max_time.to_msec() > 0):
-                        rank_array.append(i.get_json_data())
+                        rank_array.append(i.get_dict_data())
 
             ret['rank'] = rank_array
         return ret
