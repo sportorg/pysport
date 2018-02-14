@@ -57,7 +57,7 @@ def set_next_relay_number_to_person(person):
 
 def get_team_result(person):
     bib = person.bib % 1000
-    relay_team = find(race().relay_teams, bib_number = bib)
+    relay_team = find(race().relay_teams, bib_number=bib)
     if relay_team:
         if relay_team.get_lap_finished() == get_leg_count():
             return relay_team.get_time()

@@ -3,7 +3,7 @@ import logging
 from sportorg.core.otime import OTime
 from sportorg.language import _
 from sportorg.models.memory import race, Result, Person, ResultStatus, Group, Qualification, RankingItem, \
-    RelayTeam, RaceType
+    RelayTeam, RaceType, find
 from sportorg.models.start.relay import get_team_result
 from sportorg.utils.time import time_to_hhmmss
 
@@ -26,7 +26,8 @@ class ResultCalculation(object):
             else:
                 # relay
                 new_relays = self.process_relay_results(i)
-                self.race.relay_teams.append(new_relays)
+                for a in new_relays:
+                    self.race.relay_teams.append(a)
 
     def set_times(self):
         for i in self.race.results:
@@ -107,7 +108,6 @@ class ResultCalculation(object):
             for cur_team in teams_sorted:
                 cur_team.set_place(place)
                 place += 1
-            # race().relay_teams = relay_teams
             return relay_teams.values()
 
     def set_rank(self, group):
@@ -123,12 +123,7 @@ class ResultCalculation(object):
             rank = self.get_group_rank(group)
             ranking.rank_scores = rank
             if rank > 0:
-                leader_result = results[0]
-                assert isinstance(leader_result, Result)
-                if race().get_type(group) == RaceType.RELAY:
-                    leader_time = get_team_result(leader_result.person)
-                else:
-                    leader_time = leader_result.get_result_otime()
+                leader_time = self.get_group_leader_time(group)
                 for i in ranking.rank.values():
                     assert isinstance(i, RankingItem)
                     if i.is_active and i.use_scores:
@@ -154,6 +149,17 @@ class ResultCalculation(object):
                         if j.max_time and j.max_time >= result_time:
                             i.assigned_rank = j.qual
                             break
+
+    def get_group_leader_time(self, group):
+        if race().get_type(group) == RaceType.RELAY:
+            team_result = find(race().relay_teams, group=group, place=1)
+            assert isinstance(team_result, RelayTeam)
+            leader_time = team_result.get_time()
+        else:
+            results = self.get_group_finishes(group)
+            leader_result = results[0]
+            leader_time = leader_result.get_result_otime()
+        return leader_time
 
     def get_group_rank(self, group):
         """

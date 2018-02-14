@@ -1104,6 +1104,7 @@ class RelayTeam(object):
         self.bib_number = None  # bib
         self.last_finished_leg = 0
         self.last_correct_leg = 0
+        self.place = 0
 
     def __eq__(self, other):
         if self.get_is_status_ok() == self.get_is_status_ok():
@@ -1178,6 +1179,7 @@ class RelayTeam(object):
         return True
 
     def set_place(self, place):
+        self.place = place
         for i in self.legs:
             i.set_place(place)
 

@@ -19,6 +19,7 @@ class LegSplit(object):
         self.status = 'correct'
         self.speed = ''
         self.length_leg = 0
+        self.leader_name = ''
 
     def get_json(self):
         ret = {
@@ -33,7 +34,8 @@ class LegSplit(object):
             'relative_place': self.relative_place,
             'status': self.status,
             'speed': self.speed,
-            'length_leg': self.length_leg
+            'length_leg': self.length_leg,
+            'leader_name': self.leader_name
         }
         return ret
 
