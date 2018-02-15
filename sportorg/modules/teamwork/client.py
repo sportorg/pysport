@@ -33,6 +33,7 @@ class ClientSenderThread(Thread):
                 break
         self.conn.close()
         self._logger.debug('Client sender shutdown')
+        self._stop_event.set()
 
 
 class ClientReceiverThread(Thread):
@@ -71,6 +72,7 @@ class ClientReceiverThread(Thread):
                 self._logger.debug(str(e))
                 break
         self._logger.debug('Client receiver shutdown')
+        self._stop_event.set()
 
 
 class ClientThread(Thread):
