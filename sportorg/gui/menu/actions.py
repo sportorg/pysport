@@ -23,6 +23,7 @@ from sportorg.gui.dialogs.start_chess_dialog import StartChessDialog
 from sportorg.gui.dialogs.start_preparation import StartPreparationDialog, guess_courses_for_groups
 from sportorg.gui.dialogs.start_report_dialog import StartReportDialog
 from sportorg.gui.dialogs.start_time_change_dialog import StartTimeChangeDialog
+from sportorg.gui.dialogs.statistics_report_dialog import StatisticsReportDialog
 from sportorg.gui.dialogs.team_report_dialog import TeamReportDialog
 from sportorg.gui.dialogs.team_results_report_dialog import TeamResultsReportDialog
 from sportorg.gui.dialogs.teamwork_properties import TeamworkPropertiesDialog
@@ -253,6 +254,11 @@ class StartTimeChangeAction(Action):
 class StartListAction(Action):
     def execute(self):
         StartReportDialog().exec()
+
+
+class StatisticsListAction(Action):
+    def execute(self):
+        StatisticsReportDialog().exec()
 
 
 class TeamListAction(Action):
