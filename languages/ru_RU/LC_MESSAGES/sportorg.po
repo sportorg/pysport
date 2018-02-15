@@ -1152,3 +1152,6 @@ msgstr "Токен"
 
 msgid "The search has not given any results"
 msgstr "Поиск не дал результатов"
+
+msgid "Entries statistics"
+msgstr "Протокол мандатной комиссии"

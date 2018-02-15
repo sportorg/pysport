@@ -199,6 +199,10 @@ def menu_list():
                 {
                     'title': _('Print Bib'),
                     'action': 'PrintBibAction'
+                },
+                {
+                    'title': _('Entries statistics'),
+                    'action': 'StatisticsListAction'
                 }
             ]
         },

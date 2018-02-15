@@ -1,6 +1,6 @@
 from enum import Enum
 
-from sportorg.models.memory import race, Group, RaceType, find
+from sportorg.models.memory import race, Group, RaceType, find, Qualification
 from sportorg.utils.time import time_to_hhmmss
 
 
@@ -226,6 +226,115 @@ class TeamStartList:
         return data
 
 
+class TeamStatisticsList:
+    def __init__(self, persons, sorting=None):
+        self._persons = persons
+        self._sorting = sorting
+        self._group_list = []
+        self._team_list = []
+        self._create_group_list()
+        self._create_team_list()
+
+    def _create_group_list(self):
+        self._group_list = []
+        for person in self._persons:
+            if person.group:
+                cur_group = person.group
+                if cur_group not in self._group_list:
+                    self._group_list.append(cur_group)
+        self._group_list.sort(key=lambda x: x.name)
+
+    def _create_team_list(self):
+        self._team_list = []
+        for person in self._persons:
+            if person.organization:
+                cur_team = person.organization
+                if cur_team not in self._team_list:
+                    self._team_list.append(cur_team)
+        self._team_list.sort(key=lambda x: x.name)
+
+    def _get_dict_teams(self):
+        """ get statistics for all teams - count of athletes in each group"""
+        ret = []
+        for team in self._team_list:
+            team_persons = find(self._persons, organization=team, return_all=True)
+            team_dict = team.to_dict()
+            team_dict['count'] = len(team_persons)
+            team_dict['groups'] = []
+            for group in self._group_list:
+                found_list = find(team_persons, group=group, return_all=True)
+                count = len(found_list) if found_list else 0
+                group_dict = {}
+                group_dict['name'] = group.name
+                group_dict['count'] = count
+                team_dict['groups'].append(group_dict)
+            ret.append(team_dict)
+
+        # add total statistics for whole list (virtual _total team)
+        team_dict = {}
+        team_dict['name'] = '_total'
+        team_dict['count'] = len(self._persons)
+        team_dict['groups'] = []
+        for group in self._group_list:
+            count = len(find(self._persons, group=group, return_all=True))
+            group_dict = {}
+            group_dict['name'] = group.name
+            group_dict['count'] = count
+            team_dict['groups'].append(group_dict)
+        ret.append(team_dict)
+
+        return ret
+
+    def _get_dict_qualification(self):
+        """ get statistics for all qualifications - count of athletes in each group"""
+        ret = []
+        for qual in list(Qualification):
+            qual_persons = find(self._persons, qual=qual, return_all=True)
+            qual_dict = {}
+            qual_dict['name'] = qual.get_title()
+            qual_dict['count'] = len(qual_persons) if qual_persons else 0
+            qual_dict['groups'] = []
+            for group in self._group_list:
+                count = 0
+                if qual_persons:
+                    found_list = find(qual_persons, group=group, return_all=True)
+                    count = len(found_list) if found_list else 0
+                group_dict = {}
+                group_dict['name'] = group.name
+                group_dict['count'] = count
+                qual_dict['groups'].append(group_dict)
+            ret.append(qual_dict)
+
+        return ret
+
+
+    def get_list(self):
+        """
+        :return: [
+            "teams":[
+                "name": str,
+                "count": int,
+                "groups": [
+                    "name": str,
+                    "count"
+                ]
+            ]
+            "qualification":[
+                "name": str,
+                "count": int,
+                "groups": [
+                    "name": str,
+                    "count": int
+                ]
+            ]
+        ]
+        """
+        data = {}
+        data['teams'] = self._get_dict_teams()
+        data['qualification'] = self._get_dict_qualification()
+        return data
+
+
 def get_start_data():
     start_list = GroupsStartList(race().persons)
     groups = start_list.get_list()
@@ -253,4 +362,11 @@ def get_teams_data():
     return {
         'race': race().to_dict(),
         'teams': TeamStartList(race().persons, SortType.NAME).get_list()
+    }
+
+
+def get_entries_statistics_data():
+    return {
+        'race': race().to_dict(),
+        'statistics': TeamStatisticsList(race().persons, SortType.NAME).get_list()
     }
