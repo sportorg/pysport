@@ -103,6 +103,7 @@ class ServerSenderThread(Thread):
             except Exception as e:
                 self._logger.debug(str(e))
         self._logger.debug('Server sender shutdown')
+        self._stop_event.set()
 
 
 class ServerThread(Thread):
