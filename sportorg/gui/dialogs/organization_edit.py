@@ -10,6 +10,7 @@ from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
 from sportorg.models.constant import get_countries, get_regions
 from sportorg.models.memory import race, Organization, find
+from sportorg.modules.teamwork import Teamwork
 
 
 class OrganizationEditDialog(QDialog):
@@ -135,3 +136,4 @@ class OrganizationEditDialog(QDialog):
         if changed:
             GlobalAccess().get_main_window().refresh()
             # table.model().sourceModel().update_one_object(part, table.model().mapToSource(self.current_index).row())
+            Teamwork().send(org.to_dict())

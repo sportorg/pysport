@@ -327,7 +327,7 @@ class Group(Model):
         return {
             'id': str(self.id),
             'name': self.name,
-            'course': self.course.id if self.course else None,
+            'course': str(self.course.id) if self.course else None,
             'long_name': self.long_name,
             'price': self.price,
             'sex': self.sex.value,
@@ -419,7 +419,7 @@ class Result:
         self.id = uuid.uuid4()
         self.start_time = None  # type: OTime
         self.finish_time = None  # type: OTime
-        self.result = None  # type: OTime
+        self.result = None
         self.person = None  # type: Person
         self.status = ResultStatus.OK
         self.penalty_time = None  # type: OTime
@@ -464,10 +464,10 @@ class Result:
         return {
             'id': str(self.id),
             'system_type': self.system_type.value,
-            'person': self.person.id if self.person else None,
+            'person': str(self.person.id) if self.person else None,
             'start_time': self.start_time.to_msec() if self.start_time else None,
             'finish_time': self.finish_time.to_msec() if self.finish_time else None,
-            'result': self.result.to_msec() if self.result else None,
+            'result': self.result,
             'penalty_time': self.penalty_time.to_msec() if self.penalty_time else None,
             'status': self.status.value,
             'penalty_laps': self.penalty_laps,
@@ -765,7 +765,7 @@ class Person(Model):
             'bib': self.bib,
             'year': self.year,
             'birth_date': str(self.birth_date) if self.birth_date else None,
-            'group': self.group.id if self.group else None,
+            'group': str(self.group.id) if self.group else None,
             'nationality': self.nationality.to_dict() if self.nationality else None,
             'address': self.address.to_dict() if self.address else None,
             'contact': [],

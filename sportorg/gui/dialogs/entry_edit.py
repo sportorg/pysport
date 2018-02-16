@@ -13,6 +13,7 @@ from sportorg.language import _
 from sportorg.models.constant import get_names, get_race_groups, get_race_teams
 from sportorg.models.memory import race, Person, find, Qualification, Limit, Organization
 from sportorg.models.result.result_calculation import ResultCalculation
+from sportorg.modules.teamwork import Teamwork
 from sportorg.utils.time import time_to_qtime, time_to_otime
 
 
@@ -318,3 +319,4 @@ class EntryEditDialog(QDialog):
         if changed:
             ResultCalculation(race()).process_results()
             GlobalAccess().get_main_window().refresh()
+            Teamwork().send(person.to_dict())

@@ -13,6 +13,7 @@ from sportorg.language import _
 from sportorg.models.memory import race, Result, find, ResultStatus, Person, Limit, Split
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.result_checker import ResultChecker, ResultCheckerException
+from sportorg.modules.teamwork import Teamwork
 from sportorg.utils.time import time_to_qtime, time_to_otime, hhmmss_to_time
 
 
@@ -271,6 +272,7 @@ class ResultEditDialog(QDialog):
                 result.clear()
             ResultCalculation(race()).process_results()
             GlobalAccess().get_main_window().refresh()
+            Teamwork().send(result.to_dict())
 
 
 class SplitsObject:

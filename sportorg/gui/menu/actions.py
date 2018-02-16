@@ -279,7 +279,7 @@ class PrintBibAction(Action):
 class ManualFinishAction(Action):
     def execute(self):
         result = race().new_result()
-        Teamwork().send({"message": 'hello'})
+        Teamwork().send(result.to_dict())
         race().add_new_result(result)
         logging.info('Manual finish')
         self.app.get_result_table().model().init_cache()
