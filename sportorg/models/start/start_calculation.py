@@ -272,7 +272,7 @@ class TeamStatisticsList:
 
         # add total statistics for whole list (virtual _total team)
         team_dict = {}
-        team_dict['name'] = '_total'
+        team_dict['name'] = '_TOTAL'
         team_dict['count'] = len(self._persons)
         team_dict['groups'] = []
         for group in self._group_list:

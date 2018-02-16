@@ -190,10 +190,10 @@
         {% endif %}
         <tr>
             <td>{{ loop.index }}</td>
-            <td>{{ team.name }}</td>
-            <td>{{ team.count }}</td>
+            <td>{% if team.name == '_TOTAL' %}Всего{% else %}{{ team.name }}{% endif %}</td>
+            <td>{% if team.count %}{{ team.count }}{% endif %}</td>
             {% for group in team.groups %}
-                <td>{{ group.count }}</td>
+                <td>{% if group.count %}{{ group.count }}{% endif %}</td>
             {% endfor %}
         </tr>
     {% endfor %}
@@ -215,9 +215,9 @@
         <tr>
             <td>{{ loop.index }}</td>
             <td>{{ qual.name }}</td>
-            <td>{{ qual.count }}</td>
+            <td>{% if qual.count %}{{ qual.count }}{% endif %}</td>
             {% for group in qual.groups %}
-                <td>{{ group.count }}</td>
+                <td>{% if group.count %}{{ group.count }}{% endif %}</td>
             {% endfor %}
         </tr>
     {% endfor %}
