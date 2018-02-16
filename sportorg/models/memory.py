@@ -94,6 +94,15 @@ class Country(Model):
     def __repr__(self):
         return self.name
 
+    def to_dict(self):
+        return {
+            'name': self.name,
+            'code2': self.code2,
+            'code3': self.code3,
+            'digital_code': self.digital_code,
+            'code': self.code,
+        }
+
 
 class Address(Model):
     def __init__(self):
@@ -104,6 +113,16 @@ class Address(Model):
         self.state = ''
         self.country = Country()
 
+    def to_dict(self):
+        return {
+            'care_of': self.care_of,
+            'street': self.street,
+            'zip_code': self.zip_code,
+            'city': self.city,
+            'state': self.state,
+            'country': self.country.to_dict()
+        }
+
 
 class Contact(Model):
     def __init__(self):
@@ -112,6 +131,12 @@ class Contact(Model):
 
     def __repr__(self):
         return '{} {}'.format(self.name, self.value)
+
+    def to_dict(self):
+        return {
+            'name': self.name,
+            'value': self.value,
+        }
 
 
 class Organization(Model):
@@ -130,7 +155,11 @@ class Organization(Model):
 
     def to_dict(self):
         return {
-            'name': self.name
+            'id': str(self.id),
+            'name': self.name,
+            'address': self.address.to_dict(),
+            'contact': self.contact.to_dict(),
+            'count_person': self.count_person,
         }
 
 
@@ -189,6 +218,14 @@ class CoursePart(Model):
         self.control_count = 0
         self.is_free = False
 
+    def to_dict(self):
+        controls = [control.to_dict() for control in self.controls]
+        return {
+            'controls': controls,
+            'control_count': self.control_count,
+            'is_free': self.is_free,
+        }
+
 
 class Course(Model):
     def __init__(self):
@@ -230,7 +267,11 @@ class Course(Model):
         return ret
 
     def to_dict(self):
+        controls = [control.to_dict() for control in self.controls]
         return {
+            'id': str(self.id),
+            'controls': controls,
+            'bib': self.bib,
             'name': self.name,
             'length': self.length,
             'climb': self.climb,
@@ -251,7 +292,6 @@ class Group(Model):
         self.max_age = 0
 
         self.max_time = OTime()
-        self.qual_assign_text = ''
         self.start_interval = OTime()
         self.start_corridor = 0
         self.order_in_corridor = 0
@@ -285,9 +325,23 @@ class Group(Model):
 
     def to_dict(self):
         return {
+            'id': str(self.id),
             'name': self.name,
+            'course': self.course.id if self.course else None,
             'long_name': self.long_name,
             'price': self.price,
+            'sex': self.sex.value,
+            'min_age': self.min_age,
+            'max_age': self.max_age,
+            'max_time': self.max_time.to_msec(),
+            'start_interval': self.start_interval.to_msec(),
+            'start_corridor': self.start_corridor,
+            'order_in_corridor': self.order_in_corridor,
+            'first_number': self.first_number,
+            # 'ranking': None,
+            '__type': self.__type.value if self.__type else None,
+            'relay_legs': self.relay_legs,
+
         }
 
 
@@ -351,6 +405,12 @@ class Split(Model):
             return False
         return self.code == other.code and self.time == other.time
 
+    def to_dict(self):
+        return {
+            'code': self.code,
+            'time': self.time.to_msec() if self.time else None,
+        }
+
 
 class Result:
     def __init__(self):
@@ -399,6 +459,22 @@ class Result:
     @abstractmethod
     def system_type(self) -> SystemType:
         pass
+
+    def to_dict(self):
+        return {
+            'id': str(self.id),
+            'system_type': self.system_type.value,
+            'person': self.person.id if self.person else None,
+            'start_time': self.start_time.to_msec() if self.start_time else None,
+            'finish_time': self.finish_time.to_msec() if self.finish_time else None,
+            'result': self.result.to_msec() if self.result else None,
+            'penalty_time': self.penalty_time.to_msec() if self.penalty_time else None,
+            'status': self.status.value,
+            'penalty_laps': self.penalty_laps,
+            'place': self.place,
+            'scores': self.scores,
+            'assigned_rank': self.assigned_rank.value,
+        }
 
     def get_result(self):
         if self.status != ResultStatus.OK:
@@ -483,6 +559,13 @@ class ResultSportident(Result):
         else:
             return False
         return eq
+
+    def to_dict(self):
+        data = super().to_dict()
+        data['splits'] = [split.to_dict() for split in self.splits]
+        data['sportident_card'] = int(self.sportident_card) if self.sportident_card else None
+
+        return data
 
     def get_start_time(self):
         obj = race()
@@ -672,7 +755,34 @@ class Person(Model):
             surname += ' '
         return '{}{}'.format(surname, self.name)
 
-    def to_dict(self, course=None):
+    def to_dict(self):
+        return {
+            'id': str(self.id),
+            'name': self.name,
+            'surname': self.surname,
+            'sex': self.sex.value,
+            'sportident_card': int(self.sportident_card) if self.sportident_card else None,
+            'bib': self.bib,
+            'year': self.year,
+            'birth_date': str(self.birth_date) if self.birth_date else None,
+            'group': self.group.id if self.group else None,
+            'nationality': self.nationality.to_dict() if self.nationality else None,
+            'address': self.address.to_dict() if self.address else None,
+            'contact': [],
+            'world_code': self.world_code,
+            'national_code': self.national_code,
+            'rank': self.rank,
+            'qual': self.qual.value,
+            'is_out_of_competition': self.is_out_of_competition,
+            'is_paid': self.is_paid,
+            'is_rented_sportident_card': self.is_rented_sportident_card,
+            'is_personal': self.is_personal,
+            'comment': self.comment,
+            'start_time': self.start_time.to_msec() if self.start_time else None,
+            'start_group': self.start_group,
+        }
+
+    def to_dict_data(self, course=None):
         sportident_card = ''
         if self.sportident_card is not None and int(self.sportident_card):
             sportident_card = str(self.sportident_card)
@@ -728,7 +838,7 @@ class Race(Model):
     def __repr__(self):
         return repr(self.data)
 
-    def to_dict(self):
+    def to_dict_data(self):
         start_date = self.get_setting('start_date', datetime.datetime.now().replace(second=0, microsecond=0))
         return {
             'title': self.get_setting('main_title', ''),
