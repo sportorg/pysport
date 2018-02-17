@@ -8,7 +8,7 @@ from requests.exceptions import MissingSchema, ConnectionError
 
 from sportorg import config
 from sportorg.core.singleton import Singleton
-from sportorg.models.memory import race, Person, Result
+from sportorg.models.memory import race, Person, Result, RaceType
 
 
 class OrgeoCommand:
@@ -65,8 +65,8 @@ class OrgeoThread(Thread):
                 try:
                     orgeo = Orgeo(command.url, self._user_agent, self._logger)
                     response = orgeo.send(command.data)
-                    self._logger.info('status {}'.format(response.status_code))
-                    self._logger.info(response.text)
+                    self._logger.debug('status {}'.format(response.status_code))
+                    self._logger.debug(response.text)
                 except ConnectionError as e:
                     self._logger.error(str(e))
                     time.sleep(10)
@@ -117,6 +117,11 @@ class OrgeoClient(metaclass=Singleton):
             'out_of_competition': person.is_out_of_competition,
             'start': person.start_time.to_sec() if person.start_time else 0
         }
+
+        if race().get_type(person.group) == RaceType.RELAY:
+            data['relay_team'] = person.bib % 1000
+            data['lap'] = person.bib // 1000
+
         if result is not None:
             assert result, Result
             data['start'] = result.get_start_time().to_sec()
@@ -125,7 +130,7 @@ class OrgeoClient(metaclass=Singleton):
             if result.is_sportident():
                 if len(result.splits):
                     data['splits'] = []
-                    for split in race().get_course_splits(result.splits):
+                    for split in race().get_course_splits(result):
                         data['splits'].append({
                             'code': str(split.code),
                             'time': split.time.to_sec()
