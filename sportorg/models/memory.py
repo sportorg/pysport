@@ -96,6 +96,7 @@ class Country(Model):
 
     def to_dict(self):
         return {
+			'object': self.__class__.__name__,
             'name': self.name,
             'code2': self.code2,
             'code3': self.code3,
@@ -115,6 +116,7 @@ class Address(Model):
 
     def to_dict(self):
         return {
+			'object': self.__class__.__name__,
             'care_of': self.care_of,
             'street': self.street,
             'zip_code': self.zip_code,
@@ -134,6 +136,7 @@ class Contact(Model):
 
     def to_dict(self):
         return {
+			'object': self.__class__.__name__,
             'name': self.name,
             'value': self.value,
         }
@@ -155,6 +158,7 @@ class Organization(Model):
 
     def to_dict(self):
         return {
+			'object': self.__class__.__name__,
             'id': str(self.id),
             'name': self.name,
             'address': self.address.to_dict(),
@@ -207,6 +211,7 @@ class CourseControl(Model):
 
     def to_dict(self):
         return {
+			'object': self.__class__.__name__,
             'code': self.code,
             'length': self.length
         }
@@ -221,6 +226,7 @@ class CoursePart(Model):
     def to_dict(self):
         controls = [control.to_dict() for control in self.controls]
         return {
+			'object': self.__class__.__name__,
             'controls': controls,
             'control_count': self.control_count,
             'is_free': self.is_free,
@@ -269,6 +275,7 @@ class Course(Model):
     def to_dict(self):
         controls = [control.to_dict() for control in self.controls]
         return {
+			'object': self.__class__.__name__,
             'id': str(self.id),
             'controls': controls,
             'bib': self.bib,
@@ -325,6 +332,7 @@ class Group(Model):
 
     def to_dict(self):
         return {
+			'object': self.__class__.__name__,
             'id': str(self.id),
             'name': self.name,
             'course': str(self.course.id) if self.course else None,
@@ -407,6 +415,7 @@ class Split(Model):
 
     def to_dict(self):
         return {
+			'object': self.__class__.__name__,
             'code': self.code,
             'time': self.time.to_msec() if self.time else None,
         }
@@ -462,6 +471,7 @@ class Result:
 
     def to_dict(self):
         return {
+			'object': self.__class__.__name__,
             'id': str(self.id),
             'system_type': self.system_type.value,
             'person': str(self.person.id) if self.person else None,
@@ -757,6 +767,7 @@ class Person(Model):
 
     def to_dict(self):
         return {
+			'object': self.__class__.__name__,
             'id': str(self.id),
             'name': self.name,
             'surname': self.surname,
