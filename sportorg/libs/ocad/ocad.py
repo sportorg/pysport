@@ -2,6 +2,8 @@ from typing import IO
 from xml.etree import ElementTree
 from abc import ABCMeta
 
+from chardet.universaldetector import UniversalDetector
+
 
 class Item:
     __metaclass__ = ABCMeta
@@ -68,12 +70,23 @@ class ClassesV8:
         self._courses = CourseList()
         self._groups = set()
 
+
+    def detect_encoding(self, file):
+        detector = UniversalDetector()
+        with open(file, 'rb') as fh:
+            for line in fh:
+                detector.feed(line)
+                if detector.done:
+                    break
+            detector.close()
+        return detector.result['encoding']
+
     def parse(self, file):
         if not isinstance(file, str) and not isinstance(file, IO):
             raise TypeError("file is not str or IO")
         if isinstance(file, str):
             try:
-                enc = 'windows-1251'
+                enc = self.detect_encoding(file)
                 with open(file, encoding=enc) as f:
                     content = f.readlines()
             except FileNotFoundError:
