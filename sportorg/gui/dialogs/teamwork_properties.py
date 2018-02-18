@@ -1,18 +1,12 @@
 import logging
 import uuid
 
-from PyQt5.QtCore import QTime
-from PyQt5.QtWidgets import QFormLayout, QLabel, QDialog, \
-     QTimeEdit, QSpinBox, QRadioButton, QCheckBox, QDialogButtonBox, QWidget, QTabWidget, \
-     QGroupBox, QLineEdit
+from PyQt5.QtWidgets import QFormLayout, QLabel, QDialog, QSpinBox, QRadioButton, QDialogButtonBox, QWidget,\
+    QTabWidget, QGroupBox, QLineEdit
 
-from sportorg.core.otime import OTime
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import _
 from sportorg.models.memory import race
-from sportorg.models.result.result_calculation import ResultCalculation
-from sportorg.modules.configs.configs import Config
-from sportorg.utils.time import time_to_otime
 
 
 class TeamworkPropertiesDialog(QDialog):
@@ -52,7 +46,7 @@ class TeamworkPropertiesDialog(QDialog):
 
         self.teamwork_layout.addRow(QLabel(_('Host')), self.teamwork_item_host)
         self.teamwork_layout.addRow(QLabel(_('Port')), self.teamwork_item_port)
-        self.teamwork_layout.addRow(QLabel(_('Token')), self.teamwork_item_token)
+        # self.teamwork_layout.addRow(QLabel(_('Token')), self.teamwork_item_token)
         self.teamwork_layout.addRow(self.teamwork_groupbox)
         self.teamwork_tab.setLayout(self.teamwork_layout)
 

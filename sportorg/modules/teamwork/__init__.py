@@ -28,6 +28,8 @@ class ResultThread(QThread):
             except Empty:
                 if not main_thread().is_alive() or self._stop_event.is_set():
                     break
+            except Exception as e:
+                self._logger.debug(str(e))
         self._logger.debug('Teamwork result shutdown')
 
 
@@ -48,6 +50,7 @@ class Teamwork(object):
 
         self.host = ''
         self.port = 50010
+        self.token = ''
         self.connection_type = 'client'
 
     def set_call(self, value):
@@ -55,9 +58,10 @@ class Teamwork(object):
             self._call_back = value
         return self
 
-    def set_options(self, host, port, connection_type):
+    def set_options(self, host, port, token, connection_type):
         self.host = host
         self.port = port
+        self.token = token
         self.connection_type = connection_type
 
     def _start_thread(self):

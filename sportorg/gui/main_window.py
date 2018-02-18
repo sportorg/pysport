@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import QMainWindow, QTableView, QMessageBox
 
 from sportorg.core.singleton import singleton
 from sportorg.gui.menu.factory import Factory
+from sportorg.models.api.api import Api
 from sportorg.models.memory import Race, event as races, race, NotEmptyException
 
 from sportorg import config
@@ -392,9 +393,11 @@ class MainWindow(QMainWindow):
 
     def teamwork(self, command):
         try:
+            Api(race()).update(command.data)
             logging.info(repr(command.data))
+            self.refresh()
         except Exception as e:
-            logging.exception(str(e))
+            logging.error(str(e))
 
     sportident_status = False
     sportident_icon = {
