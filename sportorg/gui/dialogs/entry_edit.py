@@ -195,7 +195,7 @@ class EntryEditDialog(QDialog):
         if number:
             person = None
             for _p in race().persons:
-                if _p.sportident_card is not None and int(_p.sportident_card) == number:
+                if _p.sportident_card and _p.sportident_card == number:
                     person = _p
                     break
             if person:
@@ -238,8 +238,8 @@ class EntryEditDialog(QDialog):
         if self.current_object.start_group is not None:
             self.item_start_group.setValue(int(self.current_object.start_group))
 
-        if self.current_object.sportident_card is not None:
-            self.item_card.setValue(int(self.current_object.sportident_card))
+        if self.current_object.sportident_card:
+            self.item_card.setValue(self.current_object.sportident_card)
 
         self.item_out_of_competition.setChecked(self.current_object.is_out_of_competition)
         self.item_paid.setChecked(self.current_object.is_paid)
@@ -291,7 +291,7 @@ class EntryEditDialog(QDialog):
             person.start_group = self.item_start_group.value()
             changed = True
 
-        if (person.sportident_card is None or int(person.sportident_card) != self.item_card.value()) \
+        if (not person.sportident_card or int(person.sportident_card) != self.item_card.value()) \
                 and self.item_card.value:
             race().person_sportident_card(person, self.item_card.value())
             changed = True

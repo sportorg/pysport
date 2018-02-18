@@ -111,7 +111,7 @@ class OrgeoClient(metaclass=Singleton):
             'name': person.full_name,
             'organization': person.organization.name if person.organization else '',
             # 'country_code': 'RUS',
-            'card_number': int(person.sportident_card) if person.sportident_card is not None else 0,
+            'card_number': person.sportident_card,
             'national_code': None,
             'world_code': None,
             'out_of_competition': person.is_out_of_competition,

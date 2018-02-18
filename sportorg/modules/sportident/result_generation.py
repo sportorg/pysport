@@ -27,7 +27,7 @@ class ResultSportidentGeneration:
         if self._person is not None:
             return True
         for person in race().persons:
-            if person.sportident_card is not None and person.sportident_card == self._result.sportident_card:
+            if person.sportident_card and person.sportident_card == self._result.sportident_card:
                 self._person = person
                 return True
 

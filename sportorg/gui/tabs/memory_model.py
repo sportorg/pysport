@@ -265,7 +265,7 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
         bib = 0
         sportident_card = ''
         if i.is_sportident():
-            sportident_card = str(result.sportident_card) if result.sportident_card is not None else ''
+            sportident_card = str(result.sportident_card) if result.sportident_card else ''
         if person:
             first_name = person.name
             last_name = person.surname

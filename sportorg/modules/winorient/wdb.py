@@ -130,7 +130,7 @@ class WinOrientBinary:
                 result = ResultSportident()
                 result.person = new_person
 
-                result.sportident_card = race().new_sportident_card(man.si_card)
+                result.sportident_card = int(man.si_card)
                 result.start_time = int_to_otime(man.start)
                 result.finish_time = int_to_otime(fin.time)
                 result.penalty_time = OTime(sec = man.penalty_second)
@@ -232,7 +232,7 @@ class WinOrientBinary:
 
             if man.year:
                 new_person.year = int(man.year)
-            if man.sportident_card is not None:
+            if man.sportident_card:
                 new_person.si_card = int(man.sportident_card)
                 new_person.is_own_card = 2
             new_person.is_not_qualified = man.is_out_of_competition

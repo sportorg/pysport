@@ -96,7 +96,7 @@ class Country(Model):
 
     def to_dict(self):
         return {
-			'object': self.__class__.__name__,
+            'object': self.__class__.__name__,
             'name': self.name,
             'code2': self.code2,
             'code3': self.code3,
@@ -116,7 +116,7 @@ class Address(Model):
 
     def to_dict(self):
         return {
-			'object': self.__class__.__name__,
+            'object': self.__class__.__name__,
             'care_of': self.care_of,
             'street': self.street,
             'zip_code': self.zip_code,
@@ -136,7 +136,7 @@ class Contact(Model):
 
     def to_dict(self):
         return {
-			'object': self.__class__.__name__,
+            'object': self.__class__.__name__,
             'name': self.name,
             'value': self.value,
         }
@@ -158,7 +158,7 @@ class Organization(Model):
 
     def to_dict(self):
         return {
-			'object': self.__class__.__name__,
+            'object': self.__class__.__name__,
             'id': str(self.id),
             'name': self.name,
             'address': self.address.to_dict(),
@@ -174,7 +174,7 @@ class CourseControl(Model):
         self.order = 0
 
     def __str__(self):
-        return '{} {}'.format(self.code, self.length)   
+        return '{} {}'.format(self.code, self.length)
 
     def __repr__(self):
         return self.__str__()
@@ -211,7 +211,7 @@ class CourseControl(Model):
 
     def to_dict(self):
         return {
-			'object': self.__class__.__name__,
+            'object': self.__class__.__name__,
             'code': self.code,
             'length': self.length
         }
@@ -226,7 +226,7 @@ class CoursePart(Model):
     def to_dict(self):
         controls = [control.to_dict() for control in self.controls]
         return {
-			'object': self.__class__.__name__,
+            'object': self.__class__.__name__,
             'controls': controls,
             'control_count': self.control_count,
             'is_free': self.is_free,
@@ -275,7 +275,7 @@ class Course(Model):
     def to_dict(self):
         controls = [control.to_dict() for control in self.controls]
         return {
-			'object': self.__class__.__name__,
+            'object': self.__class__.__name__,
             'id': str(self.id),
             'controls': controls,
             'bib': self.bib,
@@ -332,7 +332,7 @@ class Group(Model):
 
     def to_dict(self):
         return {
-			'object': self.__class__.__name__,
+            'object': self.__class__.__name__,
             'id': str(self.id),
             'name': self.name,
             'course': str(self.course.id) if self.course else None,
@@ -415,7 +415,7 @@ class Split(Model):
 
     def to_dict(self):
         return {
-			'object': self.__class__.__name__,
+            'object': self.__class__.__name__,
             'code': self.code,
             'time': self.time.to_msec() if self.time else None,
         }
@@ -471,7 +471,7 @@ class Result:
 
     def to_dict(self):
         return {
-			'object': self.__class__.__name__,
+            'object': self.__class__.__name__,
             'id': str(self.id),
             'system_type': self.system_type.value,
             'person': str(self.person.id) if self.person else None,
@@ -547,7 +547,7 @@ class ResultSportident(Result):
 
     def __init__(self):
         super().__init__()
-        self.sportident_card = None  # type: SportidentCard
+        self.sportident_card = 0
         self.splits = []  # type: List[Split]
         self.__start_time = None
         self.__finish_time = None
@@ -573,7 +573,7 @@ class ResultSportident(Result):
     def to_dict(self):
         data = super().to_dict()
         data['splits'] = [split.to_dict() for split in self.splits]
-        data['sportident_card'] = int(self.sportident_card) if self.sportident_card else None
+        data['sportident_card'] = self.sportident_card
 
         return data
 
@@ -635,7 +635,7 @@ class ResultSportident(Result):
     def get_course_splits(self, course=None):
         result_splits = []
         for i, split in enumerate(self.splits):
-            if not i or split.code != self.splits[i-1].code:
+            if not i or split.code != self.splits[i - 1].code:
                 result_splits.append(split)
         if not course or course.is_unknown():
             return result_splits
@@ -732,7 +732,7 @@ class Person(Model):
         self.surname = ''
         self.sex = Sex.MF
 
-        self.sportident_card = None  # type: SportidentCard
+        self.sportident_card = 0
         self.bib = 0
 
         self.year = 0  # sometime we have only year of birth
@@ -767,12 +767,12 @@ class Person(Model):
 
     def to_dict(self):
         return {
-			'object': self.__class__.__name__,
+            'object': self.__class__.__name__,
             'id': str(self.id),
             'name': self.name,
             'surname': self.surname,
             'sex': self.sex.value,
-            'sportident_card': int(self.sportident_card) if self.sportident_card else None,
+            'sportident_card': self.sportident_card,
             'bib': self.bib,
             'year': self.year,
             'birth_date': str(self.birth_date) if self.birth_date else None,
@@ -795,7 +795,7 @@ class Person(Model):
 
     def to_dict_data(self, course=None):
         sportident_card = ''
-        if self.sportident_card is not None and int(self.sportident_card):
+        if self.sportident_card:
             sportident_card = str(self.sportident_card)
         course_name = ''
         if self.group is not None and self.group.course is not None:
@@ -843,7 +843,6 @@ class Race(Model):
         self.results = []  # type: List[Result]
         self.relay_teams = []  # type: List[RelayTeam]
         self.organizations = []  # type: List[Organization]
-        self.sportident_cards = []  # type: List[SportidentCard]
         self.settings = {}  # type: Dict[str, Any]
 
     def __repr__(self):
@@ -872,28 +871,14 @@ class Race(Model):
         else:
             return nvl_value
 
-    def new_sportident_card(self, number=None):
-        if number is None:
-            number = 0
-        if isinstance(number, SportidentCard):
-            number = int(number)
-        assert isinstance(number, int)
-        for card in self.sportident_cards:
-            if number == int(card):
-                return card
-        card = SportidentCard(number)
-        self.sportident_cards.append(card)
-        return card
-
-    def person_sportident_card(self, person, number=None):
+    def person_sportident_card(self, person, number=0):
         assert isinstance(person, Person)
-        card = self.new_sportident_card(number)
-        if card.person is not None:
-            card.person.sportident_card = None
-            card.person.is_rented_sportident_card = False
-        card.person = person
-        person.sportident_card = card
-
+        for p in self.persons:
+            if p.sportident_card == number:
+                p.sportident_card = 0
+                p.is_rented_sportident_card = False
+                break
+        person.sportident_card = number
         return person
 
     def delete_persons(self, indexes):
@@ -1153,7 +1138,8 @@ class Ranking(object):
         self.rank_scores = 0
         self.rank = {}
         self.rank[Qualification.MS] = RankingItem(qual=Qualification.MS, use_scores=False, max_place=2, is_active=False)
-        self.rank[Qualification.KMS] = RankingItem(qual=Qualification.KMS, use_scores=False, max_place=6, is_active=False)
+        self.rank[Qualification.KMS] = RankingItem(qual=Qualification.KMS, use_scores=False, max_place=6,
+                                                   is_active=False)
         self.rank[Qualification.I] = RankingItem(qual=Qualification.I)
         self.rank[Qualification.II] = RankingItem(qual=Qualification.II)
         self.rank[Qualification.III] = RankingItem(qual=Qualification.III)
@@ -1197,6 +1183,7 @@ class RelayLeg(object):
     101.2: AC
     101.3: BA
     """
+
     def __init__(self, team):
         self.number = 0
         self.leg = 0
