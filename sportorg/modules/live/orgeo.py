@@ -8,7 +8,7 @@ from requests.exceptions import MissingSchema, ConnectionError
 
 from sportorg import config
 from sportorg.core.singleton import Singleton
-from sportorg.models.memory import race, Person, Result, RaceType
+from sportorg.models.memory import race, Person, Result
 
 
 class OrgeoCommand:
@@ -105,8 +105,8 @@ class OrgeoClient(metaclass=Singleton):
             'id': str(person.id),
             'ref_id': str(person.id),
             'bib': person.bib,
-            # 'relay_team': None,
-            # 'lap': None,
+            'relay_team': person.bib % 1000,
+            'lap': max(person.bib // 1000, 1),
             'group_name': person.group.name if person.group else '',
             'name': person.full_name,
             'organization': person.organization.name if person.organization else '',
@@ -118,10 +118,6 @@ class OrgeoClient(metaclass=Singleton):
             'start': person.start_time.to_sec() if person.start_time else 0
         }
 
-        if race().get_type(person.group) == RaceType.RELAY:
-            data['relay_team'] = person.bib % 1000
-            data['lap'] = person.bib // 1000
-
         if result is not None:
             assert result, Result
             data['start'] = result.get_start_time().to_sec()
@@ -130,11 +126,23 @@ class OrgeoClient(metaclass=Singleton):
             if result.is_sportident():
                 if len(result.splits):
                     data['splits'] = []
-                    for split in race().get_course_splits(result):
-                        data['splits'].append({
-                            'code': str(split.code),
-                            'time': split.time.to_sec()
-                        })
+                    splits = race().get_course_splits(result)
+                    for i in range(len(splits)):
+                        """
+                        Orgeo Splits format: 
+                        Option 	Type 	Description
+                        code 	string 	CP code
+                        time 	int 	seconds of current split - time from previous CP to this CP
+                        """
+                        current_split = {}
+                        current_split['code'] = str(splits[i].code)
+                        end_time = splits[i].time
+                        if i > 0:
+                            start_time = splits[i - 1].time
+                        else:
+                            start_time = result.get_start_time()
+                        current_split['time'] = (end_time - start_time).to_sec()
+                        data['splits'].append(current_split)
 
         return data
 
