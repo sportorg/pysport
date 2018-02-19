@@ -217,7 +217,7 @@ class Course(Model):
 
     def is_unknown(self):
         for control in self.controls:
-            if '*' in control.code or '%' in control.code:
+            if '*' in control.code or '%' in control.code or '(' in control.code:
                 return True
 
         return False
@@ -550,11 +550,20 @@ class ResultSportident(Result):
         splits = []
         i = 0
         for control in course.controls:
-            if max_len == i:
+            if i >= max_len:
                 break
-            if str(result_splits[i].code) in control.code:
-                splits.append(result_splits[i])
+
+            while not str(result_splits[i].code) in control.code:
+                # skip incorrect punches
                 i += 1
+                if i >= max_len:
+                    break
+
+            if i >= max_len:
+                break
+
+            splits.append(result_splits[i])
+            i += 1
         return splits
 
     def check(self, course=None):
