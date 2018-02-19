@@ -184,7 +184,7 @@ class PersonSplits(object):
         person_dict['name'] = self.name
         person_dict['bib'] = self.bib if self.bib else ''
         person_dict['team'] = self.team
-        person_dict['sportident_card'] = int(self.sportident_card) if self.sportident_card is not None else ''
+        person_dict['sportident_card'] = int(self.sportident_card) if self.sportident_card else ''
         person_dict['last_correct_index'] = self.last_correct_index
         person_dict['place'] = self.place
         person_dict['start'] = self.start

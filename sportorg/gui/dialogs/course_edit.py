@@ -7,6 +7,7 @@ from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import _
 from sportorg.models.memory import race, Course, CourseControl, find
+from sportorg.modules.teamwork import Teamwork
 
 
 class CourseEditDialog(QDialog):
@@ -136,3 +137,4 @@ class CourseEditDialog(QDialog):
 
         if changed:
             GlobalAccess().get_main_window().refresh()
+            Teamwork().send(course.to_dict())

@@ -13,6 +13,7 @@ from sportorg.language import _
 from sportorg.models.memory import race, Result, find, ResultStatus, Person, Limit, Split
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.result_checker import ResultChecker, ResultCheckerException
+from sportorg.modules.teamwork import Teamwork
 from sportorg.utils.time import time_to_qtime, time_to_otime, hhmmss_to_time
 
 
@@ -136,7 +137,7 @@ class ResultEditDialog(QDialog):
                 info = person.full_name
                 if person.group:
                     info = '{}\n{}: {}'.format(info, _('Group'), person.group.name)
-                if person.sportident_card is not None:
+                if person.sportident_card:
                     info = '{}\n{}: {}'.format(info, _('Card'), person.sportident_card)
                 self.label_person_info.setText(info)
             else:
@@ -145,7 +146,7 @@ class ResultEditDialog(QDialog):
 
     def set_values_from_model(self):
         if self.current_object.is_sportident():
-            if self.current_object.sportident_card is not None:
+            if self.current_object.sportident_card:
                 self.item_sportident_card.setValue(int(self.current_object.sportident_card))
             self.splits.splits(self.current_object.splits)
             self.splits.show()
@@ -185,8 +186,8 @@ class ResultEditDialog(QDialog):
         changed = False
 
         if result.is_sportident():
-            if result.sportident_card is None or int(result.sportident_card) != self.item_sportident_card.value():
-                result.sportident_card = race().new_sportident_card(self.item_sportident_card.value())
+            if result.sportident_card != self.item_sportident_card.value():
+                result.sportident_card = self.item_sportident_card.value()
                 changed = True
 
             new_splits = self.splits.splits()
@@ -226,7 +227,7 @@ class ResultEditDialog(QDialog):
         if new_bib == 0:
             if result.person and result.is_sportident():
                 if result.person.sportident_card == result.sportident_card:
-                    result.person.sportident_card = None
+                    result.person.sportident_card = 0
             result.person = None
             changed = True
         elif cur_bib != new_bib:
@@ -235,7 +236,7 @@ class ResultEditDialog(QDialog):
                 assert isinstance(new_person, Person)
                 if result.person:
                     if result.is_sportident():
-                        result.person.sportident_card = None
+                        result.person.sportident_card = 0
                 result.person = new_person
                 if result.is_sportident():
                     race().person_sportident_card(result.person, result.sportident_card)
@@ -271,6 +272,7 @@ class ResultEditDialog(QDialog):
                 result.clear()
             ResultCalculation(race()).process_results()
             GlobalAccess().get_main_window().refresh()
+            Teamwork().send(result.to_dict())
 
 
 class SplitsObject:

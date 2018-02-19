@@ -13,6 +13,7 @@ from sportorg.language import _
 from sportorg.models.constant import get_race_courses
 from sportorg.models.memory import race, Group, find, Sex, Limit, RaceType
 from sportorg.models.result.result_calculation import ResultCalculation
+from sportorg.modules.teamwork import Teamwork
 from sportorg.utils.time import time_to_qtime, time_to_otime
 
 
@@ -163,66 +164,67 @@ class GroupEditDialog(QDialog):
 
     def apply_changes_impl(self):
         changed = False
-        org = self.current_object
-        assert (isinstance(org, Group))
+        group = self.current_object
+        assert (isinstance(group, Group))
 
-        if org.name != self.item_name.text():
-            org.name = self.item_name.text()
+        if group.name != self.item_name.text():
+            group.name = self.item_name.text()
             changed = True
 
-        if org.long_name != self.item_full_name.text():
-            org.long_name = self.item_full_name.text()
+        if group.long_name != self.item_full_name.text():
+            group.long_name = self.item_full_name.text()
             changed = True
 
-        if (org.course is not None and org.course.name != self.item_course.currentText()) \
-                or (org.course is None and len(self.item_course.currentText()) > 0):
-            org.course = find(race().courses, name=self.item_course.currentText())
+        if (group.course is not None and group.course.name != self.item_course.currentText()) \
+                or (group.course is None and len(self.item_course.currentText()) > 0):
+            group.course = find(race().courses, name=self.item_course.currentText())
             changed = True
 
-        if org.sex.get_title() != self.item_sex.currentText():
-            org.sex = Sex(self.item_sex.currentIndex())
+        if group.sex.get_title() != self.item_sex.currentText():
+            group.sex = Sex(self.item_sex.currentIndex())
             changed = True
 
-        if org.min_age != self.item_age_min.value():
-            org.min_age = self.item_age_min.value()
+        if group.min_age != self.item_age_min.value():
+            group.min_age = self.item_age_min.value()
             changed = True
 
-        if org.max_age != self.item_age_max.value():
-            org.max_age = self.item_age_max.value()
+        if group.max_age != self.item_age_max.value():
+            group.max_age = self.item_age_max.value()
             changed = True
 
-        if org.start_corridor != self.item_corridor.value():
-            org.start_corridor = self.item_corridor.value()
+        if group.start_corridor != self.item_corridor.value():
+            group.start_corridor = self.item_corridor.value()
             changed = True
 
-        if org.order_in_corridor != self.item_corridor_order.value():
-            org.order_in_corridor = self.item_corridor_order.value()
+        if group.order_in_corridor != self.item_corridor_order.value():
+            group.order_in_corridor = self.item_corridor_order.value()
             changed = True
 
-        if org.price != self.item_price.value():
-            org.price = self.item_price.value()
+        if group.price != self.item_price.value():
+            group.price = self.item_price.value()
             changed = True
 
         time = time_to_otime(self.item_start_interval.time())
-        if org.start_interval != time:
-            org.start_interval = time
+        if group.start_interval != time:
+            group.start_interval = time
             changed = True
 
         time = time_to_otime(self.item_max_time.time())
 
-        if org.max_time != time:
-            org.max_time = time
+        if group.max_time != time:
+            group.max_time = time
             changed = True
 
-        if org.ranking.is_active != self.rank_checkbox.isChecked():
-            org.ranking.is_active = self.rank_checkbox.isChecked()
+        if group.ranking.is_active != self.rank_checkbox.isChecked():
+            group.ranking.is_active = self.rank_checkbox.isChecked()
             changed = True
 
         selected_type = RaceType(self.type_combo.currentIndex())
-        if org.get_type() != selected_type:
-            org.set_type(selected_type)
+        if group.get_type() != selected_type:
+            group.set_type(selected_type)
             changed = True
 
         if changed:
-            ResultCalculation(race()).set_rank(org)
+            ResultCalculation(race()).set_rank(group)
             GlobalAccess().get_main_window().refresh()
+            Teamwork().send(group.to_dict())

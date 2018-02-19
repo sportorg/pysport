@@ -74,7 +74,7 @@ class BibDialog(QDialog):
                 info = person.full_name
                 if person.group:
                     info = '{}\n{}: {}'.format(info, _('Group'), person.group.name)
-                if person.sportident_card is not None:
+                if person.sportident_card:
                     info = '{}\n{}: {}'.format(info, _('Card'), person.sportident_card)
                 self.label_person_info.setText(info)
                 self.person = person

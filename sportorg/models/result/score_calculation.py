@@ -136,7 +136,7 @@ class ScoreCalculation(object):
                 'teams': group_teams,
             })
         ret['groups'] = data
-        ret['race'] = race().to_dict()
+        ret['race'] = race().to_dict_data()
         return ret
 
     @staticmethod

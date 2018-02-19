@@ -119,7 +119,7 @@ class GroupsStartList:
                 'persons': []
             }
             for person in self._group[group_name]:
-                group['persons'].append(person.to_dict())
+                group['persons'].append(person.to_dict_data())
             ret.append(group)
 
         return ret
@@ -128,7 +128,7 @@ class GroupsStartList:
         persons_data = []
         self._persons.sort(key=self._sort_func)
         for person in self._persons:
-            persons_data.append(person.to_dict())
+            persons_data.append(person.to_dict_data())
 
         return persons_data
 
@@ -153,9 +153,9 @@ class ChessGenerator(GroupsStartList):
                 continue
             time = time_to_hhmmss(person.start_time)
             if time not in cache:
-                data[time] = [person.to_dict()]
+                data[time] = [person.to_dict_data()]
             else:
-                data[time].append(person.to_dict())
+                data[time].append(person.to_dict_data())
             cache.add(time)
 
         for time in data.keys():
@@ -173,7 +173,7 @@ class PersonsGenerator:
         persons_data = []
         PersonSort(self._persons).sort(self._sorting)
         for person in self._persons:
-            persons_data.append(person.to_dict())
+            persons_data.append(person.to_dict_data())
 
         return persons_data
 
@@ -220,7 +220,7 @@ class TeamStartList:
             for person in team['persons']:
                 if person.group:
                     data_team['price'] += person.group.price
-                data_team['persons'].append(person.to_dict())
+                data_team['persons'].append(person.to_dict_data())
             data.append(data_team)
         data.sort(key=lambda x: x['name'].lower())
         return data
@@ -339,7 +339,7 @@ def get_start_data():
     start_list = GroupsStartList(race().persons)
     groups = start_list.get_list()
     ret = {
-        'race': race().to_dict(),
+        'race': race().to_dict_data(),
         'groups': groups
     }
 
@@ -353,20 +353,20 @@ def get_chess_list():
 
 def get_persons_data(sorting=None):
     return {
-        'race': race().to_dict(),
+        'race': race().to_dict_data(),
         'persons': PersonsGenerator(race().persons, sorting).get_list()
     }
 
 
 def get_teams_data():
     return {
-        'race': race().to_dict(),
+        'race': race().to_dict_data(),
         'teams': TeamStartList(race().persons, SortType.NAME).get_list()
     }
 
 
 def get_entries_statistics_data():
     return {
-        'race': race().to_dict(),
+        'race': race().to_dict_data(),
         'statistics': TeamStatisticsList(race().persons, SortType.NAME).get_list()
     }

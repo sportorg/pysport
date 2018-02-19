@@ -94,6 +94,16 @@ class Country(Model):
     def __repr__(self):
         return self.name
 
+    def to_dict(self):
+        return {
+            'object': self.__class__.__name__,
+            'name': self.name,
+            'code2': self.code2,
+            'code3': self.code3,
+            'digital_code': self.digital_code,
+            'code': self.code,
+        }
+
 
 class Address(Model):
     def __init__(self):
@@ -104,6 +114,17 @@ class Address(Model):
         self.state = ''
         self.country = Country()
 
+    def to_dict(self):
+        return {
+            'object': self.__class__.__name__,
+            'care_of': self.care_of,
+            'street': self.street,
+            'zip_code': self.zip_code,
+            'city': self.city,
+            'state': self.state,
+            'country': self.country.to_dict()
+        }
+
 
 class Contact(Model):
     def __init__(self):
@@ -112,6 +133,17 @@ class Contact(Model):
 
     def __repr__(self):
         return '{} {}'.format(self.name, self.value)
+
+    def to_dict(self):
+        return {
+            'object': self.__class__.__name__,
+            'name': self.name,
+            'value': self.value,
+        }
+
+    def update_data(self, data):
+        self.name = data['name']
+        self.value = data['value']
 
 
 class Organization(Model):
@@ -130,8 +162,17 @@ class Organization(Model):
 
     def to_dict(self):
         return {
-            'name': self.name
+            'object': self.__class__.__name__,
+            'id': str(self.id),
+            'name': self.name,
+            'address': self.address.to_dict(),
+            'contact': self.contact.to_dict(),
+            'count_person': self.count_person,
         }
+
+    def update_data(self, data):
+        self.name = data['name']
+        self.contact.update_data(data['data'])
 
 
 class CourseControl(Model):
@@ -141,7 +182,7 @@ class CourseControl(Model):
         self.order = 0
 
     def __str__(self):
-        return '{} {}'.format(self.code, self.length)   
+        return '{} {}'.format(self.code, self.length)
 
     def __repr__(self):
         return self.__str__()
@@ -178,9 +219,14 @@ class CourseControl(Model):
 
     def to_dict(self):
         return {
+            'object': self.__class__.__name__,
             'code': self.code,
             'length': self.length
         }
+
+    def update_data(self, data):
+        self.code = data['code']
+        self.length = data['length']
 
 
 class CoursePart(Model):
@@ -188,6 +234,15 @@ class CoursePart(Model):
         self.controls = []  # type: List[CourseControl]
         self.control_count = 0
         self.is_free = False
+
+    def to_dict(self):
+        controls = [control.to_dict() for control in self.controls]
+        return {
+            'object': self.__class__.__name__,
+            'controls': controls,
+            'control_count': self.control_count,
+            'is_free': self.is_free,
+        }
 
 
 class Course(Model):
@@ -230,12 +285,30 @@ class Course(Model):
         return ret
 
     def to_dict(self):
+        controls = [control.to_dict() for control in self.controls]
         return {
+            'object': self.__class__.__name__,
+            'id': str(self.id),
+            'controls': controls,
+            'bib': self.bib,
             'name': self.name,
             'length': self.length,
             'climb': self.climb,
             'corridor': self.corridor
         }
+
+    def update_data(self, data):
+        self.bib = data['bib']
+        self.name = data['name']
+        self.length = data['length']
+        self.climb = data['climb']
+        self.climb = data['climb']
+        self.corridor = data['corridor']
+        self.controls = []
+        for item in data['controls']:
+            control = CourseControl()
+            control.update_data(item)
+            self.controls.append(control)
 
 
 class Group(Model):
@@ -251,7 +324,6 @@ class Group(Model):
         self.max_age = 0
 
         self.max_time = OTime()
-        self.qual_assign_text = ''
         self.start_interval = OTime()
         self.start_corridor = 0
         self.order_in_corridor = 0
@@ -285,10 +357,41 @@ class Group(Model):
 
     def to_dict(self):
         return {
+            'object': self.__class__.__name__,
+            'id': str(self.id),
             'name': self.name,
+            'course_id': str(self.course.id) if self.course else None,
             'long_name': self.long_name,
             'price': self.price,
+            'sex': self.sex.value,
+            'min_age': self.min_age,
+            'max_age': self.max_age,
+            'max_time': self.max_time.to_msec(),
+            'start_interval': self.start_interval.to_msec(),
+            'start_corridor': self.start_corridor,
+            'order_in_corridor': self.order_in_corridor,
+            'first_number': self.first_number,
+            # 'ranking': None,
+            '__type': self.__type.value if self.__type else None,
+            'relay_legs': self.relay_legs,
+
         }
+
+    def update_data(self, data):
+        self.name = data['name']
+        self.long_name = data['long_name']
+        self.price = data['price']
+        self.sex = Sex(data['sex'])
+        self.min_age = data['min_age']
+        self.max_age = data['max_age']
+        self.max_time = OTime(msec=data['max_time'])
+        self.start_interval = OTime(msec=data['start_interval'])
+        self.start_corridor = data['start_corridor']
+        self.order_in_corridor = data['order_in_corridor']
+        self.first_number = data['first_number']
+        self.relay_legs = data['relay_legs']
+        if data['__type']:
+            self.__type = RaceType(data['__type'])
 
 
 class SportidentCardModel(Enum):
@@ -308,35 +411,6 @@ class SportidentCardModel(Enum):
         return self.__str__()
 
 
-class SportidentCard(Model):
-    def __init__(self, number=0):
-        self.number = number
-        self.model = SportidentCardModel.NONE
-        self.club = ''
-        self.owner = ''
-        self.person = None  # type: Person
-
-    def __int__(self):
-        return int(self.number)
-
-    def __bool__(self):
-        return bool(self.number)
-
-    def __str__(self):
-        return str(self.number)
-
-    def __repr__(self):
-        return '{} {}'.format(self.model, self.number)
-
-    def __eq__(self, other):
-        if other is None:
-            return False
-        assert isinstance(other, SportidentCard)
-        if self.number == 0:
-            return False
-        return self.number == other.number
-
-
 class Split(Model):
     def __init__(self):
         self.code = 0  # type: int
@@ -351,6 +425,18 @@ class Split(Model):
             return False
         return self.code == other.code and self.time == other.time
 
+    def to_dict(self):
+        return {
+            'object': self.__class__.__name__,
+            'code': self.code,
+            'time': self.time.to_msec() if self.time else None,
+        }
+
+    def update_data(self, data):
+        self.code = data['code']
+        if data['time']:
+            self.time = OTime(msec=data['time'])
+
 
 class Result:
     def __init__(self):
@@ -359,7 +445,7 @@ class Result:
         self.id = uuid.uuid4()
         self.start_time = None  # type: OTime
         self.finish_time = None  # type: OTime
-        self.result = None  # type: OTime
+        self.result = None
         self.person = None  # type: Person
         self.status = ResultStatus.OK
         self.penalty_time = None  # type: OTime
@@ -399,6 +485,37 @@ class Result:
     @abstractmethod
     def system_type(self) -> SystemType:
         pass
+
+    def to_dict(self):
+        return {
+            'object': self.__class__.__name__,
+            'id': str(self.id),
+            'system_type': self.system_type.value,
+            'person_id': str(self.person.id) if self.person else None,
+            'start_time': self.start_time.to_msec() if self.start_time else None,
+            'finish_time': self.finish_time.to_msec() if self.finish_time else None,
+            'result': self.result,
+            'penalty_time': self.penalty_time.to_msec() if self.penalty_time else None,
+            'status': self.status.value,
+            'penalty_laps': self.penalty_laps,
+            'place': self.place,
+            'scores': self.scores,
+            'assigned_rank': self.assigned_rank.value,
+        }
+
+    def update_data(self, data):
+        self.result = data['result']
+        self.status = ResultStatus(data['status'])
+        self.penalty_laps = data['penalty_laps']
+        self.scores = data['scores']
+        self.place = data['place']
+        self.assigned_rank = Qualification.get_qual_by_code(data['assigned_rank'])
+        if data['start_time']:
+            self.start_time = OTime(msec=data['start_time'])
+        if data['finish_time']:
+            self.finish_time = OTime(msec=data['finish_time'])
+        if data['penalty_time']:
+            self.penalty_time = OTime(msec=data['penalty_time'])
 
     def get_result(self):
         if self.status != ResultStatus.OK:
@@ -461,7 +578,7 @@ class ResultSportident(Result):
 
     def __init__(self):
         super().__init__()
-        self.sportident_card = None  # type: SportidentCard
+        self.sportident_card = 0
         self.splits = []  # type: List[Split]
         self.__start_time = None
         self.__finish_time = None
@@ -483,6 +600,22 @@ class ResultSportident(Result):
         else:
             return False
         return eq
+
+    def to_dict(self):
+        data = super().to_dict()
+        data['splits'] = [split.to_dict() for split in self.splits]
+        data['sportident_card'] = self.sportident_card
+
+        return data
+
+    def update_data(self, data):
+        super().update_data(data)
+        self.sportident_card = data['sportident_card']
+        self.splits = []
+        for item in data['splits']:
+            split = Split()
+            split.update_data(item)
+            self.splits.append(split)
 
     def get_start_time(self):
         obj = race()
@@ -542,7 +675,7 @@ class ResultSportident(Result):
     def get_course_splits(self, course=None):
         result_splits = []
         for i, split in enumerate(self.splits):
-            if not i or split.code != self.splits[i-1].code:
+            if not i or split.code != self.splits[i - 1].code:
                 result_splits.append(split)
         if not course or course.is_unknown():
             return result_splits
@@ -639,7 +772,7 @@ class Person(Model):
         self.surname = ''
         self.sex = Sex.MF
 
-        self.sportident_card = None  # type: SportidentCard
+        self.sportident_card = 0
         self.bib = 0
 
         self.year = 0  # sometime we have only year of birth
@@ -651,7 +784,6 @@ class Person(Model):
         self.contact = []  # type: List[Contact]
         self.world_code = None  # WRE ID for orienteering and the same
         self.national_code = None
-        self.rank = None  # position/scores in word ranking
         self.qual = Qualification.NOT_QUALIFIED  # type: Qualification 'qualification, used in Russia only'
         self.is_out_of_competition = False  # e.g. 20-years old person, running in M12
         self.is_paid = False
@@ -672,9 +804,57 @@ class Person(Model):
             surname += ' '
         return '{}{}'.format(surname, self.name)
 
-    def to_dict(self, course=None):
+    def to_dict(self):
+        return {
+            'object': self.__class__.__name__,
+            'id': str(self.id),
+            'name': self.name,
+            'surname': self.surname,
+            'sex': self.sex.value,
+            'sportident_card': self.sportident_card,
+            'bib': self.bib,
+            'year': self.year,
+            'birth_date': str(self.birth_date) if self.birth_date else None,
+            'group_id': str(self.group.id) if self.group else None,
+            'organization_id': str(self.organization.id) if self.organization else None,
+            'nationality': self.nationality.to_dict() if self.nationality else None,
+            'address': self.address.to_dict() if self.address else None,
+            'contact': [],
+            'world_code': self.world_code,
+            'national_code': self.national_code,
+            'qual': self.qual.value,
+            'is_out_of_competition': self.is_out_of_competition,
+            'is_paid': self.is_paid,
+            'is_rented_sportident_card': self.is_rented_sportident_card,
+            'is_personal': self.is_personal,
+            'comment': self.comment,
+            'start_time': self.start_time.to_msec() if self.start_time else None,
+            'start_group': self.start_group,
+        }
+
+    def update_data(self, data):
+        self.name = data['name']
+        self.surname = data['surname']
+        self.sex = Sex(data['sex'])
+        self.sportident_card = data['sportident_card']
+        self.bib = data['bib']
+        self.year = data['year']
+        self.contact = []
+        self.world_code = data['world_code']
+        self.national_code = data['national_code']
+        self.qual = Qualification.get_qual_by_code(data['qual'])
+        self.is_out_of_competition = data['is_out_of_competition']
+        self.is_paid = data['is_paid']
+        self.is_rented_sportident_card = data['is_rented_sportident_card']
+        self.is_personal = data['is_personal']
+        self.comment = data['comment']
+        self.start_group = data['start_group']
+        if data['start_time']:
+            self.start_time = OTime(msec=data['start_time'])
+
+    def to_dict_data(self, course=None):
         sportident_card = ''
-        if self.sportident_card is not None and int(self.sportident_card):
+        if self.sportident_card:
             sportident_card = str(self.sportident_card)
         course_name = ''
         if self.group is not None and self.group.course is not None:
@@ -722,13 +902,12 @@ class Race(Model):
         self.results = []  # type: List[Result]
         self.relay_teams = []  # type: List[RelayTeam]
         self.organizations = []  # type: List[Organization]
-        self.sportident_cards = []  # type: List[SportidentCard]
         self.settings = {}  # type: Dict[str, Any]
 
     def __repr__(self):
         return repr(self.data)
 
-    def to_dict(self):
+    def to_dict_data(self):
         start_date = self.get_setting('start_date', datetime.datetime.now().replace(second=0, microsecond=0))
         return {
             'title': self.get_setting('main_title', ''),
@@ -751,28 +930,14 @@ class Race(Model):
         else:
             return nvl_value
 
-    def new_sportident_card(self, number=None):
-        if number is None:
-            number = 0
-        if isinstance(number, SportidentCard):
-            number = int(number)
-        assert isinstance(number, int)
-        for card in self.sportident_cards:
-            if number == int(card):
-                return card
-        card = SportidentCard(number)
-        self.sportident_cards.append(card)
-        return card
-
-    def person_sportident_card(self, person, number=None):
+    def person_sportident_card(self, person, number=0):
         assert isinstance(person, Person)
-        card = self.new_sportident_card(number)
-        if card.person is not None:
-            card.person.sportident_card = None
-            card.person.is_rented_sportident_card = False
-        card.person = person
-        person.sportident_card = card
-
+        for p in self.persons:
+            if p.sportident_card == number:
+                p.sportident_card = 0
+                p.is_rented_sportident_card = False
+                break
+        person.sportident_card = number
         return person
 
     def delete_persons(self, indexes):
@@ -948,12 +1113,12 @@ class Qualification(IntEnum):
     MSMK = 9
     ZMS = 10
 
-    @staticmethod
-    def get_qual_by_code(code):
-        return Qualification(code)
+    @classmethod
+    def get_qual_by_code(cls, code):
+        return cls(code)
 
-    @staticmethod
-    def get_qual_by_name(name):
+    @classmethod
+    def get_qual_by_name(cls, name):
         qual_reverse = {
             '': 0,
             ' ': 0,
@@ -969,7 +1134,7 @@ class Qualification(IntEnum):
             'МСМК': 9,
             'ЗМС': 10
         }
-        return Qualification(qual_reverse[name])
+        return cls(qual_reverse[name])
 
     def get_title(self):
         qual = {
@@ -1032,7 +1197,8 @@ class Ranking(object):
         self.rank_scores = 0
         self.rank = {}
         self.rank[Qualification.MS] = RankingItem(qual=Qualification.MS, use_scores=False, max_place=2, is_active=False)
-        self.rank[Qualification.KMS] = RankingItem(qual=Qualification.KMS, use_scores=False, max_place=6, is_active=False)
+        self.rank[Qualification.KMS] = RankingItem(qual=Qualification.KMS, use_scores=False, max_place=6,
+                                                   is_active=False)
         self.rank[Qualification.I] = RankingItem(qual=Qualification.I)
         self.rank[Qualification.II] = RankingItem(qual=Qualification.II)
         self.rank[Qualification.III] = RankingItem(qual=Qualification.III)
@@ -1076,6 +1242,7 @@ class RelayLeg(object):
     101.2: AC
     101.3: BA
     """
+
     def __init__(self, team):
         self.number = 0
         self.leg = 0

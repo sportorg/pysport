@@ -13,6 +13,7 @@ from sportorg.language import _
 from sportorg.models.constant import get_names, get_race_groups, get_race_teams
 from sportorg.models.memory import race, Person, find, Qualification, Limit, Organization
 from sportorg.models.result.result_calculation import ResultCalculation
+from sportorg.modules.teamwork import Teamwork
 from sportorg.utils.time import time_to_qtime, time_to_otime
 
 
@@ -194,7 +195,7 @@ class EntryEditDialog(QDialog):
         if number:
             person = None
             for _p in race().persons:
-                if _p.sportident_card is not None and int(_p.sportident_card) == number:
+                if _p.sportident_card and _p.sportident_card == number:
                     person = _p
                     break
             if person:
@@ -237,8 +238,8 @@ class EntryEditDialog(QDialog):
         if self.current_object.start_group is not None:
             self.item_start_group.setValue(int(self.current_object.start_group))
 
-        if self.current_object.sportident_card is not None:
-            self.item_card.setValue(int(self.current_object.sportident_card))
+        if self.current_object.sportident_card:
+            self.item_card.setValue(self.current_object.sportident_card)
 
         self.item_out_of_competition.setChecked(self.current_object.is_out_of_competition)
         self.item_paid.setChecked(self.current_object.is_paid)
@@ -290,7 +291,7 @@ class EntryEditDialog(QDialog):
             person.start_group = self.item_start_group.value()
             changed = True
 
-        if (person.sportident_card is None or int(person.sportident_card) != self.item_card.value()) \
+        if (not person.sportident_card or int(person.sportident_card) != self.item_card.value()) \
                 and self.item_card.value:
             race().person_sportident_card(person, self.item_card.value())
             changed = True
@@ -318,3 +319,4 @@ class EntryEditDialog(QDialog):
         if changed:
             ResultCalculation(race()).process_results()
             GlobalAccess().get_main_window().refresh()
+            Teamwork().send(person.to_dict())

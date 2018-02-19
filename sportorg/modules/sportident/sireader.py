@@ -103,7 +103,7 @@ class ResultThread(QThread):
     @staticmethod
     def _get_result(card_data):
         result = memory.ResultSportident()
-        result.sportident_card = memory.race().new_sportident_card(card_data['card_number'])
+        result.sportident_card = int(card_data['card_number'])
 
         for i in range(len(card_data['punches'])):
             t = card_data['punches'][i][1]

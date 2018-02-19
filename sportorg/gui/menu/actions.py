@@ -1,5 +1,7 @@
 import logging
 import time
+import uuid
+
 from PyQt5 import QtCore
 
 from PyQt5.QtWidgets import QMessageBox, QApplication, QTableView
@@ -279,7 +281,7 @@ class PrintBibAction(Action):
 class ManualFinishAction(Action):
     def execute(self):
         result = race().new_result()
-        Teamwork().send({"message": 'hello'})
+        Teamwork().send(result.to_dict())
         race().add_new_result(result)
         logging.info('Manual finish')
         self.app.get_result_table().model().init_cache()
@@ -406,8 +408,9 @@ class TeamworkEnableAction(Action):
     def execute(self):
         host = race().get_setting('teamwork_host', 'localhost')
         port = race().get_setting('teamwork_port', 50010)
+        token = race().get_setting('teamwork_token', str(uuid.uuid4())[:8])
         connection_type = race().get_setting('teamwork_type_connection', 'client')
-        Teamwork().set_options(host, port, connection_type)
+        Teamwork().set_options(host, port, token, connection_type)
         Teamwork().toggle()
         time.sleep(0.5)
         self.app.interval()
