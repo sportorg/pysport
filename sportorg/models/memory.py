@@ -104,6 +104,13 @@ class Country(Model):
             'code': self.code,
         }
 
+    def update_data(self, data):
+        self.name = data['name']
+        self.code2 = data['code2']
+        self.code3 = data['code3']
+        self.digital_code = data['digital_code']
+        self.code = data['code']
+
 
 class Address(Model):
     def __init__(self):
@@ -124,6 +131,14 @@ class Address(Model):
             'state': self.state,
             'country': self.country.to_dict()
         }
+
+    def update_data(self, data):
+        self.care_of = data['care_of']
+        self.street = data['street']
+        self.zip_code = data['zip_code']
+        self.city = data['city']
+        self.state = data['state']
+        self.country.update_data(data['country'])
 
 
 class Contact(Model):
@@ -172,7 +187,8 @@ class Organization(Model):
 
     def update_data(self, data):
         self.name = data['name']
-        self.contact.update_data(data['data'])
+        self.contact.update_data(data['contact'])
+        self.address.update_data(data['address'])
 
 
 class CourseControl(Model):
