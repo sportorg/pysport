@@ -162,7 +162,6 @@ class ResultEditDialog(QDialog):
             self.item_penalty_laps.setValue(self.current_object.penalty_laps)
         if self.current_object.person:
             self.item_bib.setValue(self.current_object.person.bib)
-            self.item_bib.selectAll()
 
         if self.current_object.status == ResultStatus.OK:
             self.radio_ok.setChecked(True)
@@ -174,6 +173,8 @@ class ResultEditDialog(QDialog):
             self.radio_dnf.setChecked(True)
         elif self.current_object.status == ResultStatus.DID_NOT_START:
             self.radio_dns.setChecked(True)
+
+        self.item_bib.selectAll()
 
     def open_person(self):
         try:
@@ -241,14 +242,6 @@ class ResultEditDialog(QDialog):
                 if result.is_sportident():
                     race().person_sportident_card(result.person, result.sportident_card)
 
-                    logging.info('Old status {}'.format(result.status))
-                    try:
-                        ResultChecker.calculate_penalty(result)
-                        ResultChecker.checking(result)
-                    except ResultCheckerException as e:
-                        logging.error(str(e))
-                    logging.info('New status {}'.format(result.status))
-
             GlobalAccess().get_main_window().get_result_table().model().init_cache()
             changed = True
 
@@ -270,6 +263,11 @@ class ResultEditDialog(QDialog):
         if changed:
             if result.is_sportident():
                 result.clear()
+                try:
+                    ResultChecker.calculate_penalty(result)
+                    ResultChecker.checking(result)
+                except ResultCheckerException as e:
+                    logging.error(str(e))
             ResultCalculation(race()).process_results()
             GlobalAccess().get_main_window().refresh()
             Teamwork().send(result.to_dict())

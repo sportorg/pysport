@@ -371,6 +371,7 @@ class ChangeStatusAction(Action):
             return
         result = obj.results[index]
         result.status = status_dict[result.status]
+        Teamwork().send(result)
         self.app.refresh()
 
 

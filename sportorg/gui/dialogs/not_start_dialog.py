@@ -7,6 +7,7 @@ from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import _
 from sportorg.models.memory import race, ResultStatus, find, ResultSportident
+from sportorg.modules.teamwork import Teamwork
 
 
 class NotStartDialog(QDialog):
@@ -70,6 +71,7 @@ class NotStartDialog(QDialog):
                     result = ResultSportident()
                     result.person = person
                     result.status = ResultStatus.DID_NOT_START
+                    Teamwork().send(result)
                     obj.add_new_result(result)
                 else:
                     logging.info('{} not found'.format(number))
