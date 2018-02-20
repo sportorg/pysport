@@ -10,9 +10,16 @@ def import_txt_v8(source):
     try:
         classes_v8 = ocad.parse_txt_v8(source)
         for course in classes_v8.courses:
+            if course.bib and course.bib != '0':
+                name = course.bib
+            elif course.group:
+                name = course.group
+            else:
+                name = course.course
+
             c = memory.create(
                 memory.Course,
-                name=course.group if course.group else course.course,
+                name=name,
                 length=int(course.length * 1000),
                 climb=course.climb
             )
