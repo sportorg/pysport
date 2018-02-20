@@ -270,6 +270,7 @@ class EntryEditDialog(QDialog):
                 organization = Organization()
                 organization.name = self.item_team.currentText()
                 race().organizations.append(organization)
+                Teamwork().send(organization.to_dict())
             person.organization = organization
             changed = True
         if person.year != self.item_year.value():

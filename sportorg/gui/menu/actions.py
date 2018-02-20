@@ -389,6 +389,7 @@ class AddSPORTidentResultAction(Action):
     def execute(self):
         result = race().new_sportident_result()
         race().add_new_result(result)
+        Teamwork().send(result)
         logging.info('SPORTident result')
         self.app.get_result_table().model().init_cache()
         self.app.refresh()

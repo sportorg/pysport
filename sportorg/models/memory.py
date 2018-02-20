@@ -948,13 +948,12 @@ class Race(Model):
 
     def person_sportident_card(self, person, number=0):
         assert isinstance(person, Person)
+        person.sportident_card = number
         for p in self.persons:
             if p.sportident_card == number:
                 p.sportident_card = 0
                 p.is_rented_sportident_card = False
-                break
-        person.sportident_card = number
-        return person
+                return p
 
     def delete_persons(self, indexes):
         indexes = sorted(indexes, reverse=True)

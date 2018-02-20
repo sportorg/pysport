@@ -381,13 +381,15 @@ class MainWindow(QMainWindow):
                         logging.error(str(e))
                     except Exception as e:
                         logging.exception(str(e))
+                Teamwork().send(result.to_dict())
                 self.auto_save()
                 OrgeoClient().send_results()
             else:
                 for person in race().persons:
                     if not person.sportident_card:
-                        race().person_sportident_card(person, result.sportident_card)
+                        Teamwork().send(race().person_sportident_card(person, result.sportident_card))
                         person.is_rented_sportident_card = True
+                        Teamwork().send(person.to_dict())
                         break
             self.refresh()
         except Exception as e:
