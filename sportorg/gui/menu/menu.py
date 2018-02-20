@@ -216,9 +216,8 @@ def menu_list():
                     'action': 'ManualFinishAction'
                 },
                 {
-                    'title': _('on/off SPORTident readout'),
-                    'icon': config.icon_dir('sportident.png'),
-                    'action': 'SPORTidentReadoutAction'
+                    'title': _('Add SPORTident result'),
+                    'action': 'AddSPORTidentResultAction'
                 },
             ]
         },
@@ -268,13 +267,51 @@ def menu_list():
                     'title': _('Delete CP'),
                     'action': 'CPDeleteAction'
                 },
+            ]
+        },
+        {
+            'title': _('Service'),
+            'actions': [
                 {
-                    'type': 'separator',
+                    'title': _('on/off SPORTident readout'),
+                    'icon': config.icon_dir('sportident.png'),
+                    'action': 'SPORTidentReadoutAction'
                 },
                 {
-                    'title': _('Add SPORTident result'),
-                    'action': 'AddSPORTidentResultAction'
+                    'title': _('Teamwork'),
+                    'icon': config.icon_dir('network.svg'),
+                    'actions': [
+                        {
+                            'title': _('Send selected'),
+                            'action': 'TeamworkSendAction'
+                        },
+                        {
+                            'type': 'separator',
+                        },
+                        {
+                            'title': _('On/Off'),
+                            'action': 'TeamworkEnableAction'
+                        }
+                    ]
                 },
+                {
+                    'title': _('Live'),
+                    'icon': config.icon_dir('live.svg'),
+                    'actions': [
+                        {
+                            'title': _('Send start list'),
+                            'action': 'LiveSendStartListAction'
+                        },
+                        {
+                            'title': _('Send results'),
+                            'action': 'LiveSendResultsAction'
+                        },
+                        {
+                            'title': _('Resend results'),
+                            'action': 'LiveResendResultsAction'
+                        },
+                    ]
+                }
             ]
         },
         {
@@ -297,24 +334,8 @@ def menu_list():
                 },
                 {
                     'title': _('Live'),
-                    'actions': [
-                        {
-                            'title': _('Settings'),
-                            'action': 'LiveSettingsAction'
-                        },
-                        {
-                            'title': _('Send start list'),
-                            'action': 'LiveSendStartListAction'
-                        },
-                        {
-                            'title': _('Send results'),
-                            'action': 'LiveSendResultsAction'
-                        },
-                        {
-                            'title': _('Resend results'),
-                            'action': 'LiveResendResultsAction'
-                        },
-                    ]
+                    'icon': config.icon_dir('live.svg'),
+                    'action': 'LiveSettingsAction'
                 }
             ]
         },

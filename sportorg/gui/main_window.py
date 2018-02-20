@@ -167,6 +167,8 @@ class MainWindow(QMainWindow):
             else:
                 menu = QtWidgets.QMenu(parent)
                 menu.setTitle(action_item['title'])
+                if 'icon' in action_item:
+                    menu.setIcon(QtGui.QIcon(action_item['icon']))
                 self._create_menu(menu, action_item['actions'])
                 parent.addAction(menu.menuAction())
 
