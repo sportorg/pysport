@@ -1,7 +1,6 @@
 from typing import IO
 from xml.etree import ElementTree
 from abc import ABCMeta
-
 from chardet.universaldetector import UniversalDetector
 
 
@@ -70,7 +69,6 @@ class ClassesV8:
         self._courses = CourseList()
         self._groups = set()
 
-
     def detect_encoding(self, file):
         detector = UniversalDetector()
         with open(file, 'rb') as fh:
@@ -79,7 +77,15 @@ class ClassesV8:
                 if detector.done:
                     break
             detector.close()
-        return detector.result['encoding']
+
+        detected_encoding = detector.result['encoding']
+
+        supported_encodings = ['utf-8', 'UTF-8-SIG', 'windows-1251', 'UTF-32']
+        if detected_encoding in supported_encodings:
+            return detected_encoding
+
+        default_encoding = 'windows-1251'  # for Russia and people with OCAD < 11.0
+        return default_encoding
 
     def parse(self, file):
         if not isinstance(file, str) and not isinstance(file, IO):
