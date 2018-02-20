@@ -417,6 +417,25 @@ class TeamworkEnableAction(Action):
         self.app.interval()
 
 
+class TeamworkSendAction(Action):
+    def execute(self):
+        try:
+            obj = race()
+            data_list = [obj.persons, obj.results, obj.groups, obj.courses, obj.organizations]
+            if not self.app.current_tab < len(data_list):
+                return
+            items = data_list[self.app.current_tab]
+            indexes = self.app.get_selected_rows()
+            for index in indexes:
+                if index < 0:
+                    continue
+                if index >= len(items):
+                    pass
+                Teamwork().send(items[index].to_dict())
+        except Exception as e:
+            logging.error(str(e))
+
+
 class PrinterSettingsAction(Action):
     def execute(self):
         PrintPropertiesDialog().exec()

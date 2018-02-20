@@ -55,10 +55,14 @@ class ClientReceiverThread(Thread):
                 if not data:
                     break
                 full_data += data
-                if data[-2:] == b'}1':
-                    command = Command(json.loads(full_data[1:-1].decode()))
-                    self._out_queue.put(command)  # for local
-                    full_data = b''
+                while True:
+                    offset = full_data.find(b'}1')
+                    if offset != -1:
+                        command = Command(json.loads(full_data[1:offset+1].decode()))
+                        self._out_queue.put(command)  # for local
+                        full_data = full_data[offset+2:]
+                    else:
+                        break
             except socket.timeout:
                 if not main_thread().is_alive() or self._stop_event.is_set():
                     break
