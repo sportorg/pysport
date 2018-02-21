@@ -357,13 +357,12 @@ class GroupSplits(object):
         groups = [group_dict]
         ret['groups'] = groups
 
-        start_date = race().get_setting('start_date', datetime.now().replace(second=0, microsecond=0))
         ret['race'] = {
-            'title': race().get_setting('main_title', ''),
-            'sub_title': race().get_setting('sub_title', ''),
-            'location': race().get_setting('location', ''),
-            'url': race().get_setting('url', ''),
-            'date': start_date.strftime("%d.%m.%Y")
+            'title': race().data.title,
+            'sub_title': race().data.description,
+            'location': race().data.location,
+            'url': race().data.url,
+            'date': race().get_start_datetime().strftime("%d.%m.%Y")
         }
         return ret
 
@@ -397,11 +396,10 @@ def get_splits_data():
 
     data.sort(key=lambda x: x['name'])
     ret['groups'] = data
-    start_date = race().get_setting('start_date', datetime.now().replace(second=0, microsecond=0))
     ret['race'] = {
-        'title': race().get_setting('main_title', ''),
-        'sub_title': race().get_setting('sub_title', ''),
-        'url': race().get_setting('url', ''),
-        'date': start_date.strftime("%d.%m.%Y")
+        'title': race().data.title,
+        'sub_title': race().data.description,
+        'url': race().data.url,
+        'date': race().data.get_start_datetime().strftime("%d.%m.%Y")
     }
     return ret

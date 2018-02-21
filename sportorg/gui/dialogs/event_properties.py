@@ -1,5 +1,4 @@
 import logging
-from datetime import datetime
 
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, QTextEdit, QDateTimeEdit, \
@@ -110,16 +109,16 @@ class EventPropertiesDialog(QDialog):
 
     def set_values_from_model(self):
         obj = race()
-        self.item_main_title.setText(str(obj.get_setting('main_title', '')))
-        self.item_sub_title.setText(str(obj.get_setting('sub_title', '')))
-        self.item_location.setText(str(obj.get_setting('location', '')))
-        self.item_url.setText(str(obj.get_setting('url', '')))
-        self.item_refery.setText(str(obj.get_setting('chief_referee', '')))
-        self.item_secretary.setText(str(obj.get_setting('secretary', '')))
-        self.item_start_date.setDateTime(obj.get_setting('start_date', datetime.now().replace(second=0, microsecond=0)))
-        self.item_end_date.setDateTime(obj.get_setting('end_date', datetime.now().replace(second=0, microsecond=0)))
-        self.item_type.setCurrentIndex(obj.get_setting('race_type', RaceType.INDIVIDUAL_RACE).value)
-        self.item_relay_legs.setValue(obj.get_setting('relay_leg_count', 3))
+        self.item_main_title.setText(str(obj.data.title))
+        self.item_sub_title.setText(str(obj.data.description))
+        self.item_location.setText(str(obj.data.location))
+        self.item_url.setText(str(obj.data.url))
+        self.item_refery.setText(str(obj.data.chief_referee))
+        self.item_secretary.setText(str(obj.data.secretary))
+        self.item_start_date.setDateTime(obj.data.get_start_datetime())
+        self.item_end_date.setDateTime(obj.data.get_end_datetime())
+        self.item_type.setCurrentIndex(obj.data.race_type.value)
+        self.item_relay_legs.setValue(obj.data.relay_leg_count)
         self.change_type()
 
     def apply_changes_impl(self):
@@ -129,20 +128,16 @@ class EventPropertiesDialog(QDialog):
         start_date = self.item_start_date.dateTime().toPyDateTime()
         end_date = self.item_end_date.dateTime().toPyDateTime()
 
-        obj.set_setting('main_title', self.item_main_title.text())
-        obj.set_setting('sub_title', self.item_sub_title.toPlainText())
-        obj.set_setting('location', self.item_location.text())
-        obj.set_setting('url', self.item_url.text())
-        obj.set_setting('chief_referee', self.item_refery.text())
-        obj.set_setting('secretary', self.item_secretary.text())
-        obj.set_setting('start_date', start_date)
-        obj.set_setting('end_date', end_date)
-        obj.set_setting('race_type', RaceType(self.item_type.currentIndex()))
-        obj.set_setting('relay_leg_count', self.item_relay_legs.value())
-
-        obj.data.name = self.item_main_title.text()
-        obj.data.start_time = start_date
-        obj.data.end_time = end_date
+        obj.data.title = self.item_main_title.text()
+        obj.data.description = self.item_sub_title.toPlainText()
+        obj.data.location = self.item_location.text()
+        obj.data.url = self.item_url.text()
+        obj.data.chief_referee = self.item_refery.text()
+        obj.data.secretary = self.item_secretary.text()
+        obj.data.start_datetime = start_date
+        obj.data.end_datetime = end_date
+        obj.data.race_type = RaceType(self.item_type.currentIndex())
+        obj.data.relay_leg_count = self.item_relay_legs.value()
 
         obj.set_setting('sportident_zero_time', (
             start_date.hour,

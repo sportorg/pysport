@@ -429,7 +429,7 @@ class MainWindow(QMainWindow):
     def create_file(self, *args, update_data=True):
         file_name = get_save_file_name(
             _('Create SportOrg file'),
-            _('SportOrg file (*.sportorg)'),
+            _('SportOrg file (*.json)'),
             time.strftime("%Y%m%d")
         )
         if file_name is not '':
@@ -437,7 +437,7 @@ class MainWindow(QMainWindow):
                 if update_data:
                     races()[0] = Race()
                 self.clear_filters(remove_condition=False)
-                File(file_name, logging.root).create()
+                File(file_name, logging.root, File.JSON).create()
                 self.apply_filters()
                 self.file = file_name
                 self.add_recent_file(self.file)
@@ -457,7 +457,7 @@ class MainWindow(QMainWindow):
         if self.file is not None:
             try:
                 self.clear_filters(remove_condition=False)
-                File(self.file, logging.root).save()
+                File(self.file, logging.root, File.JSON).save()
                 self.apply_filters()
             except Exception as e:
                 logging.exception(str(e))
@@ -467,7 +467,7 @@ class MainWindow(QMainWindow):
     def open_file(self, file_name=None):
         if file_name:
             try:
-                File(file_name, logging.root).open()
+                File(file_name, logging.root, File.JSON).open()
                 self.file = file_name
                 self.set_title(file_name)
                 self.add_recent_file(self.file)

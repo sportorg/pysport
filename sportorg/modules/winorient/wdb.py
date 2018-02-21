@@ -54,10 +54,10 @@ class WinOrientBinary:
         my_race = race()
         assert(isinstance(my_race, Race))
 
-        my_race.set_setting('sub_title', '\n'.join(self.wdb_object.info.title))
-        my_race.set_setting('location', self.wdb_object.info.place)
-        my_race.set_setting('chief_referee', self.wdb_object.info.referee)
-        my_race.set_setting('secretary', self.wdb_object.info.secretary)
+        my_race.data.title = '\n'.join(self.wdb_object.info.title)
+        my_race.data.location = self.wdb_object.info.place
+        my_race.data.chief_referee = self.wdb_object.info.referee
+        my_race.data.secretary = self.wdb_object.info.secretary
 
         for team in self.wdb_object.team:
             assert (isinstance(team, WDBTeam))
@@ -162,11 +162,11 @@ class WinOrientBinary:
         wdb_object = WDB()
         my_race = race()
 
-        title = my_race.get_setting('sub_title', '')
+        title = my_race.data.description
         wdb_object.info.title = title.split('\n')
-        wdb_object.info.place = my_race.get_setting('location', '')
-        wdb_object.info.referee = my_race.get_setting('chief_referee', '')
-        wdb_object.info.secretary = my_race.get_setting('secretary', '')
+        wdb_object.info.place = my_race.data.location
+        wdb_object.info.referee = my_race.data.chief_referee
+        wdb_object.info.secretary = my_race.data.secretary
 
         for team in my_race.organizations:
             new_team = WDBTeam()

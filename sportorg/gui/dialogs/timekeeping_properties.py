@@ -332,7 +332,7 @@ class TimekeepingPropertiesDialog(QDialog):
         # penalty calculation
 
         mr_mode = obj.get_setting('marked_route_mode', 'off')
-        mr_penalty_time = obj.get_setting('marked_route_penalty_time', OTime(sec=60))
+        mr_penalty_time = OTime(msec=obj.get_setting('marked_route_penalty_time', 60000))
         mr_if_counting_lap = obj.get_setting('marked_route_if_counting_lap', True)
         mr_if_station_check = obj.get_setting('marked_route_if_station_check', False)
         mr_station_code = obj.get_setting('marked_route_station_code', 80)
@@ -419,12 +419,6 @@ class TimekeepingPropertiesDialog(QDialog):
         elif self.chip_reading_always.isChecked():
             assign_chip_reading = 'always'
 
-        obj.set_setting('sportident_zero_time', (
-            self.item_zero_time.time().hour(),
-            self.item_zero_time.time().minute(),
-            0
-        ))
-
         start_cp_number = self.item_start_cp_value.value()
         finish_cp_number = self.item_finish_cp_value.value()
 
@@ -477,7 +471,7 @@ class TimekeepingPropertiesDialog(QDialog):
             mr_mode = 'time'
 
         obj.set_setting('marked_route_mode', mr_mode)
-        mr_penalty_time = time_to_otime(self.mr_time_edit.time())
+        mr_penalty_time = time_to_otime(self.mr_time_edit.time()).to_msec()
         mr_if_counting_lap = self.mr_counting_lap_check.isChecked()
         mr_if_station_check = self.mr_lap_station_check.isChecked()
         mr_station_code = self.mr_lap_station_edit.value()

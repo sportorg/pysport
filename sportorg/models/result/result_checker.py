@@ -66,7 +66,7 @@ class ResultChecker:
         if mode == 'laps':
             result.penalty_laps = penalty
         elif mode == 'time':
-            time_for_one_penalty = race().get_setting('marked_route_penalty_time', OTime(sec=60))
+            time_for_one_penalty = OTime(msec=race().get_setting('marked_route_penalty_time', 60000))
             result.penalty_time = time_for_one_penalty * penalty
 
     @staticmethod

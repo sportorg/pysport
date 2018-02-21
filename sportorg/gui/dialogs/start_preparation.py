@@ -6,6 +6,7 @@ from PyQt5.QtCore import QTime
 from PyQt5.QtWidgets import QDialog
 
 from sportorg import config
+from sportorg.core.otime import OTime
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import _
 from sportorg.models.memory import race, Group
@@ -288,7 +289,7 @@ class StartPreparationDialog(QDialog):
 
         obj.set_setting('is_start_preparation_time', self.start_check_box.isChecked())
         obj.set_setting('is_fixed_start_interval', self.start_interval_radio_button.isChecked())
-        obj.set_setting('start_interval', self.start_interval_time_edit.time())
+        obj.set_setting('start_interval', time_to_otime(self.start_interval_time_edit.time()).to_msec())
 
         obj.set_setting('is_start_preparation_numbers', self.numbers_check_box.isChecked())
         obj.set_setting('is_fixed_number_interval', self.numbers_interval_radio_button.isChecked())
@@ -310,7 +311,8 @@ class StartPreparationDialog(QDialog):
 
         self.start_check_box.setChecked(obj.get_setting('is_start_preparation_time', False))
         self.start_interval_radio_button.setChecked(obj.get_setting('is_fixed_start_interval', False))
-        self.start_interval_time_edit.setTime(obj.get_setting('start_interval', QTime()))
+        t = OTime(msec=obj.get_setting('start_interval', 0))
+        self.start_interval_time_edit.setTime(QTime(t.hour, t.minute))
 
         self.numbers_check_box.setChecked(obj.get_setting('is_start_preparation_numbers', False))
         self.numbers_interval_radio_button.setChecked(obj.get_setting('is_fixed_number_interval', False))
