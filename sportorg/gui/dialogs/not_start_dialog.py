@@ -71,7 +71,7 @@ class NotStartDialog(QDialog):
                     result = ResultSportident()
                     result.person = person
                     result.status = ResultStatus.DID_NOT_START
-                    Teamwork().send(result)
+                    Teamwork().send(result.to_dict())
                     obj.add_new_result(result)
                 else:
                     logging.info('{} not found'.format(number))

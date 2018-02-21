@@ -11,7 +11,8 @@ from sportorg.gui.menu.actions import NewAction, SaveAction, OpenAction, SaveAsA
     RecheckingAction, PenaltyCalculationAction, PenaltyRemovingAction, ChangeStatusAction, SetDNSNumbersAction, \
     AddSPORTidentResultAction, TimekeepingSettingsAction, PrinterSettingsAction, LiveSettingsAction, \
     LiveSendStartListAction, LiveSendResultsAction, LiveResendResultsAction, AboutAction, TestingAction, CPDeleteAction, \
-    TeamworkSettingsAction, TeamworkEnableAction, StatisticsListAction, TeamworkSendAction
+    TeamworkSettingsAction, TeamworkEnableAction, StatisticsListAction, TeamworkSendAction, JsonImportAction, \
+    JsonExportAction
 
 
 class Factory:
@@ -74,6 +75,8 @@ class Factory:
             TestingAction(),
             TeamworkEnableAction(),
             TeamworkSendAction(),
+            JsonImportAction(),
+            JsonExportAction(),
         ]
         self._map = {}
         for action in self.actions:

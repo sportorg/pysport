@@ -899,7 +899,6 @@ class Person(Model):
 class RaceData(Model):
     def __init__(self):
         self.name = ''
-        self.organisation = None  # type: Organization
         self.start_time = None  # type: datetime
         self.end_time = None  # type: datetime
         self.url = ''
@@ -909,19 +908,41 @@ class RaceData(Model):
 
 
 class Race(Model):
+    support_obj = {
+        'Person': Person,
+        'Result': Result,
+        'ResultManual': ResultManual,
+        'ResultSportident': ResultSportident,
+        'Group': Group,
+        'Course': Course,
+        'Organization': Organization,
+    }
+
     def __init__(self):
         self.id = uuid.uuid4()
         self.data = RaceData()
+        self.organizations = []  # type: List[Organization]
         self.courses = []  # type: List[Course]
         self.groups = []  # type: List[Group]
-        self.persons = []  # type: List[Person]
         self.results = []  # type: List[Result]
+        self.persons = []  # type: List[Person]
         self.relay_teams = []  # type: List[RelayTeam]
-        self.organizations = []  # type: List[Organization]
         self.settings = {}  # type: Dict[str, Any]
 
     def __repr__(self):
         return repr(self.data)
+
+    @property
+    def list_obj(self):
+        return {
+            'Person': self.persons,
+            'Result': self.results,
+            'ResultManual': self.results,
+            'ResultSportident': self.results,
+            'Group': self.groups,
+            'Course': self.courses,
+            'Organization': self.organizations,
+        }
 
     def to_dict_data(self):
         start_date = self.get_setting('start_date', datetime.datetime.now().replace(second=0, microsecond=0))
@@ -931,6 +952,57 @@ class Race(Model):
             'url': self.get_setting('url', ''),
             'date': start_date.strftime("%d.%m.%Y")
         }
+
+    def to_dict(self):
+        return {
+            'object': self.__class__.__name__,
+            'id': str(self.id),
+            'organizations': [item.to_dict() for item in self.organizations],
+            'courses': [item.to_dict() for item in self.courses],
+            'groups': [item.to_dict() for item in self.groups],
+            'results': [item.to_dict() for item in self.results],
+            'persons': [item.to_dict() for item in self.persons],
+        }
+
+    def update_data(self, dict_obj):
+        if 'object' not in dict_obj:
+            return
+        if dict_obj['object'] == 'Race' and dict_obj['id'] == str(self.id):
+            key_list = ['organizations', 'courses', 'groups', 'results', 'persons']
+            for key in key_list:
+                if key in dict_obj:
+                    for item_obj in dict_obj[key]:
+                        self.update_data(item_obj)
+            return
+        elif dict_obj['object'] not in self.support_obj:
+            return
+
+        obj = self.get_obj(dict_obj['object'], dict_obj['id'])
+        if obj is None:
+            self.create_obj(dict_obj)
+        else:
+            self.update_obj(obj, dict_obj)
+
+    def get_obj(self, obj_name, obj_id):
+        for item in self.list_obj[obj_name]:
+            if str(item.id) == obj_id:
+                return item
+
+    def update_obj(self, obj, dict_obj):
+        obj.update_data(dict_obj)
+        if dict_obj['object'] == 'Person':
+            obj.group = self.get_obj('Group', dict_obj['group_id'])
+            obj.organization = self.get_obj('Organization', dict_obj['organization_id'])
+        elif dict_obj['object'] in ['Result', 'ResultManual', 'ResultSportident']:
+            obj.person = self.get_obj('Person', dict_obj['person_id'])
+        elif dict_obj['object'] == 'Group':
+            obj.course = self.get_obj('Course', dict_obj['course_id'])
+
+    def create_obj(self, dict_obj):
+        obj = self.support_obj[dict_obj['object']]()
+        obj.id = uuid.UUID(dict_obj['id'])
+        self.update_obj(obj, dict_obj)
+        self.list_obj[dict_obj['object']].insert(0, obj)
 
     def get_type(self, group: Group):
         if group.get_type():
@@ -1511,7 +1583,11 @@ def find(iterable: list, **kwargs):
         return None
 
 
-event = [create(Race)]
+_event = [create(Race)]
+
+
+def races():
+    return _event
 
 
 def race(day=None):
@@ -1521,7 +1597,7 @@ def race(day=None):
     else:
         day -= 1
 
-    if day < len(event):
-        return event[day]
+    if day < len(_event):
+        return _event[day]
     else:
         return Race()

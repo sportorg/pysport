@@ -1,7 +1,7 @@
 import pickle
+import uuid
 
 from sportorg import config
-from sportorg.gui.global_access import GlobalAccess
 from sportorg.models import memory
 
 
@@ -9,6 +9,7 @@ def dump(file):
     data = {'version': config.VERSION}
     race = memory.race()
 
+    data['id'] = str(race.id)
     data['data'] = race.data
     data['courses'] = race.courses
     data['groups'] = race.groups
@@ -18,9 +19,6 @@ def dump(file):
     data['settings'] = race.settings
     pickle.dump(data, file)
 
-    # apply filters again
-    GlobalAccess().get_main_window().apply_filters()
-
 
 def load(file):
     data = pickle.load(file)
@@ -29,6 +27,8 @@ def load(file):
     # FIXME
     if True or data['version'] == config.VERSION:
         race = memory.race()
+        if 'id' in data:
+            race.id = uuid.UUID(data['id'])
         race.data = data['data']
         race.courses = data['courses']
         race.groups = data['groups']
