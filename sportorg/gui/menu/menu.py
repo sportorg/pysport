@@ -52,6 +52,10 @@ def menu_list():
                     'title': _('Import'),
                     'actions': [
                         {
+                            'title': _('Json'),
+                            'action': 'JsonImportAction'
+                        },
+                        {
                             'title': _('CSV Winorient'),
                             'icon': config.icon_dir('csv.svg'),
                             'action': 'CSVWinorientImportAction'
@@ -69,6 +73,10 @@ def menu_list():
                 {
                     'title': _('Export'),
                     'actions': [
+                        {
+                            'title': _('Json'),
+                            'action': 'JsonExportAction'
+                        },
                         {
                             'title': _('WDB Winorient'),
                             'action': 'WDBWinorientExportAction'

@@ -38,6 +38,7 @@ from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.result_checker import ResultChecker
 from sportorg.models.start.start_preparation import guess_corridors_for_groups
 from sportorg.modules import testing
+from sportorg.modules.backup.file import File
 from sportorg.modules.iof import iof_xml
 from sportorg.modules.live.orgeo import OrgeoClient
 from sportorg.modules.ocad import ocad
@@ -371,7 +372,7 @@ class ChangeStatusAction(Action):
             return
         result = obj.results[index]
         result.status = status_dict[result.status]
-        Teamwork().send(result)
+        Teamwork().send(result.to_dict())
         self.app.refresh()
 
 
@@ -389,7 +390,7 @@ class AddSPORTidentResultAction(Action):
     def execute(self):
         result = race().new_sportident_result()
         race().add_new_result(result)
-        Teamwork().send(result)
+        Teamwork().send(result.to_dict())
         logging.info('SPORTident result')
         self.app.get_result_table().model().init_cache()
         self.app.refresh()
@@ -471,3 +472,34 @@ class AboutAction(Action):
 class TestingAction(Action):
     def execute(self):
         testing.test()
+
+
+class JsonExportAction(Action):
+    def execute(self):
+        file_name = get_save_file_name(
+            _('Export to SportOrg json'),
+            _('SportOrg json (*.json)'),
+            time.strftime("%Y%m%d")
+        )
+        if file_name is not '':
+            try:
+                self.app.clear_filters(remove_condition=False)
+                File(file_name, logging.root, File.JSON).create()
+                self.app.apply_filters()
+                self.app.init_model()
+            except Exception as e:
+                logging.exception(str(e))
+                QMessageBox.warning(self.app, _('Error'), _('Cannot create file') + ': ' + file_name)
+            self.app.refresh()
+
+
+class JsonImportAction(Action):
+    def execute(self):
+        file_name = get_open_file_name(_('Open SportOrg json'), _("SportOrg json (*.json)"))
+        if file_name:
+            try:
+                File(file_name, logging.root, File.JSON).open()
+                self.app.init_model()
+            except Exception as e:
+                logging.exception(str(e))
+                QMessageBox.warning(self.app, _('Error'), _('Cannot read file, format unknown') + ': ' + file_name)

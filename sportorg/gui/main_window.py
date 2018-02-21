@@ -9,8 +9,7 @@ from PyQt5.QtWidgets import QMainWindow, QTableView, QMessageBox
 
 from sportorg.core.singleton import singleton
 from sportorg.gui.menu.factory import Factory
-from sportorg.models.api.api import Api
-from sportorg.models.memory import Race, event as races, race, NotEmptyException
+from sportorg.models.memory import Race, races, race, NotEmptyException
 
 from sportorg import config
 from sportorg.models.result.result_calculation import ResultCalculation
@@ -387,7 +386,9 @@ class MainWindow(QMainWindow):
             else:
                 for person in race().persons:
                     if not person.sportident_card:
-                        Teamwork().send(race().person_sportident_card(person, result.sportident_card))
+                        old_person = race().person_sportident_card(person, result.sportident_card)
+                        if old_person is not None:
+                            Teamwork().send(old_person.to_dict())
                         person.is_rented_sportident_card = True
                         Teamwork().send(person.to_dict())
                         break
@@ -397,7 +398,7 @@ class MainWindow(QMainWindow):
 
     def teamwork(self, command):
         try:
-            Api(race()).update(command.data)
+            race().update_data(command.data)
             logging.info(repr(command.data))
             self.refresh()
         except Exception as e:
@@ -434,9 +435,10 @@ class MainWindow(QMainWindow):
         if file_name is not '':
             try:
                 if update_data:
-                    races[0] = Race()
+                    races()[0] = Race()
                 self.clear_filters(remove_condition=False)
                 File(file_name, logging.root).create()
+                self.apply_filters()
                 self.file = file_name
                 self.add_recent_file(self.file)
                 self.set_title(file_name)
@@ -456,6 +458,7 @@ class MainWindow(QMainWindow):
             try:
                 self.clear_filters(remove_condition=False)
                 File(self.file, logging.root).save()
+                self.apply_filters()
             except Exception as e:
                 logging.exception(str(e))
         else:
