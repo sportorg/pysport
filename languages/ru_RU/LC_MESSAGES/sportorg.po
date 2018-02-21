@@ -595,6 +595,9 @@ msgstr "Создать файл SportOrg"
 msgid "SportOrg file (*.sportorg)"
 msgstr "Файл SportOrg (*.sportorg)"
 
+msgid "SportOrg file (*.json)"
+msgstr "Файл SportOrg (*.json)"
+
 msgid "Question"
 msgstr "Вопрос"
 

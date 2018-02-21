@@ -45,7 +45,7 @@ def set_next_relay_number(num):
 
 def get_leg_count():
     obj = race()
-    return obj.get_setting('relay_leg_count', 3)
+    return obj.data.relay_leg_count
 
 
 def set_next_relay_number_to_person(person):

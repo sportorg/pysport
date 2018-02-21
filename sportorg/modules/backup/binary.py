@@ -7,16 +7,16 @@ from sportorg.models import memory
 
 def dump(file):
     data = {'version': config.VERSION}
-    race = memory.race()
+    obj = memory.race()
 
-    data['id'] = str(race.id)
-    data['data'] = race.data
-    data['courses'] = race.courses
-    data['groups'] = race.groups
-    data['persons'] = race.persons
-    data['results'] = race.results
-    data['organizations'] = race.organizations
-    data['settings'] = race.settings
+    data['id'] = str(obj.id)
+    data['data'] = obj.data
+    data['courses'] = obj.courses
+    data['groups'] = obj.groups
+    data['persons'] = obj.persons
+    data['results'] = obj.results
+    data['organizations'] = obj.organizations
+    data['settings'] = obj.settings
     pickle.dump(data, file)
 
 
@@ -26,13 +26,13 @@ def load(file):
         return
     # FIXME
     if True or data['version'] == config.VERSION:
-        race = memory.race()
+        obj = memory.race()
         if 'id' in data:
-            race.id = uuid.UUID(data['id'])
-        race.data = data['data']
-        race.courses = data['courses']
-        race.groups = data['groups']
-        race.persons = data['persons']
-        race.results = data['results']
-        race.organizations = data['organizations']
-        race.settings = data['settings']
+            obj.id = uuid.UUID(data['id'])
+        obj.data = data['data']
+        obj.courses = data['courses']
+        obj.groups = data['groups']
+        obj.persons = data['persons']
+        obj.results = data['results']
+        obj.organizations = data['organizations']
+        obj.settings = data['settings']
