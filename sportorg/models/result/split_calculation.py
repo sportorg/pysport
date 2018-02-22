@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from sportorg.core.otime import OTime
 from sportorg.models.memory import race, Person, Course, Group, Qualification
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.utils.time import time_to_hhmmss, get_speed_min_per_km, hhmmss_to_time
@@ -98,6 +99,7 @@ class PersonSplits(object):
         self.relay_leg = 0
         # if person.group.get_type() == RaceType.RELAY:
         self.relay_leg = person.bib // 1000
+        self.diff = result.diff
 
         person_index = 0
         course_index = 0
@@ -202,6 +204,7 @@ class PersonSplits(object):
         person_dict['assigned_rank'] = self.assigned_rank
         person_dict['scores'] = self.scores
         person_dict['relay_leg'] = self.relay_leg
+        person_dict['diff'] = self.diff
 
         person_dict['legs'] = []
         person_dict['splits'] = []
@@ -237,6 +240,7 @@ class GroupSplits(object):
         self.length = group.course.length
         self.climb = group.course.climb
         self.controls = group.course.controls
+        self.max_time = time_to_hhmmss(group.max_time) if group.max_time and group.max_time != OTime() else None
 
         self.leader = {}
 
@@ -325,6 +329,7 @@ class GroupSplits(object):
         group_dict['controls'] = self.controls
         group_dict['length'] = self.length
         group_dict['type'] = self.type
+        group_dict['max_time'] = self.max_time
         persons = []
         for i in self.person_splits:
             assert (isinstance(i, PersonSplits))
@@ -362,7 +367,9 @@ class GroupSplits(object):
             'sub_title': race().data.description,
             'location': race().data.location,
             'url': race().data.url,
-            'date': race().get_start_datetime().strftime("%d.%m.%Y")
+            'date': race().get_start_datetime().strftime("%d.%m.%Y"),
+            'chief_referee': race().data.chief_referee,
+            'secretary': race().data.secretary
         }
         return ret
 
@@ -400,6 +407,8 @@ def get_splits_data():
         'title': race().data.title,
         'sub_title': race().data.description,
         'url': race().data.url,
-        'date': race().data.get_start_datetime().strftime("%d.%m.%Y")
+        'date': race().data.get_start_datetime().strftime("%d.%m.%Y"),
+        'chief_referee': race().data.chief_referee,
+        'secretary': race().data.secretary
     }
     return ret

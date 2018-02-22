@@ -174,7 +174,7 @@
 <div>
     <div class="text-center">
         <h1>ПРОТОКОЛ СТАРТА</h1>
-        <h2>{{ race.sub_title }} <br>{{ race.date }}</h2>
+        <h2>{{ race.sub_title }} <br>{{ race.date }} {{ race.place }}</h2>
     </div>
     <table>
     {% for group in groups %}
@@ -229,5 +229,12 @@
     {% endfor %}
     </table>
 </div>
+<footer>
+Протокол сформирован в <a href="http://www.sportorg.o-ural.ru">ПО SportOrg</a> v2018. Время печати:
+<script type="text/javascript">
+    var l = new Date();
+    document.write (l.toLocaleString());
+</script>
+</footer>
 </body>
 </html>

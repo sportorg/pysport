@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Sportorg Results - {{ title }}</title>
+    <title>SportOrg Results - {{ title }}</title>
 {% raw %}
     <style>
         table {
@@ -174,14 +174,18 @@
 <div>
     <div class="text-center">
         <h1>ПРОТОКОЛ РЕЗУЛЬТАТОВ</h1>
-        <h2>{{ race.sub_title }} <br>{{ race.date }}</h2>
+        <h2>{{ race.sub_title }} <br>{{ race.date }} {{ race.place }}</h2>
     </div>
     <table>
     {% for group in groups %}
     {% if group.persons|length %}
         <tr style="background: white; border: 0">
         <td colspan="7" style="border: 0">
-            <h2 id="{{group.name}}">{{ group.name }}, длина: {{ group.length }}м, количество КП: {{ group.cp_count }} </h2>
+            <h2 id="{{group.name}}">{{ group.name }}
+                {% if group.length %} Длина:{{ group.length }}м {% endif %}
+                {% if group.cp_count %} Количество КП:{{ group.cp_count }} {% endif %}
+                {% if group.max_time %} Контрольное время:{{ group.max_time }} {% endif %}
+            </h2>
             <div class="no-print">{{ view_groups() }}</div>
         </td>
         </tr>
@@ -193,6 +197,7 @@
             <td>ГР</td>
             <td>Номер</td>
             <td>Результат</td>
+            <td>Отставание</td>
             <td>Место</td>
         </tr>
         {% set index = [1] %}
@@ -200,6 +205,7 @@
             {% if person.relay_leg == 1 and group.type == 'RELAY' %}
                 <tr>
                     <td>{{index|length}}</td>
+                    <td></td>
                     <td></td>
                     <td></td>
                     <td></td>
@@ -222,6 +228,7 @@
                 <td>{{ person.year }}</td>
                 <td>{{ person.bib }}</td>
                 <td>{{ person.result }}</td>
+                <td>{{ person.diff }}</td>
                 <td>{{ person.place }}</td>
             </tr>
         {% endfor %}
@@ -245,6 +252,17 @@
     {% endif %}
     {% endfor %}
     </table>
+    <div>
+        <h3>Главный судья:<span style='padding-left:340px;'> </span>{{ race.chief_referee }}</h3>
+        <h3>Главный секретарь:<span style='padding-left:300px;'> </span>{{ race.secretary }}</h3>
+    </div>
 </div>
+<footer>
+Протокол сформирован в <a href="http://www.sportorg.o-ural.ru">ПО SportOrg</a> v2018. Время печати:
+<script type="text/javascript">
+    var l = new Date();
+    document.write (l.toLocaleString());
+</script>
+</footer>
 </body>
 </html>

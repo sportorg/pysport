@@ -469,6 +469,7 @@ class Result:
         self.place = None  # type: Union[int, str]
         self.scores = 0  # type: int
         self.assigned_rank = Qualification.NOT_QUALIFIED
+        self.diff = None  # type: OTime
 
     def __str__(self):
         return str(self.system_type)
@@ -511,6 +512,7 @@ class Result:
             'start_time': self.start_time.to_msec() if self.start_time else None,
             'finish_time': self.finish_time.to_msec() if self.finish_time else None,
             'result': self.result,
+            'diff': self.diff.to_msec() if self.diff else None,
             'penalty_time': self.penalty_time.to_msec() if self.penalty_time else None,
             'status': self.status.value,
             'penalty_laps': self.penalty_laps,
