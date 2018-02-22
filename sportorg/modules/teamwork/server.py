@@ -41,7 +41,7 @@ class ServerReceiverThread(Thread):
     def run(self):
         with self.connect.conn:
             self._logger.debug('Server receiver start')
-            self._logger.debug('Connected by {}'.format(self.connect.addr))
+            self._logger.info('Connected by {}'.format(self.connect.addr))
             full_data = b''
             self.connect.conn.settimeout(5)
             while True:
@@ -64,13 +64,14 @@ class ServerReceiverThread(Thread):
                     if not main_thread().is_alive() or self._stop_event.is_set():
                         break
                 except ConnectionResetError as e:
-                    self._logger.debug(str(e))
+                    self._logger.error(str(e))
                     break
                 except Exception as e:
-                    self._logger.debug(str(e))
+                    self._logger.error(str(e))
                     break
         self.connect.conn.close()
-        self._logger.debug('Server receiver shutdown')
+        self.connect.died()
+        self._logger.info('Disconnect {}'.format(self.connect.addr))
 
 
 class ServerSenderThread(Thread):
@@ -94,10 +95,10 @@ class ServerSenderThread(Thread):
                             data = json.dumps(command.data)
                             connect.conn.sendall(b'0' + data.encode() + b'1')
                     except ConnectionResetError as e:
-                        self._logger.debug(str(e))
+                        self._logger.error(str(e))
                         connect.died()
                     except OSError as e:
-                        self._logger.debug(str(e))
+                        self._logger.error(str(e))
                         connect.died()
             except Empty:
                 while not self._connections_queue.empty():
@@ -105,7 +106,7 @@ class ServerSenderThread(Thread):
                 if not main_thread().is_alive() or self._stop_event.is_set():
                     break
             except Exception as e:
-                self._logger.debug(str(e))
+                self._logger.error(str(e))
         self._logger.debug('Server sender shutdown')
         self._stop_event.set()
 
@@ -132,7 +133,7 @@ class ServerThread(Thread):
             s.listen(1)
             s.settimeout(5)
 
-            self._logger.debug('Server start')
+            self._logger.info('Server start')
 
             conns_queue = Queue()
             sender = ServerSenderThread(self._in_queue, conns_queue, self._stop_event, self._logger)
@@ -152,11 +153,11 @@ class ServerThread(Thread):
                     if not main_thread().is_alive() or self._stop_event.is_set():
                         break
                 except Exception as e:
-                    self._logger.debug(str(e))
+                    self._logger.error(str(e))
             sender.join()
             for srt in connections:
                 srt.join()
-            self._logger.debug('Server shutdown')
+            self._logger.info('Server shutdown')
 
 
 if __name__ == '__main__':

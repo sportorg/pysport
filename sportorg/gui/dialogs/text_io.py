@@ -141,7 +141,7 @@ class TextExchangeDialog(QDialog):
 
             self.text_edit.setPlainText(get_text(index, key, separator))
         except Exception as e:
-            logging.exception(e)
+            logging.error(e)
 
     def accept(self):
         try:
@@ -181,7 +181,7 @@ class TextExchangeDialog(QDialog):
                         logging.debug('text_io: empty value for line ' + i)
             logging.debug('text_io: processed ' + str(success_count) + ' from ' + str(len(lines)) + ' lines')
         except Exception as e:
-            logging.exception(e)
+            logging.error(e)
 
         self.close()
 

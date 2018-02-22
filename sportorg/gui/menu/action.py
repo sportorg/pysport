@@ -14,7 +14,7 @@ class Action:
         try:
             self.execute()
         except Exception as e:
-            logging.exception(str(e))
+            logging.error(str(e))
 
     @abstractmethod
     def execute(self):

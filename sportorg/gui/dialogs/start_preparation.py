@@ -272,7 +272,7 @@ class StartPreparationDialog(QDialog):
             GlobalAccess().get_main_window().refresh()
             self.save_state()
         except Exception as e:
-            logging.exception(str(e))
+            logging.error(str(e))
 
     def save_state(self):
         obj = race()

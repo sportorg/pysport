@@ -64,7 +64,7 @@ class Widget(QtWidgets.QWidget):
                     dialog = EntryEditDialog(race().persons[index.row()])
                     dialog.exec()
             except Exception as e:
-                logging.exception(str(e))
+                logging.error(str(e))
 
         def entry_single_clicked(index):
             try:
@@ -74,7 +74,7 @@ class Widget(QtWidgets.QWidget):
                         set_next_relay_number_to_person(obj.persons[index.row()])
 
             except Exception as e:
-                logging.exception(str(e))
+                logging.error(str(e))
 
         self.EntryTable.activated.connect(entry_double_clicked)
         self.EntryTable.clicked.connect(entry_single_clicked)

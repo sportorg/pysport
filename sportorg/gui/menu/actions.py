@@ -92,7 +92,7 @@ class CSVWinorientImportAction(Action):
             try:
                 winorient.import_csv(file_name)
             except Exception as e:
-                logging.exception(str(e))
+                logging.error(str(e))
                 QMessageBox.warning(self.app, _('Error'), _('Import error') + ': ' + file_name)
             self.app.init_model()
 
@@ -104,7 +104,7 @@ class WDBWinorientImportAction(Action):
             try:
                 winorient.import_wo_wdb(file_name)
             except WDBImportError as e:
-                logging.exception(str(e))
+                logging.error(str(e))
                 QMessageBox.warning(self.app, _('Error'), _('Import error') + ': ' + file_name)
             self.app.init_model()
 
@@ -116,7 +116,7 @@ class OcadTXTv8ImportAction(Action):
             try:
                 ocad.import_txt_v8(file_name)
             except OcadImportException as e:
-                logging.exception(str(e))
+                logging.error(str(e))
                 QMessageBox.warning(self.app, _('Error'), _('Import error') + ': ' + file_name)
             self.app.init_model()
 
@@ -135,7 +135,7 @@ class WDBWinorientExportAction(Action):
 
                 write_wdb(wdb_object, file_name)
             except Exception as e:
-                logging.exception(str(e))
+                logging.error(str(e))
                 QMessageBox.warning(self.app, _('Error'), _('Export error') + ': ' + file_name)
 
 
@@ -147,7 +147,7 @@ class IOFResultListExportAction(Action):
             try:
                 iof_xml.export_result_list(file_name)
             except Exception as e:
-                logging.exception(str(e))
+                logging.error(str(e))
                 QMessageBox.warning(self.app, _('Error'), _('Export error') + ': ' + file_name)
 
 

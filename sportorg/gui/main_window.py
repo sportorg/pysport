@@ -1,6 +1,7 @@
 import ast
 import logging
 import time
+from queue import Queue
 from threading import main_thread
 
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -36,7 +37,7 @@ class ServiceListenerThread(QThread):
 
     def run(self):
         while True:
-            time.sleep(5)
+            time.sleep(1)
             self.interval.emit()
             if not main_thread().is_alive():
                 break
@@ -66,6 +67,7 @@ class MainWindow(QMainWindow):
         except IndexError:
             self.file = None
 
+        self.log_queue = Queue()
         handler = ConsolePanelHandler(self)
         logging.root.addHandler(handler)
 
@@ -226,9 +228,7 @@ class MainWindow(QMainWindow):
             self.statusbar.showMessage(msg, msecs)
 
     def logging(self, text):
-        self.statusbar_message(text)
-        if hasattr(self, 'logging_tab'):
-            self.logging_tab.write(text)
+        self.log_queue.put(text)
 
     def select_tab(self, index):
         self.current_tab = index
@@ -264,7 +264,7 @@ class MainWindow(QMainWindow):
             table.setModel(TeamMemoryModel())
             event.event('init_model')
         except Exception as e:
-            logging.exception(str(e))
+            logging.error(str(e))
 
     def refresh(self):
         logging.debug('Refreshing interface')
@@ -290,7 +290,7 @@ class MainWindow(QMainWindow):
             table.model().layoutChanged.emit()
             event.event('refresh')
         except Exception as e:
-            logging.exception(str(e))
+            logging.error(str(e))
 
     def clear_filters(self, remove_condition=True):
         self.get_person_table().model().clear_filter(remove_condition)
@@ -379,7 +379,7 @@ class MainWindow(QMainWindow):
                     except NoPrinterSelectedException as e:
                         logging.error(str(e))
                     except Exception as e:
-                        logging.exception(str(e))
+                        logging.error(str(e))
                 Teamwork().send(result.to_dict())
                 self.auto_save()
                 OrgeoClient().send_results()
@@ -394,7 +394,7 @@ class MainWindow(QMainWindow):
                         break
             self.refresh()
         except Exception as e:
-            logging.exception(str(e))
+            logging.error(str(e))
 
     def teamwork(self, command):
         try:
@@ -425,6 +425,12 @@ class MainWindow(QMainWindow):
                 QtGui.QIcon(config.icon_dir(self.teamwork_icon[Teamwork().is_alive()])))
             self.teamwork_status = Teamwork().is_alive()
 
+        while not self.log_queue.empty():
+            text = self.log_queue.get()
+            self.statusbar_message(text)
+            if hasattr(self, 'logging_tab'):
+                self.logging_tab.write(text)
+
     # Actions
     def create_file(self, *args, update_data=True):
         file_name = get_save_file_name(
@@ -444,7 +450,7 @@ class MainWindow(QMainWindow):
                 self.set_title(file_name)
                 self.init_model()
             except Exception as e:
-                logging.exception(str(e))
+                logging.error(str(e))
                 QMessageBox.warning(self, _('Error'), _('Cannot create file') + ': ' + file_name)
             self.refresh()
 
@@ -460,7 +466,7 @@ class MainWindow(QMainWindow):
                 File(self.file, logging.root, File.JSON).save()
                 self.apply_filters()
             except Exception as e:
-                logging.exception(str(e))
+                logging.error(str(e))
         else:
             self.save_file_as()
 
@@ -473,7 +479,7 @@ class MainWindow(QMainWindow):
                 self.add_recent_file(self.file)
                 self.init_model()
             except Exception as e:
-                logging.exception(str(e))
+                logging.error(str(e))
                 self.delete_from_recent_files(file_name)
                 QMessageBox.warning(self, _('Error'), _('Cannot read file, format unknown') + ': ' + file_name)
 
@@ -491,7 +497,7 @@ class MainWindow(QMainWindow):
                     pass
                 self.split_printout(obj.results[index])
         except Exception as e:
-            logging.exception(str(e))
+            logging.error(str(e))
 
     def split_printout(self, result):
         try:
@@ -526,7 +532,7 @@ class MainWindow(QMainWindow):
                 self.get_organization_table().model().init_cache()
             self.refresh()
         except Exception as e:
-            logging.exception(str(e))
+            logging.error(str(e))
 
     def delete_object(self):
         try:
@@ -534,7 +540,7 @@ class MainWindow(QMainWindow):
                 return
             self._delete_object()
         except Exception as e:
-            logging.exception(str(e))
+            logging.error(str(e))
 
     def _delete_object(self):
         indexes = self.get_selected_rows()

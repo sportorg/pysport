@@ -87,7 +87,7 @@ class DialogFilter(QDialog):
 
                 GlobalAccess().get_main_window().refresh()
         except Exception as e:
-            logging.exception(str(e))
+            logging.error(str(e))
 
         self.destroy()
 

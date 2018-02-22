@@ -37,7 +37,7 @@ class SIReaderThread(QThread):
         try:
             si = sireader.SIReaderReadout(port=self.port, logger=logging.root)
         except Exception as e:
-            self._logger.denug(str(e))
+            self._logger.error(str(e))
             return
         while True:
             try:
@@ -52,14 +52,14 @@ class SIReaderThread(QThread):
                 self._queue.put(SIReaderCommand('card_data', card_data), timeout=1)
                 si.ack_sicard()
             except sireader.SIReaderException as e:
-                self._logger.debug(str(e))
+                self._logger.error(str(e))
             except sireader.SIReaderCardChanged as e:
-                self._logger.debug(str(e))
+                self._logger.error(str(e))
             except serial.serialutil.SerialException as e:
-                self._logger.debug(str(e))
+                self._logger.error(str(e))
                 return
             except Exception as e:
-                self._logger.debug(str(e))
+                self._logger.error(str(e))
 
 
 class ResultThread(QThread):
@@ -87,7 +87,7 @@ class ResultThread(QThread):
                 if not main_thread().is_alive() or self._stop_event.is_set():
                     break
             except Exception as e:
-                self._logger.exception(str(e))
+                self._logger.error(str(e))
         self._logger.debug('Stop adder result')
 
     def _check_data(self, card_data):
@@ -222,12 +222,12 @@ class SIReaderClient(object):
     def choose_port(self):
         ports = self.get_ports()
         if len(ports):
-            self._logger.debug('Available Ports')
+            self._logger.info('Available Ports')
             for i, p in enumerate(ports):
-                self._logger.debug("{} - {}".format(i, p))
+                self._logger.info("{} - {}".format(i, p))
             return ports[0]
         else:
-            self._logger.debug('No ports available')
+            self._logger.info('No ports available')
             return None
 
     @staticmethod

@@ -45,7 +45,7 @@ class Widget(QtWidgets.QWidget):
                     dialog = GroupEditDialog(race().groups[index.row()])
                     dialog.exec()
             except Exception as e:
-                logging.exception(str(e))
+                logging.error(str(e))
 
         self.GroupTable.activated.connect(group_double_clicked)
         self.group_layout.addWidget(self.GroupTable)

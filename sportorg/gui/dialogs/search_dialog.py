@@ -61,7 +61,7 @@ class SearchDialog(QDialog):
                 self.table.selectRow(offset)
                 logging.info('Search: {}'.format(proxy_model.search))
         except Exception as e:
-            logging.exception(str(e))
+            logging.error(str(e))
 
     def reject(self):
         self.destroy()

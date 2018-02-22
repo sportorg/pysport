@@ -49,7 +49,7 @@ class ResultSportidentGeneration:
             if not self._person:
                 self.assign_chip_reading = 'off'
         except Exception as e:
-            logging.exception(str(e))
+            logging.error(str(e))
 
     def add_result(self):
         if self._has_result():
@@ -78,7 +78,6 @@ class ResultSportidentGeneration:
             self._add_result_to_race()
 
             logging.info('Sportident {}'.format(self._result))
-            logging.debug(self._result.status)
         else:
             if self._find_person_by_result():
                 self._result.person = self._person

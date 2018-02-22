@@ -65,18 +65,18 @@ class OrgeoThread(Thread):
                 try:
                     orgeo = Orgeo(command.url, self._user_agent, self._logger)
                     response = orgeo.send(command.data)
-                    self._logger.debug('status {}'.format(response.status_code))
-                    self._logger.debug(response.text)
+                    self._logger.info('status {}'.format(response.status_code))
+                    self._logger.info(response.text)
                 except ConnectionError as e:
-                    self._logger.debug(str(e))
+                    self._logger.error(str(e))
                     time.sleep(10)
                 except MissingSchema as e:
-                    self._logger.debug(str(e))
+                    self._logger.error(str(e))
 
                 # if not self._queue.qsize():
                 #     break
             except Exception as e:
-                self._logger.debug(str(e))
+                self._logger.error(str(e))
 
 
 class OrgeoClient(metaclass=Singleton):
