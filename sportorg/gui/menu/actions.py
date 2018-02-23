@@ -29,6 +29,7 @@ from sportorg.gui.dialogs.statistics_report_dialog import StatisticsReportDialog
 from sportorg.gui.dialogs.team_report_dialog import TeamReportDialog
 from sportorg.gui.dialogs.team_results_report_dialog import TeamResultsReportDialog
 from sportorg.gui.dialogs.teamwork_properties import TeamworkPropertiesDialog
+from sportorg.gui.dialogs.telegram_dialog import TelegramDialog
 from sportorg.gui.dialogs.text_io import TextExchangeDialog
 from sportorg.gui.dialogs.timekeeping_properties import TimekeepingPropertiesDialog
 from sportorg.gui.menu.action import Action
@@ -44,6 +45,7 @@ from sportorg.modules.ocad import ocad
 from sportorg.modules.ocad.ocad import OcadImportException
 from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.modules.teamwork import Teamwork
+from sportorg.modules.telegram.telegram import TelegramClient
 from sportorg.modules.winorient import winorient
 from sportorg.modules.winorient.wdb import WDBImportError, WinOrientBinary
 from sportorg.language import _
@@ -461,6 +463,29 @@ class LiveResendResultsAction(Action):
     def execute(self):
         OrgeoClient().clear()
         OrgeoClient().send_results()
+
+
+class TelegramSettingsAction(Action):
+    def execute(self):
+        TelegramDialog().exec()
+
+
+class TelegramSendAction(Action):
+    def execute(self):
+        try:
+            if not self.app.current_tab == 1:
+                logging.warning(_('No result selected'))
+                return
+            items = race().results
+            indexes = self.app.get_selected_rows()
+            for index in indexes:
+                if index < 0:
+                    continue
+                if index >= len(items):
+                    pass
+                TelegramClient().send_result(items[index])
+        except Exception as e:
+            logging.error(str(e))
 
 
 class AboutAction(Action):

@@ -29,6 +29,7 @@ from sportorg.gui.toolbar import toolbar_list
 from sportorg.language import _
 from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.modules.teamwork import Teamwork
+from sportorg.modules.telegram.telegram import TelegramClient
 
 
 @singleton
@@ -383,6 +384,7 @@ class MainWindow(QMainWindow):
                 Teamwork().send(result.to_dict())
                 self.auto_save()
                 OrgeoClient().send_results()
+                TelegramClient().send_result(result)
             else:
                 for person in race().persons:
                     if not person.sportident_card:

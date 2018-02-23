@@ -311,7 +311,16 @@ def menu_list():
                             'action': 'LiveResendResultsAction'
                         },
                     ]
-                }
+                },
+                {
+                    'title': _('Telegram'),
+                    'actions': [
+                        {
+                            'title': _('Send results'),
+                            'action': 'TelegramSendAction'
+                        },
+                    ]
+                },
             ]
         },
         {
@@ -336,6 +345,10 @@ def menu_list():
                     'title': _('Live'),
                     'icon': config.icon_dir('live.svg'),
                     'action': 'LiveSettingsAction'
+                },
+                {
+                    'title': _('Telegram'),
+                    'action': 'TelegramSettingsAction'
                 }
             ]
         },
