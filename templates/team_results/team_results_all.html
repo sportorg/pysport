@@ -172,7 +172,8 @@
 <body>
 {% macro view_groups() -%}{% for group in groups %}<a href="#{{group.name}}">{{group.name}}</a> {% endfor %}{%- endmacro %}
 <div>
-    <h1>{{ race.sub_title }}</h1>
+    <h1>Протокол командных результатов</h1>
+    <h2>{{ race.sub_title }} <br>{{ race.date }}</h2>
     <table>
     {% for group in groups %}
     {% if group.teams|length %}
@@ -184,21 +185,30 @@
         </tr>
         <tr>
             <td>№</td>
-            <td>Коллектив</td>
+            <td>Коллектив/Субъект</td>
             <td>Очки</td>
             <td>Кол-во зачетных участников</td>
         </tr>
+        {% set count = [1] %}
         {% for team in group.teams %}
             <tr>
-                <td>{{ loop.index }}</td>
+                <td>{{ count|length}}</td>
                 <td>{{ team.name }}</td>
                 <td>{{ team.scores }}</td>
                 <td>{{ team.member_qty }}</td>
             </tr>
+            {% if count.append(1) %} {% endif %} {# increment count length by 1 #}
         {% endfor %}
     {% endif %}
     {% endfor %}
     </table>
 </div>
+<footer>
+    Протокол сформирован в <a href="http://www.sportorg.o-ural.ru">ПО SportOrg</a> v2018. Время печати:
+    <script type="text/javascript">
+        var l = new Date();
+        document.write (l.toLocaleString());
+    </script>
+</footer>
 </body>
 </html>

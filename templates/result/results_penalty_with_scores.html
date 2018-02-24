@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Sportorg Results - {{ title }}</title>
+    <title>SportOrg Results - {{ title }}</title>
 {% raw %}
     <style>
         table {
@@ -25,6 +25,7 @@
             display: block;
             width: 100%;
             overflow: auto;
+            word-break: normal;
             word-break: keep-all;
         }
 
@@ -32,23 +33,18 @@
             font-weight: bold;
         }
 
-        .table-result th,
-        .table-result td {
+        table th,
+        table td {
             padding: 3px 13px;
             border: 1px solid #ddd;
         }
 
-        .no-padding th,
-        .no-padding td         {
-            padding: 1px;
-        }
-
-        .table-result .tr-result {
+        table tr {
             background-color: #fff;
             border-top: 1px solid #ccc;
         }
 
-        .table-result .tr-result:nth-child(2n) {
+        table tr:nth-child(2n) {
             background-color: #f8f8f8;
         }
 
@@ -117,41 +113,8 @@
             display: block;
         }
 
-        .nowrap {
-            white-space: nowrap;
-        }
-
-        .table-leg {
-            padding: 0;
-            margin: 0;
-        }
-        .table-leg th,
-        .table-leg td {
-            border: 0;
-        }
-
-        .table-leg tr {
-            border-top: 0;
-        }
-
         .text-center {
             text-align: center;
-        }
-
-        .result-1,
-        .result-2,
-        .result-3 {
-            font-weight: bold;
-        }
-
-        .result-1 {
-            /*background: gold;*/
-        }
-        .result-2 {
-            /*background: silver;*/
-        }
-        .result-3 {
-            /*background: #cd7f32;*/
         }
 
         @media print {
@@ -209,41 +172,103 @@
 <body>
 {% macro view_groups() -%}{% for group in groups %}<a href="#{{group.name}}">{{group.name}}</a> {% endfor %}{%- endmacro %}
 <div>
-    <h1>{{ race.sub_title }} <br>{{ race.date }}</h1>
+    <div class="text-center">
+        <h1>ПРОТОКОЛ РЕЗУЛЬТАТОВ</h1>
+        <h2>{{ race.sub_title }} <br>{{ race.date }} {{ race.place }}</h2>
+    </div>
+    <table>
     {% for group in groups %}
     {% if group.persons|length %}
-    <h2 id="{{group.name}}">{{group.name}}</h2>
-    <div class="no-print">{{ view_groups() }}</div>
-    <table class="table-result">
+        <tr style="background: white; border: 0">
+        <td colspan="7" style="border: 0">
+            <h2 id="{{group.name}}">{{ group.name }}
+                {% if group.length %} Длина:{{ group.length }}м {% endif %}
+                {% if group.cp_count %} Количество КП:{{ group.cp_count }} {% endif %}
+                {% if group.max_time %} Контрольное время:{{ group.max_time }} {% endif %}
+            </h2>
+            <div class="no-print">{{ view_groups() }}</div>
+        </td>
+        </tr>
         <tr>
             <td>№</td>
             <td>Фамилия, имя</td>
             <td>Коллектив</td>
             <td>Разряд</td>
             <td>ГР</td>
+            <td>Номер</td>
+            <td>Штраф</td>
             <td>Результат</td>
+            <td>Отставание</td>
             <td>Место</td>
+            <td>Очки</td>
         </tr>
+        {% set index = [1] %}
         {% for person in group.persons %}
-        <tr class="tr-result">
-            <td>{{ loop.index }}</td>
-            <td class="nowrap">{{ person.name }}</td>
-            <td class="nowrap">{{ person.team }}</td>
-            <td>{{ person.qual }}</td>
-            <td>{{ person.year }}</td>
-            <td>{{ person.result }}</td>
-            <td>{{ person.place }}</td>
-            {% for split in person.splits %}
-                <td>
-                    {{ split.code }}
-                    {{ split.time }}
-                </td>
-            {% endfor %}
-        </tr>
+            {% if person.relay_leg == 1 and group.type == 'RELAY' %}
+                <tr>
+                    <td>{{index|length}}</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                {% if index.append(1) %} {% endif %} {# increment index length by 1 #}
+            {% endif %}
+            <tr>
+                {% if group.type == 'RELAY' %}
+                    <td></td>
+                {% else %}
+                    <td>{{ loop.index }}</td>
+                {% endif %}
+                <td>{{ person.name }}</td>
+                <td>{{ person.team }}</td>
+                <td>{{ person.qual }}</td>
+                <td>{{ person.year }}</td>
+                <td>{{ person.bib }}</td>
+                <td>{{ person.penalty_time }}</td>
+                <td>{{ person.result }}</td>
+                <td>{{ person.diff }}</td>
+                <td>{{ person.place }}</td>
+                <td>{{ person.scores }}</td>
+            </tr>
         {% endfor %}
-    </table>
+        <tr style="background: white; border: 0">
+            <td colspan="7" style="border: 0">
+                {% if group.ranking.rank_scores and group.ranking.rank_scores > 0 %}
+                    Квалификационный уровень (баллы): {{group.ranking.rank_scores}}<br>
+                    Класс дистанции: {{group.ranking.max_qual}}<br>
+                    {% for rank in group.ranking.rank %}
+                        {{"{}".format(rank.qual)}} --
+                        {% if rank.max_place %}
+                            до {{rank.max_place}} места
+                        {% else %}
+                            {{rank.max_time}} ({{rank.percent}}%)
+                        {% endif %}
+                        <br>
+                    {% endfor %}
+                {% endif %}
+            </td>
+        </tr>
     {% endif %}
     {% endfor %}
+    </table>
+    <div>
+        <h3>Главный судья:<span style='padding-left:340px;'> </span>{{ race.chief_referee }}</h3>
+        <h3>Главный секретарь:<span style='padding-left:300px;'> </span>{{ race.secretary }}</h3>
+    </div>
 </div>
+<footer>
+    Протокол сформирован в <a href="http://www.sportorg.o-ural.ru">ПО SportOrg</a> v2018. Время печати:
+    <script type="text/javascript">
+        var l = new Date();
+        document.write (l.toLocaleString());
+    </script>
+</footer>
 </body>
 </html>

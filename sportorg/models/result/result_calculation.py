@@ -70,15 +70,18 @@ class ResultCalculation(object):
             res.place = ''
             # give place only if status = OK
             if res.status == ResultStatus.OK:
+                current_result = res.get_result_otime()
+                res.diff = current_result - array[0].get_result_otime()
+
                 # skip if out of competition
                 if res.person.is_out_of_competition:
                     res.place = _('o/c')
                     continue
 
                 # the same place processing
-                if current_place == 1 or res.result != last_result:
+                if current_place == 1 or current_result != last_result:
                     # result differs from previous - give next place
-                    last_result = res.result
+                    last_result = current_result
                     last_place = current_place
 
                 res.place = last_place
