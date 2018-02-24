@@ -1073,7 +1073,7 @@ class Race(Model):
         assert isinstance(person, Person)
         person.sportident_card = number
         for p in self.persons:
-            if p.sportident_card == number:
+            if p.sportident_card == number and p != person:
                 p.sportident_card = 0
                 p.is_rented_sportident_card = False
                 return p
