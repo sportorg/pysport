@@ -41,7 +41,7 @@ class ResultTable(TableView):
             if event.key() == QtCore.Qt.Key_Up or event.key() == QtCore.Qt.Key_Down:
                 self.entry_single_clicked(self.currentIndex())
         except Exception as e:
-            logging.exception(str(e))
+            logging.error(str(e))
 
     def entry_single_clicked(self, index):
         try:
@@ -49,7 +49,7 @@ class ResultTable(TableView):
             if -1 < index.row() < len(race().results):
                 self.parent_widget.show_splits(index)
         except Exception as e:
-            logging.exception(str(e))
+            logging.error(str(e))
 
     def double_clicked(self, index):
         try:
@@ -58,7 +58,7 @@ class ResultTable(TableView):
                 dialog = ResultEditDialog(race().results[index.row()])
                 dialog.exec()
         except Exception as e:
-            logging.exception(str(e))
+            logging.error(str(e))
 
 
 class Widget(QtWidgets.QWidget):

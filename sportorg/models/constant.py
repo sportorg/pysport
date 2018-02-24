@@ -198,7 +198,7 @@ def get_race_groups():
                 ret.append(i.name)
         return ret
     except Exception as e:
-        logging.exception(str(e))
+        logging.error(str(e))
         return get_groups()
 
 
@@ -215,7 +215,7 @@ def get_race_teams():
                 ret.append(i.name)
         return ret
     except Exception as e:
-        logging.exception(str(e))
+        logging.error(str(e))
         return get_teams()
 
 
@@ -227,7 +227,7 @@ def get_race_courses():
                 ret.append(i.name)
         return ret
     except Exception as e:
-        logging.exception(str(e))
+        logging.error(str(e))
         return []
 
 

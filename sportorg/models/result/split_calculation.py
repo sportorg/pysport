@@ -367,7 +367,7 @@ class GroupSplits(object):
             'sub_title': race().data.description,
             'location': race().data.location,
             'url': race().data.url,
-            'date': race().get_start_datetime().strftime("%d.%m.%Y"),
+            'date': race().data.get_start_datetime().strftime("%d.%m.%Y"),
             'chief_referee': race().data.chief_referee,
             'secretary': race().data.secretary
         }

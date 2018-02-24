@@ -35,7 +35,7 @@ class GroupRankingDialog(QDialog):
             try:
                 self.layout.addRow(get_widget_from_ranking(cur_item))
             except:
-                logging.exception()
+                logging.error()
 
         def cancel_changes():
             self.close()
@@ -44,7 +44,7 @@ class GroupRankingDialog(QDialog):
             try:
                 self.apply_changes_impl()
             except Exception as e:
-                logging.exception(str(e))
+                logging.error(str(e))
             self.close()
 
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)

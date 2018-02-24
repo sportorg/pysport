@@ -93,7 +93,7 @@ class ClientThread(Thread):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             try:
                 s.connect(self.addr)
-                self._logger.debug('Client start')
+                self._logger.info('Client start')
                 sender = ClientSenderThread(s, self._in_queue, self._stop_event, self._logger)
                 sender.start()
                 receiver = ClientReceiverThread(s, self._out_queue, self._stop_event, self._logger)
@@ -103,11 +103,11 @@ class ClientThread(Thread):
                 receiver.join()
 
             except ConnectionRefusedError as e:
-                self._logger.debug(str(e))
+                self._logger.error(str(e))
                 return
             except Exception as e:
                 self._logger.debug(str(e))
                 return
 
         s.close()
-        self._logger.debug('Client shutdown')
+        self._logger.info('Client shutdown')

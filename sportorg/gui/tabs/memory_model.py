@@ -76,7 +76,7 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
                 column = index.column()
                 answer = self.cache[row][column]
             except Exception as e:
-                logging.exception(str(e))
+                logging.error(str(e))
 
             # end = time.time()
             # logging.debug('Data() ' + str(index.row()) + ' ' + str(index.column()) + ': ' + str(end - start) + ' s')
@@ -163,7 +163,7 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
                 self.init_cache()
             self.layoutChanged.emit()
         except Exception as e:
-            logging.exception(str(e))
+            logging.error(str(e))
 
     def update_one_object(self, part, index):
         self.values[index] = self.get_values_from_object(part)

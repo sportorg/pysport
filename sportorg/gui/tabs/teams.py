@@ -46,7 +46,7 @@ class Widget(QtWidgets.QWidget):
                     dialog = OrganizationEditDialog(race().organizations[index.row()])
                     dialog.exec()
             except Exception as e:
-                logging.exception(str(e))
+                logging.error(str(e))
 
         self.TeamTable.activated.connect(team_double_clicked)
         self.team_layout.addWidget(self.TeamTable)

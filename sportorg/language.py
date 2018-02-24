@@ -24,7 +24,7 @@ if config.DEBUG:
             po = polib.pofile(path + '.po')
             po.save_as_mofile(path + '.mo')
         except Exception as e:
-            logging.exception(str(e))
+            logging.error(str(e))
 
     _generate()
 

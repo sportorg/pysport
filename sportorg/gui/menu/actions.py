@@ -29,6 +29,7 @@ from sportorg.gui.dialogs.statistics_report_dialog import StatisticsReportDialog
 from sportorg.gui.dialogs.team_report_dialog import TeamReportDialog
 from sportorg.gui.dialogs.team_results_report_dialog import TeamResultsReportDialog
 from sportorg.gui.dialogs.teamwork_properties import TeamworkPropertiesDialog
+from sportorg.gui.dialogs.telegram_dialog import TelegramDialog
 from sportorg.gui.dialogs.text_io import TextExchangeDialog
 from sportorg.gui.dialogs.timekeeping_properties import TimekeepingPropertiesDialog
 from sportorg.gui.menu.action import Action
@@ -44,6 +45,7 @@ from sportorg.modules.ocad import ocad
 from sportorg.modules.ocad.ocad import OcadImportException
 from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.modules.teamwork import Teamwork
+from sportorg.modules.telegram.telegram import TelegramClient
 from sportorg.modules.winorient import winorient
 from sportorg.modules.winorient.wdb import WDBImportError, WinOrientBinary
 from sportorg.language import _
@@ -92,7 +94,7 @@ class CSVWinorientImportAction(Action):
             try:
                 winorient.import_csv(file_name)
             except Exception as e:
-                logging.exception(str(e))
+                logging.error(str(e))
                 QMessageBox.warning(self.app, _('Error'), _('Import error') + ': ' + file_name)
             self.app.init_model()
 
@@ -104,7 +106,7 @@ class WDBWinorientImportAction(Action):
             try:
                 winorient.import_wo_wdb(file_name)
             except WDBImportError as e:
-                logging.exception(str(e))
+                logging.error(str(e))
                 QMessageBox.warning(self.app, _('Error'), _('Import error') + ': ' + file_name)
             self.app.init_model()
 
@@ -116,7 +118,7 @@ class OcadTXTv8ImportAction(Action):
             try:
                 ocad.import_txt_v8(file_name)
             except OcadImportException as e:
-                logging.exception(str(e))
+                logging.error(str(e))
                 QMessageBox.warning(self.app, _('Error'), _('Import error') + ': ' + file_name)
             self.app.init_model()
 
@@ -135,7 +137,7 @@ class WDBWinorientExportAction(Action):
 
                 write_wdb(wdb_object, file_name)
             except Exception as e:
-                logging.exception(str(e))
+                logging.error(str(e))
                 QMessageBox.warning(self.app, _('Error'), _('Export error') + ': ' + file_name)
 
 
@@ -147,7 +149,7 @@ class IOFResultListExportAction(Action):
             try:
                 iof_xml.export_result_list(file_name)
             except Exception as e:
-                logging.exception(str(e))
+                logging.error(str(e))
                 QMessageBox.warning(self.app, _('Error'), _('Export error') + ': ' + file_name)
 
 
@@ -461,6 +463,29 @@ class LiveResendResultsAction(Action):
     def execute(self):
         OrgeoClient().clear()
         OrgeoClient().send_results()
+
+
+class TelegramSettingsAction(Action):
+    def execute(self):
+        TelegramDialog().exec()
+
+
+class TelegramSendAction(Action):
+    def execute(self):
+        try:
+            if not self.app.current_tab == 1:
+                logging.warning(_('No result selected'))
+                return
+            items = race().results
+            indexes = self.app.get_selected_rows()
+            for index in indexes:
+                if index < 0:
+                    continue
+                if index >= len(items):
+                    pass
+                TelegramClient().send_result(items[index])
+        except Exception as e:
+            logging.error(str(e))
 
 
 class AboutAction(Action):
