@@ -61,7 +61,7 @@ class ResultChecker:
 
         controls = course.controls
 
-        penalty = ResultChecker.penalty_calculation(result.splits, controls)
+        penalty = ResultChecker.penalty_calculation(result.splits, controls, check_existence=True)
 
         if mode == 'laps':
             result.penalty_laps = penalty

@@ -253,6 +253,10 @@ class MainWindow(QMainWindow):
             self.clear_filters()  # clear filters not to loose filtered data
 
             table = self.get_person_table()
+
+            if not table:
+                return
+
             table.setModel(PersonMemoryModel())
             table = self.get_result_table()
             table.setModel(ResultMemoryModel())
@@ -293,18 +297,20 @@ class MainWindow(QMainWindow):
             logging.error(str(e))
 
     def clear_filters(self, remove_condition=True):
-        self.get_person_table().model().clear_filter(remove_condition)
-        self.get_result_table().model().clear_filter(remove_condition)
-        self.get_person_table().model().clear_filter(remove_condition)
-        self.get_course_table().model().clear_filter(remove_condition)
-        self.get_organization_table().model().clear_filter(remove_condition)
+        if(self.get_person_table()):
+            self.get_person_table().model().clear_filter(remove_condition)
+            self.get_result_table().model().clear_filter(remove_condition)
+            self.get_person_table().model().clear_filter(remove_condition)
+            self.get_course_table().model().clear_filter(remove_condition)
+            self.get_organization_table().model().clear_filter(remove_condition)
 
     def apply_filters(self):
-        self.get_person_table().model().apply_filter()
-        self.get_result_table().model().apply_filter()
-        self.get_person_table().model().apply_filter()
-        self.get_course_table().model().apply_filter()
-        self.get_organization_table().model().apply_filter()
+        if (self.get_person_table()):
+            self.get_person_table().model().apply_filter()
+            self.get_result_table().model().apply_filter()
+            self.get_person_table().model().apply_filter()
+            self.get_course_table().model().apply_filter()
+            self.get_organization_table().model().apply_filter()
 
     def auto_save(self):
         if not self.get_configuration().get('autosave'):
