@@ -177,7 +177,7 @@
     <table class="new-page">
         <tr style="background: white; border: 0">
         <td colspan="8" style="border: 0">
-            <h2 id="{{team.name}}">{{team.name}}</h2>
+            <h2 id="{{team.name}}">{{race.date}} / {{team.name}}</h2>
         </td>
         </tr>
         <tr>
@@ -207,6 +207,12 @@
     </table>
     <p>{% if team.price %}Стартовый взнос: {{ team.price }}{% endif %}
     {% if rented|length %}<br>Арендованных ЧИПов: {{ rented|length }}{% endif %}</p>
+
+    Протокол сформирован в <a href="http://www.sportorg.o-ural.ru">ПО SportOrg</a> v2018. Время печати:
+    <script type="text/javascript">
+        var l = new Date();
+        document.write (l.toLocaleString());
+    </script>
     {% endif %}
     {% endfor %}
 </div>
