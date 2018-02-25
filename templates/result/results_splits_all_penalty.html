@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>SportOrg Results - {{ title }}</title>
+    <title>SportOrg Results</title>
 {% raw %}
     <style>
         table {
@@ -46,6 +46,19 @@
 
         table tr:nth-child(2n) {
             background-color: #f8f8f8;
+        }
+
+        table.empty-table {
+            width: auto;
+        }
+
+        table.empty-table tr {
+            background-color: white;
+            border: 0;
+        }
+
+        table.empty-table td, table.empty-table th  {
+            border: 0;
         }
 
         hr {
@@ -262,12 +275,21 @@
     {% endfor %}
     </table>
     <div>
-        <h3>Главный судья:<span style='padding-left:340px;'> </span>{{ race.chief_referee }}</h3>
-        <h3>Главный секретарь:<span style='padding-left:300px;'> </span>{{ race.secretary }}</h3>
+        <table class="empty-table">
+            <tr>
+                <td><b>Главный судья:</b></td>
+                <td><b>{{ race.chief_referee }}</b></td>
+            </tr>
+            <tr>
+                <td><b>Главный секретарь:</b></td>
+                <td><b>{{ race.secretary }}</b></td>
+            </tr>
+        </table>
     </div>
 </div>
 <footer>
-    Протокол сформирован в <a href="http://www.sportorg.o-ural.ru">ПО SportOrg</a> v2018. Время печати:
+    Протокол сформирован в <a href="http://www.sportorg.o-ural.ru">ПО SportOrg {{version}}</a>.
+    Время печати:
     <script type="text/javascript">
         var l = new Date();
         document.write (l.toLocaleString());
@@ -275,4 +297,3 @@
 </footer>
 </body>
 </html>
-

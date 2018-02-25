@@ -4,8 +4,6 @@ from sportorg.core.otime import OTime
 from sportorg.language import _
 from sportorg.models.memory import race, Result, Person, ResultStatus, Group, Qualification, RankingItem, \
     RelayTeam, RaceType, find
-from sportorg.models.start.relay import get_team_result
-from sportorg.utils.time import time_to_hhmmss
 
 
 # FIXME: does not work sorting
