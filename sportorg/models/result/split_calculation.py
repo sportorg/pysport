@@ -52,7 +52,6 @@ class PersonSplits(object):
         # course = group.course
         course = self.race.find_course(person)
         assert isinstance(course, Course)
-
         self.person = person
 
         self.legs = []
@@ -73,8 +72,8 @@ class PersonSplits(object):
 
         race_result = result.get_finish_time() - result.get_start_time()
 
-        self.start = time_to_hhmmss(person.start_time)
-        self.finish = time_to_hhmmss(result.get_finish_time())
+        self.start = result.get_start_time()
+        self.finish = result.get_finish_time()
         self.result = result.get_result()
         self.splits = result.splits
         self.race_result = time_to_hhmmss(race_result)
@@ -189,8 +188,8 @@ class PersonSplits(object):
         person_dict['sportident_card'] = int(self.sportident_card) if self.sportident_card else ''
         person_dict['last_correct_index'] = self.last_correct_index
         person_dict['place'] = self.place
-        person_dict['start'] = self.start
-        person_dict['finish'] = self.finish
+        person_dict['start'] = time_to_hhmmss(self.start)
+        person_dict['finish'] = time_to_hhmmss(self.finish)
         person_dict['result'] = self.result
         person_dict['race_result'] = self.race_result
         person_dict['speed'] = self.speed
@@ -209,11 +208,16 @@ class PersonSplits(object):
         person_dict['legs'] = []
         person_dict['splits'] = []
 
+        prev_time = self.start
+
         for split in self.splits:
             person_dict['splits'].append({
                 'code': split.code,
-                'time': str(split.time)
+                'time': time_to_hhmmss(split.time),
+                'relative_time': time_to_hhmmss(split.time - self.start),
+                'leg_time': time_to_hhmmss(split.time - prev_time),
             })
+            prev_time = split.time
 
         for i in self.legs:
             assert isinstance(i, LegSplit)
@@ -221,7 +225,7 @@ class PersonSplits(object):
 
         person_dict['finish_time'] = ''
         if len(person_dict['splits']):
-            finish = hhmmss_to_time(self.finish)
+            finish = self.finish
             last_time = hhmmss_to_time(person_dict['splits'][-1]['time'])
             if last_time != finish:
                 person_dict['finish_time'] = (finish - last_time).to_minute_str()
@@ -362,15 +366,7 @@ class GroupSplits(object):
         groups = [group_dict]
         ret['groups'] = groups
 
-        ret['race'] = {
-            'title': race().data.title,
-            'sub_title': race().data.description,
-            'location': race().data.location,
-            'url': race().data.url,
-            'date': race().data.get_start_datetime().strftime("%d.%m.%Y"),
-            'chief_referee': race().data.chief_referee,
-            'secretary': race().data.secretary
-        }
+        ret['race'] = race().to_dict_data()
         return ret
 
 
@@ -403,12 +399,5 @@ def get_splits_data():
 
     data.sort(key=lambda x: x['name'])
     ret['groups'] = data
-    ret['race'] = {
-        'title': race().data.title,
-        'sub_title': race().data.description,
-        'url': race().data.url,
-        'date': race().data.get_start_datetime().strftime("%d.%m.%Y"),
-        'chief_referee': race().data.chief_referee,
-        'secretary': race().data.secretary
-    }
+    ret['race'] = race().to_dict_data()
     return ret

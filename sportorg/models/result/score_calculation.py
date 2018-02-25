@@ -1,6 +1,6 @@
 from sportorg.models.memory import Result, race, Organization, RaceType
 from sportorg.models.result.result_calculation import ResultCalculation
-from sportorg.models.start.relay import get_leg_count, get_team_result
+from sportorg.models.start.relay import get_team_result
 
 
 class ScoreCalculation(object):

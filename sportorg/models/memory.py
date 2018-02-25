@@ -995,7 +995,9 @@ class Race(Model):
             'title': self.data.title,
             'sub_title': self.data.description,
             'url': self.data.url,
-            'date': self.data.get_start_datetime().strftime("%d.%m.%Y")
+            'date': self.data.get_start_datetime().strftime("%d.%m.%Y"),
+            'chief_referee': race().data.chief_referee,
+            'secretary': race().data.secretary
         }
 
     def to_dict(self):
