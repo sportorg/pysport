@@ -8,7 +8,7 @@ from requests.exceptions import MissingSchema, ConnectionError
 
 from sportorg import config
 from sportorg.core.singleton import Singleton
-from sportorg.models.memory import race, Person, Result
+from sportorg.models.memory import race, Person, Result, RaceType
 
 
 class OrgeoCommand:
@@ -105,8 +105,6 @@ class OrgeoClient(metaclass=Singleton):
             'id': str(person.id),
             'ref_id': str(person.id),
             'bib': person.bib,
-            'relay_team': person.bib % 1000,
-            'lap': max(person.bib // 1000, 1),
             'group_name': person.group.name if person.group else '',
             'name': person.full_name,
             'organization': person.organization.name if person.organization else '',
@@ -117,6 +115,11 @@ class OrgeoClient(metaclass=Singleton):
             'out_of_competition': person.is_out_of_competition,
             'start': person.start_time.to_sec() if person.start_time else 0
         }
+
+        if race().is_relay():
+            # send relay fields only for relay events (requested by Ivan Churakoff)
+            data['relay_team'] = person.bib % 1000
+            data['lap'] = max(person.bib // 1000, 1)
 
         if result is not None:
             assert result, Result
