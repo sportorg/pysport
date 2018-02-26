@@ -1239,6 +1239,10 @@ class Race(Model):
             if result.is_sportident():
                 result.clear()
 
+    def is_relay(self):
+        if self.data.race_type == RaceType.RELAY:
+            return True
+        return False
 
 class Qualification(IntEnum):
     NOT_QUALIFIED = 0
