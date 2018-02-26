@@ -2,7 +2,7 @@ import json
 import uuid
 
 from sportorg import config
-from sportorg.models.memory import races, race, new_event
+from sportorg.models.memory import races, new_event, Race
 
 
 def dump(file):
@@ -17,7 +17,7 @@ def load(file):
     data = json.load(file)
     event = []
     for race_dict in data['races']:
-        obj = race()
+        obj = Race()
         obj.id = uuid.UUID(str(race_dict['id']))
         obj.update_data(race_dict)
         event.append(obj)
