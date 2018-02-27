@@ -464,6 +464,7 @@ class Result:
         self.result = None
         self.person = None  # type: Person
         self.status = ResultStatus.OK
+        self.status_comment = ''
         self.penalty_time = None  # type: OTime
         self.penalty_laps = 0  # count of penalty legs (marked route)
         self.place = None  # type: Union[int, str]
@@ -515,6 +516,7 @@ class Result:
             'diff': self.diff.to_msec() if self.diff else None,
             'penalty_time': self.penalty_time.to_msec() if self.penalty_time else None,
             'status': self.status.value,
+            'status_comment': self.status_comment,
             'penalty_laps': self.penalty_laps,
             'place': self.place,
             'scores': self.scores,
@@ -534,9 +536,13 @@ class Result:
             self.finish_time = OTime(msec=data['finish_time'])
         if data['penalty_time']:
             self.penalty_time = OTime(msec=data['penalty_time'])
+        if 'status_comment' in data:
+            self.status_comment = data['status_comment']
 
     def get_result(self):
         if self.status != ResultStatus.OK:
+            if self.status_comment:
+                return self.status_comment
             return self.status.get_title()
 
         if not self.person:

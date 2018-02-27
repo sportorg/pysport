@@ -3,9 +3,11 @@ from multiprocessing import freeze_support
 import sys
 from PyQt5.QtWidgets import QApplication
 
+from sportorg import config
 from sportorg.core.singleton import Singleton
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.main_window import MainWindow
+from sportorg.models.constant import StatusComments
 
 
 class Application(metaclass=Singleton):
@@ -20,5 +22,15 @@ class Application(metaclass=Singleton):
 
     def run(self):
         freeze_support()
+        self.set_status_comments()
         self.main_window.show_window()
         sys.exit(self.app.exec())
+
+    @staticmethod
+    def set_status_comments():
+        try:
+            with open(config.base_dir('status_comments.txt'), encoding='utf-8') as f:
+                content = f.readlines()
+            StatusComments().set([x.strip() for x in content])
+        except Exception as e:
+            print(str(e))

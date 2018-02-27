@@ -1,5 +1,6 @@
 import logging
 
+from sportorg.core.singleton import singleton
 from sportorg.models.memory import race
 
 
@@ -350,3 +351,22 @@ def get_names():
         'Ярослав',
         'Ярослава'
     ]
+
+
+@singleton
+class StatusComments(object):
+    STATUS_COMMENTS = []
+
+    def get_all(self):
+        return self.STATUS_COMMENTS
+
+    def get(self):
+        for item in self.STATUS_COMMENTS:
+            if item:
+                return item
+        return ''
+
+    def set(self, items):
+        if '' not in items:
+            items.insert(0, '')
+        self.STATUS_COMMENTS = items

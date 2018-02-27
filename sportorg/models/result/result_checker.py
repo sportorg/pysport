@@ -1,4 +1,5 @@
 from sportorg.core.otime import OTime
+from sportorg.models.constant import StatusComments
 from sportorg.models.memory import Person, ResultStatus, race, Result, ResultSportident
 
 
@@ -33,6 +34,8 @@ class ResultChecker:
             result.status = ResultStatus.OK
             if not o.check_result(result):
                 result.status = ResultStatus.DISQUALIFIED
+                if not result.status_comment:
+                    result.status_comment = StatusComments().get()
 
         return o
 

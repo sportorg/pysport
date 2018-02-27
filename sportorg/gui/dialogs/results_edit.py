@@ -9,7 +9,9 @@ from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, \
 from sportorg import config
 from sportorg.gui.dialogs.entry_edit import EntryEditDialog
 from sportorg.gui.global_access import GlobalAccess
+from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
+from sportorg.models.constant import StatusComments
 from sportorg.models.memory import race, Result, find, ResultStatus, Person, Limit, Split
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.result_checker import ResultChecker, ResultCheckerException
@@ -71,7 +73,8 @@ class ResultEditDialog(QDialog):
         self.radio_dnf = QRadioButton(_('DNF'))
         self.radio_overtime = QRadioButton(_('Overtime'))
         self.radio_dsq = QRadioButton(_('DSQ'))
-        self.text_dsq = QLineEdit()
+        self.item_status_comment = AdvComboBox()
+        self.item_status_comment.addItems(StatusComments().get_all())
 
         self.splits = SplitsText()
 
@@ -89,7 +92,7 @@ class ResultEditDialog(QDialog):
         self.layout.addRow(self.radio_dns)
         self.layout.addRow(self.radio_dnf)
         self.layout.addRow(self.radio_overtime)
-        self.layout.addRow(self.radio_dsq, self.text_dsq)
+        self.layout.addRow(self.radio_dsq, self.item_status_comment)
 
         if self.current_object.is_sportident():
             start_source = race().get_setting('sportident_start_source', 'protocol')
@@ -173,6 +176,8 @@ class ResultEditDialog(QDialog):
             self.radio_dnf.setChecked(True)
         elif self.current_object.status == ResultStatus.DID_NOT_START:
             self.radio_dns.setChecked(True)
+
+        self.item_status_comment.setCurrentText(self.current_object.status_comment)
 
         self.item_bib.selectAll()
 
@@ -258,6 +263,10 @@ class ResultEditDialog(QDialog):
             status = ResultStatus.DID_NOT_START
         if result.status != status:
             result.status = status
+            changed = True
+
+        if result.status_comment != self.item_status_comment.currentText():
+            result.status_comment = self.item_status_comment.currentText()
             changed = True
 
         if changed:
