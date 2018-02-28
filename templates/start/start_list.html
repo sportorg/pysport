@@ -186,8 +186,8 @@
 {% macro view_groups() -%}{% for group in groups %}<a href="#{{group.name}}">{{group.name}}</a> {% endfor %}{%- endmacro %}
 <div>
     <div class="text-center">
-        <h1>ПРОТОКОЛ СТАРТА</h1>
-        <h2>{{ race.sub_title }} <br>{{ race.date }} {{ race.place }}</h2>
+        <h2>ПРОТОКОЛ СТАРТА</h2>
+        <h2>{{ race.sub_title }} <br>{{ race.date }} {{ race.location }}</h2>
     </div>
     <table>
     {% for group in groups %}

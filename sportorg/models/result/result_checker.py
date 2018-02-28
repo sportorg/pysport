@@ -30,12 +30,15 @@ class ResultChecker:
         if result.person is None:
             raise ResultCheckerException('Not person')
         o = cls(result.person)
-        if result.status == ResultStatus.OK or result.status == ResultStatus.DISQUALIFIED:
+        if result.status == ResultStatus.OK or result.status == ResultStatus.DISQUALIFIED or result.status == ResultStatus.OVERTIME:
             result.status = ResultStatus.OK
             if not o.check_result(result):
                 result.status = ResultStatus.DISQUALIFIED
                 if not result.status_comment:
                     result.status_comment = StatusComments().get()
+            elif result.person.group and result.person.group.max_time.to_msec():
+                if result.get_result_otime() > result.person.group.max_time:
+                    result.status = ResultStatus.OVERTIME
 
         return o
 

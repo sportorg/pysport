@@ -60,8 +60,10 @@ class PersonSplits(object):
         self.group = person.group.name
         self.bib = person.bib
         self.team = ''
+        self.team_subject = ''
         if person.organization:
             self.team = person.organization.name
+            self.team_subject = person.organization.address.state
         self.sportident_card = person.sportident_card
         if result.is_sportident() and result.sportident_card:
             self.sportident_card = result.sportident_card
@@ -185,6 +187,7 @@ class PersonSplits(object):
         person_dict['name'] = self.name
         person_dict['bib'] = self.bib if self.bib else ''
         person_dict['team'] = self.team
+        person_dict['team_subject'] = self.team_subject
         person_dict['sportident_card'] = int(self.sportident_card) if self.sportident_card else ''
         person_dict['last_correct_index'] = self.last_correct_index
         person_dict['place'] = self.place

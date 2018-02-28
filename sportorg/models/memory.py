@@ -873,8 +873,7 @@ class Person(Model):
         self.is_personal = bool(data['is_personal'])
         self.comment = str(data['comment'])
         self.start_group = int(data['start_group'])
-        if data['start_time']:
-            self.start_time = OTime(msec=data['start_time'])
+        self.start_time = OTime(msec=int(data['start_time']))
 
     def to_dict_data(self, course=None):
         sportident_card = ''
@@ -890,6 +889,7 @@ class Person(Model):
             'bib': self.bib,
             'course': course_name,
             'team': self.organization.name if self.organization is not None else '',
+            'team_subject': self.organization.address.state if self.organization is not None else '',
             'group': self.group.name if self.group is not None else '',
             'group_start_corridor': self.group.start_corridor if self.group is not None else 0,
             'price': self.group.price if self.group is not None else 0,
@@ -1001,6 +1001,7 @@ class Race(Model):
             'title': self.data.title,
             'sub_title': self.data.description,
             'url': self.data.url,
+            'location': self.data.location,
             'date': self.data.get_start_datetime().strftime("%d.%m.%Y"),
             'chief_referee': race().data.chief_referee,
             'secretary': race().data.secretary

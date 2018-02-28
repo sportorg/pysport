@@ -361,7 +361,7 @@ def get_persons_data(sorting=None):
 def get_teams_data():
     return {
         'race': race().to_dict_data(),
-        'teams': TeamStartList(race().persons, SortType.NAME).get_list()
+        'teams': TeamStartList(race().persons, SortType.START).get_list()
     }
 
 

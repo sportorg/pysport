@@ -5,7 +5,9 @@ from PyQt5.QtWidgets import QFormLayout, QLabel, QDialog, QDialogButtonBox, QTex
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
+from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
+from sportorg.models.constant import StatusComments
 from sportorg.models.memory import race, ResultStatus, find, ResultSportident
 from sportorg.modules.teamwork import Teamwork
 
@@ -25,6 +27,11 @@ class NotStartDialog(QDialog):
         self.setModal(True)
 
         self.layout = QFormLayout(self)
+
+        self.item_status_comment = AdvComboBox()
+        self.item_status_comment.addItems(StatusComments().get_all())
+
+        self.layout.addRow(self.item_status_comment)
 
         self.label_controls = QLabel('\n\n1 4 15 25\n58 32\n33\n34\n...\n150')
         self.item_numbers = QTextEdit()
@@ -54,6 +61,7 @@ class NotStartDialog(QDialog):
         self.show()
 
     def apply_changes_impl(self):
+        status_comment = self.item_status_comment.currentText()
         text = self.item_numbers.toPlainText()
         numbers = []
         for item in text.split('\n'):
@@ -71,6 +79,7 @@ class NotStartDialog(QDialog):
                     result = ResultSportident()
                     result.person = person
                     result.status = ResultStatus.DID_NOT_START
+                    result.status_comment = status_comment
                     Teamwork().send(result.to_dict())
                     obj.add_new_result(result)
                 else:

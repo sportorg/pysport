@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>SportOrg. Командный зачет</title>
+    <title>SportOrg Results</title>
 {% raw %}
     <style>
         table {
@@ -186,34 +186,82 @@
 {% macro view_groups() -%}{% for group in groups %}<a href="#{{group.name}}">{{group.name}}</a> {% endfor %}{%- endmacro %}
 <div>
     <div class="text-center">
-        <h2>Протокол командных результатов</h2>
-        <h2>{{ race.sub_title }} <br>{{ race.date }}</h2>
+        <h2>ПРОТОКОЛ РЕЗУЛЬТАТОВ</h2>
+        <h2>{{ race.sub_title }} <br>{{ race.date }} {{ race.location }}</h2>
     </div>
     <table>
     {% for group in groups %}
-    {% if group.teams|length %}
+    {% if group.persons|length %}
         <tr style="background: white; border: 0">
         <td colspan="7" style="border: 0">
-            <h2 id="{{group.name}}">{{group.name}}</h2>
+            <h2 id="{{group.name}}">{{ group.name }}{% if group.length %}, {{ group.length }}м{% endif %}{% if group.cp_count %}, {{ group.cp_count }} КП{% endif %}{% if group.max_time %}, Контрольное время: {{ group.max_time }} {% endif %}
+            </h2>
             <div class="no-print">{{ view_groups() }}</div>
         </td>
         </tr>
         <tr>
             <td>№</td>
-            <td>Коллектив/Субъект</td>
+            <td>Фамилия, имя</td>
+            <td>Коллектив</td>
+            <td>Субъект</td>
+            <td>Разряд</td>
+            <td>ГР</td>
+            <td>Штраф</td>
+            <td>Результат</td>
+            <td>Место</td>
             <td>Очки</td>
-            <td>Кол-во зачетных участников</td>
         </tr>
-        {% set count = [1] %}
-        {% for team in group.teams %}
+        {% set index = [1] %}
+        {% for person in group.persons %}
+            {% if person.relay_leg == 1 and group.type == 'RELAY' %}
+                <tr>
+                    <td>{{index|length}}</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                {% if index.append(1) %} {% endif %} {# increment index length by 1 #}
+            {% endif %}
             <tr>
-                <td>{{ count|length}}</td>
-                <td>{{ team.name }}</td>
-                <td>{{ team.scores }}</td>
-                <td>{{ team.member_qty }}</td>
+                {% if group.type == 'RELAY' %}
+                    <td></td>
+                {% else %}
+                    <td>{{ loop.index }}</td>
+                {% endif %}
+                <td>{{ person.name }}</td>
+                <td>{{ person.team }}</td>
+                <td>{{ person.team_subject }}</td>
+                <td>{{ person.qual }}</td>
+                <td>{{ person.year }}</td>
+                <td>{{ person.penalty_time }}</td>
+                <td>{{ person.result }}</td>
+                <td>{{ person.place }}</td>
+                <td>{{ person.scores }}</td>
             </tr>
-            {% if count.append(1) %} {% endif %} {# increment count length by 1 #}
         {% endfor %}
+        <tr style="background: white; border: 0">
+            <td colspan="7" style="border: 0">
+                {% if group.ranking.rank_scores and group.ranking.rank_scores > 0 %}
+                    Квалификационный уровень (баллы): {{group.ranking.rank_scores}}<br>
+                    Класс дистанции: {{group.ranking.max_qual}}<br>
+                    {% for rank in group.ranking.rank %}
+                        {{"{}".format(rank.qual)}} --
+                        {% if rank.max_place %}
+                            до {{rank.max_place}} места
+                        {% else %}
+                            {{rank.max_time}} ({{rank.percent}}%)
+                        {% endif %}
+                        <br>
+                    {% endfor %}
+                {% endif %}
+            </td>
+        </tr>
     {% endif %}
     {% endfor %}
     </table>
@@ -221,10 +269,12 @@
         <table class="empty-table">
             <tr>
                 <td><b>Главный судья:</b></td>
+                <td width="150px"></td>
                 <td><b>{{ race.chief_referee }}</b></td>
             </tr>
             <tr>
                 <td><b>Главный секретарь:</b></td>
+                <td width="150px"></td>
                 <td><b>{{ race.secretary }}</b></td>
             </tr>
         </table>

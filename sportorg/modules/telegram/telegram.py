@@ -62,6 +62,8 @@ class TelegramClient:
                 'bib': result.person.bib,
                 'result': result.get_result(),
                 'place': result.place,
+                'penalty_time': result.penalty_time,
+                'penalty_laps': result.penalty_laps,
             })
 
     def send(self, data_dict):
