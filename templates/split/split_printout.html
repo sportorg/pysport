@@ -6,7 +6,7 @@
 {% raw %}
     <style>
         td {
-            padding-right: 7px;
+            padding-right: 3px;
         }
         body {
             font-weight: bold;
@@ -174,21 +174,21 @@
         {% endfor %}
         </table>
         <br> Финиш: {{person.finish}} {{person.finish_time}} {{person.speed}}
-        <br> Время без штрафа: {{person.race_result}}
-        <br> Штраф: {{person.penalty_time}}
+        <!--<br> Время без штрафа: {{person.race_result}}
+        <br> Штраф: {{person.penalty_time}}-->
         <br> Результат: {{person.result}} {% if person.status_title != person.result %}{{person.status_title}}{% endif %}
         {% if person.place %}
             <br> Место: {{person.place}} из {{group.count_finished}} (всего {{group.count_all}})
         {% endif %}
         <br>
-        <!--{% if person.status != 1 %}
+        {% if person.status != 1 %}
             {% for control in group.controls %}
                 {{control.code}}
             {% endfor %}<br>
-        {% endif %}-->
+        {% endif %}
         <table>
             {% for item in group.group_persons %}
-            {% if item.place == 1 or item.place == 2 or item.place == 3 %}
+            {% if item.place|int < 11 and item.place|int > 0 %}
             <tr>
                 <td>{{item.place}}</td>
                 <td>{{item.name}}</td>

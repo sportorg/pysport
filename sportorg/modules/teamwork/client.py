@@ -106,7 +106,7 @@ class ClientThread(Thread):
                 self._logger.error(str(e))
                 return
             except Exception as e:
-                self._logger.debug(str(e))
+                self._logger.error(str(e))
                 return
 
         s.close()
