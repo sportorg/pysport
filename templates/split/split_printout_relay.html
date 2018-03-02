@@ -141,7 +141,7 @@
     {% for person in group.persons %}
         {{ race.title }}
         <br> {{ race.date }}
-        <br>{{ person.name }} - {{ group.name }}
+        <h2>{{ person.name }} - {{ group.name }}</h2>
         <br> Команда: {{person.team}}
         <br> Номер: {{person.bib}} SI-card: {{person.sportident_card}}
         <br> Старт: {{person.start}}
@@ -151,8 +151,8 @@
                 <tr>
                     <td>{{leg.course_index}}</td>
                     <td>{{leg.code}}</td>
-                    <td>{{leg.absolute_time}}</td>
-                    <td>{{leg.leg_time}}</td>
+                    <td>{{leg.relative_time}}</td>
+                    <td>{{leg.leg_minute_time}}</td>
                     <td>{{leg.speed}}</td>
                 </tr>
             {% else %}
@@ -167,7 +167,10 @@
         {% endfor %}
         </table>
         <br> Финиш: {{person.finish}} {{person.finish_time}}
-        <br> Результат команды: {{person.result}}
+        <br> Результат: {{person.result}}
+        {% if person.status_title != person.result %}
+        <span style="font-size:16px">{{person.status_title}}</span>
+        {% endif %}
         <br>
         {% if person.status != 1 %}
             {% for control in person.controls %}

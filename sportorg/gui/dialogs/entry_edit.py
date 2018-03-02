@@ -279,7 +279,7 @@ class EntryEditDialog(QDialog):
         if person.qual.get_title() != self.item_qual.currentText():
             person.qual = Qualification.get_qual_by_name(self.item_qual.currentText())
             changed = True
-        if person.bib != self.item_bib.value() and self.item_bib.value():
+        if person.bib != self.item_bib.value():
             person.bib = self.item_bib.value()
             changed = True
 

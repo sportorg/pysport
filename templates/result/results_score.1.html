@@ -206,7 +206,6 @@
             <td>Субъект</td>
             <td>Разряд</td>
             <td>ГР</td>
-            <td>Штраф</td>
             <td>Результат</td>
             <td>Место</td>
             <td>Очки</td>
@@ -216,7 +215,6 @@
             {% if person.relay_leg == 1 and group.type == 'RELAY' %}
                 <tr>
                     <td>{{index|length}}</td>
-                    <td></td>
                     <td></td>
                     <td></td>
                     <td></td>
@@ -239,7 +237,6 @@
                 <td>{{ person.team_subject }}</td>
                 <td>{{ person.qual }}</td>
                 <td>{{ person.year }}</td>
-                <td>{{ person.penalty_time }}</td>
                 <td>{{ person.result }}</td>
                 <td>{{ person.place }}</td>
                 <td>{{ person.scores }}</td>

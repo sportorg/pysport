@@ -873,7 +873,8 @@ class Person(Model):
         self.is_personal = bool(data['is_personal'])
         self.comment = str(data['comment'])
         self.start_group = int(data['start_group'])
-        self.start_time = OTime(msec=int(data['start_time']))
+        if data['start_time'] is not None:
+            self.start_time = OTime(msec=int(data['start_time']))
 
     def to_dict_data(self, course=None):
         sportident_card = ''

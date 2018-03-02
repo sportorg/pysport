@@ -2,6 +2,7 @@ import logging
 import math
 import random
 from datetime import timedelta
+from sportorg.core.otime import OTime
 
 from sportorg.models.memory import race, Group, Person
 
@@ -381,6 +382,8 @@ def guess_corridors_for_groups():
 def change_start_time(if_add, time_offset):
     obj = race()
     for person in obj.persons:
+        if person.start_time is None:
+            person.start_time = OTime()
         if if_add:
             person.start_time = person.start_time + time_offset
         else:

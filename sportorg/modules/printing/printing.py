@@ -31,12 +31,12 @@ class PrintProcess(Process):
             if self.printer_name:
                 printer.setPrinterName(self.printer_name)
 
-            printer.setResolution(96)
+            # printer.setResolution(96)
 
             text_document = QTextDocument()
 
             printer.setFullPage(True)
-            printer.setPageMargins(5, 5, 5, 5, QPrinter.Millimeter)
+            printer.setPageMargins(1, 1, 1, 1, QPrinter.Millimeter)
 
             page_size = QSizeF()
             page_size.setHeight(printer.height())
