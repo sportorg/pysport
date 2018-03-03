@@ -185,8 +185,10 @@
 <body>
 {% macro view_groups() -%}{% for group in groups %}<a href="#{{group.name}}">{{group.name}}</a> {% endfor %}{%- endmacro %}
 <div>
-    <h1>Протокол командных результатов</h1>
-    <h2>{{ race.sub_title }} <br>{{ race.date }}</h2>
+    <div class="text-center">
+        <h2>Протокол командных результатов</h2>
+        <h2>{{ race.sub_title }} <br>{{ race.date }} {{ race.location }}</h2>
+    </div>
     <table>
     {% for group in groups %}
     {% if group.teams|length %}
@@ -219,10 +221,12 @@
         <table class="empty-table">
             <tr>
                 <td><b>Главный судья:</b></td>
+                <td width="150px"></td>
                 <td><b>{{ race.chief_referee }}</b></td>
             </tr>
             <tr>
                 <td><b>Главный секретарь:</b></td>
+                <td width="150px"></td>
                 <td><b>{{ race.secretary }}</b></td>
             </tr>
         </table>

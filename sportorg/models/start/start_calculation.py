@@ -358,10 +358,12 @@ def get_persons_data(sorting=None):
     }
 
 
-def get_teams_data():
+def get_teams_data(sorting=None):
+    if sorting is None:
+        sorting = SortType.NAME
     return {
         'race': race().to_dict_data(),
-        'teams': TeamStartList(race().persons, SortType.NAME).get_list()
+        'teams': TeamStartList(race().persons, sorting).get_list()
     }
 
 

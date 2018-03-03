@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from sportorg.core.otime import OTime
-from sportorg.models.memory import race, Person, Course, Group, Qualification
+from sportorg.models.memory import race, Person, Course, Group, Qualification, ResultStatus
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.utils.time import time_to_hhmmss, get_speed_min_per_km, hhmmss_to_time
 
@@ -51,7 +51,8 @@ class PersonSplits(object):
         # group = person.group
         # course = group.course
         course = self.race.find_course(person)
-        assert isinstance(course, Course)
+        if course is None:
+            course = Course()
         self.person = person
 
         self.legs = []
@@ -60,8 +61,10 @@ class PersonSplits(object):
         self.group = person.group.name
         self.bib = person.bib
         self.team = ''
+        self.team_subject = ''
         if person.organization:
             self.team = person.organization.name
+            self.team_subject = person.organization.address.state
         self.sportident_card = person.sportident_card
         if result.is_sportident() and result.sportident_card:
             self.sportident_card = result.sportident_card
@@ -75,7 +78,7 @@ class PersonSplits(object):
         self.start = result.get_start_time()
         self.finish = result.get_finish_time()
         self.result = result.get_result()
-        self.splits = result.splits
+        self.splits = result.splits if result.is_sportident() else []
         self.race_result = time_to_hhmmss(race_result)
         self.status = result.status.value
         self.status_title = result.status.get_title()
@@ -83,7 +86,7 @@ class PersonSplits(object):
         self.group_count_alll = person.group.get_count_all()
         self.group_count_finished = person.group.get_count_finished()
         self.scores = result.scores
-        self.controls = [control.code for control in self.race.find_course(person).controls]
+        self.controls = [control.code for control in course.controls]
         self.speed = ''
         if course.length:
             self.speed = get_speed_min_per_km(race_result, course.length)
@@ -185,6 +188,7 @@ class PersonSplits(object):
         person_dict['name'] = self.name
         person_dict['bib'] = self.bib if self.bib else ''
         person_dict['team'] = self.team
+        person_dict['team_subject'] = self.team_subject
         person_dict['sportident_card'] = int(self.sportident_card) if self.sportident_card else ''
         person_dict['last_correct_index'] = self.last_correct_index
         person_dict['place'] = self.place
@@ -240,10 +244,10 @@ class GroupSplits(object):
 
         assert isinstance(group, Group)
         self.name = group.name
-        self.cp_count = len(group.course.controls)
-        self.length = group.course.length
-        self.climb = group.course.climb
-        self.controls = group.course.controls
+        self.cp_count = len(group.course.controls) if group.course else 0
+        self.length = group.course.length if group.course else 0
+        self.climb = group.course.climb if group.course else 0
+        self.controls = group.course.controls if group.course else 0
         self.max_time = time_to_hhmmss(group.max_time) if group.max_time and group.max_time != OTime() else None
 
         self.leader = {}
@@ -260,7 +264,7 @@ class GroupSplits(object):
             self.person_splits.append(person)
 
         self.set_places()
-        self.sort_by_place()
+        self.sort_by_result()
 
     def set_places(self):
         len_persons = len(self.person_splits)
@@ -285,7 +289,20 @@ class GroupSplits(object):
                                                           item.get_leg_time(index)))
 
     def sort_by_result(self):
-        self.person_splits = sorted(self.person_splits, key=lambda item: (item.result is None, item.result))
+        status_priority = [
+            ResultStatus.OVERTIME.value,
+            ResultStatus.DISQUALIFIED.value,
+            ResultStatus.DID_NOT_FINISH.value,
+            ResultStatus.DID_NOT_START.value,
+        ]
+
+        def sort_func(item):
+            priority = 0
+            if item.status in status_priority:
+                priority = status_priority.index(item.status) + 1
+            return item.result is None, priority, item.result
+
+        self.person_splits = sorted(self.person_splits, key=sort_func)
 
     def sort_by_place(self):
         self.person_splits = sorted(self.person_splits, key=lambda item: (item.place is None or item.place == '',

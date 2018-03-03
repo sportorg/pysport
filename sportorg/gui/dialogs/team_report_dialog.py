@@ -4,7 +4,8 @@ import time
 import webbrowser
 
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QFormLayout, QLabel, QDialog, QPushButton, QDialogButtonBox, QCheckBox
+from PyQt5.QtWidgets import QFormLayout, QLabel, QDialog, QPushButton, QDialogButtonBox, QCheckBox, QGroupBox, \
+    QRadioButton
 
 from sportorg import config
 from sportorg.core.template import get_templates, get_text_from_file
@@ -12,8 +13,7 @@ from sportorg.gui.dialogs.file_dialog import get_open_file_name, get_save_file_n
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
-from sportorg.models.start.start_calculation import get_teams_data
-
+from sportorg.models.start.start_calculation import get_teams_data, SortType
 
 _settings = {
     'last_template': None,
@@ -65,6 +65,18 @@ class TeamReportDialog(QDialog):
         if _settings['last_file'] is None:
             self.item_save_to_last_file.setDisabled(True)
 
+        self.sorting_type_box = QGroupBox(_('Sorting by'))
+        self.sorting_type_layout = QFormLayout()
+        self.sorting_type_name = QRadioButton(_('Name'))
+        self.sorting_type_name.setChecked(True)
+        self.sorting_type_layout.addRow(self.sorting_type_name)
+        self.sorting_type_bib = QRadioButton(_('Bib'))
+        self.sorting_type_layout.addRow(self.sorting_type_bib)
+        self.sorting_type_start = QRadioButton(_('Start'))
+        self.sorting_type_layout.addRow(self.sorting_type_start)
+        self.sorting_type_box.setLayout(self.sorting_type_layout)
+        self.layout.addRow(self.sorting_type_box)
+
         def cancel_changes():
             self.close()
 
@@ -96,7 +108,13 @@ class TeamReportDialog(QDialog):
         _settings['open_in_browser'] = self.item_open_in_browser.isChecked()
         _settings['save_to_last_file'] = self.item_save_to_last_file.isChecked()
 
-        template = get_text_from_file(template_path, **get_teams_data())
+        sorting = SortType.NAME
+        if self.sorting_type_bib.isChecked():
+            sorting = SortType.BIB
+        elif self.sorting_type_start.isChecked():
+            sorting = SortType.START
+
+        template = get_text_from_file(template_path, **get_teams_data(sorting))
 
         if _settings['save_to_last_file']:
             file_name = _settings['last_file']

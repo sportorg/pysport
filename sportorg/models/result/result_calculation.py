@@ -344,6 +344,7 @@ class ResultCalculation(object):
             return ret
         return None
 
+
 def get_start_list_data():
     pass
 
