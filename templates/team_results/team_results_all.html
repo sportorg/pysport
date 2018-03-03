@@ -187,7 +187,7 @@
 <div>
     <div class="text-center">
         <h2>Протокол командных результатов</h2>
-        <h2>{{ race.sub_title }} <br>{{ race.date }}</h2>
+        <h2>{{ race.sub_title }} <br>{{ race.date }} {{ race.location }}</h2>
     </div>
     <table>
     {% for group in groups %}
@@ -221,10 +221,12 @@
         <table class="empty-table">
             <tr>
                 <td><b>Главный судья:</b></td>
+                <td width="150px"></td>
                 <td><b>{{ race.chief_referee }}</b></td>
             </tr>
             <tr>
                 <td><b>Главный секретарь:</b></td>
+                <td width="150px"></td>
                 <td><b>{{ race.secretary }}</b></td>
             </tr>
         </table>

@@ -12,6 +12,8 @@ from sportorg.gui.dialogs.file_dialog import get_open_file_name, get_save_file_n
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
+from sportorg.models.memory import race
+from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.split_calculation import get_splits_data
 
 
@@ -74,7 +76,7 @@ class ReportDialog(QDialog):
             except FileNotFoundError as e:
                 logging.error(str(e))
             except Exception as e:
-                logging.error(str(e))
+                logging.exception(str(e))
             self.close()
 
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
@@ -95,6 +97,8 @@ class ReportDialog(QDialog):
         _settings['last_template'] = template_path
         _settings['open_in_browser'] = self.item_open_in_browser.isChecked()
         _settings['save_to_last_file'] = self.item_save_to_last_file.isChecked()
+
+        ResultCalculation(race()).process_results()
 
         template = get_text_from_file(template_path, **get_splits_data())
 

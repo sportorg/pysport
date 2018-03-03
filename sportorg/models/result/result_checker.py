@@ -30,7 +30,7 @@ class ResultChecker:
         if result.person is None:
             raise ResultCheckerException('Not person')
         o = cls(result.person)
-        if result.status == ResultStatus.OK or result.status == ResultStatus.DISQUALIFIED or result.status == ResultStatus.OVERTIME:
+        if result.status in [ResultStatus.OK, ResultStatus.DISQUALIFIED, ResultStatus.OVERTIME]:
             result.status = ResultStatus.OK
             if not o.check_result(result):
                 result.status = ResultStatus.DISQUALIFIED

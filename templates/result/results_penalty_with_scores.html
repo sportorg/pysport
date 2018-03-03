@@ -186,18 +186,15 @@
 {% macro view_groups() -%}{% for group in groups %}<a href="#{{group.name}}">{{group.name}}</a> {% endfor %}{%- endmacro %}
 <div>
     <div class="text-center">
-        <h1>ПРОТОКОЛ РЕЗУЛЬТАТОВ</h1>
-        <h2>{{ race.sub_title }} <br>{{ race.date }} {{ race.place }}</h2>
+        <h2>ПРОТОКОЛ РЕЗУЛЬТАТОВ</h2>
+        <h2>{{ race.sub_title }} <br>{{ race.date }} {{ race.location }}</h2>
     </div>
     <table>
     {% for group in groups %}
     {% if group.persons|length %}
         <tr style="background: white; border: 0">
         <td colspan="7" style="border: 0">
-            <h2 id="{{group.name}}">{{ group.name }}
-                {% if group.length %} Длина:{{ group.length }}м {% endif %}
-                {% if group.cp_count %} Количество КП:{{ group.cp_count }} {% endif %}
-                {% if group.max_time %} Контрольное время:{{ group.max_time }} {% endif %}
+            <h2 id="{{group.name}}">{{ group.name }}{% if group.length %}, {{ group.length }}м{% endif %}{% if group.cp_count %}, {{ group.cp_count }} КП{% endif %}{% if group.max_time %}, Контрольное время: {{ group.max_time }} {% endif %}
             </h2>
             <div class="no-print">{{ view_groups() }}</div>
         </td>
@@ -275,10 +272,12 @@
         <table class="empty-table">
             <tr>
                 <td><b>Главный судья:</b></td>
+                <td width="150px"></td>
                 <td><b>{{ race.chief_referee }}</b></td>
             </tr>
             <tr>
                 <td><b>Главный секретарь:</b></td>
+                <td width="150px"></td>
                 <td><b>{{ race.secretary }}</b></td>
             </tr>
         </table>
