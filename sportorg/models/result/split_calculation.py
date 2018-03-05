@@ -265,7 +265,10 @@ class GroupSplits(object):
             self.person_splits.append(person)
 
         self.set_places()
-        self.sort_by_result()
+        if group.is_relay():
+            self.sort_by_place()
+        else:
+            self.sort_by_result()
 
     def set_places(self):
         len_persons = len(self.person_splits)
