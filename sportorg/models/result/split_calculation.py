@@ -265,7 +265,7 @@ class GroupSplits(object):
             self.person_splits.append(person)
 
         self.set_places()
-        self.sort_by_result()
+        self.sort_by_result(group.is_relay())
 
     def set_places(self):
         len_persons = len(self.person_splits)
@@ -289,7 +289,7 @@ class GroupSplits(object):
                                         key=lambda item: (item.get_leg_time(index) is None,
                                                           item.get_leg_time(index)))
 
-    def sort_by_result(self):
+    def sort_by_result(self, is_relay=False):
         status_priority = [
             ResultStatus.OVERTIME.value,
             ResultStatus.DISQUALIFIED.value,
@@ -301,7 +301,10 @@ class GroupSplits(object):
             priority = 0
             if item.status in status_priority:
                 priority = status_priority.index(item.status) + 1
-            return item.result is None, priority, item.result
+            if is_relay:
+                return item.place is None or item.place == '', ('0000' + str(item.place))[-4:], item.relay_leg
+            else:
+                return item.result is None, priority, item.result
 
         self.person_splits = sorted(self.person_splits, key=sort_func)
 

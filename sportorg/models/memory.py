@@ -1543,7 +1543,7 @@ class RelayTeam(object):
 
     def __eq__(self, other):
         if self.get_is_status_ok() == self.get_is_status_ok():
-            if self.get_lap_finished() == other.get_lap_finished():
+            if self.get_correct_lap_count() == other.get_correct_lap_count():
                 if self.get_time() == other.get_time():
                     return True
         return False
@@ -1555,8 +1555,8 @@ class RelayTeam(object):
         if not self.get_is_status_ok() and other.get_is_status_ok():
             return True
 
-        if self.get_lap_finished() != other.get_lap_finished():
-            return self.get_lap_finished() < other.get_lap_finished()
+        if self.get_correct_lap_count() != other.get_correct_lap_count():
+            return self.get_correct_lap_count() < other.get_correct_lap_count()
 
         return self.get_time() > other.get_time()
 
@@ -1586,10 +1586,12 @@ class RelayTeam(object):
 
     def get_time(self):
         if len(self.legs):
-            last_finish = self.legs[-1].get_finish_time()
-            start = self.legs[0].get_start_time()
-            return last_finish - start
-        return None
+            last_correct_leg = self.get_correct_lap_count()
+            if last_correct_leg > 0:
+                last_finish = self.legs[last_correct_leg-1].get_finish_time()
+                start = self.legs[0].get_start_time()
+                return last_finish - start
+        return OTime()
 
     def get_lap_finished(self):
         """quantity of already finished laps"""
@@ -1604,6 +1606,14 @@ class RelayTeam(object):
 
     def get_correct_lap_count(self):
         """quantity of successfully finished laps"""
+        correct_qty = 0
+        for leg in self.legs:
+            assert isinstance(leg, RelayLeg)
+            if leg.is_correct():
+                correct_qty += 1
+            else:
+                return correct_qty
+        return correct_qty
 
     def get_is_status_ok(self):
         """get the whole status of team - OK if all laps are OK"""
