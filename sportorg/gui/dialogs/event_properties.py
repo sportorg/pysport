@@ -130,6 +130,7 @@ class EventPropertiesDialog(QDialog):
 
         obj.data.title = self.item_main_title.text()
         obj.data.description = self.item_sub_title.toPlainText()
+        obj.data.description = obj.data.description.replace('\n', '<br>\n')
         obj.data.location = self.item_location.text()
         obj.data.url = self.item_url.text()
         obj.data.chief_referee = self.item_refery.text()
