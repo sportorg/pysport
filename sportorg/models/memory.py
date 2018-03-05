@@ -387,7 +387,7 @@ class Group(Model):
             'start_corridor': self.start_corridor,
             'order_in_corridor': self.order_in_corridor,
             'first_number': self.first_number,
-            # 'ranking': None,
+            'ranking': self.ranking.to_dict() if self.ranking else None,
             '__type': self.__type.value if self.__type else None,
             'relay_legs': self.relay_legs,
 
@@ -406,6 +406,10 @@ class Group(Model):
         self.order_in_corridor = int(data['order_in_corridor'])
         self.first_number = int(data['first_number'])
         self.relay_legs = int(data['relay_legs'])
+        if 'ranking' in data:
+            if data['ranking']:
+                self.ranking = Ranking()
+                self.ranking.update_data(data['ranking'])
         if data['__type']:
             self.__type = RaceType(int(data['__type']))
 
@@ -1342,6 +1346,25 @@ class RankingItem(object):
         ret['percent'] = self.percent
         return ret
 
+    def to_dict(self):
+        ret = {}
+        ret['qual'] = self.qual.value
+        ret['use_scores'] = self.use_scores
+        ret['max_place'] = str(self.max_place)
+        ret['max_time'] = self.max_time.to_msec() if self.max_time else None
+        ret['is_active'] = self.is_active
+        ret['percent'] = self.percent
+        return ret
+
+    def update_data(self, data):
+        self.qual = Qualification.get_qual_by_code(int(data['qual']))
+        self.use_scores = bool(data['use_scores'])
+        self.max_place = int(data['max_place'])
+        if data['max_time']:
+            self.max_time = OTime(msec=int(data['max_time']))
+        self.is_active = bool(data['is_active'])
+        self.percent = int(data['percent'])
+
 
 class Ranking(object):
     def __init__(self):
@@ -1383,6 +1406,26 @@ class Ranking(object):
 
             ret['rank'] = rank_array
         return ret
+
+    def to_dict(self):
+        ret = {}
+        ret['is_active'] = self.is_active
+        ret['rank_scores'] = self.rank_scores
+        ret['rank'] = []
+        for i in self.rank:
+            obj = self.rank[i]
+            rank = obj.to_dict()
+            ret['rank'].append(rank)
+        return ret
+
+    def update_data(self, data):
+        self.is_active = bool(data['is_active'])
+        if 'rank_scores' in data:
+            self.rank_scores = int(data['rank_scores'])
+        for i in data['rank']:
+            rank = RankingItem()
+            rank.update_data(i)
+            self.rank[rank.qual] = rank
 
 
 class RelayLeg(object):
