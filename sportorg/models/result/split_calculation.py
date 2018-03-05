@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from sportorg.core.otime import OTime
-from sportorg.models.memory import race, Person, Course, Group, Qualification, ResultStatus
+from sportorg.models.memory import race, Person, Course, Group, Qualification, ResultStatus, ResultSportident
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.utils.time import time_to_hhmmss, get_speed_min_per_km, hhmmss_to_time
 
@@ -113,45 +113,46 @@ class PersonSplits(object):
         leg_start_time = result.get_start_time()
         start_time = result.get_start_time()
 
-        while person_index < len(result.splits):
-            cur_split = result.splits[person_index]
-            cur_code = cur_split.code
-            cur_time = cur_split.time
+        if result.is_sportident():
+            while person_index < len(result.splits):
+                cur_split = result.splits[person_index]
+                cur_code = cur_split.code
+                cur_time = cur_split.time
 
-            leg = LegSplit()
-            leg.code = cur_code
-            leg.index = person_index
-            leg.absolute_time = time_to_hhmmss(cur_time)
-            leg.relative_time = time_to_hhmmss(cur_time - start_time)
+                leg = LegSplit()
+                leg.code = cur_code
+                leg.index = person_index
+                leg.absolute_time = time_to_hhmmss(cur_time)
+                leg.relative_time = time_to_hhmmss(cur_time - start_time)
 
-            leg.status = 'correct'
-            if course_code == cur_code:
-                leg_time = cur_time - leg_start_time
-                leg.leg_time = time_to_hhmmss(leg_time)
-                leg.leg_minute_time = leg_time.to_minute_str()
-                leg_start_time = cur_time
+                leg.status = 'correct'
+                if course_code == cur_code:
+                    leg_time = cur_time - leg_start_time
+                    leg.leg_time = time_to_hhmmss(leg_time)
+                    leg.leg_minute_time = leg_time.to_minute_str()
+                    leg_start_time = cur_time
 
-                leg.course_index = course_index
-                leg.length_leg = course.controls[course_index].length
-                if leg.length_leg:
-                    leg.speed = get_speed_min_per_km(leg_time, leg.length_leg)
+                    leg.course_index = course_index
+                    leg.length_leg = course.controls[course_index].length
+                    if leg.length_leg:
+                        leg.speed = get_speed_min_per_km(leg_time, leg.length_leg)
 
-                leg.leg_place = '0'
+                    leg.leg_place = '0'
 
-                course_index += 1
-                if course_index >= len(course.controls):
-                    course_code = -1
+                    course_index += 1
+                    if course_index >= len(course.controls):
+                        course_code = -1
+                    else:
+                        course_code = course.controls[course_index].code
+                        if str(course_code).strip().isdigit():
+                            course_code = int(str(course_code).strip())
+
                 else:
-                    course_code = course.controls[course_index].code
-                    if str(course_code).strip().isdigit():
-                        course_code = int(str(course_code).strip())
+                    leg.status = 'extra'
 
-            else:
-                leg.status = 'extra'
+                self.legs.append(leg)
 
-            self.legs.append(leg)
-
-            person_index += 1
+                person_index += 1
 
         self.last_correct_index = course_index - 1
 
