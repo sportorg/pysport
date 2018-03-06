@@ -1521,6 +1521,12 @@ class RelayLeg(object):
             return res.status == ResultStatus.OK
         return True
 
+    def is_out_of_competition(self):
+        res = self.get_result()
+        if res and res.person:
+            return res.person.is_out_of_competition
+        return False
+
     def set_bib(self):
         if self.person:
             assert isinstance(self.person, Person)
@@ -1665,6 +1671,20 @@ class RelayTeam(object):
             if not leg.is_correct():
                 return False
         return True
+
+    def get_is_all_legs_finished(self):
+        # check leg count
+        leg_count = race().data.relay_leg_count
+        return len(self.legs) >= leg_count
+
+
+    def get_is_out_of_competition(self):
+        """get the whole status of team - OK if any lap is out of competition"""
+        for leg in self.legs:
+            assert isinstance(leg, RelayLeg)
+            if leg.is_out_of_competition():
+                return True
+        return False
 
     def set_place(self, place):
         self.place = place

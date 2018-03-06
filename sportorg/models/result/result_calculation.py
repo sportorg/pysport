@@ -20,12 +20,12 @@ class ResultCalculation(object):
                 # single race
                 array = self.get_group_finishes(i)
                 self.set_places(array)
-                self.set_rank(i)
             else:
                 # relay
                 new_relays = self.process_relay_results(i)
                 for a in new_relays:
                     self.race.relay_teams.append(a)
+            self.set_rank(i)
 
     def set_times(self):
         for i in self.race.results:
@@ -121,7 +121,10 @@ class ResultCalculation(object):
             i.assigned_rank = Qualification.NOT_QUALIFIED
 
         if ranking.is_active:
-            rank = self.get_group_rank(group)
+            if group.is_relay():
+                rank = self.get_group_rank_relay(group)
+            else:
+                rank = self.get_group_rank(group)
             ranking.rank_scores = rank
             if rank > 0:
                 leader_time = self.get_group_leader_time(group)
@@ -171,14 +174,9 @@ class ResultCalculation(object):
         scores = []
         array = self.get_group_finishes(group)
 
-        if race().get_type(group) != RaceType.RELAY:
-            if len(array) < 10:
-                # less than 10 started
-                return -1
-        else:
-            if len(array) < 6 * 3:
-                # less than 6 started in relay
-                return -1
+        if len(array) < 10:
+            # less than 10 started
+            return -1
 
         for i in array:
             assert isinstance(i, Result)
@@ -188,14 +186,52 @@ class ResultCalculation(object):
                     qual = person.qual
                     scores.append(qual.get_scores())
 
-        if race().get_type(group) != RaceType.RELAY:
-            if len(scores) < 5:
-                # less than 5 finished and not disqualified
-                return -1
-        else:
-            if len(scores) < 4 * 3:
-                # less than 4 finished and not disqualified
-                return -1
+        if len(scores) < 5:
+            # less than 5 finished and not disqualified
+            return -1
+
+        if len(scores) <= 10:
+            # get rank sum of 10 best finished
+            return sum(scores)
+
+        scores = sorted(scores)
+        return sum(scores[-10:])
+
+    def get_group_rank_relay(self, group):
+        """
+        Rank calculation, takes sums or scores from qualification of best 10 athletes, who have OK result and not o/c
+        :param group:
+        :return: rank of group, -1 if we have < 10 successfull results
+        """
+        teams = find(race().relay_teams, group=group, return_all=True)
+        success_teams = []
+
+        started_teams = 0
+        for cur_team in teams:
+            assert isinstance(cur_team, RelayTeam)
+            if cur_team.get_is_out_of_competition():
+                continue
+            if not cur_team.get_is_all_legs_finished():
+                continue
+            started_teams += 1
+            if cur_team.get_is_status_ok():
+                success_teams.append(cur_team)
+
+        if started_teams < 6:
+            # less than 6 teams started in relay
+            return -1
+
+        if len(success_teams) < 4:
+            # less than 4 teams successfully finished in relay
+            return -1
+
+        scores = []
+        for cur_team in success_teams:
+            for cur_leg in cur_team.legs:
+                res = cur_leg.get_result()
+                person = res.person
+                qual = person.qual
+                scores.append(qual.get_scores())
 
         if len(scores) <= 10:
             # get rank sum of 10 best finished
