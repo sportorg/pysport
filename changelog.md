@@ -1,11 +1,42 @@
-### 2018-02-23 v0.11.0-rc3
+### 2018-03-06 v0.11.0-rc4
++ Automatic disqualification if overtimed
++ Templates improvement - information about course, location, time limit, referees was added
++ Team lists - added sorting by number and start time
++ Custom statuses for disqualification (external file)
++ Entry statistics report
++ Ranking for relays (Rus)
++ Saving of ranking information (Rus)
+- Row braking in event title
+- Relay online sending for orgeo.ru
+- Simple finish support fixed (just finish time, F3)
+- SI card editing fixed
 
-* pass
+
+### 2018-02-23 v0.11.0-rc3
++ SI Card assign mode
++ New templates for relay (srart/result)
++ New storage format (.json)
++ Team work (client/server)
++ Editing person from result dialog
++ SI station status
++ Multi-language support
++ CP removing from courses and splits
++ Integration with Telegram
+- Minor bug fixed
+- Search fixed
+- Online sending fixed
 
 
 ### 2018-01-25 v0.11.0-rc2
++ Fast start group editing (Alt + num)
++ Bulk DNS processing
++ New templates for splits and results
++ Partial relay support
++ Custom course order checking
+- Minor buf fixed
+- Saving with applied filter
+- Stable sireader working (separated thread)
 
-* pass
 
 
 ### 2018-01-16 v0.11.0-rc1
@@ -22,6 +53,7 @@
 + Penalty calculation for marked route (Rus)
 + New Russian ranking ESVK 2018-2021 (Rus)
 - Fixed the error of concurrent SI readout and split printing
+
 
 ### 2017-12-12 v0.10.0-beta
 + Added the ability to edit splits
