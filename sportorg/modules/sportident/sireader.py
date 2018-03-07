@@ -220,9 +220,12 @@ class SIReaderClient(object):
         return ports
 
     def choose_port(self):
+        si_port = memory.race().get_setting('sportident_port', '')
+        if si_port:
+            return si_port
         ports = self.get_ports()
         if len(ports):
-            self._logger.info('Available Ports')
+            self._logger.info(_('Available Ports'))
             for i, p in enumerate(ports):
                 self._logger.info("{} - {}".format(i, p))
             return ports[0]

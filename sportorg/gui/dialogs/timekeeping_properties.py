@@ -7,10 +7,12 @@ from PyQt5.QtWidgets import QFormLayout, QLabel, QDialog, \
 
 from sportorg.core.otime import OTime
 from sportorg.gui.global_access import GlobalAccess
+from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
 from sportorg.models.memory import race
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.modules.configs.configs import Config
+from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.utils.time import time_to_otime
 
 
@@ -42,6 +44,11 @@ class TimekeepingPropertiesDialog(QDialog):
         self.item_zero_time.setMaximumSize(60, 20)
         self.item_zero_time.setDisabled(True)
         self.tk_layout.addRow(self.label_zero_time, self.item_zero_time)
+
+        self.label_si_port = QLabel(_('Available Ports'))
+        self.item_si_port = AdvComboBox()
+        self.item_si_port.addItems(SIReaderClient().get_ports())
+        self.tk_layout.addRow(self.label_si_port, self.item_si_port)
 
         self.start_group_box = QGroupBox(_('Start time'))
         self.start_layout = QFormLayout()
@@ -276,8 +283,11 @@ class TimekeepingPropertiesDialog(QDialog):
         finish_cp_number = cur_race.get_setting('sportident_finish_cp_number', 90)
         assign_chip_reading = cur_race.get_setting('sportident_assign_chip_reading', 'off')
         assignment_mode = cur_race.get_setting('sportident_assignment_mode', False)
+        si_port = cur_race.get_setting('sportident_port', '')
 
         self.item_zero_time.setTime(QTime(zero_time[0], zero_time[1]))
+
+        self.item_si_port.setCurrentText(si_port)
 
         if start_source == 'protocol':
             self.item_start_protocol.setChecked(True)
@@ -432,6 +442,8 @@ class TimekeepingPropertiesDialog(QDialog):
         if old_start_cp_number != start_cp_number or old_finish_cp_number != finish_cp_number:
             changed = True
             race().clear_sportident_results()
+
+        obj.set_setting('sportident_port', self.item_si_port.currentText())
 
         obj.set_setting('sportident_start_source', start_source)
         obj.set_setting('sportident_finish_source', finish_source)

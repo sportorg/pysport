@@ -1164,3 +1164,6 @@ msgstr "Включить/Выключить"
 
 msgid "Send selected"
 msgstr "Отправить выбранные"
+
+msgid "Available Ports"
+msgstr "Доступные порты"
