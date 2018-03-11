@@ -207,15 +207,16 @@ class ResultCalculation(object):
         success_teams = []
 
         started_teams = 0
-        for cur_team in teams:
-            assert isinstance(cur_team, RelayTeam)
-            if cur_team.get_is_out_of_competition():
-                continue
-            if not cur_team.get_is_all_legs_finished():
-                continue
-            started_teams += 1
-            if cur_team.get_is_status_ok():
-                success_teams.append(cur_team)
+        if teams:
+            for cur_team in teams:
+                assert isinstance(cur_team, RelayTeam)
+                if cur_team.get_is_out_of_competition():
+                    continue
+                if not cur_team.get_is_all_legs_finished():
+                    continue
+                started_teams += 1
+                if cur_team.get_is_status_ok():
+                    success_teams.append(cur_team)
 
         if started_teams < 6:
             # less than 6 teams started in relay
