@@ -1,8 +1,8 @@
+from sportorg.core.template import get_text_from_file
 from sportorg.models.memory import race
 
 from sportorg.modules.printing.printing import print_html
 from sportorg.config import template_dir
-from sportorg.libs.template.template import get_text_from_file
 from sportorg.models.result.split_calculation import GroupSplits
 
 

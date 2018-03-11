@@ -465,7 +465,7 @@ class Result:
         self.id = uuid.uuid4()
         self.start_time = None  # type: OTime
         self.finish_time = None  # type: OTime
-        self.result = None
+        self._result = None  # type: int
         self.person = None  # type: Person
         self.status = ResultStatus.OK
         self.status_comment = ''
@@ -475,6 +475,14 @@ class Result:
         self.scores = 0  # type: int
         self.assigned_rank = Qualification.NOT_QUALIFIED
         self.diff = None  # type: OTime
+
+    @property
+    def result(self):
+        return self._result
+
+    @result.setter
+    def result(self, value):
+        self._result = value
 
     def __str__(self):
         return str(self.system_type)
