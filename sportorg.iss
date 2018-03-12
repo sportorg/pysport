@@ -7,7 +7,7 @@
 #define MyAppURL "http://sportorg.o-ural.ru/"
 #define MyAppExeName "SportOrg.exe"
 
-#define BuildDir "path_to\{#MyAppName}-{#MyAppVersion}" ; !!replace with your build path!!
+#define BuildDir "build/exe.win32-3.6" ; !!replace with your build path!!
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
