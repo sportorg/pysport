@@ -166,7 +166,7 @@ class ResultEditDialog(QDialog):
         if self.current_object.person:
             self.item_bib.setValue(self.current_object.person.bib)
 
-        if self.current_object.status == ResultStatus.OK:
+        if self.current_object.is_status_ok():
             self.radio_ok.setChecked(True)
         elif self.current_object.status == ResultStatus.DISQUALIFIED:
             self.radio_dsq.setChecked(True)
