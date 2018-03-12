@@ -1,7 +1,5 @@
-from datetime import datetime
-
 from sportorg.core.otime import OTime
-from sportorg.models.memory import race, Person, Course, Group, Qualification, ResultStatus, ResultSportident
+from sportorg.models.memory import race, Person, Course, Group, Qualification, ResultStatus
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.utils.time import time_to_hhmmss, get_speed_min_per_km, hhmmss_to_time
 

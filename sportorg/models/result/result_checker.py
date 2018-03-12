@@ -18,9 +18,6 @@ class ResultChecker:
         if self.person.group is None:
             return True
 
-        if not result.is_sportident():
-            return True
-
         course = race().find_course(self.person)
 
         return result.check(course)
@@ -52,18 +49,18 @@ class ResultChecker:
         person = result.person
 
         if person is None:
-            return True
+            return
         if person.group is None:
-            return True
+            return
 
         if not result.is_sportident():
-            return True
+            return
 
         assert isinstance(result, ResultSportident)
 
         course = race().find_course(person)
         if not course:
-            return True
+            return
 
         controls = course.controls
 

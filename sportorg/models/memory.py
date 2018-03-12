@@ -414,23 +414,6 @@ class Group(Model):
             self.__type = RaceType(int(data['__type']))
 
 
-class SportidentCardModel(Enum):
-    NONE = 0
-    P_CARD = 1
-    SI5 = 2
-    SI8 = 3
-    SI9 = 4
-    SI10 = 5
-    SI11 = 6
-    SIAC = 7
-
-    def __str__(self):
-        return "%s" % self._name_
-
-    def __repr__(self):
-        return self.__str__()
-
-
 class Split(Model):
     def __init__(self):
         self.code = 0  # type: int
@@ -501,7 +484,7 @@ class Result:
         return eq
 
     def __gt__(self, other):
-        if self.status == ResultStatus.OK and other.status != ResultStatus.OK:
+        if self.is_status_ok() and not other.is_status_ok():
             return False
 
         if not self.result:
@@ -552,7 +535,7 @@ class Result:
             self.status_comment = data['status_comment']
 
     def get_result(self):
-        if self.status != ResultStatus.OK:
+        if not self.is_status_ok():
             if self.status_comment:
                 return self.status_comment
             return self.status.get_title()
@@ -564,7 +547,7 @@ class Result:
 
     def get_result_for_sort(self):
         ret = 0
-        if self.status != 0 and self.status != ResultStatus.OK:
+        if not self.is_status_ok():
             ret += 24 * 3600 * 1000
 
         delta = self.get_finish_time() - self.get_start_time() + self.get_penalty_time()
@@ -597,6 +580,9 @@ class Result:
 
     def check(self, course=None):
         return True
+
+    def is_status_ok(self):
+        return self.status == ResultStatus.OK
 
     def is_sportident(self):
         return self.system_type == SystemType.SPORTIDENT
@@ -1264,6 +1250,7 @@ class Race(Model):
             return True
         return False
 
+
 class Qualification(IntEnum):
     NOT_QUALIFIED = 0
     I_Y = 1
@@ -1526,7 +1513,7 @@ class RelayLeg(object):
         res = self.get_result()
         if res:
             assert isinstance(res, Result)
-            return res.status == ResultStatus.OK
+            return res.is_status_ok()
         return True
 
     def is_out_of_competition(self):

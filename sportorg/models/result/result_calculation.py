@@ -2,7 +2,7 @@ import logging
 
 from sportorg.core.otime import OTime
 from sportorg.language import _
-from sportorg.models.memory import race, Result, Person, ResultStatus, Group, Qualification, RankingItem, \
+from sportorg.models.memory import race, Result, Person, Group, Qualification, RankingItem, \
     RelayTeam, RaceType, find
 
 
@@ -67,7 +67,7 @@ class ResultCalculation(object):
 
             res.place = ''
             # give place only if status = OK
-            if res.status == ResultStatus.OK:
+            if res.is_status_ok():
                 current_result = res.get_result_otime()
                 res.diff = current_result - array[0].get_result_otime()
 
@@ -140,7 +140,7 @@ class ResultCalculation(object):
                 result_time = i.get_result_otime()
                 place = i.place
 
-                if i.person.is_out_of_competition or i.status != ResultStatus.OK:
+                if i.person.is_out_of_competition or not i.is_status_ok():
                     continue
 
                 qual_list = sorted(ranking.rank.values(), reverse=True, key=lambda item: item.qual.get_scores())
@@ -180,7 +180,7 @@ class ResultCalculation(object):
 
         for i in array:
             assert isinstance(i, Result)
-            if i.status == ResultStatus.OK:
+            if i.is_status_ok():
                 person = i.person
                 if not person.is_out_of_competition:
                     qual = person.qual
