@@ -94,7 +94,7 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
             self.filter_backup.clear()
 
     def set_filter_for_column(self, column_num, filter_regexp):
-        self.filter.update({column_num: filter_regexp})
+        self.filter.update({column_num: re.escape(filter_regexp)})
 
     def apply_filter(self):
         # get initial list and filter it
@@ -126,20 +126,54 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
         else:
             self.search_offset += 1
         current_array = self.get_source_array()
-        check = re.compile(self.search, re.IGNORECASE)
+        escaped_text = re.escape(self.search)
+        check = re.compile(escaped_text, re.IGNORECASE)
 
         count_columns = len(self.get_headers())
         columns = range(count_columns)
-        i = self.search_offset
-        while i < len(current_array):
-            obj = self.get_values_from_object(current_array[i])
+
+        # 1 phase - full match
+        i = 0
+        max = len(current_array)
+        while i < max:
+            cur_pos = (self.search_offset + i) % max
+            obj = self.get_values_from_object(current_array[cur_pos])
             for column in columns:
                 value = str(obj[column])
-                if check.match(value):
-                    self.search_offset = i
+                if value == self.search:
+                    self.search_offset = cur_pos
                     self.search_old = self.search
                     return
             i += 1
+
+        # 2 phase - match
+        i = 0
+        max = len(current_array)
+        while i < max:
+            cur_pos = (self.search_offset + i) % max
+            obj = self.get_values_from_object(current_array[cur_pos])
+            for column in columns:
+                value = str(obj[column])
+                if check.match(value):
+                    self.search_offset = cur_pos
+                    self.search_old = self.search
+                    return
+            i += 1
+
+        # 3 phase - search
+        i = 0
+        max = len(current_array)
+        while i < max:
+            cur_pos = (self.search_offset + i) % max
+            obj = self.get_values_from_object(current_array[cur_pos])
+            for column in columns:
+                value = str(obj[column])
+                if check.search(value):
+                    self.search_offset = cur_pos
+                    self.search_old = self.search
+                    return
+            i += 1
+
         self.search_offset = -1
 
     def sort(self, p_int, order=None):
