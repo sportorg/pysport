@@ -9,15 +9,19 @@ def import_csv(source):
     race = memory.race()
 
     for group_name in wo_csv.groups:
-        group = memory.Group()
-        group.name = group_name
-        group.long_name = group_name
-        race.groups.append(group)
+        group = memory.find(race.groups, name=group_name)
+        if group is None:
+            group = memory.Group()
+            group.name = group_name
+            group.long_name = group_name
+            race.groups.append(group)
 
     for team_name in wo_csv.teams:
-        org = memory.Organization()
-        org.name = team_name
-        race.organizations.append(org)
+        org = memory.find(race.organizations, name=team_name)
+        if org is None:
+            org = memory.Organization()
+            org.name = team_name
+            race.organizations.append(org)
 
     for person_dict in wo_csv.data:
         if person_dict['qual_id'] and person_dict['qual_id'].isdigit():
