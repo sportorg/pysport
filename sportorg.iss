@@ -42,6 +42,7 @@ Source: "{#BuildDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs c
 Name: "{app}\log"; Permissions: everyone-full
 Name: "{app}\templates"; Permissions: everyone-full
 Name: "{app}\example"; Permissions: everyone-full
+Name: "{app}\data"; Permissions: everyone-full
 ; NOTE: to allow start by non-privileged user from Program Files
 
 [Icons]

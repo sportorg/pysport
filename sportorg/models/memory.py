@@ -447,25 +447,17 @@ class Result:
             raise Exception("<Result> must be subclassed.")
         self.id = uuid.uuid4()
         self.start_time = None  # type: OTime
-        self.finish_time = None  # type: OTime
-        self._result = None  # type: int
+        self.finish_time = OTime.now()  # type: OTime
         self.person = None  # type: Person
         self.status = ResultStatus.OK
         self.status_comment = ''
         self.penalty_time = None  # type: OTime
         self.penalty_laps = 0  # count of penalty legs (marked route)
-        self.place = None  # type: Union[int, str]
+        self.place = 0  # type: int
         self.scores = 0  # type: int
         self.assigned_rank = Qualification.NOT_QUALIFIED
         self.diff = None  # type: OTime
 
-    @property
-    def result(self):
-        return self._result
-
-    @result.setter
-    def result(self, value):
-        self._result = value
 
     def __str__(self):
         return str(self.system_type)
@@ -484,15 +476,9 @@ class Result:
         return eq
 
     def __gt__(self, other):
-        if self.is_status_ok() and not other.is_status_ok():
-            return False
-
-        if not self.result:
-            return True
-        if not other.result:
-            return False
-
-        return self.result > other.result
+        if self.status != other.status:
+            return self.status.value > other.status.value
+        return self.get_result_otime() > other.get_result_otime()
 
     @property
     @abstractmethod
@@ -507,7 +493,6 @@ class Result:
             'person_id': str(self.person.id) if self.person else None,
             'start_time': self.start_time.to_msec() if self.start_time else None,
             'finish_time': self.finish_time.to_msec() if self.finish_time else None,
-            'result': self.result,
             'diff': self.diff.to_msec() if self.diff else None,
             'penalty_time': self.penalty_time.to_msec() if self.penalty_time else None,
             'status': self.status.value,
@@ -519,7 +504,6 @@ class Result:
         }
 
     def update_data(self, data):
-        self.result = data['result']
         self.status = ResultStatus(int(data['status']))
         self.penalty_laps = int(data['penalty_laps'])
         self.scores = data['scores']
@@ -546,23 +530,18 @@ class Result:
         return time_to_hhmmss(self.get_finish_time() - self.get_start_time() + self.get_penalty_time())
 
     def get_result_for_sort(self):
-        ret = 0
-        if not self.is_status_ok():
-            ret += 24 * 3600 * 1000
-
-        delta = self.get_finish_time() - self.get_start_time() + self.get_penalty_time()
-        ret += delta.to_msec()
-        return ret
+        ret = self.get_result_otime()
+        return self.status, ret.to_msec()
 
     def get_result_otime(self):
-        return OTime(msec=self.get_result_for_sort())
+        return self.get_finish_time() - self.get_start_time() + self.get_penalty_time()
 
     def get_start_time(self):
         if self.start_time and self.start_time.to_msec():
             return self.start_time
         if self.person and self.person.start_time and self.person.start_time.to_msec():
             return self.person.start_time
-        return int_to_otime(0)
+        return OTime()
 
     def get_finish_time(self):
         if self.finish_time:
@@ -603,7 +582,6 @@ class ResultSportident(Result):
         self.sportident_card = 0
         self.splits = []  # type: List[Split]
         self.__start_time = None
-        self.__finish_time = None
 
     def __repr__(self):
         splits = ''
@@ -674,17 +652,15 @@ class ResultSportident(Result):
             if self.finish_time:
                 return self.finish_time
         elif finish_source == 'cp':
-            if self.__finish_time is not None:
-                return self.__finish_time
             if len(self.splits):
                 finish_cp_number = obj.get_setting('sportident_finish_cp_number', 90)
                 if finish_cp_number == -1:
-                    self.__finish_time = self.splits[-1].time
-                    return self.__finish_time
+                    self.finish_time = self.splits[-1].time
+                    return self.finish_time
                 for split in reversed(self.splits):
                     if split.code == finish_cp_number:
-                        self.__finish_time = split.time
-                        return self.__finish_time
+                        self.finish_time = split.time
+                        return self.finish_time
         elif finish_source == 'beam':
             pass
 

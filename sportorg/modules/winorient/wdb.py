@@ -137,7 +137,6 @@ class WinOrientBinary:
 
                 if man.status in self.status:
                     result.status = self.status[man.status]
-                result.result = man.result
 
                 my_race.add_result(result)
 
