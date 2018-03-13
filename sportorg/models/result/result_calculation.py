@@ -13,7 +13,6 @@ class ResultCalculation(object):
 
     def process_results(self):
         logging.debug('Process results')
-        self.set_times()
         self.race.relay_teams.clear()
         for i in self.race.groups:
             if not self.race.get_type(i) == RaceType.RELAY:
@@ -26,11 +25,6 @@ class ResultCalculation(object):
                 for a in new_relays:
                     self.race.relay_teams.append(a)
             self.set_rank(i)
-
-    def set_times(self):
-        for i in self.race.results:
-            assert isinstance(i, Result)
-            i.result = round(i.get_result_for_sort()/10)
 
     def get_group_finishes(self, group):
         ret = []

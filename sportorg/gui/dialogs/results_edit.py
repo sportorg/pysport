@@ -153,11 +153,11 @@ class ResultEditDialog(QDialog):
                 self.item_sportident_card.setValue(int(self.current_object.sportident_card))
             self.splits.splits(self.current_object.splits)
             self.splits.show()
-        if self.current_object.finish_time is not None:
+        if self.current_object.finish_time:
             self.item_finish.setTime(time_to_qtime(self.current_object.finish_time))
         if self.current_object.start_time is not None:
             self.item_start.setTime(time_to_qtime(self.current_object.start_time))
-        if self.current_object.result is not None:
+        if self.current_object.finish_time:
             self.item_result.setText(str(self.current_object.get_result()))
         if self.current_object.penalty_time is not None:
             self.item_penalty.setTime(time_to_qtime(self.current_object.penalty_time))
