@@ -185,8 +185,8 @@
         {% endif %}
         <br>
         {% if person.status != 1 %}
-            {% for control in group.controls %}
-                {{control.code}}
+            {% for control in person.controls %}
+                {{control}}
             {% endfor %}<br>
         {% endif %}
         <table>

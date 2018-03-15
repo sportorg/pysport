@@ -15,7 +15,7 @@ class ScoreCalculation(object):
         obj = race()
         if isinstance(result, Result):
             place = result.place
-            if place and (isinstance(place, int) or place.isdigit()):
+            if place > 0:
                 place = int(place)
                 scores_type = obj.get_setting('scores_mode', 'off')
                 if scores_type == 'array':
@@ -39,6 +39,8 @@ class ScoreCalculation(object):
                     value = eval(expr)
                     value = max(round(value), 0)
                     result.scores = value
+            else:
+                result.scores = 0
 
     @staticmethod
     def get_leader_time(result):

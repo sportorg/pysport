@@ -269,6 +269,7 @@ class MainWindow(QMainWindow):
             table.setModel(TeamMemoryModel())
             event.event('init_model')
         except Exception as e:
+            logging.exception(e)
             logging.error(str(e))
 
     def refresh(self):

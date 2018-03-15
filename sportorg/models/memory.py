@@ -9,7 +9,7 @@ import dateutil.parser
 from sportorg.core.model import Model
 from sportorg.core.otime import OTime
 from sportorg.language import _
-from sportorg.utils.time import int_to_otime, time_to_hhmmss, time_to_sec
+from sportorg.utils.time import time_to_hhmmss, time_to_sec
 
 
 class NotEmptyException(Exception):
@@ -507,7 +507,8 @@ class Result:
         self.status = ResultStatus(int(data['status']))
         self.penalty_laps = int(data['penalty_laps'])
         self.scores = data['scores']
-        self.place = data['place']
+        if str(data['place']).isdigit():
+            self.place = int(data['place'])
         self.assigned_rank = Qualification.get_qual_by_code(data['assigned_rank'])
         if data['start_time']:
             self.start_time = OTime(msec=data['start_time'])
@@ -517,6 +518,9 @@ class Result:
             self.penalty_time = OTime(msec=data['penalty_time'])
         if 'status_comment' in data:
             self.status_comment = data['status_comment']
+
+    def clear(self):
+        pass
 
     def get_result(self):
         if not self.is_status_ok():
@@ -554,6 +558,14 @@ class Result:
             return self.penalty_time
         return OTime()
 
+    def get_place(self):
+        """Returns text for place column in results"""
+        if self.place > 0:
+            return self.place
+        if self.person and self.person.is_out_of_competition:
+            return _('o/c')
+        return ''
+
     def get_course_splits(self, course=None):
         return []
 
@@ -582,6 +594,7 @@ class ResultSportident(Result):
         self.sportident_card = 0
         self.splits = []  # type: List[Split]
         self.__start_time = None
+        self.__finish_time = None
 
     def __repr__(self):
         splits = ''
@@ -643,7 +656,7 @@ class ResultSportident(Result):
         elif start_source == 'gate':
             pass
 
-        return int_to_otime(0)
+        return OTime()
 
     def get_finish_time(self):
         obj = race()
@@ -652,19 +665,22 @@ class ResultSportident(Result):
             if self.finish_time:
                 return self.finish_time
         elif finish_source == 'cp':
+            if self.__finish_time is not None:
+                return self.__finish_time
             if len(self.splits):
                 finish_cp_number = obj.get_setting('sportident_finish_cp_number', 90)
                 if finish_cp_number == -1:
-                    self.finish_time = self.splits[-1].time
-                    return self.finish_time
+                    self.__finish_time = self.splits[-1].time
+                    return self.__finish_time
                 for split in reversed(self.splits):
                     if split.code == finish_cp_number:
-                        self.finish_time = split.time
-                        return self.finish_time
+                        self.__finish_time = split.time
+                        return self.__finish_time
         elif finish_source == 'beam':
             pass
 
-        return OTime.now()
+        # return 0 to avoid incorrect results
+        return OTime()
 
     def clear(self):
         self.__start_time = None

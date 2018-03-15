@@ -14,6 +14,7 @@ from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
 from sportorg.models.memory import race
 from sportorg.models.result.result_calculation import ResultCalculation
+from sportorg.models.result.score_calculation import ScoreCalculation
 from sportorg.models.result.split_calculation import get_splits_data
 
 
@@ -99,6 +100,7 @@ class ReportDialog(QDialog):
         _settings['save_to_last_file'] = self.item_save_to_last_file.isChecked()
 
         ResultCalculation(race()).process_results()
+        ScoreCalculation.calculate_scores()
 
         template = get_text_from_file(template_path, **get_splits_data())
 

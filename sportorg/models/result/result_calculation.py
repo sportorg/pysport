@@ -59,7 +59,7 @@ class ResultCalculation(object):
             res = array[i]
             assert isinstance(res, Result)
 
-            res.place = ''
+            res.place = -1
             # give place only if status = OK
             if res.is_status_ok():
                 current_result = res.get_result_otime()
@@ -67,7 +67,7 @@ class ResultCalculation(object):
 
                 # skip if out of competition
                 if res.person.is_out_of_competition:
-                    res.place = _('o/c')
+                    res.place = -1
                     continue
 
                 # the same place processing
