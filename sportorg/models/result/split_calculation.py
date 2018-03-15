@@ -80,8 +80,8 @@ class PersonSplits(object):
         self.race_result = time_to_hhmmss(race_result)
         self.status = result.status.value
         self.status_title = result.status.get_title()
-        self.place = result.place
-        self.group_count_alll = person.group.get_count_all()
+        self.place = result.get_place()
+        self.group_count_all = person.group.get_count_all()
         self.group_count_finished = person.group.get_count_finished()
         self.scores = result.scores
         self.controls = [control.code for control in course.controls]

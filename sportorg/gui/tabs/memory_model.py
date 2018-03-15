@@ -332,7 +332,7 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
             i.status.get_title(),
             time_to_hhmmss(i.get_penalty_time()),
             i.penalty_laps,
-            i.place if i.place is not None else '',
+            i.get_place(),
             str(i.system_type)
         ]
 
