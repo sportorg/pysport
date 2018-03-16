@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "SportOrg"
-#define MyAppVersion "0.11.0.rc4"
+#define MyAppVersion "v1.0.0"
 #define MyAppPublisher "Danil Akhtarov, Sergei Kobelev"
 #define MyAppURL "http://sportorg.o-ural.ru/"
 #define MyAppExeName "SportOrg.exe"
