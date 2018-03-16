@@ -444,7 +444,7 @@ class Split(Model):
 class Result:
     def __init__(self):
         if type(self) == Result:
-            raise Exception("<Result> must be subclassed.")
+            raise Exception("<Result> is abstracted")
         self.id = uuid.uuid4()
         self.start_time = None  # type: OTime
         self.finish_time = OTime.now()  # type: OTime
@@ -457,7 +457,6 @@ class Result:
         self.scores = 0  # type: int
         self.assigned_rank = Qualification.NOT_QUALIFIED
         self.diff = None  # type: OTime
-
 
     def __str__(self):
         return str(self.system_type)
