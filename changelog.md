@@ -1,5 +1,9 @@
 # Changelog
 
+## 2018-03-16 v1.0.0
+
+* pass
+
 ## 2018-03-06 v0.11.0-rc4
 
 + Automatic disqualification if overtime
