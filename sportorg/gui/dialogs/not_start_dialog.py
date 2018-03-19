@@ -76,7 +76,7 @@ class NotStartDialog(QDialog):
             if number not in old_numbers:
                 person = find(obj.persons, bib=number)
                 if person:
-                    result = ResultSportident()
+                    result = race().new_sportident_result()
                     result.person = person
                     result.status = ResultStatus.DID_NOT_START
                     result.status_comment = status_comment

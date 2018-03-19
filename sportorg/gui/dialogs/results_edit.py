@@ -52,6 +52,9 @@ class ResultEditDialog(QDialog):
 
         self.label_person_info = QLabel('')
 
+        self.item_days = QSpinBox()
+        self.item_days.setMaximum(365)
+
         self.item_finish = QTimeEdit()
         self.item_finish.setDisplayFormat(self.time_format)
 
@@ -76,12 +79,15 @@ class ResultEditDialog(QDialog):
         self.item_status_comment = AdvComboBox()
         self.item_status_comment.addItems(StatusComments().get_all())
 
-        self.splits = SplitsText()
+        more24 = race().get_setting('time_format_24', 'less24') == 'more24'
+        self.splits = SplitsText(more24=more24)
 
         if self.current_object.is_sportident():
             self.layout.addRow(QLabel(_('Card')), self.item_sportident_card)
         self.layout.addRow(QLabel(_('Bib')), self.item_bib)
         self.layout.addRow(QLabel(''), self.label_person_info)
+        if more24:
+            self.layout.addRow(QLabel(_('Days')), self.item_days)
         self.layout.addRow(QLabel(_('Start')), self.item_start)
         self.layout.addRow(QLabel(_('Finish')), self.item_finish)
         self.layout.addRow(QLabel(_('Penalty')), self.item_penalty)
@@ -165,6 +171,8 @@ class ResultEditDialog(QDialog):
             self.item_penalty_laps.setValue(self.current_object.penalty_laps)
         if self.current_object.person:
             self.item_bib.setValue(self.current_object.person.bib)
+
+        self.item_days.setValue(self.current_object.days)
 
         if self.current_object.is_status_ok():
             self.radio_ok.setChecked(True)
@@ -250,6 +258,10 @@ class ResultEditDialog(QDialog):
             GlobalAccess().get_main_window().get_result_table().model().init_cache()
             changed = True
 
+        if self.item_days.value() != result.days:
+            result.days = self.item_days.value()
+            changed = True
+
         status = ResultStatus.NONE
         if self.radio_ok.isChecked():
             status = ResultStatus.OK
@@ -298,8 +310,9 @@ class SplitsObject:
 
 
 class SplitsText(SplitsObject):
-    def __init__(self, splits=None):
+    def __init__(self, splits=None, more24=False):
         self._splits = splits
+        self._more24 = more24
         self._box = QGroupBox(_('Splits'))
         self._layout = QFormLayout()
         self._text = QTextEdit()
@@ -326,6 +339,8 @@ class SplitsText(SplitsObject):
                         split.code = int(item[0])
                     else:
                         logging.error('{} not number'.format(item[0]))
+                    if self._more24 and len(item) >= 3 and item[2].isdigit():
+                        split.days = int(item[2])
                     splits.append(split)
                 else:
                     logging.error('In "{}" no code and no time'.format(row))
@@ -338,7 +353,11 @@ class SplitsText(SplitsObject):
         splits = self._splits if self._splits is not None else []
         text = ''
         for split in splits:
-            text += '{} {}\n'.format(split.code, str(split.time))
+            if self._more24:
+                text += '{} {} {}\n'.format(split.code, str(split.time), split.days)
+            else:
+                text += '{} {}\n'.format(split.code, str(split.time))
+
         self._text.setText(text)
 
     @staticmethod
