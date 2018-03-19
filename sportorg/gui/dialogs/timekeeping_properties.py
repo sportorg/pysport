@@ -224,7 +224,6 @@ class TimekeepingPropertiesDialog(QDialog):
         self.time_settings_format.setTitle(_('Format of competitions'))
         self.time_settings_format_less = QRadioButton(_('< 24'))
         self.time_settings_format_more = QRadioButton(_('> 24'))
-        self.time_settings_format_more.setDisabled(True)
         self.time_settings_format_layout = QFormLayout()
         self.time_settings_format_layout.addRow(self.time_settings_format_less)
         self.time_settings_format_layout.addRow(self.time_settings_format_more)

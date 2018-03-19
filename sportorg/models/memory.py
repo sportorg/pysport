@@ -1,7 +1,7 @@
 import uuid
 from abc import abstractmethod
 from enum import IntEnum, Enum
-from typing import Dict, List, Any, Union
+from typing import Dict, List, Any
 
 import datetime
 import dateutil.parser
@@ -9,7 +9,6 @@ import dateutil.parser
 from sportorg.core.model import Model
 from sportorg.core.otime import OTime
 from sportorg.language import _
-from sportorg.utils.time import time_to_hhmmss, time_to_sec
 
 
 class NotEmptyException(Exception):
@@ -416,7 +415,8 @@ class Group(Model):
 
 class Split(Model):
     def __init__(self):
-        self.code = 0  # type: int
+        self.code = 0
+        self.days = 0
         self.time = None  # type: OTime
         self.pace = None  # type: OTime
 
@@ -431,6 +431,7 @@ class Split(Model):
     def to_dict(self):
         return {
             'object': self.__class__.__name__,
+            'days': self.days,
             'code': self.code,
             'time': self.time.to_msec() if self.time else None,
         }
@@ -439,6 +440,8 @@ class Split(Model):
         self.code = int(data['code'])
         if data['time']:
             self.time = OTime(msec=data['time'])
+        if 'days' in data:
+            self.days = int(data['days'])
 
 
 class Result:
@@ -446,6 +449,7 @@ class Result:
         if type(self) == Result:
             raise Exception("<Result> is abstracted")
         self.id = uuid.uuid4()
+        self.days = 0
         self.start_time = None  # type: OTime
         self.finish_time = OTime.now()  # type: OTime
         self.person = None  # type: Person
@@ -453,8 +457,8 @@ class Result:
         self.status_comment = ''
         self.penalty_time = None  # type: OTime
         self.penalty_laps = 0  # count of penalty legs (marked route)
-        self.place = 0  # type: int
-        self.scores = 0  # type: int
+        self.place = 0
+        self.scores = 0
         self.assigned_rank = Qualification.NOT_QUALIFIED
         self.diff = None  # type: OTime
 
@@ -467,9 +471,9 @@ class Result:
     def __eq__(self, other):
         eq = self.system_type and other.system_type
         if self.start_time and other.start_time:
-            eq = eq and time_to_sec(self.start_time) == time_to_sec(other.start_time)
+            eq = eq and self.start_time == other.start_time
         if self.finish_time and other.finish_time:
-            eq = eq and time_to_sec(self.finish_time) == time_to_sec(other.finish_time)
+            eq = eq and self.finish_time == other.finish_time
         else:
             return False
         return eq
@@ -490,6 +494,7 @@ class Result:
             'id': str(self.id),
             'system_type': self.system_type.value,
             'person_id': str(self.person.id) if self.person else None,
+            'days': self.days,
             'start_time': self.start_time.to_msec() if self.start_time else None,
             'finish_time': self.finish_time.to_msec() if self.finish_time else None,
             'diff': self.diff.to_msec() if self.diff else None,
@@ -517,6 +522,8 @@ class Result:
             self.penalty_time = OTime(msec=data['penalty_time'])
         if 'status_comment' in data:
             self.status_comment = data['status_comment']
+        if 'days' in data:
+            self.days = int(data['days'])
 
     def clear(self):
         pass
@@ -530,7 +537,7 @@ class Result:
         if not self.person:
             return ''
 
-        return time_to_hhmmss(self.get_finish_time() - self.get_start_time() + self.get_penalty_time())
+        return str(self.get_finish_time() - self.get_start_time() + self.get_penalty_time())
 
     def get_result_for_sort(self):
         ret = self.get_result_otime()
@@ -608,7 +615,7 @@ class ResultSportident(Result):
         if len(self.splits) == len(other.splits):
             for i in range(len(self.splits)):
                 eq = eq and self.splits[i].code == other.splits[i].code
-                eq = eq and time_to_sec(self.splits[i].time) == time_to_sec(other.splits[i].time)
+                eq = eq and self.splits[i].time == other.splits[i].time
         else:
             return False
         return eq
@@ -886,7 +893,7 @@ class Person(Model):
             'qual': self.qual.get_title(),
             'year': self.year if self.year else '',
             'sportident_card': sportident_card,
-            'start': time_to_hhmmss(self.start_time),
+            'start': str(self.start_time),
             'comment': self.comment,
             'is_out_of_competition': self.is_out_of_competition,
             'is_rented': self.is_rented_sportident_card,
@@ -919,6 +926,13 @@ class RaceData(Model):
         if self.end_datetime is None:
             return datetime.datetime.now().replace(second=0, microsecond=0)
         return self.end_datetime
+
+    def get_days(self, date=None):
+        if self.start_datetime is None:
+            return 0
+        if date is None:
+            date = datetime.datetime.now()
+        return max((date - self.start_datetime).days, 0)
 
     def to_dict(self):
         return {
@@ -1068,6 +1082,9 @@ class Race(Model):
         else:
             return nvl_value
 
+    def get_days(self, date=None):
+        return self.data.get_days(date)
+
     def person_sportident_card(self, person, number=0):
         assert isinstance(person, Person)
         person.sportident_card = number
@@ -1149,16 +1166,14 @@ class Race(Model):
         course = self.find_course(result.person)  # type: Course
         return result.get_course_splits(course)
 
-    @staticmethod
-    def new_result():
+    def new_result(self):
         new_result = ResultManual()
-        new_result.finish_time = OTime.now()
+        new_result.days = self.get_days()
         return new_result
 
-    @staticmethod
-    def new_sportident_result():
+    def new_sportident_result(self):
         new_result = ResultSportident()
-        new_result.finish_time = OTime.now()
+        new_result.days = self.get_days()
         return new_result
 
     def add_new_person(self):
@@ -1328,7 +1343,7 @@ class RankingItem(object):
         ret = {}
         ret['qual'] = self.qual.get_title()
         ret['max_place'] = self.max_place
-        ret['max_time'] = time_to_hhmmss(self.max_time)
+        ret['max_time'] = str(self.max_time)
         ret['percent'] = self.percent
         return ret
 
@@ -1662,7 +1677,6 @@ class RelayTeam(object):
         # check leg count
         leg_count = race().data.relay_leg_count
         return len(self.legs) >= leg_count
-
 
     def get_is_out_of_competition(self):
         """get the whole status of team - OK if any lap is out of competition"""

@@ -50,6 +50,8 @@ class OTime:
         return self.to_msec() > other.to_msec()
 
     def __ge__(self, other):
+        if not other:
+            return False
         return self.to_msec() >= other.to_msec()
 
     def __add__(self, other):
@@ -77,9 +79,6 @@ class OTime:
 
     def __repr__(self):
         return self.__str__()
-
-    def __truediv__(self, fl):
-        return OTime(msec=(int(self.to_msec() / fl)))
 
     @classmethod
     def now(cls):
@@ -124,7 +123,3 @@ class OTime:
     @staticmethod
     def if_none(val, default=None):
         return default if val is None else val
-
-
-def otime(hour=0, minute=0, sec=0, msec=0):
-    return OTime(0, hour, minute, sec, msec)
