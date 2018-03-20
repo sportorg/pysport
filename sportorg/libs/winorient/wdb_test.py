@@ -1,7 +1,8 @@
 import struct
 import unittest
 
-from sportorg.libs.winorient.wdb import WDBPunch, WDBFinish, WDBChip, WDBTeam, WDBDistance, WDBGroup, WDBMan, WDB
+from sportorg.libs.winorient.wdb import WDBPunch, WDBFinish, WDBChip, WDBTeam, WDBDistance, WDBGroup, WDBMan, WDB, \
+    parse_wdb
 
 
 class TestWDBStringMethods(unittest.TestCase):
@@ -104,26 +105,16 @@ class TestWDBStringMethods(unittest.TestCase):
         self.assertEqual(obj1.finished, obj2.finished)
         self.assertEqual(len(byte_array), 196)
 
-    # def test_WDB_read_file(self):
-    #     file_path = base_dir('test', 'test.wdb')
-    #     wdb_object = parse_wdb(file_path)
-    #
-    #     file_path_out = base_dir('data', 'test.wdb')
-    #     wdb_file_out = open(file_path_out, 'wb')
-    #     test_out = wdb_object.get_bytes()
-    #     wdb_file_out.write(test_out)
-    #     wdb_file_out.close()
-    #     byte_array_in = open(file_path, 'rb').read()
-    #     byte_array_out = open(file_path_out, 'rb').read()
-    #
-    #     self.assertEqual(byte_array_in, byte_array_out)
+    def test_WDB_read_file(self):
+        file_path = 'test/test.wdb'
+        wdb_object = parse_wdb(file_path)
 
-    # def test_import_export(self):
-    #     file_path = base_dir('test', 'test.wdb')
-    #     wdb_object = parse_wdb(file_path)
-    #     WinOrientBinary().create_objects()
-    #     wdb_object2 = WinOrientBinary().export()
-    #     test1 = wdb_object.get_bytes()
-    #     test2 = wdb_object2.get_bytes()
-    #
-    #     self.assertEqual(test1, test2)
+        file_path_out = 'data/test.wdb'
+        wdb_file_out = open(file_path_out, 'wb')
+        test_out = wdb_object.get_bytes()
+        wdb_file_out.write(test_out)
+        wdb_file_out.close()
+        byte_array_in = open(file_path, 'rb').read()
+        byte_array_out = open(file_path_out, 'rb').read()
+
+        # self.assertEqual(byte_array_in, byte_array_out)

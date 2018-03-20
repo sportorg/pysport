@@ -14,7 +14,6 @@ from sportorg.models.memory import Race, races, race, NotEmptyException
 
 from sportorg import config
 from sportorg.models.result.result_calculation import ResultCalculation
-from sportorg.modules import testing
 from sportorg.modules.backup.file import File
 from sportorg.modules.live.orgeo import OrgeoClient
 from sportorg.modules.printing.model import NoResultToPrintException, split_printout, NoPrinterSelectedException
@@ -489,9 +488,6 @@ class MainWindow(QMainWindow):
                 self.set_title(file_name)
                 self.add_recent_file(self.file)
                 self.init_model()
-                if config.DEBUG:
-                    logging.info('Start testing after opening file')
-                    testing.test()
             except Exception as e:
                 logging.error(str(e))
                 self.delete_from_recent_files(file_name)
