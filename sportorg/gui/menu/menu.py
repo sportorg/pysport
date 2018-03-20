@@ -360,12 +360,13 @@ def menu_list():
                     'shortcut': 'F1',
                     'action': 'AboutAction'
                 },
-                # {
-                #     'title': _('Testing'),
-                #     'show': config.DEBUG and not config.is_executable(),
-                #     'shortcut': 'F10',
-                #     'action': 'TestingAction'
-                # }
+                {
+                    'title': _('Testing'),
+                    'show': config.DEBUG and not config.is_executable(),
+                    'shortcut': 'F10',
+                    'action': 'TestingAction',
+                    'debug': True
+                }
             ]
         },
     ]

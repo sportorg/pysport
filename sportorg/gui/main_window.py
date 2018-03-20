@@ -14,6 +14,7 @@ from sportorg.models.memory import Race, races, race, NotEmptyException
 
 from sportorg import config
 from sportorg.models.result.result_calculation import ResultCalculation
+from sportorg.modules import testing
 from sportorg.modules.backup.file import File
 from sportorg.modules.live.orgeo import OrgeoClient
 from sportorg.modules.printing.model import NoResultToPrintException, split_printout, NoPrinterSelectedException
@@ -155,7 +156,6 @@ class MainWindow(QMainWindow):
                     parent.addSeparator()
             elif 'action' in action_item:
                 action = QtWidgets.QAction(self)
-                parent.addAction(action)
                 action.setText(action_item['title'])
                 action.triggered.connect(self.menu_factory.get_action(action_item['action']))
                 if 'shortcut' in action_item:
@@ -166,6 +166,8 @@ class MainWindow(QMainWindow):
                     action.setStatusTip(action_item['status_tip'])
                 if 'property' in action_item:
                     self.menu_property[action_item['property']] = action
+                if ('debug' in action_item and action_item['debug']) or 'debug' not in action_item:
+                    parent.addAction(action)
             else:
                 menu = QtWidgets.QMenu(parent)
                 menu.setTitle(action_item['title'])
@@ -487,6 +489,9 @@ class MainWindow(QMainWindow):
                 self.set_title(file_name)
                 self.add_recent_file(self.file)
                 self.init_model()
+                if config.DEBUG:
+                    logging.info('Start testing after opening file')
+                    testing.test()
             except Exception as e:
                 logging.error(str(e))
                 self.delete_from_recent_files(file_name)
