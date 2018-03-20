@@ -1,10 +1,16 @@
 import unittest
 
+from sportorg import config
+
+print('Test {} {}'.format(config.NAME, config.VERSION))
+
 testmodules = [
     'sportorg.core.otime_test',
     'sportorg.core.version_test',
     'sportorg.libs.winorient.wdb_test',
     'sportorg.libs.ocad.ocad_test',
+    'sportorg.modules.backup.json_test',
+    'sportorg.modules.testing.memory_test',
 ]
 
 suite = unittest.TestSuite()

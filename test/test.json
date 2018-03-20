@@ -1,0 +1,235 @@
+{
+  "races": [
+    {
+      "courses": [
+        {
+          "bib": 0,
+          "climb": 300,
+          "controls": [
+            {
+              "code": "31",
+              "length": 150,
+              "object": "CourseControl"
+            },
+            {
+              "code": "32",
+              "length": 200,
+              "object": "CourseControl"
+            },
+            {
+              "code": "90",
+              "length": 2650,
+              "object": "CourseControl"
+            }
+          ],
+          "corridor": 0,
+          "id": "f6a25b2a-4d56-45db-9486-a416990bc1cf",
+          "length": 5600,
+          "name": "D1",
+          "object": "Course"
+        }
+      ],
+      "data": {
+        "chief_referee": "",
+        "description": "",
+        "end_datetime": null,
+        "location": "",
+        "race_type": 0,
+        "relay_leg_count": 3,
+        "secretary": "",
+        "start_datetime": null,
+        "title": "",
+        "url": ""
+      },
+      "groups": [
+        {
+          "__type": null,
+          "course_id": "f6a25b2a-4d56-45db-9486-a416990bc1cf",
+          "first_number": 0,
+          "id": "a1f1f92c-9f1b-46f1-bd94-30ed830154a6",
+          "long_name": "Group1",
+          "max_age": 0,
+          "max_time": 5400000,
+          "min_age": 0,
+          "name": "G1",
+          "object": "Group",
+          "order_in_corridor": 0,
+          "price": 0,
+          "ranking": {
+            "is_active": false,
+            "rank": [
+              {
+                "is_active": false,
+                "max_place": "2",
+                "max_time": null,
+                "percent": 0,
+                "qual": 8,
+                "use_scores": false
+              },
+              {
+                "is_active": false,
+                "max_place": "6",
+                "max_time": null,
+                "percent": 0,
+                "qual": 7,
+                "use_scores": false
+              },
+              {
+                "is_active": true,
+                "max_place": "0",
+                "max_time": null,
+                "percent": 0,
+                "qual": 4,
+                "use_scores": true
+              },
+              {
+                "is_active": true,
+                "max_place": "0",
+                "max_time": null,
+                "percent": 0,
+                "qual": 5,
+                "use_scores": true
+              },
+              {
+                "is_active": true,
+                "max_place": "0",
+                "max_time": null,
+                "percent": 0,
+                "qual": 6,
+                "use_scores": true
+              },
+              {
+                "is_active": false,
+                "max_place": "0",
+                "max_time": null,
+                "percent": 0,
+                "qual": 1,
+                "use_scores": true
+              },
+              {
+                "is_active": false,
+                "max_place": "0",
+                "max_time": null,
+                "percent": 0,
+                "qual": 2,
+                "use_scores": true
+              },
+              {
+                "is_active": false,
+                "max_place": "0",
+                "max_time": null,
+                "percent": 0,
+                "qual": 3,
+                "use_scores": true
+              }
+            ],
+            "rank_scores": 0
+          },
+          "relay_legs": 0,
+          "sex": 0,
+          "start_corridor": 0,
+          "start_interval": 0
+        }
+      ],
+      "id": "97d1f039-7522-4286-9749-58f35465d503",
+      "object": "Race",
+      "organizations": [
+        {
+          "address": {
+            "care_of": "",
+            "city": "",
+            "country": {
+              "code": "",
+              "code2": "",
+              "code3": "",
+              "digital_code": "",
+              "name": "",
+              "object": "Country"
+            },
+            "object": "Address",
+            "state": "",
+            "street": "",
+            "zip_code": ""
+          },
+          "contact": {
+            "name": "",
+            "object": "Contact",
+            "value": ""
+          },
+          "count_person": 0,
+          "id": "72e30070-d35e-423a-a95b-b585f351c650",
+          "name": "Abris",
+          "object": "Organization"
+        }
+      ],
+      "persons": [
+        {
+          "address": null,
+          "bib": 1,
+          "birth_date": null,
+          "comment": "",
+          "contact": [],
+          "group_id": "a1f1f92c-9f1b-46f1-bd94-30ed830154a6",
+          "id": "d134e1db-5c57-47e8-94e1-a4b51651662f",
+          "is_out_of_competition": false,
+          "is_paid": false,
+          "is_personal": false,
+          "is_rented_sportident_card": false,
+          "name": "Danil",
+          "national_code": null,
+          "nationality": null,
+          "object": "Person",
+          "organization_id": "72e30070-d35e-423a-a95b-b585f351c650",
+          "qual": 7,
+          "sex": 0,
+          "sportident_card": 9777775,
+          "start_group": 0,
+          "start_time": 37800000,
+          "surname": "Akhtarov",
+          "world_code": null,
+          "year": 1996
+        }
+      ],
+      "results": [
+        {
+          "assigned_rank": 0,
+          "days": 0,
+          "diff": 0,
+          "finish_time": 41521341,
+          "id": "d4f25f07-6f12-47d7-a24d-f479e1c535a4",
+          "object": "ResultManual",
+          "penalty_laps": 0,
+          "penalty_time": null,
+          "person_id": "d134e1db-5c57-47e8-94e1-a4b51651662f",
+          "place": 1,
+          "scores": 0,
+          "start_time": null,
+          "status": 1,
+          "status_comment": "",
+          "system_type": 1
+        },
+        {
+          "assigned_rank": 0,
+          "days": 0,
+          "diff": null,
+          "finish_time": 41552966,
+          "id": "13d423f0-0b49-45af-baad-7c0e3ed41542",
+          "object": "ResultSportident",
+          "penalty_laps": 0,
+          "penalty_time": null,
+          "person_id": "d134e1db-5c57-47e8-94e1-a4b51651662f",
+          "place": -1,
+          "scores": 0,
+          "splits": [],
+          "sportident_card": 0,
+          "start_time": null,
+          "status": 4,
+          "status_comment": "\u043f.\u043f.3.13.12.2",
+          "system_type": 2
+        }
+      ],
+      "settings": {}
+    }
+  ],
+  "version": "1.0.0.0"
+}
