@@ -18,7 +18,7 @@
 sportiduino.py - Classes to work with Sportiduino v1.2.0 and above.
 """
 
-from six import int2byte, byte2int, iterbytes, PY3
+from six import int2byte, byte2int, iterbytes, print_, PY3
 from serial import Serial
 from serial.serialutil import SerialException
 from datetime import datetime
@@ -34,6 +34,7 @@ if PY3:
             return x[0]
         except TypeError:
             return x
+
 
 class Sportiduino(object):
     """Protocol functions and constants to interact with Sportiduino master station."""
@@ -95,14 +96,24 @@ class Sportiduino(object):
             """
             return 'v%d.%d.x' % (self.major, self.minor)
 
-    def __init__(self, port=None, debug=False):
+    def __init__(self, port=None, debug=False, logger=None):
         """Initializes communication with master station at port.
         @param port: Serial device for the connection. If port is None it
                      scans all available ports and connects to the first
                      reader found.
         """
         self._serial = None
-        self._debug = debug
+
+        self._log_info = print_
+        self._log_debug = lambda s: None
+        if debug:
+            self._log_debug = print_
+
+        if logger is not None:
+            if callable(logger.debug):
+                self._log_debug = logger.debug
+            if callable(logger.info):
+                self._log_info = logger.info
 
         errors = ''
         if port is not None:
@@ -185,8 +196,7 @@ class Sportiduino(object):
         except SportiduinoTimeout:
             pass
         except SportiduinoException as msg:
-            if self._debug:
-                print("Warning: %s" % msg)
+            self._log_debug("Warning: %s" % msg)
         return False
 
 
@@ -319,7 +329,7 @@ class Sportiduino(object):
         self.baudrate = self._serial.baudrate
         version = self.read_version()
         if version is not None:
-            print("Master station %s on port '%s' connected" % (version, port))
+            self._log_info("Master station %s on port '%s' connected" % (version, port))
 
 
     def _send_command(self, code, parameters=None, wait_response=True, timeout=None):
@@ -333,15 +343,14 @@ class Sportiduino(object):
         cs = self._checsum(cmd_string)
         cmd = Sportiduino.START_BYTE + cmd_string + cs
 
-        if self._debug:
-            print("=> %s" % ' '.join(hex(byte2int(c)) for c in cmd))
+        self._log_debug("=> %s" % ' '.join(hex(byte2int(c)) for c in cmd))
 
         self._serial.flushInput()
         self._serial.write(cmd)
 
         if wait_response:
             resp_code, data = self._read_response(timeout)
-            return Sportiduino._preprocess_response(resp_code, data, self._debug)
+            return Sportiduino._preprocess_response(resp_code, data, self._log_debug)
 
         return None
 
@@ -377,12 +386,11 @@ class Sportiduino(object):
                 length = Sportiduino.MAX_DATA_LEN
             data = self._serial.read(length)
             checksum = self._serial.read()
-            if self._debug:
-                print("<= code '%s', len %i, data %s, cs %s" % (hex(byte2int(code)),
-                                                                length,
-                                                                ' '.join(hex(byte2int(c)) for c in data),
-                                                                hex(byte2int(checksum))
-                                                                ))
+            self._log_debug("<= code '%s', len %i, data %s, cs %s" % (hex(byte2int(code)),
+                                                                      length,
+                                                                      ' '.join(hex(byte2int(c)) for c in data),
+                                                                      hex(byte2int(checksum))
+                                                                     ))
 
             if not Sportiduino._cs_check(code + length_byte + data, checksum):
                 raise SportiduinoException('Checksum mismatch')
@@ -430,7 +438,7 @@ class Sportiduino(object):
 
 
     @staticmethod
-    def _preprocess_response(code, data, debug=False):
+    def _preprocess_response(code, data, log_debug):
         if code == Sportiduino.RESP_ERROR:
             if data == Sportiduino.ERR_COM:
                 raise SportiduinoException("COM error")
@@ -442,8 +450,8 @@ class Sportiduino(object):
                 raise SportiduinoException("EEPROM read error")
             else:
                 raise SportiduinoException("Error with code %s" % hex(byte2int(code)))
-        elif code == Sportiduino.RESP_OK and debug:
-            print("Ok received")
+        elif code == Sportiduino.RESP_OK:
+            log_debug("Ok received")
         return code, data
 
 

@@ -4,6 +4,7 @@ from queue import Queue, Empty
 from threading import main_thread, Event
 
 import time
+import serial
 
 from PyQt5.QtCore import QThread, pyqtSignal
 
@@ -32,7 +33,7 @@ class SportiduinoThread(QThread):
 
     def run(self):
         try:
-            sduino = sportiduino.Sportiduino(port=self.port)
+            sduino = sportiduino.Sportiduino(port=self.port, logger=logging.root)
         except Exception as e:
             self._logger.error(str(e))
             return
@@ -48,7 +49,7 @@ class SportiduinoThread(QThread):
                 card_data = sduino.card_data
                 self._queue.put(SportiduinoCommand('card_data', card_data), timeout=1)
                 sduino.beep_ok()
-            except sduino.SportiduinoException as e:
+            except sportiduino.SportiduinoException as e:
                 self._logger.error(str(e))
             except serial.serialutil.SerialException as e:
                 self._logger.error(str(e))
