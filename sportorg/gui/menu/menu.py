@@ -278,6 +278,10 @@ def menu_list():
                     'action': 'SPORTidentReadoutAction'
                 },
                 {
+                    'title': _('on/off Sportiduino readout'),
+                    'action': 'SportiduinoReadoutAction'
+                },
+                {
                     'title': _('Teamwork'),
                     'icon': config.icon_dir('network.svg'),
                     'actions': [
