@@ -10,13 +10,10 @@ class CSVReader:
         self._cards = set()
 
     def parse(self, source):
-        try:
-            with open(source) as csv_file:
-                spam_reader = csv.reader(csv_file, delimiter=';')
-                for row in spam_reader:
-                    self.append(row)
-        except FileNotFoundError:
-            raise FileNotFoundError("Not found " + source)
+        with open(source, encoding='cp1251') as csv_file:
+            spam_reader = csv.reader(csv_file, delimiter=';')
+            for row in spam_reader:
+                self.append(row)
 
         return self
 

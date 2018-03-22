@@ -6,6 +6,8 @@ from sportorg.libs.winorient.wdb import WDBPunch, WDBFinish, WDBChip, WDBTeam, W
 
 
 class TestWDBStringMethods(unittest.TestCase):
+    def setUp(self):
+        print('=========>', self.__class__.__name__, self._testMethodName)
 
     def test_WDBPunch_parsing(self):
         # 31 code
