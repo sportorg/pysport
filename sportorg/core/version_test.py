@@ -3,6 +3,9 @@ from sportorg.core.version import *
 
 
 class TestVersion(unittest.TestCase):
+    def setUp(self):
+        print('=========>', self.__class__.__name__, self._testMethodName)
+
     def test_version(self):
         vals = [
             ((1, 13, 5, 35, 'v', 'beta'), 'v1.13.5-beta.35'),

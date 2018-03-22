@@ -6,6 +6,7 @@ from sportorg.config import base_dir
 class TestOcadMethods(unittest.TestCase):
 
     def setUp(self):
+        print('=========>', self.__class__.__name__, self._testMethodName)
         file = base_dir('test', 'CoursesV8.txt')
         self.classes_v8 = ocad.parse_txt_v8(file)
 

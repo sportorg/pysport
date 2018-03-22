@@ -3,6 +3,9 @@ from sportorg.core.otime import *
 
 
 class TestOTime(unittest.TestCase):
+    def setUp(self):
+        print('=========>', self.__class__.__name__, self._testMethodName)
+
     def test_otime(self):
         vals = [
             ((1, 13, 5, 35), (1, 13, 5, 35), '37:05:35'),

@@ -6,6 +6,8 @@ from sportorg.modules.backup.file import File
 
 
 class TestJson(unittest.TestCase):
+    def setUp(self):
+        print('=========>', self.__class__.__name__, self._testMethodName)
 
     def test_main(self):
         File('test/test.json', logging.root, File.JSON).open()

@@ -4,6 +4,9 @@ from sportorg.models.memory import race, Result, Person, Group, Course, Organiza
 
 
 class TestMemoryData(unittest.TestCase):
+    def setUp(self):
+        print('=========>', self.__class__.__name__, self._testMethodName)
+
     @staticmethod
     def class_not_equal_msg(obj, t):
         return '{} not is {}'.format(obj.__class__.__name__, t.__class__.__name__)

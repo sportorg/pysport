@@ -3,6 +3,7 @@
 
 #define MyAppName "SportOrg"
 #define MyAppVersion "v1.0.0"
+#define MyVersionInfoVersion "1.0.0.0"
 #define MyAppPublisher "Danil Akhtarov, Sergei Kobelev"
 #define MyAppURL "http://sportorg.o-ural.ru/"
 #define MyAppExeName "SportOrg.exe"
@@ -16,6 +17,7 @@
 AppId={{0C7DBB23-2F49-410E-B92E-47CC79ED9801}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
+VersionInfoVersion={#MyVersionInfoVersion}
 ;AppVerName={#MyAppName} {#MyAppVersion}
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
@@ -23,9 +25,11 @@ AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DefaultDirName={pf}\{#MyAppName}
 DisableProgramGroupPage=yes
-OutputBaseFilename=setup
+OutputBaseFilename={#MyAppName}-{#MyAppVersion}
 Compression=lzma
 SolidCompression=yes
+LicenseFile=LICENSE
+SetupIconFile="img\icon\sportorg.ico"
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -51,4 +55,3 @@ Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: 
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
-
