@@ -1,5 +1,6 @@
 import uuid
 from abc import abstractmethod
+from datetime import date
 from enum import IntEnum, Enum
 from typing import Dict, List, Any
 
@@ -9,6 +10,7 @@ import dateutil.parser
 from sportorg.core.model import Model
 from sportorg.core.otime import OTime
 from sportorg.language import _
+from sportorg.utils.time import str_to_date, date_to_str
 
 
 class NotEmptyException(Exception):
@@ -796,7 +798,7 @@ class Person(Model):
         self.bib = 0
 
         self.year = 0  # sometime we have only year of birth
-        self.birth_date = None  # type: datetime
+        self.birth_date = None  # type: date
         self.organization = None  # type: Organization
         self.group = None  # type: Group
         self.nationality = None  # type: Country
@@ -834,7 +836,7 @@ class Person(Model):
             'sportident_card': self.sportident_card,
             'bib': self.bib,
             'year': self.year,
-            'birth_date': str(self.birth_date) if self.birth_date else None,
+            'birth_date': date_to_str(self.birth_date) if self.birth_date else None,
             'group_id': str(self.group.id) if self.group else None,
             'organization_id': str(self.organization.id) if self.organization else None,
             'nationality': self.nationality.to_dict() if self.nationality else None,
@@ -871,6 +873,9 @@ class Person(Model):
         self.start_group = int(data['start_group'])
         if data['start_time'] is not None:
             self.start_time = OTime(msec=int(data['start_time']))
+        if data['birth_date']:
+            self.birth_date = str_to_date(data['birth_date'])
+
 
     def to_dict_data(self, course=None):
         sportident_card = ''
@@ -1268,7 +1273,6 @@ class Qualification(IntEnum):
     KMS = 7
     MS = 8
     MSMK = 9
-    ZMS = 10
 
     @classmethod
     def get_qual_by_code(cls, code):
@@ -1289,7 +1293,7 @@ class Qualification(IntEnum):
             'КМС': 7,
             'МС': 8,
             'МСМК': 9,
-            'ЗМС': 10
+            'ЗМС': 9
         }
         return cls(qual_reverse[name])
 
@@ -1305,8 +1309,7 @@ class Qualification(IntEnum):
             4: 'I',
             7: 'КМС',
             8: 'МС',
-            9: 'МСМК',
-            10: 'ЗМС'
+            9: 'МСМК'
         }
         return qual[self.value]
 
@@ -1324,8 +1327,7 @@ class Qualification(IntEnum):
             4: 50,
             7: 80,
             8: 100,
-            9: 100,
-            10: 100
+            9: 100
         }
         return scores[self.value]
 

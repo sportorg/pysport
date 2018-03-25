@@ -91,8 +91,14 @@ class MainWindow(QMainWindow):
         event.event('close')
 
     def closeEvent(self, _event):
-        self.close()
-        _event.accept()
+        quit_msg = _('Are you sure you want to exit the program?')
+        reply = QMessageBox.question(self, _('Question'), quit_msg, QMessageBox.Yes | QMessageBox.No)
+
+        if reply == QMessageBox.Yes:
+            self.close()
+            _event.accept()
+        else:
+            _event.ignore()
 
     def resizeEvent(self, e):
         event.event('resize', self.get_size())
@@ -490,6 +496,7 @@ class MainWindow(QMainWindow):
                 self.init_model()
             except Exception as e:
                 logging.error(str(e))
+                logging.exception(e)
                 self.delete_from_recent_files(file_name)
                 QMessageBox.warning(self, _('Error'), _('Cannot read file, format unknown') + ': ' + file_name)
 

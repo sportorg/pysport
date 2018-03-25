@@ -1,10 +1,9 @@
 import logging
 from datetime import date
 
-from PyQt5.QtCore import QModelIndex
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit, QSpinBox, QTimeEdit, QTextEdit, QCheckBox, QDialog, \
-    QDialogButtonBox
+    QDialogButtonBox, QDateEdit
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
@@ -14,7 +13,7 @@ from sportorg.models.constant import get_names, get_race_groups, get_race_teams
 from sportorg.models.memory import race, Person, find, Qualification, Limit, Organization
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.modules.teamwork import Teamwork
-from sportorg.utils.time import time_to_qtime, time_to_otime
+from sportorg.utils.time import time_to_qtime, time_to_otime, qdate_to_date
 
 
 class EntryEditDialog(QDialog):
@@ -66,6 +65,12 @@ class EntryEditDialog(QDialog):
         self.item_year.setMaximum(date.today().year)
         self.item_year.editingFinished.connect(self.year_change)
         self.layout.addRow(self.label_year, self.item_year)
+
+        self.label_birthday = QLabel(_('Birthday'))
+        self.item_birthday = QDateEdit()
+        self.item_birthday.setDate(date(1900,1,1))
+        # self.item_birthday.editingFinished.connect(self.birthday_change)
+        self.layout.addRow(self.label_birthday, self.item_birthday)
 
         self.label_qual = QLabel(_('Qualification'))
         self.item_qual = AdvComboBox()
@@ -158,6 +163,15 @@ class EntryEditDialog(QDialog):
                 new_year -= 100
             widget.setValue(new_year)
 
+    def birthday_change(self):
+        widget = self.sender()
+        assert isinstance(widget, QTimeEdit)
+        year = widget.dateTime().year
+        year_widget = widget.previousInFocusChain()
+        assert isinstance(year_widget, QSpinBox)
+        if year_widget.getValue() != year:
+            year_widget.setValue(year)
+
     def items_ok(self):
         ret = True
         for item_name in self.is_ok.keys():
@@ -249,6 +263,9 @@ class EntryEditDialog(QDialog):
 
         self.item_comment.setText(self.current_object.comment)
 
+        if self.current_object.birth_date:
+            self.item_birthday.setDate(self.current_object.birth_date)
+
     def apply_changes_impl(self):
         changed = False
         person = self.current_object
@@ -316,6 +333,12 @@ class EntryEditDialog(QDialog):
         if person.comment != self.item_comment.toPlainText():
             person.comment = self.item_comment.toPlainText()
             changed = True
+
+        new_birthday = qdate_to_date(self.item_birthday.date())
+        if person.birth_date != new_birthday and new_birthday:
+            if person.birth_date or new_birthday != date(1900,1,1):
+                person.birth_date = new_birthday
+                changed = True
 
         if changed:
             ResultCalculation(race()).process_results()
