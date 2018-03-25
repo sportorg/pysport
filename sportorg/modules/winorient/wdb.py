@@ -103,6 +103,8 @@ class WinOrientBinary:
             new_person.name = man.name.split(" ")[-1]
             new_person.bib = man.number
             if man.qualification:
+                if man.qualification == 10:
+                    man.qualification = Qualification.MSMK.value  # Convert ZMS to MSMK
                 new_person.qual = Qualification.get_qual_by_code(man.qualification)
             new_person.year = man.year
             race().person_sportident_card(new_person, man.si_card)

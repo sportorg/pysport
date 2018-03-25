@@ -1,6 +1,7 @@
 import datetime
+from datetime import date
 
-from PyQt5.QtCore import QTime
+from PyQt5.QtCore import QTime, QDate
 
 from sportorg.core.otime import OTime
 
@@ -113,3 +114,22 @@ def time_to_minutes(value, max_val=24*60):
 def get_speed_min_per_km(time, length_m):
     time_km = time / (length_m / 1000)
     return time_to_mmss(time_km) + "/km"
+
+
+def qdate_to_date(value):
+    assert isinstance(value, QDate)
+    return date(year=value.year(), month=value.month(), day=value.day())
+
+
+def date_to_qdate(value):
+    assert isinstance(value, date)
+    return QDate(value.year, value.month, value.day)
+
+
+def date_to_str(value, separator='-'):
+    return '{:%m' + separator + '%d' + separator + '%Y}'.format(value)
+
+
+def str_to_date(value, separator='-'):
+    day, month, year = str(value).split(separator)
+    return date(int(year), int(month), int(day))

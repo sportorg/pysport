@@ -113,7 +113,7 @@ msgid "Race Results"
 msgstr "Результаты"
 
 msgid "Groups"
-msgstr "Группы"
+msgstr "Возр. категории"
 
 msgid "Courses"
 msgstr "Дистанции"
@@ -164,7 +164,7 @@ msgid "Qualification"
 msgstr "Квалификация"
 
 msgid "Group"
-msgstr "Группа"
+msgstr "Возрастная категория"
 
 msgid "Year"
 msgstr "Год рождения"
@@ -242,7 +242,7 @@ msgid "Country"
 msgstr "Страна"
 
 msgid "Region"
-msgstr "Регион"
+msgstr "Субъект РФ"
 
 msgid "City"
 msgstr "Город"
@@ -290,7 +290,7 @@ msgid "Course properties"
 msgstr "Свойства дистанции"
 
 msgid "Group properties"
-msgstr "Свойства группы"
+msgstr "Свойства возрастной категории"
 
 msgid "Max time"
 msgstr "Контрольное время"
@@ -380,10 +380,10 @@ msgid "Reserve"
 msgstr "_Резерв"
 
 msgid "Reserves per group, %"
-msgstr "Количество резервов на группу, %"
+msgstr "Количество резервов на возр. категорию, %"
 
 msgid "Reserves per group, ps"
-msgstr "Количество резервов на группу, шт."
+msgstr "Количество резервов на возр. категорию, шт."
 
 msgid "Change start time"
 msgstr "Присвоение стартового времени"
@@ -395,7 +395,7 @@ msgid "Fixed start interval"
 msgstr "Заданный интервал"
 
 msgid "Take start interval from group settings"
-msgstr "Брать стартовый интервал из настроек групп"
+msgstr "Брать стартовый интервал из настроек возр. категорий"
 
 msgid "Draw"
 msgstr "Жеребьевка"
@@ -407,7 +407,7 @@ msgid "Split by teams"
 msgstr "С учетом коллективов"
 
 msgid "Split by regions"
-msgstr "С учетом регионов"
+msgstr "С учетом субъектов РФ"
 
 msgid "Mix groups"
 msgstr "Общая жеребьевка по дистанции"
@@ -605,7 +605,7 @@ msgid "No results to print"
 msgstr "Нет результатов для печати"
 
 msgid "Cannot remove group"
-msgstr "Невозможно удалить группу"
+msgstr "Невозможно удалить возрастную категорию"
 
 msgid "Cannot remove course"
 msgstr "Невозможно удалить дистанцию"
@@ -1061,7 +1061,7 @@ msgid "organization grouping"
 msgstr "группировка по коллективам"
 
 msgid "region grouping"
-msgstr "группировка по регионам"
+msgstr "группировка по субъектам РФ"
 
 msgid "Sum"
 msgstr "Сумма"
@@ -1157,7 +1157,7 @@ msgid "The search has not given any results"
 msgstr "Поиск не дал результатов"
 
 msgid "Entries statistics"
-msgstr "Протокол мандатной комиссии"
+msgstr "Протокол комиссии по допуску"
 
 msgid "On/Off"
 msgstr "Включить/Выключить"
@@ -1170,3 +1170,9 @@ msgstr "Доступные порты"
 
 msgid "Days"
 msgstr "Дней"
+
+msgid "Birthday"
+msgstr "Дата рождения"
+
+msgid "'Are you sure you want to exit the program?'"
+msgstr "Вы действительно хотите закрыть приложение?"
