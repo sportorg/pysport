@@ -3,6 +3,9 @@ import logging
 from queue import Queue, Empty
 from threading import main_thread, Event
 
+import os
+import platform
+import re
 import time
 
 import serial
@@ -209,9 +212,14 @@ class SIReaderClient(object):
     @staticmethod
     def get_ports():
         ports = []
-        for i in range(32):
+        if platform.system() == 'Linux':
+            scan_ports = [os.path.join('/dev', f) for f in os.listdir('/dev') if
+                     re.match('ttyS.*|ttyUSB.*', f)]
+        elif platform.system() == 'Windows':
+            scan_ports = ['COM' + str(i) for i in range(32)]
+
+        for p in scan_ports:
             try:
-                p = 'COM' + str(i)
                 com = serial.Serial(p, 38400, timeout=5)
                 com.close()
                 ports.append(p)
