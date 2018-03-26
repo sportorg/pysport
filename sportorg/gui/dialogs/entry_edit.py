@@ -1,6 +1,7 @@
 import logging
 from datetime import date
 
+from PyQt5.QtCore import QDate
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit, QSpinBox, QTimeEdit, QTextEdit, QCheckBox, QDialog, \
     QDialogButtonBox, QDateEdit
@@ -61,6 +62,7 @@ class EntryEditDialog(QDialog):
 
         self.label_year = QLabel(_('Year of birth'))
         self.item_year = QSpinBox()
+        self.item_year.setObjectName('YearSpinBox')
         self.item_year.setMinimum(0)
         self.item_year.setMaximum(date.today().year)
         self.item_year.editingFinished.connect(self.year_change)
@@ -68,8 +70,9 @@ class EntryEditDialog(QDialog):
 
         self.label_birthday = QLabel(_('Birthday'))
         self.item_birthday = QDateEdit()
+        self.item_birthday.setObjectName('BirthdayDateEdit')
         self.item_birthday.setDate(date(1900,1,1))
-        # self.item_birthday.editingFinished.connect(self.birthday_change)
+        self.item_birthday.editingFinished.connect(self.birthday_change)
         self.layout.addRow(self.label_birthday, self.item_birthday)
 
         self.label_qual = QLabel(_('Qualification'))
@@ -155,7 +158,7 @@ class EntryEditDialog(QDialog):
         """
         widget = self.sender()
         assert isinstance(widget, QSpinBox)
-        year = int(widget.value())
+        year = widget.value()
         if 0 < year < 100:
             cur_year = date.today().year
             new_year = cur_year - cur_year % 100 + year
@@ -163,13 +166,22 @@ class EntryEditDialog(QDialog):
                 new_year -= 100
             widget.setValue(new_year)
 
+        year = widget.value()
+        birthday_widget = widget.parent().findChild(QDateEdit, 'BirthdayDateEdit')
+        birthday_date = birthday_widget.date()
+        assert isinstance(birthday_date, QDate)
+        if year != birthday_date.year():
+            birthday_widget.setDate(QDate(year, birthday_date.month(), birthday_date.day()))
+
     def birthday_change(self):
         widget = self.sender()
-        assert isinstance(widget, QTimeEdit)
-        year = widget.dateTime().year
-        year_widget = widget.previousInFocusChain()
+        assert isinstance(widget, QDateEdit)
+        year = widget.date().year()
+
+        year_widget = widget.parent().findChild(QSpinBox,'YearSpinBox')
+
         assert isinstance(year_widget, QSpinBox)
-        if year_widget.getValue() != year:
+        if year_widget.value() != year:
             year_widget.setValue(year)
 
     def items_ok(self):

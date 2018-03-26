@@ -279,7 +279,7 @@ class ResultEditDialog(QDialog):
             result.status = status
             changed = True
 
-        status = self.item_status_comment.currentText().split('#')[0].strip()
+        status = StatusComments().remove_hint(self.item_status_comment.currentText())
         if result.status_comment != status:
             result.status_comment = status
             changed = True
