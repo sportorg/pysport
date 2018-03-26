@@ -28,6 +28,7 @@ from sportorg.gui.tabs.memory_model import PersonMemoryModel, ResultMemoryModel,
 from sportorg.gui.toolbar import toolbar_list
 from sportorg.language import _
 from sportorg.modules.sportident.sireader import SIReaderClient
+from sportorg.modules.sportiduino.sportiduino import SportiduinoClient
 from sportorg.modules.teamwork import Teamwork
 from sportorg.modules.telegram.telegram import TelegramClient
 
@@ -130,6 +131,7 @@ class MainWindow(QMainWindow):
 
         Teamwork().set_call(self.teamwork)
         SIReaderClient().set_call(self.add_sportident_result_from_sireader)
+        SportiduinoClient().set_call(self.add_sportident_result_from_sireader)
 
         ServiceListenerThread().interval.connect(self.interval)
         ServiceListenerThread().start()
