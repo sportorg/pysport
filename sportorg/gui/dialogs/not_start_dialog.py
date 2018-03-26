@@ -61,7 +61,7 @@ class NotStartDialog(QDialog):
         self.show()
 
     def apply_changes_impl(self):
-        status_comment = self.item_status_comment.currentText()
+        status_comment = StatusComments().remove_hint(self.item_status_comment.currentText())
         text = self.item_numbers.toPlainText()
         numbers = []
         for item in text.split('\n'):

@@ -32,7 +32,7 @@ class ResultChecker:
             if not o.check_result(result):
                 result.status = ResultStatus.DISQUALIFIED
                 if not result.status_comment:
-                    result.status_comment = StatusComments().get()
+                    result.status_comment = StatusComments().remove_hint(StatusComments().get())
             elif result.person.group and result.person.group.max_time.to_msec():
                 if result.get_result_otime() > result.person.group.max_time:
                     result.status = ResultStatus.OVERTIME

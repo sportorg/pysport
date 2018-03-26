@@ -836,7 +836,7 @@ class Person(Model):
             'sportident_card': self.sportident_card,
             'bib': self.bib,
             'year': self.year,
-            'birth_date': date_to_str(self.birth_date) if self.birth_date else None,
+            'birth_date': str(self.birth_date) if self.birth_date else None,
             'group_id': str(self.group.id) if self.group else None,
             'organization_id': str(self.organization.id) if self.organization else None,
             'nationality': self.nationality.to_dict() if self.nationality else None,
@@ -874,8 +874,7 @@ class Person(Model):
         if data['start_time'] is not None:
             self.start_time = OTime(msec=int(data['start_time']))
         if data['birth_date']:
-            self.birth_date = str_to_date(data['birth_date'])
-
+            self.birth_date = dateutil.parser.parse(data['birth_date']).date()
 
     def to_dict_data(self, course=None):
         sportident_card = ''
