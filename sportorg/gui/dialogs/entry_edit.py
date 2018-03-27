@@ -1,7 +1,6 @@
 import logging
 from datetime import date
 
-from PyQt5.QtCore import QDate
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit, QSpinBox, QTimeEdit, QTextEdit, QCheckBox, QDialog, \
     QDialogButtonBox, QDateEdit
@@ -13,6 +12,7 @@ from sportorg.language import _
 from sportorg.models.constant import get_names, get_race_groups, get_race_teams
 from sportorg.models.memory import race, Person, find, Qualification, Limit, Organization
 from sportorg.models.result.result_calculation import ResultCalculation
+from sportorg.modules.configs.configs import Config
 from sportorg.modules.teamwork import Teamwork
 from sportorg.utils.time import time_to_qtime, time_to_otime, qdate_to_date
 
@@ -60,20 +60,22 @@ class EntryEditDialog(QDialog):
         self.item_team.addItems(get_race_teams())
         self.layout.addRow(self.label_team, self.item_team)
 
-        self.label_year = QLabel(_('Year of birth'))
-        self.item_year = QSpinBox()
-        self.item_year.setObjectName('YearSpinBox')
-        self.item_year.setMinimum(0)
-        self.item_year.setMaximum(date.today().year)
-        self.item_year.editingFinished.connect(self.year_change)
-        self.layout.addRow(self.label_year, self.item_year)
-
-        self.label_birthday = QLabel(_('Birthday'))
-        self.item_birthday = QDateEdit()
-        self.item_birthday.setObjectName('BirthdayDateEdit')
-        self.item_birthday.setDate(date(1900,1,1))
-        self.item_birthday.editingFinished.connect(self.birthday_change)
-        self.layout.addRow(self.label_birthday, self.item_birthday)
+        use_birthday = Config().configuration.get('use_birthday', False)
+        if use_birthday:
+            self.label_birthday = QLabel(_('Birthday'))
+            self.item_birthday = QDateEdit()
+            self.item_birthday.setObjectName('BirthdayDateEdit')
+            self.item_birthday.setDate(date.today())
+            self.item_birthday.setMaximumDate(date.today())
+            self.layout.addRow(self.label_birthday, self.item_birthday)
+        else:
+            self.label_year = QLabel(_('Year of birth'))
+            self.item_year = QSpinBox()
+            self.item_year.setObjectName('YearSpinBox')
+            self.item_year.setMinimum(0)
+            self.item_year.setMaximum(date.today().year)
+            self.item_year.editingFinished.connect(self.year_change)
+            self.layout.addRow(self.label_year, self.item_year)
 
         self.label_qual = QLabel(_('Qualification'))
         self.item_qual = AdvComboBox()
@@ -166,24 +168,6 @@ class EntryEditDialog(QDialog):
                 new_year -= 100
             widget.setValue(new_year)
 
-        year = widget.value()
-        birthday_widget = widget.parent().findChild(QDateEdit, 'BirthdayDateEdit')
-        birthday_date = birthday_widget.date()
-        assert isinstance(birthday_date, QDate)
-        if year != birthday_date.year():
-            birthday_widget.setDate(QDate(year, birthday_date.month(), birthday_date.day()))
-
-    def birthday_change(self):
-        widget = self.sender()
-        assert isinstance(widget, QDateEdit)
-        year = widget.date().year()
-
-        year_widget = widget.parent().findChild(QSpinBox,'YearSpinBox')
-
-        assert isinstance(year_widget, QSpinBox)
-        if year_widget.value() != year:
-            year_widget.setValue(year)
-
     def items_ok(self):
         ret = True
         for item_name in self.is_ok.keys():
@@ -252,8 +236,6 @@ class EntryEditDialog(QDialog):
             self.item_group.setCurrentText(self.current_object.group.name)
         if self.current_object.organization is not None:
             self.item_team.setCurrentText(self.current_object.organization.name)
-        if self.current_object.year:
-            self.item_year.setValue(int(self.current_object.year))
         if self.current_object.qual:
             self.item_qual.setCurrentText(self.current_object.qual.get_title())
         if self.current_object.bib:
@@ -275,8 +257,13 @@ class EntryEditDialog(QDialog):
 
         self.item_comment.setText(self.current_object.comment)
 
-        if self.current_object.birth_date:
-            self.item_birthday.setDate(self.current_object.birth_date)
+        use_birthday = Config().configuration.get('use_birthday', False)
+        if use_birthday:
+            if self.current_object.birth_date:
+                self.item_birthday.setDate(self.current_object.birth_date)
+        else:
+            if self.current_object.get_year():
+                self.item_year.setValue(self.current_object.get_year())
 
     def apply_changes_impl(self):
         changed = False
@@ -301,9 +288,6 @@ class EntryEditDialog(QDialog):
                 race().organizations.append(organization)
                 Teamwork().send(organization.to_dict())
             person.organization = organization
-            changed = True
-        if person.year != self.item_year.value():
-            person.year = self.item_year.value()
             changed = True
         if person.qual.get_title() != self.item_qual.currentText():
             person.qual = Qualification.get_qual_by_name(self.item_qual.currentText())
@@ -346,10 +330,16 @@ class EntryEditDialog(QDialog):
             person.comment = self.item_comment.toPlainText()
             changed = True
 
-        new_birthday = qdate_to_date(self.item_birthday.date())
-        if person.birth_date != new_birthday and new_birthday:
-            if person.birth_date or new_birthday != date(1900,1,1):
-                person.birth_date = new_birthday
+        use_birthday = Config().configuration.get('use_birthday', False)
+        if use_birthday:
+            new_birthday = qdate_to_date(self.item_birthday.date())
+            if person.birth_date != new_birthday and new_birthday:
+                if person.birth_date or new_birthday != date.today():
+                    person.birth_date = new_birthday
+                    changed = True
+        else:
+            if person.get_year() != self.item_year.value():
+                person.set_year(self.item_year.value())
                 changed = True
 
         if changed:

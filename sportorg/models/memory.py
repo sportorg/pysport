@@ -797,7 +797,6 @@ class Person(Model):
         self.sportident_card = 0
         self.bib = 0
 
-        self.year = 0  # sometime we have only year of birth
         self.birth_date = None  # type: date
         self.organization = None  # type: Organization
         self.group = None  # type: Group
@@ -819,6 +818,23 @@ class Person(Model):
     def __repr__(self):
         return '{} {} {}'.format(self.full_name, self.bib, self.group)
 
+    def get_year(self):
+        """Get year from birth_date. If only year is used in the event, it's stored as 01-01-year"""
+        if self.birth_date:
+            return self.birth_date.year
+        return 0
+
+    def set_year(self, year):
+        """Change only year of birth_date"""
+        if year == 0:
+            self.birth_date = None
+            return
+
+        if self.birth_date:
+            self.birth_date = date(year, self.birth_date.month, self.birth_date.day)
+        else:
+            self.birth_date = date(year, 1, 1)
+
     @property
     def full_name(self):
         surname = self.surname
@@ -835,7 +851,6 @@ class Person(Model):
             'sex': self.sex.value,
             'sportident_card': self.sportident_card,
             'bib': self.bib,
-            'year': self.year,
             'birth_date': str(self.birth_date) if self.birth_date else None,
             'group_id': str(self.group.id) if self.group else None,
             'organization_id': str(self.organization.id) if self.organization else None,
@@ -860,7 +875,6 @@ class Person(Model):
         self.sex = Sex(int(data['sex']))
         self.sportident_card = int(data['sportident_card'])
         self.bib = int(data['bib'])
-        self.year = int(data['year'])
         self.contact = []
         self.world_code = data['world_code']
         self.national_code = data['national_code']
@@ -895,7 +909,7 @@ class Person(Model):
             'group_start_corridor': self.group.start_corridor if self.group is not None else 0,
             'price': self.group.price if self.group is not None else 0,
             'qual': self.qual.get_title(),
-            'year': self.year if self.year else '',
+            'year': self.get_year() if self.get_year() else '',
             'sportident_card': sportident_card,
             'start': str(self.start_time),
             'comment': self.comment,

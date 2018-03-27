@@ -106,7 +106,7 @@ class WinOrientBinary:
                 if man.qualification == 10:
                     man.qualification = Qualification.MSMK.value  # Convert ZMS to MSMK
                 new_person.qual = Qualification.get_qual_by_code(man.qualification)
-            new_person.year = man.year
+            new_person.set_year(man.year)
             race().person_sportident_card(new_person, man.si_card)
             new_person.is_out_of_competition = man.is_not_qualified
             new_person.comment = man.comment
@@ -231,8 +231,8 @@ class WinOrientBinary:
             if man.qual:
                 new_person.qualification = Qualification(int(man.qual.value))
 
-            if man.year:
-                new_person.year = int(man.year)
+            if man.get_year():
+                new_person.year = man.get_year()
             if man.sportident_card:
                 new_person.si_card = int(man.sportident_card)
                 new_person.is_own_card = 2

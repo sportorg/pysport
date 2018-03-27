@@ -1037,7 +1037,7 @@ msgid "no penalty"
 msgstr "штрафа не начисляется"
 
 msgid "Penalty calculation"
-msgstr "Рассчет штрафа из сплитов"
+msgstr "Расчет штрафа из сплитов"
 
 msgid "Penalty removing"
 msgstr "Обнуление штрафа"
@@ -1049,7 +1049,7 @@ msgid "scores array"
 msgstr "список значений"
 
 msgid "scores formula"
-msgstr "рассчет очков по формуле"
+msgstr "расчет очков по формуле"
 
 msgid "scores formula hint"
 msgstr "Составьте произвольную формулу. Поддерживаются переменные: \n leader - результат победителя группы; \n time - результат участника"
@@ -1176,3 +1176,6 @@ msgstr "Дата рождения"
 
 msgid "Are you sure you want to exit the program?"
 msgstr "Вы действительно хотите закрыть приложение?"
+
+msgid "Use birthday"
+msgstr "Использовать день рождения, а не только год"

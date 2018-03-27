@@ -69,7 +69,7 @@ class PersonSplits(object):
         self.qual = ''
         if person.qual:
             self.qual = person.qual.get_title()
-        self.year = person.year
+        self.year = person.get_year()
 
         race_result = result.get_finish_time() - result.get_start_time()
 

@@ -242,7 +242,7 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
             ret.append(person.organization.name)
         else:
             ret.append('')
-        ret.append(person.year)
+        ret.append(person.get_year())
         ret.append(person.bib)
         if person.start_time:
             ret.append(time_to_hhmmss(person.start_time))
