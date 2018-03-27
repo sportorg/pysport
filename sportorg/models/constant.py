@@ -371,5 +371,6 @@ class StatusComments(object):
             items.insert(0, '')
         self.STATUS_COMMENTS = items
 
-    def remove_hint(self, full_str):
+    @staticmethod
+    def remove_hint(full_str):
         return str(full_str).split('#')[0].strip()

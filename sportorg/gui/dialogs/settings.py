@@ -49,6 +49,10 @@ class SettingsDialog(QDialog):
         self.item_open_recent_file.setChecked(Config().configuration.get('open_recent_file'))
         self.layout.addRow(self.item_open_recent_file)
 
+        self.item_use_birthday = QCheckBox(_('Use birthday'))
+        self.item_use_birthday.setChecked(Config().configuration.get('use_birthday', False))
+        self.layout.addRow(self.item_use_birthday)
+
         def cancel_changes():
             self.close()
 
@@ -76,4 +80,5 @@ class SettingsDialog(QDialog):
         Config().configuration.set('autosave', self.item_auto_save.isChecked())
         Config().configuration.set('autoconnect', self.item_auto_connect.isChecked())
         Config().configuration.set('open_recent_file', self.item_open_recent_file.isChecked())
+        Config().configuration.set('use_birthday', self.item_use_birthday.isChecked())
         Config().save()

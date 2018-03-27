@@ -77,8 +77,8 @@ class ResultEditDialog(QDialog):
         self.radio_overtime = QRadioButton(_('Overtime'))
         self.radio_dsq = QRadioButton(_('DSQ'))
         self.item_status_comment = AdvComboBox()
-        self.item_status_comment.setMaximumWidth(300)
-        self.item_status_comment.view().setMinimumWidth(700)
+        self.item_status_comment.setMaximumWidth(250)
+        self.item_status_comment.view().setMinimumWidth(650)
         self.item_status_comment.addItems(StatusComments().get_all())
 
         more24 = race().get_setting('time_format_24', 'less24') == 'more24'
