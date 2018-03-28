@@ -23,7 +23,3 @@ class TestISS(unittest.TestCase):
                 self.assertTrue(config.VERSION.file in item, '{} not in "{}"'.format(config.VERSION.file, item))
                 return
         self.fail('Not version info')
-
-
-if __name__ == '__main__':
-    unittest.main()
