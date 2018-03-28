@@ -73,9 +73,6 @@ msgstr "Дистанция"
 msgid "Person"
 msgstr "Личность"
 
-msgid "Live"
-msgstr "Live"
-
 msgid "Start"
 msgstr "Старт"
 
@@ -99,9 +96,6 @@ msgstr "Редактировать"
 
 msgid "File"
 msgstr "Файл"
-
-msgid "Languages"
-msgstr "Языки"
 
 msgid "Options"
 msgstr "Опции"
