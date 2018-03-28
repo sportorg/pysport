@@ -61,7 +61,7 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
         if role == Qt.DisplayRole:
             if orientation == Qt.Horizontal:
                 columns = self.get_headers()
-                return _(columns[index])
+                return columns[index]
             if orientation == Qt.Vertical:
                 return str(index+1)
 
@@ -212,8 +212,8 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
         self.init_cache()
 
     def get_headers(self):
-        return ['Last name', 'First name', 'Sex', 'Qualification', 'Group', 'Team', 'Year', 'Bib', 'Start',
-                'Start group', 'Card', 'Rented card', 'Comment', 'World code', 'National code', 'Out of competition']
+        return [_('Last name'), _('First name'), _('Sex'), _('Qualification'), _('Group'), _('Team'), _('Year'), _('Bib'), _('Start'),
+                _('Start group'), _('Card'), _('Rented card'), _('Comment'), _('World code'), _('National code'), _('Out of competition')]
 
     def init_cache(self):
         self.cache.clear()
@@ -276,8 +276,8 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
         self.count = None
 
     def get_headers(self):
-        return ['Last name', 'First name', 'Group', 'Team', 'Bib', 'Card', 'Start', 'Finish', 'Result',
-                'Status', 'Penalty', 'Penalty legs', 'Place', 'Type']
+        return [_('Last name'), _('First name'), _('Group'), _('Team'), _('Bib'), _('Card'), _('Start'), _('Finish'), _('Result'),
+                _('Status'), _('Penalty'), _('Penalty legs'), _('Place'), _('Type')]
 
     def init_cache(self):
         self.cache.clear()
@@ -348,8 +348,8 @@ class GroupMemoryModel(AbstractSportOrgMemoryModel):
         super().__init__()
 
     def get_headers(self):
-        return ['Name', 'Full name', 'Course name', 'Start fee', 'Type', 'Length', 'Point count', 'Climb', 'Sex', 'Min age',
-                'Max age', 'Start interval', 'Start corridor', 'Order in corridor']
+        return [_('Name'), _('Full name'), _('Course name'), _('Start fee'), _('Type'), _('Length'), _('Point count'), _('Climb'), _('Sex'), _('Min age'),
+                _('Max age'), _('Start interval'), _('Start corridor'), _('Order in corridor')]
 
     def init_cache(self):
         self.cache.clear()
@@ -397,7 +397,7 @@ class CourseMemoryModel(AbstractSportOrgMemoryModel):
         super().__init__()
 
     def get_headers(self):
-        return ['Name', 'Length', 'Point count', 'Climb', 'Controls']
+        return [_('Name'), _('Length'), _('Point count'), _('Climb'), _('Controls')]
 
     def init_cache(self):
         self.cache.clear()
@@ -433,7 +433,7 @@ class TeamMemoryModel(AbstractSportOrgMemoryModel):
         super().__init__()
 
     def get_headers(self):
-        return ['Name', 'Address', 'Country', 'Region', 'City', 'Contact']
+        return [_('Name'), _('Address'), _('Country'), _('Region'), _('City'), _('Contact')]
 
     def init_cache(self):
         self.cache.clear()
