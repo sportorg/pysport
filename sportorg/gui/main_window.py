@@ -224,7 +224,7 @@ class MainWindow(QMainWindow):
         }
 
     def set_title(self, title=None):
-        main_title = '{} {}'.format(_(config.NAME), config.VERSION)
+        main_title = '{} {}'.format(config.NAME, config.VERSION)
         if title:
             self.setWindowTitle('{} - {}'.format(title, main_title))
         else:
