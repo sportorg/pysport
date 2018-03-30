@@ -121,25 +121,22 @@ class Sportiduino(object):
             return
         else:
             if platform.system() == 'Linux':
-                scan_ports = [ os.path.join('/dev', f) for f in os.listdir('/dev') if
-                               re.match('ttyUSB.*', f) ]
-
-                if len(scan_ports) == 0:
-                    errors = 'no serial ports found'
-
-                for port in scan_ports:
-                    try:
-                        self._connect_master_station(port)
-                        return
-                    except SportiduinoException as msg:
-                        errors += 'port %s: %s\n' % (port, msg)
+                scan_ports = [os.path.join('/dev', f) for f in os.listdir('/dev') if
+                              re.match('ttyUSB.*', f)]
             elif platform.system() == 'Windows':
-                for i in range(32):
-                    try:
-                        port = 'COM' + str(i)
-                        self._connect_master_station(port)
-                    except SportiduinoException as msg:
-                        errors += 'port %s: %s\n' % (port, msg)
+                scan_ports = ['COM' + i for i in range(32)]
+            else:
+                raise SportiduinoException('Unsupported platform: %s' % platform.system())
+
+            if len(scan_ports) == 0:
+                errors = 'no serial ports found'
+
+            for port in scan_ports:
+                try:
+                    self._connect_master_station(port)
+                    return
+                except SportiduinoException as msg:
+                    errors += 'port %s: %s\n' % (port, msg)
 
         raise SportiduinoException('No Sportiduino master station found. Possible reasons: %s' % errors)
 
