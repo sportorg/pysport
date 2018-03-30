@@ -279,6 +279,7 @@ def menu_list():
                 },
                 {
                     'title': _('on/off Sportiduino readout'),
+                    'icon': config.icon_dir('sportiduino.png'),
                     'action': 'SportiduinoReadoutAction'
                 },
                 {
