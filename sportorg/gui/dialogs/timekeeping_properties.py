@@ -96,7 +96,7 @@ class TimekeepingPropertiesDialog(QDialog):
         self.assignment_mode.stateChanged.connect(self.on_assignment_mode)
         self.tk_layout.addRow(self.assignment_mode)
 
-        self.auto_connect = QCheckBox(_('Auto connect to station'))
+        self.auto_connect = QCheckBox(_('Auto connect to SPORTident station'))
         self.tk_layout.addRow(self.auto_connect)
 
         self.timekeeping_tab.setLayout(self.tk_layout)
@@ -232,7 +232,7 @@ class TimekeepingPropertiesDialog(QDialog):
 
         self.time_settings_tab.setLayout(self.time_settings_layout)
 
-        self.tab_widget.addTab(self.timekeeping_tab, _('SPORTident settings'))
+        self.tab_widget.addTab(self.timekeeping_tab, _('SPORTident (Sportiduino) settings'))
         self.tab_widget.addTab(self.result_proc_tab, _('Result processing'))
         self.tab_widget.addTab(self.team_result_tab, _('Team results'))
         self.tab_widget.addTab(self.scores_tab, _('Scores'))
