@@ -26,6 +26,7 @@ from sportorg.gui.tabs import start_preparation, groups, teams, race_results, co
 from sportorg.gui.tabs.memory_model import PersonMemoryModel, ResultMemoryModel, GroupMemoryModel, \
     CourseMemoryModel, TeamMemoryModel
 from sportorg.gui.toolbar import toolbar_list
+from sportorg.gui.utils.custom_controls import messageBoxQuestion
 from sportorg.language import _
 from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.modules.sportiduino.sportiduino import SportiduinoClient
@@ -93,7 +94,7 @@ class MainWindow(QMainWindow):
 
     def closeEvent(self, _event):
         quit_msg = _('Are you sure you want to exit the program?')
-        reply = QMessageBox.question(self, _('Question'), quit_msg, QMessageBox.Yes | QMessageBox.No)
+        reply = messageBoxQuestion(self, _('Question'), quit_msg, QMessageBox.Yes | QMessageBox.No)
 
         if reply == QMessageBox.Yes:
             self.close()
@@ -566,7 +567,7 @@ class MainWindow(QMainWindow):
         if not len(indexes):
             return
 
-        confirm = QMessageBox.question(self, _('Question'), _('Please confirm'), QMessageBox.Yes | QMessageBox.No)
+        confirm = messageBoxQuestion(self, _('Question'), _('Please confirm'), QMessageBox.Yes | QMessageBox.No)
         if confirm == QMessageBox.No:
             return
         tab = self.current_tab

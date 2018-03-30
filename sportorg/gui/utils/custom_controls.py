@@ -1,7 +1,8 @@
 from PyQt5 import QtCore
 from PyQt5.QtCore import QSortFilterProxyModel
-from PyQt5.QtWidgets import QComboBox, QCompleter
+from PyQt5.QtWidgets import QComboBox, QCompleter, QMessageBox
 
+from sportorg.language import _
 
 class AdvComboBox(QComboBox):
     """
@@ -40,3 +41,18 @@ class AdvComboBox(QComboBox):
         if text:
             index = self.findText(str(text))
             self.setCurrentIndex(index)
+
+def messageBoxQuestion(parent=None, title='', text='', buttons=(QMessageBox.Yes | QMessageBox.No)):
+    messageBox = QMessageBox(QMessageBox.Question, title, text, buttons, parent)
+
+    button_yes = messageBox.button(QMessageBox.Yes)
+    if button_yes is not None:
+        button_yes.setText(_('Yes'))
+
+    button_no = messageBox.button(QMessageBox.No)
+    if button_no is not None:
+        button_no.setText(_('No'))
+
+    return messageBox.exec()
+
+
