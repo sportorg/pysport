@@ -11,3 +11,6 @@ install:
 script:
   - python SportOrg_test.py
   - python setup.py build
+branches:
+  only:
+    - dev
