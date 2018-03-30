@@ -41,7 +41,7 @@ class SettingsDialog(QDialog):
         self.item_auto_save.setChecked(Config().configuration.get('autosave'))
         self.layout.addRow(self.item_auto_save)
 
-        self.item_auto_connect = QCheckBox(_('Auto connect to station'))
+        self.item_auto_connect = QCheckBox(_('Auto connect to SPORTident station'))
         self.item_auto_connect.setChecked(Config().configuration.get('autoconnect'))
         self.layout.addRow(self.item_auto_connect)
 

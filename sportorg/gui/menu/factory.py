@@ -6,7 +6,7 @@ from sportorg.gui.menu.actions import NewAction, SaveAction, OpenAction, SaveAsA
     ToCoursesAction, ToTeamsAction, StartPreparationAction, GuessCoursesAction, GuessCorridorsAction, \
     RelayNumberAction, \
     NumberChangeAction, StartTimeChangeAction, StartListAction, TeamListAction, StartTimesAction, PrintBibAction, \
-    ManualFinishAction, SPORTidentReadoutAction, CreateReportAction, CreateTeamResultsReportAction, \
+    ManualFinishAction, SPORTidentReadoutAction, SportiduinoReadoutAction, CreateReportAction, CreateTeamResultsReportAction, \
     SplitPrintoutAction, \
     RecheckingAction, PenaltyCalculationAction, PenaltyRemovingAction, ChangeStatusAction, SetDNSNumbersAction, \
     AddSPORTidentResultAction, TimekeepingSettingsAction, PrinterSettingsAction, LiveSettingsAction, \
@@ -54,6 +54,7 @@ class Factory:
             PrintBibAction(),
             ManualFinishAction(),
             SPORTidentReadoutAction(),
+            SportiduinoReadoutAction(),
             CreateReportAction(),
             CreateTeamResultsReportAction(),
             SplitPrintoutAction(),

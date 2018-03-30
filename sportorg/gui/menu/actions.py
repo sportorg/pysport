@@ -44,6 +44,7 @@ from sportorg.modules.live.orgeo import OrgeoClient
 from sportorg.modules.ocad import ocad
 from sportorg.modules.ocad.ocad import OcadImportException
 from sportorg.modules.sportident.sireader import SIReaderClient
+from sportorg.modules.sportiduino.sportiduino import SportiduinoClient
 from sportorg.modules.teamwork import Teamwork
 from sportorg.modules.telegram.telegram import TelegramClient
 from sportorg.modules.winorient import winorient
@@ -294,6 +295,12 @@ class ManualFinishAction(Action):
 class SPORTidentReadoutAction(Action):
     def execute(self):
         SIReaderClient().toggle()
+        time.sleep(0.5)
+        self.app.interval()
+
+class SportiduinoReadoutAction(Action):
+    def execute(self):
+        SportiduinoClient().toggle()
         time.sleep(0.5)
         self.app.interval()
 
