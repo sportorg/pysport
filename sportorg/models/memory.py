@@ -64,36 +64,36 @@ class _TitleType(Enum):
 
 class Sex(_TitleType):
     MF = PrintableValue(0, _('MF'))
-    M  = PrintableValue(1, _('M'))
-    F  = PrintableValue(2, _('F'))
+    M = PrintableValue(1, _('M'))
+    F = PrintableValue(2, _('F'))
 
 
 class RaceType(_TitleType):
     INDIVIDUAL_RACE = PrintableValue(0, _('Individual race'))
-    MASS_START      = PrintableValue(1, _('Mass start'))
-    PURSUIT         = PrintableValue(2, _('Pursuit'))
-    RELAY           = PrintableValue(3, _('Relay'))
-    ONE_MAN_RELAY   = PrintableValue(4, _('One man relay'))
-    SPRINT_RELAY    = PrintableValue(5, _('Sprint relay'))
+    MASS_START = PrintableValue(1, _('Mass start'))
+    PURSUIT = PrintableValue(2, _('Pursuit'))
+    RELAY = PrintableValue(3, _('Relay'))
+    ONE_MAN_RELAY = PrintableValue(4, _('One man relay'))
+    SPRINT_RELAY = PrintableValue(5, _('Sprint relay'))
 
 
 class ResultStatus(_TitleType):
-    NONE                = PrintableValue(0,  _('None'))
-    OK                  = PrintableValue(1,  _('OK'))
-    FINISHED            = PrintableValue(2,  _('Finished'))
-    MISSING_PUNCH       = PrintableValue(3,  _('Missing punch'))
-    DISQUALIFIED        = PrintableValue(4,  _('DSQ'))
-    DID_NOT_FINISH      = PrintableValue(5,  _('DNF'))
-    ACTIVE              = PrintableValue(6,  _('Active'))
-    INACTIVE            = PrintableValue(7,  _('Inactive'))
-    OVERTIME            = PrintableValue(8,  _('Overtime'))
-    SPORTING_WITHDRAWAL = PrintableValue(9,  _('Sporting withdrawal'))
-    NOT_COMPETING       = PrintableValue(10, _('Not competing'))
-    MOVED               = PrintableValue(11, _('Moved'))
-    MOVED_UP            = PrintableValue(12, _('Moved_up'))
-    DID_NOT_START       = PrintableValue(13, _('DNS'))
-    DID_NOT_ENTER       = PrintableValue(14, _('Did not enter'))
-    CANCELLED           = PrintableValue(15, _('Cancelled'))
+    NONE = PrintableValue(0, _('None'))
+    OK = PrintableValue(1, _('OK'))
+    FINISHED = PrintableValue(2, _('Finished'))
+    MISSING_PUNCH = PrintableValue(3,  _('Missing punch'))
+    DISQUALIFIED = PrintableValue(4, _('DSQ'))
+    DID_NOT_FINISH = PrintableValue(5, _('DNF'))
+    ACTIVE = PrintableValue(6, _('Active'))
+    INACTIVE = PrintableValue(7, _('Inactive'))
+    OVERTIME = PrintableValue(8, _('Overtime'))
+    SPORTING_WITHDRAWAL = PrintableValue(9, _('Sporting withdrawal'))
+    NOT_COMPETING = PrintableValue(10, _('Not competing'))
+    MOVED = PrintableValue(11, _('Moved'))
+    MOVED_UP = PrintableValue(12, _('Moved_up'))
+    DID_NOT_START = PrintableValue(13, _('DNS'))
+    DID_NOT_ENTER = PrintableValue(14, _('Did not enter'))
+    CANCELLED = PrintableValue(15, _('Cancelled'))
 
 
 class Country(Model):
