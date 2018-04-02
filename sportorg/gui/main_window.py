@@ -18,6 +18,7 @@ from sportorg.modules.backup.file import File
 from sportorg.modules.live.orgeo import OrgeoClient
 from sportorg.modules.printing.model import NoResultToPrintException, split_printout, NoPrinterSelectedException
 from sportorg.modules.configs.configs import Config as Configuration, ConfigFile
+from sportorg.modules.sfr.sfrreader import SFRReaderClient
 from sportorg.modules.sportident.result_generation import ResultSportidentGeneration
 from sportorg.core.broker import Broker
 from sportorg.gui.dialogs.file_dialog import get_save_file_name
@@ -133,6 +134,7 @@ class MainWindow(QMainWindow):
         Teamwork().set_call(self.teamwork)
         SIReaderClient().set_call(self.add_sportident_result_from_sireader)
         SportiduinoClient().set_call(self.add_sportident_result_from_sireader)
+        SFRReaderClient().set_call(self.add_sfr_result_from_reader)
 
         ServiceListenerThread().interval.connect(self.interval)
         ServiceListenerThread().start()
@@ -414,6 +416,10 @@ class MainWindow(QMainWindow):
             self.refresh()
         except Exception as e:
             logging.error(str(e))
+
+    def add_sfr_result_from_reader(self, result):
+        pass
+        # TODO: complete
 
     def teamwork(self, command):
         try:

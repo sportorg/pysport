@@ -283,6 +283,11 @@ def menu_list():
                     'action': 'SportiduinoReadoutAction'
                 },
                 {
+                    'title': _('on/off SFR readout'),
+                    'icon': config.icon_dir('sfr.png'),
+                    'action': 'SFRReadoutAction'
+                },
+                {
                     'title': _('Teamwork'),
                     'icon': config.icon_dir('network.svg'),
                     'actions': [

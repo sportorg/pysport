@@ -12,7 +12,7 @@ from sportorg.gui.menu.actions import NewAction, SaveAction, OpenAction, SaveAsA
     AddSPORTidentResultAction, TimekeepingSettingsAction, PrinterSettingsAction, LiveSettingsAction, \
     LiveSendStartListAction, LiveSendResultsAction, LiveResendResultsAction, AboutAction, TestingAction, CPDeleteAction, \
     TeamworkSettingsAction, TeamworkEnableAction, StatisticsListAction, TeamworkSendAction, TelegramSettingsAction, \
-    TelegramSendAction
+    TelegramSendAction, SFRReadoutAction
 
 
 class Factory:
@@ -55,6 +55,7 @@ class Factory:
             ManualFinishAction(),
             SPORTidentReadoutAction(),
             SportiduinoReadoutAction(),
+            SFRReadoutAction(),
             CreateReportAction(),
             CreateTeamResultsReportAction(),
             SplitPrintoutAction(),
