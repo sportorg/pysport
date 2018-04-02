@@ -43,6 +43,7 @@ from sportorg.modules.iof import iof_xml
 from sportorg.modules.live.orgeo import OrgeoClient
 from sportorg.modules.ocad import ocad
 from sportorg.modules.ocad.ocad import OcadImportException
+from sportorg.modules.sfr.sfrreader import SFRReaderClient
 from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.modules.sportiduino.sportiduino import SportiduinoClient
 from sportorg.modules.teamwork import Teamwork
@@ -298,12 +299,19 @@ class SPORTidentReadoutAction(Action):
         time.sleep(0.5)
         self.app.interval()
 
+
 class SportiduinoReadoutAction(Action):
     def execute(self):
         SportiduinoClient().toggle()
         time.sleep(0.5)
         self.app.interval()
 
+
+class SFRReadoutAction(Action):
+    def execute(self):
+        SFRReaderClient().toggle()
+        time.sleep(0.5)
+        self.app.interval()
 
 class CreateReportAction(Action):
     def execute(self):
