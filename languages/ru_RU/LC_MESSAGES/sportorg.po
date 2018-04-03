@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SportOrg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-03-30 12:05+0300\n"
-"PO-Revision-Date: 2018-03-30 12:07+0300\n"
+"POT-Creation-Date: 2018-03-30 22:17+0300\n"
+"PO-Revision-Date: 2018-03-30 22:17+0300\n"
 "Last-Translator: SportOrg\n"
 "Language-Team: SportOrg\n"
 "Language: ru_RU\n"
@@ -19,7 +19,7 @@ msgstr ""
 "X-Poedit-Basepath: ../../../sportorg\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: gui/dialogs/about.py:21 gui/menu/menu.py:363
+#: gui/dialogs/about.py:21 gui/menu/menu.py:364
 msgid "About"
 msgstr "О нас"
 
@@ -193,11 +193,11 @@ msgid "Number CP"
 msgstr "Номер КП"
 
 #: gui/dialogs/cp_delete.py:34 gui/dialogs/cp_delete.py:87
-#: gui/main_window.py:215 gui/menu/menu.py:150
+#: gui/main_window.py:216 gui/menu/menu.py:150
 msgid "Courses"
 msgstr "Дистанции"
 
-#: gui/dialogs/cp_delete.py:39 gui/main_window.py:213 gui/menu/menu.py:140
+#: gui/dialogs/cp_delete.py:39 gui/main_window.py:214 gui/menu/menu.py:140
 msgid "Race Results"
 msgstr "Результаты"
 
@@ -409,7 +409,7 @@ msgstr "Макс. место"
 msgid "Result time"
 msgstr "Результат"
 
-#: gui/dialogs/live_dialog.py:30 gui/menu/menu.py:302 gui/menu/menu.py:349
+#: gui/dialogs/live_dialog.py:30 gui/menu/menu.py:303 gui/menu/menu.py:350
 msgid "Live"
 msgstr "Онлайн"
 
@@ -481,7 +481,7 @@ msgstr "Адрес"
 msgid "Contact"
 msgstr "Контактные данные"
 
-#: gui/dialogs/print_properties.py:26 gui/menu/menu.py:344
+#: gui/dialogs/print_properties.py:26 gui/menu/menu.py:345
 msgid "Printer settings"
 msgstr "Настройки печати"
 
@@ -617,7 +617,7 @@ msgstr "Язык интерфейса"
 msgid "Show toolbar"
 msgstr "Показать панель инструментов"
 
-#: gui/dialogs/settings.py:40 gui/main_window.py:331
+#: gui/dialogs/settings.py:40 gui/main_window.py:332
 msgid "Auto save"
 msgstr "Автосохранение"
 
@@ -637,7 +637,7 @@ msgstr "Использовать день рождения, а не только
 msgid "Start times"
 msgstr "Шахматка"
 
-#: gui/dialogs/start_preparation.py:171 gui/main_window.py:212
+#: gui/dialogs/start_preparation.py:171 gui/main_window.py:213
 #: gui/menu/menu.py:135 gui/menu/menu.py:162 gui/menu/menu.py:165
 msgid "Start Preparation"
 msgstr "Подготовка к старту"
@@ -752,8 +752,8 @@ msgstr "Протокол комиссии по допуску"
 msgid "Team list"
 msgstr "Выписка по командам"
 
-#: gui/dialogs/teamwork_properties.py:23 gui/menu/menu.py:285
-#: gui/menu/menu.py:339 gui/toolbar.py:12
+#: gui/dialogs/teamwork_properties.py:23 gui/menu/menu.py:286
+#: gui/menu/menu.py:340 gui/toolbar.py:12
 msgid "Teamwork"
 msgstr "Командная работа"
 
@@ -781,7 +781,7 @@ msgstr "Порт"
 msgid "Client/Server"
 msgstr "Клиент/Сервер"
 
-#: gui/dialogs/telegram_dialog.py:23 gui/menu/menu.py:320 gui/menu/menu.py:354
+#: gui/dialogs/telegram_dialog.py:23 gui/menu/menu.py:321 gui/menu/menu.py:355
 msgid "Telegram"
 msgstr ""
 
@@ -851,7 +851,7 @@ msgstr "точка с запятой"
 msgid "custom"
 msgstr "пользовательский"
 
-#: gui/dialogs/timekeeping_properties.py:30 gui/menu/menu.py:334
+#: gui/dialogs/timekeeping_properties.py:30 gui/menu/menu.py:335
 msgid "Timekeeping settings"
 msgstr "Настройки хронометража"
 
@@ -1043,86 +1043,86 @@ msgstr "Расчет штрафа из сплитов"
 msgid "Time settings"
 msgstr "Настройки времени"
 
-#: gui/main_window.py:95
+#: gui/main_window.py:96
 msgid "Are you sure you want to exit the program?"
 msgstr "Вы действительно хотите закрыть приложение?"
 
-#: gui/main_window.py:96 gui/main_window.py:569
+#: gui/main_window.py:97 gui/main_window.py:570
 msgid "Question"
 msgstr "Вопрос"
 
-#: gui/main_window.py:193
+#: gui/main_window.py:194
 msgid "Toolbar"
 msgstr "Панель инструментов"
 
-#: gui/main_window.py:214 gui/menu/menu.py:145
+#: gui/main_window.py:215 gui/menu/menu.py:145
 msgid "Groups"
 msgstr "Возр. категории"
 
-#: gui/main_window.py:216 gui/menu/menu.py:155
+#: gui/main_window.py:217 gui/menu/menu.py:155
 msgid "Teams"
 msgstr "Коллективы"
 
-#: gui/main_window.py:218
+#: gui/main_window.py:219
 msgid "Logs"
 msgstr "Логи"
 
-#: gui/main_window.py:255
+#: gui/main_window.py:256
 msgid "Tab doesn't exist"
 msgstr "Раздел не существует"
 
-#: gui/main_window.py:333
+#: gui/main_window.py:334
 msgid "No file to auto save"
 msgstr "Имя файла не задано, автосохранение отменено"
 
-#: gui/main_window.py:455
+#: gui/main_window.py:456
 msgid "Create SportOrg file"
 msgstr "Создать файл SportOrg"
 
-#: gui/main_window.py:456 gui/menu/actions.py:67
+#: gui/main_window.py:457 gui/menu/actions.py:67
 msgid "SportOrg file (*.json)"
 msgstr "Файл SportOrg (*.json)"
 
-#: gui/main_window.py:472 gui/main_window.py:503 gui/main_window.py:588
-#: gui/main_window.py:597 gui/main_window.py:606 gui/menu/actions.py:99
+#: gui/main_window.py:473 gui/main_window.py:504 gui/main_window.py:589
+#: gui/main_window.py:598 gui/main_window.py:607 gui/menu/actions.py:99
 #: gui/menu/actions.py:111 gui/menu/actions.py:123 gui/menu/actions.py:142
 #: gui/menu/actions.py:154
 msgid "Error"
 msgstr "Ошибка"
 
-#: gui/main_window.py:472
+#: gui/main_window.py:473
 msgid "Cannot create file"
 msgstr ""
 
-#: gui/main_window.py:503
+#: gui/main_window.py:504
 msgid "Cannot read file, format unknown"
 msgstr "Не удается открыть файл, некорректный формат"
 
-#: gui/main_window.py:507 gui/menu/actions.py:359 gui/menu/actions.py:485
+#: gui/main_window.py:508 gui/menu/actions.py:359 gui/menu/actions.py:485
 msgid "No result selected"
 msgstr "Результат не выбран"
 
-#: gui/main_window.py:527
+#: gui/main_window.py:528
 msgid "No results to print"
 msgstr "Нет результатов для печати"
 
-#: gui/main_window.py:532
+#: gui/main_window.py:533
 msgid "No printer selected"
 msgstr ""
 
-#: gui/main_window.py:569
+#: gui/main_window.py:570
 msgid "Please confirm"
 msgstr "Пожалуйста, подтвердите действие"
 
-#: gui/main_window.py:589
+#: gui/main_window.py:590
 msgid "Cannot remove group"
 msgstr "Невозможно удалить возрастную категорию"
 
-#: gui/main_window.py:598
+#: gui/main_window.py:599
 msgid "Cannot remove course"
 msgstr "Невозможно удалить дистанцию"
 
-#: gui/main_window.py:607
+#: gui/main_window.py:608
 msgid "Cannot remove organization"
 msgstr "Невозможно удалить коллектив"
 
@@ -1324,35 +1324,35 @@ msgstr "Запустить/остановить чтение чипов SPORTide
 msgid "on/off Sportiduino readout"
 msgstr "Запустить/остановить чтение чипов Sportiduino"
 
-#: gui/menu/menu.py:289
+#: gui/menu/menu.py:290
 msgid "Send selected"
 msgstr "Отправить выбранные"
 
-#: gui/menu/menu.py:296
+#: gui/menu/menu.py:297
 msgid "On/Off"
 msgstr "Включить/Выключить"
 
-#: gui/menu/menu.py:306
+#: gui/menu/menu.py:307
 msgid "Send start list"
 msgstr "Отправить стартовый протокол"
 
-#: gui/menu/menu.py:310 gui/menu/menu.py:323
+#: gui/menu/menu.py:311 gui/menu/menu.py:324
 msgid "Send results"
 msgstr "Отправить результаты"
 
-#: gui/menu/menu.py:314
+#: gui/menu/menu.py:315
 msgid "Resend results"
 msgstr "Переотправить результаты"
 
-#: gui/menu/menu.py:331
+#: gui/menu/menu.py:332
 msgid "Options"
 msgstr "Опции"
 
-#: gui/menu/menu.py:360
+#: gui/menu/menu.py:361
 msgid "Help"
 msgstr "Помощь"
 
-#: gui/menu/menu.py:368
+#: gui/menu/menu.py:369
 msgid "Testing"
 msgstr "Тестирование"
 
@@ -1403,6 +1403,14 @@ msgstr "Чип"
 #: gui/toolbar.py:11
 msgid "SPORTident readout"
 msgstr "Чтение SPORTident"
+
+#: gui/utils/custom_controls.py:48
+msgid "Yes"
+msgstr "Да"
+
+#: gui/utils/custom_controls.py:50
+msgid "No"
+msgstr "Нет"
 
 #: models/memory.py:66
 msgid "MF"
@@ -1561,12 +1569,6 @@ msgstr "Заменить номера чипов нагрудными номер
 
 #~ msgid "Close"
 #~ msgstr "Закрыть"
-
-#~ msgid "No"
-#~ msgstr "Нет"
-
-#~ msgid "Yes"
-#~ msgstr "Да"
 
 #~ msgid "Entry properties Window"
 #~ msgstr "Окно редактирования спортсмена"

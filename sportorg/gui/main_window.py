@@ -20,13 +20,14 @@ from sportorg.modules.printing.model import NoResultToPrintException, split_prin
 from sportorg.modules.configs.configs import Config as Configuration, ConfigFile
 from sportorg.modules.sfr.sfrreader import SFRReaderClient
 from sportorg.modules.sportident.result_generation import ResultSportidentGeneration
-from sportorg.core import event
+from sportorg.core.broker import Broker
 from sportorg.gui.dialogs.file_dialog import get_save_file_name
 from sportorg.gui.menu.menu import menu_list
 from sportorg.gui.tabs import start_preparation, groups, teams, race_results, courses, log
 from sportorg.gui.tabs.memory_model import PersonMemoryModel, ResultMemoryModel, GroupMemoryModel, \
     CourseMemoryModel, TeamMemoryModel
 from sportorg.gui.toolbar import toolbar_list
+from sportorg.gui.utils.custom_controls import messageBoxQuestion
 from sportorg.language import _
 from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.modules.sportiduino.sportiduino import SportiduinoClient
@@ -90,11 +91,11 @@ class MainWindow(QMainWindow):
 
     def close(self):
         self.conf_write()
-        event.event('close')
+        Broker().produce('close')
 
     def closeEvent(self, _event):
         quit_msg = _('Are you sure you want to exit the program?')
-        reply = QMessageBox.question(self, _('Question'), quit_msg, QMessageBox.Yes | QMessageBox.No)
+        reply = messageBoxQuestion(self, _('Question'), quit_msg, QMessageBox.Yes | QMessageBox.No)
 
         if reply == QMessageBox.Yes:
             self.close()
@@ -103,7 +104,7 @@ class MainWindow(QMainWindow):
             _event.ignore()
 
     def resizeEvent(self, e):
-        event.event('resize', self.get_size())
+        Broker().produce('resize', self.get_size())
 
     def conf_read(self):
         Configuration().read()
@@ -278,7 +279,7 @@ class MainWindow(QMainWindow):
             table.setModel(CourseMemoryModel())
             table = self.get_organization_table()
             table.setModel(TeamMemoryModel())
-            event.event('init_model')
+            Broker().produce('init_model')
         except Exception as e:
             logging.error(str(e))
 
@@ -304,7 +305,7 @@ class MainWindow(QMainWindow):
             table = self.get_organization_table()
             table.model().init_cache()
             table.model().layoutChanged.emit()
-            event.event('refresh')
+            Broker().produce('refresh')
         except Exception as e:
             logging.error(str(e))
 
@@ -569,7 +570,7 @@ class MainWindow(QMainWindow):
         if not len(indexes):
             return
 
-        confirm = QMessageBox.question(self, _('Question'), _('Please confirm'), QMessageBox.Yes | QMessageBox.No)
+        confirm = messageBoxQuestion(self, _('Question'), _('Please confirm'), QMessageBox.Yes | QMessageBox.No)
         if confirm == QMessageBox.No:
             return
         tab = self.current_tab

@@ -124,7 +124,7 @@ class Sportiduino(object):
                 scan_ports = [os.path.join('/dev', f) for f in os.listdir('/dev') if
                               re.match('ttyUSB.*', f)]
             elif platform.system() == 'Windows':
-                scan_ports = ['COM' + i for i in range(32)]
+                scan_ports = ['COM' + str(i) for i in range(32)]
             else:
                 raise SportiduinoException('Unsupported platform: %s' % platform.system())
 

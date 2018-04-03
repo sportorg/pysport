@@ -4,7 +4,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QModelIndex
 from PyQt5.QtWidgets import QAbstractItemView, QHeaderView
 
-from sportorg.core import event as event_handler
+from sportorg.core.broker import Broker
 from sportorg.gui.dialogs.results_edit import ResultEditDialog
 from sportorg.gui.tabs.memory_model import ResultMemoryModel
 from sportorg.gui.tabs.table import TableView
@@ -29,7 +29,7 @@ class ResultTable(TableView):
 
         self.popup_items = []
 
-        event_handler.add_event('refresh', self.update_splits)
+        Broker().subscribe('refresh', self.update_splits, 1)
 
     def update_splits(self):
         if -1 < self.currentIndex().row() < len(race().results):
@@ -138,7 +138,7 @@ class Widget(QtWidgets.QWidget):
         hor_header.setSectionsMovable(True)
         hor_header.setDropIndicatorShown(True)
         hor_header.setSectionResizeMode(QHeaderView.ResizeToContents)
-        event_handler.add_event('refresh', lambda: hor_header.setSectionResizeMode(QHeaderView.ResizeToContents))
+        Broker().subscribe('refresh', lambda: hor_header.setSectionResizeMode(QHeaderView.ResizeToContents))
 
         self.gridLayout.addWidget(self.ResultSplitter)
         self.ResultCourseGroupBox.setTitle(_("Course"))
@@ -150,7 +150,7 @@ class Widget(QtWidgets.QWidget):
         self.ResultChipFinishLabel.setText(_("Finish"))
         # self.ResultChipDetails.setHtml()
 
-        event_handler.add_event('resize', self.resize_event)
+        Broker().subscribe('resize', self.resize_event)
 
     def show_splits(self, index):
         assert (isinstance(index, QModelIndex))
