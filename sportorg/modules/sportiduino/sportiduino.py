@@ -9,7 +9,6 @@ import serial
 from PyQt5.QtCore import QThread, pyqtSignal
 
 from sportorg.core.singleton import singleton
-from sportorg.language import _
 from sportorg.libs.sportiduino import sportiduino
 from sportorg.models import memory
 from sportorg.utils.time import time_to_otime
