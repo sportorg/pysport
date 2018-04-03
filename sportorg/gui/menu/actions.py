@@ -37,7 +37,7 @@ from sportorg.libs.winorient.wdb import write_wdb
 from sportorg.models.memory import race, ResultStatus
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.result_checker import ResultChecker
-from sportorg.models.start.start_preparation import guess_corridors_for_groups
+from sportorg.models.start.start_preparation import guess_corridors_for_groups, copy_bib_to_card_number
 from sportorg.modules import testing
 from sportorg.modules.iof import iof_xml
 from sportorg.modules.live.orgeo import OrgeoClient
@@ -255,6 +255,15 @@ class NumberChangeAction(Action):
 class StartTimeChangeAction(Action):
     def execute(self):
         StartTimeChangeDialog().exec()
+
+
+class CopyBibToCardNumber(Action):
+    def execute(self):
+        msg = _('Use bib as card number') + '?'
+        reply = QMessageBox.question(self.app, _('Question'), msg, QMessageBox.Yes | QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            copy_bib_to_card_number()
+            self.app.refresh()
 
 
 class StartListAction(Action):

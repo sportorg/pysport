@@ -6,13 +6,14 @@ from sportorg.gui.menu.actions import NewAction, SaveAction, OpenAction, SaveAsA
     ToCoursesAction, ToTeamsAction, StartPreparationAction, GuessCoursesAction, GuessCorridorsAction, \
     RelayNumberAction, \
     NumberChangeAction, StartTimeChangeAction, StartListAction, TeamListAction, StartTimesAction, PrintBibAction, \
-    ManualFinishAction, SPORTidentReadoutAction, SportiduinoReadoutAction, CreateReportAction, CreateTeamResultsReportAction, \
+    ManualFinishAction, SPORTidentReadoutAction, SportiduinoReadoutAction, CreateReportAction, \
+    CreateTeamResultsReportAction, \
     SplitPrintoutAction, \
     RecheckingAction, PenaltyCalculationAction, PenaltyRemovingAction, ChangeStatusAction, SetDNSNumbersAction, \
     AddSPORTidentResultAction, TimekeepingSettingsAction, PrinterSettingsAction, LiveSettingsAction, \
     LiveSendStartListAction, LiveSendResultsAction, LiveResendResultsAction, AboutAction, TestingAction, CPDeleteAction, \
     TeamworkSettingsAction, TeamworkEnableAction, StatisticsListAction, TeamworkSendAction, TelegramSettingsAction, \
-    TelegramSendAction, SFRReadoutAction
+    TelegramSendAction, SFRReadoutAction, CopyBibToCardNumber
 
 
 class Factory:
@@ -47,6 +48,7 @@ class Factory:
             RelayNumberAction(),
             NumberChangeAction(),
             StartTimeChangeAction(),
+            CopyBibToCardNumber(),
             StartListAction(),
             StatisticsListAction(),
             TeamListAction(),
