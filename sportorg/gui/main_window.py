@@ -281,7 +281,6 @@ class MainWindow(QMainWindow):
             table.setModel(TeamMemoryModel())
             Broker().produce('init_model')
         except Exception as e:
-            logging.exception(e)
             logging.error(str(e))
 
     def refresh(self):
@@ -418,8 +417,7 @@ class MainWindow(QMainWindow):
             logging.error(str(e))
 
     def add_sfr_result_from_reader(self, result):
-        pass
-        # TODO: complete
+        self.add_sportident_result_from_sireader(result)
 
     def teamwork(self, command):
         try:
@@ -505,7 +503,6 @@ class MainWindow(QMainWindow):
                 self.init_model()
             except Exception as e:
                 logging.error(str(e))
-                logging.exception(e)
                 self.delete_from_recent_files(file_name)
                 QMessageBox.warning(self, _('Error'), _('Cannot read file, format unknown') + ': ' + file_name)
 

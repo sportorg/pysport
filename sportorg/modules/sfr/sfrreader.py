@@ -5,7 +5,6 @@ from threading import main_thread, Event
 
 import time
 
-import serial
 from PyQt5.QtCore import QThread, pyqtSignal
 
 from sportorg.core.singleton import singleton
@@ -51,17 +50,15 @@ class SFRReaderThread(QThread):
                         self._logger.debug('Stop sfrreader')
                         return
                 card_data = sfr.read_card()
-                self._queue.put(SFRReaderCommand(card_data), timeout=1)
-                sfr.ack_card()
+                if sfr.is_card_connected():
+                    self._queue.put(SFRReaderCommand('card_data', card_data), timeout=1)
+                    sfr.ack_card()
             except SFRReaderException as e:
                 self._logger.error(str(e))
             except SFRReaderCardChanged as e:
                 self._logger.error(str(e))
-            except serial.serialutil.SerialException as e:
-                self._logger.error(str(e))
-                return
             except Exception as e:
-                self._logger.exception(e)
+                self._logger.error(str(e))
 
 
 
@@ -99,7 +96,7 @@ class ResultThread(QThread):
     @staticmethod
     def _get_result(card_data):
         result = memory.race().new_sportident_result()
-        result.sportident_card = 0
+        result.sportident_card = card_data['bib']  # SFR has no card id, only bib
 
         for i in range(len(card_data['punches'])):
             t = card_data['punches'][i][1]

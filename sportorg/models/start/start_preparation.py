@@ -388,3 +388,10 @@ def change_start_time(if_add, time_offset):
             person.start_time = person.start_time + time_offset
         else:
             person.start_time = person.start_time - time_offset
+
+
+def copy_bib_to_card_number():
+    obj = race()
+    for person in obj.persons:
+        if person.bib:
+            person.sportident_card = person.bib

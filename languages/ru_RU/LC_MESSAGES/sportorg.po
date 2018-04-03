@@ -1516,6 +1516,9 @@ msgstr ""
 msgid "Save WDB file"
 msgstr ""
 
+msgid "Use bib as card number"
+msgstr "Заменить номера чипов нагрудными номерами"
+
 #~ msgid "Auto connect to station"
 #~ msgstr "Автоматическое подключение станции SPORTident"
 

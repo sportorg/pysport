@@ -182,6 +182,10 @@ def menu_list():
                     'action': 'StartTimeChangeAction'
                 },
                 {
+                    'title': _('Use bib as card number'),
+                    'action': 'CopyBibToCardNumber'
+                },
+                {
                     'type': 'separator',
                 },
                 {
