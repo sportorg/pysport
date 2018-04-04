@@ -2,25 +2,6 @@
 
 # SportOrg
 
-### Packages
-
-- PyQt5
-- [sireader](https://pypi.python.org/pypi/sireader/1.0.1)
-- jinja2
-- [polib](http://polib.readthedocs.io/en/latest/quickstart.html)
-- xmlschema
-- cx_Freeze
-- requests
-
-Install packages
-```commandline
-pip install package-name
-
-pip install sireader
-```
-
-or
-
 ```commandline
 pip install -r requirements.txt
 ```
@@ -31,7 +12,7 @@ Run
 python SportOrg.pyw
 ```
 
-### Struct
+## Struct
 
 ```
 <sportorg>/
@@ -62,8 +43,8 @@ python SportOrg.pyw
 ![Bibprintout sportorg](img/bibprintout.png)
 
 
-### build
+## build
 
-#### cx_Freeze
+### cx_Freeze
 
 `python setup.py build`

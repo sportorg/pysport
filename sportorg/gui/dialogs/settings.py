@@ -1,31 +1,26 @@
 import logging
 
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QFormLayout, QDialog, QCheckBox, QDialogButtonBox, QLabel
+from PyQt5.QtWidgets import QFormLayout, QDialog, QCheckBox, QDialogButtonBox, QLabel, QTabWidget, QWidget
 
 from sportorg import config
+from sportorg.core.audio import get_sounds
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _, get_languages
 from sportorg.modules.configs.configs import Config
+from sportorg.modules.sound import Sound
 
 
-class SettingsDialog(QDialog):
-    def __init__(self):
-        super().__init__(GlobalAccess().get_main_window())
+class Tab:
+    def save(self):
+        pass
 
-    def exec(self):
-        self.init_ui()
-        return super().exec()
 
-    def init_ui(self):
-        self.setWindowTitle(_('Settings'))
-        self.setWindowIcon(QIcon(config.ICON))
-        self.setSizeGripEnabled(False)
-        self.setModal(True)
-        # self.setMinimumWidth(540)
-        # self.setMinimumHeight(250)
-        self.layout = QFormLayout(self)
+class MainTab(Tab):
+    def __init__(self, parent):
+        self.widget = QWidget()
+        self.layout = QFormLayout(parent)
 
         self.label_lang = QLabel(_('Languages'))
         self.item_lang = AdvComboBox()
@@ -50,8 +45,76 @@ class SettingsDialog(QDialog):
         self.layout.addRow(self.item_open_recent_file)
 
         self.item_use_birthday = QCheckBox(_('Use birthday'))
-        self.item_use_birthday.setChecked(Config().configuration.get('use_birthday', False))
+        self.item_use_birthday.setChecked(Config().configuration.get('use_birthday'))
         self.layout.addRow(self.item_use_birthday)
+
+        self.widget.setLayout(self.layout)
+
+    def save(self):
+        Config().configuration.set('current_locale', self.item_lang.currentText())
+        Config().configuration.set('show_toolbar', self.item_show_toolbar.isChecked())
+        Config().configuration.set('autosave', self.item_auto_save.isChecked())
+        Config().configuration.set('autoconnect', self.item_auto_connect.isChecked())
+        Config().configuration.set('open_recent_file', self.item_open_recent_file.isChecked())
+        Config().configuration.set('use_birthday', self.item_use_birthday.isChecked())
+
+
+class SoundTab(Tab):
+    def __init__(self, parent):
+        self.widget = QWidget()
+        self.layout = QFormLayout(parent)
+
+        self.sounds = get_sounds()
+
+        self.item_enabled = QCheckBox(_('Enabled'))
+        self.item_enabled.setChecked(Config().sound.get('enabled'))
+        self.layout.addRow(self.item_enabled)
+
+        self.label_successful = QLabel(_('Successful result'))
+        self.item_successful = AdvComboBox()
+        self.item_successful.addItems(self.sounds)
+        self.item_successful.setCurrentText(Config().sound.get('successful') or config.sound_dir('ok.wav'))
+        self.layout.addRow(self.label_successful, self.item_successful)
+
+        self.label_unsuccessful = QLabel(_('Unsuccessful result'))
+        self.item_unsuccessful = AdvComboBox()
+        self.item_unsuccessful.addItems(self.sounds)
+        self.item_unsuccessful.setCurrentText(Config().sound.get('unsuccessful') or config.sound_dir('failure.wav'))
+        self.layout.addRow(self.label_unsuccessful, self.item_unsuccessful)
+
+        self.widget.setLayout(self.layout)
+
+    def save(self):
+        Config().sound.set('enabled', self.item_enabled.isChecked())
+        Config().sound.set('successful', self.item_successful.currentText())
+        Config().sound.set('unsuccessful', self.item_unsuccessful.currentText())
+
+
+class SettingsDialog(QDialog):
+    def __init__(self):
+        super().__init__(GlobalAccess().get_main_window())
+        self.widgets = [
+            (MainTab(self), _('Main settings')),
+            (SoundTab(self), _('Sounds')),
+        ]
+
+    def exec(self):
+        self.init_ui()
+        return super().exec()
+
+    def init_ui(self):
+        self.setWindowTitle(_('Settings'))
+        self.setWindowIcon(QIcon(config.ICON))
+        self.setSizeGripEnabled(False)
+        self.setModal(True)
+
+        self.tab_widget = QTabWidget()
+
+        for tab, title in self.widgets:
+            self.tab_widget.addTab(tab.widget, title)
+
+        self.layout = QFormLayout(self)
+        self.layout.addRow(self.tab_widget)
 
         def cancel_changes():
             self.close()
@@ -75,10 +138,6 @@ class SettingsDialog(QDialog):
         self.show()
 
     def apply_changes_impl(self):
-        Config().configuration.set('current_locale', self.item_lang.currentText())
-        Config().configuration.set('show_toolbar', self.item_show_toolbar.isChecked())
-        Config().configuration.set('autosave', self.item_auto_save.isChecked())
-        Config().configuration.set('autoconnect', self.item_auto_connect.isChecked())
-        Config().configuration.set('open_recent_file', self.item_open_recent_file.isChecked())
-        Config().configuration.set('use_birthday', self.item_use_birthday.isChecked())
+        for tab, _ in self.widgets:
+            tab.save()
         Config().save()

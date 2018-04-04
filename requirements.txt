@@ -7,3 +7,4 @@ polib==1.0.8
 cx_Freeze==5.1.1
 requests==2.18.4
 pywinusb==0.4.2
+playsound==1.2.2

@@ -1108,7 +1108,7 @@ msgstr "Нет результатов для печати"
 
 #: gui/main_window.py:533
 msgid "No printer selected"
-msgstr ""
+msgstr "Принтер не выбран"
 
 #: gui/main_window.py:570
 msgid "Please confirm"
@@ -1506,18 +1506,27 @@ msgstr "Закрытие порта"
 
 #: modules/winorient/wdb_number_setter.py:30
 msgid "Open target WDB file"
-msgstr ""
+msgstr "Открыть WDB файл"
 
 #: modules/winorient/wdb_number_setter.py:31
 msgid "Open source WDB file"
-msgstr ""
+msgstr "Открыть WDB файл"
 
 #: modules/winorient/wdb_number_setter.py:36
 msgid "Save WDB file"
-msgstr ""
+msgstr "Сохранить WDB файл"
 
 msgid "Use bib as card number"
 msgstr "Заменить номера чипов нагрудными номерами"
+
+msgid "on/off SFR readout"
+msgstr "Запустить/остановить чтение чипов SFR"
+
+msgid "Main settings"
+msgstr "Основные настройки"
+
+msgid "Sounds"
+msgstr "Звуки"
 
 #~ msgid "Auto connect to station"
 #~ msgstr "Автоматическое подключение станции SPORTident"

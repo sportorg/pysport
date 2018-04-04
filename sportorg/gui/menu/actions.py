@@ -322,6 +322,7 @@ class SFRReadoutAction(Action):
         time.sleep(0.5)
         self.app.interval()
 
+
 class CreateReportAction(Action):
     def execute(self):
         ReportDialog().exec()
