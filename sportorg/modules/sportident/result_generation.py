@@ -54,10 +54,11 @@ class ResultSportidentGeneration:
     def add_result(self):
         if self._has_result():
             logging.info('Result already exist')
-            return
+            return False
         if self.assign_chip_reading == 'always':
             self._bib_dialog()
         self._add_result()
+        return True
 
     def _no_person(self):
         if self.assign_chip_reading == 'off':

@@ -19,6 +19,7 @@ from sportorg.modules.live.orgeo import OrgeoClient
 from sportorg.modules.printing.model import NoResultToPrintException, split_printout, NoPrinterSelectedException
 from sportorg.modules.configs.configs import Config as Configuration, ConfigFile
 from sportorg.modules.sfr.sfrreader import SFRReaderClient
+from sportorg.modules.sound import Sound
 from sportorg.modules.sportident.result_generation import ResultSportidentGeneration
 from sportorg.core.broker import Broker
 from sportorg.gui.dialogs.file_dialog import get_save_file_name
@@ -388,21 +389,26 @@ class MainWindow(QMainWindow):
             assignment_mode = race().get_setting('sportident_assignment_mode', False)
             if not assignment_mode:
                 self.clear_filters(remove_condition=False)
-                ResultSportidentGeneration(result).add_result()
-                ResultCalculation(race()).process_results()
-                if race().get_setting('split_printout', False):
-                    try:
-                        split_printout(result)
-                    except NoResultToPrintException as e:
-                        logging.error(str(e))
-                    except NoPrinterSelectedException as e:
-                        logging.error(str(e))
-                    except Exception as e:
-                        logging.error(str(e))
-                Teamwork().send(result.to_dict())
-                self.auto_save()
-                OrgeoClient().send_results()
-                TelegramClient().send_result(result)
+                if ResultSportidentGeneration(result).add_result():
+                    ResultCalculation(race()).process_results()
+                    if race().get_setting('split_printout', False):
+                        try:
+                            split_printout(result)
+                        except NoResultToPrintException as e:
+                            logging.error(str(e))
+                        except NoPrinterSelectedException as e:
+                            logging.error(str(e))
+                        except Exception as e:
+                            logging.error(str(e))
+                    Teamwork().send(result.to_dict())
+                    self.auto_save()
+                    OrgeoClient().send_results()
+                    TelegramClient().send_result(result)
+                    if result.person:
+                        if result.is_status_ok():
+                            Sound().ok()
+                        else:
+                            Sound().fail()
             else:
                 for person in race().persons:
                     if not person.sportident_card:

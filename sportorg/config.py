@@ -57,18 +57,18 @@ def data_dir(*paths):
     return os.path.join(DATA_DIR, *paths)
 
 
-PLUGIN_DIR = base_dir('sportorg', 'app', 'plugins')
-
-
-def plugin_dir(*paths):
-    return os.path.join(PLUGIN_DIR, *paths)
-
-
 TEMPLATE_DIR = base_dir('templates')
 
 
 def template_dir(*paths):
     return os.path.join(TEMPLATE_DIR, *paths)
+
+
+SOUND_DIR = base_dir('sounds')
+
+
+def sound_dir(*paths):
+    return os.path.join(SOUND_DIR, *paths)
 
 
 ICON = icon_dir('sportorg.ico')
@@ -83,7 +83,8 @@ DIRS = [
     DATA_DIR,
     LOCALE_DIR,
     LOG_DIR,
-    TEMPLATE_DIR
+    TEMPLATE_DIR,
+    SOUND_DIR
 ]
 
 for _DIR in DIRS:
