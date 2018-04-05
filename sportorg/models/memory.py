@@ -900,6 +900,8 @@ class Person(Model):
             self.start_time = OTime(msec=int(data['start_time']))
         if data['birth_date']:
             self.birth_date = dateutil.parser.parse(data['birth_date']).date()
+        elif data['year']:  # back compatibility with v 1.0.0
+            self.set_year(int(data['year']))
 
     def to_dict_data(self, course=None):
         sportident_card = ''

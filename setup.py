@@ -16,7 +16,7 @@ options = {
     'build_exe': {
         'includes': includes,
         'excludes': excludes,
-        "packages": ['idna', 'requests', 'encodings', 'asyncio'],
+        "packages": ['idna', 'requests', 'encodings', 'asyncio', 'pywinusb/hid'],
         'include_files': include_files
     }
 }
