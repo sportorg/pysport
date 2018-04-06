@@ -18,6 +18,9 @@ from sportorg.utils.time import time_to_qtime, time_to_otime, qdate_to_date
 
 
 class EntryEditDialog(QDialog):
+    GROUP_NAME = ''
+    ORGANIZATION_NAME = ''
+
     def __init__(self, person):
         super().__init__(GlobalAccess().get_main_window())
         self.is_ok = {}
@@ -234,8 +237,12 @@ class EntryEditDialog(QDialog):
         self.item_name.setCurrentText(self.current_object.name)
         if self.current_object.group is not None:
             self.item_group.setCurrentText(self.current_object.group.name)
+        else:
+            self.item_group.setCurrentText(self.GROUP_NAME)
         if self.current_object.organization is not None:
             self.item_team.setCurrentText(self.current_object.organization.name)
+        else:
+            self.item_team.setCurrentText(self.ORGANIZATION_NAME)
         if self.current_object.qual:
             self.item_qual.setCurrentText(self.current_object.qual.get_title())
         if self.current_object.bib:
