@@ -5,6 +5,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QDialog, QTableView, QDialogButtonBox, QVBoxLayout, QWidget
 
 from sportorg import config
+from sportorg.gui.dialogs.entry_edit import EntryEditDialog
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
@@ -84,6 +85,9 @@ class DialogFilter(QDialog):
                 proxy_model.set_filter_for_column(team_column, self.team_combo.currentText())
 
                 proxy_model.apply_filter()
+
+                EntryEditDialog.GROUP_NAME = self.group_combo.currentText()
+                EntryEditDialog.ORGANIZATION_NAME = self.team_combo.currentText()
 
                 GlobalAccess().get_main_window().refresh()
         except Exception as e:
