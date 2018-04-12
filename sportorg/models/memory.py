@@ -90,7 +90,7 @@ class ResultStatus(_TitleType):
     SPORTING_WITHDRAWAL = PrintableValue(9, _('Sporting withdrawal'))
     NOT_COMPETING = PrintableValue(10, _('Not competing'))
     MOVED = PrintableValue(11, _('Moved'))
-    MOVED_UP = PrintableValue(12, _('Moved_up'))
+    MOVED_UP = PrintableValue(12, _('Moved up'))
     DID_NOT_START = PrintableValue(13, _('DNS'))
     DID_NOT_ENTER = PrintableValue(14, _('Did not enter'))
     CANCELLED = PrintableValue(15, _('Cancelled'))
