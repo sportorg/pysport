@@ -33,6 +33,7 @@ from sportorg.gui.dialogs.telegram_dialog import TelegramDialog
 from sportorg.gui.dialogs.text_io import TextExchangeDialog
 from sportorg.gui.dialogs.timekeeping_properties import TimekeepingPropertiesDialog
 from sportorg.gui.menu.action import Action
+from sportorg.gui.utils.custom_controls import messageBoxQuestion
 from sportorg.libs.winorient.wdb import write_wdb
 from sportorg.models.memory import race, ResultStatus
 from sportorg.models.result.result_calculation import ResultCalculation
@@ -260,7 +261,7 @@ class StartTimeChangeAction(Action):
 class CopyBibToCardNumber(Action):
     def execute(self):
         msg = _('Use bib as card number') + '?'
-        reply = QMessageBox.question(self.app, _('Question'), msg, QMessageBox.Yes | QMessageBox.No)
+        reply = messageBoxQuestion(self.app, _('Question'), msg, QMessageBox.Yes | QMessageBox.No)
         if reply == QMessageBox.Yes:
             copy_bib_to_card_number()
             self.app.refresh()
