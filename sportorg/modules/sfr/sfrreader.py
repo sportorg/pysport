@@ -61,7 +61,6 @@ class SFRReaderThread(QThread):
                 self._logger.error(str(e))
 
 
-
 class ResultThread(QThread):
     data_sender = pyqtSignal(object)
 
@@ -181,7 +180,6 @@ class SFRReaderClient(object):
         self._stop_event.clear()
         self._start_reader_thread()
         self._start_result_thread()
-
 
     def stop(self):
         self._stop_event.set()

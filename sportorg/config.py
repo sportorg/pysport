@@ -5,7 +5,7 @@ import logging.config
 from sportorg.core.version import Version
 
 NAME = 'SportOrg'
-VERSION = Version(1, 0, 0, 0, 'v')
+VERSION = Version(1, 1, 0, 0, 'v')
 DEBUG = True
 
 
@@ -76,6 +76,8 @@ ICON = icon_dir('sportorg.ico')
 CONFIG_INI = data_dir('config.ini')
 
 LOCALE_DIR = base_dir('languages')
+
+STATUS_COMMENTS_FILE = base_dir('status_comments.txt')
 
 DIRS = [
     IMG_DIR,

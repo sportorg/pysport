@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QComboBox, QCompleter, QMessageBox
 
 from sportorg.language import _
 
+
 class AdvComboBox(QComboBox):
     """
     Combo with autocomplete
@@ -41,6 +42,7 @@ class AdvComboBox(QComboBox):
         if text:
             index = self.findText(str(text))
             self.setCurrentIndex(index)
+
 
 def messageBoxQuestion(parent=None, title='', text='', buttons=(QMessageBox.Yes | QMessageBox.No)):
     messageBox = QMessageBox(QMessageBox.Question, title, text, buttons, parent)

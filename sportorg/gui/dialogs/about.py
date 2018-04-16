@@ -36,7 +36,10 @@ class AboutDialog(QDialog):
         self.layout.addRow(title_icon, title_text)
 
         contributors_text = QLabel()
-        contributors_text.setText('\n{}:{}'.format(_('Contributors'), '\n\t- Akhtarov Danil,\n\t- Kobelev Sergei.'))
+        contributors_text.setText('\n{}:{}'.format(
+            _('Contributors'),
+            '\n\t- Akhtarov Danil,\n\t- Kobelev Sergei,\n\t- Yakimov Semyon.'
+        ))
         self.layout.addRow(contributors_text)
 
         home_page_text = QLabel()

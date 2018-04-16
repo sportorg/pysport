@@ -1,8 +1,7 @@
 import logging
 
-from PyQt5.QtCore import QModelIndex
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, QPushButton, QDialogButtonBox
+from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, QDialogButtonBox
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
@@ -135,5 +134,4 @@ class OrganizationEditDialog(QDialog):
 
         if changed:
             GlobalAccess().get_main_window().refresh()
-            # table.model().sourceModel().update_one_object(part, table.model().mapToSource(self.current_index).row())
             Teamwork().send(org.to_dict())

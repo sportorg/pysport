@@ -632,11 +632,11 @@ msgstr "Использовать день рождения, а не только
 
 #: gui/dialogs/settings.py:73
 msgid "Successful result"
-msgstr ""
+msgstr "Успешный результат"
 
 #: gui/dialogs/settings.py:79
 msgid "Unsuccessful result"
-msgstr ""
+msgstr "Неуспешный результат"
 
 #: gui/dialogs/settings.py:97
 msgid "Main settings"
@@ -1203,7 +1203,7 @@ msgstr "Заменить номера чипов нагрудными номер
 
 #: gui/menu/actions.py:398
 msgid "No results to change status"
-msgstr ""
+msgstr "Нет результата для изменения статуса"
 
 #: gui/menu/menu.py:8
 msgid "File"

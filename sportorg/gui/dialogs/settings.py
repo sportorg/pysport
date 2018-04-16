@@ -9,7 +9,6 @@ from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _, get_languages
 from sportorg.modules.configs.configs import Config
-from sportorg.modules.sound import Sound
 
 
 class Tab:
