@@ -2,11 +2,27 @@
 
 ## 2018-04-17 v1.1.0
 
-* pass
++ SFR (http://www.sportsystem.ru) timekeeping system support (only last model U5a with HID Interface). Thanks to Alexander Kurdumov for support and equipment sample.
++ Sportiduino (https://github.com/alexandervolikov/sportiduino) timekeeping system support. Thanks to Semyon Yakimov for contribution.
++ Sound effects while e-card readout
++ Auto filling of group and team if filter applied
++ Confirmation of application closing (including Alt+F4)
++ Detailed description of disqualification rules (Rus)
++ rufso-18-2. 'ZMS' qualification was removed (Rus)
++ rufso-18-10. Some translation changes (Rus)
+
+* Linux compatibility was lost because of pywinusb library (used for SFR, will be fixed in next version)
+
+- Fixed. Incorrect course order in relay printout
+- Fixed. No ".json" extension while saving file on Linux
 
 ## 2018-03-16 v1.0.0
 
-* pass
++ Official stable release
++ COM-port selecting for SPORTident master station
+
+* Environment configuration for html templates
+* Minor fixes in data model
 
 ## 2018-03-06 v0.11.0-rc4
 
