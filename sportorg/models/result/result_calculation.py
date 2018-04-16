@@ -1,7 +1,6 @@
 import logging
 
 from sportorg.core.otime import OTime
-from sportorg.language import _
 from sportorg.models.memory import race, Result, Person, Group, Qualification, RankingItem, \
     RelayTeam, RaceType, find
 

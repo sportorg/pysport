@@ -29,7 +29,7 @@ class Application(metaclass=Singleton):
     @staticmethod
     def set_status_comments():
         try:
-            with open(config.base_dir('status_comments.txt'), encoding='utf-8') as f:
+            with open(config.STATUS_COMMENTS_FILE, encoding='utf-8') as f:
                 content = f.readlines()
             StatusComments().set([x.strip() for x in content])
         except Exception as e:

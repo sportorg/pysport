@@ -8,7 +8,7 @@ from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
 from sportorg.models.constant import StatusComments
-from sportorg.models.memory import race, ResultStatus, find, ResultSportident
+from sportorg.models.memory import race, ResultStatus, find
 from sportorg.modules.teamwork import Teamwork
 
 
