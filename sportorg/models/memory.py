@@ -863,6 +863,7 @@ class Person(Model):
             'sportident_card': self.sportident_card,
             'bib': self.bib,
             'birth_date': str(self.birth_date) if self.birth_date else None,
+            'year': self.get_year() if self.get_year() else '0',  # back compatibility with 1.0
             'group_id': str(self.group.id) if self.group else None,
             'organization_id': str(self.organization.id) if self.organization else None,
             'nationality': self.nationality.to_dict() if self.nationality else None,

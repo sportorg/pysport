@@ -85,7 +85,7 @@ msgstr "Отмена"
 #: gui/dialogs/text_io.py:290 gui/tabs/memory_model.py:215
 #: gui/tabs/memory_model.py:279
 msgid "Group"
-msgstr "Возрастная категория"
+msgstr "Группа"
 
 #: gui/dialogs/bib_dialog.py:78 gui/dialogs/results_edit.py:88
 #: gui/dialogs/results_edit.py:152 gui/tabs/memory_model.py:216
@@ -336,7 +336,7 @@ msgstr ""
 
 #: gui/dialogs/group_edit.py:33
 msgid "Group properties"
-msgstr "Свойства возрастной категории"
+msgstr "Свойства группы"
 
 #: gui/dialogs/group_edit.py:45 gui/tabs/memory_model.py:351
 msgid "Full name"
@@ -673,11 +673,11 @@ msgstr "_Резерв"
 
 #: gui/dialogs/start_preparation.py:175
 msgid "Reserves per group, ps"
-msgstr "Количество резервов на возр. категорию, шт."
+msgstr "Количество резервов на группу, шт."
 
 #: gui/dialogs/start_preparation.py:176
 msgid "Reserves per group, %"
-msgstr "Количество резервов на возр. категорию, %"
+msgstr "Количество резервов на группу, %"
 
 #: gui/dialogs/start_preparation.py:177
 msgid "Insert reserves"
@@ -717,7 +717,7 @@ msgstr "Заданный интервал"
 
 #: gui/dialogs/start_preparation.py:188
 msgid "Take start interval from group settings"
-msgstr "Брать стартовый интервал из настроек возр. категорий"
+msgstr "Брать стартовый интервал из настроек групп"
 
 #: gui/dialogs/start_preparation.py:189
 msgid "Start numbers"
@@ -1074,7 +1074,7 @@ msgstr "Панель инструментов"
 
 #: gui/main_window.py:218 gui/menu/menu.py:145
 msgid "Groups"
-msgstr "Возр. категории"
+msgstr "Группы"
 
 #: gui/main_window.py:220 gui/menu/menu.py:155
 msgid "Teams"
@@ -1133,7 +1133,7 @@ msgstr "Пожалуйста, подтвердите действие"
 
 #: gui/main_window.py:599
 msgid "Cannot remove group"
-msgstr "Невозможно удалить возрастную категорию"
+msgstr "Невозможно удалить группу"
 
 #: gui/main_window.py:608
 msgid "Cannot remove course"
