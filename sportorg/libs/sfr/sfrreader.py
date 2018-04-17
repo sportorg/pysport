@@ -21,9 +21,11 @@
 """
 sfrreader.py - Classes to read out SFR card data from master HID stations.
 """
+import platform
 
 from time import sleep
-from pywinusb.hid import HidDeviceFilter, HidDevice
+if platform.system() == 'Windows':
+    from pywinusb.hid import HidDeviceFilter, HidDevice
 
 from datetime import datetime
 
@@ -254,6 +256,9 @@ class SFRReader(object):
     def _connect_reader(self):
         """Connect to SFR Reader.
         """
+        if platform.system() != 'Windows':
+            raise SFRReaderException('Unsupported platform: %s' % platform.system())
+
         hid_filter = HidDeviceFilter(vendor_id=self.VENDOR_ID, product_id=self.PRODUCT_ID)
         devices = hid_filter.get_devices()
 
