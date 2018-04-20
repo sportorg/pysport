@@ -4,6 +4,7 @@ from threading import Event, main_thread
 
 from PyQt5.QtCore import QThread, pyqtSignal
 
+from sportorg.core.broker import Broker
 from sportorg.core.singleton import singleton
 from .client import ClientThread
 from .server import ServerThread, Command
@@ -119,6 +120,7 @@ class Teamwork(object):
             self._logger.info('{} starting'.format(self.connection_type.upper()))
 
     def send(self, data):
+        Broker().produce('teamwork_sending', self.is_alive())
         if self.is_alive():
             if isinstance(data, Command):
                 self._in_queue.put(data)

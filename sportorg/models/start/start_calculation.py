@@ -142,7 +142,6 @@ class GroupsStartList:
             return person.start_time is None, person.start_time
 
 
-
 class ChessGenerator(GroupsStartList):
     def get_list(self):
         cache = set()
@@ -306,7 +305,6 @@ class TeamStatisticsList:
             ret.append(qual_dict)
 
         return ret
-
 
     def get_list(self):
         """

@@ -1,16 +1,16 @@
 import uuid
 from abc import abstractmethod
+import dateutil.parser
+import datetime
 from datetime import date
+import time
 from enum import IntEnum, Enum
 from typing import Dict, List, Any
 
-import datetime
-import dateutil.parser
 
 from sportorg.core.model import Model
 from sportorg.core.otime import OTime
 from sportorg.language import _
-from sportorg.utils.time import str_to_date, date_to_str
 
 
 class NotEmptyException(Exception):
@@ -474,6 +474,7 @@ class Result:
         self.scores = 0
         self.assigned_rank = Qualification.NOT_QUALIFIED
         self.diff = None  # type: OTime
+        self.created_at = time.time()
 
     def __str__(self):
         return str(self.system_type)
@@ -518,6 +519,8 @@ class Result:
             'place': self.place,
             'scores': self.scores,
             'assigned_rank': self.assigned_rank.value,
+            'created_at': self.created_at,
+            'result': self.get_result(),
         }
 
     def update_data(self, data):
@@ -537,6 +540,10 @@ class Result:
             self.status_comment = data['status_comment']
         if 'days' in data:
             self.days = int(data['days'])
+        if 'created_at' in data:
+            self.created_at = float(data['created_at'])
+        else:
+            self.created_at = time.time()
 
     def clear(self):
         pass

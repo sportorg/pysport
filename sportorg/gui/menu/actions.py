@@ -49,6 +49,7 @@ from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.modules.sportiduino.sportiduino import SportiduinoClient
 from sportorg.modules.teamwork import Teamwork
 from sportorg.modules.telegram.telegram import TelegramClient
+from sportorg.modules.web import web
 from sportorg.modules.winorient import winorient
 from sportorg.modules.winorient.wdb import WDBImportError, WinOrientBinary
 from sportorg.language import _
@@ -523,3 +524,8 @@ class AboutAction(Action):
 class TestingAction(Action):
     def execute(self):
         testing.test()
+
+
+class WebAction(Action):
+    def execute(self):
+        web.app_thread().start()
