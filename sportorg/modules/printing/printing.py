@@ -12,10 +12,14 @@ from sportorg.core.fake_std import FakeStd
 
 
 class PrintProcess(Process):
-    def __init__(self, printer_name, html):
+    def __init__(self, printer_name, html, left=5.0, top=5.0, right=5.0, bottom=5.0):
         super().__init__()
         self.printer_name = printer_name
         self.html = html
+        self.margin_left = left
+        self.margin_top = top
+        self.margin_right = right
+        self.margin_bottom = bottom
 
     def run(self):
         try:
@@ -36,7 +40,13 @@ class PrintProcess(Process):
             text_document = QTextDocument()
 
             printer.setFullPage(True)
-            printer.setPageMargins(1, 1, 1, 1, QPrinter.Millimeter)
+            printer.setPageMargins(
+                self.margin_left,
+                self.margin_top,
+                self.margin_right,
+                self.margin_bottom,
+                QPrinter.Millimeter
+            )
 
             page_size = QSizeF()
             page_size.setHeight(printer.height())
@@ -50,8 +60,8 @@ class PrintProcess(Process):
             logging.error(str(e))
 
 
-def print_html(printer_name, html):
-    thread = PrintProcess(printer_name, html)
+def print_html(printer_name, html, left=5.0, top=5.0, right=5.0, bottom=5.0):
+    thread = PrintProcess(printer_name, html, left, top, right, bottom)
     thread.start()
     logging.info('printing poccess started')
 

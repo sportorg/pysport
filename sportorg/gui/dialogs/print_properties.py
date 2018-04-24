@@ -3,7 +3,8 @@ import logging
 from PyQt5 import QtPrintSupport
 from PyQt5.QtGui import QIcon
 from PyQt5.QtPrintSupport import QPrinter, QPrintDialog, QAbstractPrintDialog
-from PyQt5.QtWidgets import QFormLayout, QLabel, QDialog, QPushButton, QCheckBox, QDialogButtonBox
+from PyQt5.QtWidgets import QFormLayout, QLabel, QDialog, QPushButton, QCheckBox, QDialogButtonBox, QGroupBox, \
+    QDoubleSpinBox
 
 from sportorg import config
 from sportorg.core.template import get_templates
@@ -75,6 +76,19 @@ class PrintPropertiesDialog(QDialog):
         self.print_splits_checkbox = QCheckBox(_('Print splits'))
         self.layout.addRow(self.print_splits_checkbox)
 
+        self.margin_group_box = QGroupBox(_('Margins'))
+        self.margin_layout = QFormLayout()
+        self.item_margin_left = QDoubleSpinBox()
+        self.margin_layout.addRow(QLabel(_('Left')), self.item_margin_left)
+        self.item_margin_top = QDoubleSpinBox()
+        self.margin_layout.addRow(QLabel(_('Top')), self.item_margin_top)
+        self.item_margin_right = QDoubleSpinBox()
+        self.margin_layout.addRow(QLabel(_('Right')), self.item_margin_right)
+        self.item_margin_bottom = QDoubleSpinBox()
+        self.margin_layout.addRow(QLabel(_('Bottom')), self.item_margin_bottom)
+        self.margin_group_box.setLayout(self.margin_layout)
+        self.layout.addRow(self.margin_group_box)
+
         self.set_values()
 
         def cancel_changes():
@@ -122,6 +136,11 @@ class PrintPropertiesDialog(QDialog):
         if template:
             self.item_template.setCurrentText(template)
 
+        self.item_margin_left.setValue(obj.get_setting('print_margin_left', 5.0))
+        self.item_margin_top.setValue(obj.get_setting('print_margin_top', 5.0))
+        self.item_margin_right.setValue(obj.get_setting('print_margin_right', 5.0))
+        self.item_margin_bottom.setValue(obj.get_setting('print_margin_bottom', 5.0))
+
     def select_printer(self):
         try:
             printer = QtPrintSupport.QPrinter()
@@ -141,3 +160,8 @@ class PrintPropertiesDialog(QDialog):
         obj.set_setting('split_printer', split_printer)
         obj.set_setting('split_printout', self.print_splits_checkbox.isChecked())
         obj.set_setting('split_template', self.item_template.currentText())
+
+        obj.set_setting('print_margin_left', self.item_margin_left.value())
+        obj.set_setting('print_margin_top', self.item_margin_top.value())
+        obj.set_setting('print_margin_right', self.item_margin_right.value())
+        obj.set_setting('print_margin_bottom', self.item_margin_bottom.value())
