@@ -28,4 +28,11 @@ def split_printout(result):
         template = get_text_from_file(template_path, **spl.get_dict_printout(person))
         if not printer:
             raise NoPrinterSelectedException('No printer selected')
-        print_html(printer, template)
+        print_html(
+            printer,
+            template,
+            obj.get_setting('print_margin_left', 5.0),
+            obj.get_setting('print_margin_top', 5.0),
+            obj.get_setting('print_margin_right', 5.0),
+            obj.get_setting('print_margin_bottom', 5.0),
+        )

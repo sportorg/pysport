@@ -1,5 +1,9 @@
 # Changelog
 
+## 2018-04-24 v1.1.1
+
++ Added margins when printing
+
 ## 2018-04-17 v1.1.0
 
 + SFR (http://www.sportsystem.ru) timekeeping system support on Windows (only last model U5a with HID Interface). Thanks to Alexander Kurdumov for support and equipment sample.

@@ -1545,6 +1545,21 @@ msgstr "Открыть WDB файл"
 msgid "Save WDB file"
 msgstr "Сохранить WDB файл"
 
+msgid "Margins"
+msgstr "Поля"
+
+msgid "Left"
+msgstr "Слева"
+
+msgid "Top"
+msgstr "Сверху"
+
+msgid "Right"
+msgstr "Справа"
+
+msgid "Bottom"
+msgstr "Снизу"
+
 #~ msgid "Auto connect to station"
 #~ msgstr "Автоматическое подключение станции SPORTident"
 
