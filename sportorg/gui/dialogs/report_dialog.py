@@ -101,9 +101,7 @@ class ReportDialog(QDialog):
         ResultCalculation(race()).process_results()
         ScoreCalculation(race()).calculate_scores()
 
-        # FIXME
-        # template = get_text_from_file(template_path, **get_splits_data())
-        template = ''
+        template = get_text_from_file(template_path, race=race().to_dict())
 
         if _settings['save_to_last_file']:
             file_name = _settings['last_file']

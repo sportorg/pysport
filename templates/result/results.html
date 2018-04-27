@@ -6,98 +6,83 @@
 {{ super() }}
 {% endblock %}
 
-{% macro view_groups() -%}{% for group in groups %}<a href="#{{group.name}}">{{group.name}}</a> {% endfor %}{%- endmacro %}
-
 {% block content %}
-    <div class="text-center">
-        <h3>{{ race.sub_title }} <br>{{ race.date }} {{ race.location }}</h3>
-        <h2>ПРОТОКОЛ РЕЗУЛЬТАТОВ</h2>
-    </div>
-    <table class="sportorg-table">
-    {% for group in groups %}
-    {% if group.persons|length %}
-        <tr style="background: white; border: 0">
-        <td colspan="7" style="border: 0">
-            <h2 id="{{group.name}}">{{ group.name }}{% if group.length %}, {{ group.length / 1000 }} км{% endif %}{% if group.cp_count %}, {{ group.cp_count }} КП{% endif %}{% if group.max_time %}, Контрольное время: {{ group.max_time }} {% endif %}
-            </h2>
-            <div class="no-print">{{ view_groups() }}</div>
-        </td>
-        </tr>
-        <tr>
-            <td>№</td>
-            <td>Фамилия, имя</td>
-            <td>Коллектив</td>
-            <td>Разряд</td>
-            <td>ГР</td>
-            <td>Номер</td>
-            <td>Результат</td>
-            <td>Отставание</td>
-            <td>Место</td>
-        </tr>
-        {% set index = [1] %}
-        {% for person in group.persons %}
-            {% if person.relay_leg == 1 and group.type == 'RELAY' %}
-                <tr>
-                    <td>{{index|length}}</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                {% if index.append(1) %} {% endif %} {# increment index length by 1 #}
-            {% endif %}
-            <tr>
-                {% if group.type == 'RELAY' %}
-                    <td></td>
-                {% else %}
-                    <td>{{ loop.index }}</td>
-                {% endif %}
-                <td>{{ person.name }}</td>
-                <td>{{ person.team }}</td>
-                <td>{{ person.qual }}</td>
-                <td>{{ person.year }}</td>
-                <td>{{ person.bib }}</td>
-                <td>{{ person.result }}</td>
-                <td>{{ person.diff }}</td>
-                <td>{{ person.place }}</td>
-            </tr>
-        {% endfor %}
-        <tr style="background: white; border: 0">
-            <td colspan="7" style="border: 0">
-                {% if group.ranking.rank_scores and group.ranking.rank_scores > 0 %}
-                    Квалификационный уровень (баллы): {{group.ranking.rank_scores}}<br>
-                    Класс дистанции: {{group.ranking.max_qual}}<br>
-                    {% for rank in group.ranking.rank %}
-                        {{"{}".format(rank.qual)}} --
-                        {% if rank.max_place %}
-                            до {{rank.max_place}} места
-                        {% else %}
-                            {{rank.max_time}} ({{rank.percent}}%)
-                        {% endif %}
-                        <br>
-                    {% endfor %}
-                {% endif %}
-            </td>
-        </tr>
-    {% endif %}
-    {% endfor %}
-    </table>
-    <div>
-        <table class="empty-table">
-            <tr>
-                <td><b>Главный судья:</b></td>
-                <td width="150px"></td>
-                <td><b>{{ race.chief_referee }}</b></td>
-            </tr>
-            <tr>
-                <td><b>Главный секретарь:</b></td>
-                <td width="150px"></td>
-                <td><b>{{ race.secretary }}</b></td>
-            </tr>
-        </table>
-    </div>
+<div class="text-center">
+    <h3>{{ race.data.description }} <br>{{ race.data.location }}</h3>
+    <h2>ПРОТОКОЛ РЕЗУЛЬТАТОВ</h2>
+</div>
+<div id="results-tables"></div>
+{% raw %}
+<script>
+    var race = {% endraw %}{{race|tojson}}{% raw %};
+    racePreparation(race);
+
+    function getResultsByGroup(group) {
+        var isRelay = group.__type ? group.__type === 3 : race.data.race_type === 3;
+        var results = [];
+        var index = 0;
+        for (var result of race.results) {
+            if (result.person && result.person.group.id === group.id) {
+                index++;
+                results.push({
+                    index: index,
+                    name: result.person.surname + ' ' + result.person.name,
+                    org: (result.person.organization && result.person.organization.name) || '',
+                    bib: result.person.bib,
+                    year: result.person.birth_date ? (new Date(result.person.birth_date)).getFullYear() : '',
+                    result: result.result,
+                    place: result.place || '',
+                })
+            }
+        }
+        results.sort((a, b) => {
+            if (a.place === '') {
+                return 1
+            }
+            if (b.place === '') {
+                return -1
+            }
+            if (isRelay && a.place === b.place) {
+                return ~~(a.bib / 1000) - ~~(b.bib / 1000)
+            }
+            return a.place - b.place
+        });
+        if (isRelay) {
+            index = 0;
+            var prevBib = 0;
+            var resultsList = results.slice();
+            results = [];
+            for (var r of resultsList) {
+                r.index = '';
+                if (r.bib % 1000 !== prevBib) {
+                    index++;
+                    results.push({index: index});
+                    prevBib = r.bib % 1000
+                }
+                results.push(r)
+            }
+        }
+        return results;
+    }
+
+    var fields = [
+        {key: 'index', title: '#'},
+        {key: 'name', title: 'Фамилия, имя'},
+        {key: 'org', title: 'Коллектив'},
+        {key: 'year', title: 'ГР'},
+        // qual
+        {key: 'bib', title: 'Номер'},
+        {key: 'result', title: 'Результат'},
+        // diff
+        {key: 'place', title: 'Место'},
+    ];
+
+    for (var group of race.groups) {
+        var titleBlock = document.createElement('h2');
+        titleBlock.appendChild(document.createTextNode(group.name));
+        document.getElementById('results-tables').appendChild(titleBlock);
+        document.getElementById('results-tables').appendChild(new TableGenerator(getResultsByGroup(group), fields).getTable({class: 'sportorg-table'}));
+    }
+</script>
+{% endraw %}
 {% endblock %}

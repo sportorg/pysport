@@ -213,6 +213,124 @@
             }
         }
     </style>
+    <script>
+        var TableGenerator = (function () {
+            var Table = function () { return document.createElement('table') };
+            var THead = function () { return document.createElement('thead') };
+            var TBody = function () { return document.createElement('tbody') };
+            var Tr = function () { return document.createElement('tr') };
+            var Th = function () { return document.createElement('th') };
+            var Td = function () { return document.createElement('td') };
+
+            function TableGenerator(data, fields) {
+                this.data = data
+                this.fields = fields
+            }
+
+            TableGenerator.prototype.getTable = function (options) {
+                var table = Table();
+                if (options && options.class) table.classList.add(options.class);
+                table.appendChild(this.getHead());
+                table.appendChild(this.getBody());
+                return table;
+            }
+
+            TableGenerator.prototype.getHead = function () {
+                var tr = Tr();
+                for (var key of this.headers()) {
+                    var th = Th();
+                    th.appendChild(document.createTextNode(this.getHeaderName(key)));
+                    tr.appendChild(th);
+                }
+                var thead = THead();
+                thead.appendChild(tr);
+                return thead;
+            }
+
+            TableGenerator.prototype.getBody = function () {
+                var tbody = TBody();
+                for (var obj of this.data) {
+                    var tr = Tr();
+                    for (var key of this.headers()) {
+                        var td = Td();
+                        if (obj[key]) {
+                            td.appendChild(document.createTextNode(obj[key]));
+                        }
+                        tr.appendChild(td);
+                    }
+
+                    tbody.appendChild(tr);
+                }
+                return tbody;
+            }
+
+            TableGenerator.prototype.headers = function () {
+                if (this._headers) {
+                    return this._headers
+                }
+                var headers = {};
+                if (!this.fields) {
+                    for (var obj of this.data) {
+                        for (var key in obj) {
+                            headers[key] = true;
+                        }
+                    }
+                } else if (this.fields instanceof Array) {
+                    for (var field of this.fields) {
+                        if (typeof field === 'string') {
+                            headers[field] = true;
+                        } else {
+                            headers[field.key] = true;
+                        }
+                    }
+                }
+                return this._headers = Object.keys(headers)
+            }
+
+            TableGenerator.prototype.getHeaderName = function (key) {
+                if (this.fields && this.fields instanceof Array) {
+                    for (var field of this.fields) {
+                        if (typeof field === 'object' && field.key === key) {
+                            return field.title;
+                        }
+                    }
+                }
+                return key;
+            }
+
+            return TableGenerator
+        }());
+        function getById (list, id) {
+            if (id) {
+                for (var obj of list) {
+                    if (obj.id === id) {
+                        return obj;
+                    }
+                }
+            }
+            return null;
+        }
+        function racePreparation(race) {
+            for (var obj of race.persons) {
+                obj.organization = getById(race.organizations, obj.organization_id);
+                obj.group = getById(race.groups, obj.group_id);
+            }
+            for (var obj of race.results) {
+                obj.person = getById(race.persons, obj.person_id);
+            }
+            for (var obj of race.groups) {
+                obj.course = getById(race.courses, obj.course_id);
+            }
+            for (var itemName of ['groups', 'courses']) {
+                race[itemName].sort((a, b) => {
+                    if (a.name.toUpperCase() < b.name.toUpperCase()) return -1;
+                    if (a.name.toUpperCase() > b.name.toUpperCase()) return 1;
+                    return 0
+                })
+            }
+            return race;
+        }
+    </script>
     {% endraw %}
 </head>
 <body>

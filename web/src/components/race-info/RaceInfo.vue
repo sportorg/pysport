@@ -89,7 +89,7 @@ export default {
   },
   methods: {
     getResults (group) {
-      this.isRelay = this.$store.state.race.race && this.$store.state.race.race.data.race_type === 3
+      this.isRelay = group.__type ? group.__type === 3 : this.$store.state.race.race && this.$store.state.race.race.data.race_type === 3
       let results = []
       if (this.$store.state.race.race && this.$store.state.race.race.results) {
         for (const result of this.$store.state.race.race.results) {
