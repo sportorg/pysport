@@ -36,7 +36,6 @@ class StartTimeChangeDialog(QDialog):
         self.layout.addRow(self.time_reduce)
         self.layout.addRow(self.time_value)
 
-
         def cancel_changes():
             self.close()
 
