@@ -5,7 +5,6 @@ from sportorg.models.memory import race, Result, Person, Group, Qualification, R
     RelayTeam, RaceType, find
 
 
-# FIXME: does not work sorting
 class ResultCalculation(object):
     def __init__(self, r):
         self.race = r
@@ -190,7 +189,8 @@ class ResultCalculation(object):
         scores = sorted(scores)
         return sum(scores[-10:])
 
-    def get_group_rank_relay(self, group):
+    @staticmethod
+    def get_group_rank_relay(group):
         """
         Rank calculation, takes sums or scores from qualification of best 10 athletes, who have OK result and not o/c
         :param group:
@@ -373,20 +373,3 @@ class ResultCalculation(object):
             ret = OTime(msec=msec_new)
             return ret
         return None
-
-
-def get_start_list_data():
-    pass
-
-
-def get_splits_data():
-    pass
-
-
-def get_entry_statistics_data():
-    pass
-
-
-def get_team_statistics_data():
-    pass
-

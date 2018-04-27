@@ -399,6 +399,8 @@ class Group(Model):
             'start_corridor': self.start_corridor,
             'order_in_corridor': self.order_in_corridor,
             'first_number': self.first_number,
+            'count_person': self.count_person,
+            'count_finished': self.count_finished,
             'ranking': self.ranking.to_dict() if self.ranking else None,
             '__type': self.__type.value if self.__type else None,
             'relay_legs': self.relay_legs,
@@ -428,10 +430,19 @@ class Group(Model):
 
 class Split(Model):
     def __init__(self):
-        self.code = 0
+        self.index = 0
+        self.course_index = -1
+        self.code = ''
         self.days = 0
         self.time = None  # type: OTime
-        self.pace = None  # type: OTime
+        self.leg_time = None  # type: OTime
+        self.relative_time = None  # type: OTime
+        self.leg_place = 0
+        self.relative_place = 0
+        self.is_correct = True
+        self.speed = ''
+        self.length_leg = 0
+        self.leader_name = ''
 
     def __eq__(self, other):
         assert isinstance(other, Split)
@@ -444,13 +455,23 @@ class Split(Model):
     def to_dict(self):
         return {
             'object': self.__class__.__name__,
+            'index': self.index,
+            'course_index': self.course_index + 1,
             'days': self.days,
             'code': self.code,
             'time': self.time.to_msec() if self.time else None,
+            'leg_time': self.leg_time,
+            'relative_time': self.relative_time,
+            'leg_place': self.leg_place,
+            'relative_place': self.relative_place,
+            'is_correct': self.is_correct,
+            'speed': self.speed,
+            'length_leg': self.length_leg,
+            'leader_name': self.leader_name
         }
 
     def update_data(self, data):
-        self.code = int(data['code'])
+        self.code = str(data['code'])
         if data['time']:
             self.time = OTime(msec=data['time'])
         if 'days' in data:
@@ -475,6 +496,7 @@ class Result:
         self.assigned_rank = Qualification.NOT_QUALIFIED
         self.diff = None  # type: OTime
         self.created_at = time.time()
+        self.speed = ''
 
     def __str__(self):
         return str(self.system_type)

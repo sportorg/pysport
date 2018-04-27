@@ -24,7 +24,7 @@ def split_printout(result):
     printer = obj.get_setting('split_printer')
     template_path = obj.get_setting('split_template', template_dir('split', 'split_printout.html'))
     if person.group and person.group.course:
-        spl = GroupSplits(race(), person.group)
+        spl = GroupSplits(race(), person.group).generate()
         template = get_text_from_file(template_path, **spl.get_dict_printout(person))
         if not printer:
             raise NoPrinterSelectedException('No printer selected')

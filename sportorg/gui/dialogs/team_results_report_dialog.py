@@ -12,6 +12,7 @@ from sportorg.gui.dialogs.file_dialog import get_open_file_name, get_save_file_n
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
+from sportorg.models.memory import race
 from sportorg.models.result.score_calculation import ScoreCalculation
 
 _settings = {
@@ -95,8 +96,9 @@ class TeamResultsReportDialog(QDialog):
         _settings['open_in_browser'] = self.item_open_in_browser.isChecked()
         _settings['save_to_last_file'] = self.item_save_to_last_file.isChecked()
 
-        ScoreCalculation.calculate_scores()
-        template = get_text_from_file(template_path, **ScoreCalculation.get_team_results_data())
+        score = ScoreCalculation(race())
+        score.calculate_scores()
+        template = get_text_from_file(template_path, **score.get_team_results_data())
 
         if _settings['save_to_last_file']:
             file_name = _settings['last_file']

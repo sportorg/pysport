@@ -77,7 +77,7 @@ class ReportDialog(QDialog):
             except FileNotFoundError as e:
                 logging.error(str(e))
             except Exception as e:
-                logging.error(str(e))
+                logging.exception(str(e))
             self.close()
 
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
@@ -100,7 +100,7 @@ class ReportDialog(QDialog):
         _settings['save_to_last_file'] = self.item_save_to_last_file.isChecked()
 
         ResultCalculation(race()).process_results()
-        ScoreCalculation.calculate_scores()
+        ScoreCalculation(race()).calculate_scores()
 
         template = get_text_from_file(template_path, **get_splits_data())
 

@@ -182,7 +182,7 @@ class Widget(QtWidgets.QWidget):
                 control_codes.append(str(control.code))
 
         prev_time = result.get_start_time()
-        code = -1
+        code = ''
         index = 1
         for split in result.splits:
             s = '{index} ({code}) {time} {diff}'.format(
@@ -194,7 +194,7 @@ class Widget(QtWidgets.QWidget):
 
             if split.code == code:
                 s = '<span style="background: red">{}</span>'.format(s)
-            if is_highlight and len(control_codes) and str(split.code) not in control_codes:
+            if is_highlight and len(control_codes) and split.code not in control_codes:
                 s = '<span style="background: yellow">{}</span>'.format(s)
 
             self.ResultChipDetails.append(s)
@@ -208,7 +208,7 @@ class Widget(QtWidgets.QWidget):
 
         split_codes = []
         for split in result.splits:
-            split_codes.append(str(split.code))
+            split_codes.append(split.code)
 
         if course:
             index = 1
