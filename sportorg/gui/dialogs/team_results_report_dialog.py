@@ -98,7 +98,9 @@ class TeamResultsReportDialog(QDialog):
 
         score = ScoreCalculation(race())
         score.calculate_scores()
-        template = get_text_from_file(template_path, **score.get_team_results_data())
+        # FIXME
+        # template = get_text_from_file(template_path, **score.get_team_results_data())
+        template = ''
 
         if _settings['save_to_last_file']:
             file_name = _settings['last_file']

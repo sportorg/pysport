@@ -76,67 +76,6 @@ class ScoreCalculation(object):
                     ret.append(result)
         return ret
 
-    def get_team_results_data(self):
-        ret = {}
-        data = []
-        for group in self.race.groups:
-
-            group_teams = []
-
-            team_group_mode = self.race.get_setting('team_group_mode', 'organization')
-
-            if team_group_mode == 'organization':
-                # organization grouping
-                for team in self.race.organizations:
-                    results = self.get_group_team_results(group, team)
-                    if results:
-                        results = sorted(results, reverse=True, key=lambda item: item.scores)
-
-                        # apply limit
-                        limit = self.race.get_setting('team_qty', 0)
-                        if len(results) > limit > 0:
-                            results = results[:limit]
-
-                    sum_scores = 0
-
-                    for result in results:
-                        sum_scores += result.scores
-
-                    group_teams.append({
-                        'name': team.name,
-                        'member_qty': len(results),
-                        'scores': sum_scores
-                    })
-            else:
-                # region grouping
-                for team in self.get_all_regions():
-                    results = self.get_group_region_results(group, team)
-                    if results:
-                        results = sorted(results, reverse=True, key=lambda item: item.scores)
-
-                        # apply limit
-                        limit = self.race.get_setting('team_qty', 0)
-                        if len(results) > limit > 0:
-                            results = results[:limit]
-
-                    sum_scores = 0
-
-                    for result in results:
-                        sum_scores += result.scores
-
-                    group_teams.append({
-                        'name': team,
-                        'member_qty': len(results),
-                        'scores': sum_scores
-                    })
-            data.append({
-                'name': group.name,
-                'teams': group_teams,
-            })
-        ret['groups'] = data
-        ret['race'] = self.race.to_dict_data()
-        return ret
-
     @staticmethod
     def get_region_for_organization(org):
         if org:

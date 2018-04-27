@@ -12,7 +12,6 @@ from sportorg.gui.dialogs.file_dialog import get_open_file_name, get_save_file_n
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
-from sportorg.models.start.start_calculation import get_start_data
 
 
 _settings = {
@@ -95,8 +94,9 @@ class StartReportDialog(QDialog):
         _settings['last_template'] = template_path
         _settings['open_in_browser'] = self.item_open_in_browser.isChecked()
         _settings['save_to_last_file'] = self.item_save_to_last_file.isChecked()
-
-        template = get_text_from_file(template_path, **get_start_data())
+        # FIXME
+        # template = get_text_from_file(template_path, **get_start_data())
+        template = ''
 
         if _settings['save_to_last_file']:
             file_name = _settings['last_file']

@@ -13,13 +13,14 @@ from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
 from sportorg.models.constant import get_race_groups, get_race_courses
 from sportorg.models.memory import race
-from sportorg.models.start.start_calculation import get_chess_list
 
 
 class StartChessDialog(QDialog):
     def __init__(self):
         super().__init__(GlobalAccess().get_main_window())
-        self.data = get_chess_list()
+        # FIXME
+        # self.data = get_chess_list()
+        self.data = []
 
     def exec(self):
         self.init_ui()

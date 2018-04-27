@@ -1,4 +1,4 @@
-from sportorg.models.memory import race, Person, Course, Group, Qualification, ResultStatus
+from sportorg.models.memory import Person, Course, Group, Qualification, ResultStatus
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.utils.time import get_speed_min_per_km
 
@@ -205,71 +205,3 @@ class GroupSplits(object):
         for i in range(self.cp_count):
             self.sort_by_leg(i, True)
             self.set_places_for_leg(i, True)
-
-    def get_dict(self, person_to_export=None):
-        data = self.group.to_dict()
-        persons = []
-        for i in self.person_splits:
-            assert (isinstance(i, PersonSplits))
-
-            if person_to_export:
-                if not person_to_export == i.person:
-                    continue
-
-            person_dict = i.get_dict()
-            persons.append(person_dict)
-
-        data['persons'] = persons
-        return data
-
-    def get_dict_printout(self, person_to_export=None):
-        data = self.get_dict(person_to_export)
-
-        # list of athletes
-        group_persons = []
-        for i in self.person_splits:
-            group_persons.append({
-                'name': i.person.full_name,
-                'bib': i.person.bib,
-                'place': i.result.get_place(),
-                'result': i.result.get_result(),
-            })
-        data['group_persons'] = group_persons
-
-        return {
-            'groups': [data],
-            'race': self.race.to_dict_data()
-        }
-
-
-def get_splits_data():
-    """
-
-    :return: {
-        "race": {"title": str, "sub_title": str},
-        "groups": [
-            {
-                "name": str,
-                "persons": [
-                    PersonSplits.get_person_split_data,
-                    ...
-                ]
-            }
-        ]
-    }
-    """
-    ret = {}
-    data = []
-    for group in race().groups:
-        gs = GroupSplits(race(), group).generate()
-        group_data = gs.get_dict()
-
-        ranking_data = group.ranking.get_dict_data()
-        group_data['ranking'] = ranking_data
-
-        data.append(group_data)
-
-    data.sort(key=lambda x: x['name'])
-    ret['groups'] = data
-    ret['race'] = race().to_dict_data()
-    return ret

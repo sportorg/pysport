@@ -13,7 +13,7 @@ from sportorg.gui.dialogs.file_dialog import get_open_file_name, get_save_file_n
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
-from sportorg.models.start.start_calculation import get_teams_data, SortType
+from sportorg.models.start.start_calculation import SortType
 
 _settings = {
     'last_template': None,
@@ -113,8 +113,9 @@ class TeamReportDialog(QDialog):
             sorting = SortType.BIB
         elif self.sorting_type_start.isChecked():
             sorting = SortType.START
-
-        template = get_text_from_file(template_path, **get_teams_data(sorting))
+        # FIXME
+        # template = get_text_from_file(template_path, **get_teams_data(sorting))
+        template = ''
 
         if _settings['save_to_last_file']:
             file_name = _settings['last_file']

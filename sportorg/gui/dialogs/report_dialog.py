@@ -15,7 +15,6 @@ from sportorg.language import _
 from sportorg.models.memory import race
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.score_calculation import ScoreCalculation
-from sportorg.models.result.split_calculation import get_splits_data
 
 
 _settings = {
@@ -77,7 +76,7 @@ class ReportDialog(QDialog):
             except FileNotFoundError as e:
                 logging.error(str(e))
             except Exception as e:
-                logging.exception(str(e))
+                logging.error(str(e))
             self.close()
 
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
@@ -102,7 +101,9 @@ class ReportDialog(QDialog):
         ResultCalculation(race()).process_results()
         ScoreCalculation(race()).calculate_scores()
 
-        template = get_text_from_file(template_path, **get_splits_data())
+        # FIXME
+        # template = get_text_from_file(template_path, **get_splits_data())
+        template = ''
 
         if _settings['save_to_last_file']:
             file_name = _settings['last_file']

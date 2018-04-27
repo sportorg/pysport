@@ -933,34 +933,6 @@ class Person(Model):
         elif 'year' in data and data['year']:  # back compatibility with v 1.0.0
             self.set_year(int(data['year']))
 
-    def to_dict_data(self, course=None):
-        sportident_card = ''
-        if self.sportident_card:
-            sportident_card = str(self.sportident_card)
-        course_name = ''
-        if self.group is not None and self.group.course is not None:
-            course_name = self.group.course.name
-        if course:
-            course_name = course.name
-        return {
-            'name': self.full_name,
-            'bib': self.bib,
-            'course': course_name,
-            'team': self.organization.name if self.organization is not None else '',
-            'team_subject': self.organization.address.state if self.organization is not None else '',
-            'group': self.group.name if self.group is not None else '',
-            'group_start_corridor': self.group.start_corridor if self.group is not None else 0,
-            'price': self.group.price if self.group is not None else 0,
-            'qual': self.qual.get_title(),
-            'year': self.get_year() if self.get_year() else '',
-            'sportident_card': sportident_card,
-            'start': str(self.start_time),
-            'comment': self.comment,
-            'is_out_of_competition': self.is_out_of_competition,
-            'is_rented': self.is_rented_sportident_card,
-            'is_paid': self.is_paid,
-        }
-
 
 class RaceData(Model):
     def __init__(self):
@@ -1059,17 +1031,6 @@ class Race(Model):
             'Group': self.groups,
             'Course': self.courses,
             'Organization': self.organizations,
-        }
-
-    def to_dict_data(self):
-        return {
-            'title': self.data.title,
-            'sub_title': self.data.description,
-            'url': self.data.url,
-            'location': self.data.location,
-            'date': self.data.get_start_datetime().strftime("%d.%m.%Y"),
-            'chief_referee': race().data.chief_referee,
-            'secretary': race().data.secretary
         }
 
     def to_dict(self):

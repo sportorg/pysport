@@ -12,7 +12,7 @@ from sportorg.gui.dialogs.file_dialog import get_open_file_name, get_save_file_n
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
-from sportorg.models.start.start_calculation import get_persons_data, SortType
+from sportorg.models.start.start_calculation import SortType
 
 
 class BibReportDialog(QDialog):
@@ -87,8 +87,9 @@ class BibReportDialog(QDialog):
             sorting = SortType.GROUP
 
         template_path = self.item_template.currentText()
-
-        template = get_text_from_file(template_path, **get_persons_data(sorting))
+        # FIXME
+        # template = get_text_from_file(template_path, **get_persons_data(sorting))
+        template = ''
 
         file_name = get_save_file_name(_('Save As HTML file'), _("HTML file (*.html)"),
                                        '{}_bib'.format(time.strftime("%Y%m%d")))
