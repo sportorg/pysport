@@ -11,9 +11,9 @@ from sportorg.gui.menu.actions import NewAction, SaveAction, OpenAction, SaveAsA
     SplitPrintoutAction, \
     RecheckingAction, PenaltyCalculationAction, PenaltyRemovingAction, ChangeStatusAction, SetDNSNumbersAction, \
     AddSPORTidentResultAction, TimekeepingSettingsAction, PrinterSettingsAction, LiveSettingsAction, \
-    LiveSendStartListAction, LiveSendResultsAction, LiveResendResultsAction, AboutAction, TestingAction, CPDeleteAction, \
-    TeamworkSettingsAction, TeamworkEnableAction, StatisticsListAction, TeamworkSendAction, TelegramSettingsAction, \
-    TelegramSendAction, SFRReadoutAction, CopyBibToCardNumber
+    LiveSendStartListAction, LiveSendResultsAction, LiveResendResultsAction, AboutAction, TestingAction, \
+    CPDeleteAction, TeamworkSettingsAction, TeamworkEnableAction, StatisticsListAction, TeamworkSendAction, \
+    TelegramSettingsAction, TelegramSendAction, SFRReadoutAction, CopyBibToCardNumber, StartHandicapAction
 
 
 class Factory:
@@ -48,6 +48,7 @@ class Factory:
             RelayNumberAction(),
             NumberChangeAction(),
             StartTimeChangeAction(),
+            StartHandicapAction(),
             CopyBibToCardNumber(),
             StartListAction(),
             StatisticsListAction(),
