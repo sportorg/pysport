@@ -1578,6 +1578,9 @@ msgstr "Время старта непопавших в гандикап"
 msgid "Offset after DSQ"
 msgstr "Интервал после снятых участников"
 
+msgid "Selected list report"
+msgstr "Выписка по выбранным участникам"
+
 #~ msgid "Auto connect to station"
 #~ msgstr "Автоматическое подключение станции SPORTident"
 
