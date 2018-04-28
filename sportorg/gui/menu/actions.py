@@ -27,7 +27,6 @@ from sportorg.gui.dialogs.start_report_dialog import StartReportDialog
 from sportorg.gui.dialogs.start_time_change_dialog import StartTimeChangeDialog
 from sportorg.gui.dialogs.statistics_report_dialog import StatisticsReportDialog
 from sportorg.gui.dialogs.team_report_dialog import TeamReportDialog
-from sportorg.gui.dialogs.team_results_report_dialog import TeamResultsReportDialog
 from sportorg.gui.dialogs.teamwork_properties import TeamworkPropertiesDialog
 from sportorg.gui.dialogs.telegram_dialog import TelegramDialog
 from sportorg.gui.dialogs.text_io import TextExchangeDialog
@@ -328,11 +327,6 @@ class SFRReadoutAction(Action):
 class CreateReportAction(Action):
     def execute(self):
         ReportDialog().exec()
-
-
-class CreateTeamResultsReportAction(Action):
-    def execute(self):
-        TeamResultsReportDialog().exec()
 
 
 class SplitPrintoutAction(Action):

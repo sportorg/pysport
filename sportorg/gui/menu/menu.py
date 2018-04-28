@@ -234,10 +234,6 @@ def menu_list():
                     'action': 'CreateReportAction'
                 },
                 {
-                    'title': _('Create team results report'),
-                    'action': 'CreateTeamResultsReportAction'
-                },
-                {
                     'title': _('Split printout'),
                     'shortcut': 'Ctrl+L',
                     'action': 'SplitPrintoutAction'

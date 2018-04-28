@@ -7,7 +7,6 @@ from sportorg.gui.menu.actions import NewAction, SaveAction, OpenAction, SaveAsA
     RelayNumberAction, \
     NumberChangeAction, StartTimeChangeAction, StartListAction, TeamListAction, StartTimesAction, PrintBibAction, \
     ManualFinishAction, SPORTidentReadoutAction, SportiduinoReadoutAction, CreateReportAction, \
-    CreateTeamResultsReportAction, \
     SplitPrintoutAction, \
     RecheckingAction, PenaltyCalculationAction, PenaltyRemovingAction, ChangeStatusAction, SetDNSNumbersAction, \
     AddSPORTidentResultAction, TimekeepingSettingsAction, PrinterSettingsAction, LiveSettingsAction, \
@@ -59,7 +58,6 @@ class Factory:
             SportiduinoReadoutAction(),
             SFRReadoutAction(),
             CreateReportAction(),
-            CreateTeamResultsReportAction(),
             SplitPrintoutAction(),
             RecheckingAction(),
             PenaltyCalculationAction(),

@@ -163,6 +163,21 @@
             /*background: #cd7f32;*/
         }
 
+        /* SETTINGS */
+        .sportorg-settings {
+            position: absolute;
+            border: 1px solid #dddddd;
+            border-radius: 5px;
+            min-width: 350px;
+            background: white;
+            top: 3px;
+            left: 3px;
+        }
+
+        .sportorg-settings-row {
+            margin: 5px;
+        }
+
         @media print {
             @page {
                 margin: 0.5cm;
@@ -208,6 +223,7 @@
             .print-only {
                 display: block;
             }
+            .sportorg-settings,
             .no-print {
                 display: none;
             }
@@ -229,7 +245,7 @@
 
             TableGenerator.prototype.getTable = function (options) {
                 var table = Table();
-                if (options && options.class) table.classList.add(options.class);
+                if (options && options.className) table.classList.add(options.className);
                 table.appendChild(this.getHead());
                 table.appendChild(this.getBody());
                 return table;
@@ -249,16 +265,27 @@
 
             TableGenerator.prototype.getBody = function () {
                 var tbody = TBody();
+                var cols = this.headers().length;
                 for (var obj of this.data) {
                     var tr = Tr();
-                    for (var key of this.headers()) {
+                    if (obj instanceof Node || typeof obj === 'string') {
                         var td = Td();
-                        if (obj[key]) {
-                            td.appendChild(document.createTextNode(obj[key]));
+                        td.colSpan = cols;
+                        if (typeof obj === 'string') {
+                            td.appendChild(document.createTextNode(obj));
+                        } else {
+                            td.appendChild(obj);
                         }
                         tr.appendChild(td);
+                    } else {
+                        for (var key of this.headers()) {
+                            var td = Td();
+                            if (obj[key]) {
+                                td.appendChild(document.createTextNode(obj[key]));
+                            }
+                            tr.appendChild(td);
+                        }
                     }
-
                     tbody.appendChild(tr);
                 }
                 return tbody;
@@ -300,6 +327,48 @@
 
             return TableGenerator
         }());
+        var SettingsGenerator = (function () {
+            var Block = function () { var el = document.createElement('div'); el.className = 'sportorg-settings'; return el };
+            var Row = function () { var el = document.createElement('div'); el.className = 'sportorg-settings-row'; return el };
+            function SettingsGenerator(settings) {
+                this.settings = settings;
+            }
+            SettingsGenerator.prototype.show = function () {
+                var block = Block();
+                for (var setting of this.settings) {
+                    var row = Row();
+                    row.appendChild(this.getElBySetting(setting.title));
+                    block.appendChild(row);
+                }
+                document.body.appendChild(block);
+            };
+            SettingsGenerator.prototype.getElBySetting = function (setting) {
+                if (typeof setting.value === 'boolean') {
+                    var i = document.createElement('input');
+                    i.type = 'checkbox';
+                    if (setting.value) {
+                        i.checked = true;
+                    }
+                    var label = document.createElement('label');
+                    label.appendChild(i);
+                    label.appendChild(document.createTextNode(setting.title));
+                    return label
+                }
+            }
+            return SettingsGenerator;
+        }());
+        function toHHMMSS (value) {
+            if (!value) return '';
+            value /= 1000;
+            var hours = Math.floor(value / 3600);
+            value %= 3600;
+            var minutes = Math.floor(value / 60);
+            var seconds = value % 60;
+            hours = hours < 10 ? '0' + hours : hours;
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+            seconds = seconds < 10 ? '0' + seconds : seconds;
+            return hours + ":" + minutes + ":" + seconds;
+        }
         function getById (list, id) {
             if (id) {
                 for (var obj of list) {
@@ -330,6 +399,30 @@
             }
             return race;
         }
+        function getGroupsBlockElement(race) {
+            var groupBlock = document.createElement('div');
+            groupBlock.className = 'no-print';
+            for (var group of race.groups) {
+                var a = document.createElement('a');
+                a.href = '#' + group.name;
+                a.appendChild(document.createTextNode(group.name + ' '));
+                groupBlock.appendChild(a);
+            }
+            return groupBlock;
+        }
+        var Qualification = {
+            '': 'б/р',
+            0: 'б/р',
+            3: 'IIIю',
+            2: 'IIю',
+            1: 'Iю',
+            6: 'III',
+            5: 'II',
+            4: 'I',
+            7: 'КМС',
+            8: 'МС',
+            9: 'МСМК'
+        };
     </script>
     {% endraw %}
 </head>

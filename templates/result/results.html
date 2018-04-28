@@ -12,6 +12,20 @@
     <h2>ПРОТОКОЛ РЕЗУЛЬТАТОВ</h2>
 </div>
 <div id="results-tables"></div>
+<div>
+    <table class="empty-table">
+        <tr>
+            <td><b>Главный судья:</b></td>
+            <td width="150px"></td>
+            <td><b>{{ race.data.chief_referee }}</b></td>
+        </tr>
+        <tr>
+            <td><b>Главный секретарь:</b></td>
+            <td width="150px"></td>
+            <td><b>{{ race.data.secretary }}</b></td>
+        </tr>
+    </table>
+</div>
 {% raw %}
 <script>
     var race = {% endraw %}{{race|tojson}}{% raw %};
@@ -28,9 +42,13 @@
                     index: index,
                     name: result.person.surname + ' ' + result.person.name,
                     org: (result.person.organization && result.person.organization.name) || '',
+                    qual: Qualification[result.person.qual],
                     bib: result.person.bib,
                     year: result.person.birth_date ? (new Date(result.person.birth_date)).getFullYear() : '',
+                    penalty_time: toHHMMSS(result.penalty_time),
+                    penalty_laps: result.penalty_laps,
                     result: result.result,
+                    diff: result.diff,
                     place: result.place || '',
                 })
             }
@@ -70,19 +88,33 @@
         {key: 'name', title: 'Фамилия, имя'},
         {key: 'org', title: 'Коллектив'},
         {key: 'year', title: 'ГР'},
-        // qual
+        {key: 'qual', title: 'Разряд'},
         {key: 'bib', title: 'Номер'},
+        {key: 'penalty_time', title: 'Штраф'},
+        {key: 'penalty_laps', title: 'Штраф'},
         {key: 'result', title: 'Результат'},
-        // diff
+        {key: 'diff', title: 'Отставание'},
         {key: 'place', title: 'Место'},
     ];
 
     for (var group of race.groups) {
         var titleBlock = document.createElement('h2');
+        titleBlock.id = group.name;
         titleBlock.appendChild(document.createTextNode(group.name));
         document.getElementById('results-tables').appendChild(titleBlock);
-        document.getElementById('results-tables').appendChild(new TableGenerator(getResultsByGroup(group), fields).getTable({class: 'sportorg-table'}));
+
+        document.getElementById('results-tables').appendChild(getGroupsBlockElement(race));
+
+        document.getElementById('results-tables').appendChild(new TableGenerator(getResultsByGroup(group), fields).getTable({className: 'sportorg-table'}));
     }
+
+    new SettingsGenerator([
+        {title: 'Отображать штрафное время', value: true},
+        {title: 'Отображать кол-во штрафных кругов', value: true},
+        {title: 'Отображать отставание', value: true},
+        {title: 'Отображать сплиты', value: false},
+    ]).show();
 </script>
+<div class="no-print"></div>
 {% endraw %}
 {% endblock %}
