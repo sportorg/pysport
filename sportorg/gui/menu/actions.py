@@ -20,6 +20,7 @@ from sportorg.gui.dialogs.print_properties import PrintPropertiesDialog
 from sportorg.gui.dialogs.relay_number_dialog import RelayNumberDialog
 from sportorg.gui.dialogs.report_dialog import ReportDialog
 from sportorg.gui.dialogs.search_dialog import SearchDialog
+from sportorg.gui.dialogs.selected_report_dialog import SelectedReportDialog
 from sportorg.gui.dialogs.settings import SettingsDialog
 from sportorg.gui.dialogs.start_chess_dialog import StartChessDialog
 from sportorg.gui.dialogs.start_handicap_dialog import StartHandicapDialog
@@ -286,6 +287,11 @@ class StatisticsListAction(Action):
 class TeamListAction(Action):
     def execute(self):
         TeamReportDialog().exec()
+
+
+class SelectedListAction(Action):
+    def execute(self):
+        SelectedReportDialog().exec()
 
 
 class StartTimesAction(Action):

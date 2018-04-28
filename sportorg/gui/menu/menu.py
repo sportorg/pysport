@@ -201,6 +201,11 @@ def menu_list():
                     'action': 'TeamListAction'
                 },
                 {
+                    'title': _('Selected list report'),
+                    'action': 'SelectedListAction',
+                    'shortcut': 'Ctrl+Shift+W',
+                },
+                {
                     'title': _('Start times'),
                     'action': 'StartTimesAction'
                 },

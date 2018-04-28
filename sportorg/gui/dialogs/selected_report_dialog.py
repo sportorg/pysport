@@ -5,7 +5,7 @@ import webbrowser
 
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QLabel, QDialog, QPushButton, QDialogButtonBox, QCheckBox, QGroupBox, \
-    QRadioButton
+    QRadioButton, QMessageBox
 
 from sportorg import config
 from sportorg.core.template import get_templates, get_text_from_file
@@ -13,7 +13,8 @@ from sportorg.gui.dialogs.file_dialog import get_open_file_name, get_save_file_n
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
-from sportorg.models.start.start_calculation import get_teams_data, SortType
+from sportorg.models.memory import race
+from sportorg.models.start.start_calculation import SortType, get_selected_data
 
 _settings = {
     'last_template': None,
@@ -23,7 +24,7 @@ _settings = {
 }
 
 
-class TeamReportDialog(QDialog):
+class SelectedReportDialog(QDialog):
     def __init__(self):
         super().__init__(GlobalAccess().get_main_window())
 
@@ -32,7 +33,7 @@ class TeamReportDialog(QDialog):
         return super().exec()
 
     def init_ui(self):
-        self.setWindowTitle(_('Team list'))
+        self.setWindowTitle(_('Selected list report'))
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(True)
@@ -87,6 +88,7 @@ class TeamReportDialog(QDialog):
                 logging.error(str(e))
             except Exception as e:
                 logging.error(str(e))
+                logging.exception(e)
             self.close()
 
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
@@ -114,7 +116,22 @@ class TeamReportDialog(QDialog):
         elif self.sorting_type_start.isChecked():
             sorting = SortType.START
 
-        template = get_text_from_file(template_path, **get_teams_data(sorting))
+        win = GlobalAccess().get_main_window()
+        if win.get_person_table() != win.get_current_table():
+            QMessageBox.warning(self, _('Error'), _('Please go to Entry Tab'))
+            return
+
+        indexes = win.get_selected_rows()
+        if len(indexes) == 0:
+            QMessageBox.warning(self, _('Error'), _('Please select entries'))
+            return
+
+        selected_persons = []
+        obj = race()
+        for i in indexes:
+            selected_persons.append(obj.persons[i])
+
+        template = get_text_from_file(template_path, **get_selected_data(selected_persons, sorting))
 
         if _settings['save_to_last_file']:
             file_name = _settings['last_file']

@@ -1,6 +1,6 @@
 from enum import Enum
 
-from sportorg.models.memory import race, Group, RaceType, find, Qualification
+from sportorg.models.memory import race, Group, RaceType, find, Qualification, Organization
 from sportorg.utils.time import time_to_hhmmss
 
 
@@ -226,6 +226,22 @@ class TeamStartList:
         return data
 
 
+class SelectedStartList(TeamStartList):
+    """Emulate current selection as single team"""
+    def _get_teams(self):
+        team_persons = {}
+        title = 'Selected persons'
+        team = Organization()
+        team.name = title
+        team_persons[title] = {
+            'persons': [],
+            'team': team
+        }
+        for person in self._persons:
+            team_persons[title]['persons'].append(person)
+        return team_persons
+
+
 class TeamStatisticsList:
     def __init__(self, persons, sorting=None):
         self._persons = persons
@@ -364,6 +380,15 @@ def get_teams_data(sorting=None):
     return {
         'race': race().to_dict_data(),
         'teams': TeamStartList(race().persons, sorting).get_list()
+    }
+
+
+def get_selected_data(persons, sorting=None):
+    if sorting is None:
+        sorting = SortType.NAME
+    return {
+        'race': race().to_dict_data(),
+        'teams': SelectedStartList(persons, sorting).get_list()
     }
 
 
