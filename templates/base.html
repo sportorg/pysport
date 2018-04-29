@@ -306,7 +306,7 @@
                     for (var field of this.fields) {
                         if (typeof field === 'string') {
                             headers[field] = true;
-                        } else {
+                        } else if (field.active !== false){
                             headers[field.key] = true;
                         }
                     }
@@ -337,7 +337,7 @@
                 var block = Block();
                 for (var setting of this.settings) {
                     var row = Row();
-                    row.appendChild(this.getElBySetting(setting.title));
+                    row.appendChild(this.getElBySetting(setting));
                     block.appendChild(row);
                 }
                 document.body.appendChild(block);
@@ -348,6 +348,14 @@
                     i.type = 'checkbox';
                     if (setting.value) {
                         i.checked = true;
+                    }
+                    if (setting.change) {
+                        i.onchange = function () {
+                            if (i.checked !== setting.value) {
+                                setting.change(i.checked);
+                                setting.value = i.checked;
+                            }
+                        }
                     }
                     var label = document.createElement('label');
                     label.appendChild(i);

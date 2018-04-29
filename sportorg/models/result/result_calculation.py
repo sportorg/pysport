@@ -31,7 +31,7 @@ class ResultCalculation(object):
             person = i.person
             if person:
                 assert isinstance(person, Person)
-                if person.group == group:
+                if person.group is group:
                     ret.append(i)
         ret.sort()
         group.count_finished = len(ret)
@@ -43,7 +43,7 @@ class ResultCalculation(object):
         for i in self.race.persons:
             person = i
             assert isinstance(person, Person)
-            if person.group == group:
+            if person.group is group:
                 ret.append(i)
         group.count_person = len(ret)
         return ret

@@ -8,7 +8,6 @@ from PyQt5.QtWidgets import QMessageBox, QApplication, QTableView
 
 from sportorg.core.otime import OTime
 from sportorg.gui.dialogs.about import AboutDialog
-from sportorg.gui.dialogs.bib_report_dialog import BibReportDialog
 from sportorg.gui.dialogs.cp_delete import CPDeleteDialog
 from sportorg.gui.dialogs.entry_filter import DialogFilter
 from sportorg.gui.dialogs.event_properties import EventPropertiesDialog
@@ -26,7 +25,6 @@ from sportorg.gui.dialogs.start_preparation import StartPreparationDialog, guess
 from sportorg.gui.dialogs.start_report_dialog import StartReportDialog
 from sportorg.gui.dialogs.start_time_change_dialog import StartTimeChangeDialog
 from sportorg.gui.dialogs.statistics_report_dialog import StatisticsReportDialog
-from sportorg.gui.dialogs.team_report_dialog import TeamReportDialog
 from sportorg.gui.dialogs.teamwork_properties import TeamworkPropertiesDialog
 from sportorg.gui.dialogs.telegram_dialog import TelegramDialog
 from sportorg.gui.dialogs.text_io import TextExchangeDialog
@@ -277,19 +275,9 @@ class StatisticsListAction(Action):
         StatisticsReportDialog().exec()
 
 
-class TeamListAction(Action):
-    def execute(self):
-        TeamReportDialog().exec()
-
-
 class StartTimesAction(Action):
     def execute(self):
         StartChessDialog().exec()
-
-
-class PrintBibAction(Action):
-    def execute(self):
-        BibReportDialog().exec()
 
 
 class ManualFinishAction(Action):

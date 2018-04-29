@@ -15,7 +15,7 @@ from sportorg.language import _
 from sportorg.models.memory import race
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.score_calculation import ScoreCalculation
-
+from sportorg.models.result.split_calculation import RaceSplits
 
 _settings = {
     'last_template': None,
@@ -99,6 +99,7 @@ class ReportDialog(QDialog):
         _settings['save_to_last_file'] = self.item_save_to_last_file.isChecked()
 
         ResultCalculation(race()).process_results()
+        RaceSplits(race()).generate()
         ScoreCalculation(race()).calculate_scores()
 
         template = get_text_from_file(template_path, race=race().to_dict())

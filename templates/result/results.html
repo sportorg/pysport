@@ -48,8 +48,9 @@
                     penalty_time: toHHMMSS(result.penalty_time),
                     penalty_laps: result.penalty_laps,
                     result: result.result,
-                    diff: result.diff,
+                    diff: toHHMMSS(result.diff),
                     place: result.place || '',
+                    speed: result.speed,
                 })
             }
         }
@@ -83,36 +84,121 @@
         return results;
     }
 
-    var fields = [
-        {key: 'index', title: '#'},
-        {key: 'name', title: 'Фамилия, имя'},
-        {key: 'org', title: 'Коллектив'},
-        {key: 'year', title: 'ГР'},
-        {key: 'qual', title: 'Разряд'},
-        {key: 'bib', title: 'Номер'},
-        {key: 'penalty_time', title: 'Штраф'},
-        {key: 'penalty_laps', title: 'Штраф'},
-        {key: 'result', title: 'Результат'},
-        {key: 'diff', title: 'Отставание'},
-        {key: 'place', title: 'Место'},
-    ];
+    var Fields = {
+        localId: 'race_' + race.id + '_result_fields',
+        fields: [
+            {key: 'index', title: '#'},
+            {key: 'name', title: 'Фамилия, имя'},
+            {key: 'org', title: 'Коллектив'},
+            {key: 'year', title: 'ГР'},
+            {key: 'qual', title: 'Разряд'},
+            {key: 'bib', title: 'Номер'},
+            {key: 'penalty_time', title: 'Штраф'},
+            {key: 'penalty_laps', title: 'Штраф'},
+            {key: 'result', title: 'Результат'},
+            {key: 'diff', title: 'Отставание'},
+            {key: 'speed', title: 'Темп'},
+            {key: 'place', title: 'Место'},
+        ],
+        active: function (key, val) {
+            for (var obj of this.fields) {
+                if (key === obj.key) {
+                    obj.active = val
+                }
+            }
+        },
+        isActive: function (key) {
+            for (var obj of this.fields) {
+                if (key === obj.key) {
+                    if (obj.active === void 0) {
+                        return true;
+                    } else {
+                        return !!obj.active;
+                    }
+                }
+            }
+            return false;
+        },
+        save: function () {
+            localStorage.setItem(this.localId, JSON.stringify(this.fields));
+            return this;
+        },
+        load: function () {
+            var fields = JSON.parse(localStorage.getItem(this.localId));
+            if (fields) {
+                for (var f of fields) {
+                    this.active(f.key, f.active)
+                }
+            }
+            return this;
+        },
+        clear: function () {
+            localStorage.clear()
+        }
+    }.load();
 
-    for (var group of race.groups) {
-        var titleBlock = document.createElement('h2');
-        titleBlock.id = group.name;
-        titleBlock.appendChild(document.createTextNode(group.name));
-        document.getElementById('results-tables').appendChild(titleBlock);
+    function render() {
+        var resultBlock = document.getElementById('results-tables');
+        resultBlock.innerHTML = '';
+        for (var group of race.groups) {
+            var titleBlock = document.createElement('h2');
+            titleBlock.id = group.name;
+            titleBlock.appendChild(document.createTextNode(group.name));
+            resultBlock.appendChild(titleBlock);
 
-        document.getElementById('results-tables').appendChild(getGroupsBlockElement(race));
+            resultBlock.appendChild(getGroupsBlockElement(race));
 
-        document.getElementById('results-tables').appendChild(new TableGenerator(getResultsByGroup(group), fields).getTable({className: 'sportorg-table'}));
+            resultBlock.appendChild(new TableGenerator(getResultsByGroup(group), Fields.fields).getTable({className: 'sportorg-table'}));
+        }
+        Fields.save();
     }
+    render();
 
     new SettingsGenerator([
-        {title: 'Отображать штрафное время', value: true},
-        {title: 'Отображать кол-во штрафных кругов', value: true},
-        {title: 'Отображать отставание', value: true},
-        {title: 'Отображать сплиты', value: false},
+        {
+            title: 'Отображать номер',
+            value: Fields.isActive('bib'),
+            change: function (checked) {
+                Fields.active('bib', checked);
+                render()
+            }
+        },
+        {
+            title: 'Отображать штрафное время',
+            value: Fields.isActive('penalty_time'),
+            change: function (checked) {
+                Fields.active('penalty_time', checked);
+                render()
+            }
+        },
+        {
+            title: 'Отображать кол-во штрафных кругов',
+            value: Fields.isActive('penalty_laps'),
+            change: function (checked) {
+                Fields.active('penalty_laps', checked);
+                render()
+            }
+        },
+        {
+            title: 'Отображать отставание',
+            value: Fields.isActive('diff'),
+            change: function (checked) {
+                Fields.active('diff', checked);
+                render()
+            }
+        },
+        {
+            title: 'Отображать темп',
+            value: Fields.isActive('speed'),
+            change: function (checked) {
+                Fields.active('speed', checked);
+                render()
+            }
+        },
+        {
+            title: 'Отображать сплиты',
+            value: Fields.isActive('splits'),
+        },
     ]).show();
 </script>
 <div class="no-print"></div>

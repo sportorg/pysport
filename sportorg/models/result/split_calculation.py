@@ -35,6 +35,9 @@ class PersonSplits(object):
         leg_start_time = self.result.get_start_time()
         start_time = self.result.get_start_time()
 
+        if self.course.length:
+            self.result.speed = get_speed_min_per_km(self.result.get_result_otime(), self.course.length)
+
         if self.result.is_sportident():
             while split_index < len(self.result.splits):
                 cur_split = self.result.splits[split_index]
@@ -164,8 +167,8 @@ class GroupSplits(object):
 
         def sort_func(item):
             priority = 0
-            if item.status in status_priority:
-                priority = status_priority.index(item.status) + 1
+            if item.result.status in status_priority:
+                priority = status_priority.index(item.result.status) + 1
             return item.result is None, priority, item.result
 
         self.person_splits = sorted(self.person_splits, key=sort_func)
@@ -179,7 +182,7 @@ class GroupSplits(object):
         if not len(self.person_splits):
             return
 
-        leader_name = self.person_splits[0].person.name
+        leader = self.person_splits[0].person
         leader_time = self.person_splits[0].get_leg_time(index)
 
         for i in range(len(self.person_splits)):
@@ -190,7 +193,7 @@ class GroupSplits(object):
                     leg.relative_place = i + 1
                 else:
                     leg.leg_place = i + 1
-                    leg.leader_name = leader_name
+                    leg.leader = leader
                     leg.leader_time = leader_time
 
     def set_leg_leader(self, index, person_split):
@@ -205,3 +208,13 @@ class GroupSplits(object):
         for i in range(self.cp_count):
             self.sort_by_leg(i, True)
             self.set_places_for_leg(i, True)
+
+
+class RaceSplits(object):
+    def __init__(self, r):
+        self.race = r
+
+    def generate(self):
+        for group in self.race.groups:
+            GroupSplits(self.race, group).generate()
+        return self

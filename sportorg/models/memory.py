@@ -442,7 +442,7 @@ class Split(Model):
         self.is_correct = True
         self.speed = ''
         self.length_leg = 0
-        self.leader_name = ''
+        self.leader = None
 
     def __eq__(self, other):
         assert isinstance(other, Split)
@@ -460,14 +460,14 @@ class Split(Model):
             'days': self.days,
             'code': self.code,
             'time': self.time.to_msec() if self.time else None,
-            'leg_time': self.leg_time,
-            'relative_time': self.relative_time,
+            'leg_time': self.leg_time.to_msec() if self.leg_time else None,
+            'relative_time': self.relative_time.to_msec() if self.relative_time else None,
             'leg_place': self.leg_place,
             'relative_place': self.relative_place,
             'is_correct': self.is_correct,
             'speed': self.speed,
             'length_leg': self.length_leg,
-            'leader_name': self.leader_name
+            'leader_id': str(self.leader.id) if self.leader else None
         }
 
     def update_data(self, data):
@@ -539,6 +539,7 @@ class Result:
             'status_comment': self.status_comment,
             'penalty_laps': self.penalty_laps,
             'place': self.place,
+            'speed': self.speed,
             'scores': self.scores,
             'assigned_rank': self.assigned_rank.value,
             'created_at': self.created_at,

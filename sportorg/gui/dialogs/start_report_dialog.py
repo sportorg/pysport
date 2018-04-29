@@ -12,7 +12,7 @@ from sportorg.gui.dialogs.file_dialog import get_open_file_name, get_save_file_n
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
-
+from sportorg.models.memory import race
 
 _settings = {
     'last_template': None,
@@ -73,7 +73,7 @@ class StartReportDialog(QDialog):
             except FileNotFoundError as e:
                 logging.error(str(e))
             except Exception as e:
-                logging.error(str(e))
+                logging.exception(str(e))
             self.close()
 
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
@@ -94,9 +94,7 @@ class StartReportDialog(QDialog):
         _settings['last_template'] = template_path
         _settings['open_in_browser'] = self.item_open_in_browser.isChecked()
         _settings['save_to_last_file'] = self.item_save_to_last_file.isChecked()
-        # FIXME
-        # template = get_text_from_file(template_path, **get_start_data())
-        template = ''
+        template = get_text_from_file(template_path, race=race().to_dict())
 
         if _settings['save_to_last_file']:
             file_name = _settings['last_file']

@@ -193,16 +193,8 @@ def menu_list():
                     'action': 'StartListAction'
                 },
                 {
-                    'title': _('Team list'),
-                    'action': 'TeamListAction'
-                },
-                {
                     'title': _('Start times'),
                     'action': 'StartTimesAction'
-                },
-                {
-                    'title': _('Print Bib'),
-                    'action': 'PrintBibAction'
                 },
                 {
                     'title': _('Entries statistics'),
