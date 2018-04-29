@@ -190,34 +190,110 @@
         }
     </style>
     {% endraw %}
+    {% include 'script.html' %}
 </head>
 <body>
-<div class="bib-list">
-    {% if persons|length %}
-    {% for person in persons %}
-    <div class="bib-item">
-        <div class="bib-title">{{ race.title }}<br>{{ race.date }}</div>
-        <div class="bib-number">{{ person.bib }}</div>
-        <div class="bib-info">
-            <div class="left-info">
-                <span class="info-item"><strong>{{ person.name }}</strong></span><br>
-                <span class="info-item">Номер чипа: <strong>{{ person.sportident_card }}</strong></span><br>
-                <span class="info-item">Время старта: <strong>{{ person.start }}</strong></span><br>
-                <span class="info-item">Группа: <strong>{{ person.group }}</strong></span><br>
-                <span class="info-item">Коллектив: <strong>{{ person.team }}</strong></span><br>
-            </div>
-            <div class="right-info rotatable">
-                <span class="info-item"><strong>{{ person.name }}</strong></span><br>
-                <span class="info-item">Номер чипа: <strong>{{ person.sportident_card }}</strong></span><br>
-                <span class="info-item">Время старта: <strong>{{ person.start }}</strong></span><br>
-                <span class="info-item">Группа: <strong>{{ person.group }}</strong></span><br>
-                <span class="info-item">Коллектив: <strong>{{ person.team }}</strong></span><br>
-            </div>
-        </div>
-    </div>
-    <div class="new-page"></div>
-    {% endfor %}
-    {% endif %}
+<div class="bib-list" id="bib-list">
 </div>
+{% raw %}
+<script>
+    var race = {% endraw %}{{race|tojson}}{% raw %};
+    racePreparation(race);
+    function render (sort) {
+        var sortFunc = function (a, b) {
+            return a.bib - b.bib;
+        };
+        if (sort === 'name') {
+            sortFunc = function (a, b) {
+                var nameA = a.surname && a.surname.toLowerCase() || '';
+                var nameB = b.surname && b.surname.toLowerCase() || '';
+                if (nameA < nameB) //sort string ascending
+                    return -1;
+                if (nameA > nameB)
+                    return 1;
+                return 0;
+            };
+        } else if (sort === 'group') {
+            sortFunc = function (a, b) {
+                var nameA = a.group && a.group.name.toLowerCase() || '';
+                var nameB = b.group && b.group.name.toLowerCase() || '';
+                if (nameA < nameB) //sort string ascending
+                    return -1;
+                if (nameA > nameB)
+                    return 1;
+                return 0;
+            };
+        }
+        race.persons.sort(sortFunc);
+        var bibListBlock = document.getElementById('bib-list');
+        bibListBlock.innerHTML = '';
+        for (var person of race.persons) {
+            var bibItemBlock = document.createElement('div');
+            bibItemBlock.className = 'bib-item';
+            var bibTitleBlock = document.createElement('div');
+            bibTitleBlock.className = 'bib-title';
+            var bibNumberBlock = document.createElement('div');
+            bibNumberBlock.className = 'bib-number';
+            var bibInfoBlock = document.createElement('div');
+            bibInfoBlock.className = 'bib-info';
+            var bibDetailedBlock = document.createElement('div');
+
+            var detildData = [
+                {title: '', value: person.surname + ' ' + person.name},
+                {title: 'Номер чипа: ', value: person.sportident_card || ''},
+                {title: 'Время старта: ', value: toHHMMSS(person.start_time)},
+                {title: 'Группа: ', value: person.group && person.group.name},
+                {title: 'Коллектив: ', value: person.organization && person.organization.name},
+            ];
+
+            for (var obj of detildData) {
+                var itemSpan = document.createElement('span');
+                itemSpan.className = 'info-item';
+                itemSpan.appendChild(document.createTextNode(obj.title));
+                var strong = document.createElement('strong');
+                strong.appendChild(document.createTextNode(obj.value));
+                itemSpan.appendChild(strong);
+                bibDetailedBlock.appendChild(itemSpan);
+                bibDetailedBlock.appendChild(document.createElement('br'));
+            }
+
+            var bibDetailedRotatableBlock = bibDetailedBlock.cloneNode(true);
+            bibDetailedBlock.className = 'left-info';
+            bibDetailedRotatableBlock.className = 'right-info rotatable';
+
+            bibTitleBlock.appendChild(document.createTextNode(race.data.title));
+            bibTitleBlock.appendChild(document.createElement('br'));
+            bibTitleBlock.appendChild(document.createTextNode(''));
+
+            bibNumberBlock.appendChild(document.createTextNode(person.bib));
+
+            bibInfoBlock.appendChild(bibDetailedBlock);
+            bibInfoBlock.appendChild(bibDetailedRotatableBlock);
+            bibItemBlock.appendChild(bibTitleBlock);
+            bibItemBlock.appendChild(bibNumberBlock);
+            bibItemBlock.appendChild(bibInfoBlock);
+            bibListBlock.appendChild(bibItemBlock);
+
+            var newPageBlock = document.createElement('div');
+            newPageBlock.className = 'new-page';
+            bibListBlock.appendChild(newPageBlock);
+        }
+    }
+    render();
+    new SettingsGenerator([
+        {
+            title: 'Сортировать по: ',
+            value: [
+                {text: 'номеру', value: 'bib'},
+                {text: 'имени', value: 'name'},
+                {text: 'группе', value: 'group'},
+            ],
+            change: function (arr) {
+                render(arr[0]);
+            }
+        }
+    ]).show()
+</script>
+{% endraw %}
 </body>
 </html>

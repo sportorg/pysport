@@ -544,6 +544,7 @@ class Result:
             'assigned_rank': self.assigned_rank.value,
             'created_at': self.created_at,
             'result': self.get_result(),
+            'result_msec': self.get_result_otime().to_msec(),
         }
 
     def update_data(self, data):

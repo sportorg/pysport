@@ -34,12 +34,10 @@
     function getResultsByGroup(group) {
         var isRelay = group.__type ? group.__type === 3 : race.data.race_type === 3;
         var results = [];
-        var index = 0;
         for (var result of race.results) {
             if (result.person && result.person.group.id === group.id) {
-                index++;
                 results.push({
-                    index: index,
+                    index: 0,
                     name: result.person.surname + ' ' + result.person.name,
                     org: (result.person.organization && result.person.organization.name) || '',
                     qual: Qualification[result.person.qual],
@@ -48,26 +46,40 @@
                     penalty_time: toHHMMSS(result.penalty_time),
                     penalty_laps: result.penalty_laps,
                     result: result.result,
+                    resultMsec: result.result_msec,
                     diff: toHHMMSS(result.diff),
-                    place: result.place || '',
+                    place: result.place,
+                    status: result.status,
+                    place_show: result.person.is_out_of_competition ? 'в/к' : result.place === 0 ? '' : result.place === -1 ? '' : result.place,
                     speed: result.speed,
                 })
             }
         }
         results.sort((a, b) => {
-            if (a.place === '') {
-                return 1
+            if (isRelay) {
+                if (a.place < 1) {
+                    return 1
+                }
+                if (b.place < 1) {
+                    return -1
+                }
+                if (isRelay && a.place === b.place) {
+                    return ~~(a.bib / 1000) - ~~(b.bib / 1000)
+                }
+                return a.place - b.place
+
+            } else {
+                if (a.status !== 1) {
+                    return 1
+                }
+                if (b.status !== 1) {
+                    return -1
+                }
+                return a.resultMsec - b.resultMsec
             }
-            if (b.place === '') {
-                return -1
-            }
-            if (isRelay && a.place === b.place) {
-                return ~~(a.bib / 1000) - ~~(b.bib / 1000)
-            }
-            return a.place - b.place
         });
+        var index = 0;
         if (isRelay) {
-            index = 0;
             var prevBib = 0;
             var resultsList = results.slice();
             results = [];
@@ -80,6 +92,11 @@
                 }
                 results.push(r)
             }
+        } else {
+            results.forEach(function (elem) {
+                index++;
+                elem.index = index;
+            })
         }
         return results;
     }
@@ -98,7 +115,7 @@
             {key: 'result', title: 'Результат'},
             {key: 'diff', title: 'Отставание'},
             {key: 'speed', title: 'Темп'},
-            {key: 'place', title: 'Место'},
+            {key: 'place_show', title: 'Место'},
         ],
         active: function (key, val) {
             for (var obj of this.fields) {

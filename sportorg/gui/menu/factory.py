@@ -11,7 +11,7 @@ from sportorg.gui.menu.actions import NewAction, SaveAction, OpenAction, SaveAsA
     RecheckingAction, PenaltyCalculationAction, PenaltyRemovingAction, ChangeStatusAction, SetDNSNumbersAction, \
     AddSPORTidentResultAction, TimekeepingSettingsAction, PrinterSettingsAction, LiveSettingsAction, \
     LiveSendStartListAction, LiveSendResultsAction, LiveResendResultsAction, AboutAction, TestingAction, CPDeleteAction, \
-    TeamworkSettingsAction, TeamworkEnableAction, StatisticsListAction, TeamworkSendAction, TelegramSettingsAction, \
+    TeamworkSettingsAction, TeamworkEnableAction, TeamworkSendAction, TelegramSettingsAction, \
     TelegramSendAction, SFRReadoutAction, CopyBibToCardNumber, WebAction
 
 
@@ -49,7 +49,6 @@ class Factory:
             StartTimeChangeAction(),
             CopyBibToCardNumber(),
             StartListAction(),
-            StatisticsListAction(),
             StartTimesAction(),
             ManualFinishAction(),
             SPORTidentReadoutAction(),

@@ -24,7 +24,6 @@ from sportorg.gui.dialogs.start_chess_dialog import StartChessDialog
 from sportorg.gui.dialogs.start_preparation import StartPreparationDialog, guess_courses_for_groups
 from sportorg.gui.dialogs.start_report_dialog import StartReportDialog
 from sportorg.gui.dialogs.start_time_change_dialog import StartTimeChangeDialog
-from sportorg.gui.dialogs.statistics_report_dialog import StatisticsReportDialog
 from sportorg.gui.dialogs.teamwork_properties import TeamworkPropertiesDialog
 from sportorg.gui.dialogs.telegram_dialog import TelegramDialog
 from sportorg.gui.dialogs.text_io import TextExchangeDialog
@@ -268,11 +267,6 @@ class CopyBibToCardNumber(Action):
 class StartListAction(Action):
     def execute(self):
         StartReportDialog().exec()
-
-
-class StatisticsListAction(Action):
-    def execute(self):
-        StatisticsReportDialog().exec()
 
 
 class StartTimesAction(Action):
