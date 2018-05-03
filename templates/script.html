@@ -38,7 +38,7 @@
 
         TableGenerator.prototype.getTable = function (options) {
             var table = Table();
-            if (options && options.className) table.classList.add(options.className);
+            if (options && options.className) table.className = options.className;
             table.appendChild(this.getHead());
             table.appendChild(this.getBody());
             return table;
@@ -209,7 +209,7 @@
         for (var obj of race.groups) {
             obj.course = getById(race.courses, obj.course_id);
         }
-        for (var itemName of ['groups', 'courses']) {
+        for (var itemName of ['groups', 'courses', 'organizations']) {
             race[itemName].sort((a, b) => {
                 if (a.name.toUpperCase() < b.name.toUpperCase()) return -1;
                 if (a.name.toUpperCase() > b.name.toUpperCase()) return 1;
@@ -228,6 +228,10 @@
             groupBlock.appendChild(a);
         }
         return groupBlock;
+    }
+    function dateFormat(date) {
+        date = date ? new Date(date) : new Date;
+        return date.getDate() + '.' + (date.getMonth() + 1) + '.' + date.getFullYear();
     }
     var Qualification = {
         '': 'б/р',
