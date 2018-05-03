@@ -196,10 +196,6 @@ def menu_list():
                     'title': _('Start times'),
                     'action': 'StartTimesAction'
                 },
-                {
-                    'title': _('Entries statistics'),
-                    'action': 'StatisticsListAction'
-                }
             ]
         },
         {
