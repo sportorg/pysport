@@ -88,23 +88,25 @@
             if (this._headers) {
                 return this._headers
             }
-            var headers = {};
             if (!this.fields) {
+                var headers = {};
                 for (var obj of this.data) {
                     for (var key in obj) {
                         headers[key] = true;
                     }
                 }
+                this._headers = Object.keys(headers)
             } else if (this.fields instanceof Array) {
+                this._headers = [];
                 for (var field of this.fields) {
                     if (typeof field === 'string') {
-                        headers[field] = true;
+                        this._headers.push(field);
                     } else if (field.active !== false){
-                        headers[field.key] = true;
+                        this._headers.push(field.key);
                     }
                 }
             }
-            return this._headers = Object.keys(headers)
+            return this._headers;
         }
 
         TableGenerator.prototype.getHeaderName = function (key) {

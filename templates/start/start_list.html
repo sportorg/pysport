@@ -35,12 +35,10 @@
     function getStartListByGroup(group) {
         var isRelay = group.__type ? group.__type === 3 : race.data.race_type === 3;
         var results = [];
-        var index = 0;
         for (var person of race.persons) {
             if (person.group.id === group.id) {
-                index++;
                 results.push({
-                    index: index,
+                    index: 0,
                     name: person.surname + ' ' + person.name,
                     org: (person.organization && person.organization.name) || '',
                     qual: Qualification[person.qual],
@@ -64,6 +62,11 @@
                 return a.bib - b.bib;
             }
             return a.start_time - b.start_time
+        });
+        var index = 0;
+        results.forEach(function (elem) {
+            index++;
+            elem.index = index
         });
         if (isRelay) {
             index = 0;

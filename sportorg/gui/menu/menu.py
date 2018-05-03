@@ -190,11 +190,8 @@ def menu_list():
                 },
                 {
                     'title': _('Start list'),
+                    'shortcut': 'Ctrl+Shift+P',
                     'action': 'StartListAction'
-                },
-                {
-                    'title': _('Start times'),
-                    'action': 'StartTimesAction'
                 },
             ]
         },
