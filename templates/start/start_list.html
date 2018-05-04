@@ -9,7 +9,7 @@
 {% block content %}
 <div class="text-center">
     <h3>{{ race.data.description }} <br>
-        <script> document.write(dateFormat('{{ race.data.start_datetime }}'))</script> {{ race.data.location }}</h3>
+        {{ race.data.start_datetime|date }} {{ race.data.location }}</h3>
     <h2>ПРОТОКОЛ СТАРТА</h2>
 </div>
 <div id="start-list-tables"></div>

@@ -44,7 +44,7 @@ class _TitleType(Enum):
     def __new__(cls, value):
         obj = object.__new__(cls)
         obj._value_ = value.value
-        obj._title  = value.printable_name
+        obj._title = value.printable_name
         return obj
 
     def __str__(self):
@@ -455,11 +455,12 @@ class Split(Model):
     def to_dict(self):
         return {
             'object': self.__class__.__name__,
-            'index': self.index,
-            'course_index': self.course_index + 1,
             'days': self.days,
             'code': self.code,
             'time': self.time.to_msec() if self.time else None,
+
+            'index': self.index,
+            'course_index': self.course_index + 1,
             'leg_time': self.leg_time.to_msec() if self.leg_time else None,
             'relative_time': self.relative_time.to_msec() if self.relative_time else None,
             'leg_place': self.leg_place,
@@ -539,11 +540,14 @@ class Result:
             'status_comment': self.status_comment,
             'penalty_laps': self.penalty_laps,
             'place': self.place,
+            'assigned_rank': self.assigned_rank.value,
+
             'speed': self.speed,
             'scores': self.scores,
-            'assigned_rank': self.assigned_rank.value,
             'created_at': self.created_at,
             'result': self.get_result(),
+            'start_msec': self.get_start_time().to_msec(),
+            'finish_msec': self.get_finish_time().to_msec(),
             'result_msec': self.get_result_otime().to_msec(),
         }
 

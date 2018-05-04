@@ -98,6 +98,13 @@ class PersonSplits(object):
             return leg.relative_time
         return None
 
+    def to_dict(self):
+        return {
+            'person': self.person.to_dict(),
+            'result': self.result.to_dict(),
+            'course': self.course.to_dict()
+        }
+
 
 class GroupSplits(object):
     def __init__(self, r, group):
@@ -204,6 +211,9 @@ class GroupSplits(object):
         for i in range(self.cp_count):
             self.sort_by_leg(i, True)
             self.set_places_for_leg(i, True)
+
+    def to_dict(self):
+        return [ps.to_dict() for ps in self.person_splits]
 
 
 class RaceSplits(object):
