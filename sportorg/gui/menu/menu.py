@@ -273,10 +273,6 @@ def menu_list():
                     'action': 'SFRReadoutAction'
                 },
                 {
-                    'title': _('On Web'),
-                    'action': 'WebAction'
-                },
-                {
                     'title': _('Teamwork'),
                     'icon': config.icon_dir('network.svg'),
                     'actions': [
