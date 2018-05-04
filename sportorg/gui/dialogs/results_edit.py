@@ -337,11 +337,8 @@ class SplitsText(SplitsObject):
                 item = row.split()
                 if len(item) >= 2:
                     split = Split()
+                    split.code = item[0]
                     split.time = hhmmss_to_time(item[1])
-                    if item[0].isdigit():
-                        split.code = int(item[0])
-                    else:
-                        logging.error('{} not number'.format(item[0]))
                     if self._more24 and len(item) >= 3 and item[2].isdigit():
                         split.days = int(item[2])
                     splits.append(split)

@@ -1,4 +1,4 @@
-from sportorg.models.memory import Person, Course, Group, Qualification, ResultStatus
+from sportorg.models.memory import Course, Group, Qualification, ResultStatus
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.utils.time import get_speed_min_per_km
 
@@ -8,23 +8,26 @@ class PersonSplits(object):
 
         self.race = r
         self.result = result
-
-        person = self.result.person
-        assert isinstance(person, Person)
-        self.person = person
-        self.course = self.race.find_course(person)
-        if self.course is None:
-            self.course = Course()
-        self.code_controls = [control.code for control in self.course.controls]
-
-        self.legs = []
+        self._course = None
 
         self.assigned_rank = ''
         if hasattr(self.result, 'assigned_rank') and self.result.assigned_rank != Qualification.NOT_QUALIFIED:
             self.assigned_rank = self.result.assigned_rank.get_title()
 
-        self.relay_leg = person.bib // 1000
+        self.relay_leg = self.result.person.bib // 1000
         self.last_correct_index = 0
+
+    @property
+    def person(self):
+        return self.result.person
+
+    @property
+    def course(self):
+        if self._course is None:
+            self._course = self.race.find_course(self.person)
+            if self._course is None:
+                self._course = Course()
+        return self._course
 
     def generate(self):
         split_index = 0
@@ -65,8 +68,6 @@ class PersonSplits(object):
                 else:
                     cur_split.is_correct = False
 
-                self.legs.append(cur_split)
-
                 split_index += 1
 
         self.last_correct_index = course_index - 1
@@ -79,7 +80,7 @@ class PersonSplits(object):
         if index > self.get_last_correct_index():
             return None
 
-        for i in self.legs:
+        for i in self.result.splits:
             if i.course_index == index:
                 return i
 
@@ -96,17 +97,6 @@ class PersonSplits(object):
         if leg:
             return leg.relative_time
         return None
-
-    def get_person_split_data(self):
-        return self.get_dict()
-
-    def get_dict(self):
-        return {
-            'person': self.person.to_dict(),
-            'result': self.result.to_dict(),
-            'course': self.course.to_dict(),
-            'legs': [leg.to_dict() for leg in self.legs],
-        }
 
 
 class GroupSplits(object):
@@ -125,8 +115,7 @@ class GroupSplits(object):
         ResultCalculation(self.race).get_group_persons(self.group)
 
         for i in ResultCalculation(self.race).get_group_finishes(self.group):
-            person = PersonSplits(self.race, i).generate()
-            self.person_splits.append(person)
+            self.person_splits.append(PersonSplits(self.race, i).generate())
 
         self.set_places()
         if self.group.is_relay():
@@ -149,13 +138,15 @@ class GroupSplits(object):
 
     def sort_by_leg(self, index, relative=False):
         if relative:
-            self.person_splits = sorted(self.person_splits,
-                                        key=lambda item: (item.get_leg_relative_time(index) is None,
-                                                          item.get_leg_relative_time(index)))
+            self.person_splits = sorted(
+                self.person_splits,
+                key=lambda item: (item.get_leg_relative_time(index) is None, item.get_leg_relative_time(index))
+            )
         else:
-            self.person_splits = sorted(self.person_splits,
-                                        key=lambda item: (item.get_leg_time(index) is None,
-                                                          item.get_leg_time(index)))
+            self.person_splits = sorted(
+                self.person_splits,
+                key=lambda item: (item.get_leg_time(index) is None, item.get_leg_time(index))
+            )
 
     def sort_by_result(self):
         status_priority = [
@@ -174,15 +165,20 @@ class GroupSplits(object):
         self.person_splits = sorted(self.person_splits, key=sort_func)
 
     def sort_by_place(self):
-        self.person_splits = sorted(self.person_splits, key=lambda item: (item.result.get_place() is None or item.result.get_place() == '',
-                                                                          ('0000' + str(item.result.get_place()))[-4:],
-                                                                          int(item.relay_leg)))
+        self.person_splits = sorted(
+            self.person_splits,
+            key=lambda item: (
+                item.result.get_place() is None or item.result.get_place() == '',
+                ('0000' + str(item.result.get_place()))[-4:],
+                int(item.relay_leg)
+            )
+        )
 
     def set_places_for_leg(self, index, relative=False):
         if not len(self.person_splits):
             return
 
-        leader = self.person_splits[0].person
+        leader = self.person_splits[0].result.person
         leader_time = self.person_splits[0].get_leg_time(index)
 
         for i in range(len(self.person_splits)):
