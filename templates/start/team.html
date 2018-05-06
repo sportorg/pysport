@@ -11,25 +11,30 @@
 {% raw %}
 <script>
     var race = {% endraw %}{{race|tojson}}{% raw %};
+    var selected = {% endraw %}{{selected|tojson}}{% raw %};
     racePreparation(race);
 
     function getStartListByOrg(org, sort) {
         var results = [];
         for (var person of race.persons) {
-            if (person.organization.id === org.id) {
-                results.push({
-                    name: person.surname + ' ' + person.name + (person.is_out_of_competition ? ' *' : ''),
-                    group: (person.group && person.group.name) || '',
-                    qual: Qualification[person.qual],
-                    bib: person.bib,
-                    sportident_card: person.sportident_card + (person.is_rented_sportident_card ? ' *' : ''),
-                    year: person.birth_date ? (new Date(person.birth_date)).getFullYear() : '',
-                    start: toHHMMSS(person.start_time),
-                    start_time: person.start_time,
-                    comment: person.comment,
-                    price: person.group && person.group.price,
-                    person: person
-                })
+            if (!org || person.organization.id === org.id) {
+                if (selected.persons.length && selected.persons.some(function (elem) {
+                        return elem.id === person.id;
+                    })) {
+                    results.push({
+                        name: person.surname + ' ' + person.name + (person.is_out_of_competition ? ' *' : ''),
+                        group: (person.group && person.group.name) || '',
+                        qual: Qualification[person.qual],
+                        bib: person.bib,
+                        sportident_card: person.sportident_card + (person.is_rented_sportident_card ? ' *' : ''),
+                        year: person.birth_date ? (new Date(person.birth_date)).getFullYear() : '',
+                        start: toHHMMSS(person.start_time),
+                        start_time: person.start_time,
+                        comment: person.comment,
+                        price: person.group && person.group.price,
+                        person: person
+                    })
+                }
             }
         }
         var sortFunc = function (a, b) {
@@ -118,26 +123,15 @@
 
     var store = {};
 
-    function render(sort) {
+    function render(sort, noCombine) {
         if (sort) {
             store.sort = sort;
         }
-        var resultBlock = document.getElementById('org-list-tables');
-        resultBlock.innerHTML = '';
-        var i = 0;
-        for (var org of race.organizations) {
-            var rows = getStartListByOrg(org, store.sort);
-            if (!rows.length) {
-                continue;
-            }
+        if (typeof noCombine === 'boolean') {
+            store.noCombine = noCombine;
+        }
 
-            var titleBlock = document.createElement('h2');
-            titleBlock.id = org.name;
-            titleBlock.appendChild(document.createTextNode(dateFormat(race.data.start_datetime) + ' / ' + org.name));
-            resultBlock.appendChild(titleBlock);
-
-            resultBlock.appendChild(new TableGenerator(rows, Fields.fields).getTable({className: 'sportorg-table'}));
-
+        var getInfoBlock = function (rows) {
             var price = 0;
             var rentedSportidentCards = 0;
             rows.forEach(function (row) {
@@ -154,14 +148,38 @@
             if (rentedSportidentCards) {
                 infoBlock.appendChild(document.createTextNode('Арендованных ЧИПов: ' + rentedSportidentCards));
             }
+            return infoBlock;
+        };
 
-            resultBlock.appendChild(infoBlock);
-            if (i < race.organizations.length-1) {
-                var newPage = document.createElement('div');
-                newPage.className = 'new-page';
-                resultBlock.appendChild(newPage);
+        var resultBlock = document.getElementById('org-list-tables');
+        resultBlock.innerHTML = '';
+        if (store.noCombine) {
+            var rows = getStartListByOrg(null, store.sort);
+            resultBlock.appendChild(new TableGenerator(rows, Fields.fields).getTable({className: 'sportorg-table'}));
+            resultBlock.appendChild(getInfoBlock(rows));
+        } else {
+            var i = 0;
+            for (var org of race.organizations) {
+                var rows = getStartListByOrg(org, store.sort);
+                if (!rows.length) {
+                    continue;
+                }
+
+                var titleBlock = document.createElement('h2');
+                titleBlock.id = org.name;
+                titleBlock.appendChild(document.createTextNode(dateFormat(race.data.start_datetime) + ' / ' + org.name));
+                resultBlock.appendChild(titleBlock);
+
+                resultBlock.appendChild(new TableGenerator(rows, Fields.fields).getTable({className: 'sportorg-table'}));
+
+                resultBlock.appendChild(getInfoBlock(rows));
+                if (i < race.organizations.length-1) {
+                    var newPage = document.createElement('div');
+                    newPage.className = 'new-page';
+                    resultBlock.appendChild(newPage);
+                }
+                i++;
             }
-            i++;
         }
         Fields.save();
     }
@@ -197,6 +215,13 @@
             change: function (checked) {
                 Fields.active('comment', checked);
                 render()
+            }
+        },
+        {
+            title: 'Объединять по коллективам',
+            value: true,
+            change: function (checked) {
+                render(null, !checked)
             }
         },
         {

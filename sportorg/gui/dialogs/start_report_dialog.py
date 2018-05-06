@@ -19,6 +19,7 @@ _settings = {
     'open_in_browser': True,
     'last_file': None,
     'save_to_last_file': False,
+    'selected': False,
 }
 
 
@@ -64,6 +65,10 @@ class StartReportDialog(QDialog):
         if _settings['last_file'] is None:
             self.item_save_to_last_file.setDisabled(True)
 
+        self.item_selected = QCheckBox(_('Send selected'))
+        self.item_selected.setChecked(_settings['selected'])
+        self.layout.addRow(self.item_selected)
+
         def cancel_changes():
             self.close()
 
@@ -89,12 +94,32 @@ class StartReportDialog(QDialog):
         self.button_ok.setFocus()
 
     def apply_changes_impl(self):
+        obj = race()
+        mw = GlobalAccess().get_main_window()
+        map_items = [obj.persons, obj.results, obj.groups, obj.courses, obj.organizations]
+        map_names = ['persons', 'results', 'groups', 'courses', 'organizations']
+        selected_items = {
+            'persons': [],
+            'results': [],
+            'groups': [],
+            'courses': [],
+            'organizations': [],
+        }
+
         template_path = self.item_template.currentText()
 
         _settings['last_template'] = template_path
         _settings['open_in_browser'] = self.item_open_in_browser.isChecked()
         _settings['save_to_last_file'] = self.item_save_to_last_file.isChecked()
-        template = get_text_from_file(template_path, race=race().to_dict())
+        _settings['selected'] = self.item_selected.isChecked()
+
+        if _settings['selected']:
+            cur_items = map_items[mw.current_tab]
+
+            for i in mw.get_selected_rows():
+                selected_items[map_names[mw.current_tab]].append(cur_items[i].to_dict())
+
+        template = get_text_from_file(template_path, race=obj.to_dict(), selected=selected_items)
 
         if _settings['save_to_last_file']:
             file_name = _settings['last_file']

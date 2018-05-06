@@ -29,6 +29,7 @@
 {% raw %}
 <script>
     var race = {% endraw %}{{race|tojson}}{% raw %};
+    var selected = {% endraw %}{{selected|tojson}}{% raw %};
     racePreparation(race);
 
     function getResultsByGroup(group) {
