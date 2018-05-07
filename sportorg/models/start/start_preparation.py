@@ -322,10 +322,6 @@ class StartTimeManager(object):
                 current_start = current_start + timedelta(seconds=start_interval.second, minutes=start_interval.minute)
 
 
-def get_selected_list():
-    pass
-
-
 def get_corridors():
         current_race = race()
         ret = []

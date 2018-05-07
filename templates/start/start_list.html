@@ -6,83 +6,169 @@
 {{ super() }}
 {% endblock %}
 
-{% macro view_groups() -%}{% for group in groups %}<a href="#{{group.name}}">{{group.name}}</a> {% endfor %}{%- endmacro %}
-<div>
-    <div class="text-center">
-        <h3>{{ race.sub_title }} <br>{{ race.date }} {{ race.location }}</h3>
-        <h2>ПРОТОКОЛ СТАРТА</h2>
-    </div>
-    <table>
-
 {% block content %}
 <div class="text-center">
+    <h3>{{ race.data.description }} <br>
+        {{ race.data.start_datetime|date }} {{ race.data.location }}</h3>
     <h2>ПРОТОКОЛ СТАРТА</h2>
-    <h2>{{ race.sub_title }} <br>{{ race.date }} {{ race.location }}</h2>
 </div>
-<table class="sportorg-table">
-    {% for group in groups %}
-    {% if group.persons|length %}
-    <tr style="background: white; border: 0">
-        <td colspan="8" style="border: 0">
-            <h2 id="{{group.name}}">{{group.name}}</h2>
-            <div class="no-print">{{ view_groups() }}</div>
-        </td>
-    </tr>
-    <tr>
-        <td>№</td>
-        <td>Фамилия, имя</td>
-        <td>Коллектив</td>
-        <td>Разряд</td>
-        <td>ГР</td>
-        <td>Номер</td>
-        <td>Номер чипа</td>
-        <td>Время старта</td>
-    </tr>
-    {% set index = [1] %}
-    {% for person in group.persons %}
-    {% if person.bib // 1000 == 1 and group.type == 'RELAY' %}
-    <tr>
-        <td>{{index|length}}</td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
-    {% if index.append(1) %} {% endif %} {# increment index length by 1 #}
-    {% endif %}
-    <tr>
-        {% if group.type == 'RELAY' %}
-        <td></td>
-        {% else %}
-        <td>{{ loop.index }}</td>
-        {% endif %}
-        <td>{{ person.name }}{% if person.is_out_of_competition %} *{% endif %}</td>
-        <td>{{ person.team }}</td>
-        <td>{{ person.qual }}</td>
-        <td>{{ person.year }}</td>
-        <td>{{ person.bib }}</td>
-        <td>{{ person.sportident_card }}{% if person.is_rented %} *{% endif %}</td>
-        <td>{{ person.start }}</td>
-    </tr>
-    {% endfor %}
-    {% endif %}
-    {% endfor %}
-</table>
+<div id="start-list-tables"></div>
 <div>
     <table class="empty-table">
         <tr>
             <td><b>Главный судья:</b></td>
             <td width="150px"></td>
-            <td><b>{{ race.chief_referee }}</b></td>
+            <td><b>{{ race.data.chief_referee }}</b></td>
         </tr>
         <tr>
             <td><b>Главный секретарь:</b></td>
             <td width="150px"></td>
-            <td><b>{{ race.secretary }}</b></td>
+            <td><b>{{ race.data.secretary }}</b></td>
         </tr>
     </table>
 </div>
+{% raw %}
+<script>
+    var race = {% endraw %}{{race|tojson}}{% raw %};
+    racePreparation(race);
+
+    function getStartListByGroup(group) {
+        var isRelay = group.__type ? group.__type === 3 : race.data.race_type === 3;
+        var results = [];
+        for (var person of race.persons) {
+            if (person.group.id === group.id) {
+                results.push({
+                    index: 0,
+                    name: person.surname + ' ' + person.name,
+                    org: (person.organization && person.organization.name) || '',
+                    qual: Qualification[person.qual],
+                    bib: person.bib,
+                    sportident_card: person.sportident_card,
+                    year: person.birth_date ? (new Date(person.birth_date)).getFullYear() : '',
+                    start: toHHMMSS(person.start_time),
+                    start_time: person.start_time,
+                })
+            }
+        }
+        results.sort((a, b) => {
+            if (isRelay && a.start_time === b.start_time) {
+                if (a.bib % 1000 === b.bib % 1000) {
+                    return ~~(a.bib / 1000) - ~~(b.bib / 1000)
+                } else {
+                    return a.bib % 1000 - b.bib % 1000
+                }
+            }
+            if (a.start_time === b.start_time) {
+                return a.bib - b.bib;
+            }
+            return a.start_time - b.start_time
+        });
+        var index = 0;
+        results.forEach(function (elem) {
+            index++;
+            elem.index = index
+        });
+        if (isRelay) {
+            index = 0;
+            var prevBib = 0;
+            var resultsList = results.slice();
+            results = [];
+            for (var r of resultsList) {
+                r.index = '';
+                if (r.bib % 1000 !== prevBib) {
+                    index++;
+                    results.push({index: index});
+                    prevBib = r.bib % 1000
+                }
+                results.push(r)
+            }
+        }
+        return results;
+    }
+
+    var Fields = {
+        localId: 'race_' + race.id + '_start_fields',
+        fields: [
+            {key: 'index', title: '№'},
+            {key: 'name', title: 'Фамилия, имя'},
+            {key: 'org', title: 'Коллектив'},
+            {key: 'year', title: 'ГР'},
+            {key: 'qual', title: 'Разряд'},
+            {key: 'bib', title: 'Номер'},
+            {key: 'sportident_card', title: 'Номер чипа'},
+            {key: 'start', title: 'Время старта'},
+        ],
+        active: function (key, val) {
+            for (var obj of this.fields) {
+                if (key === obj.key) {
+                    obj.active = val
+                }
+            }
+        },
+        isActive: function (key) {
+            for (var obj of this.fields) {
+                if (key === obj.key) {
+                    if (obj.active === void 0) {
+                        return true;
+                    } else {
+                        return !!obj.active;
+                    }
+                }
+            }
+            return false;
+        },
+        save: function () {
+            localStorage.setItem(this.localId, JSON.stringify(this.fields));
+            return this;
+        },
+        load: function () {
+            var fields = JSON.parse(localStorage.getItem(this.localId));
+            if (fields) {
+                for (var f of fields) {
+                    this.active(f.key, f.active)
+                }
+            }
+            return this;
+        },
+        clear: function () {
+            localStorage.clear()
+        }
+    }.load();
+
+    function render() {
+        var resultBlock = document.getElementById('start-list-tables');
+        resultBlock.innerHTML = '';
+        for (var group of race.groups) {
+            var titleBlock = document.createElement('h2');
+            titleBlock.id = group.name;
+            titleBlock.appendChild(document.createTextNode(group.name));
+            resultBlock.appendChild(titleBlock);
+
+            resultBlock.appendChild(getGroupsBlockElement(race));
+
+            resultBlock.appendChild(new TableGenerator(getStartListByGroup(group), Fields.fields).getTable({className: 'sportorg-table'}));
+        }
+        Fields.save();
+    }
+    render();
+    new SettingsGenerator([
+        {
+            title: 'Отображать номер',
+            value: Fields.isActive('bib'),
+            change: function (checked) {
+                Fields.active('bib', checked);
+                render()
+            }
+        },
+        {
+            title: 'Отображать номер чипа',
+            value: Fields.isActive('sportident_card'),
+            change: function (checked) {
+                Fields.active('sportident_card', checked);
+                render()
+            }
+        },
+    ]).show();
+</script>
+{% endraw %}
 {% endblock %}

@@ -1,16 +1,16 @@
 import uuid
 from abc import abstractmethod
+import dateutil.parser
+import datetime
 from datetime import date
+import time
 from enum import IntEnum, Enum
 from typing import Dict, List, Any
 
-import datetime
-import dateutil.parser
 
 from sportorg.core.model import Model
 from sportorg.core.otime import OTime
 from sportorg.language import _
-from sportorg.utils.time import str_to_date, date_to_str
 
 
 class NotEmptyException(Exception):
@@ -44,7 +44,7 @@ class _TitleType(Enum):
     def __new__(cls, value):
         obj = object.__new__(cls)
         obj._value_ = value.value
-        obj._title  = value.printable_name
+        obj._title = value.printable_name
         return obj
 
     def __str__(self):
@@ -399,6 +399,8 @@ class Group(Model):
             'start_corridor': self.start_corridor,
             'order_in_corridor': self.order_in_corridor,
             'first_number': self.first_number,
+            'count_person': self.count_person,
+            'count_finished': self.count_finished,
             'ranking': self.ranking.to_dict() if self.ranking else None,
             '__type': self.__type.value if self.__type else None,
             'relay_legs': self.relay_legs,
@@ -428,10 +430,19 @@ class Group(Model):
 
 class Split(Model):
     def __init__(self):
-        self.code = 0
+        self.index = 0
+        self.course_index = -1
+        self.code = ''
         self.days = 0
         self.time = None  # type: OTime
-        self.pace = None  # type: OTime
+        self.leg_time = None  # type: OTime
+        self.relative_time = None  # type: OTime
+        self.leg_place = 0
+        self.relative_place = 0
+        self.is_correct = True
+        self.speed = ''
+        self.length_leg = 0
+        self.leader = None
 
     def __eq__(self, other):
         assert isinstance(other, Split)
@@ -447,10 +458,21 @@ class Split(Model):
             'days': self.days,
             'code': self.code,
             'time': self.time.to_msec() if self.time else None,
+
+            'index': self.index,
+            'course_index': self.course_index + 1,
+            'leg_time': self.leg_time.to_msec() if self.leg_time else None,
+            'relative_time': self.relative_time.to_msec() if self.relative_time else None,
+            'leg_place': self.leg_place,
+            'relative_place': self.relative_place,
+            'is_correct': self.is_correct,
+            'speed': self.speed,
+            'length_leg': self.length_leg,
+            'leader_id': str(self.leader.id) if self.leader else None
         }
 
     def update_data(self, data):
-        self.code = int(data['code'])
+        self.code = str(data['code'])
         if data['time']:
             self.time = OTime(msec=data['time'])
         if 'days' in data:
@@ -474,6 +496,8 @@ class Result:
         self.scores = 0
         self.assigned_rank = Qualification.NOT_QUALIFIED
         self.diff = None  # type: OTime
+        self.created_at = time.time()
+        self.speed = ''
 
     def __str__(self):
         return str(self.system_type)
@@ -516,8 +540,15 @@ class Result:
             'status_comment': self.status_comment,
             'penalty_laps': self.penalty_laps,
             'place': self.place,
-            'scores': self.scores,
             'assigned_rank': self.assigned_rank.value,
+
+            'speed': self.speed,
+            'scores': self.scores,
+            'created_at': self.created_at,
+            'result': self.get_result(),
+            'start_msec': self.get_start_time().to_msec(),
+            'finish_msec': self.get_finish_time().to_msec(),
+            'result_msec': self.get_result_otime().to_msec(),
         }
 
     def update_data(self, data):
@@ -537,6 +568,10 @@ class Result:
             self.status_comment = data['status_comment']
         if 'days' in data:
             self.days = int(data['days'])
+        if 'created_at' in data:
+            self.created_at = float(data['created_at'])
+        else:
+            self.created_at = time.time()
 
     def clear(self):
         pass
@@ -904,34 +939,6 @@ class Person(Model):
         elif 'year' in data and data['year']:  # back compatibility with v 1.0.0
             self.set_year(int(data['year']))
 
-    def to_dict_data(self, course=None):
-        sportident_card = ''
-        if self.sportident_card:
-            sportident_card = str(self.sportident_card)
-        course_name = ''
-        if self.group is not None and self.group.course is not None:
-            course_name = self.group.course.name
-        if course:
-            course_name = course.name
-        return {
-            'name': self.full_name,
-            'bib': self.bib,
-            'course': course_name,
-            'team': self.organization.name if self.organization is not None else '',
-            'team_subject': self.organization.address.state if self.organization is not None else '',
-            'group': self.group.name if self.group is not None else '',
-            'group_start_corridor': self.group.start_corridor if self.group is not None else 0,
-            'price': self.group.price if self.group is not None else 0,
-            'qual': self.qual.get_title(),
-            'year': self.get_year() if self.get_year() else '',
-            'sportident_card': sportident_card,
-            'start': str(self.start_time),
-            'comment': self.comment,
-            'is_out_of_competition': self.is_out_of_competition,
-            'is_rented': self.is_rented_sportident_card,
-            'is_paid': self.is_paid,
-        }
-
 
 class RaceData(Model):
     def __init__(self):
@@ -1030,17 +1037,6 @@ class Race(Model):
             'Group': self.groups,
             'Course': self.courses,
             'Organization': self.organizations,
-        }
-
-    def to_dict_data(self):
-        return {
-            'title': self.data.title,
-            'sub_title': self.data.description,
-            'url': self.data.url,
-            'location': self.data.location,
-            'date': self.data.get_start_datetime().strftime("%d.%m.%Y"),
-            'chief_referee': race().data.chief_referee,
-            'secretary': race().data.secretary
         }
 
     def to_dict(self):

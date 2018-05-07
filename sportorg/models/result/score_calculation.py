@@ -1,25 +1,25 @@
-from sportorg.models.memory import Result, race, Organization, RaceType
+from sportorg.models.memory import Result, Organization, RaceType
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.start.relay import get_team_result
 
 
 class ScoreCalculation(object):
-    @staticmethod
-    def calculate_scores():
-        obj = race()
-        for i in obj.results:
-            ScoreCalculation.calculate_scores_result(i)
 
-    @staticmethod
-    def calculate_scores_result(result):
-        obj = race()
+    def __init__(self, r):
+        self.race = r
+
+    def calculate_scores(self):
+        for i in self.race.results:
+            self.calculate_scores_result(i)
+
+    def calculate_scores_result(self, result):
         if isinstance(result, Result):
             place = result.place
             if place > 0:
                 place = int(place)
-                scores_type = obj.get_setting('scores_mode', 'off')
+                scores_type = self.race.get_setting('scores_mode', 'off')
                 if scores_type == 'array':
-                    scores_array = str(obj.get_setting('scores_array', '0')).split(',')
+                    scores_array = str(self.race.get_setting('scores_array', '0')).split(',')
                     if len(scores_array):
                         if place > len(scores_array):
                             result.scores = int(scores_array[-1])
@@ -29,11 +29,11 @@ class ScoreCalculation(object):
                         result.scores = 0
                 elif scores_type == 'formula':
                     time_value = result.get_result_otime().to_msec()
-                    leader_time_value = ScoreCalculation.get_leader_time(result).to_msec()
+                    leader_time_value = self.get_leader_time(result).to_msec()
 
                     time_phrase = 'time'
                     leader_time_phrase = 'leader'
-                    expr = str(obj.get_setting('scores_formula', '0'))
+                    expr = str(self.race.get_setting('scores_formula', '0'))
                     expr = expr.replace(time_phrase, str(time_value))
                     expr = expr.replace(leader_time_phrase, str(leader_time_value))
                     value = eval(expr)
@@ -42,17 +42,16 @@ class ScoreCalculation(object):
             else:
                 result.scores = 0
 
-    @staticmethod
-    def get_leader_time(result):
+    def get_leader_time(self, result):
         # find leader time in group
         if result and isinstance(result, Result):
             if result.person and result.person.group:
                 group = result.person.group
-                results = ResultCalculation(race()).get_group_finishes(group)
+                results = ResultCalculation(self.race).get_group_finishes(group)
                 best_time = None
                 for cur_result in results:
                     assert isinstance(cur_result, Result)
-                    if race().get_type(group) == RaceType.RELAY:
+                    if self.race.get_type(group) == RaceType.RELAY:
                         cur_time = get_team_result(result.person)
                     else:
                         cur_time = cur_result.get_result_otime()
@@ -61,84 +60,20 @@ class ScoreCalculation(object):
                 return best_time
         return None
 
-    @staticmethod
-    def get_group_team_results(group, team):
+    def get_group_team_results(self, group, team):
         ret = []
-        for result in race().results:
+        for result in self.race.results:
             if result.person and result.person.group == group:
                 if result.person.organization == team:
                     ret.append(result)
         return ret
 
-    @staticmethod
-    def get_group_region_results(group, region):
+    def get_group_region_results(self, group, region):
         ret = []
-        for result in race().results:
+        for result in self.race.results:
             if result.person and result.person.group == group:
-                if ScoreCalculation.get_region_for_organization(result.person.organization) == region:
+                if self.get_region_for_organization(result.person.organization) == region:
                     ret.append(result)
-        return ret
-
-    @staticmethod
-    def get_team_results_data():
-        ret = {}
-        data = []
-        for group in race().groups:
-
-            group_teams = []
-
-            team_group_mode = race().get_setting('team_group_mode', 'organization')
-
-            if team_group_mode == 'organization':
-                # organization grouping
-                for team in race().organizations:
-                    results = ScoreCalculation.get_group_team_results(group, team)
-                    if results:
-                        results = sorted(results, reverse=True, key=lambda item: item.scores)
-
-                        # apply limit
-                        limit = race().get_setting('team_qty', 0)
-                        if len(results) > limit > 0:
-                            results = results[:limit]
-
-                    sum_scores = 0
-
-                    for result in results:
-                        sum_scores += result.scores
-
-                    group_teams.append({
-                        'name': team.name,
-                        'member_qty': len(results),
-                        'scores': sum_scores
-                    })
-            else:
-                # region grouping
-                for team in ScoreCalculation.get_all_regions():
-                    results = ScoreCalculation.get_group_region_results(group, team)
-                    if results:
-                        results = sorted(results, reverse=True, key=lambda item: item.scores)
-
-                        # apply limit
-                        limit = race().get_setting('team_qty', 0)
-                        if len(results) > limit > 0:
-                            results = results[:limit]
-
-                    sum_scores = 0
-
-                    for result in results:
-                        sum_scores += result.scores
-
-                    group_teams.append({
-                        'name': team,
-                        'member_qty': len(results),
-                        'scores': sum_scores
-                    })
-            data.append({
-                'name': group.name,
-                'teams': group_teams,
-            })
-        ret['groups'] = data
-        ret['race'] = race().to_dict_data()
         return ret
 
     @staticmethod
@@ -150,11 +85,10 @@ class ScoreCalculation(object):
                     return org.address.state
         return None
 
-    @staticmethod
-    def get_all_regions():
+    def get_all_regions(self):
         ret = []
-        for i in race().organizations:
-            region = ScoreCalculation.get_region_for_organization(i)
-            if region and not region in ret:
+        for i in self.race.organizations:
+            region = self.get_region_for_organization(i)
+            if region and region not in ret:
                 ret.append(region)
         return ret

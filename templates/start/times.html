@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Start Times{% endblock %}
+
+{% block head %}
+{{ super() }}
+{% endblock %}
+
+{% block content %}
+<div id="start-times-tables"></div>
+{% raw %}
+<script>
+    var race = {% endraw %}{{race|tojson}}{% raw %};
+    racePreparation(race);
+
+    function getStartTimes() {
+        var times = {};
+        for (var person of race.persons) {
+            if (times[person.start_time]) {
+                var val = times[person.start_time][person.group && person.group.start_corridor || 0];
+                if (val) {
+                    val += ' ' + person.bib;
+                } else {
+                    val = person.bib;
+                }
+                times[person.start_time][person.group && person.group.start_corridor || 0] = val;
+            } else {
+                times[person.start_time] = {};
+                times[person.start_time][person.group && person.group.start_corridor || 0] = person.bib;
+            }
+        }
+        var results = [];
+        for (var start_time in times) {
+            times[start_time]['start_time'] = start_time;
+            times[start_time]['start_time_str'] = toHHMMSS(start_time);
+            results.push(times[start_time])
+        }
+        results.sort(function (a, b) {
+            return a.start_time - b-start_time;
+        });
+        return results;
+    }
+    var Fields = {
+        fields: [
+            {key: 'start_time_str', title: 'Время'}
+        ],
+        init: function () {
+            var start_corridors = {};
+            for (var group of race.groups) {
+                start_corridors[group.start_corridor] = group.start_corridor;
+            }
+            for (var c in start_corridors) {
+                this.fields.push({key: c, title: start_corridors[c]})
+            }
+            return this;
+        }
+    }.init();
+    function render() {
+        var resultBlock = document.getElementById('start-times-tables');
+        resultBlock.innerHTML = '';
+        resultBlock.appendChild(new TableGenerator(getStartTimes(), Fields.fields).getTable({className: 'sportorg-table'}));
+    }
+    render();
+</script>
+{% endraw %}
+{% endblock %}

@@ -1,11 +1,10 @@
 import logging
 
 from sportorg.core.otime import OTime
-from sportorg.models.memory import race, Result, Person, Group, Qualification, RankingItem, \
+from sportorg.models.memory import Result, Person, Group, Qualification, RankingItem, \
     RelayTeam, RaceType, find
 
 
-# FIXME: does not work sorting
 class ResultCalculation(object):
     def __init__(self, r):
         self.race = r
@@ -32,7 +31,7 @@ class ResultCalculation(object):
             person = i.person
             if person:
                 assert isinstance(person, Person)
-                if person.group == group:
+                if person.group is group:
                     ret.append(i)
         ret.sort()
         group.count_finished = len(ret)
@@ -44,12 +43,13 @@ class ResultCalculation(object):
         for i in self.race.persons:
             person = i
             assert isinstance(person, Person)
-            if person.group == group:
+            if person.group is group:
                 ret.append(i)
         group.count_person = len(ret)
         return ret
 
-    def set_places(self, array):
+    @staticmethod
+    def set_places(array):
         assert isinstance(array, list)
         current_place = 1
         last_place = 1
@@ -148,8 +148,8 @@ class ResultCalculation(object):
                             break
 
     def get_group_leader_time(self, group):
-        if race().get_type(group) == RaceType.RELAY:
-            team_result = find(race().relay_teams, group=group, place=1)
+        if self.race.get_type(group) == RaceType.RELAY:
+            team_result = find(self.race.relay_teams, group=group, place=1)
             assert isinstance(team_result, RelayTeam)
             leader_time = team_result.get_time()
         else:
@@ -196,7 +196,7 @@ class ResultCalculation(object):
         :param group:
         :return: rank of group, -1 if we have < 10 successfull results
         """
-        teams = find(race().relay_teams, group=group, return_all=True)
+        teams = find(self.race.relay_teams, group=group, return_all=True)
         success_teams = []
 
         started_teams = 0
@@ -234,7 +234,8 @@ class ResultCalculation(object):
         scores = sorted(scores)
         return sum(scores[-10:])
 
-    def get_percent_for_rank(self, qual, rank):
+    @staticmethod
+    def get_percent_for_rank(qual, rank):
         table = []
         if qual == Qualification.I:
             table = [
@@ -373,20 +374,3 @@ class ResultCalculation(object):
             ret = OTime(msec=msec_new)
             return ret
         return None
-
-
-def get_start_list_data():
-    pass
-
-
-def get_splits_data():
-    pass
-
-
-def get_entry_statistics_data():
-    pass
-
-
-def get_team_statistics_data():
-    pass
-

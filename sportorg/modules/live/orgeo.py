@@ -138,7 +138,7 @@ class OrgeoClient(metaclass=Singleton):
                         time 	int 	seconds of current split - time from previous CP to this CP
                         """
                         current_split = {}
-                        current_split['code'] = str(splits[i].code)
+                        current_split['code'] = splits[i].code
                         end_time = splits[i].time
                         if i > 0:
                             start_time = splits[i - 1].time

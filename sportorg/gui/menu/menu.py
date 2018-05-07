@@ -190,24 +190,9 @@ def menu_list():
                 },
                 {
                     'title': _('Start list'),
+                    'shortcut': 'Ctrl+Shift+P',
                     'action': 'StartListAction'
                 },
-                {
-                    'title': _('Team list'),
-                    'action': 'TeamListAction'
-                },
-                {
-                    'title': _('Start times'),
-                    'action': 'StartTimesAction'
-                },
-                {
-                    'title': _('Print Bib'),
-                    'action': 'PrintBibAction'
-                },
-                {
-                    'title': _('Entries statistics'),
-                    'action': 'StatisticsListAction'
-                }
             ]
         },
         {
@@ -232,10 +217,6 @@ def menu_list():
                     'title': _('Create report'),
                     'shortcut': 'Ctrl+P',
                     'action': 'CreateReportAction'
-                },
-                {
-                    'title': _('Create team results report'),
-                    'action': 'CreateTeamResultsReportAction'
                 },
                 {
                     'title': _('Split printout'),

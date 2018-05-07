@@ -8,7 +8,6 @@ from PyQt5.QtWidgets import QMessageBox, QApplication, QTableView
 
 from sportorg.core.otime import OTime
 from sportorg.gui.dialogs.about import AboutDialog
-from sportorg.gui.dialogs.bib_report_dialog import BibReportDialog
 from sportorg.gui.dialogs.cp_delete import CPDeleteDialog
 from sportorg.gui.dialogs.entry_filter import DialogFilter
 from sportorg.gui.dialogs.event_properties import EventPropertiesDialog
@@ -21,13 +20,9 @@ from sportorg.gui.dialogs.relay_number_dialog import RelayNumberDialog
 from sportorg.gui.dialogs.report_dialog import ReportDialog
 from sportorg.gui.dialogs.search_dialog import SearchDialog
 from sportorg.gui.dialogs.settings import SettingsDialog
-from sportorg.gui.dialogs.start_chess_dialog import StartChessDialog
 from sportorg.gui.dialogs.start_preparation import StartPreparationDialog, guess_courses_for_groups
 from sportorg.gui.dialogs.start_report_dialog import StartReportDialog
 from sportorg.gui.dialogs.start_time_change_dialog import StartTimeChangeDialog
-from sportorg.gui.dialogs.statistics_report_dialog import StatisticsReportDialog
-from sportorg.gui.dialogs.team_report_dialog import TeamReportDialog
-from sportorg.gui.dialogs.team_results_report_dialog import TeamResultsReportDialog
 from sportorg.gui.dialogs.teamwork_properties import TeamworkPropertiesDialog
 from sportorg.gui.dialogs.telegram_dialog import TelegramDialog
 from sportorg.gui.dialogs.text_io import TextExchangeDialog
@@ -272,26 +267,6 @@ class StartListAction(Action):
         StartReportDialog().exec()
 
 
-class StatisticsListAction(Action):
-    def execute(self):
-        StatisticsReportDialog().exec()
-
-
-class TeamListAction(Action):
-    def execute(self):
-        TeamReportDialog().exec()
-
-
-class StartTimesAction(Action):
-    def execute(self):
-        StartChessDialog().exec()
-
-
-class PrintBibAction(Action):
-    def execute(self):
-        BibReportDialog().exec()
-
-
 class ManualFinishAction(Action):
     def execute(self):
         result = race().new_result()
@@ -327,11 +302,6 @@ class SFRReadoutAction(Action):
 class CreateReportAction(Action):
     def execute(self):
         ReportDialog().exec()
-
-
-class CreateTeamResultsReportAction(Action):
-    def execute(self):
-        TeamResultsReportDialog().exec()
 
 
 class SplitPrintoutAction(Action):

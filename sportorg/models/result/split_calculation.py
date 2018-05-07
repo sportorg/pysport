@@ -1,158 +1,77 @@
-from sportorg.core.otime import OTime
-from sportorg.models.memory import race, Person, Course, Group, Qualification, ResultStatus
+from sportorg.models.memory import Course, Group, Qualification, ResultStatus
 from sportorg.models.result.result_calculation import ResultCalculation
-from sportorg.utils.time import time_to_hhmmss, get_speed_min_per_km, hhmmss_to_time
-
-
-class LegSplit(object):
-    def __init__(self):
-        self.index = 0
-        self.course_index = -1
-        self.code = 0
-        self.absolute_time = None
-        self.leg_time = None
-        self.leg_minute_time = None
-        self.relative_time = None
-        self.leg_place = 0
-        self.relative_place = 0
-        self.status = 'correct'
-        self.speed = ''
-        self.length_leg = 0
-        self.leader_name = ''
-
-    def get_dict(self):
-        ret = {
-            'index': self.index,
-            'course_index': self.course_index + 1,
-            'code': self.code,
-            'absolute_time': self.absolute_time,
-            'relative_time': self.relative_time,
-            'leg_time': self.leg_time,
-            'leg_minute_time': self.leg_minute_time,
-            'leg_place': self.leg_place,
-            'relative_place': self.relative_place,
-            'status': self.status,
-            'speed': self.speed,
-            'length_leg': self.length_leg,
-            'leader_name': self.leader_name
-        }
-        return ret
+from sportorg.utils.time import get_speed_min_per_km
 
 
 class PersonSplits(object):
     def __init__(self, r, result):
 
         self.race = r
-
-        person = result.person
-        assert isinstance(person, Person)
-        # group = person.group
-        # course = group.course
-        course = self.race.find_course(person)
-        if course is None:
-            course = Course()
-        self.person = person
-
-        self.legs = []
-
-        self.name = person.full_name
-        self.group = person.group.name
-        self.bib = person.bib
-        self.team = ''
-        self.team_subject = ''
-        if person.organization:
-            self.team = person.organization.name
-            self.team_subject = person.organization.address.state
-        self.sportident_card = person.sportident_card
-        if result.is_sportident() and result.sportident_card:
-            self.sportident_card = result.sportident_card
-        self.qual = ''
-        if person.qual:
-            self.qual = person.qual.get_title()
-        self.year = person.get_year()
-
-        race_result = result.get_finish_time() - result.get_start_time()
-
-        self.start = result.get_start_time()
-        self.finish = result.get_finish_time()
-        self.result = result.get_result()
-        self.splits = result.splits if result.is_sportident() else []
-        self.race_result = time_to_hhmmss(race_result)
-        self.status = result.status.value
-        self.status_title = result.status.get_title()
-        self.place = result.get_place()
-        self.group_count_all = person.group.get_count_all()
-        self.group_count_finished = person.group.get_count_finished()
-        self.scores = result.scores
-        self.controls = [control.code for control in course.controls]
-        self.speed = ''
-        if course.length:
-            self.speed = get_speed_min_per_km(race_result, course.length)
-
-        self.penalty_time = time_to_hhmmss(result.get_penalty_time())
-        self.penalty_laps = result.penalty_laps
+        self.result = result
+        self._course = None
 
         self.assigned_rank = ''
-        if hasattr(result, 'assigned_rank') and result.assigned_rank != Qualification.NOT_QUALIFIED:
-            self.assigned_rank = result.assigned_rank.get_title()
+        if hasattr(self.result, 'assigned_rank') and self.result.assigned_rank != Qualification.NOT_QUALIFIED:
+            self.assigned_rank = self.result.assigned_rank.get_title()
 
-        self.relay_leg = 0
-        # if person.group.get_type() == RaceType.RELAY:
-        self.relay_leg = person.bib // 1000
-        self.diff = result.diff
+        self.relay_leg = self.result.person.bib // 1000
+        self.last_correct_index = 0
 
-        person_index = 0
+    @property
+    def person(self):
+        return self.result.person
+
+    @property
+    def course(self):
+        if self._course is None:
+            self._course = self.race.find_course(self.person)
+            if self._course is None:
+                self._course = Course()
+        return self._course
+
+    def generate(self):
+        split_index = 0
         course_index = 0
         course_code = 0
-        if len(course.controls) > course_index:
-            course_code = course.controls[course_index].code
-            if str(course_code).strip().isdigit():
-                course_code = int(str(course_code).strip())
-        leg_start_time = result.get_start_time()
-        start_time = result.get_start_time()
+        if len(self.course.controls) > course_index:
+            course_code = self.course.controls[course_index].code
+        leg_start_time = self.result.get_start_time()
+        start_time = self.result.get_start_time()
 
-        if result.is_sportident():
-            while person_index < len(result.splits):
-                cur_split = result.splits[person_index]
-                cur_code = cur_split.code
-                cur_time = cur_split.time
+        if self.course.length:
+            self.result.speed = get_speed_min_per_km(self.result.get_result_otime(), self.course.length)
 
-                leg = LegSplit()
-                leg.code = cur_code
-                leg.index = person_index
-                leg.absolute_time = time_to_hhmmss(cur_time)
-                leg.relative_time = time_to_hhmmss(cur_time - start_time)
+        if self.result.is_sportident():
+            while split_index < len(self.result.splits):
+                cur_split = self.result.splits[split_index]
 
-                leg.status = 'correct'
-                if course_code == cur_code:
-                    leg_time = cur_time - leg_start_time
-                    leg.leg_time = time_to_hhmmss(leg_time)
-                    leg.leg_minute_time = leg_time.to_minute_str()
-                    leg_start_time = cur_time
+                cur_split.index = split_index
+                cur_split.relative_time = cur_split.time - start_time
 
-                    leg.course_index = course_index
-                    leg.length_leg = course.controls[course_index].length
-                    if leg.length_leg:
-                        leg.speed = get_speed_min_per_km(leg_time, leg.length_leg)
+                if course_code == cur_split.code:
+                    cur_split.leg_time = cur_split.time - leg_start_time
+                    leg_start_time = cur_split.time
 
-                    leg.leg_place = '0'
+                    cur_split.course_index = course_index
+                    cur_split.length_leg = self.course.controls[course_index].length
+                    if cur_split.length_leg:
+                        cur_split.speed = get_speed_min_per_km(cur_split.leg_time, cur_split.length_leg)
+
+                    cur_split.leg_place = 0
 
                     course_index += 1
-                    if course_index >= len(course.controls):
+                    if course_index >= len(self.course.controls):
                         course_code = -1
                     else:
-                        course_code = course.controls[course_index].code
-                        if str(course_code).strip().isdigit():
-                            course_code = int(str(course_code).strip())
+                        course_code = self.course.controls[course_index].code
 
                 else:
-                    leg.status = 'extra'
+                    cur_split.is_correct = False
 
-                self.legs.append(leg)
-
-                person_index += 1
+                split_index += 1
 
         self.last_correct_index = course_index - 1
+        return self
 
     def get_last_correct_index(self):
         return self.last_correct_index
@@ -161,7 +80,7 @@ class PersonSplits(object):
         if index > self.get_last_correct_index():
             return None
 
-        for i in self.legs:
+        for i in self.result.splits:
             if i.course_index == index:
                 return i
 
@@ -179,94 +98,38 @@ class PersonSplits(object):
             return leg.relative_time
         return None
 
-    def get_person_split_data(self):
-        return self.get_dict()
-
-    def get_dict(self):
-        person_dict = {}
-        person_dict['name'] = self.name
-        person_dict['bib'] = self.bib if self.bib else ''
-        person_dict['team'] = self.team
-        person_dict['team_subject'] = self.team_subject
-        person_dict['sportident_card'] = int(self.sportident_card) if self.sportident_card else ''
-        person_dict['last_correct_index'] = self.last_correct_index
-        person_dict['place'] = self.place
-        person_dict['start'] = time_to_hhmmss(self.start)
-        person_dict['finish'] = time_to_hhmmss(self.finish)
-        person_dict['result'] = self.result
-        person_dict['race_result'] = self.race_result
-        person_dict['speed'] = self.speed
-        person_dict['status'] = self.status
-        person_dict['status_title'] = self.status_title
-        person_dict['penalty_time'] = self.penalty_time
-        person_dict['penalty_laps'] = self.penalty_laps
-        person_dict['controls'] = self.controls
-        person_dict['qual'] = self.qual
-        person_dict['year'] = self.year
-        person_dict['assigned_rank'] = self.assigned_rank
-        person_dict['scores'] = self.scores
-        person_dict['relay_leg'] = self.relay_leg
-        person_dict['diff'] = self.diff
-
-        person_dict['legs'] = []
-        person_dict['splits'] = []
-
-        prev_time = self.start
-
-        for split in self.splits:
-            person_dict['splits'].append({
-                'code': split.code,
-                'time': time_to_hhmmss(split.time),
-                'relative_time': time_to_hhmmss(split.time - self.start),
-                'leg_time': time_to_hhmmss(split.time - prev_time),
-            })
-            prev_time = split.time
-
-        for i in self.legs:
-            assert isinstance(i, LegSplit)
-            person_dict['legs'].append(i.get_dict())
-
-        person_dict['finish_time'] = ''
-        if len(person_dict['splits']):
-            finish = self.finish
-            last_time = hhmmss_to_time(person_dict['splits'][-1]['time'])
-            if last_time != finish:
-                person_dict['finish_time'] = (finish - last_time).to_minute_str()
-
-        return person_dict
+    def to_dict(self):
+        return {
+            'person': self.person.to_dict(),
+            'result': self.result.to_dict(),
+            'course': self.course.to_dict()
+        }
 
 
 class GroupSplits(object):
     def __init__(self, r, group):
         self.race = r
-        self.person_splits = []
-
         assert isinstance(group, Group)
-        self.name = group.name
-        self.cp_count = len(group.course.controls) if group.course else 0
-        self.length = group.course.length if group.course else 0
-        self.climb = group.course.climb if group.course else 0
-        self.controls = group.course.controls if group.course else 0
-        self.max_time = time_to_hhmmss(group.max_time) if group.max_time and group.max_time != OTime() else None
+        self.group = group
+        self.cp_count = len(self.group.course.controls) if self.group.course else 0
+
+        self.person_splits = []
 
         self.leader = {}
 
+    def generate(self):
         # to have group count
-        ResultCalculation(race()).get_group_persons(group)
-        self.count_all = group.get_count_all()
-        self.count_finished = group.get_count_finished()
+        ResultCalculation(self.race).get_group_persons(self.group)
 
-        self.type = race().get_type(group).name
-
-        for i in ResultCalculation(race()).get_group_finishes(group):
-            person = PersonSplits(self.race, i)
-            self.person_splits.append(person)
+        for i in ResultCalculation(self.race).get_group_finishes(self.group):
+            self.person_splits.append(PersonSplits(self.race, i).generate())
 
         self.set_places()
-        if group.is_relay():
+        if self.group.is_relay():
             self.sort_by_place()
         else:
             self.sort_by_result()
+        return self
 
     def set_places(self):
         len_persons = len(self.person_splits)
@@ -282,13 +145,15 @@ class GroupSplits(object):
 
     def sort_by_leg(self, index, relative=False):
         if relative:
-            self.person_splits = sorted(self.person_splits,
-                                        key=lambda item: (item.get_leg_relative_time(index) is None,
-                                                          item.get_leg_relative_time(index)))
+            self.person_splits = sorted(
+                self.person_splits,
+                key=lambda item: (item.get_leg_relative_time(index) is None, item.get_leg_relative_time(index))
+            )
         else:
-            self.person_splits = sorted(self.person_splits,
-                                        key=lambda item: (item.get_leg_time(index) is None,
-                                                          item.get_leg_time(index)))
+            self.person_splits = sorted(
+                self.person_splits,
+                key=lambda item: (item.get_leg_time(index) is None, item.get_leg_time(index))
+            )
 
     def sort_by_result(self):
         status_priority = [
@@ -300,22 +165,27 @@ class GroupSplits(object):
 
         def sort_func(item):
             priority = 0
-            if item.status in status_priority:
-                priority = status_priority.index(item.status) + 1
+            if item.result.status in status_priority:
+                priority = status_priority.index(item.result.status) + 1
             return item.result is None, priority, item.result
 
         self.person_splits = sorted(self.person_splits, key=sort_func)
 
     def sort_by_place(self):
-        self.person_splits = sorted(self.person_splits, key=lambda item: (item.place is None or item.place == '',
-                                                                          ('0000' + str(item.place))[-4:],
-                                                                          int(item.relay_leg)))
+        self.person_splits = sorted(
+            self.person_splits,
+            key=lambda item: (
+                item.result.get_place() is None or item.result.get_place() == '',
+                ('0000' + str(item.result.get_place()))[-4:],
+                int(item.relay_leg)
+            )
+        )
 
     def set_places_for_leg(self, index, relative=False):
         if not len(self.person_splits):
             return
 
-        leader_name = self.person_splits[0].name
+        leader = self.person_splits[0].result.person
         leader_time = self.person_splits[0].get_leg_time(index)
 
         for i in range(len(self.person_splits)):
@@ -326,11 +196,11 @@ class GroupSplits(object):
                     leg.relative_place = i + 1
                 else:
                     leg.leg_place = i + 1
-                    leg.leader_name = leader_name
+                    leg.leader = leader
                     leg.leader_time = leader_time
 
-    def set_leg_leader(self, index, person):
-        self.leader[str(index)] = (person.name, person.get_leg_time(index))
+    def set_leg_leader(self, index, person_split):
+        self.leader[str(index)] = (person_split.person.name, person_split.get_leg_time(index))
 
     def get_leg_leader(self, index):
         if str(index) in self.leader.keys():
@@ -342,81 +212,15 @@ class GroupSplits(object):
             self.sort_by_leg(i, True)
             self.set_places_for_leg(i, True)
 
-    def get_dict(self, person_to_export=None):
-        group_dict = {}
-        group_dict['name'] = self.name
-        group_dict['climb'] = self.climb
-        group_dict['count_all'] = self.count_all
-        group_dict['count_finished'] = self.count_finished
-        group_dict['cp_count'] = self.cp_count
-        group_dict['controls'] = self.controls
-        group_dict['length'] = self.length
-        group_dict['type'] = self.type
-        group_dict['max_time'] = self.max_time
-        persons = []
-        for i in self.person_splits:
-            assert (isinstance(i, PersonSplits))
-
-            if person_to_export:
-                if not person_to_export == i.person:
-                    continue
-
-            person_dict = i.get_dict()
-            persons.append(person_dict)
-
-        group_dict['persons'] = persons
-        return group_dict
-
-    def get_dict_printout(self, person_to_export=None):
-        ret = {}
-        group_dict = self.get_dict(person_to_export)
-
-        # list of athletes
-        group_persons = []
-        for i in self.person_splits:
-            group_persons.append({
-                'name': i.name,
-                'bib': i.bib,
-                'place': i.place,
-                'result': i.result,
-            })
-        group_dict['group_persons'] = group_persons
-
-        groups = [group_dict]
-        ret['groups'] = groups
-
-        ret['race'] = race().to_dict_data()
-        return ret
+    def to_dict(self):
+        return [ps.to_dict() for ps in self.person_splits]
 
 
-def get_splits_data():
-    """
+class RaceSplits(object):
+    def __init__(self, r):
+        self.race = r
 
-    :return: {
-        "race": {"title": str, "sub_title": str},
-        "groups": [
-            {
-                "name": str,
-                "persons": [
-                    PersonSplits.get_person_split_data,
-                    ...
-                ]
-            }
-        ]
-    }
-    """
-    ret = {}
-    data = []
-    for group in race().groups:
-        gs = GroupSplits(race(), group)
-        group_data = gs.get_dict()
-
-        ranking_data = group.ranking.get_dict_data()
-        group_data['ranking'] = ranking_data
-
-        data.append(group_data)
-
-    data.sort(key=lambda x: x['name'])
-    ret['groups'] = data
-    ret['race'] = race().to_dict_data()
-    return ret
+    def generate(self):
+        for group in self.race.groups:
+            GroupSplits(self.race, group).generate()
+        return self

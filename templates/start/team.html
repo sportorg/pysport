@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+
+{% block title %}Team list{% endblock %}
+
+{% block head %}
+{{ super() }}
+{% endblock %}
+
+{% block content %}
+<div id="org-list-tables"></div>
+{% raw %}
+<script>
+    var race = {% endraw %}{{race|tojson}}{% raw %};
+    var selected = {% endraw %}{{selected|tojson}}{% raw %};
+    racePreparation(race);
+
+    function getStartListByOrg(org, sort) {
+        var results = [];
+        for (var person of race.persons) {
+            if (!org || person.organization.id === org.id) {
+                if (selected.persons.length && selected.persons.some(function (elem) {
+                        return elem.id === person.id;
+                    })) {
+                    results.push({
+                        name: person.surname + ' ' + person.name + (person.is_out_of_competition ? ' *' : ''),
+                        group: (person.group && person.group.name) || '',
+                        qual: Qualification[person.qual],
+                        bib: person.bib,
+                        sportident_card: person.sportident_card + (person.is_rented_sportident_card ? ' *' : ''),
+                        year: person.birth_date ? (new Date(person.birth_date)).getFullYear() : '',
+                        start: toHHMMSS(person.start_time),
+                        start_time: person.start_time,
+                        comment: person.comment,
+                        price: person.group && person.group.price,
+                        person: person
+                    })
+                }
+            }
+        }
+        var sortFunc = function (a, b) {
+            var nameA = a.name && a.name.toLowerCase() || '';
+            var nameB = b.name && b.name.toLowerCase() || '';
+            if (nameA < nameB)
+                return -1;
+            if (nameA > nameB)
+                return 1;
+            return 0;
+        };
+        if (sort === 'bib') {
+            sortFunc = function (a, b) {
+                return a.bib - b.bib;
+            }
+        } else if (sort === 'group') {
+            sortFunc = function (a, b) {
+                var nameA = a.group.toLowerCase() || '';
+                var nameB = b.group.toLowerCase() || '';
+                if (nameA < nameB)
+                    return -1;
+                if (nameA > nameB)
+                    return 1;
+                return 0;
+            };
+        }
+        results.sort(sortFunc);
+        var index = 0;
+        results.forEach(function (elem) {
+            index++;
+            elem.index = index
+        });
+        return results;
+    }
+
+    var Fields = {
+        localId: 'race_' + race.id + '_org_fields',
+        fields: [
+            {key: 'index', title: '№'},
+            {key: 'name', title: 'Фамилия, имя'},
+            {key: 'group', title: 'Группа'},
+            {key: 'year', title: 'ГР'},
+            {key: 'qual', title: 'Разряд'},
+            {key: 'bib', title: 'Номер'},
+            {key: 'sportident_card', title: 'Номер чипа'},
+            {key: 'start', title: 'Время старта'},
+            {key: 'price', title: 'Взнос'},
+            {key: 'comment', title: 'Прим.', active: false},
+        ],
+        active: function (key, val) {
+            for (var obj of this.fields) {
+                if (key === obj.key) {
+                    obj.active = val
+                }
+            }
+        },
+        isActive: function (key) {
+            for (var obj of this.fields) {
+                if (key === obj.key) {
+                    if (obj.active === void 0) {
+                        return true;
+                    } else {
+                        return !!obj.active;
+                    }
+                }
+            }
+            return false;
+        },
+        save: function () {
+            localStorage.setItem(this.localId, JSON.stringify(this.fields));
+            return this;
+        },
+        load: function () {
+            var fields = JSON.parse(localStorage.getItem(this.localId));
+            if (fields) {
+                for (var f of fields) {
+                    this.active(f.key, f.active)
+                }
+            }
+            return this;
+        },
+        clear: function () {
+            localStorage.clear()
+        }
+    }.load();
+
+    var store = {};
+
+    function render(sort, noCombine) {
+        if (sort) {
+            store.sort = sort;
+        }
+        if (typeof noCombine === 'boolean') {
+            store.noCombine = noCombine;
+        }
+
+        var getInfoBlock = function (rows) {
+            var price = 0;
+            var rentedSportidentCards = 0;
+            rows.forEach(function (row) {
+                price += row.price;
+                if (row.person.is_rented_sportident_card) {
+                    rentedSportidentCards++;
+                }
+            });
+            var infoBlock = document.createElement('div');
+            if (price) {
+                infoBlock.appendChild(document.createTextNode('Стартовый взнос: ' + price));
+                infoBlock.appendChild(document.createElement('br'));
+            }
+            if (rentedSportidentCards) {
+                infoBlock.appendChild(document.createTextNode('Арендованных ЧИПов: ' + rentedSportidentCards));
+            }
+            return infoBlock;
+        };
+
+        var resultBlock = document.getElementById('org-list-tables');
+        resultBlock.innerHTML = '';
+        if (store.noCombine) {
+            var rows = getStartListByOrg(null, store.sort);
+            resultBlock.appendChild(new TableGenerator(rows, Fields.fields).getTable({className: 'sportorg-table'}));
+            resultBlock.appendChild(getInfoBlock(rows));
+        } else {
+            var i = 0;
+            for (var org of race.organizations) {
+                var rows = getStartListByOrg(org, store.sort);
+                if (!rows.length) {
+                    continue;
+                }
+
+                var titleBlock = document.createElement('h2');
+                titleBlock.id = org.name;
+                titleBlock.appendChild(document.createTextNode(dateFormat(race.data.start_datetime) + ' / ' + org.name));
+                resultBlock.appendChild(titleBlock);
+
+                resultBlock.appendChild(new TableGenerator(rows, Fields.fields).getTable({className: 'sportorg-table'}));
+
+                resultBlock.appendChild(getInfoBlock(rows));
+                if (i < race.organizations.length-1) {
+                    var newPage = document.createElement('div');
+                    newPage.className = 'new-page';
+                    resultBlock.appendChild(newPage);
+                }
+                i++;
+            }
+        }
+        Fields.save();
+    }
+    render();
+    new SettingsGenerator([
+        {
+            title: 'Отображать номер',
+            value: Fields.isActive('bib'),
+            change: function (checked) {
+                Fields.active('bib', checked);
+                render()
+            }
+        },
+        {
+            title: 'Отображать номер чипа',
+            value: Fields.isActive('sportident_card'),
+            change: function (checked) {
+                Fields.active('sportident_card', checked);
+                render()
+            }
+        },
+        {
+            title: 'Отображать стартовый взнос',
+            value: Fields.isActive('price'),
+            change: function (checked) {
+                Fields.active('price', checked);
+                render()
+            }
+        },
+        {
+            title: 'Отображать комментарий',
+            value: Fields.isActive('comment'),
+            change: function (checked) {
+                Fields.active('comment', checked);
+                render()
+            }
+        },
+        {
+            title: 'Объединять по коллективам',
+            value: true,
+            change: function (checked) {
+                render(null, !checked)
+            }
+        },
+        {
+            title: 'Сортировать участников по: ',
+            value: [
+                {text: 'имени', value: 'name'},
+                {text: 'номеру', value: 'bib'},
+                {text: 'группе', value: 'group'},
+            ],
+            change: function (arr) {
+                render(arr[0]);
+            }
+        }
+    ]).show();
+</script>
+{% endraw %}
+{% endblock %}
+{% block footer %}{% endblock %}

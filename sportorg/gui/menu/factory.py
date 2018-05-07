@@ -5,14 +5,13 @@ from sportorg.gui.menu.actions import NewAction, SaveAction, OpenAction, SaveAsA
     RefreshAction, FilterAction, SearchAction, ToStartPreparationAction, ToRaceResultsAction, ToGroupsAction, \
     ToCoursesAction, ToTeamsAction, StartPreparationAction, GuessCoursesAction, GuessCorridorsAction, \
     RelayNumberAction, \
-    NumberChangeAction, StartTimeChangeAction, StartListAction, TeamListAction, StartTimesAction, PrintBibAction, \
+    NumberChangeAction, StartTimeChangeAction, StartListAction, \
     ManualFinishAction, SPORTidentReadoutAction, SportiduinoReadoutAction, CreateReportAction, \
-    CreateTeamResultsReportAction, \
     SplitPrintoutAction, \
     RecheckingAction, PenaltyCalculationAction, PenaltyRemovingAction, ChangeStatusAction, SetDNSNumbersAction, \
     AddSPORTidentResultAction, TimekeepingSettingsAction, PrinterSettingsAction, LiveSettingsAction, \
     LiveSendStartListAction, LiveSendResultsAction, LiveResendResultsAction, AboutAction, TestingAction, CPDeleteAction, \
-    TeamworkSettingsAction, TeamworkEnableAction, StatisticsListAction, TeamworkSendAction, TelegramSettingsAction, \
+    TeamworkSettingsAction, TeamworkEnableAction, TeamworkSendAction, TelegramSettingsAction, \
     TelegramSendAction, SFRReadoutAction, CopyBibToCardNumber
 
 
@@ -50,16 +49,11 @@ class Factory:
             StartTimeChangeAction(),
             CopyBibToCardNumber(),
             StartListAction(),
-            StatisticsListAction(),
-            TeamListAction(),
-            StartTimesAction(),
-            PrintBibAction(),
             ManualFinishAction(),
             SPORTidentReadoutAction(),
             SportiduinoReadoutAction(),
             SFRReadoutAction(),
             CreateReportAction(),
-            CreateTeamResultsReportAction(),
             SplitPrintoutAction(),
             RecheckingAction(),
             PenaltyCalculationAction(),
