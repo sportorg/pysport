@@ -1747,12 +1747,64 @@ def find(iterable: list, **kwargs):
 
 
 _event = [create(Race)]
-
+current_race = 0
 
 def new_event(event):
     if len(event):
         global _event
         _event = event
+
+
+def add_race():
+    _event.append(create(Race))
+
+
+def copy_race():
+    cur_race = race()
+    copy = Race()
+    obj = cur_race.to_dict()
+    tmp_id = copy.id
+    copy.id = cur_race.id
+    copy.update_data(obj)
+    copy.id = tmp_id
+    _event.append(copy)
+
+
+def move_up_race():
+    index = get_current_race_index()
+    if index > 0:
+        tmp = _event[index]
+        _event[index] = _event[index - 1]
+        _event[index - 1] = tmp
+        set_current_race_index(index - 1)
+
+
+def move_down_race():
+    index = get_current_race_index()
+    if index < len(_event) - 1:
+        tmp = _event[index]
+        _event[index] = _event[index + 1]
+        _event[index + 1] = tmp
+        set_current_race_index(index + 1)
+
+
+def del_race():
+    # Leave at least 1 race
+    if len(_event) > 1:
+        index = get_current_race_index()
+        _event.remove(_event[index])
+        if index > 0:
+            set_current_race_index(index - 1)
+
+
+def set_current_race_index(index):
+    if len(_event) > index:
+        global current_race
+        current_race = index
+
+
+def get_current_race_index():
+    return current_race
 
 
 def races():
@@ -1762,7 +1814,7 @@ def races():
 def race(day=None):
     if day is None:
         # TODO: from settings
-        day = 0
+        day = get_current_race_index()
     else:
         day -= 1
 

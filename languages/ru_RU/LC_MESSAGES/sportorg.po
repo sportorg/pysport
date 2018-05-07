@@ -1581,6 +1581,18 @@ msgstr "Интервал после снятых участников"
 msgid "Selected list report"
 msgstr "Выписка по выбранным участникам"
 
+msgid "Multi day"
+msgstr "Многодневные соревнования"
+
+msgid "Copy"
+msgstr "Копировать"
+
+msgid "Move up"
+msgstr "Сдвинуть вверх"
+
+msgid "Move down"
+msgstr "Сдвинуть вниз"
+
 #~ msgid "Auto connect to station"
 #~ msgstr "Автоматическое подключение станции SPORTident"
 
