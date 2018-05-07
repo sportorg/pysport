@@ -1,13 +1,15 @@
 import logging
 
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QFormLayout, QDialog, QCheckBox, QDialogButtonBox, QLabel, QTabWidget, QWidget
+from PyQt5.QtWidgets import QFormLayout, QDialog, QCheckBox, QDialogButtonBox, QLabel, QTabWidget, QWidget, QPushButton
 
 from sportorg import config
 from sportorg.core.audio import get_sounds
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _, get_languages
+from sportorg.models.memory import races, Race, set_current_race_index, add_race, copy_race, get_current_race_index, \
+    del_race, move_up_race, move_down_race
 from sportorg.modules.configs.configs import Config
 
 
@@ -89,12 +91,88 @@ class SoundTab(Tab):
         Config().sound.set('unsuccessful', self.item_unsuccessful.currentText())
 
 
+class MultidayTab(Tab):
+    def __init__(self, parent):
+        self.widget = QWidget()
+        self.layout = QFormLayout(parent)
+
+        self.item_races = AdvComboBox()
+        self.fill_race_list()
+
+        max_button_width = 100
+
+        def select_race():
+            index = self.item_races.currentIndex()
+            set_current_race_index(index)
+            GlobalAccess().get_main_window().refresh()
+        self.item_races.currentIndexChanged.connect(select_race)
+        self.layout.addRow(self.item_races)
+
+        def add_race_function():
+            add_race()
+            self.fill_race_list()
+        self.item_new = QPushButton(_('New'))
+        self.item_new.clicked.connect(add_race_function)
+        self.item_new.setMaximumWidth(max_button_width)
+        self.layout.addRow(self.item_new)
+
+        def copy_race_function():
+            copy_race()
+            self.fill_race_list()
+        self.item_copy = QPushButton(_('Copy'))
+        self.item_copy.clicked.connect(copy_race_function)
+        self.item_copy.setMaximumWidth(max_button_width)
+        self.layout.addRow(self.item_copy)
+
+        def move_up_race_function():
+            move_up_race()
+            self.fill_race_list()
+        self.item_move_up = QPushButton(_('Move up'))
+        self.item_move_up.clicked.connect(move_up_race_function)
+        self.item_move_up.setMaximumWidth(max_button_width)
+        self.layout.addRow(self.item_move_up)
+        
+        def move_down_race_function():
+            move_down_race()
+            self.fill_race_list()
+        self.item_move_down = QPushButton(_('Move down'))
+        self.item_move_down.clicked.connect(move_down_race_function)
+        self.item_move_down.setMaximumWidth(max_button_width)
+        self.layout.addRow(self.item_move_down)
+
+        def del_race_function():
+            del_race()
+            self.fill_race_list()
+        self.item_del = QPushButton(_('Delete'))
+        self.item_del.clicked.connect(del_race_function)
+        self.item_del.setMaximumWidth(max_button_width)
+        self.layout.addRow(self.item_del)
+
+        self.widget.setLayout(self.layout)
+
+    def save(self):
+        pass
+
+    def fill_race_list(self):
+        race_list = []
+        index = get_current_race_index()
+
+        self.item_races.clear()
+        for cur_race in races():
+            assert isinstance(cur_race, Race)
+            race_list.append(str(cur_race.data.start_datetime))
+        self.item_races.addItems(race_list)
+
+        self.item_races.setCurrentIndex(index)
+
+
 class SettingsDialog(QDialog):
     def __init__(self):
         super().__init__(GlobalAccess().get_main_window())
         self.widgets = [
             (MainTab(self), _('Main settings')),
             (SoundTab(self), _('Sounds')),
+            (MultidayTab(self), _('Multi day')),
         ]
 
     def exec(self):

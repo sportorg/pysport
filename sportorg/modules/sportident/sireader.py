@@ -94,11 +94,17 @@ class ResultThread(QThread):
         self._logger.debug('Stop adder result')
 
     def _check_data(self, card_data):
+        # TODO requires more complex checking for long starts > 12 hours
         if self.start_time is not None and card_data['card_type'] == 'SI5':
             start_time = self.time_to_sec(self.start_time)
             for i in range(len(card_data['punches'])):
                 if self.time_to_sec(card_data['punches'][i][1]) < start_time:
-                    new_datetime = card_data['punches'][i][1].replace(hour=card_data['punches'][i][1].hour+12)
+                    new_datetime = card_data['punches'][i][1].replace(hour=card_data['punches'][i][1].hour + 12)
+                    card_data['punches'][i] = (card_data['punches'][i][0], new_datetime)
+
+                # simple check for morning starts (10:00 a.m. was 22:00 in splits)
+                if self.time_to_sec(card_data['punches'][i][1]) - 12 * 3600 > start_time:
+                    new_datetime = card_data['punches'][i][1].replace(hour=card_data['punches'][i][1].hour - 12)
                     card_data['punches'][i] = (card_data['punches'][i][0], new_datetime)
 
         return card_data
