@@ -36,7 +36,7 @@
         var isRelay = group.__type ? group.__type === 3 : race.data.race_type === 3;
         var results = [];
         for (var person of race.persons) {
-            if (person.group.id === group.id) {
+            if (person.group && person.group.id === group.id) {
                 results.push({
                     index: 0,
                     name: person.surname + ' ' + person.name,
