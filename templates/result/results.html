@@ -27,17 +27,24 @@
     </table>
 </div>
 {% raw %}
+<style>
+    td {
+        white-space: nowrap;
+        overflow: hidden;
+    }
+</style>
 <script>
     var race = {% endraw %}{{race|tojson}}{% raw %};
     var selected = {% endraw %}{{selected|tojson}}{% raw %};
     racePreparation(race);
 
-    function getResultsByGroup(group) {
+    function getResultsByGroup(group, splitInfo) {
+        splitInfo = splitInfo || 'cumulativeTotal';
         var isRelay = group.__type ? group.__type === 3 : race.data.race_type === 3;
         var results = [];
         for (var result of race.results) {
             if (result.person && result.person.group && result.person.group.id === group.id) {
-                results.push({
+                var r = {
                     index: 0,
                     name: result.person.surname + ' ' + result.person.name,
                     org: (result.person.organization && result.person.organization.name) || '',
@@ -53,7 +60,26 @@
                     status: result.status,
                     place_show: result.person.is_out_of_competition ? 'в/к' : result.place === 0 ? '' : result.place === -1 ? '' : result.place,
                     speed: result.speed,
-                })
+                    splits: document.createElement('tr'),
+                    data: result,
+                };
+                for (var split of result.splits) {
+                    if (split.is_correct) {
+                        var td = document.createElement('td');
+                        var info;
+                        switch (splitInfo) {
+                            case 'cumulativeTotal':
+                                info = split.code + ' ' + toHHMMSS(split.relative_time) + ' (' + split.relative_place + ')';
+                                break;
+                            case 'segment':
+                                info = split.code + ' ' + toHHMMSS(split.leg_time) + ' (' + split.leg_place + ')';
+                                break;
+                        }
+                        td.appendChild(document.createTextNode(info));
+                        r.splits.appendChild(td);
+                    }
+                }
+                results.push(r)
             }
         }
         results.sort((a, b) => {
@@ -111,12 +137,13 @@
             {key: 'year', title: 'ГР'},
             {key: 'qual', title: 'Разряд'},
             {key: 'bib', title: 'Номер'},
-            {key: 'penalty_time', title: 'Штраф'},
-            {key: 'penalty_laps', title: 'Штраф'},
+            {key: 'penalty_time', title: 'Штраф', active: false},
+            {key: 'penalty_laps', title: 'Штраф', active: false},
             {key: 'result', title: 'Результат'},
             {key: 'diff', title: 'Отставание'},
-            {key: 'speed', title: 'Темп'},
+            {key: 'speed', title: 'Темп', active: false},
             {key: 'place_show', title: 'Место'},
+            {key: 'splits', title: '', active: false},
         ],
         active: function (key, val) {
             for (var obj of this.fields) {
@@ -155,6 +182,8 @@
         }
     }.load();
 
+    store = {};
+
     function render() {
         var resultBlock = document.getElementById('results-tables');
         resultBlock.innerHTML = '';
@@ -166,7 +195,7 @@
 
             resultBlock.appendChild(getGroupsBlockElement(race));
 
-            resultBlock.appendChild(new TableGenerator(getResultsByGroup(group), Fields.fields).getTable({className: 'sportorg-table'}));
+            resultBlock.appendChild(new TableGenerator(getResultsByGroup(group, store.splitInfo), Fields.fields).getTable({className: 'sportorg-table'}));
         }
         Fields.save();
     }
@@ -174,7 +203,7 @@
 
     new SettingsGenerator([
         {
-            title: 'Отображать номер',
+            title: 'Номер',
             value: Fields.isActive('bib'),
             change: function (checked) {
                 Fields.active('bib', checked);
@@ -182,7 +211,7 @@
             }
         },
         {
-            title: 'Отображать штрафное время',
+            title: 'Штрафное время',
             value: Fields.isActive('penalty_time'),
             change: function (checked) {
                 Fields.active('penalty_time', checked);
@@ -190,7 +219,7 @@
             }
         },
         {
-            title: 'Отображать кол-во штрафных кругов',
+            title: 'Кол-во штрафных кругов',
             value: Fields.isActive('penalty_laps'),
             change: function (checked) {
                 Fields.active('penalty_laps', checked);
@@ -198,7 +227,7 @@
             }
         },
         {
-            title: 'Отображать отставание',
+            title: 'Отставание',
             value: Fields.isActive('diff'),
             change: function (checked) {
                 Fields.active('diff', checked);
@@ -206,7 +235,7 @@
             }
         },
         {
-            title: 'Отображать темп',
+            title: 'Темп',
             value: Fields.isActive('speed'),
             change: function (checked) {
                 Fields.active('speed', checked);
@@ -214,9 +243,24 @@
             }
         },
         {
-            title: 'Отображать сплиты',
+            title: 'Сплиты',
             value: Fields.isActive('splits'),
+            change: function (checked) {
+                Fields.active('splits', checked);
+                render()
+            }
         },
+        {
+            title: 'Выводить ',
+            value: [
+                {text: 'Нарастающий итог', value: 'cumulativeTotal'},
+                {text: 'Отрезок', value: 'segment'},
+            ],
+            change: function (arr) {
+                store.splitInfo = arr[0];
+                render();
+            }
+        }
     ]).show();
 </script>
 {% endraw %}
