@@ -48,7 +48,12 @@
             var tr = Tr();
             for (var key of this.headers()) {
                 var th = Th();
-                th.appendChild(document.createTextNode(this.getHeaderName(key)));
+                var title = this.getHeaderName(key);
+                if (title instanceof Node) {
+                    th.appendChild(title);
+                } else {
+                    th.appendChild(document.createTextNode(title));
+                }
                 tr.appendChild(th);
             }
             var thead = THead();
@@ -74,7 +79,11 @@
                     for (var key of this.headers()) {
                         var td = Td();
                         if (obj[key]) {
-                            td.appendChild(document.createTextNode(obj[key]));
+                            if (obj[key] instanceof Node) {
+                                td.appendChild(obj[key]);
+                            } else {
+                                td.appendChild(document.createTextNode(obj[key]));
+                            }
                         }
                         tr.appendChild(td);
                     }

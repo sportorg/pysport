@@ -112,7 +112,7 @@ msgstr "Шаблон"
 #: gui/dialogs/team_report_dialog.py:49
 #: gui/dialogs/team_results_report_dialog.py:48
 msgid "Choose template"
-msgstr "Выберете шаблон"
+msgstr "Выбрать шаблон"
 
 #: gui/dialogs/bib_report_dialog.py:42 gui/dialogs/print_properties.py:69
 #: gui/dialogs/report_dialog.py:55 gui/dialogs/start_report_dialog.py:52
@@ -1559,9 +1559,6 @@ msgstr "Справа"
 
 msgid "Bottom"
 msgstr "Снизу"
-
-msgid "On Web"
-msgstr "Включить web интерфейс"
 
 #~ msgid "Auto connect to station"
 #~ msgstr "Автоматическое подключение станции SPORTident"
