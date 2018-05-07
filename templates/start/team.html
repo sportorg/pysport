@@ -17,8 +17,8 @@
     function getStartListByOrg(org, sort) {
         var results = [];
         for (var person of race.persons) {
-            if (!org || person.organization.id === org.id) {
-                if (selected.persons.length && selected.persons.some(function (elem) {
+            if (!org || person.organization && person.organization.id === org.id) {
+                if (!selected.persons.length || selected.persons.some(function (elem) {
                         return elem.id === person.id;
                     })) {
                     results.push({
