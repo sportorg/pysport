@@ -1,11 +1,6 @@
 {% extends "base.html" %}
-
 {% block title %}Results{% endblock %}
-
-{% block head %}
-{{ super() }}
-{% endblock %}
-
+{% block head %}{{ super() }}{% endblock %}
 {% block content %}
 <div class="text-center">
     <h3>{{ race.data.description }} <br>{{ race.data.start_datetime|date }} {{ race.data.location }}</h3>
@@ -42,7 +37,8 @@
         splitInfo = splitInfo || 'cumulativeTotal';
         var isRelay = group.__type ? group.__type === 3 : race.data.race_type === 3;
         var results = [];
-        for (var result of race.results) {
+        for (var _i = 0, _a = race.results; _i < _a.length; _i++) {
+            var result = _a[_i];
             if (result.person && result.person.group && result.person.group.id === group.id) {
                 var r = {
                     index: 0,
@@ -60,29 +56,35 @@
                     status: result.status,
                     place_show: result.person.is_out_of_competition ? 'в/к' : result.place === 0 ? '' : result.place === -1 ? '' : result.place,
                     speed: result.speed,
-                    splits: document.createElement('tr'),
-                    data: result,
+                    data: result
                 };
-                for (var split of result.splits) {
+                var control_index = 0;
+                for (var _b = 0, _c = result.splits; _b < _c.length; _b++) {
+                    var split = _c[_b];
                     if (split.is_correct) {
-                        var td = document.createElement('td');
                         var info;
+                        var place = 0;
                         switch (splitInfo) {
                             case 'cumulativeTotal':
-                                info = split.code + ' ' + toHHMMSS(split.relative_time) + ' (' + split.relative_place + ')';
+                                info = toHHMMSS(split.relative_time) + ' (' + split.relative_place + ')';
+                                place = split.relative_place;
                                 break;
                             case 'segment':
-                                info = split.code + ' ' + toHHMMSS(split.leg_time) + ' (' + split.leg_place + ')';
+                                info = toHHMMSS(split.leg_time) + ' (' + split.leg_place + ')';
+                                place = split.leg_place;
                                 break;
                         }
-                        td.appendChild(document.createTextNode(info));
-                        r.splits.appendChild(td);
+                        var span = document.createElement('span');
+                        span.className = 'result-' + place;
+                        span.appendChild(document.createTextNode(info));
+                        r[control_index + '_' + split.code] = span;
+                        control_index++;
                     }
                 }
-                results.push(r)
+                results.push(r);
             }
         }
-        results.sort((a, b) => {
+        results.sort(function(a, b) {
             if (isRelay) {
                 if (a.place < 1) {
                     return 1
@@ -110,14 +112,15 @@
             var prevBib = 0;
             var resultsList = results.slice();
             results = [];
-            for (var r of resultsList) {
+            for (var _i = 0, resultsList_1 = resultsList; _i < resultsList_1.length; _i++) {
+                var r = resultsList_1[_i];
                 r.index = '';
                 if (r.bib % 1000 !== prevBib) {
                     index++;
-                    results.push({index: index});
-                    prevBib = r.bib % 1000
+                    results.push({ index: index });
+                    prevBib = r.bib % 1000;
                 }
-                results.push(r)
+                results.push(r);
             }
         } else {
             results.forEach(function (elem) {
@@ -142,27 +145,32 @@
             {key: 'result', title: 'Результат'},
             {key: 'diff', title: 'Отставание'},
             {key: 'speed', title: 'Темп', active: false},
-            {key: 'place_show', title: 'Место'},
-            {key: 'splits', title: '', active: false},
+            {key: 'place_show', title: 'Место'}
         ],
         active: function (key, val) {
-            for (var obj of this.fields) {
+            for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+                var obj = _a[_i];
                 if (key === obj.key) {
-                    obj.active = val
+                    obj.active = val;
                 }
             }
         },
         isActive: function (key) {
-            for (var obj of this.fields) {
+            for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+                var obj = _a[_i];
                 if (key === obj.key) {
                     if (obj.active === void 0) {
                         return true;
-                    } else {
+                    }
+                    else {
                         return !!obj.active;
                     }
                 }
             }
             return false;
+        },
+        getCopyFileds: function () {
+            return JSON.parse(JSON.stringify(this.fields))
         },
         save: function () {
             localStorage.setItem(this.localId, JSON.stringify(this.fields));
@@ -171,8 +179,9 @@
         load: function () {
             var fields = JSON.parse(localStorage.getItem(this.localId));
             if (fields) {
-                for (var f of fields) {
-                    this.active(f.key, f.active)
+                for (var _i = 0, fields_1 = fields; _i < fields_1.length; _i++) {
+                    var f = fields_1[_i];
+                    this.active(f.key, f.active);
                 }
             }
             return this;
@@ -187,15 +196,20 @@
     function render() {
         var resultBlock = document.getElementById('results-tables');
         resultBlock.innerHTML = '';
-        for (var group of race.groups) {
+        for (var _i = 0, _a = race.groups; _i < _a.length; _i++) {
+            var group = _a[_i];
             var titleBlock = document.createElement('h2');
             titleBlock.id = group.name;
             titleBlock.appendChild(document.createTextNode(group.name));
             resultBlock.appendChild(titleBlock);
-
             resultBlock.appendChild(getGroupsBlockElement(race));
-
-            resultBlock.appendChild(new TableGenerator(getResultsByGroup(group, store.splitInfo), Fields.fields).getTable({className: 'sportorg-table'}));
+            var fields = Fields.getCopyFileds();
+            if (store.splitsShow && group.course) {
+                group.course.controls.forEach(function (control, index) {
+                    fields.push({key: index + '_' + control.code, title: control.code})
+                })
+            }
+            resultBlock.appendChild(new TableGenerator(getResultsByGroup(group, store.splitInfo), fields).getTable({ className: 'sportorg-table' }));
         }
         Fields.save();
     }
@@ -244,9 +258,9 @@
         },
         {
             title: 'Сплиты',
-            value: Fields.isActive('splits'),
+            value: false,
             change: function (checked) {
-                Fields.active('splits', checked);
+                store.splitsShow = checked;
                 render()
             }
         },
@@ -254,7 +268,7 @@
             title: 'Выводить ',
             value: [
                 {text: 'Нарастающий итог', value: 'cumulativeTotal'},
-                {text: 'Отрезок', value: 'segment'},
+                {text: 'Отрезок', value: 'segment'}
             ],
             change: function (arr) {
                 store.splitInfo = arr[0];
