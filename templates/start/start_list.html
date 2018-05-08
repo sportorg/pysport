@@ -50,7 +50,7 @@
                 })
             }
         }
-        results.sort((a, b) => {
+        results.sort(function(a, b) {
             if (isRelay && a.start_time === b.start_time) {
                 if (a.bib % 1000 === b.bib % 1000) {
                     return ~~(a.bib / 1000) - ~~(b.bib / 1000)
@@ -167,7 +167,7 @@
                 Fields.active('sportident_card', checked);
                 render()
             }
-        },
+        }
     ]).show();
 </script>
 {% endraw %}

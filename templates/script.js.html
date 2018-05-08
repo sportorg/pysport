@@ -1,4 +1,3 @@
-{% block script %}
 {% raw %}
 <style>
     /* SETTINGS */
@@ -23,17 +22,34 @@
     }
 </style>
 <script>
+    // Chrome 1+
+    var isChrome = !!window.chrome && !!window.chrome.webstore;
+    // Firefox 1.0+
+    var isFirefox = typeof InstallTrigger !== 'undefined';
+
     var TableGenerator = (function () {
-        var Table = function () { return document.createElement('table') };
-        var THead = function () { return document.createElement('thead') };
-        var TBody = function () { return document.createElement('tbody') };
-        var Tr = function () { return document.createElement('tr') };
-        var Th = function () { return document.createElement('th') };
-        var Td = function () { return document.createElement('td') };
+        var Table = function () {
+            return document.createElement('table');
+        };
+        var THead = function () {
+            return document.createElement('thead');
+        };
+        var TBody = function () {
+            return document.createElement('tbody');
+        };
+        var Tr = function () {
+            return document.createElement('tr');
+        };
+        var Th = function () {
+            return document.createElement('th');
+        };
+        var Td = function () {
+            return document.createElement('td');
+        };
 
         function TableGenerator(data, fields) {
-            this.data = data
-            this.fields = fields
+            this.data = data;
+            this.fields = fields;
         }
 
         TableGenerator.prototype.getTable = function (options) {
@@ -42,16 +58,18 @@
             table.appendChild(this.getHead());
             table.appendChild(this.getBody());
             return table;
-        }
+        };
 
         TableGenerator.prototype.getHead = function () {
             var tr = Tr();
-            for (var key of this.headers()) {
+            for (var _i = 0, _a = this.headers(); _i < _a.length; _i++) {
+                var key = _a[_i];
                 var th = Th();
                 var title = this.getHeaderName(key);
                 if (title instanceof Node) {
                     th.appendChild(title);
-                } else {
+                }
+                else {
                     th.appendChild(document.createTextNode(title));
                 }
                 tr.appendChild(th);
@@ -59,29 +77,34 @@
             var thead = THead();
             thead.appendChild(tr);
             return thead;
-        }
+        };
 
         TableGenerator.prototype.getBody = function () {
             var tbody = TBody();
             var cols = this.headers().length;
-            for (var obj of this.data) {
+            for (var _b = 0, _c = this.data; _b < _c.length; _b++) {
+                var obj = _c[_b];
                 var tr = Tr();
                 if (obj instanceof Node || typeof obj === 'string') {
                     var td = Td();
                     td.colSpan = cols;
                     if (typeof obj === 'string') {
                         td.appendChild(document.createTextNode(obj));
-                    } else {
+                    }
+                    else {
                         td.appendChild(obj);
                     }
                     tr.appendChild(td);
-                } else {
-                    for (var key of this.headers()) {
+                }
+                else {
+                    for (var _i = 0, _a = this.headers(); _i < _a.length; _i++) {
+                        var key = _a[_i];
                         var td = Td();
                         if (obj[key]) {
                             if (obj[key] instanceof Node) {
                                 td.appendChild(obj[key]);
-                            } else {
+                            }
+                            else {
                                 td.appendChild(document.createTextNode(obj[key]));
                             }
                         }
@@ -91,7 +114,7 @@
                 tbody.appendChild(tr);
             }
             return tbody;
-        }
+        };
 
         TableGenerator.prototype.headers = function () {
             if (this._headers) {
@@ -99,7 +122,8 @@
             }
             if (!this.fields) {
                 var headers = {};
-                for (var obj of this.data) {
+                for (var _i = 0, _a = this.data; _i < _a.length; _i++) {
+                    var obj = _a[_i];
                     for (var key in obj) {
                         headers[key] = true;
                     }
@@ -107,39 +131,53 @@
                 this._headers = Object.keys(headers)
             } else if (this.fields instanceof Array) {
                 this._headers = [];
-                for (var field of this.fields) {
+                for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+                    var field = _a[_i];
                     if (typeof field === 'string') {
                         this._headers.push(field);
-                    } else if (field.active !== false){
+                    }
+                    else if (field.active !== false) {
                         this._headers.push(field.key);
                     }
                 }
             }
             return this._headers;
-        }
+        };
 
         TableGenerator.prototype.getHeaderName = function (key) {
             if (this.fields && this.fields instanceof Array) {
-                for (var field of this.fields) {
+                for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+                    var field = _a[_i];
                     if (typeof field === 'object' && field.key === key) {
                         return field.title;
                     }
                 }
             }
             return key;
-        }
+        };
 
         return TableGenerator
     }());
     var SettingsGenerator = (function () {
-        var Block = function () { var el = document.createElement('div'); el.className = 'sportorg-settings'; return el };
-        var Row = function () { var el = document.createElement('div'); el.className = 'sportorg-settings-row'; return el };
+        var Block = function () {
+            var el = document.createElement('div');
+            el.className = 'sportorg-settings';
+            return el
+        };
+        var Row = function () {
+            var el = document.createElement('div');
+            el.className = 'sportorg-settings-row';
+            return el
+        };
+
         function SettingsGenerator(settings) {
             this.settings = settings;
         }
+
         SettingsGenerator.prototype.show = function () {
             var block = Block();
-            for (var setting of this.settings) {
+            for (var _i = 0, _a = this.settings; _i < _a.length; _i++) {
+                var setting = _a[_i];
                 var row = Row();
                 row.appendChild(this.getElBySetting(setting));
                 block.appendChild(row);
@@ -167,14 +205,16 @@
                 return label
             } else if (setting.value instanceof Array) {
                 var s = document.createElement('select');
-                for (var obj of setting.value) {
-                    s.appendChild(new Option(obj.text, obj.value))
+                for (var _i = 0, _a = setting.value; _i < _a.length; _i++) {
+                    var obj = _a[_i];
+                    s.appendChild(new Option(obj.text, obj.value));
                 }
                 if (setting.change) {
                     s.onchange = function () {
                         var results = [];
-                        for (var item of s.selectedOptions) {
-                            results.push(item.value)
+                        for (var _i = 0, _a = s.selectedOptions; _i < _a.length; _i++) {
+                            var item = _a[_i];
+                            results.push(item.value);
                         }
                         setting.change(results);
                     };
@@ -187,7 +227,8 @@
         };
         return SettingsGenerator;
     }());
-    function toHHMMSS (value) {
+
+    function toHHMMSS(value) {
         if (!value) return '';
         value /= 1000;
         var hours = Math.floor(value / 3600);
@@ -199,9 +240,11 @@
         seconds = seconds < 10 ? '0' + seconds : seconds;
         return hours + ":" + minutes + ":" + seconds;
     }
-    function getById (list, id) {
+
+    function getById(list, id) {
         if (id) {
-            for (var obj of list) {
+            for (var _i = 0, list_1 = list; _i < list_1.length; _i++) {
+                var obj = list_1[_i];
                 if (obj.id === id) {
                     return obj;
                 }
@@ -209,30 +252,39 @@
         }
         return null;
     }
+
     function racePreparation(race) {
-        for (var obj of race.persons) {
+        for (var _i = 0, _a = race.persons; _i < _a.length; _i++) {
+            var obj = _a[_i];
             obj.organization = getById(race.organizations, obj.organization_id);
             obj.group = getById(race.groups, obj.group_id);
         }
-        for (var obj of race.results) {
+        for (var _b = 0, _c = race.results; _b < _c.length; _b++) {
+            var obj = _c[_b];
             obj.person = getById(race.persons, obj.person_id);
         }
-        for (var obj of race.groups) {
+        for (var _d = 0, _e = race.groups; _d < _e.length; _d++) {
+            var obj = _e[_d];
             obj.course = getById(race.courses, obj.course_id);
         }
-        for (var itemName of ['groups', 'courses', 'organizations']) {
-            race[itemName].sort((a, b) => {
-                if (a.name.toUpperCase() < b.name.toUpperCase()) return -1;
-                if (a.name.toUpperCase() > b.name.toUpperCase()) return 1;
-                return 0
-            })
+        for (var _f = 0, _g = ['groups', 'courses', 'organizations']; _f < _g.length; _f++) {
+            var itemName = _g[_f];
+            race[itemName].sort(function (a, b) {
+                if (a.name.toUpperCase() < b.name.toUpperCase())
+                    return -1;
+                if (a.name.toUpperCase() > b.name.toUpperCase())
+                    return 1;
+                return 0;
+            });
         }
         return race;
     }
+
     function getGroupsBlockElement(race) {
         var groupBlock = document.createElement('div');
         groupBlock.className = 'no-print';
-        for (var group of race.groups) {
+        for (var _i = 0, _a = race.groups; _i < _a.length; _i++) {
+            var group = _a[_i];
             var a = document.createElement('a');
             a.href = '#' + group.name;
             a.appendChild(document.createTextNode(group.name + ' '));
@@ -240,10 +292,12 @@
         }
         return groupBlock;
     }
+
     function dateFormat(date) {
         date = date ? new Date(date) : new Date;
         return date.getDate() + '.' + (date.getMonth() + 1) + '.' + date.getFullYear();
     }
+
     var Qualification = {
         '': 'б/р',
         0: 'б/р',
@@ -259,4 +313,3 @@
     };
 </script>
 {% endraw %}
-{% endblock %}
