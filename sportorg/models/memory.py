@@ -1763,10 +1763,8 @@ def copy_race():
     cur_race = race()
     copy = Race()
     obj = cur_race.to_dict()
-    tmp_id = copy.id
-    copy.id = cur_race.id
+    obj['id'] = str(copy.id)
     copy.update_data(obj)
-    copy.id = tmp_id
     _event.append(copy)
 
 

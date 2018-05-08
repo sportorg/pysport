@@ -398,10 +398,10 @@ def change_start_time(if_add, time_offset):
 
 def handicap_start_time():
     obj = race()
-    handicap_start = obj.get_setting('handicap_start', OTime(hour=11))
-    handicap_max_gap = obj.get_setting('handicap_max_gap', OTime(minute=30))
-    handicap_second_start = obj.get_setting('handicap_second_start', OTime(hour=11, minute=30))
-    handicap_interval = obj.get_setting('handicap_interval', OTime(minute=30))
+    handicap_start = OTime(msec=obj.get_setting('handicap_start', OTime(hour=11).to_msec()))
+    handicap_max_gap = OTime(msec=obj.get_setting('handicap_max_gap', OTime(minute=30).to_msec()))
+    handicap_second_start = OTime(msec=obj.get_setting('handicap_second_start', OTime(hour=11, minute=30).to_msec()))
+    handicap_interval = OTime(msec=obj.get_setting('handicap_interval', OTime(minute=30).to_msec()))
 
     rc = ResultCalculation(obj)
     for group in obj.groups:
@@ -436,9 +436,9 @@ def handicap_start_time():
 
 def reverse_start_time():
     obj = race()
-    handicap_start = obj.get_setting('handicap_start', OTime(hour=11))
-    handicap_interval = obj.get_setting('handicap_interval', OTime(minute=30))
-    handicap_dsg_offset = obj.get_setting('handicap_dsg_offset', OTime(minute=10))
+    handicap_start = OTime(msec=obj.get_setting('handicap_start', OTime(hour=11).to_msec()))
+    handicap_interval = OTime(msec=obj.get_setting('handicap_interval', OTime(minute=30).to_msec()))
+    handicap_dsg_offset = OTime(msec=obj.get_setting('handicap_dsg_offset', OTime(minute=10).to_msec()))
 
     rc = ResultCalculation(obj)
     for group in obj.groups:
