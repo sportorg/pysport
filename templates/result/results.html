@@ -59,26 +59,28 @@
                     data: result
                 };
                 var control_index = 0;
-                for (var _b = 0, _c = result.splits; _b < _c.length; _b++) {
-                    var split = _c[_b];
-                    if (split.is_correct) {
-                        var info;
-                        var place = 0;
-                        switch (splitInfo) {
-                            case 'cumulativeTotal':
-                                info = toHHMMSS(split.relative_time) + ' (' + split.relative_place + ')';
-                                place = split.relative_place;
-                                break;
-                            case 'segment':
-                                info = toHHMMSS(split.leg_time) + ' (' + split.leg_place + ')';
-                                place = split.leg_place;
-                                break;
+                if (result.splits) {
+                    for (var _b = 0, _c = result.splits; _b < _c.length; _b++) {
+                        var split = _c[_b];
+                        if (split.is_correct) {
+                            var info;
+                            var place = 0;
+                            switch (splitInfo) {
+                                case 'cumulativeTotal':
+                                    info = toHHMMSS(split.relative_time) + ' (' + split.relative_place + ')';
+                                    place = split.relative_place;
+                                    break;
+                                case 'segment':
+                                    info = toHHMMSS(split.leg_time) + ' (' + split.leg_place + ')';
+                                    place = split.leg_place;
+                                    break;
+                            }
+                            var span = document.createElement('span');
+                            span.className = 'result-' + place;
+                            span.appendChild(document.createTextNode(info));
+                            r[control_index + '_' + split.code] = span;
+                            control_index++;
                         }
-                        var span = document.createElement('span');
-                        span.className = 'result-' + place;
-                        span.appendChild(document.createTextNode(info));
-                        r[control_index + '_' + split.code] = span;
-                        control_index++;
                     }
                 }
                 results.push(r);
