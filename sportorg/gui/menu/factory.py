@@ -12,7 +12,7 @@ from sportorg.gui.menu.actions import NewAction, SaveAction, OpenAction, SaveAsA
     AddSPORTidentResultAction, TimekeepingSettingsAction, PrinterSettingsAction, LiveSettingsAction, \
     LiveSendStartListAction, LiveSendResultsAction, LiveResendResultsAction, AboutAction, TestingAction, CPDeleteAction, \
     TeamworkSettingsAction, TeamworkEnableAction, TeamworkSendAction, TelegramSettingsAction, \
-    TelegramSendAction, SFRReadoutAction, CopyBibToCardNumber
+    TelegramSendAction, SFRReadoutAction, CopyBibToCardNumber, StartHandicapAction
 
 
 class Factory:
@@ -47,6 +47,7 @@ class Factory:
             RelayNumberAction(),
             NumberChangeAction(),
             StartTimeChangeAction(),
+            StartHandicapAction(),
             CopyBibToCardNumber(),
             StartListAction(),
             ManualFinishAction(),

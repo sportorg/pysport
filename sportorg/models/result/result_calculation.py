@@ -150,12 +150,17 @@ class ResultCalculation(object):
     def get_group_leader_time(self, group):
         if self.race.get_type(group) == RaceType.RELAY:
             team_result = find(self.race.relay_teams, group=group, place=1)
-            assert isinstance(team_result, RelayTeam)
-            leader_time = team_result.get_time()
+            if isinstance(team_result, RelayTeam):
+                leader_time = team_result.get_time()
+            else:
+                return OTime()
         else:
             results = self.get_group_finishes(group)
-            leader_result = results[0]
-            leader_time = leader_result.get_result_otime()
+            if len(results) > 0:
+                leader_result = results[0]
+                leader_time = leader_result.get_result_otime()
+            else:
+                return OTime()
         return leader_time
 
     def get_group_rank(self, group):

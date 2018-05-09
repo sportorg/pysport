@@ -4,7 +4,8 @@ import random
 from datetime import timedelta
 from sportorg.core.otime import OTime
 
-from sportorg.models.memory import race, Group, Person
+from sportorg.models.memory import race, Group, Person, Result, ResultStatus
+from sportorg.models.result.result_calculation import ResultCalculation
 
 
 class ReserveManager(object):
@@ -35,7 +36,7 @@ class ReserveManager(object):
                     if str.find(str_name, reserve_prefix) > -1:
                         existing_reserves += 1
 
-            insert_count = max(reserve_count, percent_count) - existing_reserves
+            insert_count = int(max(reserve_count, percent_count) - existing_reserves)
 
             for i in range(insert_count):
                 new_person = Person()
@@ -57,21 +58,11 @@ class DrawManager(object):
         self.split_teams = False
         self.split_start_groups = False
 
-    def process(self, split_start_groups, split_teams, split_regions, mix_groups=False):
-        current_race = self.race
-        current_race.update_counters()
-
-        self.mix_groups = mix_groups
-        self.split_start_groups = split_start_groups
-        self.split_teams = split_teams
-        self.split_regions = split_regions
-
-        # create temporary array
+    def set_array(self, persons):
         self.person_array = []
-        self.person_array = self.person_array
 
-        for i in range(len(current_race.persons)):
-            current_person = current_race.persons[i]
+        for i in range(len(persons)):
+            current_person = persons[i]
             assert isinstance(current_person, Person)
             index = i
             group = ''
@@ -85,6 +76,28 @@ class DrawManager(object):
                 region = current_person.organization.address.state
 
             self.person_array.append([index, group, '{:03}'.format(start_group), team, region])
+
+    def get_tossed_array(self, persons):
+        index_array = []
+        for i in self.person_array:
+            index_array.append(i[0])
+        ret = [persons[x] for x in index_array]
+        return ret
+
+    def process(self, split_start_groups, split_teams, split_regions, mix_groups=False):
+        current_race = self.race
+        current_race.update_counters()
+        ret = self.process_array(current_race.persons, split_start_groups, split_teams, split_regions, mix_groups)
+        current_race.persons = ret
+
+    def process_array(self, persons, split_start_groups, split_teams, split_regions, mix_groups=False):
+        self.mix_groups = mix_groups
+        self.split_start_groups = split_start_groups
+        self.split_teams = split_teams
+        self.split_regions = split_regions
+
+        # create temporary array
+        self.set_array(persons)
 
         # shuffle
         random.shuffle(self.person_array)
@@ -103,11 +116,8 @@ class DrawManager(object):
         # process team and region conflicts in each start group
         self.process_conflicts()
 
-        # apply to model
-        index_array = []
-        for i in self.person_array:
-            index_array.append(i[0])
-        current_race.persons = [current_race.persons[x] for x in index_array]
+        # apply to initial list
+        return self.get_tossed_array(persons)
 
     def process_conflicts(self):
         start = 0
@@ -152,7 +162,7 @@ class DrawManager(object):
 
                     if j == i:
                         # no solution found
-                        print('no solution found')
+                        print('no solution found for group ' + self.person_array[j][1])
                         return False
                     else:
                         # insert j after checked_index i
@@ -384,6 +394,88 @@ def change_start_time(if_add, time_offset):
             person.start_time = person.start_time + time_offset
         else:
             person.start_time = person.start_time - time_offset
+
+
+def handicap_start_time():
+    obj = race()
+    handicap_start = OTime(msec=obj.get_setting('handicap_start', OTime(hour=11).to_msec()))
+    handicap_max_gap = OTime(msec=obj.get_setting('handicap_max_gap', OTime(minute=30).to_msec()))
+    handicap_second_start = OTime(msec=obj.get_setting('handicap_second_start', OTime(hour=11, minute=30).to_msec()))
+    handicap_interval = OTime(msec=obj.get_setting('handicap_interval', OTime(minute=30).to_msec()))
+
+    rc = ResultCalculation(obj)
+    for group in obj.groups:
+        results = rc.get_group_finishes(group)  # get sorted results
+        leader_time = rc.get_group_leader_time(group)
+        changed_persons = []
+
+        current_second_group_time = handicap_second_start
+
+        for result in results:
+            assert isinstance(result, Result)
+            cur_time = result.get_result_otime()
+            gap = cur_time - leader_time
+
+            if gap < handicap_max_gap and result.status == ResultStatus.OK:
+                start_time = handicap_start + gap
+            else:
+                start_time = current_second_group_time
+                current_second_group_time += handicap_interval
+
+            if result.person:
+                result.person.start_time = start_time
+                changed_persons.append(result.person)
+
+        # also process people without finish (DNS)
+        persons = rc.get_group_persons(group)
+        for person in persons:
+            if person not in changed_persons:
+                person.start_time = current_second_group_time
+                current_second_group_time += handicap_interval
+
+
+def reverse_start_time():
+    obj = race()
+    handicap_start = OTime(msec=obj.get_setting('handicap_start', OTime(hour=11).to_msec()))
+    handicap_interval = OTime(msec=obj.get_setting('handicap_interval', OTime(minute=30).to_msec()))
+    handicap_dsg_offset = OTime(msec=obj.get_setting('handicap_dsg_offset', OTime(minute=10).to_msec()))
+
+    rc = ResultCalculation(obj)
+    for group in obj.groups:
+        results = rc.get_group_finishes(group)  # get sorted results
+        first_group = []
+        second_group = []
+
+        for result in results:
+            assert isinstance(result, Result)
+            if result.status == ResultStatus.OK and result.person:
+                second_group.append(result.person)
+
+        # reverse main group, leader should be last
+        second_group.reverse()
+
+        persons = rc.get_group_persons(group)
+        for person in persons:
+            if person not in second_group:
+                first_group.append(person)
+
+        # first process DSQ and DNS - toss them
+        first_group = DrawManager(obj).process_array(first_group, False, True, False)
+
+        cur_time = handicap_start
+        for person in first_group:
+            assert isinstance(person, Person)
+            person.start_time = cur_time
+            cur_time += handicap_interval
+
+        # add offset after DSQ and DNS
+        cur_time += handicap_dsg_offset - handicap_interval
+
+        # set time for main group
+        for person in second_group:
+            assert isinstance(person, Person)
+            person.start_time = cur_time
+            cur_time += handicap_interval
 
 
 def copy_bib_to_card_number():
