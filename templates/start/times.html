@@ -31,8 +31,8 @@
         }
         var results = [];
         for (var start_time in times) {
-            times[start_time]['start_time'] = start_time;
-            times[start_time]['start_time_str'] = toHHMMSS(start_time);
+            times[start_time]['start_time'] = +start_time;
+            times[start_time]['start_time_str'] = toHHMMSS(+start_time);
             results.push(times[start_time])
         }
         results.sort(function (a, b) {

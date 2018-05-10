@@ -1749,6 +1749,7 @@ def find(iterable: list, **kwargs):
 _event = [create(Race)]
 current_race = 0
 
+
 def new_event(event):
     if len(event):
         global _event
