@@ -7,6 +7,8 @@ from jinja2 import Template, Environment, FileSystemLoader
 
 def to_hhmmss(value, fmt=None):
     """value = 1/1000 s"""
+    if value is None:
+        return ''
     if not fmt:
         fmt = '%H:%M:%S'
     dt = datetime.datetime(2000, 1, 1, value // 3600000 % 24, (value % 3600000) // 60000,
@@ -15,6 +17,8 @@ def to_hhmmss(value, fmt=None):
 
 
 def date(value, fmt=None):
+    if not value:
+        return ''
     if not fmt:
         fmt = '%d.%m.%Y'
     return dateutil.parser.parse(value).strftime(fmt)

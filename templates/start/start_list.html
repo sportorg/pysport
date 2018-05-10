@@ -46,7 +46,7 @@
                     sportident_card: person.sportident_card,
                     year: person.birth_date ? (new Date(person.birth_date)).getFullYear() : '',
                     start: toHHMMSS(person.start_time),
-                    start_time: person.start_time,
+                    start_time: person.start_time
                 })
             }
         }
@@ -96,7 +96,7 @@
             {key: 'qual', title: 'Разряд'},
             {key: 'bib', title: 'Номер'},
             {key: 'sportident_card', title: 'Номер чипа'},
-            {key: 'start', title: 'Время старта'},
+            {key: 'start', title: 'Время старта'}
         ],
         active: function (key, val) {
             for (var obj of this.fields) {

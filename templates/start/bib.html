@@ -223,6 +223,16 @@
                     return 1;
                 return 0;
             };
+        }else if (sort === 'organization') {
+            sortFunc = function (a, b) {
+                var nameA = a.organization && a.organization.name.toLowerCase() || '';
+                var nameB = b.organization && b.organization.name.toLowerCase() || '';
+                if (nameA < nameB) //sort string ascending
+                    return -1;
+                if (nameA > nameB)
+                    return 1;
+                return 0;
+            };
         }
         race.persons.sort(sortFunc);
         var bibListBlock = document.getElementById('bib-list');
@@ -243,7 +253,7 @@
                 {title: 'Номер чипа: ', value: person.sportident_card || ''},
                 {title: 'Время старта: ', value: toHHMMSS(person.start_time)},
                 {title: 'Группа: ', value: person.group && person.group.name},
-                {title: 'Коллектив: ', value: person.organization && person.organization.name},
+                {title: 'Коллектив: ', value: person.organization && person.organization.name || ''}
             ];
 
             for (var obj of detildData) {
@@ -287,6 +297,7 @@
                 {text: 'номеру', value: 'bib'},
                 {text: 'имени', value: 'name'},
                 {text: 'группе', value: 'group'},
+                {text: 'коллективу', value: 'organization'}
             ],
             change: function (arr) {
                 render(arr[0]);
