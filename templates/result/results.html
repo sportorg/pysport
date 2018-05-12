@@ -133,6 +133,42 @@
         return results;
     }
 
+    function getRankingByGroup(group){
+        var rankingBlock = document.createElement('span');
+        var ranking = group.ranking;
+        if (ranking && ranking.is_active){
+            var text = 'Квалификационный уровень (баллы):' + ranking.rank_scores;
+            rankingBlock.appendChild(document.createTextNode(text));
+
+            for (var _i = 0; _i < ranking.rank.length; _i++) {
+                var rank = ranking.rank[_i];
+                if (rank.is_active) {
+                    if (rank.max_place > 0){
+                        var text = Qualification[rank.qual] + ' - до ' + rank.max_place + ' места';
+                        rankingBlock.appendChild(document.createElement("br"));
+                        rankingBlock.appendChild(document.createTextNode(text));
+                    }
+                    else{
+                        if(rank.max_time > 0){
+                            var text = Qualification[rank.qual] + ' - ' + toHHMMSS(rank.max_time);
+                            if(rank.percent > 0){
+                                 text += ' (' + rank.percent + '%)';
+                            }
+                            rankingBlock.appendChild(document.createElement("br"));
+                            rankingBlock.appendChild(document.createTextNode(text));
+                        }
+                    }
+                }
+            }
+        }
+        else{
+            var text = 'Ранг не подсчитывался';
+            rankingBlock.appendChild(document.createTextNode(text));
+        }
+
+        return rankingBlock;
+    }
+
     var Fields = {
         localId: 'race_' + race.id + '_result_fields',
         fields: [
@@ -212,6 +248,11 @@
                 })
             }
             resultBlock.appendChild(new TableGenerator(getResultsByGroup(group, store.splitInfo), fields).getTable({ className: 'sportorg-table' }));
+
+            //show ranking information
+            if (store.rankingShow){
+                resultBlock.appendChild(getRankingByGroup(group))
+            }
         }
         Fields.save();
     }
@@ -276,7 +317,16 @@
                 store.splitInfo = arr[0];
                 render();
             }
-        }
+        },
+        {
+            title: 'Выполнение',
+            value: false,
+            change: function (checked) {
+                store.rankingShow = checked;
+                render()
+            }
+        },
+
     ]).show();
 </script>
 {% endraw %}
