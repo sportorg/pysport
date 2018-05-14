@@ -142,7 +142,7 @@ class WDBWinorientExportAction(Action):
 
 class IOFResultListExportAction(Action):
     def execute(self):
-        file_name = get_save_file_name(_('Save As IOF xml'), _("IOF xml (*.xml)"),
+        file_name = get_save_file_name(_('Save As IOF xml'), _('IOF xml (*.xml)'),
                                        '{}_resultList'.format(time.strftime("%Y%m%d")))
         if file_name is not '':
             try:
@@ -150,6 +150,18 @@ class IOFResultListExportAction(Action):
             except Exception as e:
                 logging.error(str(e))
                 QMessageBox.warning(self.app, _('Error'), _('Export error') + ': ' + file_name)
+
+
+class IOFEntryListImportAction(Action):
+    def execute(self):
+        file_name = get_open_file_name(_('Open IOF xml'), _('IOF xml (*.xml)'))
+        if file_name is not '':
+            try:
+                iof_xml.import_entry_list(file_name)
+            except Exception as e:
+                logging.error(str(e))
+                QMessageBox.warning(self.app, _('Error'), _('Import error') + ': ' + file_name)
+            self.app.init_model()
 
 
 class AddObjectAction(Action):

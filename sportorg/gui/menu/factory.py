@@ -12,7 +12,7 @@ from sportorg.gui.menu.actions import NewAction, SaveAction, OpenAction, SaveAsA
     AddSPORTidentResultAction, TimekeepingSettingsAction, PrinterSettingsAction, LiveSettingsAction, \
     LiveSendStartListAction, LiveSendResultsAction, LiveResendResultsAction, AboutAction, TestingAction, CPDeleteAction, \
     TeamworkSettingsAction, TeamworkEnableAction, TeamworkSendAction, TelegramSettingsAction, \
-    TelegramSendAction, SFRReadoutAction, CopyBibToCardNumber, StartHandicapAction
+    TelegramSendAction, SFRReadoutAction, CopyBibToCardNumber, StartHandicapAction, IOFEntryListImportAction
 
 
 class Factory:
@@ -76,6 +76,7 @@ class Factory:
             TeamworkSendAction(),
             TelegramSettingsAction(),
             TelegramSendAction(),
+            IOFEntryListImportAction()
         ]
         self._map = {}
         for action in self.actions:

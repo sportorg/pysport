@@ -64,6 +64,10 @@ def menu_list():
                             'title': _('Ocad txt v8'),
                             'action': 'OcadTXTv8ImportAction'
                         },
+                        {
+                            'title': _('IOF xml'),
+                            'action': 'IOFEntryListImportAction'
+                        },
                     ]
                 },
                 {
