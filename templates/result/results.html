@@ -22,12 +22,6 @@
     </table>
 </div>
 {% raw %}
-<style>
-    td {
-        white-space: nowrap;
-        overflow: hidden;
-    }
-</style>
 <script>
     var race = {% endraw %}{{race|tojson}}{% raw %};
     var selected = {% endraw %}{{selected|tojson}}{% raw %};
@@ -42,8 +36,8 @@
             if (result.person && result.person.group && result.person.group.id === group.id) {
                 var r = {
                     index: 0,
-                    name: result.person.surname + ' ' + result.person.name,
-                    org: (result.person.organization && result.person.organization.name) || '',
+                    name: (result.person.surname + ' ' + result.person.name).slice(0, MAX_PERSON_NAME),
+                    org: (result.person.organization && String(result.person.organization.name).slice(0, MAX_ORG_NAME)) || '',
                     qual: Qualification[result.person.qual],
                     bib: result.person.bib,
                     year: result.person.birth_date ? (new Date(result.person.birth_date)).getFullYear() : '',
@@ -137,7 +131,7 @@
         var rankingBlock = document.createElement('span');
         var ranking = group.ranking;
         if (ranking && ranking.is_active){
-            var text = 'Квалификационный уровень (баллы):' + ranking.rank_scores;
+            var text = 'Квалификационный уровень (баллы): ' + ranking.rank_scores;
             rankingBlock.appendChild(document.createTextNode(text));
 
             for (var _i = 0; _i < ranking.rank.length; _i++) {

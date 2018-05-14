@@ -9,6 +9,18 @@
 {% block content %}
 <div id="start-times-tables"></div>
 {% raw %}
+<style>
+    @media print {
+        table.sportorg-table th {
+            text-align: left;
+        }
+
+        table.sportorg-table td {
+            padding-top: 15px;
+            border-bottom: 1px solid black;
+        }
+    }
+</style>
 <script>
     var race = {% endraw %}{{race|tojson}}{% raw %};
     racePreparation(race);
