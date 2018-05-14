@@ -18,7 +18,7 @@
         var l = new Date();
         document.write (l.toLocaleString());
         if (!isChrome && !isFirefox) {
-            document.write('<p style="color: red">Используйте браузер Google Chrome или Firefox</p>');
+            document.write('<p class="no-print" style="color: red">Используйте браузер Google Chrome или Firefox</p>');
         }
     </script>
     {% endblock %}

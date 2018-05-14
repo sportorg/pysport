@@ -6,7 +6,7 @@
     {% raw %}
     <style>
         td {
-            padding-right: 3px;
+            padding-right: 7px;
         }
         body {
             font-weight: bold;
@@ -144,7 +144,7 @@
         <br> {{ race.data.start_datetime|date }}
         <h2>{{ person.surname }} {{ person.name }} - {{ group.name }}</h2>
         <br> Команда: {{organization.name}}
-        <br> Номер: {{person.bib}} SI-card: {{person.sportident_card}}
+        <br> Номер: {{person.bib}} Card: {{person.sportident_card}}
         <br> Старт: {{result.start_msec|tohhmmss}}
         <table>
         {% for leg in result.splits %}

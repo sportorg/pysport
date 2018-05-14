@@ -40,7 +40,7 @@
                 results.push({
                     index: 0,
                     name: person.surname + ' ' + person.name,
-                    org: (person.organization && person.organization.name) || '',
+                    org: (person.organization && String(person.organization.name).slice(0, MAX_ORG_NAME)) || '',
                     qual: Qualification[person.qual],
                     bib: person.bib,
                     sportident_card: person.sportident_card,
