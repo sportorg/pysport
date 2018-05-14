@@ -13,6 +13,7 @@ from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
 from sportorg.models.memory import race
+from sportorg.modules.configs.configs import Config
 
 
 class PrintPropertiesDialog(QDialog):
@@ -115,14 +116,14 @@ class PrintPropertiesDialog(QDialog):
     def set_values(self):
         obj = race()
         default_printer_name = QPrinter().printerName()
-        printer_name = obj.get_setting('main_printer', default_printer_name)
+        printer_name = Config().printer.get('main', default_printer_name)
         # try:
         #     QPrinter().setPrinterName(printer_name)
         # except Exception as e:
         #     printer_name = default_printer_name
         self.selected_printer.setText(printer_name)
 
-        printer_name = obj.get_setting('split_printer', default_printer_name)
+        printer_name = Config().printer.get('split', default_printer_name)
         # try:
         #     QPrinter().setPrinterName(printer_name)
         # except Exception as e:
@@ -155,9 +156,9 @@ class PrintPropertiesDialog(QDialog):
     def apply_changes_impl(self):
         obj = race()
         main_printer = self.selected_printer.text()
-        obj.set_setting('main_printer', main_printer)
+        Config().printer.set('main', main_printer)
         split_printer = self.selected_split_printer.text()
-        obj.set_setting('split_printer', split_printer)
+        Config().printer.set('split', split_printer)
         obj.set_setting('split_printout', self.print_splits_checkbox.isChecked())
         obj.set_setting('split_template', self.item_template.currentText())
 

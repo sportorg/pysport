@@ -11,6 +11,7 @@ class ConfigFile(object):
     DIRECTORY = 'directory'
     PATH = 'path'
     SOUND = 'sound'
+    PRINTER = 'printer'
 
 
 class Parser:
@@ -80,6 +81,10 @@ class Config(metaclass=Singleton):
                 'enabled': False,
                 'successful': '',
                 'unsuccessful': '',
+            }),
+            ConfigFile.PRINTER: Configurations({
+                'main': '',
+                'split': '',
             })
         }
 
@@ -94,6 +99,10 @@ class Config(metaclass=Singleton):
     @property
     def sound(self):
         return self._configurations[ConfigFile.SOUND]
+
+    @property
+    def printer(self):
+        return self._configurations[ConfigFile.PRINTER]
 
     def read(self):
         self.parser.read(sportorg_config.CONFIG_INI)

@@ -1,5 +1,6 @@
 from sportorg.core.template import get_text_from_file
 from sportorg.models.memory import race, Organization
+from sportorg.modules.configs.configs import Config
 
 from sportorg.modules.printing.printing import print_html
 from sportorg.config import template_dir
@@ -24,7 +25,7 @@ def split_printout(result):
     course = obj.find_course(person)
 
     if person.group and course:
-        printer = obj.get_setting('split_printer')
+        printer = Config().printer.get('split')
         template_path = obj.get_setting('split_template', template_dir('split', 'split_printout.html'))
 
         organization = person.organization
