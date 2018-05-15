@@ -2,7 +2,7 @@ import logging
 
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QDialog, QTableView, QDialogButtonBox, QVBoxLayout, QWidget
+from PyQt5.QtWidgets import QDialog, QTableView, QDialogButtonBox, QFormLayout
 
 from sportorg import config
 from sportorg.gui.dialogs.entry_edit import EntryEditDialog
@@ -26,31 +26,25 @@ class DialogFilter(QDialog):
     def init_ui(self):
         self.setWindowModality(QtCore.Qt.WindowModal)
         self.setWindowIcon(QIcon(config.ICON))
-        self.resize(300, 200)
+        self.resize(300, 0)
         self.setSizeGripEnabled(False)
         self.setModal(True)
 
-        self.layout = QVBoxLayout(self)
-
-        self.grid_layout = QtWidgets.QGridLayout()
-        widget = QWidget(self)
-        widget.setLayout(self.grid_layout)
+        self.layout = QFormLayout(self)
         
         self.group_label = QtWidgets.QLabel(self)
-        self.grid_layout.addWidget(self.group_label, 0, 0, 1, 4)
 
         self.group_combo = AdvComboBox(self)
         self.group_combo.addItem('')
         self.group_combo.addItems(get_race_groups())
-        self.grid_layout.addWidget(self.group_combo, 0, 1, 1, 4)
+        self.layout.addRow(self.group_label, self.group_combo)
 
         self.team_label = QtWidgets.QLabel(self)
-        self.grid_layout.addWidget(self.team_label, 1, 0, 1, 4)
 
         self.team_combo = AdvComboBox(self)
         self.team_combo.addItem('')
         self.team_combo.addItems(get_race_teams())
-        self.grid_layout.addWidget(self.team_combo, 1, 1, 1, 4)
+        self.layout.addRow(self.team_label, self.team_combo)
 
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         self.button_ok = button_box.button(QDialogButtonBox.Ok)
@@ -58,8 +52,7 @@ class DialogFilter(QDialog):
         self.button_cancel = button_box.button(QDialogButtonBox.Cancel)
         self.button_cancel.clicked.connect(self.reject)
 
-        self.layout.addWidget(widget)
-        self.layout.addWidget(button_box)
+        self.layout.addRow(button_box)
 
         self.retranslate_ui()
 
