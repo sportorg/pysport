@@ -7,7 +7,7 @@ from sportorg import config
 from sportorg.core.singleton import Singleton
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.main_window import MainWindow
-from sportorg.models.constant import StatusComments
+from sportorg.models.constant import StatusComments, PersonNames, Regions
 
 
 class Application(metaclass=Singleton):
@@ -23,6 +23,8 @@ class Application(metaclass=Singleton):
     def run(self):
         freeze_support()
         self.set_status_comments()
+        self.set_names()
+        self.set_regions()
         self.main_window.show_window()
         sys.exit(self.app.exec())
 
@@ -32,5 +34,23 @@ class Application(metaclass=Singleton):
             with open(config.STATUS_COMMENTS_FILE, encoding='utf-8') as f:
                 content = f.readlines()
             StatusComments().set([x.strip() for x in content])
+        except Exception as e:
+            print(str(e))
+
+    @staticmethod
+    def set_names():
+        try:
+            with open(config.NAMES_FILE, encoding='utf-8') as f:
+                content = f.readlines()
+            PersonNames().set([x.strip() for x in content])
+        except Exception as e:
+            print(str(e))
+
+    @staticmethod
+    def set_regions():
+        try:
+            with open(config.REGIONS_FILE, encoding='utf-8') as f:
+                content = f.readlines()
+            Regions().set([x.strip() for x in content])
         except Exception as e:
             print(str(e))
