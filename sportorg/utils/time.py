@@ -69,10 +69,10 @@ def hhmmss_to_time(value):
         sec = int(secs[0])
         if len(secs) == 2:
             msec = int(secs[1])
-        if 0 < msec < 10:
-            msec *= 100
-        elif 0 < msec < 100:
-            msec *= 10
+            if len(secs[1]) == 1:
+                msec *= 100
+            elif len(secs[1]) == 2:
+                msec *= 10
         return OTime(0, int(arr[0]), int(arr[1]), sec, msec)
     return OTime()
 
