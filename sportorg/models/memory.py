@@ -1187,6 +1187,19 @@ class Race(Model):
             ret = person.group.course
         return ret
 
+    def find_group(self, group_name):
+        # get group by name
+        ret = find(self.groups, name=str(group_name))
+        return ret
+
+    def find_organization(self, org_name):
+        # get organization by name
+        ret = find(self.organizations, name=str(org_name))
+        return ret
+
+    def find_team(self, team_name):
+        return self.find_organization(team_name)
+
     def get_course_splits(self, result):
         """List[Split]"""
         if not result.person:

@@ -5,13 +5,13 @@ from PyQt5.QtWidgets import QDialog, QDialogButtonBox, QVBoxLayout, QWidget
 
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import _
-from sportorg.models.memory import race, Person
+from sportorg.models.memory import race, Person, Qualification
 from sportorg.utils.time import time_to_hhmmss, hhmmss_to_time
 
 
 def get_value_options():
     return [_('Start'), _('Finish'), _('Result'), _('Penalty time'), _('Penalty legs'), _('Card number'),
-            _('Group'), _('Team'), _('Qualification')]
+            _('Group'), _('Team'), _('Qualification'), _('Bib')]
 
 
 class TextExchangeDialog(QDialog):
@@ -62,15 +62,15 @@ class TextExchangeDialog(QDialog):
         self.gridLayout = QtWidgets.QGridLayout(self.separator_group_box)
 
         self.space_radio_button = QtWidgets.QRadioButton(self.separator_group_box)
-        self.space_radio_button.setChecked(True)
-
         self.gridLayout.addWidget(self.space_radio_button, 0, 0, 1, 1)
+
         self.tab_radio_button = QtWidgets.QRadioButton(self.separator_group_box)
-
+        self.tab_radio_button.setChecked(True)
         self.gridLayout.addWidget(self.tab_radio_button, 1, 0, 1, 1)
-        self.semicolon_radio_button = QtWidgets.QRadioButton(self.separator_group_box)
 
+        self.semicolon_radio_button = QtWidgets.QRadioButton(self.separator_group_box)
         self.gridLayout.addWidget(self.semicolon_radio_button, 2, 0, 1, 1)
+
         self.custom_layout = QtWidgets.QHBoxLayout()
 
         self.custom_radio_button = QtWidgets.QRadioButton(self.separator_group_box)
@@ -81,8 +81,8 @@ class TextExchangeDialog(QDialog):
         self.custom_layout.addWidget(self.custom_edit)
         self.gridLayout.addLayout(self.custom_layout, 3, 0, 1, 1)
         self.grid_layout.addWidget(self.separator_group_box, 0, 1, 1, 1)
-        self.text_edit = QtWidgets.QPlainTextEdit(self)
 
+        self.text_edit = QtWidgets.QPlainTextEdit(self)
         self.grid_layout.addWidget(self.text_edit, 1, 0, 1, 2)
 
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
@@ -168,7 +168,9 @@ class TextExchangeDialog(QDialog):
                     value = arr[-1]
                     index = arr[0]
                     if separator == ' ' and len(arr) > 2:
-                        index += separator + arr[1]
+                        if index_type == 'person name':
+                            index += separator + arr[1]
+                        value = ' '.join(arr[1:])
 
                     if value:
                         person = get_person_by_id(index_type, index)
@@ -259,6 +261,8 @@ def get_property(person, key):
             return person.organization.name
     elif key == _('Qualification'):
         return person.qual.get_title()
+    elif key == _('Bib'):
+        return str(person.bib)
 
     return ''
 
@@ -269,6 +273,7 @@ def set_property(person, key, value):
         result = race().find_person_result(person)
         if result:
             result.start_time = hhmmss_to_time(value)
+            person.start_time = hhmmss_to_time(value)
         else:
             person.start_time = hhmmss_to_time(value)
     elif key == _('Finish'):
@@ -288,8 +293,18 @@ def set_property(person, key, value):
     elif key == _('Card number'):
         race().person_sportident_card(person, int(value))
     elif key == _('Group'):
-        pass
+        group = race().find_group(value)
+        if(group):
+            person.group = group
     elif key == _('Team'):
-        pass
+        team = race().find_team(value)
+        if (team):
+            person.organization = team
     elif key == _('Qualification'):
-        pass
+        qual = Qualification.get_qual_by_name(value)
+        if (qual):
+            person.qual = qual
+    elif key == _('Bib'):
+        if value.isdigit():
+            new_bib = int(value)
+            person.bib = new_bib
