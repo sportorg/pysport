@@ -92,8 +92,6 @@ class CPDeleteDialog(QDialog):
                 results = race().results
                 results_has_number = []
                 for result in results:
-                    if not result.is_sportident():
-                        continue
                     for split in result.splits:
                         if str(number) == str(split.code):
                             results_has_number.append(result)
@@ -101,7 +99,7 @@ class CPDeleteDialog(QDialog):
                 if len(results_has_number):
                     text += '{}:\n{}'.format(
                         _('Results'),
-                        '\n'.join([str(result.sportident_card) for result in results_has_number])
+                        '\n'.join([str(result.card_number) for result in results_has_number])
                     )
             self.item_info.setText(text)
         except Exception as e:
@@ -131,16 +129,14 @@ class CPDeleteDialog(QDialog):
         if is_result:
             results = race().results
             for result in results:
-                if not result.is_sportident():
-                    continue
                 splits = []
                 for split in result.splits:
                     if str(number) == str(split.code):
-                        logging.info('Del {} from {} {}'.format(number, result.sportident_card, split.time))
+                        logging.info('Del {} from {} {}'.format(number, result.card_number, split.time))
                     else:
                         splits.append(split)
                 result.splits = splits
 
-        race().clear_sportident_results()
+        race().clear_results()
         ResultCalculation(race()).process_results()
         GlobalAccess().get_main_window().refresh()

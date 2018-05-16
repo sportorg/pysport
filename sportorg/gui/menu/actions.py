@@ -31,7 +31,7 @@ from sportorg.gui.dialogs.timekeeping_properties import TimekeepingPropertiesDia
 from sportorg.gui.menu.action import Action
 from sportorg.gui.utils.custom_controls import messageBoxQuestion
 from sportorg.libs.winorient.wdb import write_wdb
-from sportorg.models.memory import race, ResultStatus
+from sportorg.models.memory import race, ResultStatus, ResultManual
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.result_checker import ResultChecker
 from sportorg.models.start.start_preparation import guess_corridors_for_groups, copy_bib_to_card_number
@@ -136,7 +136,7 @@ class WDBWinorientExportAction(Action):
 
                 write_wdb(wdb_object, file_name)
             except Exception as e:
-                logging.error(str(e))
+                logging.exception(str(e))
                 QMessageBox.warning(self.app, _('Error'), _('Export error') + ': ' + file_name)
 
 
@@ -287,7 +287,7 @@ class StartListAction(Action):
 
 class ManualFinishAction(Action):
     def execute(self):
-        result = race().new_result()
+        result = race().new_result(ResultManual)
         Teamwork().send(result.to_dict())
         race().add_new_result(result)
         logging.info('Manual finish')
@@ -404,7 +404,7 @@ class CPDeleteAction(Action):
 
 class AddSPORTidentResultAction(Action):
     def execute(self):
-        result = race().new_sportident_result()
+        result = race().new_result()
         race().add_new_result(result)
         Teamwork().send(result.to_dict())
         logging.info('SPORTident result')

@@ -14,7 +14,7 @@ class TestJson(unittest.TestCase):
         r = race()
         person = None
         for p in r.persons:
-            if p.full_name == 'Akhtarov Danil' and p.sportident_card == 9777775:
+            if p.full_name == 'Akhtarov Danil' and p.card_number == 9777775:
                 person = p
         self.assertIsInstance(person, Person, 'Import person failed')
         self.assertIsInstance(person.group, Group, 'Import group failed')

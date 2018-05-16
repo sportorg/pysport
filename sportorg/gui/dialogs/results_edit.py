@@ -2,9 +2,11 @@ import logging
 
 from abc import abstractmethod
 
+from datetime import datetime
+
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, \
-    QTimeEdit, QRadioButton, QSpinBox, QGroupBox, QTextEdit, QDialogButtonBox
+    QTimeEdit, QRadioButton, QSpinBox, QGroupBox, QTextEdit, QDialogButtonBox, QDateTimeEdit
 
 from sportorg import config
 from sportorg.gui.dialogs.entry_edit import EntryEditDialog
@@ -42,6 +44,10 @@ class ResultEditDialog(QDialog):
         self.setModal(True)
 
         self.layout = QFormLayout(self)
+
+        self.item_created_at = QTimeEdit()
+        self.item_created_at.setDisplayFormat(self.time_format)
+        self.item_created_at.setReadOnly(True)
 
         self.item_sportident_card = QSpinBox()
         self.item_sportident_card.setMaximum(9999999)
@@ -84,7 +90,8 @@ class ResultEditDialog(QDialog):
         more24 = race().get_setting('time_format_24', 'less24') == 'more24'
         self.splits = SplitsText(more24=more24)
 
-        if self.current_object.is_sportident():
+        self.layout.addRow(QLabel(_('Created at')), self.item_created_at)
+        if self.current_object.is_punch():
             self.layout.addRow(QLabel(_('Card')), self.item_sportident_card)
         self.layout.addRow(QLabel(_('Bib')), self.item_bib)
         self.layout.addRow(QLabel(''), self.label_person_info)
@@ -102,7 +109,7 @@ class ResultEditDialog(QDialog):
         self.layout.addRow(self.radio_overtime)
         self.layout.addRow(self.radio_dsq, self.item_status_comment)
 
-        if self.current_object.is_sportident():
+        if self.current_object.is_punch():
             start_source = race().get_setting('sportident_start_source', 'protocol')
             finish_source = race().get_setting('sportident_finish_source', 'station')
             if start_source == 'protocol' or start_source == 'cp':
@@ -148,19 +155,21 @@ class ResultEditDialog(QDialog):
                 info = person.full_name
                 if person.group:
                     info = '{}\n{}: {}'.format(info, _('Group'), person.group.name)
-                if person.sportident_card:
-                    info = '{}\n{}: {}'.format(info, _('Card'), person.sportident_card)
+                if person.card_number:
+                    info = '{}\n{}: {}'.format(info, _('Card'), person.card_number)
                 self.label_person_info.setText(info)
             else:
                 self.label_person_info.setText(_('not found'))
                 self.button_ok.setDisabled(True)
 
     def set_values_from_model(self):
-        if self.current_object.is_sportident():
-            if self.current_object.sportident_card:
-                self.item_sportident_card.setValue(int(self.current_object.sportident_card))
+        if self.current_object.is_punch():
+            if self.current_object.card_number:
+                self.item_sportident_card.setValue(int(self.current_object.card_number))
             self.splits.splits(self.current_object.splits)
             self.splits.show()
+        if self.current_object.created_at:
+            self.item_created_at.setTime(time_to_qtime(datetime.fromtimestamp(self.current_object.created_at)))
         if self.current_object.finish_time:
             self.item_finish.setTime(time_to_qtime(self.current_object.finish_time))
         if self.current_object.start_time is not None:
@@ -201,9 +210,9 @@ class ResultEditDialog(QDialog):
         result = self.current_object
         changed = False
 
-        if result.is_sportident():
-            if result.sportident_card != self.item_sportident_card.value():
-                result.sportident_card = self.item_sportident_card.value()
+        if result.is_punch():
+            if result.card_number != self.item_sportident_card.value():
+                result.card_number = self.item_sportident_card.value()
                 changed = True
 
             new_splits = self.splits.splits()
@@ -216,19 +225,19 @@ class ResultEditDialog(QDialog):
                 changed = True
             result.splits = new_splits
 
-        time = time_to_otime(self.item_finish.time())
-        if result.finish_time != time:
-            result.finish_time = time
+        time_ = time_to_otime(self.item_finish.time())
+        if result.finish_time != time_:
+            result.finish_time = time_
             changed = True
 
-        time = time_to_otime(self.item_start.time())
-        if result.start_time != time:
-            result.start_time = time
+        time_ = time_to_otime(self.item_start.time())
+        if result.start_time != time_:
+            result.start_time = time_
             changed = True
 
-        time = time_to_otime(self.item_penalty.time())
-        if result.penalty_time != time:
-            result.penalty_time = time
+        time_ = time_to_otime(self.item_penalty.time())
+        if result.penalty_time != time_:
+            result.penalty_time = time_
             changed = True
 
         if result.penalty_laps != self.item_penalty_laps.value():
@@ -241,9 +250,9 @@ class ResultEditDialog(QDialog):
             cur_bib = result.person.bib
 
         if new_bib == 0:
-            if result.person and result.is_sportident():
-                if result.person.sportident_card == result.sportident_card:
-                    result.person.sportident_card = 0
+            if result.person and result.is_punch():
+                if result.person.card_number == result.card_number:
+                    result.person.card_number = 0
             result.person = None
             changed = True
         elif cur_bib != new_bib:
@@ -251,11 +260,11 @@ class ResultEditDialog(QDialog):
             if new_person is not None:
                 assert isinstance(new_person, Person)
                 if result.person:
-                    if result.is_sportident():
-                        result.person.sportident_card = 0
+                    if result.is_punch():
+                        result.person.card_number = 0
                 result.person = new_person
-                if result.is_sportident():
-                    race().person_sportident_card(result.person, result.sportident_card)
+                if result.is_punch():
+                    race().person_card_number(result.person, result.card_number)
 
             GlobalAccess().get_main_window().get_result_table().model().init_cache()
             changed = True
@@ -285,7 +294,7 @@ class ResultEditDialog(QDialog):
             changed = True
 
         if changed:
-            if result.is_sportident():
+            if result.is_punch():
                 result.clear()
                 try:
                     ResultChecker.calculate_penalty(result)

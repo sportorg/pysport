@@ -17,6 +17,6 @@ class TestWinorient(unittest.TestCase):
         self.assertIsInstance(person.organization, Organization, 'Not organization')
         self.assertEqual(person.organization.name, 'УралГУФК, Челябинск', 'Organization name error')
         self.assertEqual(person.get_year(), 1995, 'Year error')
-        self.assertEqual(person.sportident_card, 1005404, 'Card number error')
+        self.assertEqual(person.card_number, 1005404, 'Card number error')
         self.assertEqual(person.comment, 'C:123', 'Comment error')
         self.assertEqual(person.qual, Qualification.MS, 'Qualification error')

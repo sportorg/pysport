@@ -64,7 +64,7 @@ def import_entry_list(file):
         if len(person_entry['race_numbers']):
             person.comment = 'C:' + ''.join(person_entry['race_numbers'])
         if person_entry['control_card']:
-            person.sportident_card = int(person_entry['control_card'])
+            person.card_number = int(person_entry['control_card'])
         if 'bib' in person_entry['person']['extensions'] and person_entry['person']['extensions']['bib']:
             person.bib = int(person_entry['person']['extensions']['bib'])
         if 'qual' in person_entry['person']['extensions'] and person_entry['person']['extensions']['qual']:

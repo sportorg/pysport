@@ -18,14 +18,16 @@ class NotEmptyException(Exception):
 
 
 class Limit:
-    BIB = 10000
-    PRICE = 100000000
+    BIB = 100000
+    PRICE = 100000000000
 
 
 class SystemType(Enum):
     NONE = 0
     MANUAL = 1
     SPORTIDENT = 2
+    SFR = 3
+    SPORTIDUINO = 4
 
     def __str__(self):
         return "%s" % self._name_
@@ -432,9 +434,9 @@ class Split(Model):
     def __init__(self):
         self.index = 0
         self.course_index = -1
-        self.code = ''
+        self.code = '0'
         self.days = 0
-        self.time = None  # type: OTime
+        self._time = None  # type: OTime
         self.leg_time = None  # type: OTime
         self.relative_time = None  # type: OTime
         self.leg_place = 0
@@ -443,6 +445,16 @@ class Split(Model):
         self.speed = ''
         self.length_leg = 0
         self.leader = None
+
+    @property
+    def time(self):
+        return self._time
+
+    @time.setter
+    def time(self, value):
+        if value is None:
+            value = OTime()
+        self._time = value
 
     def __eq__(self, other):
         assert isinstance(other, Split)
@@ -499,6 +511,11 @@ class Result:
         self.created_at = time.time()
         self.speed = ''
 
+        self.card_number = 0
+        self.splits = []  # type: List[Split]
+        self.__start_time = None
+        self.__finish_time = None
+
     def __str__(self):
         return str(self.system_type)
 
@@ -542,6 +559,9 @@ class Result:
             'place': self.place,
             'assigned_rank': self.assigned_rank.value,
 
+            'splits': [split.to_dict() for split in self.splits],
+            'sportident_card': self.card_number,
+
             'speed': self.speed,
             'scores': self.scores,
             'created_at': self.created_at,
@@ -572,6 +592,15 @@ class Result:
             self.created_at = float(data['created_at'])
         else:
             self.created_at = time.time()
+
+        if 'sportident_card' in data:
+            self.card_number = int(data['sportident_card'])
+        if 'splits' in data:
+            self.splits = []
+            for item in data['splits']:
+                split = Split()
+                split.update_data(item)
+                self.splits.append(split)
 
     def clear(self):
         pass
@@ -629,8 +658,17 @@ class Result:
     def is_status_ok(self):
         return self.status == ResultStatus.OK
 
+    def is_punch(self):
+        return self.is_sportident() or self.is_sfr() or self.is_sportiduino()
+
     def is_sportident(self):
         return self.system_type == SystemType.SPORTIDENT
+
+    def is_sfr(self):
+        return self.system_type == SystemType.SFR
+
+    def is_sportiduino(self):
+        return self.system_type == SystemType.SPORTIDUINO
 
     def is_manual(self):
         return self.system_type == SystemType.MANUAL
@@ -643,23 +681,16 @@ class ResultManual(Result):
 class ResultSportident(Result):
     system_type = SystemType.SPORTIDENT
 
-    def __init__(self):
-        super().__init__()
-        self.sportident_card = 0
-        self.splits = []  # type: List[Split]
-        self.__start_time = None
-        self.__finish_time = None
-
     def __repr__(self):
         splits = ''
         for split in self.splits:
             splits += '{} — {}\n'.format(split[0], split[1])
         person = self.person.full_name if self.person is not None else ''
         return "Card: {}\nStart: {}\nFinish: {}\nPerson: {}\nSplits:\n{}".format(
-            self.sportident_card, self.start_time, self.finish_time, person, splits)
+            self.card_number, self.start_time, self.finish_time, person, splits)
 
     def __eq__(self, other):
-        eq = self.sportident_card == other.sportident_card and super().__eq__(other)
+        eq = self.card_number == other.card_number and super().__eq__(other)
         if len(self.splits) == len(other.splits):
             for i in range(len(self.splits)):
                 eq = eq and self.splits[i].code == other.splits[i].code
@@ -667,22 +698,6 @@ class ResultSportident(Result):
         else:
             return False
         return eq
-
-    def to_dict(self):
-        data = super().to_dict()
-        data['splits'] = [split.to_dict() for split in self.splits]
-        data['sportident_card'] = self.sportident_card
-
-        return data
-
-    def update_data(self, data):
-        super().update_data(data)
-        self.sportident_card = int(data['sportident_card'])
-        self.splits = []
-        for item in data['splits']:
-            split = Split()
-            split.update_data(item)
-            self.splits.append(split)
 
     def get_start_time(self):
         obj = race()
@@ -833,6 +848,14 @@ class ResultSportident(Result):
         return False
 
 
+class ResultSFR(ResultSportident):
+    system_type = SystemType.SFR
+
+
+class ResultSportiduino(ResultSportident):
+    system_type = SystemType.SPORTIDUINO
+
+
 class Person(Model):
     def __init__(self):
         self.id = uuid.uuid4()
@@ -840,7 +863,7 @@ class Person(Model):
         self.surname = ''
         self.sex = Sex.MF
 
-        self.sportident_card = 0
+        self.card_number = 0
         self.bib = 0
 
         self.birth_date = None  # type: date
@@ -854,7 +877,7 @@ class Person(Model):
         self.qual = Qualification.NOT_QUALIFIED  # type: Qualification 'qualification, used in Russia only'
         self.is_out_of_competition = False  # e.g. 20-years old person, running in M12
         self.is_paid = False
-        self.is_rented_sportident_card = False
+        self.is_rented_card_number = False
         self.is_personal = False
         self.comment = ''
 
@@ -895,7 +918,7 @@ class Person(Model):
             'name': self.name,
             'surname': self.surname,
             'sex': self.sex.value,
-            'sportident_card': self.sportident_card,
+            'sportident_card': self.card_number,
             'bib': self.bib,
             'birth_date': str(self.birth_date) if self.birth_date else None,
             'year': self.get_year() if self.get_year() else '0',  # back compatibility with 1.0
@@ -909,7 +932,7 @@ class Person(Model):
             'qual': self.qual.value,
             'is_out_of_competition': self.is_out_of_competition,
             'is_paid': self.is_paid,
-            'is_rented_sportident_card': self.is_rented_sportident_card,
+            'is_rented_sportident_card': self.is_rented_card_number,
             'is_personal': self.is_personal,
             'comment': self.comment,
             'start_time': self.start_time.to_msec() if self.start_time else None,
@@ -920,7 +943,7 @@ class Person(Model):
         self.name = str(data['name'])
         self.surname = str(data['surname'])
         self.sex = Sex(int(data['sex']))
-        self.sportident_card = int(data['sportident_card'])
+        self.card_number = int(data['sportident_card'])
         self.bib = int(data['bib'])
         self.contact = []
         self.world_code = data['world_code']
@@ -928,7 +951,7 @@ class Person(Model):
         self.qual = Qualification.get_qual_by_code(data['qual'])
         self.is_out_of_competition = bool(data['is_out_of_competition'])
         self.is_paid = bool(data['is_paid'])
-        self.is_rented_sportident_card = bool(data['is_rented_sportident_card'])
+        self.is_rented_card_number = bool(data['is_rented_sportident_card'])
         self.is_personal = bool(data['is_personal'])
         self.comment = str(data['comment'])
         self.start_group = int(data['start_group'])
@@ -966,12 +989,12 @@ class RaceData(Model):
             return datetime.datetime.now().replace(second=0, microsecond=0)
         return self.end_datetime
 
-    def get_days(self, date=None):
+    def get_days(self, date_=None):
         if self.start_datetime is None:
             return 0
-        if date is None:
-            date = datetime.datetime.now()
-        return max((date - self.start_datetime).days, 0)
+        if date_ is None:
+            date_ = datetime.datetime.now()
+        return max((date_ - self.start_datetime).days, 0)
 
     def to_dict(self):
         return {
@@ -1008,6 +1031,8 @@ class Race(Model):
         'Result': Result,
         'ResultManual': ResultManual,
         'ResultSportident': ResultSportident,
+        'ResultSFR': ResultSFR,
+        'ResultSportiduino': ResultSportiduino,
         'Group': Group,
         'Course': Course,
         'Organization': Organization,
@@ -1034,6 +1059,8 @@ class Race(Model):
             'Result': self.results,
             'ResultManual': self.results,
             'ResultSportident': self.results,
+            'ResultSFR': self.results,
+            'ResultSportiduino': self.results,
             'Group': self.groups,
             'Course': self.courses,
             'Organization': self.organizations,
@@ -1085,7 +1112,7 @@ class Race(Model):
         if dict_obj['object'] == 'Person':
             obj.group = self.get_obj('Group', dict_obj['group_id'])
             obj.organization = self.get_obj('Organization', dict_obj['organization_id'])
-        elif dict_obj['object'] in ['Result', 'ResultManual', 'ResultSportident']:
+        elif dict_obj['object'] in ['Result', 'ResultManual', 'ResultSportident', 'ResultSFR', 'ResultSportiduino']:
             obj.person = self.get_obj('Person', dict_obj['person_id'])
         elif dict_obj['object'] == 'Group':
             obj.course = self.get_obj('Course', dict_obj['course_id'])
@@ -1110,16 +1137,16 @@ class Race(Model):
         else:
             return nvl_value
 
-    def get_days(self, date=None):
-        return self.data.get_days(date)
+    def get_days(self, date_=None):
+        return self.data.get_days(date_)
 
-    def person_sportident_card(self, person, number=0):
+    def person_card_number(self, person, number=0):
         assert isinstance(person, Person)
-        person.sportident_card = number
+        person.card_number = number
         for p in self.persons:
-            if p.sportident_card == number and p != person:
-                p.sportident_card = 0
-                p.is_rented_sportident_card = False
+            if p.card_number == number and p != person:
+                p.card_number = 0
+                p.is_rented_card_number = False
                 return p
 
     def delete_persons(self, indexes):
@@ -1207,13 +1234,10 @@ class Race(Model):
         course = self.find_course(result.person)  # type: Course
         return result.get_course_splits(course)
 
-    def new_result(self):
-        new_result = ResultManual()
-        new_result.days = self.get_days()
-        return new_result
-
-    def new_sportident_result(self):
-        new_result = ResultSportident()
+    def new_result(self, obj=None):
+        if obj is None:
+            obj = ResultSportident
+        new_result = obj()
         new_result.days = self.get_days()
         return new_result
 
@@ -1287,10 +1311,9 @@ class Race(Model):
         if add:
             self.add_new_result(result)
 
-    def clear_sportident_results(self):
+    def clear_results(self):
         for result in self.results:
-            if result.is_sportident():
-                result.clear()
+            result.clear()
 
     def is_relay(self):
         if self.data.race_type == RaceType.RELAY:

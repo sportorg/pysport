@@ -131,7 +131,7 @@ class MainWindow(QMainWindow):
 
         Teamwork().set_call(self.teamwork)
         SIReaderClient().set_call(self.add_sportident_result_from_sireader)
-        SportiduinoClient().set_call(self.add_sportident_result_from_sireader)
+        SportiduinoClient().set_call(self.add_sportiduino_result_from_reader)
         SFRReaderClient().set_call(self.add_sfr_result_from_reader)
 
         ServiceListenerThread().interval.connect(self.interval)
@@ -408,11 +408,11 @@ class MainWindow(QMainWindow):
                             Sound().fail()
             else:
                 for person in race().persons:
-                    if not person.sportident_card:
-                        old_person = race().person_sportident_card(person, result.sportident_card)
+                    if not person.card_number:
+                        old_person = race().person_card_number(person, result.card_number)
                         if old_person is not None:
                             Teamwork().send(old_person.to_dict())
-                        person.is_rented_sportident_card = True
+                        person.is_rented_card_number = True
                         Teamwork().send(person.to_dict())
                         break
             self.refresh()
@@ -420,6 +420,9 @@ class MainWindow(QMainWindow):
             logging.error(str(e))
 
     def add_sfr_result_from_reader(self, result):
+        self.add_sportident_result_from_sireader(result)
+
+    def add_sportiduino_result_from_reader(self, result):
         self.add_sportident_result_from_sireader(result)
 
     def teamwork(self, command):

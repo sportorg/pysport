@@ -482,4 +482,4 @@ def copy_bib_to_card_number():
     obj = race()
     for person in obj.persons:
         if person.bib:
-            person.sportident_card = person.bib
+            person.card_number = person.bib

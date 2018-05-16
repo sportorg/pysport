@@ -168,11 +168,6 @@ class Widget(QtWidgets.QWidget):
         if result.person:
             course = race().find_course(result.person)
 
-        if not result.is_sportident():
-            return
-
-        assert isinstance(result, ResultSportident)
-
         control_codes = []
         is_highlight = True
         if course:
