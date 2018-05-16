@@ -260,7 +260,7 @@ class EntryEditDialog(QDialog):
         self.item_paid.setChecked(self.current_object.is_paid)
         self.item_paid.setChecked(self.current_object.is_paid)
         self.item_personal.setChecked(self.current_object.is_personal)
-        self.item_rented.setChecked(self.current_object.is_rented_card_number)
+        self.item_rented.setChecked(self.current_object.is_rented_card)
 
         self.item_comment.setText(self.current_object.comment)
 
@@ -325,8 +325,8 @@ class EntryEditDialog(QDialog):
             person.is_paid = self.item_paid.isChecked()
             changed = True
 
-        if person.is_rented_card_number != self.item_rented.isChecked():
-            person.is_rented_card_number = self.item_rented.isChecked()
+        if person.is_rented_card != self.item_rented.isChecked():
+            person.is_rented_card = self.item_rented.isChecked()
             changed = True
 
         if person.is_personal != self.item_personal.isChecked():

@@ -250,7 +250,7 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
             ret.append('')
         ret.append(person.start_group)
         ret.append(person.card_number)
-        ret.append(_('Rented card') if person.is_rented_card_number else _('Rented stub'))
+        ret.append(_('Rented card') if person.is_rented_card else _('Rented stub'))
         ret.append(person.comment)
         ret.append(str(person.world_code) if person.world_code else '')
         ret.append(str(person.national_code) if person.national_code else '')
@@ -297,7 +297,6 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
         first_name = ''
         last_name = ''
         bib = 0
-        sportident_card = str(result.card_number) if result.card_number else ''
         if person:
             first_name = person.name
             last_name = person.surname
@@ -323,7 +322,7 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
             group,
             team,
             bib,
-            sportident_card,
+            i.card_number,
             start,
             finish,
             i.get_result(),

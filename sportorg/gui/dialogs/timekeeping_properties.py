@@ -231,14 +231,14 @@ class TimekeepingPropertiesDialog(QDialog):
 
     def set_values_from_model(self):
         cur_race = race()
-        zero_time = cur_race.get_setting('sportident_zero_time', (8, 0, 0))
-        start_source = cur_race.get_setting('sportident_start_source', 'protocol')
-        start_cp_number = cur_race.get_setting('sportident_start_cp_number', 31)
-        finish_source = cur_race.get_setting('sportident_finish_source', 'station')
-        finish_cp_number = cur_race.get_setting('sportident_finish_cp_number', 90)
-        assign_chip_reading = cur_race.get_setting('sportident_assign_chip_reading', 'off')
-        assignment_mode = cur_race.get_setting('sportident_assignment_mode', False)
-        si_port = cur_race.get_setting('sportident_port', '')
+        zero_time = cur_race.get_setting('system_zero_time', (8, 0, 0))
+        start_source = cur_race.get_setting('system_start_source', 'protocol')
+        start_cp_number = cur_race.get_setting('system_start_cp_number', 31)
+        finish_source = cur_race.get_setting('system_finish_source', 'station')
+        finish_cp_number = cur_race.get_setting('system_finish_cp_number', 90)
+        assign_chip_reading = cur_race.get_setting('system_assign_chip_reading', 'off')
+        assignment_mode = cur_race.get_setting('system_assignment_mode', False)
+        si_port = cur_race.get_setting('system_port', '')
 
         self.item_zero_time.setTime(QTime(zero_time[0], zero_time[1]))
 
@@ -367,10 +367,10 @@ class TimekeepingPropertiesDialog(QDialog):
         start_cp_number = self.item_start_cp_value.value()
         finish_cp_number = self.item_finish_cp_value.value()
 
-        old_start_source = obj.get_setting('sportident_start_source', 'protocol')
-        old_start_cp_number = obj.get_setting('sportident_start_cp_number', 31)
-        old_finish_source = obj.get_setting('sportident_finish_source', 'station')
-        old_finish_cp_number = obj.get_setting('sportident_finish_cp_number', 90)
+        old_start_source = obj.get_setting('system_start_source', 'protocol')
+        old_start_cp_number = obj.get_setting('system_start_cp_number', 31)
+        old_finish_source = obj.get_setting('system_finish_source', 'station')
+        old_finish_cp_number = obj.get_setting('system_finish_cp_number', 90)
 
         if old_start_source != start_source or old_finish_source != finish_source:
             changed = True
@@ -378,17 +378,17 @@ class TimekeepingPropertiesDialog(QDialog):
             changed = True
             race().clear_results()
 
-        obj.set_setting('sportident_port', self.item_si_port.currentText())
+        obj.set_setting('system_port', self.item_si_port.currentText())
 
-        obj.set_setting('sportident_start_source', start_source)
-        obj.set_setting('sportident_finish_source', finish_source)
+        obj.set_setting('system_start_source', start_source)
+        obj.set_setting('system_finish_source', finish_source)
 
-        obj.set_setting('sportident_start_cp_number', start_cp_number)
-        obj.set_setting('sportident_finish_cp_number', finish_cp_number)
+        obj.set_setting('system_start_cp_number', start_cp_number)
+        obj.set_setting('system_finish_cp_number', finish_cp_number)
 
-        obj.set_setting('sportident_assign_chip_reading', assign_chip_reading)
+        obj.set_setting('system_assign_chip_reading', assign_chip_reading)
 
-        obj.set_setting('sportident_assignment_mode', self.assignment_mode.isChecked())
+        obj.set_setting('system_assignment_mode', self.assignment_mode.isChecked())
 
         # result processing
         rp_mode = 'time'

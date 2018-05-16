@@ -560,7 +560,7 @@ class Result:
             'assigned_rank': self.assigned_rank.value,
 
             'splits': [split.to_dict() for split in self.splits],
-            'sportident_card': self.card_number,
+            'card_number': self.card_number,
 
             'speed': self.speed,
             'scores': self.scores,
@@ -593,8 +593,8 @@ class Result:
         else:
             self.created_at = time.time()
 
-        if 'sportident_card' in data:
-            self.card_number = int(data['sportident_card'])
+        if 'card_number' in data:
+            self.card_number = int(data['card_number'])
         if 'splits' in data:
             self.splits = []
             for item in data['splits']:
@@ -701,7 +701,7 @@ class ResultSportident(Result):
 
     def get_start_time(self):
         obj = race()
-        start_source = obj.get_setting('sportident_start_source', 'protocol')
+        start_source = obj.get_setting('system_start_source', 'protocol')
         if start_source == 'protocol':
             if self.person and self.person.start_time and self.person.start_time.to_msec():
                 return self.person.start_time
@@ -714,12 +714,12 @@ class ResultSportident(Result):
             if self.__start_time is not None:
                 return self.__start_time
             if len(self.splits):
-                start_cp_number = obj.get_setting('sportident_start_cp_number', 31)
+                start_cp_number = obj.get_setting('system_start_cp_number', 31)
                 if start_cp_number == 0:
                     self.__start_time = self.splits[0].time
                     return self.__start_time
                 for split in self.splits:
-                    if split.code == start_cp_number:
+                    if split.code == str(start_cp_number):
                         self.__start_time = split.time
                         return self.__start_time
         elif start_source == 'gate':
@@ -729,7 +729,7 @@ class ResultSportident(Result):
 
     def get_finish_time(self):
         obj = race()
-        finish_source = obj.get_setting('sportident_finish_source', 'station')
+        finish_source = obj.get_setting('system_finish_source', 'station')
         if finish_source == 'station':
             if self.finish_time:
                 return self.finish_time
@@ -737,12 +737,12 @@ class ResultSportident(Result):
             if self.__finish_time is not None:
                 return self.__finish_time
             if len(self.splits):
-                finish_cp_number = obj.get_setting('sportident_finish_cp_number', 90)
+                finish_cp_number = obj.get_setting('system_finish_cp_number', 90)
                 if finish_cp_number == -1:
                     self.__finish_time = self.splits[-1].time
                     return self.__finish_time
                 for split in reversed(self.splits):
-                    if split.code == finish_cp_number:
+                    if split.code == str(finish_cp_number):
                         self.__finish_time = split.time
                         return self.__finish_time
         elif finish_source == 'beam':
@@ -877,7 +877,7 @@ class Person(Model):
         self.qual = Qualification.NOT_QUALIFIED  # type: Qualification 'qualification, used in Russia only'
         self.is_out_of_competition = False  # e.g. 20-years old person, running in M12
         self.is_paid = False
-        self.is_rented_card_number = False
+        self.is_rented_card = False
         self.is_personal = False
         self.comment = ''
 
@@ -918,7 +918,7 @@ class Person(Model):
             'name': self.name,
             'surname': self.surname,
             'sex': self.sex.value,
-            'sportident_card': self.card_number,
+            'card_number': self.card_number,
             'bib': self.bib,
             'birth_date': str(self.birth_date) if self.birth_date else None,
             'year': self.get_year() if self.get_year() else '0',  # back compatibility with 1.0
@@ -932,7 +932,7 @@ class Person(Model):
             'qual': self.qual.value,
             'is_out_of_competition': self.is_out_of_competition,
             'is_paid': self.is_paid,
-            'is_rented_sportident_card': self.is_rented_card_number,
+            'is_rented_card': self.is_rented_card,
             'is_personal': self.is_personal,
             'comment': self.comment,
             'start_time': self.start_time.to_msec() if self.start_time else None,
@@ -943,7 +943,7 @@ class Person(Model):
         self.name = str(data['name'])
         self.surname = str(data['surname'])
         self.sex = Sex(int(data['sex']))
-        self.card_number = int(data['sportident_card'])
+        self.card_number = int(data['card_number'])
         self.bib = int(data['bib'])
         self.contact = []
         self.world_code = data['world_code']
@@ -951,7 +951,7 @@ class Person(Model):
         self.qual = Qualification.get_qual_by_code(data['qual'])
         self.is_out_of_competition = bool(data['is_out_of_competition'])
         self.is_paid = bool(data['is_paid'])
-        self.is_rented_card_number = bool(data['is_rented_sportident_card'])
+        self.is_rented_card = bool(data['is_rented_card'])
         self.is_personal = bool(data['is_personal'])
         self.comment = str(data['comment'])
         self.start_group = int(data['start_group'])
@@ -1146,7 +1146,7 @@ class Race(Model):
         for p in self.persons:
             if p.card_number == number and p != person:
                 p.card_number = 0
-                p.is_rented_card_number = False
+                p.is_rented_card = False
                 return p
 
     def delete_persons(self, indexes):

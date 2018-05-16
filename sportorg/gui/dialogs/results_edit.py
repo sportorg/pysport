@@ -49,8 +49,8 @@ class ResultEditDialog(QDialog):
         self.item_created_at.setDisplayFormat(self.time_format)
         self.item_created_at.setReadOnly(True)
 
-        self.item_sportident_card = QSpinBox()
-        self.item_sportident_card.setMaximum(9999999)
+        self.item_card_number = QSpinBox()
+        self.item_card_number.setMaximum(9999999)
 
         self.item_bib = QSpinBox()
         self.item_bib.setMaximum(Limit.BIB)
@@ -92,7 +92,7 @@ class ResultEditDialog(QDialog):
 
         self.layout.addRow(QLabel(_('Created at')), self.item_created_at)
         if self.current_object.is_punch():
-            self.layout.addRow(QLabel(_('Card')), self.item_sportident_card)
+            self.layout.addRow(QLabel(_('Card')), self.item_card_number)
         self.layout.addRow(QLabel(_('Bib')), self.item_bib)
         self.layout.addRow(QLabel(''), self.label_person_info)
         if more24:
@@ -110,8 +110,8 @@ class ResultEditDialog(QDialog):
         self.layout.addRow(self.radio_dsq, self.item_status_comment)
 
         if self.current_object.is_punch():
-            start_source = race().get_setting('sportident_start_source', 'protocol')
-            finish_source = race().get_setting('sportident_finish_source', 'station')
+            start_source = race().get_setting('system_start_source', 'protocol')
+            finish_source = race().get_setting('system_finish_source', 'station')
             if start_source == 'protocol' or start_source == 'cp':
                 self.item_start.setDisabled(True)
             if finish_source == 'cp':
@@ -165,7 +165,7 @@ class ResultEditDialog(QDialog):
     def set_values_from_model(self):
         if self.current_object.is_punch():
             if self.current_object.card_number:
-                self.item_sportident_card.setValue(int(self.current_object.card_number))
+                self.item_card_number.setValue(int(self.current_object.card_number))
             self.splits.splits(self.current_object.splits)
             self.splits.show()
         if self.current_object.created_at:
@@ -211,8 +211,8 @@ class ResultEditDialog(QDialog):
         changed = False
 
         if result.is_punch():
-            if result.card_number != self.item_sportident_card.value():
-                result.card_number = self.item_sportident_card.value()
+            if result.card_number != self.item_card_number.value():
+                result.card_number = self.item_card_number.value()
                 changed = True
 
             new_splits = self.splits.splits()

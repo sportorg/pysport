@@ -140,7 +140,7 @@ class EventPropertiesDialog(QDialog):
         obj.data.race_type = RaceType(self.item_type.currentIndex())
         obj.data.relay_leg_count = self.item_relay_legs.value()
 
-        obj.set_setting('sportident_zero_time', (
+        obj.set_setting('system_zero_time', (
             start_date.hour,
             start_date.minute,
             0

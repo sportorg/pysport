@@ -383,7 +383,7 @@ class MainWindow(QMainWindow):
 
     def add_sportident_result_from_sireader(self, result):
         try:
-            assignment_mode = race().get_setting('sportident_assignment_mode', False)
+            assignment_mode = race().get_setting('system_assignment_mode', False)
             if not assignment_mode:
                 self.clear_filters(remove_condition=False)
                 if ResultSportidentGeneration(result).add_result():
@@ -412,7 +412,7 @@ class MainWindow(QMainWindow):
                         old_person = race().person_card_number(person, result.card_number)
                         if old_person is not None:
                             Teamwork().send(old_person.to_dict())
-                        person.is_rented_card_number = True
+                        person.is_rented_card = True
                         Teamwork().send(person.to_dict())
                         break
             self.refresh()
@@ -508,7 +508,7 @@ class MainWindow(QMainWindow):
                 self.add_recent_file(self.file)
                 self.init_model()
             except Exception as e:
-                logging.error(str(e))
+                logging.exception(str(e))
                 self.delete_from_recent_files(file_name)
                 QMessageBox.warning(self, _('Error'), _('Cannot read file, format unknown') + ': ' + file_name)
 
