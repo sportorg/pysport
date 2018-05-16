@@ -103,9 +103,11 @@ class TimekeepingPropertiesDialog(QDialog):
         self.rp_time_radio = QRadioButton(_('by time'))
         self.result_proc_layout.addRow(self.rp_time_radio)
         self.rp_scores_radio = QRadioButton(_('by scores'))
+        self.rp_scores_radio.setDisabled(True)  # TODO
         self.result_proc_layout.addRow(self.rp_scores_radio)
 
         self.rp_scores_group = QGroupBox()
+        self.rp_scores_group.setDisabled(True)  # TODO
         self.rp_scores_layout = QFormLayout(self.rp_scores_group)
         self.rp_rogain_scores_radio = QRadioButton(_('rogain scores'))
         self.rp_scores_layout.addRow(self.rp_rogain_scores_radio)
@@ -132,8 +134,10 @@ class TimekeepingPropertiesDialog(QDialog):
         self.mr_laps_radio = QRadioButton(_('penalty laps'))
         self.mr_layout.addRow(self.mr_laps_radio)
         self.mr_counting_lap_check = QCheckBox(_('counting lap'))
+        self.mr_counting_lap_check.setDisabled(True)  # TODO
         self.mr_layout.addRow(self.mr_counting_lap_check)
         self.mr_lap_station_check = QCheckBox(_('lap station'))
+        self.mr_lap_station_check.setDisabled(True)  # TODO
         self.mr_lap_station_edit = QSpinBox()
         self.mr_lap_station_edit.setMaximumWidth(50)
         self.mr_layout.addRow(self.mr_lap_station_check, self.mr_lap_station_edit)
@@ -164,49 +168,6 @@ class TimekeepingPropertiesDialog(QDialog):
         self.scores_layout.addRow(self.scores_formula_hint)
         self.scores_tab.setLayout(self.scores_layout)
 
-        # team results
-        """
-        Team result calculation
-           quantity of persons[ Edit ]
-           grouping
-             [ x ] organization grouping
-             [   ] region grouping
-           sum
-             [ x ] scores
-             [   ] time
-             [   ] places
-        """
-        self.team_result_tab = QWidget()
-        self.team_layout = QFormLayout()
-        self.team_qty_label = QLabel(_('Persons in team'))
-        self.team_qty_edit = QSpinBox()
-        self.team_qty_edit.setMaximumWidth(50)
-        self.team_layout.addRow(self.team_qty_label, self.team_qty_edit)
-
-        self.team_group = QGroupBox()
-        self.team_group.setTitle(_('Grouping'))
-        self.team_group_organization = QRadioButton(_('organization grouping'))
-        self.team_group_region = QRadioButton(_('region grouping'))
-        self.team_group_layout = QFormLayout()
-        self.team_group_layout.addRow(self.team_group_organization)
-        self.team_group_layout.addRow(self.team_group_region)
-        self.team_group.setLayout(self.team_group_layout)
-        self.team_layout.addRow(self.team_group)
-
-        self.team_sum = QGroupBox()
-        self.team_sum.setTitle(_('Sum'))
-        self.team_sum_scores = QRadioButton(_('scores'))
-        self.team_sum_time = QRadioButton(_('time'))
-        self.team_sum_places = QRadioButton(_('places'))
-        self.team_sum_layout = QFormLayout()
-        self.team_sum_layout.addRow(self.team_sum_scores)
-        self.team_sum_layout.addRow(self.team_sum_time)
-        self.team_sum_layout.addRow(self.team_sum_places)
-        self.team_sum.setLayout(self.team_sum_layout)
-        self.team_layout.addRow(self.team_sum)
-
-        self.team_result_tab.setLayout(self.team_layout)
-
         # time settings
         self.time_settings_tab = QWidget()
         self.time_settings_layout = QFormLayout()
@@ -230,7 +191,6 @@ class TimekeepingPropertiesDialog(QDialog):
 
         self.tab_widget.addTab(self.timekeeping_tab, _('SPORTident (Sportiduino) settings'))
         self.tab_widget.addTab(self.result_proc_tab, _('Result processing'))
-        self.tab_widget.addTab(self.team_result_tab, _('Team results'))
         self.tab_widget.addTab(self.scores_tab, _('Scores'))
         self.tab_widget.addTab(self.marked_route_tab, _('Penalty calculation'))
         self.tab_widget.addTab(self.time_settings_tab, _('Time settings'))
@@ -370,25 +330,6 @@ class TimekeepingPropertiesDialog(QDialog):
         self.scores_array_edit.setText(scores_array)
         self.scores_formula_edit.setText(scores_formula)
 
-        # team results
-        team_group_mode = obj.get_setting('team_group_mode', 'organization')
-        team_sum_mode = obj.get_setting('team_sum_mode', 'scores')
-        team_qty = obj.get_setting('team_qty', 4)
-
-        if team_group_mode == 'organization':
-            self.team_group_organization.setChecked(True)
-        else:
-            self.team_group_region.setChecked(True)
-
-        if team_sum_mode == 'scores':
-            self.team_sum_scores.setChecked(True)
-        elif team_sum_mode == 'time':
-            self.team_sum_time.setChecked(True)
-        else:
-            self.team_sum_places.setChecked(True)
-
-        self.team_qty_edit.setValue(team_qty)
-
         # time settings
         time_accuracy = obj.get_setting('time_accuracy', 0)
         time_format_24 = obj.get_setting('time_format_24', 'less24')
@@ -500,23 +441,6 @@ class TimekeepingPropertiesDialog(QDialog):
         obj.set_setting('scores_mode', scores_mode)
         obj.set_setting('scores_array', scores_array)
         obj.set_setting('scores_formula', scores_formula)
-
-        # team result
-        team_group_mode = 'organization'
-        if self.team_group_region.isChecked():
-            team_group_mode = 'region'
-
-        team_sum_mode = 'scores'
-        if self.team_sum_places.isChecked():
-            team_sum_mode = 'places'
-        elif self.team_sum_time.isChecked():
-            team_sum_mode = 'time'
-
-        team_qty = self.team_qty_edit.value()
-
-        obj.set_setting('team_group_mode', team_group_mode)
-        obj.set_setting('team_sum_mode', team_sum_mode)
-        obj.set_setting('team_qty', team_qty)
 
         # time settings
         time_accuracy = self.time_settings_accuracy_edit.value()
