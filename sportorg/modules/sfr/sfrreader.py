@@ -193,7 +193,7 @@ class SFRReaderClient(object):
 
     @staticmethod
     def get_start_time():
-        start_time = memory.race().get_setting('sportident_zero_time', (8, 0, 0))
+        start_time = memory.race().get_setting('system_zero_time', (8, 0, 0))
         return datetime.datetime.today().replace(
             hour=start_time[0],
             minute=start_time[1],

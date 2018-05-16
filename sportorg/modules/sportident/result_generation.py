@@ -10,7 +10,7 @@ class ResultSportidentGeneration:
         assert result, Result
         self._result = result
         self._person = None
-        self.assign_chip_reading = race().get_setting('sportident_assign_chip_reading', 'off')
+        self.assign_chip_reading = race().get_setting('system_assign_chip_reading', 'off')
 
     def _add_result_to_race(self):
         race().add_result(self._result)

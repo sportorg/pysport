@@ -179,5 +179,5 @@ class SportiduinoClient(object):
         self.start()
 
     def choose_port(self):
-        return memory.race().get_setting('sportident_port', None)
+        return memory.race().get_setting('system_port', None)
 
