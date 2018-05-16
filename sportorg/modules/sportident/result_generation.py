@@ -27,7 +27,7 @@ class ResultSportidentGeneration:
         if self._person is not None:
             return True
         for person in race().persons:
-            if person.sportident_card and person.sportident_card == self._result.sportident_card:
+            if person.card_number and person.card_number == self._result.card_number:
                 self._person = person
                 return True
 
@@ -37,13 +37,13 @@ class ResultSportidentGeneration:
         for result in race().results:
             if result is None:
                 continue
-            if result.sportident_card == self._result.sportident_card:
+            if result.card_number == self._result.card_number:
                 return True
         return False
 
     def _bib_dialog(self):
         try:
-            bib_dialog = BibDialog('{}'.format(self._result.sportident_card))
+            bib_dialog = BibDialog('{}'.format(self._result.card_number))
             bib_dialog.exec()
             self._person = bib_dialog.get_person()
             if not self._person:
@@ -78,11 +78,11 @@ class ResultSportidentGeneration:
 
             self._add_result_to_race()
 
-            logging.info('Sportident {}'.format(self._result))
+            logging.info('{} {}'.format(self._result.system_type, self._result))
         else:
             if self._find_person_by_result():
                 self._result.person = self._person
-                race().person_sportident_card(self._person, self._result.sportident_card)
+                race().person_card_number(self._person, self._result.card_number)
                 self._add_result()
             else:
                 self._no_person()

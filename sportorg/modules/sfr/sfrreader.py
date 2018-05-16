@@ -94,8 +94,8 @@ class ResultThread(QThread):
 
     @staticmethod
     def _get_result(card_data):
-        result = memory.race().new_sportident_result()
-        result.sportident_card = card_data['bib']  # SFR has no card id, only bib
+        result = memory.race().new_result(memory.ResultSFR)
+        result.card_number = card_data['bib']  # SFR has no card id, only bib
 
         for i in range(len(card_data['punches'])):
             t = card_data['punches'][i][1]

@@ -208,11 +208,11 @@ class EntryEditDialog(QDialog):
         if number:
             person = None
             for _p in race().persons:
-                if _p.sportident_card and _p.sportident_card == number:
+                if _p.card_number and _p.card_number == number:
                     person = _p
                     break
             if person:
-                if person.sportident_card == self.current_object.sportident_card:
+                if person.card_number == self.current_object.card_number:
                     self.button_ok.setEnabled(True)
                     return
                 self.button_ok.setDisabled(True)
@@ -253,14 +253,14 @@ class EntryEditDialog(QDialog):
         if self.current_object.start_group is not None:
             self.item_start_group.setValue(int(self.current_object.start_group))
 
-        if self.current_object.sportident_card:
-            self.item_card.setValue(self.current_object.sportident_card)
+        if self.current_object.card_number:
+            self.item_card.setValue(self.current_object.card_number)
 
         self.item_out_of_competition.setChecked(self.current_object.is_out_of_competition)
         self.item_paid.setChecked(self.current_object.is_paid)
         self.item_paid.setChecked(self.current_object.is_paid)
         self.item_personal.setChecked(self.current_object.is_personal)
-        self.item_rented.setChecked(self.current_object.is_rented_sportident_card)
+        self.item_rented.setChecked(self.current_object.is_rented_card_number)
 
         self.item_comment.setText(self.current_object.comment)
 
@@ -312,9 +312,9 @@ class EntryEditDialog(QDialog):
             person.start_group = self.item_start_group.value()
             changed = True
 
-        if (not person.sportident_card or int(person.sportident_card) != self.item_card.value()) \
+        if (not person.card_number or int(person.card_number) != self.item_card.value()) \
                 and self.item_card.value:
-            race().person_sportident_card(person, self.item_card.value())
+            race().person_card_number(person, self.item_card.value())
             changed = True
 
         if person.is_out_of_competition != self.item_out_of_competition.isChecked():
@@ -325,8 +325,8 @@ class EntryEditDialog(QDialog):
             person.is_paid = self.item_paid.isChecked()
             changed = True
 
-        if person.is_rented_sportident_card != self.item_rented.isChecked():
-            person.is_rented_sportident_card = self.item_rented.isChecked()
+        if person.is_rented_card_number != self.item_rented.isChecked():
+            person.is_rented_card_number = self.item_rented.isChecked()
             changed = True
 
         if person.is_personal != self.item_personal.isChecked():

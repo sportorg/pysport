@@ -8,7 +8,7 @@ from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
 from sportorg.models.constant import StatusComments
-from sportorg.models.memory import race, ResultStatus, find
+from sportorg.models.memory import race, ResultStatus, find, ResultManual
 from sportorg.modules.teamwork import Teamwork
 
 
@@ -76,7 +76,7 @@ class NotStartDialog(QDialog):
             if number not in old_numbers:
                 person = find(obj.persons, bib=number)
                 if person:
-                    result = race().new_sportident_result()
+                    result = race().new_result(ResultManual)
                     result.person = person
                     result.status = ResultStatus.DID_NOT_START
                     result.status_comment = status_comment

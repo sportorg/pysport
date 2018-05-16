@@ -107,7 +107,7 @@ class WinOrientBinary:
                     man.qualification = Qualification.MSMK.value  # Convert ZMS to MSMK
                 new_person.qual = Qualification.get_qual_by_code(man.qualification)
             new_person.set_year(man.year)
-            race().person_sportident_card(new_person, man.si_card)
+            race().person_card_number(new_person, man.si_card)
             new_person.is_out_of_competition = man.is_not_qualified
             new_person.comment = man.comment
             new_person.start_group = man.start_group
@@ -132,7 +132,7 @@ class WinOrientBinary:
                 result = ResultSportident()
                 result.person = new_person
 
-                result.sportident_card = int(man.si_card)
+                result.card_number = int(man.si_card)
                 result.start_time = int_to_otime(man.start)
                 result.finish_time = int_to_otime(fin.time)
                 result.penalty_time = OTime(sec = man.penalty_second)
@@ -233,8 +233,8 @@ class WinOrientBinary:
 
             if man.get_year():
                 new_person.year = man.get_year()
-            if man.sportident_card:
-                new_person.si_card = int(man.sportident_card)
+            if man.card_number:
+                new_person.si_card = int(man.card_number)
                 new_person.is_own_card = 2
             new_person.is_not_qualified = man.is_out_of_competition
             new_person.comment = man.comment
@@ -274,8 +274,8 @@ class WinOrientBinary:
 
                 if result.splits:
                     new_chip = WDBChip()
-                    if man.sportident_card:
-                        new_chip.id = int(man.sportident_card)
+                    if man.card_number:
+                        new_chip.id = int(man.card_number)
                     new_chip.start = WDBPunch(time=time_to_int(result.start_time))
                     new_chip.finish = WDBPunch(time=time_to_int(result.finish_time))
 

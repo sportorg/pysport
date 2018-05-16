@@ -189,7 +189,7 @@ class TimekeepingPropertiesDialog(QDialog):
 
         self.time_settings_tab.setLayout(self.time_settings_layout)
 
-        self.tab_widget.addTab(self.timekeeping_tab, _('SPORTident (Sportiduino) settings'))
+        self.tab_widget.addTab(self.timekeeping_tab, _('SPORTident (Sportiduino, ...) settings'))
         self.tab_widget.addTab(self.result_proc_tab, _('Result processing'))
         self.tab_widget.addTab(self.scores_tab, _('Scores'))
         self.tab_widget.addTab(self.marked_route_tab, _('Penalty calculation'))
@@ -376,7 +376,7 @@ class TimekeepingPropertiesDialog(QDialog):
             changed = True
         if old_start_cp_number != start_cp_number or old_finish_cp_number != finish_cp_number:
             changed = True
-            race().clear_sportident_results()
+            race().clear_results()
 
         obj.set_setting('sportident_port', self.item_si_port.currentText())
 

@@ -251,8 +251,8 @@ def get_property(person, key):
         if result and result.penalty_laps:
             return str(result.penalty_laps)
     elif key == _('Card number'):
-        if person.sportident_card:
-            return str(person.sportident_card)
+        if person.card_number:
+            return str(person.card_number)
     elif key == _('Group'):
         if person.group:
             return person.group.name
@@ -291,7 +291,7 @@ def set_property(person, key, value):
         if result:
             result.penalty_laps = int(value)
     elif key == _('Card number'):
-        race().person_sportident_card(person, int(value))
+        race().person_card_number(person, int(value))
     elif key == _('Group'):
         group = race().find_group(value)
         if(group):

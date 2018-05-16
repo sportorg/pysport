@@ -109,7 +109,7 @@ class OrgeoClient(metaclass=Singleton):
             'name': person.full_name,
             'organization': person.organization.name if person.organization else '',
             # 'country_code': 'RUS',
-            'card_number': person.sportident_card,
+            'card_number': person.card_number,
             'national_code': None,
             'world_code': None,
             'out_of_competition': person.is_out_of_competition,
@@ -126,26 +126,25 @@ class OrgeoClient(metaclass=Singleton):
             data['start'] = result.get_start_time().to_sec()
             data['result_ms'] = round(result.get_result_otime().to_msec() / 10)  # 1/100 sec - proprietary format
             data['result_status'] = str(result.status)
-            if result.is_sportident():
-                if len(result.splits):
-                    data['splits'] = []
-                    splits = race().get_course_splits(result)
-                    for i in range(len(splits)):
-                        """
-                        Orgeo Splits format: 
-                        Option 	Type 	Description
-                        code 	string 	CP code
-                        time 	int 	seconds of current split - time from previous CP to this CP
-                        """
-                        current_split = {}
-                        current_split['code'] = splits[i].code
-                        end_time = splits[i].time
-                        if i > 0:
-                            start_time = splits[i - 1].time
-                        else:
-                            start_time = result.get_start_time()
-                        current_split['time'] = (end_time - start_time).to_sec()
-                        data['splits'].append(current_split)
+            if len(result.splits):
+                data['splits'] = []
+                splits = race().get_course_splits(result)
+                for i in range(len(splits)):
+                    """
+                    Orgeo Splits format: 
+                    Option 	Type 	Description
+                    code 	string 	CP code
+                    time 	int 	seconds of current split - time from previous CP to this CP
+                    """
+                    current_split = {}
+                    current_split['code'] = splits[i].code
+                    end_time = splits[i].time
+                    if i > 0:
+                        start_time = splits[i - 1].time
+                    else:
+                        start_time = result.get_start_time()
+                    current_split['time'] = (end_time - start_time).to_sec()
+                    data['splits'].append(current_split)
 
         return data
 

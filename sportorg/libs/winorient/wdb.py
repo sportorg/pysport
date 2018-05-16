@@ -94,7 +94,10 @@ class WDBPunch:
 
     def get_bytes(self):
         byteorder = get_wdb_byteorder()
-        return self.code.to_bytes(4, byteorder) + self.time.to_bytes(4, byteorder)
+        code = 0
+        if str(self.code).isdigit():
+            code = int(self.code)
+        return code.to_bytes(4, byteorder) + self.time.to_bytes(4, byteorder)
 
 
 class WDBFinish:

@@ -53,11 +53,6 @@ class ResultChecker:
         if person.group is None:
             return
 
-        if not result.is_sportident():
-            return
-
-        assert isinstance(result, ResultSportident)
-
         course = race().find_course(person)
         if not course:
             return

@@ -41,34 +41,33 @@ class PersonSplits(object):
         if self.course.length:
             self.result.speed = get_speed_min_per_km(self.result.get_result_otime(), self.course.length)
 
-        if self.result.is_sportident():
-            while split_index < len(self.result.splits):
-                cur_split = self.result.splits[split_index]
+        while split_index < len(self.result.splits):
+            cur_split = self.result.splits[split_index]
 
-                cur_split.index = split_index
-                cur_split.relative_time = cur_split.time - start_time
+            cur_split.index = split_index
+            cur_split.relative_time = cur_split.time - start_time
 
-                if course_code == cur_split.code:
-                    cur_split.leg_time = cur_split.time - leg_start_time
-                    leg_start_time = cur_split.time
+            if course_code == cur_split.code:
+                cur_split.leg_time = cur_split.time - leg_start_time
+                leg_start_time = cur_split.time
 
-                    cur_split.course_index = course_index
-                    cur_split.length_leg = self.course.controls[course_index].length
-                    if cur_split.length_leg:
-                        cur_split.speed = get_speed_min_per_km(cur_split.leg_time, cur_split.length_leg)
+                cur_split.course_index = course_index
+                cur_split.length_leg = self.course.controls[course_index].length
+                if cur_split.length_leg:
+                    cur_split.speed = get_speed_min_per_km(cur_split.leg_time, cur_split.length_leg)
 
-                    cur_split.leg_place = 0
+                cur_split.leg_place = 0
 
-                    course_index += 1
-                    if course_index >= len(self.course.controls):
-                        course_code = -1
-                    else:
-                        course_code = self.course.controls[course_index].code
-
+                course_index += 1
+                if course_index >= len(self.course.controls):
+                    course_code = -1
                 else:
-                    cur_split.is_correct = False
+                    course_code = self.course.controls[course_index].code
 
-                split_index += 1
+            else:
+                cur_split.is_correct = False
+
+            split_index += 1
 
         self.last_correct_index = course_index - 1
         return self
