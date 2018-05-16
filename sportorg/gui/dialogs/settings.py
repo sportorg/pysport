@@ -37,10 +37,6 @@ class MainTab(Tab):
         self.item_auto_save.setChecked(Config().configuration.get('autosave'))
         self.layout.addRow(self.item_auto_save)
 
-        self.item_auto_connect = QCheckBox(_('Auto connect to SPORTident station'))
-        self.item_auto_connect.setChecked(Config().configuration.get('autoconnect'))
-        self.layout.addRow(self.item_auto_connect)
-
         self.item_open_recent_file = QCheckBox(_('Open recent file'))
         self.item_open_recent_file.setChecked(Config().configuration.get('open_recent_file'))
         self.layout.addRow(self.item_open_recent_file)
@@ -55,7 +51,6 @@ class MainTab(Tab):
         Config().configuration.set('current_locale', self.item_lang.currentText())
         Config().configuration.set('show_toolbar', self.item_show_toolbar.isChecked())
         Config().configuration.set('autosave', self.item_auto_save.isChecked())
-        Config().configuration.set('autoconnect', self.item_auto_connect.isChecked())
         Config().configuration.set('open_recent_file', self.item_open_recent_file.isChecked())
         Config().configuration.set('use_birthday', self.item_use_birthday.isChecked())
 
