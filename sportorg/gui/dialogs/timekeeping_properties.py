@@ -11,7 +11,6 @@ from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
 from sportorg.models.memory import race
 from sportorg.models.result.result_calculation import ResultCalculation
-from sportorg.modules.configs.configs import Config
 from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.utils.time import time_to_otime
 
@@ -95,9 +94,6 @@ class TimekeepingPropertiesDialog(QDialog):
         self.assignment_mode = QCheckBox(_('Assignment mode'))
         self.assignment_mode.stateChanged.connect(self.on_assignment_mode)
         self.tk_layout.addRow(self.assignment_mode)
-
-        self.auto_connect = QCheckBox(_('Auto connect to SPORTident station'))
-        self.tk_layout.addRow(self.auto_connect)
 
         self.timekeeping_tab.setLayout(self.tk_layout)
 
@@ -316,7 +312,6 @@ class TimekeepingPropertiesDialog(QDialog):
             self.chip_reading_always.setChecked(True)
 
         self.assignment_mode.setChecked(assignment_mode)
-        self.auto_connect.setChecked(Config().configuration.get('autoconnect'))
 
         # result processing
         obj = cur_race
@@ -453,8 +448,6 @@ class TimekeepingPropertiesDialog(QDialog):
         obj.set_setting('sportident_assign_chip_reading', assign_chip_reading)
 
         obj.set_setting('sportident_assignment_mode', self.assignment_mode.isChecked())
-
-        Config().configuration.set('autoconnect', self.auto_connect.isChecked())
 
         # result processing
         rp_mode = 'time'

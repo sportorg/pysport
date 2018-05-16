@@ -129,9 +129,6 @@ class MainWindow(QMainWindow):
             if len(self.recent_files):
                 self.open_file(self.recent_files[0])
 
-        if Configuration().configuration.get('autoconnect'):
-            self.menu_factory.execute('SPORTidentReadoutAction')
-
         Teamwork().set_call(self.teamwork)
         SIReaderClient().set_call(self.add_sportident_result_from_sireader)
         SportiduinoClient().set_call(self.add_sportident_result_from_sireader)
