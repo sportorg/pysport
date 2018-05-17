@@ -341,7 +341,6 @@ class TimekeepingPropertiesDialog(QDialog):
             self.time_settings_format_more.setChecked(True)
 
     def apply_changes_impl(self):
-        changed = False
         obj = race()
 
         start_source = 'protocol'
@@ -367,15 +366,10 @@ class TimekeepingPropertiesDialog(QDialog):
         start_cp_number = self.item_start_cp_value.value()
         finish_cp_number = self.item_finish_cp_value.value()
 
-        old_start_source = obj.get_setting('system_start_source', 'protocol')
         old_start_cp_number = obj.get_setting('system_start_cp_number', 31)
-        old_finish_source = obj.get_setting('system_finish_source', 'station')
         old_finish_cp_number = obj.get_setting('system_finish_cp_number', 90)
 
-        if old_start_source != start_source or old_finish_source != finish_source:
-            changed = True
         if old_start_cp_number != start_cp_number or old_finish_cp_number != finish_cp_number:
-            changed = True
             race().clear_results()
 
         obj.set_setting('system_port', self.item_si_port.currentText())
@@ -451,8 +445,5 @@ class TimekeepingPropertiesDialog(QDialog):
         obj.set_setting('time_accuracy', time_accuracy)
         obj.set_setting('time_format_24', time_format_24)
 
-        changed = True
-
-        if changed:
-            ResultCalculation(race()).process_results()
-            GlobalAccess().get_main_window().refresh()
+        ResultCalculation(race()).process_results()
+        GlobalAccess().get_main_window().refresh()

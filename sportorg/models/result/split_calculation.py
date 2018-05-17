@@ -118,7 +118,9 @@ class GroupSplits(object):
 
         self.leader = {}
 
-    def generate(self):
+    def generate(self, logged=False):
+        if logged:
+            logging.debug('Group splits generate for ' + self.group.name)
         # to have group count
         ResultCalculation(self.race).get_group_persons(self.group)
 

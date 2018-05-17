@@ -103,35 +103,27 @@ class OrganizationEditDialog(QDialog):
             self.item_address.setText(self.current_object.address.street)
 
     def apply_changes_impl(self):
-        changed = False
         org = self.current_object
         assert (isinstance(org, Organization))
 
         if org.name != self.item_name.text():
             org.name = self.item_name.text()
-            changed = True
 
         if org.address.country.name != self.item_country.currentText():
             org.address.country.name = self.item_country.currentText()
-            changed = True
 
         if org.address.state != self.item_region.currentText():
             org.address.state = self.item_region.currentText()
-            changed = True
 
         if org.address.city != self.item_city.text():
             org.address.city = self.item_city.text()
-            changed = True
 
         if org.address.street != self.item_address.text():
             org.address.street = self.item_address.text()
-            changed = True
 
         if org.contact.value != self.item_contact.text():
             org.contact.value = self.item_contact.text()
             org.contact.name = 'phone'
-            changed = True
 
-        if changed:
-            GlobalAccess().get_main_window().refresh()
-            Teamwork().send(org.to_dict())
+        GlobalAccess().get_main_window().refresh()
+        Teamwork().send(org.to_dict())

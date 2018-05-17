@@ -163,68 +163,53 @@ class GroupEditDialog(QDialog):
         self.rank_button.clicked.connect(rank_configuration)
 
     def apply_changes_impl(self):
-        changed = False
         group = self.current_object
         assert (isinstance(group, Group))
 
         if group.name != self.item_name.text():
             group.name = self.item_name.text()
-            changed = True
 
         if group.long_name != self.item_full_name.text():
             group.long_name = self.item_full_name.text()
-            changed = True
 
         if (group.course is not None and group.course.name != self.item_course.currentText()) \
                 or (group.course is None and len(self.item_course.currentText()) > 0):
             group.course = find(race().courses, name=self.item_course.currentText())
-            changed = True
 
         if group.sex.get_title() != self.item_sex.currentText():
             group.sex = Sex(self.item_sex.currentIndex())
-            changed = True
 
         if group.min_age != self.item_age_min.value():
             group.min_age = self.item_age_min.value()
-            changed = True
 
         if group.max_age != self.item_age_max.value():
             group.max_age = self.item_age_max.value()
-            changed = True
 
         if group.start_corridor != self.item_corridor.value():
             group.start_corridor = self.item_corridor.value()
-            changed = True
 
         if group.order_in_corridor != self.item_corridor_order.value():
             group.order_in_corridor = self.item_corridor_order.value()
-            changed = True
 
         if group.price != self.item_price.value():
             group.price = self.item_price.value()
-            changed = True
 
         time = time_to_otime(self.item_start_interval.time())
         if group.start_interval != time:
             group.start_interval = time
-            changed = True
 
         time = time_to_otime(self.item_max_time.time())
 
         if group.max_time != time:
             group.max_time = time
-            changed = True
 
         if group.ranking.is_active != self.rank_checkbox.isChecked():
             group.ranking.is_active = self.rank_checkbox.isChecked()
-            changed = True
 
         selected_type = RaceType(self.type_combo.currentIndex())
         if group.get_type() != selected_type:
             group.set_type(selected_type)
-            changed = True
 
-        if changed:
-            ResultCalculation(race()).set_rank(group)
-            GlobalAccess().get_main_window().refresh()
-            Teamwork().send(group.to_dict())
+        ResultCalculation(race()).set_rank(group)
+        GlobalAccess().get_main_window().refresh()
+        Teamwork().send(group.to_dict())
