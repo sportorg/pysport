@@ -152,7 +152,7 @@ class WinOrientBinary:
                         code = p.code
                         time = int_to_otime(p.time)
                         split = Split()
-                        split.code = code
+                        split.code = str(code)
                         split.time = time
                         if code > 0:
                             result.splits.append(split)
@@ -282,7 +282,7 @@ class WinOrientBinary:
                     new_chip.quantity = len(result.splits)
                     for split in result.splits:
                         new_punch = WDBPunch()
-                        new_punch.code = split.code
+                        new_punch.code = int(split.code)
                         new_punch.time = time_to_int(split.time)
                         new_chip.punch.append(new_punch)
 

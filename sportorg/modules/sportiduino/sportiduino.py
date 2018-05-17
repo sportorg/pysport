@@ -91,7 +91,7 @@ class ResultThread(QThread):
             t = card_data['punches'][i][1]
             if t:
                 split = memory.Split()
-                split.code = card_data['punches'][i][0]
+                split.code = str(card_data['punches'][i][0])
                 split.time = time_to_otime(t)
                 split.days = memory.race().get_days(t)
                 result.splits.append(split)

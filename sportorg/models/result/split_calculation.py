@@ -1,3 +1,5 @@
+import logging
+
 from sportorg.models.memory import Course, Group, Qualification, ResultStatus
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.utils.time import get_speed_min_per_km
@@ -60,7 +62,7 @@ class PersonSplits(object):
 
                 course_index += 1
                 if course_index >= len(self.course.controls):
-                    course_code = -1
+                    course_code = '-1'
                 else:
                     course_code = self.course.controls[course_index].code
 
@@ -220,6 +222,7 @@ class RaceSplits(object):
         self.race = r
 
     def generate(self):
+        logging.debug('Race splits generate')
         for group in self.race.groups:
             GroupSplits(self.race, group).generate()
         return self

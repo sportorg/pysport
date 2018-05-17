@@ -2,7 +2,11 @@ import json
 import uuid
 
 from sportorg import config
-from sportorg.models.memory import races, new_event, Race
+from sportorg.models.memory import races, new_event, Race, race
+from sportorg.models.result.result_calculation import ResultCalculation
+from sportorg.models.result.result_checker import ResultChecker
+from sportorg.models.result.score_calculation import ScoreCalculation
+from sportorg.models.result.split_calculation import RaceSplits
 
 
 def dump(file):
@@ -23,6 +27,11 @@ def load(file):
         obj.update_data(race_dict)
         event.append(obj)
     new_event(event)
+    obj = race()
+    ResultChecker.check_all()
+    ResultCalculation(obj).process_results()
+    RaceSplits(obj).generate()
+    ScoreCalculation(obj).calculate_scores()
 
 
 def race_migrate(data):
