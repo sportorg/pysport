@@ -1,3 +1,5 @@
+import logging
+
 from sportorg.models.memory import Result, Organization, RaceType
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.start.relay import get_team_result
@@ -9,6 +11,7 @@ class ScoreCalculation(object):
         self.race = r
 
     def calculate_scores(self):
+        logging.debug('Score calculation')
         for i in self.race.results:
             self.calculate_scores_result(i)
 

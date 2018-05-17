@@ -330,9 +330,7 @@ class SplitPrintoutAction(Action):
 class RecheckingAction(Action):
     def execute(self):
         logging.debug('Rechecking start')
-        for result in race().results:
-            if result.person is not None:
-                ResultChecker.checking(result)
+        ResultChecker.check_all()
         logging.debug('Rechecking finish')
         ResultCalculation(race()).process_results()
         self.app.refresh()

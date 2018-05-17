@@ -2,14 +2,14 @@ import logging
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QModelIndex
-from PyQt5.QtWidgets import QAbstractItemView, QHeaderView
+from PyQt5.QtWidgets import QAbstractItemView, QHeaderView, QTextEdit
 
 from sportorg.core.broker import Broker
 from sportorg.gui.dialogs.results_edit import ResultEditDialog
 from sportorg.gui.tabs.memory_model import ResultMemoryModel
 from sportorg.gui.tabs.table import TableView
 from sportorg.language import _
-from sportorg.models.memory import race, Result, Course, CourseControl, ResultSportident
+from sportorg.models.memory import race, Result, Course, CourseControl
 from sportorg.utils.time import time_to_hhmmss
 
 
@@ -157,10 +157,12 @@ class Widget(QtWidgets.QWidget):
         result = race().results[index.row()]
         assert isinstance(result, Result)
         self.ResultChipDetails.clear()
+        self.ResultChipDetails.setLineWrapMode(QTextEdit.NoWrap)
         self.ResultChipFinishEdit.setText('')
         self.ResultChipStartEdit.setText('')
 
         self.ResultCourseDetails.clear()
+        self.ResultCourseDetails.setLineWrapMode(QTextEdit.NoWrap)
         self.ResultCourseNameEdit.setText('')
         self.ResultCourseLengthEdit.setText('')
 
@@ -176,16 +178,23 @@ class Widget(QtWidgets.QWidget):
             for control in course.controls:
                 control_codes.append(str(control.code))
 
-        prev_time = result.get_start_time()
         code = ''
         index = 1
         for split in result.splits:
-            s = '{index} ({code}) {time} {diff}'.format(
+            str_fmt = '{index:02d} ({code}) {time} {diff}'
+            if not split.is_correct:
+                str_fmt = '-- ({code}) {time}'
+
+            s = str_fmt.format(
                 index=index,
                 code=split.code,
                 time=time_to_hhmmss(split.time),
-                diff=(split.time-prev_time).to_minute_str())
-            index += 1
+                diff=time_to_hhmmss(split.leg_time),
+                leg_place=split.leg_place,
+                speed=split.speed,
+            )
+            if split.is_correct:
+                index += 1
 
             if split.code == code:
                 s = '<span style="background: red">{}</span>'.format(s)
@@ -194,7 +203,6 @@ class Widget(QtWidgets.QWidget):
 
             self.ResultChipDetails.append(s)
             code = split.code
-            prev_time = split.time
 
         if result.finish_time is not None:
             self.ResultChipFinishEdit.setText(time_to_hhmmss(result.finish_time))
@@ -209,7 +217,7 @@ class Widget(QtWidgets.QWidget):
             index = 1
             for control in course.controls:
                 assert control, CourseControl
-                s = '{index} ({code}) {length}'.format(
+                s = '{index:02d} ({code}) {length}'.format(
                     index=index,
                     code=control.code,
                     length=control.length if control.length else '')

@@ -794,7 +794,7 @@ class ResultSportident(Result):
         for split in self.splits:
             try:
                 template = str(controls[i].code)
-                cur_code = int(split.code)
+                cur_code = split.code
 
                 list_exists = False
                 list_contains = False
@@ -821,7 +821,7 @@ class ResultSportident(Result):
                     # test previous splits
                     is_unique = True
                     for prev_split in self.splits[0:i]:
-                        if int(prev_split.code) == cur_code:
+                        if prev_split.code == cur_code:
                             is_unique = False
                             break
                     if is_unique:
@@ -835,7 +835,7 @@ class ResultSportident(Result):
                             i += 1
                     else:
                         # just cp '31 989'
-                        is_equal = cur_code == int(controls[i].code)
+                        is_equal = cur_code == controls[i].code
                         if is_equal:
                             i += 1
 
