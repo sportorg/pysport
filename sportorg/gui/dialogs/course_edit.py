@@ -7,6 +7,10 @@ from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import _
 from sportorg.models.memory import race, Course, CourseControl, find
+from sportorg.models.result.result_calculation import ResultCalculation
+from sportorg.models.result.result_checker import ResultChecker
+from sportorg.models.result.score_calculation import ScoreCalculation
+from sportorg.models.result.split_calculation import RaceSplits
 from sportorg.modules.teamwork import Teamwork
 
 
@@ -101,25 +105,18 @@ class CourseEditDialog(QDialog):
             self.item_controls.append('{} {}'.format(i.code, i.length if i.length else ''))
 
     def apply_changes_impl(self):
-        changed = False
         course = self.current_object
 
         if course.name != self.item_name.text():
             course.name = self.item_name.text()
-            changed = True
 
         if course.length != self.item_length.value():
             course.length = self.item_length.value()
-            changed = True
 
         if course.climb != self.item_climb.value():
             course.climb = self.item_climb.value()
-            changed = True
 
         text = self.item_controls.toPlainText()
-
-        if len(course.controls) == 0 and len(text):
-            changed = True
 
         course.controls.clear()
         for i in text.split('\n'):
@@ -135,6 +132,10 @@ class CourseEditDialog(QDialog):
                     control.length = 0
             course.controls.append(control)
 
-        if changed:
-            GlobalAccess().get_main_window().refresh()
-            Teamwork().send(course.to_dict())
+        obj = race()
+        ResultChecker.check_all()
+        ResultCalculation(obj).process_results()
+        RaceSplits(obj).generate()
+        ScoreCalculation(obj).calculate_scores()
+        GlobalAccess().get_main_window().refresh()
+        Teamwork().send(course.to_dict())

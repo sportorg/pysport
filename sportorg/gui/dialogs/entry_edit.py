@@ -273,19 +273,15 @@ class EntryEditDialog(QDialog):
                 self.item_year.setValue(self.current_object.get_year())
 
     def apply_changes_impl(self):
-        changed = False
         person = self.current_object
         assert (isinstance(person, Person))
         if person.name != self.item_name.currentText():
             person.name = self.item_name.currentText()
-            changed = True
         if person.surname != self.item_surname.text():
             person.surname = self.item_surname.text()
-            changed = True
         if (person.group is not None and person.group.name != self.item_group.currentText()) or\
                 (person.group is None and len(self.item_group.currentText()) > 0):
             person.group = find(race().groups, name=self.item_group.currentText())
-            changed = True
         if (person.organization is not None and person.organization.name != self.item_team.currentText()) or \
                 (person.organization is None and len(self.item_team.currentText()) > 0):
             organization = find(race().organizations, name=self.item_team.currentText())
@@ -295,47 +291,36 @@ class EntryEditDialog(QDialog):
                 race().organizations.append(organization)
                 Teamwork().send(organization.to_dict())
             person.organization = organization
-            changed = True
         if person.qual.get_title() != self.item_qual.currentText():
             person.qual = Qualification.get_qual_by_name(self.item_qual.currentText())
-            changed = True
         if person.bib != self.item_bib.value():
             person.bib = self.item_bib.value()
-            changed = True
 
         new_time = time_to_otime(self.item_start.time())
         if person.start_time != new_time:
             person.start_time = new_time
-            changed = True
 
         if person.start_group != self.item_start_group.value() and self.item_start_group.value():
             person.start_group = self.item_start_group.value()
-            changed = True
 
         if (not person.card_number or int(person.card_number) != self.item_card.value()) \
                 and self.item_card.value:
             race().person_card_number(person, self.item_card.value())
-            changed = True
 
         if person.is_out_of_competition != self.item_out_of_competition.isChecked():
             person.is_out_of_competition = self.item_out_of_competition.isChecked()
-            changed = True
 
         if person.is_paid != self.item_paid.isChecked():
             person.is_paid = self.item_paid.isChecked()
-            changed = True
 
         if person.is_rented_card != self.item_rented.isChecked():
             person.is_rented_card = self.item_rented.isChecked()
-            changed = True
 
         if person.is_personal != self.item_personal.isChecked():
             person.is_personal = self.item_personal.isChecked()
-            changed = True
 
         if person.comment != self.item_comment.toPlainText():
             person.comment = self.item_comment.toPlainText()
-            changed = True
 
         use_birthday = Config().configuration.get('use_birthday', False)
         if use_birthday:
@@ -343,13 +328,10 @@ class EntryEditDialog(QDialog):
             if person.birth_date != new_birthday and new_birthday:
                 if person.birth_date or new_birthday != date.today():
                     person.birth_date = new_birthday
-                    changed = True
         else:
             if person.get_year() != self.item_year.value():
                 person.set_year(self.item_year.value())
-                changed = True
 
-        if changed:
-            ResultCalculation(race()).process_results()
-            GlobalAccess().get_main_window().refresh()
-            Teamwork().send(person.to_dict())
+        ResultCalculation(race()).process_results()
+        GlobalAccess().get_main_window().refresh()
+        Teamwork().send(person.to_dict())

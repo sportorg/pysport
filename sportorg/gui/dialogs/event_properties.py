@@ -122,7 +122,6 @@ class EventPropertiesDialog(QDialog):
         self.change_type()
 
     def apply_changes_impl(self):
-        changed = True
         obj = race()
 
         start_date = self.item_start_date.dateTime().toPyDateTime()
@@ -146,6 +145,5 @@ class EventPropertiesDialog(QDialog):
             0
         ))
 
-        if changed:
-            ResultCalculation(race()).process_results()
-            GlobalAccess().get_main_window().refresh()
+        ResultCalculation(race()).process_results()
+        GlobalAccess().get_main_window().refresh()

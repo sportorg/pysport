@@ -1,3 +1,5 @@
+import logging
+
 from sportorg.core.otime import OTime
 from sportorg.models.constant import StatusComments
 from sportorg.models.memory import Person, ResultStatus, race, Result
@@ -41,6 +43,7 @@ class ResultChecker:
 
     @classmethod
     def check_all(cls):
+        logging.debug('Checking all results')
         for result in race().results:
             if result.person is not None:
                 ResultChecker.checking(result)

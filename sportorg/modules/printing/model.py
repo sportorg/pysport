@@ -32,7 +32,7 @@ def split_printout(result):
         if not organization:
             organization = Organization()
 
-        s = GroupSplits(obj, person.group).generate()
+        s = GroupSplits(obj, person.group).generate(True)
         template = get_text_from_file(
             template_path,
             race=obj.to_dict(),

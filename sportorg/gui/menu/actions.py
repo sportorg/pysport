@@ -329,9 +329,7 @@ class SplitPrintoutAction(Action):
 
 class RecheckingAction(Action):
     def execute(self):
-        logging.debug('Rechecking start')
         ResultChecker.check_all()
-        logging.debug('Rechecking finish')
         ResultCalculation(race()).process_results()
         self.app.refresh()
 

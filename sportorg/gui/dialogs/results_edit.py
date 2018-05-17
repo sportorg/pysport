@@ -17,6 +17,7 @@ from sportorg.models.constant import StatusComments
 from sportorg.models.memory import race, Result, find, ResultStatus, Person, Limit, Split
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.result_checker import ResultChecker, ResultCheckerException
+from sportorg.models.result.split_calculation import GroupSplits
 from sportorg.modules.teamwork import Teamwork
 from sportorg.utils.time import time_to_qtime, time_to_otime, hhmmss_to_time
 
@@ -208,41 +209,32 @@ class ResultEditDialog(QDialog):
 
     def apply_changes_impl(self):
         result = self.current_object
-        changed = False
 
         if result.is_punch():
             if result.card_number != self.item_card_number.value():
                 result.card_number = self.item_card_number.value()
-                changed = True
 
             new_splits = self.splits.splits()
             if len(result.splits) == len(new_splits):
                 for i, split in enumerate(result.splits):
                     if split != new_splits[i]:
-                        changed = True
                         break
-            else:
-                changed = True
             result.splits = new_splits
 
         time_ = time_to_otime(self.item_finish.time())
         if result.finish_time != time_:
             result.finish_time = time_
-            changed = True
 
         time_ = time_to_otime(self.item_start.time())
         if result.start_time != time_:
             result.start_time = time_
-            changed = True
 
         time_ = time_to_otime(self.item_penalty.time())
         if result.penalty_time != time_:
             result.penalty_time = time_
-            changed = True
 
         if result.penalty_laps != self.item_penalty_laps.value():
             result.penalty_laps = self.item_penalty_laps.value()
-            changed = True
 
         cur_bib = -1
         new_bib = self.item_bib.value()
@@ -254,7 +246,6 @@ class ResultEditDialog(QDialog):
                 if result.person.card_number == result.card_number:
                     result.person.card_number = 0
             result.person = None
-            changed = True
         elif cur_bib != new_bib:
             new_person = find(race().persons, bib=new_bib)
             if new_person is not None:
@@ -267,11 +258,9 @@ class ResultEditDialog(QDialog):
                     race().person_card_number(result.person, result.card_number)
 
             GlobalAccess().get_main_window().get_result_table().model().init_cache()
-            changed = True
 
         if self.item_days.value() != result.days:
             result.days = self.item_days.value()
-            changed = True
 
         status = ResultStatus.NONE
         if self.radio_ok.isChecked():
@@ -286,24 +275,23 @@ class ResultEditDialog(QDialog):
             status = ResultStatus.DID_NOT_START
         if result.status != status:
             result.status = status
-            changed = True
 
         status = StatusComments().remove_hint(self.item_status_comment.currentText())
         if result.status_comment != status:
             result.status_comment = status
-            changed = True
 
-        if changed:
-            if result.is_punch():
-                result.clear()
-                try:
-                    ResultChecker.calculate_penalty(result)
-                    ResultChecker.checking(result)
-                except ResultCheckerException as e:
-                    logging.error(str(e))
-            ResultCalculation(race()).process_results()
-            GlobalAccess().get_main_window().refresh()
-            Teamwork().send(result.to_dict())
+        if result.is_punch():
+            result.clear()
+            try:
+                ResultChecker.checking(result)
+                ResultChecker.calculate_penalty(result)
+                if result.person and result.person.group:
+                    GroupSplits(race(), result.person.group).generate(True)
+            except ResultCheckerException as e:
+                logging.error(str(e))
+        ResultCalculation(race()).process_results()
+        GlobalAccess().get_main_window().refresh()
+        Teamwork().send(result.to_dict())
 
 
 class SplitsObject:
