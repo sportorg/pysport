@@ -43,7 +43,7 @@
                     org: (person.organization && String(person.organization.name).slice(0, MAX_ORG_NAME)) || '',
                     qual: Qualification[person.qual],
                     bib: person.bib,
-                    sportident_card: person.sportident_card,
+                    card_number: person.card_number,
                     year: person.birth_date ? (new Date(person.birth_date)).getFullYear() : '',
                     start: toHHMMSS(person.start_time),
                     start_time: person.start_time
@@ -95,7 +95,7 @@
             {key: 'year', title: 'ГР'},
             {key: 'qual', title: 'Разряд'},
             {key: 'bib', title: 'Номер'},
-            {key: 'sportident_card', title: 'Номер чипа'},
+            {key: 'card_number', title: 'Номер чипа'},
             {key: 'start', title: 'Время старта'}
         ],
         active: function (key, val) {
@@ -162,9 +162,9 @@
         },
         {
             title: 'Номер чипа',
-            value: Fields.isActive('sportident_card'),
+            value: Fields.isActive('card_number'),
             change: function (checked) {
-                Fields.active('sportident_card', checked);
+                Fields.active('card_number', checked);
                 render()
             }
         }
