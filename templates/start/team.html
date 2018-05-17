@@ -22,7 +22,7 @@
                         group: (person.group && person.group.name) || '',
                         qual: Qualification[person.qual],
                         bib: person.bib,
-                        sportident_card: person.sportident_card + (person.is_rented_sportident_card ? ' *' : ''),
+                        card_number: person.card_number + (person.is_rented_card ? ' *' : ''),
                         year: person.birth_date ? (new Date(person.birth_date)).getFullYear() : '',
                         start: toHHMMSS(person.start_time),
                         start_time: person.start_time,
@@ -75,7 +75,7 @@
             {key: 'year', title: 'ГР'},
             {key: 'qual', title: 'Разряд'},
             {key: 'bib', title: 'Номер'},
-            {key: 'sportident_card', title: 'Номер чипа'},
+            {key: 'card_number', title: 'Номер чипа'},
             {key: 'start', title: 'Время старта'},
             {key: 'price', title: 'Взнос'},
             {key: 'comment', title: 'Прим.', active: false},
@@ -132,7 +132,7 @@
             var rentedSportidentCards = 0;
             rows.forEach(function (row) {
                 price += row.price;
-                if (row.person.is_rented_sportident_card) {
+                if (row.person.is_rented_card) {
                     rentedSportidentCards++;
                 }
             });
@@ -191,9 +191,9 @@
         },
         {
             title: 'Номер чипа',
-            value: Fields.isActive('sportident_card'),
+            value: Fields.isActive('card_number'),
             change: function (checked) {
-                Fields.active('sportident_card', checked);
+                Fields.active('card_number', checked);
                 render()
             }
         },

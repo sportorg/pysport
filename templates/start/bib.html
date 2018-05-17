@@ -250,7 +250,7 @@
 
             var detildData = [
                 {title: '', value: person.surname + ' ' + person.name},
-                {title: 'Номер чипа: ', value: person.sportident_card || ''},
+                {title: 'Номер чипа: ', value: person.card_number || ''},
                 {title: 'Время старта: ', value: toHHMMSS(person.start_time)},
                 {title: 'Группа: ', value: person.group && person.group.name},
                 {title: 'Коллектив: ', value: person.organization && person.organization.name || ''}
