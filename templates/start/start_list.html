@@ -35,7 +35,8 @@
     function getStartListByGroup(group) {
         var isRelay = group.__type ? group.__type === 3 : race.data.race_type === 3;
         var results = [];
-        for (var person of race.persons) {
+        for (var _i = 0, _a = race.persons; _i < _a.length; _i++) {
+            var person = _a[_i];
             if (person.group && person.group.id === group.id) {
                 results.push({
                     index: 0,
@@ -47,7 +48,7 @@
                     year: person.birth_date ? (new Date(person.birth_date)).getFullYear() : '',
                     start: toHHMMSS(person.start_time),
                     start_time: person.start_time
-                })
+                });
             }
         }
         results.sort(function(a, b) {
@@ -73,14 +74,15 @@
             var prevBib = 0;
             var resultsList = results.slice();
             results = [];
-            for (var r of resultsList) {
+            for (var _i = 0, resultsList_ = resultsList; _i < resultsList_.length; _i++) {
+                var r = resultsList_[_i];
                 r.index = '';
                 if (r.bib % 1000 !== prevBib) {
                     index++;
-                    results.push({index: index});
-                    prevBib = r.bib % 1000
+                    results.push({ index: index });
+                    prevBib = r.bib % 1000;
                 }
-                results.push(r)
+                results.push(r);
             }
         }
         return results;
@@ -99,18 +101,21 @@
             {key: 'start', title: 'Время старта'}
         ],
         active: function (key, val) {
-            for (var obj of this.fields) {
+            for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+                var obj = _a[_i];
                 if (key === obj.key) {
-                    obj.active = val
+                    obj.active = val;
                 }
             }
         },
         isActive: function (key) {
-            for (var obj of this.fields) {
+            for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+                var obj = _a[_i];
                 if (key === obj.key) {
                     if (obj.active === void 0) {
                         return true;
-                    } else {
+                    }
+                    else {
                         return !!obj.active;
                     }
                 }
@@ -118,35 +123,39 @@
             return false;
         },
         save: function () {
-            localStorage.setItem(this.localId, JSON.stringify(this.fields));
+            if (localStorage) {
+                localStorage.setItem(this.localId, JSON.stringify(this.fields));
+            }
             return this;
         },
         load: function () {
-            var fields = JSON.parse(localStorage.getItem(this.localId));
+            var fields = localStorage ? JSON.parse(localStorage.getItem(this.localId)) : undefined;
             if (fields) {
-                for (var f of fields) {
-                    this.active(f.key, f.active)
+                for (var _i = 0, fields_ = fields; _i < fields_.length; _i++) {
+                    var f = fields_[_i];
+                    this.active(f.key, f.active);
                 }
             }
             return this;
         },
         clear: function () {
-            localStorage.clear()
+            if (localStorage) {
+                localStorage.clear()
+            }
         }
     }.load();
 
     function render() {
         var resultBlock = document.getElementById('start-list-tables');
         resultBlock.innerHTML = '';
-        for (var group of race.groups) {
+        for (var _i = 0, _a = race.groups; _i < _a.length; _i++) {
+            var group = _a[_i];
             var titleBlock = document.createElement('h2');
             titleBlock.id = group.name;
             titleBlock.appendChild(document.createTextNode(group.name));
             resultBlock.appendChild(titleBlock);
-
             resultBlock.appendChild(getGroupsBlockElement(race));
-
-            resultBlock.appendChild(new TableGenerator(getStartListByGroup(group), Fields.fields).getTable({className: 'sportorg-table'}));
+            resultBlock.appendChild(new TableGenerator(getStartListByGroup(group), Fields.fields).getTable({ className: 'sportorg-table' }));
         }
         Fields.save();
     }

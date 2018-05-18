@@ -12,11 +12,12 @@
 
     function getStartListByOrg(org, sort) {
         var results = [];
-        for (var person of race.persons) {
+        for (var _i = 0, _a = race.persons; _i < _a.length; _i++) {
+            var person = _a[_i];
             if (!org || person.organization && person.organization.id === org.id) {
                 if (!selected.persons.length || selected.persons.some(function (elem) {
-                        return elem.id === person.id;
-                    })) {
+                            return elem.id === person.id;
+                        })) {
                     results.push({
                         name: person.surname + ' ' + person.name + (person.is_out_of_competition ? ' *' : ''),
                         group: (person.group && person.group.name) || '',
@@ -29,7 +30,7 @@
                         comment: person.comment,
                         price: person.group && person.group.price,
                         person: person
-                    })
+                    });
                 }
             }
         }
@@ -81,18 +82,21 @@
             {key: 'comment', title: 'Прим.', active: false},
         ],
         active: function (key, val) {
-            for (var obj of this.fields) {
+            for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+                var obj = _a[_i];
                 if (key === obj.key) {
-                    obj.active = val
+                    obj.active = val;
                 }
             }
         },
         isActive: function (key) {
-            for (var obj of this.fields) {
+            for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+                var obj = _a[_i];
                 if (key === obj.key) {
                     if (obj.active === void 0) {
                         return true;
-                    } else {
+                    }
+                    else {
                         return !!obj.active;
                     }
                 }
@@ -100,20 +104,25 @@
             return false;
         },
         save: function () {
-            localStorage.setItem(this.localId, JSON.stringify(this.fields));
+            if (localStorage) {
+                localStorage.setItem(this.localId, JSON.stringify(this.fields));
+            }
             return this;
         },
         load: function () {
-            var fields = JSON.parse(localStorage.getItem(this.localId));
+            var fields = localStorage ? JSON.parse(localStorage.getItem(this.localId)) : undefined;
             if (fields) {
-                for (var f of fields) {
-                    this.active(f.key, f.active)
+                for (var _i = 0, fields_ = fields; _i < fields_.length; _i++) {
+                    var f = fields_[_i];
+                    this.active(f.key, f.active);
                 }
             }
             return this;
         },
         clear: function () {
-            localStorage.clear()
+            if (localStorage) {
+                localStorage.clear()
+            }
         }
     }.load();
 
@@ -155,21 +164,19 @@
             resultBlock.appendChild(getInfoBlock(rows));
         } else {
             var i = 0;
-            for (var org of race.organizations) {
+            for (var _i = 0, _a = race.organizations; _i < _a.length; _i++) {
+                var org = _a[_i];
                 var rows = getStartListByOrg(org, store.sort);
                 if (!rows.length) {
                     continue;
                 }
-
                 var titleBlock = document.createElement('h2');
                 titleBlock.id = org.name;
                 titleBlock.appendChild(document.createTextNode(dateFormat(race.data.start_datetime) + ' / ' + org.name));
                 resultBlock.appendChild(titleBlock);
-
-                resultBlock.appendChild(new TableGenerator(rows, Fields.fields).getTable({className: 'sportorg-table'}));
-
+                resultBlock.appendChild(new TableGenerator(rows, Fields.fields).getTable({ className: 'sportorg-table' }));
                 resultBlock.appendChild(getInfoBlock(rows));
-                if (i < race.organizations.length-1) {
+                if (i < race.organizations.length - 1) {
                     var newPage = document.createElement('div');
                     newPage.className = 'new-page';
                     resultBlock.appendChild(newPage);

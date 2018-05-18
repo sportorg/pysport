@@ -237,7 +237,8 @@
         race.persons.sort(sortFunc);
         var bibListBlock = document.getElementById('bib-list');
         bibListBlock.innerHTML = '';
-        for (var person of race.persons) {
+        for (var _i = 0, _a = race.persons; _i < _a.length; _i++) {
+            var person = _a[_i];
             var bibItemBlock = document.createElement('div');
             bibItemBlock.className = 'bib-item';
             var bibTitleBlock = document.createElement('div');
@@ -247,16 +248,15 @@
             var bibInfoBlock = document.createElement('div');
             bibInfoBlock.className = 'bib-info';
             var bibDetailedBlock = document.createElement('div');
-
             var detildData = [
-                {title: '', value: person.surname + ' ' + person.name},
-                {title: 'Номер чипа: ', value: person.card_number || ''},
-                {title: 'Время старта: ', value: toHHMMSS(person.start_time)},
-                {title: 'Группа: ', value: person.group && person.group.name},
-                {title: 'Коллектив: ', value: person.organization && person.organization.name || ''}
+                { title: '', value: person.surname + ' ' + person.name },
+                { title: 'Номер чипа: ', value: person.card_number || '' },
+                { title: 'Время старта: ', value: toHHMMSS(person.start_time) },
+                { title: 'Группа: ', value: person.group && person.group.name },
+                { title: 'Коллектив: ', value: person.organization && person.organization.name || '' }
             ];
-
-            for (var obj of detildData) {
+            for (var _b = 0, detildData_ = detildData; _b < detildData_.length; _b++) {
+                var obj = detildData_[_b];
                 var itemSpan = document.createElement('span');
                 itemSpan.className = 'info-item';
                 itemSpan.appendChild(document.createTextNode(obj.title));
@@ -266,24 +266,19 @@
                 bibDetailedBlock.appendChild(itemSpan);
                 bibDetailedBlock.appendChild(document.createElement('br'));
             }
-
             var bibDetailedRotatableBlock = bibDetailedBlock.cloneNode(true);
             bibDetailedBlock.className = 'left-info';
             bibDetailedRotatableBlock.className = 'right-info rotatable';
-
             bibTitleBlock.appendChild(document.createTextNode(race.data.title));
             bibTitleBlock.appendChild(document.createElement('br'));
             bibTitleBlock.appendChild(document.createTextNode(''));
-
             bibNumberBlock.appendChild(document.createTextNode(person.bib));
-
             bibInfoBlock.appendChild(bibDetailedBlock);
             bibInfoBlock.appendChild(bibDetailedRotatableBlock);
             bibItemBlock.appendChild(bibTitleBlock);
             bibItemBlock.appendChild(bibNumberBlock);
             bibItemBlock.appendChild(bibInfoBlock);
             bibListBlock.appendChild(bibItemBlock);
-
             var newPageBlock = document.createElement('div');
             newPageBlock.className = 'new-page';
             bibListBlock.appendChild(newPageBlock);

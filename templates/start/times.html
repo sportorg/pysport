@@ -27,16 +27,19 @@
 
     function getStartTimes() {
         var times = {};
-        for (var person of race.persons) {
+        for (var _i = 0, _a = race.persons; _i < _a.length; _i++) {
+            var person = _a[_i];
             if (times[person.start_time]) {
                 var val = times[person.start_time][person.group && person.group.start_corridor || 0];
                 if (val) {
                     val += ' ' + person.bib;
-                } else {
+                }
+                else {
                     val = person.bib;
                 }
                 times[person.start_time][person.group && person.group.start_corridor || 0] = val;
-            } else {
+            }
+            else {
                 times[person.start_time] = {};
                 times[person.start_time][person.group && person.group.start_corridor || 0] = person.bib;
             }
@@ -58,7 +61,8 @@
         ],
         init: function () {
             var start_corridors = {};
-            for (var group of race.groups) {
+            for (var _i = 0, _a = race.groups; _i < _a.length; _i++) {
+                var group = _a[_i];
                 start_corridors[group.start_corridor] = group.start_corridor;
             }
             for (var c in start_corridors) {
