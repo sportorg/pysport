@@ -436,9 +436,9 @@ class Split(Model):
         self.course_index = -1
         self.code = '0'
         self.days = 0
-        self._time = None  # type: OTime
-        self.leg_time = None  # type: OTime
-        self.relative_time = None  # type: OTime
+        self._time = OTime()  # type: OTime
+        self.leg_time = OTime()  # type: OTime
+        self.relative_time = OTime()  # type: OTime
         self.leg_place = 0
         self.relative_place = 0
         self.is_correct = True

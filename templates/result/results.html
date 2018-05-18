@@ -33,7 +33,7 @@
         var results = [];
         for (var _i = 0, _a = race.results; _i < _a.length; _i++) {
             var result = _a[_i];
-            if (result.person && result.person.group && result.person.group.id === group.id) {
+            if (result.status !== 13 && result.person && result.person.group && result.person.group.id === group.id) {
                 var r = {
                     index: 0,
                     name: (result.person.surname + ' ' + result.person.name).slice(0, MAX_PERSON_NAME),
@@ -108,8 +108,8 @@
             var prevBib = 0;
             var resultsList = results.slice();
             results = [];
-            for (var _i = 0, resultsList_1 = resultsList; _i < resultsList_1.length; _i++) {
-                var r = resultsList_1[_i];
+            for (var _i = 0, resultsList_ = resultsList; _i < resultsList_.length; _i++) {
+                var r = resultsList_[_i];
                 r.index = '';
                 if (r.bib % 1000 !== prevBib) {
                     index++;
@@ -205,21 +205,25 @@
             return JSON.parse(JSON.stringify(this.fields))
         },
         save: function () {
-            localStorage.setItem(this.localId, JSON.stringify(this.fields));
+            if (localStorage) {
+                localStorage.setItem(this.localId, JSON.stringify(this.fields));
+            }
             return this;
         },
         load: function () {
-            var fields = JSON.parse(localStorage.getItem(this.localId));
+            var fields = localStorage ? JSON.parse(localStorage.getItem(this.localId)) : undefined;
             if (fields) {
-                for (var _i = 0, fields_1 = fields; _i < fields_1.length; _i++) {
-                    var f = fields_1[_i];
+                for (var _i = 0, fields_ = fields; _i < fields_.length; _i++) {
+                    var f = fields_[_i];
                     this.active(f.key, f.active);
                 }
             }
             return this;
         },
         clear: function () {
-            localStorage.clear()
+            if (localStorage) {
+                localStorage.clear()
+            }
         }
     }.load();
 

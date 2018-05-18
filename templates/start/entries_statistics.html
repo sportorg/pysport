@@ -4,8 +4,8 @@
 
 {% block content %}
 <div class="text-center">
-    <h1>Протокол комиссии по допуску</h1>
-    <h2>{{ race.data.description }}</h2>
+    <h3>{{ race.data.description }}</h3>
+    <h2>Протокол комиссии по допуску</h2>
 </div>
 <h3>Информация о коллективах</h3>
 <div id="org-group"></div>
@@ -27,7 +27,8 @@
     // команда группа
     function getCountPersonOrg(org, group) {
         var count = 0;
-        for (var person of race.persons) {
+        for (var _i = 0, _a = race.persons; _i < _a.length; _i++) {
+            var person = _a[_i];
             if (person.group && person.organization) {
                 if (person.group.id === group.id && person.organization.id === org.id) {
                     count++;
@@ -43,14 +44,16 @@
             index: index,
             org: 'Всего'
         };
-        for (var org of race.organizations) {
+        for (var _i = 0, _a = race.organizations; _i < _a.length; _i++) {
+            var org = _a[_i];
             index++;
             var row = {
                 index: index,
                 org: org.name,
                 total: 0
             };
-            for (var group of race.groups) {
+            for (var _b = 0, _c = race.groups; _b < _c.length; _b++) {
+                var group = _c[_b];
                 var count = getCountPersonOrg(org, group);
                 row[group.id] = count;
                 row.total += count;
@@ -64,7 +67,8 @@
     // разряд группа
     function getCountPersonQual(qual, group) {
         var count = 0;
-        for (var person of race.persons) {
+        for (var _i = 0, _a = race.persons; _i < _a.length; _i++) {
+            var person = _a[_i];
             if (person.group) {
                 if (person.group.id === group.id && Number(person.qual) === Number(qual)) {
                     count++;
@@ -80,14 +84,16 @@
             index: index,
             qual: 'Всего'
         };
-        for (var qual of [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]) {
+        for (var _i = 0, _a = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]; _i < _a.length; _i++) {
+            var qual = _a[_i];
             index++;
             var row = {
                 index: index,
                 qual: Qualification[qual],
                 total: 0
             };
-            for (var group of race.groups) {
+            for (var _b = 0, _c = race.groups; _b < _c.length; _b++) {
+                var group = _c[_b];
                 var count = getCountPersonQual(qual, group);
                 row[group.id] = count;
                 row.total += count;
@@ -105,8 +111,9 @@
             {key: 'org', title: 'Коллектив'}
         ],
         init: function () {
-            for (var group of race.groups) {
-                this.fields.push({key: group.id, title: group.name});
+            for (var _i = 0, _a = race.groups; _i < _a.length; _i++) {
+                var group = _a[_i];
+                this.fields.push({ key: group.id, title: group.name });
             }
             this.fields.push({key: 'total', title: 'Всего'});
             return this;
@@ -119,8 +126,9 @@
             {key: 'qual', title: 'Квалификационный разряд'}
         ],
         init: function () {
-            for (var group of race.groups) {
-                this.fields.push({key: group.id, title: group.name});
+            for (var _i = 0, _a = race.groups; _i < _a.length; _i++) {
+                var group = _a[_i];
+                this.fields.push({ key: group.id, title: group.name });
             }
             this.fields.push({key: 'total', title: 'Всего'});
             return this;

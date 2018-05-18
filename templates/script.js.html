@@ -241,16 +241,20 @@
         value %= 3600;
         var minutes = Math.floor(value / 60);
         var seconds = ~~(value % 60);
-        hours = hours < 10 ? '0' + hours : hours;
-        minutes = minutes < 10 ? '0' + minutes : minutes;
-        seconds = seconds < 10 ? '0' + seconds : seconds;
-        return hours + ":" + minutes + ":" + seconds;
+
+        var date = new Date(2000, 0, 1, hours, minutes, seconds);
+
+        var with0 = function (dd) {
+            return (dd < 10 ? '0' + dd : dd) + '';
+        };
+
+        return with0(date.getHours()) + ':' + with0(date.getMinutes()) + ':' + with0(date.getSeconds());
     }
 
     function getById(list, id) {
         if (id) {
-            for (var _i = 0, list_1 = list; _i < list_1.length; _i++) {
-                var obj = list_1[_i];
+            for (var _i = 0, list_ = list; _i < list_.length; _i++) {
+                var obj = list_[_i];
                 if (obj.id === id) {
                     return obj;
                 }
