@@ -21,29 +21,27 @@
 """
 sfrreader.py - Classes to read out SFR card data from master HID stations.
 """
+import os
 import platform
-
 from time import sleep
-if platform.system() == 'Windows':
-    from pywinusb.hid import HidDeviceFilter, HidDevice
-
+import usb
+from usb.core import Device
 from datetime import datetime
 
 
 class SFRReader(object):
     SFR_DEBUG = False
-    SFR_ALLOW_DUPLICATE = False  # Don't check card to be new, allow multiple reading of one card - used for debug only
+    SFR_ALLOW_DUPLICATE = True  # Don't check card to be new, allow multiple reading of one card - used for debug only
     TIMEOUT_STEP = 0.001  # Sleeping step while waiting for command response
     TIMEOUT_LIMIT = 200  # Max count of sleeping calls
 
     # HID device properties
     VENDOR_ID = 0x2047
-    PRODUCT_ID = 0x301
+    PRODUCT_ID = 0x0301
 
     HID_REPORT_COUNT = 64
 
     """Base protocol functions and constants to interact with SFR Stations."""
-
     # Protocol characters
     CMD_INIT = 0x3f
     CMD_START = 0xfd
@@ -64,7 +62,7 @@ class SFRReader(object):
         """Initializes communication with sfr station via HID interface.
             We have no information, how to manage 2 connected stations
         """
-        self._device = None  # Type HidDevice
+        self._device = None
         self._debug = debug
         if logfile is not None:
             self._logfile = open(logfile, 'ab')
@@ -72,16 +70,18 @@ class SFRReader(object):
             self._logfile = None
         self._logger = logger
 
-        self._last_command = None
+        if self.SFR_DEBUG:
+            os.environ['PYUSB_DEBUG'] = 'debug'
+            usb._setup_log()
+
         self._last_card = None
-        self._reading_process = False
         self._count = 0
-        self._block = False
         self._is_card_connected = False
-        self.ret = {}
-        self.init_card_data()
+        self._need_reattach_driver = False
 
         self._connect_reader()
+        self.ret = {}
+        self.init_card_data()
 
     @staticmethod
     def check_sum(data):
@@ -104,10 +104,8 @@ class SFRReader(object):
         return buffer
 
     def is_device_connected(self):
-        if self._device and isinstance(self._device, HidDevice):
-            assert isinstance(self._device, HidDevice)
-            if self._device.is_plugged() and self._device.is_opened():
-                return True
+        if self._device:
+            return True
         return False
 
     def _send_command(self, command, callback=True):
@@ -118,79 +116,59 @@ class SFRReader(object):
         buffer = self.get_hid_buffer(command)
 
         hid_device = self._device
-        assert isinstance(hid_device, HidDevice)
+        assert isinstance(hid_device, Device)
         if self.is_device_connected():
             if callback:
                 # Wait for the data response, callback is processed in HID data handler
                 start = datetime.now()
 
-                while self._block:
-                    if self.SFR_DEBUG:
-                        print('sfrreader.send_command: sleeping before command')
-                    sleep(0.1)
-
-                self._block = True
-                self._last_command = command
                 try:
-                    hid_device.send_output_report(buffer)
-                    count = 1
-                    while self._block and count < self.TIMEOUT_LIMIT:
+                    hid_device.write(endpoint=0x1, data=buffer)
+                    ret = hid_device.read(0x81, len(buffer), 100)
+                    data = ret
+                    cmd_code = data[4]
+                    if command[3] == data[3]:
+                        # correct answer, card detected
+                        if self._logger:
+                            self._logger.debug("sfrreader.data_handler ==>> command  '%s' " % command)
+                            self._logger.debug("sfrreader.data_handler <<== response '%s' " % data)
                         if self.SFR_DEBUG:
-                            print('sfrreader.send_command: sleeping, waiting for response')
-                        sleep(self.TIMEOUT_STEP)
-                        count += 1
+                            print("sfrreader.data_handler ==>> command  '%s' " % command)
+                            print("sfrreader.data_handler <<== response '%s' " % data)
+                        self._is_card_connected = True
+                        if cmd_code == 1:
+                            # request of card id
+                            self._read_card_id(data)
+                        elif cmd_code == 3:
+                            # reading of bib
+                            self._read_bib(data)
+                        elif cmd_code == 4:
+                            # reading of counter
+                            self._read_data_counter(data)
+                        else:
+                            # reading of data
+                            self._read_data_punch(data)
+                    else:
+                        # no card connected
+                        self._is_card_connected = False
 
-                    end = datetime.now()
-                    time_used = end - start
                     if self.SFR_DEBUG:
+                        end = datetime.now()
+                        time_used = end - start
                         print('sfrreader.send_command: ended in ' + str(time_used.microseconds / 1000) + ' ms')
                 except Exception as e:
                     if self.SFR_DEBUG:
                         print('sfrreader.send_command: device disconnected during command')
-                    self._logger.error(str(e))
+                    if self._logger:
+                        self._logger.error(str(e))
                     self.disconnect()
 
-                self._block = False
             else:
                 # Just send command
-                hid_device.send_output_report(buffer)
-                self._last_command = command
+                hid_device.write(endpoint=0x1, data=buffer)
         else:
             if self.SFR_DEBUG:
                 print('sfrreader.send_command: device is busy or unavailable')
-
-    def _data_handler(self, data):
-        if self.SFR_DEBUG:
-            print("sfrreader.data_handler: Raw data: {0}".format(data))
-
-        last_command = self._last_command
-
-        cmd_code = data[4]
-        if not last_command or last_command[3] == data[3]:
-            # correct answer, card detected
-
-            if self._logger:
-                self._logger.debug("sfrreader.data_handler ==>> command  '%s' " % last_command)
-                self._logger.debug("sfrreader.data_handler <<== response '%s' " % data)
-
-            self._is_card_connected = True
-            if cmd_code == 1:
-                # request of card id
-                self._read_card_id(data)
-            elif cmd_code == 3:
-                # reading of bib
-                self._read_bib(data)
-            elif cmd_code == 4:
-                # reading of counter
-                self._read_data_counter(data)
-            else:
-                # reading of data
-                self._read_data_punch(data)
-        else:
-            # no card connected
-            self._is_card_connected = False
-
-        self._block = False
 
     def request(self, pos=1, callback=True):
         command = SFRReader.CMD_REQUEST
@@ -224,12 +202,13 @@ class SFRReader(object):
     def disconnect(self):
         """Close the connection and disconnect from the station."""
         if self._device:
-            self._device.close()
-
-    def reconnect(self):
-        """Close the connection and reopen again."""
-        self.disconnect()
-        self._connect_reader()
+            tmp_device = self._device
+            self._device = None
+            usb.util.dispose_resources(tmp_device)
+            if platform.system() != 'Windows':
+                if self._need_reattach_driver:
+                    tmp_device.attach_kernel_driver(0)
+                    self._need_reattach_driver = False
 
     def _read_card_id(self, data):
         self._last_card = data[5:9]
@@ -256,30 +235,36 @@ class SFRReader(object):
     def _connect_reader(self):
         """Connect to SFR Reader.
         """
-        if platform.system() != 'Windows':
-            raise SFRReaderException('Unsupported platform: %s' % platform.system())
+        self._device = None
+        dev = usb.core.find(idVendor=self.VENDOR_ID, idProduct=self.PRODUCT_ID)
+        if dev:
+            device = dev
+            assert isinstance(device, Device)
 
-        hid_filter = HidDeviceFilter(vendor_id=self.VENDOR_ID, product_id=self.PRODUCT_ID)
-        devices = hid_filter.get_devices()
+            if platform.system() != 'Windows':
+                if device.is_kernel_driver_active(0):
+                    # detach kernel driver to allow direct access vi libusb (Linux)
+                    device.detach_kernel_driver(0)
+                    self._need_reattach_driver = True
 
-        if devices:
-            device = devices[0]
-            device.open()
             self._device = device
 
             self.beep(delay=0.3, count=3)
-            
-            if self._logger:
-                self._logger.debug("SFR station connected")
 
-            device.set_raw_data_handler(self._data_handler)
+            if self._logger:
+                self._logger.debug("Used USB library:" + str(device.backend.lib))
+                self._logger.debug("SFR station connected")
+            if self.SFR_DEBUG:
+                print("Used USB library:" + str(device.backend.lib))
+                print("SFR station connected")
         else:
             if self._logger:
                 self._logger.debug("SFR station not found or unavailable")
+            if self.SFR_DEBUG:
+                print("SFR station not found or unavailable")
 
     def __del__(self):
-        if self._device is not None:
-            self._device.close()
+        self._device = None
 
     @staticmethod
     def _decode_time(raw_time):
@@ -323,9 +308,6 @@ class SFRReaderReadout(SFRReader):
         """Polls for an SFR-Card, located near the station (up to 5cm).
         Returns true on card detected and false otherwise."""
 
-        if self._reading_process:
-            return False
-
         if not (self.is_device_connected()):
             return False
 
@@ -348,10 +330,9 @@ class SFRReaderReadout(SFRReader):
 
         self.init_card_data()
 
-        self._reading_process = True
         i = 3
-        self._count = 5  # will be overwritten in request(4)
-        while i < self._count:
+        self._count = 4  # will be overwritten in request(4)
+        while i <= self._count:
 
             self.request(i)  # see callback processing in data_handler method
 
@@ -359,11 +340,9 @@ class SFRReaderReadout(SFRReader):
                 if self.SFR_DEBUG:
                     print('sfrreader.read_card: card was removed during readout, pos=' + str(i))
                 self._last_card = None  # to allow rereading
-                self._reading_process = False
                 return
 
             i += 1
-        self._reading_process = False
         return self.get_card_data()
 
 
