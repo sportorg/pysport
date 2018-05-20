@@ -22,6 +22,9 @@ class ResultChecker:
 
         course = race().find_course(self.person)
 
+        if course is None:
+            return True
+
         return result.check(course)
 
     @classmethod
