@@ -9,7 +9,7 @@
 {% block content %}
 <div class="text-center">
     <h3>{{ race.data.description }} <br>
-        {{ race.data.start_datetime|date }} {{ race.data.location }}</h3>
+    {{ race.data.start_datetime|date }} {{ race.data.location }}</h3>
     <h2>ПРОТОКОЛ СТАРТА</h2>
 </div>
 <div id="start-list-tables"></div>
@@ -29,7 +29,7 @@
 </div>
 {% raw %}
 <script>
-    var race = {% endraw %}{{race|tojson}}{% raw %};
+    var race = {% endraw %}{{race|tojson}}{%raw %};
     racePreparation(race);
 
     function getStartListByGroup(group) {
@@ -51,7 +51,7 @@
                 });
             }
         }
-        results.sort(function(a, b) {
+        results.sort(function (a, b) {
             if (isRelay && a.start_time === b.start_time) {
                 if (a.bib % 1000 === b.bib % 1000) {
                     return ~~(a.bib / 1000) - ~~(b.bib / 1000)
@@ -79,7 +79,7 @@
                 r.index = '';
                 if (r.bib % 1000 !== prevBib) {
                     index++;
-                    results.push({ index: index });
+                    results.push({index: index});
                     prevBib = r.bib % 1000;
                 }
                 results.push(r);
@@ -129,12 +129,16 @@
             return this;
         },
         load: function () {
-            var fields = localStorage ? JSON.parse(localStorage.getItem(this.localId)) : undefined;
-            if (fields) {
-                for (var _i = 0, fields_ = fields; _i < fields_.length; _i++) {
-                    var f = fields_[_i];
-                    this.active(f.key, f.active);
+            try {
+                var fields = localStorage ? JSON.parse(localStorage.getItem(this.localId)) : undefined;
+                if (fields) {
+                    for (var _i = 0, fields_ = fields; _i < fields_.length; _i++) {
+                        var f = fields_[_i];
+                        this.active(f.key, f.active);
+                    }
                 }
+            } catch (e) {
+                console.log(e)
             }
             return this;
         },
@@ -155,10 +159,11 @@
             titleBlock.appendChild(document.createTextNode(group.name));
             resultBlock.appendChild(titleBlock);
             resultBlock.appendChild(getGroupsBlockElement(race));
-            resultBlock.appendChild(new TableGenerator(getStartListByGroup(group), Fields.fields).getTable({ className: 'sportorg-table' }));
+            resultBlock.appendChild(new TableGenerator(getStartListByGroup(group), Fields.fields).getTable({className: 'sportorg-table'}));
         }
         Fields.save();
     }
+
     render();
     new SettingsGenerator([
         {

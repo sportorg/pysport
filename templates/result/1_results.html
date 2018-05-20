@@ -23,8 +23,8 @@
 </div>
 {% raw %}
 <script>
-    var race = {% endraw %}{{race|tojson}}{% raw %};
-    var selected = {% endraw %}{{selected|tojson}}{% raw %};
+    var race = {% endraw %}{{race|tojson}}{%raw %};
+    var selected = {% endraw %}{{selected|tojson}}{%raw %};
     racePreparation(race);
 
     function getResultsByGroup(group, splitInfo) {
@@ -80,7 +80,7 @@
                 results.push(r);
             }
         }
-        results.sort(function(a, b) {
+        results.sort(function (a, b) {
             if (isRelay) {
                 if (a.place < 1) {
                     return 1
@@ -113,7 +113,7 @@
                 r.index = '';
                 if (r.bib % 1000 !== prevBib) {
                     index++;
-                    results.push({ index: index });
+                    results.push({index: index});
                     prevBib = r.bib % 1000;
                 }
                 results.push(r);
@@ -127,26 +127,26 @@
         return results;
     }
 
-    function getRankingByGroup(group){
+    function getRankingByGroup(group) {
         var rankingBlock = document.createElement('span');
         var ranking = group.ranking;
-        if (ranking && ranking.is_active){
+        if (ranking && ranking.is_active) {
             var text = 'Квалификационный уровень (баллы): ' + ranking.rank_scores;
             rankingBlock.appendChild(document.createTextNode(text));
 
             for (var _i = 0; _i < ranking.rank.length; _i++) {
                 var rank = ranking.rank[_i];
                 if (rank.is_active) {
-                    if (rank.max_place > 0){
+                    if (rank.max_place > 0) {
                         var text = Qualification[rank.qual] + ' - до ' + rank.max_place + ' места';
                         rankingBlock.appendChild(document.createElement("br"));
                         rankingBlock.appendChild(document.createTextNode(text));
                     }
-                    else{
-                        if(rank.max_time > 0){
+                    else {
+                        if (rank.max_time > 0) {
                             var text = Qualification[rank.qual] + ' - ' + toHHMMSS(rank.max_time);
-                            if(rank.percent > 0){
-                                 text += ' (' + rank.percent + '%)';
+                            if (rank.percent > 0) {
+                                text += ' (' + rank.percent + '%)';
                             }
                             rankingBlock.appendChild(document.createElement("br"));
                             rankingBlock.appendChild(document.createTextNode(text));
@@ -155,7 +155,7 @@
                 }
             }
         }
-        else{
+        else {
             var text = 'Ранг не подсчитывался';
             rankingBlock.appendChild(document.createTextNode(text));
         }
@@ -211,12 +211,16 @@
             return this;
         },
         load: function () {
-            var fields = localStorage ? JSON.parse(localStorage.getItem(this.localId)) : undefined;
-            if (fields) {
-                for (var _i = 0, fields_ = fields; _i < fields_.length; _i++) {
-                    var f = fields_[_i];
-                    this.active(f.key, f.active);
+            try {
+                var fields = localStorage ? JSON.parse(localStorage.getItem(this.localId)) : undefined;
+                if (fields) {
+                    for (var _i = 0, fields_ = fields; _i < fields_.length; _i++) {
+                        var f = fields_[_i];
+                        this.active(f.key, f.active);
+                    }
                 }
+            } catch (e) {
+                console.log(e)
             }
             return this;
         },
@@ -245,15 +249,16 @@
                     fields.push({key: index + '_' + control.code, title: control.code})
                 })
             }
-            resultBlock.appendChild(new TableGenerator(getResultsByGroup(group, store.splitInfo), fields).getTable({ className: 'sportorg-table' }));
+            resultBlock.appendChild(new TableGenerator(getResultsByGroup(group, store.splitInfo), fields).getTable({className: 'sportorg-table'}));
 
             //show ranking information
-            if (store.rankingShow){
+            if (store.rankingShow) {
                 resultBlock.appendChild(getRankingByGroup(group))
             }
         }
         Fields.save();
     }
+
     render();
 
     new SettingsGenerator([
