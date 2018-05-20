@@ -12,11 +12,10 @@
 <div id="content">{% block content %}{% endblock %}</div>
 <div id="footer">
     {% block footer %}
-    <a href="http://www.sportorg.o-ural.ru">ПО {{name}} {{version}}</a>.
-    Время печати:
+    <a href="http://www.sportorg.o-ural.ru">ПО {{name}} {{version}}</a>
     <script type="text/javascript">
         var l = new Date();
-        document.write (l.toLocaleString());
+        document.write ('<span class="print-only">Время печати: ' + l.toLocaleString() + '</span>');
         if (!isChrome && !isFirefox) {
             document.write('<p class="no-print" style="color: red">Используйте браузер Google Chrome или Firefox</p>');
         }
