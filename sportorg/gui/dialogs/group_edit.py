@@ -1,6 +1,5 @@
 import logging
 
-from PyQt5.QtCore import QModelIndex
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, QPushButton, QSpinBox, QTimeEdit, QCheckBox, \
     QDialogButtonBox
@@ -18,10 +17,11 @@ from sportorg.utils.time import time_to_qtime, time_to_otime
 
 
 class GroupEditDialog(QDialog):
-    def __init__(self, group):
+    def __init__(self, group, is_new=False):
         super().__init__(GlobalAccess().get_main_window())
         assert (isinstance(group, Group))
         self.current_object = group
+        self.is_new = is_new
         self.time_format = 'hh:mm:ss'
 
     def exec(self):
@@ -123,8 +123,8 @@ class GroupEditDialog(QDialog):
         name = self.item_name.text()
         self.button_ok.setDisabled(False)
         if name and name != self.current_object.name:
-            org = find(race().groups, name=name)
-            if org:
+            group = find(race().groups, name=name)
+            if group:
                 self.button_ok.setDisabled(True)
 
     def set_values_from_model(self):
@@ -165,6 +165,8 @@ class GroupEditDialog(QDialog):
     def apply_changes_impl(self):
         group = self.current_object
         assert (isinstance(group, Group))
+        if self.is_new:
+            race().groups.insert(0, group)
 
         if group.name != self.item_name.text():
             group.name = self.item_name.text()

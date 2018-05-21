@@ -23,10 +23,11 @@ from sportorg.utils.time import time_to_qtime, time_to_otime, hhmmss_to_time
 
 
 class ResultEditDialog(QDialog):
-    def __init__(self, result):
+    def __init__(self, result, is_new=False):
         super().__init__(GlobalAccess().get_main_window())
         assert (isinstance(result, Result))
         self.current_object = result
+        self.is_new = is_new
 
         self.time_format = 'hh:mm:ss'
         time_accuracy = race().get_setting('time_accuracy', 0)
@@ -209,6 +210,8 @@ class ResultEditDialog(QDialog):
 
     def apply_changes_impl(self):
         result = self.current_object
+        if self.is_new:
+            race().results.insert(0, result)
 
         if result.is_punch():
             if result.card_number != self.item_card_number.value():

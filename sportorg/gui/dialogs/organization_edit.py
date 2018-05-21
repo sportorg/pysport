@@ -13,10 +13,11 @@ from sportorg.modules.teamwork import Teamwork
 
 
 class OrganizationEditDialog(QDialog):
-    def __init__(self, organization):
+    def __init__(self, organization, is_new=False):
         super().__init__(GlobalAccess().get_main_window())
         assert (isinstance(organization, Organization))
         self.current_object = organization
+        self.is_new = is_new
 
     def exec(self):
         self.init_ui()
@@ -105,6 +106,8 @@ class OrganizationEditDialog(QDialog):
     def apply_changes_impl(self):
         org = self.current_object
         assert (isinstance(org, Organization))
+        if self.is_new:
+            race().organizations.insert(0, org)
 
         if org.name != self.item_name.text():
             org.name = self.item_name.text()
