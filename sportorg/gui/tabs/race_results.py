@@ -168,7 +168,7 @@ class Widget(QtWidgets.QWidget):
 
         course = None
         if result.person:
-            course = race().find_course(result.person)
+            course = race().find_course(result)
 
         control_codes = []
         is_highlight = True

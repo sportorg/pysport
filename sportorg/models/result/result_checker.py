@@ -20,7 +20,7 @@ class ResultChecker:
         if self.person.group is None:
             return True
 
-        course = race().find_course(self.person)
+        course = race().find_course(result)
 
         if course is None:
             return True
@@ -65,7 +65,7 @@ class ResultChecker:
         if person.group is None:
             return
 
-        course = race().find_course(person)
+        course = race().find_course(result)
         if not course:
             return
 

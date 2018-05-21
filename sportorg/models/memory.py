@@ -1202,17 +1202,19 @@ class Race(Model):
                 return i
         return None
 
-    def find_course(self, person):
+    def find_course(self, result):
         # first get course by number
-        bib = person.bib
-        ret = find(self.courses, name=str(bib))
-        if not ret and bib > 1000:
-            course_name = '{}.{}'.format(bib % 1000, bib // 1000)
-            ret = find(self.courses, name=course_name)
-        # usual connection via group
-        if not ret and person.group:
-            ret = person.group.course
-        return ret
+        person = result.person
+        if person:
+            bib = person.bib
+            ret = find(self.courses, name=str(bib))
+            if not ret and bib > 1000:
+                course_name = '{}.{}'.format(bib % 1000, bib // 1000)
+                ret = find(self.courses, name=course_name)
+            # usual connection via group
+            if not ret and person.group:
+                ret = person.group.course
+            return ret
 
     def find_group(self, group_name):
         # get group by name
@@ -1231,7 +1233,7 @@ class Race(Model):
         """List[Split]"""
         if not result.person:
             return result.get_course_splits()
-        course = self.find_course(result.person)  # type: Course
+        course = self.find_course(result)  # type: Course
         return result.get_course_splits(course)
 
     def new_result(self, obj=None):
