@@ -22,7 +22,7 @@ def split_printout(result):
         raise NoResultToPrintException('No results to print')
 
     obj = race()
-    course = obj.find_course(person)
+    course = obj.find_course(result)
 
     if person.group and course:
         printer = Config().printer.get('split')

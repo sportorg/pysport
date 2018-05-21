@@ -26,7 +26,7 @@ class PersonSplits(object):
     @property
     def course(self):
         if self._course is None:
-            self._course = self.race.find_course(self.person)
+            self._course = self.race.find_course(self.result)
             if self._course is None:
                 self._course = Course()
         return self._course
