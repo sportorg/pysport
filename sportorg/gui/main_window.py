@@ -9,6 +9,10 @@ from PyQt5.QtCore import QModelIndex, QItemSelectionModel, QThread, pyqtSignal
 from PyQt5.QtWidgets import QMainWindow, QTableView, QMessageBox
 
 from sportorg.core.singleton import singleton
+from sportorg.gui.dialogs.course_edit import CourseEditDialog
+from sportorg.gui.dialogs.entry_edit import EntryEditDialog
+from sportorg.gui.dialogs.group_edit import GroupEditDialog
+from sportorg.gui.dialogs.organization_edit import OrganizationEditDialog
 from sportorg.gui.menu.factory import Factory
 from sportorg.models.memory import Race, races, race, NotEmptyException
 
@@ -546,18 +550,22 @@ class MainWindow(QMainWindow):
         try:
             tab = self.current_tab
             if tab == 0:
-                race().add_new_person()
+                p = race().add_new_person()
+                EntryEditDialog(p, True).exec()
                 self.get_person_table().model().init_cache()
             elif tab == 1:
                 self.menu_factory.execute('ManualFinishAction')
             elif tab == 2:
-                race().add_new_group()
-                self.get_person_table().model().init_cache()
+                g = race().add_new_group()
+                GroupEditDialog(g, True).exec()
+                self.get_group_table().model().init_cache()
             elif tab == 3:
-                race().add_new_course()
+                c = race().add_new_course()
+                CourseEditDialog(c, True).exec()
                 self.get_course_table().model().init_cache()
             elif tab == 4:
-                race().add_new_organization()
+                o = race().add_new_organization()
+                OrganizationEditDialog(o, True).exec()
                 self.get_organization_table().model().init_cache()
             self.refresh()
         except Exception as e:

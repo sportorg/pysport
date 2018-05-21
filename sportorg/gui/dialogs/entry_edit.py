@@ -21,11 +21,12 @@ class EntryEditDialog(QDialog):
     GROUP_NAME = ''
     ORGANIZATION_NAME = ''
 
-    def __init__(self, person):
+    def __init__(self, person, is_new=False):
         super().__init__(GlobalAccess().get_main_window())
         self.is_ok = {}
         assert (isinstance(person, Person))
         self.current_object = person
+        self.is_new = is_new
 
         self.time_format = 'hh:mm:ss'
         time_accuracy = race().get_setting('time_accuracy', 0)
@@ -275,6 +276,8 @@ class EntryEditDialog(QDialog):
     def apply_changes_impl(self):
         person = self.current_object
         assert (isinstance(person, Person))
+        if self.is_new:
+            race().persons.insert(0, person)
         if person.name != self.item_name.currentText():
             person.name = self.item_name.currentText()
         if person.surname != self.item_surname.text():

@@ -19,7 +19,7 @@ class NotEmptyException(Exception):
 
 class Limit:
     BIB = 100000
-    PRICE = 100000000000
+    PRICE = 100000000
 
 
 class SystemType(Enum):
@@ -1241,21 +1241,29 @@ class Race(Model):
         new_result.days = self.get_days()
         return new_result
 
-    def add_new_person(self):
+    def add_new_person(self, append_to_race=False):
         new_person = Person()
-        self.persons.insert(0, new_person)
+        if append_to_race:
+            self.persons.insert(0, new_person)
+        return new_person
 
-    def add_new_group(self):
+    def add_new_group(self, append_to_race=False):
         new_group = Group()
-        self.groups.insert(0, new_group)
+        if append_to_race:
+            self.groups.insert(0, new_group)
+        return new_group
 
-    def add_new_course(self):
+    def add_new_course(self, append_to_race=False):
         new_course = Course()
-        self.courses.insert(0, new_course)
+        if append_to_race:
+            self.courses.insert(0, new_course)
+        return new_course
 
-    def add_new_organization(self):
+    def add_new_organization(self, append_to_race=False):
         new_organization = Organization()
-        self.organizations.insert(0, new_organization)
+        if append_to_race:
+            self.organizations.insert(0, new_organization)
+        return new_organization
 
     def update_counters(self):
         # recalculate group counters
