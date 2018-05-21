@@ -238,6 +238,10 @@
         resultBlock.innerHTML = '';
         for (var _i = 0, _a = race.groups; _i < _a.length; _i++) {
             var group = _a[_i];
+            var rows = getResultsByGroup(group, store.splitInfo);
+            if (!rows.length) {
+                continue;
+            }
             var titleBlock = document.createElement('h2');
             titleBlock.id = group.name;
             titleBlock.appendChild(document.createTextNode(group.name));
@@ -249,11 +253,16 @@
                     fields.push({key: index + '_' + control.code, title: control.code})
                 })
             }
-            resultBlock.appendChild(new TableGenerator(getResultsByGroup(group, store.splitInfo), fields).getTable({className: 'sportorg-table'}));
+            resultBlock.appendChild(new TableGenerator(rows, fields).getTable({className: 'sportorg-table'}));
 
             //show ranking information
             if (store.rankingShow) {
                 resultBlock.appendChild(getRankingByGroup(group))
+            }
+            if (store.newPage && _i < _a.length - 1) {
+                var newPage = document.createElement('div');
+                newPage.className = 'new-page';
+                resultBlock.appendChild(newPage);
             }
         }
         Fields.save();
@@ -329,7 +338,14 @@
                 render()
             }
         },
-
+        {
+            title: 'Печатать на отдельной странице',
+            value: false,
+            change: function (checked) {
+                store.newPage = checked;
+                render()
+            }
+        }
     ]).show();
 </script>
 {% endraw %}

@@ -175,6 +175,7 @@
 
         function SettingsGenerator(settings) {
             this.settings = settings;
+            this.isShow = true;
         }
 
         SettingsGenerator.prototype.show = function () {
@@ -182,9 +183,13 @@
             for (var _i = 0, _a = this.settings; _i < _a.length; _i++) {
                 var setting = _a[_i];
                 var row = Row();
+                row.className = row.className + ' ' + 'sportorg-settings-hidden';
                 row.appendChild(this.getElBySetting(setting));
                 block.appendChild(row);
             }
+            var btn = Row();
+            btn.appendChild(this.getHiddenButton());
+            block.appendChild(btn);
             document.body.appendChild(block);
         };
         SettingsGenerator.prototype.getElBySetting = function (setting) {
@@ -227,6 +232,24 @@
                 label.appendChild(s);
                 return label
             }
+        };
+        SettingsGenerator.prototype.getHiddenButton = function () {
+            var el = document.createElement('button');
+            el.appendChild(document.createTextNode('Свернуть/Развернуть'));
+            var _this = this;
+            el.onclick = function (ev) {
+                var els = document.getElementsByClassName('sportorg-settings-hidden');
+                for (var _i = 0, els_ = els; _i < els_.length; _i++) {
+                    var el = els_[_i];
+                    if (_this.isShow) {
+                        el.style.display = 'none';
+                    } else {
+                        el.style.display = 'block';
+                    }
+                }
+                _this.isShow = !_this.isShow;
+            };
+            return el;
         };
         return SettingsGenerator;
     }());
