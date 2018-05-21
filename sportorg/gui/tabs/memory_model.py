@@ -277,7 +277,7 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
 
     def get_headers(self):
         return [_('Last name'), _('First name'), _('Group'), _('Team'), _('Bib'), _('Card'), _('Start'), _('Finish'), _('Result'),
-                _('Status'), _('Penalty'), _('Penalty legs'), _('Place'), _('Type')]
+                _('Status'), _('Penalty'), _('Penalty legs'), _('Place'), _('Type'), _('Rented card')]
 
     def init_cache(self):
         self.cache.clear()
@@ -297,6 +297,7 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
         first_name = ''
         last_name = ''
         bib = 0
+        rented_card = ''
         if person:
             first_name = person.name
             last_name = person.surname
@@ -307,6 +308,8 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
 
             if person.organization:
                 team = person.organization.name
+
+            rented_card = _('Rented card') if person.is_rented_card else _('Rented stub')
 
         start = ''
         if i.get_start_time():
@@ -330,7 +333,8 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
             time_to_hhmmss(i.get_penalty_time()),
             i.penalty_laps,
             i.get_place(),
-            str(i.system_type)
+            str(i.system_type),
+            rented_card
         ]
 
     def get_source_array(self):
