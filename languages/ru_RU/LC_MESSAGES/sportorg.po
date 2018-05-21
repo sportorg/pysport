@@ -1125,3 +1125,15 @@ msgstr "Сдвинуть вниз"
 
 msgid "Created at"
 msgstr "Создан"
+
+msgid "Import result"
+msgstr "Результат импорта"
+
+msgid "Persons"
+msgstr "Люди"
+
+msgid "Duplicate card numbers (card numbers are reset)"
+msgstr "Дублирующиеся чипы (номера чипов обнулены)"
+
+msgid "Duplicate names"
+msgstr "Повторяющиеся имена"

@@ -1320,6 +1320,25 @@ class Race(Model):
             return True
         return False
 
+    def get_lengths(self):
+        return len(self.persons), len(self.results), len(self.groups), len(self.courses), len(self.organizations)
+
+    def get_duplicate_card_numbers(self):
+        ret = []
+        for person in self.persons:
+            for p in self.persons:
+                if person.id != p.id and person.card_number and person.card_number == p.card_number:
+                    ret.append(person)
+        return ret
+
+    def get_duplicate_names(self):
+        ret = []
+        for person in self.persons:
+            for p in self.persons:
+                if person.id != p.id and person.full_name and person.full_name == p.full_name:
+                    ret.append(person)
+        return ret
+
 
 class Qualification(IntEnum):
     NOT_QUALIFIED = 0

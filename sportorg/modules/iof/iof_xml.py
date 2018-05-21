@@ -1,8 +1,10 @@
+import logging
 from datetime import datetime
 
 import dateutil.parser
 
 from sportorg import config
+from sportorg.language import _
 from sportorg.libs.iof.iof import ResultList
 from sportorg.libs.iof.parser import parse
 from sportorg.models.memory import race, Group, find, Organization, Person, Qualification
@@ -70,3 +72,27 @@ def import_entry_list(file):
         if 'qual' in person_entry['person']['extensions'] and person_entry['person']['extensions']['qual']:
             person.qual = Qualification.get_qual_by_name(person_entry['person']['extensions']['qual'])
         obj.persons.append(person)
+
+    persons_dupl_cards = obj.get_duplicate_card_numbers()
+    persons_dupl_names = obj.get_duplicate_names()
+
+    if len(persons_dupl_cards):
+        logging.info('{}'.format(_('Duplicate card numbers (card numbers are reset)')))
+        for person in persons_dupl_cards:
+            logging.info('{} {} {} {}'.format(
+                person.full_name,
+                person.group.name if person.group else '',
+                person.organization.name if person.organization else '',
+                person.card_number
+            ))
+            person.card_number = 0
+    if len(persons_dupl_names):
+        logging.info('{}'.format(_('Duplicate names')))
+        for person in persons_dupl_names:
+            person.card_number = 0
+            logging.info('{} {} {} {}'.format(
+                person.full_name,
+                person.get_year(),
+                person.group.name if person.group else '',
+                person.organization.name if person.organization else ''
+            ))
