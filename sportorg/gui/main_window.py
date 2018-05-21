@@ -18,6 +18,7 @@ from sportorg.models.memory import Race, races, race, NotEmptyException
 
 from sportorg import config
 from sportorg.models.result.result_calculation import ResultCalculation
+from sportorg.models.result.split_calculation import GroupSplits
 from sportorg.modules.backup.file import File
 from sportorg.modules.live.orgeo import OrgeoClient
 from sportorg.modules.printing.model import NoResultToPrintException, split_printout, NoPrinterSelectedException
@@ -401,6 +402,8 @@ class MainWindow(QMainWindow):
                             logging.error(str(e))
                         except Exception as e:
                             logging.error(str(e))
+                    elif result.person and result.person.group:
+                        GroupSplits(race(), result.person.group).generate(True)
                     Teamwork().send(result.to_dict())
                     self.auto_save()
                     OrgeoClient().send_results()

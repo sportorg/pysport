@@ -756,30 +756,10 @@ class ResultSportident(Result):
         self.__finish_time = None
 
     def get_course_splits(self, course=None):
-        result_splits = []
-        for i, split in enumerate(self.splits):
-            if not i or split.code != self.splits[i - 1].code:
-                result_splits.append(split)
-        if not course or course.is_unknown():
-            return result_splits
-        max_len = len(result_splits)
         splits = []
-        i = 0
-        for control in course.controls:
-            if i >= max_len:
-                break
-
-            while not str(result_splits[i].code) in control.code:
-                # skip incorrect punches
-                i += 1
-                if i >= max_len:
-                    break
-
-            if i >= max_len:
-                break
-
-            splits.append(result_splits[i])
-            i += 1
+        for split in self.splits:
+            if split.is_correct:
+                splits.append(split)
         return splits
 
     def check(self, course=None):
