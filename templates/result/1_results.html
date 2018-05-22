@@ -94,6 +94,9 @@
                 return a.place - b.place
 
             } else {
+                if (a.status !== 1 && b.status !== 1) {
+                    return STATUS_PRIORITY.indexOf(a.status) - STATUS_PRIORITY.indexOf(b.status);
+                }
                 if (a.status !== 1) {
                     return 1
                 }
