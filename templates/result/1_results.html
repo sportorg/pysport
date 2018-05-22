@@ -48,10 +48,19 @@
                     diff: toHHMMSS(result.diff),
                     place: result.place,
                     status: result.status,
+                    scores: result.scores,
                     place_show: result.person.is_out_of_competition ? 'в/к' : result.place === 0 ? '' : result.place === -1 ? '' : result.place,
                     speed: result.speed,
                     data: result
                 };
+                if (result.status !== 1) {
+                    r.diff = '';
+                    r.place_show = '';
+                    r.speed = '';
+                    r.scores = '';
+                    r.penalty_time = '';
+                    r.penalty_laps = '';
+                }
                 var control_index = 0;
                 if (result.splits) {
                     for (var _b = 0, _c = result.splits; _b < _c.length; _b++) {
@@ -180,7 +189,8 @@
             {key: 'result', title: 'Результат'},
             {key: 'diff', title: 'Отставание'},
             {key: 'speed', title: 'Темп', active: false},
-            {key: 'place_show', title: 'Место'}
+            {key: 'place_show', title: 'Место'},
+            {key: 'scores', title: 'Очки', active: false}
         ],
         active: function (key, val) {
             for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
@@ -331,6 +341,14 @@
             change: function (arr) {
                 store.splitInfo = arr[0];
                 render();
+            }
+        },
+        {
+            title: 'Очки',
+            value: Fields.isActive('scores'),
+            change: function (checked) {
+                Fields.active('scores', checked);
+                render()
             }
         },
         {
