@@ -7,6 +7,7 @@
     <h2>ПРОТОКОЛ РЕЗУЛЬТАТОВ</h2>
 </div>
 <div id="groups-table"></div>
+<div id="not-results-table"></div>
 <div id="results-tables"></div>
 <div>
     <table class="empty-table">
@@ -35,6 +36,16 @@
             {key: 'name', title: 'Группа'},
             {key: 'count_person', title: 'Кол-во участников'},
             {key: 'count_not_finished', title: 'Бегут'}
+        ],
+        didNotFields: [
+            {key: 'group', title: 'Группа'},
+            {key: 'name', title: 'Фамилия, имя'},
+            {key: 'bib', title: 'Номер'},
+            {key: 'start', title: 'Время старта'},
+            {key: 'year', title: 'ГР'},
+            {key: 'qual', title: 'Разряд'},
+            {key: 'org', title: 'Коллектив'},
+            {key: 'contact', title: 'Контактные данные'}
         ],
         fields: [
             {key: 'index', title: '№'},
@@ -121,6 +132,13 @@
                         start: toHHMMSS(result.start_msec),
                         data: result
                     };
+                    if (result.status !== 1) {
+                        r.diff = '';
+                        r.place_show = '';
+                        r.speed = '';
+                        r.penalty_time = '';
+                        r.penalty_laps = '';
+                    }
                     if (result.status === 14) {
                         countDidNotEnter++;
                     }
@@ -141,6 +159,9 @@
                     return a.place - b.place
 
                 } else {
+                    if (a.status !== 1 && b.status !== 1) {
+                        return STATUS_PRIORITY.indexOf(a.status) - STATUS_PRIORITY.indexOf(b.status);
+                    }
                     if (a.status !== 1) {
                         return 1
                     }
@@ -172,6 +193,39 @@
                 })
             }
             return {results: results, countDidNotEnter: countDidNotEnter};
+        },
+        getDidNotEnterResults: function () {
+            var results = [];
+            for (var _i = 0, _a = this.race.results; _i < _a.length; _i++) {
+                var result = _a[_i];
+                if (result.status === 14) {
+                    var r = {
+                        name: result.person.surname + ' ' + result.person.name,
+                        group: (result.person.group && result.person.group.name) || '',
+                        org: (result.person.organization && String(result.person.organization.name).slice(0, MAX_ORG_NAME)) || '',
+                        qual: Qualification[result.person.qual],
+                        bib: result.person.bib,
+                        start: toHHMMSS(result.start_msec),
+                        contact: result.person.organization && result.person.organization.contact.value,
+                        year: result.person.birth_date ? (new Date(result.person.birth_date)).getFullYear() : '',
+                        data: result
+                    };
+                    results.push(r);
+                }
+            }
+            results.sort(function (a, b) {
+                var nameA = a.group.toLowerCase() || '';
+                var nameB = b.group.toLowerCase() || '';
+                if (nameA === nameB) {
+                    return a.data.start_msec - b.data.start_msec;
+                }
+                if (nameA < nameB)
+                    return -1;
+                if (nameA > nameB)
+                    return 1;
+                return 0;
+            });
+            return results;
         },
         countDidNotEnter: function (group) {
             var count = 0;
@@ -209,6 +263,8 @@
         render: function () {
             var resultBlock = document.getElementById('results-tables');
             resultBlock.innerHTML = '';
+            var notResultBlock = document.getElementById('not-results-table');
+            notResultBlock.innerHTML = '';
             var groupBlock = document.getElementById('groups-table');
             groupBlock.innerHTML = '';
 
@@ -222,6 +278,15 @@
                 return group;
             }), this.groupFields).getTable({ className: 'sportorg-table' }));
 
+            groupBlock.appendChild(document.createElement('hr'));
+
+            notResultBlock.appendChild(new TableGenerator(
+                this.getDidNotEnterResults(),
+                this.didNotFields
+            ).getTable({ className: 'sportorg-table' }));
+
+            notResultBlock.appendChild(document.createElement('hr'));
+
             for (var _i = 0, _a = this.race.groups; _i < _a.length; _i++) {
                 var group = _a[_i];
                 var r = this.getResults(group);
@@ -229,9 +294,8 @@
                 var titleBlock = document.createElement('h2');
                 titleBlock.id = group.name;
                 titleBlock.appendChild(document.createTextNode(group.name));
-                var maxTime = toHHMMSS(group.max_time);
-                if (maxTime) {
-                    titleBlock.appendChild(document.createTextNode(', Контрольное время: ' + maxTime));
+                if (group.max_time) {
+                    titleBlock.appendChild(document.createTextNode(', Контрольное время: ' + toHHMMSS(group.max_time)));
                 }
                 if (r.countDidNotEnter) {
                     titleBlock.appendChild(document.createTextNode(', Не финишировали: ' + r.countDidNotEnter));
