@@ -199,7 +199,11 @@
 <script>
     var race = {% endraw %}{{race|tojson}}{% raw %};
     racePreparation(race);
-    function render (sort) {
+    var store = {
+        bibDetailedRotatableText: true
+    };
+    function render (options) {
+        var sort = options && options.sort;
         var sortFunc = function (a, b) {
             return a.bib - b.bib;
         };
@@ -274,7 +278,9 @@
             bibTitleBlock.appendChild(document.createTextNode(''));
             bibNumberBlock.appendChild(document.createTextNode(person.bib));
             bibInfoBlock.appendChild(bibDetailedBlock);
-            bibInfoBlock.appendChild(bibDetailedRotatableBlock);
+            if (options && options.bibDetailedRotatableText) {
+                bibInfoBlock.appendChild(bibDetailedRotatableBlock);
+            }
             bibItemBlock.appendChild(bibTitleBlock);
             bibItemBlock.appendChild(bibNumberBlock);
             bibItemBlock.appendChild(bibInfoBlock);
@@ -284,7 +290,7 @@
             bibListBlock.appendChild(newPageBlock);
         }
     }
-    render();
+    render(store);
     new SettingsGenerator([
         {
             title: 'Сортировать по: ',
@@ -295,7 +301,16 @@
                 {text: 'коллективу', value: 'organization'}
             ],
             change: function (arr) {
-                render(arr[0]);
+                store.sort = arr[0];
+                render(store);
+            }
+        },
+        {
+            title: 'Отображать перевернутые данные',
+            value: store.bibDetailedRotatableText,
+            change: function (checked) {
+                store.bibDetailedRotatableText = checked;
+                render(store);
             }
         }
     ]).show()
