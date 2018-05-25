@@ -63,6 +63,12 @@ class _TitleType(Enum):
         ret = [obj.get_title() for obj in cls]
         return ret
 
+    @classmethod
+    def get_by_name(cls, printable_name):
+        for obj in cls:
+            if obj.get_title() == printable_name:
+                return obj
+
 
 class Sex(_TitleType):
     MF = PrintableValue(0, _('MF'))
@@ -72,11 +78,11 @@ class Sex(_TitleType):
 
 class RaceType(_TitleType):
     INDIVIDUAL_RACE = PrintableValue(0, _('Individual race'))
-    MASS_START = PrintableValue(1, _('Mass start'))
-    PURSUIT = PrintableValue(2, _('Pursuit'))
+    # MASS_START = PrintableValue(1, _('Mass start'))
+    # PURSUIT = PrintableValue(2, _('Pursuit'))
     RELAY = PrintableValue(3, _('Relay'))
-    ONE_MAN_RELAY = PrintableValue(4, _('One man relay'))
-    SPRINT_RELAY = PrintableValue(5, _('Sprint relay'))
+    # ONE_MAN_RELAY = PrintableValue(4, _('One man relay'))
+    # SPRINT_RELAY = PrintableValue(5, _('Sprint relay'))
 
 
 class ResultStatus(_TitleType):

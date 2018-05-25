@@ -117,7 +117,7 @@ class EventPropertiesDialog(QDialog):
         self.item_secretary.setText(str(obj.data.secretary))
         self.item_start_date.setDateTime(obj.data.get_start_datetime())
         self.item_end_date.setDateTime(obj.data.get_end_datetime())
-        self.item_type.setCurrentIndex(obj.data.race_type.value)
+        self.item_type.setCurrentText(obj.data.race_type.get_title())
         self.item_relay_legs.setValue(obj.data.relay_leg_count)
         self.change_type()
 
@@ -136,7 +136,10 @@ class EventPropertiesDialog(QDialog):
         obj.data.secretary = self.item_secretary.text()
         obj.data.start_datetime = start_date
         obj.data.end_datetime = end_date
-        obj.data.race_type = RaceType(self.item_type.currentIndex())
+
+        t = RaceType.get_by_name(self.item_type.currentText())
+        if t is not None:
+            obj.data.race_type = t
         obj.data.relay_leg_count = self.item_relay_legs.value()
 
         obj.set_setting('system_zero_time', (
