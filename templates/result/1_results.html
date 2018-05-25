@@ -22,13 +22,21 @@
     </table>
 </div>
 {% raw %}
+<style>
+    table.table-split {
+        margin: 0;
+    }
+    table.table-split td{
+        border: 0;
+        padding: 0;
+    }
+</style>
 <script>
     var race = {% endraw %}{{race|tojson}}{%raw %};
     var selected = {% endraw %}{{selected|tojson}}{%raw %};
     racePreparation(race);
 
-    function getResultsByGroup(group, splitInfo) {
-        splitInfo = splitInfo || 'cumulativeTotal';
+    function getResultsByGroup(group) {
         var isRelay = group.__type ? group.__type === 3 : race.data.race_type === 3;
         var results = [];
         for (var _i = 0, _a = race.results; _i < _a.length; _i++) {
@@ -63,27 +71,38 @@
                 }
                 var control_index = 0;
                 if (result.splits) {
+                    var lastSplit = 0;
                     for (var _b = 0, _c = result.splits; _b < _c.length; _b++) {
                         var split = _c[_b];
                         if (split.is_correct) {
-                            var info;
-                            var place = 0;
-                            switch (splitInfo) {
-                                case 'cumulativeTotal':
-                                    info = toHHMMSS(split.relative_time) + ' (' + split.relative_place + ')';
-                                    place = split.relative_place;
-                                    break;
-                                case 'segment':
-                                    info = toHHMMSS(split.leg_time) + ' (' + split.leg_place + ')';
-                                    place = split.leg_place;
-                                    break;
-                            }
-                            var span = document.createElement('span');
-                            span.className = 'result-' + place;
-                            span.appendChild(document.createTextNode(info));
-                            r[control_index + '_' + split.code] = span;
+
+                            var getTrBlock = function (t, p) {
+                                var tr = document.createElement('tr');
+                                var td1 = document.createElement('td');
+                                td1.className = 'result-' + p;
+                                td1.appendChild(document.createTextNode(t));
+                                tr.appendChild(td1);
+                                return tr;
+                            };
+
+                            var tbl = document.createElement('table');
+                            tbl.className = 'table-split';
+                            tbl.appendChild(getTrBlock(toHHMMSS(split.leg_time) + ' (' + split.leg_place + ')', split.leg_place));
+                            tbl.appendChild(getTrBlock(toHHMMSS(split.relative_time) + ' (' + split.relative_place + ')', split.relative_place));
+                            r[control_index + '_' + split.code] = tbl;
                             control_index++;
+                            lastSplit = split.relative_time;
                         }
+                    }
+
+                    var finishMsec = r.resultMsec - lastSplit;
+
+                    if (r.status === 1 && finishMsec > 0) {
+                        var tblF = document.createElement('table');
+                        tblF.className = 'table-split';
+                        tblF.appendChild(getTrBlock(toHHMMSS(finishMsec), 0));
+                        tblF.appendChild(getTrBlock(toHHMMSS(r.resultMsec) + ' (' + r.place + ')', r.place));
+                        r.finish_split = tblF;
                     }
                 }
                 results.push(r);
@@ -251,7 +270,7 @@
         resultBlock.innerHTML = '';
         for (var _i = 0, _a = race.groups; _i < _a.length; _i++) {
             var group = _a[_i];
-            var rows = getResultsByGroup(group, store.splitInfo);
+            var rows = getResultsByGroup(group);
             if (!rows.length) {
                 continue;
             }
@@ -264,7 +283,8 @@
             if (store.splitsShow && group.course) {
                 group.course.controls.forEach(function (control, index) {
                     fields.push({key: index + '_' + control.code, title: control.code})
-                })
+                });
+                fields.push({key: 'finish_split', title: 'F'})
             }
             resultBlock.appendChild(new TableGenerator(rows, fields).getTable({className: 'sportorg-table'}));
 
@@ -330,17 +350,6 @@
             change: function (checked) {
                 store.splitsShow = checked;
                 render()
-            }
-        },
-        {
-            title: 'Выводить ',
-            value: [
-                {text: 'Нарастающий итог', value: 'cumulativeTotal'},
-                {text: 'Отрезок', value: 'segment'}
-            ],
-            change: function (arr) {
-                store.splitInfo = arr[0];
-                render();
             }
         },
         {
