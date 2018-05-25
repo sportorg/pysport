@@ -99,7 +99,7 @@ class ClassesV8:
                 raise FileNotFoundError("Not found " + file)
         else:
             content = file.readlines()
-        self._data = [x.strip() for x in content]
+        self._data = [x.strip() for x in content if x]
         self.clear()
 
         return self
@@ -140,8 +140,13 @@ class ClassesV8:
         limit = len(courses_split)
         i = 0
         while (2 * i + 1) < limit:
+            len_str = str(courses_split[2 * i]).replace(',', '.')
+            if len_str and not len_str.replace('.', '').isdecimal():
+                raise OcadImportException('Incorrect length:' + len_str + ' in row ' + str(item))
+
             courses[i] = CourseControl(**{"order": i, "code": courses_split[2 * i + 1],
-                                          "length": float(courses_split[2 * i]) if len(item[4]) else 0.0})
+                                          "length": float(len_str) if len(item[4])
+                                          else 0.0})
             i += 1
 
         return courses
@@ -159,12 +164,24 @@ class ClassesV8:
             raise TypeError("item is not string or list")
         if isinstance(item, str):
             item = str(item).split(';')
+
+        if len(item) < 5:
+            raise OcadImportException('Too few fields: ' + str(item))
+
+        len_str = str(item[3]).replace(',', '.')
+        if len_str and not len_str.replace('.', '').isdecimal():
+            raise OcadImportException('Incorrect length:' + len_str + ' in row ' + str(item))
+
+        climb_str = str(item[4]).replace(',', '.')
+        if climb_str and not climb_str.replace('.', '').isdecimal():
+            raise OcadImportException('Incorrect climb:' + climb_str + ' in row ' + str(item))
+
         course = {
             "group": item[0],
             "course": item[1],
             "bib": item[2],
-            "length": float(item[3]) if len(item[3]) else 0.0,
-            "climb": float(item[4]) if len(item[4]) else 0.0,
+            "length": float(len_str) if len(item[3]) else 0.0,
+            "climb": float(climb_str) if len(item[4]) else 0.0,
             "controls": ClassesV8.get_courses(item)
         }
 
@@ -204,3 +221,7 @@ def parse_xml_v3(source):
     iof_xml_v3 = IofXMLv3()
 
     return iof_xml_v3.parse(source)
+
+
+class OcadImportException(Exception):
+    pass
