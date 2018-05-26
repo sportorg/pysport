@@ -1118,9 +1118,7 @@ class SIReaderReadout(SIReader):
             Card 6/7 detected STX, 66h, CSI, TI, TP, CN3, CN2, CN1, CN0, ETX
             """
             self.sicard = self._to_int(data[-3:])
-            if self.sicard >= 2000000 and self.sicard <= 2999999:
-                self.cardtype = 'SI8'
-            elif self.sicard >= 1000000 and self.sicard <= 1999999:
+            if self.sicard >= 1000000 and self.sicard <= 1999999:
                 self.cardtype = 'SI9'
             elif self.sicard >= 7000000 and self.sicard <= 9999999:
                 self.cardtype = 'SI10'
@@ -1128,6 +1126,16 @@ class SIReaderReadout(SIReader):
                 self.cardtype = 'SItCard'
             elif self.sicard >= 4000000 and self.sicard <= 4999999:
                 self.cardtype = 'SIpCard'
+            elif self.sicard >= 500000 and self.sicard <= 999999:
+                self.cardtype = 'SI6'
+            #  special case: SI Cards for OL WM 2003
+            elif self.sicard >= 2003000  and self.sicard <= 2003799:
+                self.cardtype = 'SI6'
+            # SI 6* (star)
+            elif self.sicard >= 16711680 and self.sicard <= 16777215:
+                self.cardtype = 'SI6'
+            elif self.sicard >= 2000000 and self.sicard <= 2999999:
+                self.cardtype = 'SI8'
             else:
                 raise SIReaderException('Unknown cardtype!')
             raise SIReaderCardChanged("SI-Card inserted during command.")
