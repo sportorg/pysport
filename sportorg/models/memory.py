@@ -841,7 +841,7 @@ class ResultSportident(Result):
                             course_index += 1
                     else:
                         # just cp '31 989'
-                        is_equal = cur_code == controls[course_index].code
+                        is_equal = str(cur_code) == controls[course_index].code
                         if is_equal:
                             split.is_correct = True
                             recognized_indexes.append(i)
