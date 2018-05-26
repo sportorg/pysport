@@ -215,13 +215,13 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.tabwidget)
         self.setCentralWidget(self.centralwidget)
 
-        self.tabwidget.addTab(start_preparation.Widget(), _("Start Preparation"))
-        self.tabwidget.addTab(race_results.Widget(), _("Race Results"))
-        self.tabwidget.addTab(groups.Widget(), _("Groups"))
-        self.tabwidget.addTab(courses.Widget(), _("Courses"))
-        self.tabwidget.addTab(teams.Widget(), _("Teams"))
+        self.tabwidget.addTab(start_preparation.Widget(), _('Competitors'))
+        self.tabwidget.addTab(race_results.Widget(), _('Race Results'))
+        self.tabwidget.addTab(groups.Widget(), _('Groups'))
+        self.tabwidget.addTab(courses.Widget(), _('Courses'))
+        self.tabwidget.addTab(teams.Widget(), _('Teams'))
         self.logging_tab = log.Widget()
-        self.tabwidget.addTab(self.logging_tab, _("Logs"))
+        self.tabwidget.addTab(self.logging_tab, _('Logs'))
 
     def get_size(self):
         return {

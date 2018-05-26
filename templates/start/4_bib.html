@@ -200,12 +200,13 @@
     var race = {% endraw %}{{race|tojson}}{% raw %};
     racePreparation(race);
     var store = {
-        bibDetailedRotatableText: true
+        bibDetailedRotatableText: true,
+        isRelayView: false
     };
     function render (options) {
         var sort = options && options.sort;
         var sortFunc = function (a, b) {
-            return a.bib - b.bib;
+            return !options.isRelayView ? a.bib - b.bib: a.bib % 1000 - b.bib % 1000;
         };
         if (sort === 'name') {
             sortFunc = function (a, b) {
@@ -276,7 +277,7 @@
             bibTitleBlock.appendChild(document.createTextNode(race.data.title));
             bibTitleBlock.appendChild(document.createElement('br'));
             bibTitleBlock.appendChild(document.createTextNode(''));
-            bibNumberBlock.appendChild(document.createTextNode(person.bib));
+            bibNumberBlock.appendChild(document.createTextNode(!options.isRelayView ? person.bib : person.bib % 1000 + '.' + ~~(person.bib / 1000)));
             bibInfoBlock.appendChild(bibDetailedBlock);
             if (options && options.bibDetailedRotatableText) {
                 bibInfoBlock.appendChild(bibDetailedRotatableBlock);
@@ -310,6 +311,14 @@
             value: store.bibDetailedRotatableText,
             change: function (checked) {
                 store.bibDetailedRotatableText = checked;
+                render(store);
+            }
+        },
+        {
+            title: '1002 -> 2.1',
+            value: store.isRelayView,
+            change: function (checked) {
+                store.isRelayView = checked;
                 render(store);
             }
         }
