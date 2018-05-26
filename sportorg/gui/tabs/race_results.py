@@ -181,13 +181,13 @@ class Widget(QtWidgets.QWidget):
         code = ''
         index = 1
         for split in result.splits:
-            str_fmt = '{index:02d} ({code}) {time} {diff}'
+            str_fmt = '{index:02d} {code} {time} {diff}'
             if not split.is_correct:
-                str_fmt = '-- ({code}) {time}'
+                str_fmt = '-- {code} {time}'
 
             s = str_fmt.format(
                 index=index,
-                code=split.code,
+                code=('(' + str(split.code) + ')   ')[:5],
                 time=time_to_hhmmss(split.time),
                 diff=time_to_hhmmss(split.leg_time),
                 leg_place=split.leg_place,

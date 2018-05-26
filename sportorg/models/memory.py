@@ -687,6 +687,11 @@ class ResultManual(Result):
 class ResultSportident(Result):
     system_type = SystemType.SPORTIDENT
 
+    def __init__(self):
+        super(ResultSportident, self).__init__()
+        self.__start_time = None
+        self.__finish_time = None
+
     def __repr__(self):
         splits = ''
         for split in self.splits:
@@ -772,14 +777,22 @@ class ResultSportident(Result):
         if not course:
             return super().check()
         controls = course.controls
-        i = 0
+        course_index = 0
         count_controls = len(controls)
         if count_controls == 0:
             return True
 
-        for split in self.splits:
+        # list of indexes, coincide with course, used for mixed course order1
+        recognized_indexes = []
+
+        # invalidate all splits before check
+        for i in self.splits:
+            i.is_correct = False
+
+        for i in range(len(self.splits)):
             try:
-                template = str(controls[i].code)
+                split = self.splits[i]
+                template = str(controls[course_index].code)
                 cur_code = split.code
 
                 list_exists = False
@@ -797,7 +810,9 @@ class ResultSportident(Result):
                     # non-unique control
                     if not list_exists or list_contains:
                         # any control '%' or '%(31,32,33)' or '31%'
-                        i += 1
+                        split.is_correct = True
+                        recognized_indexes.append(i)
+                        course_index += 1
 
                 elif template.find('*') > -1:
                     # unique control '*' or '*(31,32,33)' or '31*'
@@ -806,26 +821,33 @@ class ResultSportident(Result):
                         continue
                     # test previous splits
                     is_unique = True
-                    for prev_split in self.splits[0:i]:
-                        if prev_split.code == cur_code:
+                    for j in range(i):
+                        prev_split = self.splits[j]
+                        if prev_split.code == cur_code and j in recognized_indexes:
                             is_unique = False
                             break
                     if is_unique:
-                        i += 1
+                        split.is_correct = True
+                        recognized_indexes.append(i)
+                        course_index += 1
 
                 else:
                     # simple pre-ordered control '31 989' or '31(31,32,33) 989'
                     if list_exists:
                         # control with optional codes '31(31,32,33) 989'
                         if list_contains:
-                            i += 1
+                            split.is_correct = True
+                            recognized_indexes.append(i)
+                            course_index += 1
                     else:
                         # just cp '31 989'
-                        is_equal = cur_code == controls[i].code
+                        is_equal = cur_code == controls[course_index].code
                         if is_equal:
-                            i += 1
+                            split.is_correct = True
+                            recognized_indexes.append(i)
+                            course_index += 1
 
-                if i == count_controls:
+                if course_index == count_controls:
                     return True
 
             except KeyError:

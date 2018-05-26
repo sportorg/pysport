@@ -43,13 +43,13 @@ class PersonSplits(object):
         if self.course.length:
             self.result.speed = get_speed_min_per_km(self.result.get_result_otime(), self.course.length)
 
-        while split_index < len(self.result.splits):
+        while split_index < len(self.result.splits) and course_index < len(self.course.controls):
             cur_split = self.result.splits[split_index]
 
             cur_split.index = split_index
             cur_split.relative_time = cur_split.time - start_time
 
-            if course_code == cur_split.code:
+            if cur_split.is_correct:
                 cur_split.leg_time = cur_split.time - leg_start_time
                 leg_start_time = cur_split.time
 
@@ -61,13 +61,6 @@ class PersonSplits(object):
                 cur_split.leg_place = 0
 
                 course_index += 1
-                if course_index >= len(self.course.controls):
-                    course_code = '-1'
-                else:
-                    course_code = self.course.controls[course_index].code
-
-            else:
-                cur_split.is_correct = False
 
             split_index += 1
 
