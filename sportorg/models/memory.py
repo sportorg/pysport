@@ -440,7 +440,7 @@ class Split(Model):
     def __init__(self):
         self.index = 0
         self.course_index = -1
-        self.code = '0'
+        self.code = ''
         self.days = 0
         self._time = OTime()  # type: OTime
         self.leg_time = OTime()  # type: OTime
