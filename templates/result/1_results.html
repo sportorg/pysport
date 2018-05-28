@@ -36,12 +36,13 @@
     var selected = {% endraw %}{{selected|tojson}}{%raw %};
     racePreparation(race);
 
-    function getResultsByGroup(group) {
+    function getResultsByGroup(group, count) {
+        count = +count || 0;
         var isRelay = group.__type ? group.__type === 3 : race.data.race_type === 3;
         var results = [];
         for (var _i = 0, _a = race.results; _i < _a.length; _i++) {
             var result = _a[_i];
-            if (result.status !== 13 && result.person && result.person.group && result.person.group.id === group.id) {
+            if (result.status !== 13 && result.person && result.person.group && result.person.group.id === group.id && (count ? result.place <= count && result.place > 0 : 1)) {
                 var r = {
                     index: 0,
                     name: (result.person.surname + ' ' + result.person.name).slice(0, MAX_PERSON_NAME),
@@ -303,7 +304,7 @@
         resultBlock.innerHTML = '';
         for (var _i = 0, _a = race.groups; _i < _a.length; _i++) {
             var group = _a[_i];
-            var rows = getResultsByGroup(group);
+            var rows = getResultsByGroup(group, store.count);
             if (!rows.length) {
                 continue;
             }
@@ -407,6 +408,22 @@
             change: function (checked) {
                 store.rankingShow = checked;
                 render()
+            }
+        },
+        {
+            title: 'Показать первые: ',
+            value: [
+                {text: 'Все результаты', value: 0},
+                {text: '1', value: 1},
+                {text: '3', value: 3},
+                {text: '4', value: 4},
+                {text: '5', value: 5},
+                {text: '6', value: 6},
+                {text: '10', value: 10}
+            ],
+            change: function (arr) {
+                store.count = arr[0];
+                render();
             }
         },
         {
