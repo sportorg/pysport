@@ -1140,3 +1140,9 @@ msgstr "Повторяющиеся имена"
 
 msgid "Competitors"
 msgstr "Участники"
+
+msgid "Min year"
+msgstr "Минимальный год"
+
+msgid "Max year"
+msgstr "Максимальный год"
