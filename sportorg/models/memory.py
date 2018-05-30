@@ -356,6 +356,9 @@ class Group(Model):
         self.long_name = ''
         self.sex = Sex.MF
 
+        self.min_year = 0
+        self.max_year = 0
+
         self.min_age = 0
         self.max_age = 0
 
@@ -400,6 +403,8 @@ class Group(Model):
             'long_name': self.long_name,
             'price': self.price,
             'sex': self.sex.value,
+            'min_year': self.min_year,
+            'max_year': self.max_year,
             'min_age': self.min_age,
             'max_age': self.max_age,
             'max_time': self.max_time.to_msec(),
@@ -420,6 +425,8 @@ class Group(Model):
         self.long_name = str(data['long_name'])
         self.price = int(data['price'])
         self.sex = Sex(int(data['sex']))
+        self.min_year = int(data['min_year'])
+        self.max_year = int(data['max_year'])
         self.min_age = int(data['min_age'])
         self.max_age = int(data['max_age'])
         self.max_time = OTime(msec=int(data['max_time']))
@@ -440,7 +447,7 @@ class Split(Model):
     def __init__(self):
         self.index = 0
         self.course_index = -1
-        self.code = '0'
+        self.code = ''
         self.days = 0
         self._time = OTime()  # type: OTime
         self.leg_time = OTime()  # type: OTime

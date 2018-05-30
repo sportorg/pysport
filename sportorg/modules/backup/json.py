@@ -41,6 +41,11 @@ def race_migrate(data):
     for result in data['results']:
         if 'sportident_card' in result:
             result['card_number'] = result['sportident_card']
+    for group in data['groups']:
+        if 'min_year' not in group:
+            group['min_year'] = 0
+        if 'max_year' not in group:
+            group['max_year'] = 0
     settings = data['settings']
     if 'sportident_zero_time' in settings:
         settings['system_zero_time'] = settings['sportident_zero_time']
