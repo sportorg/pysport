@@ -631,7 +631,9 @@ class Result:
         if not self.person:
             return ''
 
-        return str(self.get_finish_time() - self.get_start_time() + self.get_penalty_time())
+        time_accuracy = race().get_setting('time_accuracy', 0)
+
+        return self.get_result_otime().to_str(time_accuracy)
 
     def get_result_for_sort(self):
         ret = self.get_result_otime()

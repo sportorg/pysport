@@ -313,11 +313,13 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
 
         start = ''
         if i.get_start_time():
-            start = str(i.get_start_time())
+            time_accuracy = race().get_setting('time_accuracy', 0)
+            start = i.get_start_time().to_str(time_accuracy)
 
         finish = ''
         if i.get_finish_time():
-            finish = str(i.get_finish_time())
+            time_accuracy = race().get_setting('time_accuracy', 0)
+            finish = i.get_finish_time().to_str(time_accuracy)
 
         return [
             last_name,
