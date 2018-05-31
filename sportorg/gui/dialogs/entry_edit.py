@@ -129,6 +129,7 @@ class EntryEditDialog(QDialog):
 
         self.label_comment = QLabel(_('Comment'))
         self.item_comment = QTextEdit()
+        self.item_comment.setTabChangesFocus(True)
         self.layout.addRow(self.label_comment, self.item_comment)
 
         def cancel_changes():
