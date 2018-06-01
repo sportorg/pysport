@@ -1890,14 +1890,13 @@ def races():
     return _event
 
 
-def race(day=None):
-    if day is None:
-        # TODO: from settings
-        day = get_current_race_index()
+def race(i=None):
+    if i is None:
+        i = get_current_race_index()
     else:
-        day -= 1
+        i = 0
 
-    if day < len(_event):
-        return _event[day]
+    if i < len(_event):
+        return _event[i]
     else:
         return Race()

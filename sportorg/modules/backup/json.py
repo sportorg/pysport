@@ -2,7 +2,7 @@ import json
 import uuid
 
 from sportorg import config
-from sportorg.models.memory import races, new_event, Race, race
+from sportorg.models.memory import races, new_event, Race, race, get_current_race_index, set_current_race_index
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.result_checker import ResultChecker
 from sportorg.models.result.score_calculation import ScoreCalculation
@@ -12,6 +12,7 @@ from sportorg.models.result.split_calculation import RaceSplits
 def dump(file):
     data = {
         'version': config.VERSION.file,
+        'current_race': get_current_race_index(),
         'races': [race_downgrade(r.to_dict()) for r in races()]
     }
     json.dump(data, file, sort_keys=True, indent=2)
@@ -27,6 +28,8 @@ def load(file):
         obj.update_data(race_dict)
         event.append(obj)
     new_event(event)
+    if 'current_race' in data:
+        set_current_race_index(data['current_race'])
     obj = race()
     ResultChecker.check_all()
     ResultCalculation(obj).process_results()

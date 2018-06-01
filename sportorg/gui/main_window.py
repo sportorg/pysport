@@ -235,6 +235,8 @@ class MainWindow(QMainWindow):
         main_title = '{} {}'.format(config.NAME, config.VERSION)
         if title:
             self.setWindowTitle('{} - {}'.format(title, main_title))
+        elif self.file:
+            self.set_title('{} [{}]'.format(race().data.get_start_datetime(), self.file))
         else:
             self.setWindowTitle(main_title)
 
@@ -308,6 +310,7 @@ class MainWindow(QMainWindow):
             table = self.get_organization_table()
             table.model().init_cache()
             table.model().layoutChanged.emit()
+            self.set_title()
             Broker().produce('refresh')
         except Exception as e:
             logging.error(str(e))
@@ -483,7 +486,7 @@ class MainWindow(QMainWindow):
                 self.apply_filters()
                 self.file = file_name
                 self.add_recent_file(self.file)
-                self.set_title(file_name)
+                self.set_title()
                 self.init_model()
             except Exception as e:
                 logging.error(str(e))
@@ -511,7 +514,7 @@ class MainWindow(QMainWindow):
             try:
                 File(file_name, logging.root, File.JSON).open()
                 self.file = file_name
-                self.set_title(file_name)
+                self.set_title()
                 self.add_recent_file(self.file)
                 self.init_model()
             except Exception as e:
