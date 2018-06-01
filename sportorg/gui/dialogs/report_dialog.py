@@ -12,7 +12,7 @@ from sportorg.gui.dialogs.file_dialog import get_open_file_name, get_save_file_n
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
-from sportorg.models.memory import race
+from sportorg.models.memory import race, races, get_current_race_index
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.score_calculation import ScoreCalculation
 from sportorg.models.result.split_calculation import RaceSplits
@@ -126,7 +126,15 @@ class ReportDialog(QDialog):
         RaceSplits(obj).generate()
         ScoreCalculation(obj).calculate_scores()
 
-        template = get_text_from_file(template_path, race=obj.to_dict(), selected=selected_items)
+        races_dict = [r.to_dict() for r in races()]
+
+        template = get_text_from_file(
+            template_path,
+            race=races_dict[get_current_race_index()],
+            races=races_dict,
+            current_race=get_current_race_index(),
+            selected=selected_items
+        )
 
         if _settings['save_to_last_file']:
             file_name = _settings['last_file']
