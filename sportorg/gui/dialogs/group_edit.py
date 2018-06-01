@@ -52,6 +52,11 @@ class GroupEditDialog(QDialog):
         self.item_course.addItems(get_race_courses())
         self.layout.addRow(self.label_course, self.item_course)
 
+        self.label_is_any_course = QLabel(_('Is any course'))
+        self.item_is_any_course = QCheckBox()
+        self.item_is_any_course.stateChanged.connect(self.is_any_course_update)
+        self.layout.addRow(self.label_is_any_course, self.item_is_any_course)
+
         self.label_sex = QLabel(_('Sex'))
         self.item_sex = AdvComboBox()
         self.item_sex.addItems(Sex.get_titles())
@@ -160,6 +165,12 @@ class GroupEditDialog(QDialog):
                 new_year -= 100
             widget.setValue(new_year)
 
+    def is_any_course_update(self):
+        if self.item_is_any_course.isChecked():
+            self.item_course.setDisabled(True)
+        else:
+            self.item_course.setDisabled(False)
+
     def set_values_from_model(self):
 
         self.item_name.setText(self.current_object.name)
@@ -189,6 +200,7 @@ class GroupEditDialog(QDialog):
         if self.current_object.price:
             self.item_price.setValue(self.current_object.price)
 
+        self.item_is_any_course.setChecked(self.current_object.is_any_course)
         self.rank_checkbox.setChecked(self.current_object.ranking.is_active)
         self.type_combo.setCurrentText(race().get_type(self.current_object).get_title())
 
@@ -254,6 +266,8 @@ class GroupEditDialog(QDialog):
         selected_type = t if t is not None else group.get_type()
         if group.get_type() != selected_type:
             group.set_type(selected_type)
+
+        group.is_any_course = self.item_is_any_course.isChecked()
 
         ResultCalculation(race()).set_rank(group)
         GlobalAccess().get_main_window().refresh()
