@@ -352,6 +352,7 @@ class Group(Model):
         self.id = uuid.uuid4()
         self.name = ''
         self.course = None  # type: Course
+        self.is_any_course = False
         self.price = 0
         self.long_name = ''
         self.sex = Sex.MF
@@ -400,6 +401,7 @@ class Group(Model):
             'id': str(self.id),
             'name': self.name,
             'course_id': str(self.course.id) if self.course else None,
+            'is_any_course': self.is_any_course,
             'long_name': self.long_name,
             'price': self.price,
             'sex': self.sex.value,
@@ -439,6 +441,8 @@ class Group(Model):
             if data['ranking']:
                 self.ranking = Ranking()
                 self.ranking.update_data(data['ranking'])
+        if 'is_any_course' in data:
+            self.is_any_course = bool(data['is_any_course'])
         if data['__type']:
             self.__type = RaceType(int(data['__type']))
 
@@ -1228,7 +1232,12 @@ class Race(Model):
                 ret = find(self.courses, name=course_name)
             # usual connection via group
             if not ret and person.group:
-                ret = person.group.course
+                if person.group.is_any_course:
+                    for course in self.courses:
+                        if result.check(course):
+                            return course
+                else:
+                    ret = person.group.course
             return ret
 
     def find_group(self, group_name):
@@ -1688,8 +1697,8 @@ class RelayLeg(object):
 class RelayTeam(object):
     def __init__(self, r):
         self.race = r
-        self.group = None  # type:Group
-        self.legs = []  # type:list[RelayLeg]
+        self.group = None  # type: Group
+        self.legs = []  # type: List[RelayLeg]
         self.description = ''  # Name of team, optional
         self.bib_number = None  # bib
         self.last_finished_leg = 0

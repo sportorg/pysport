@@ -23,6 +23,11 @@ class ResultChecker:
         course = race().find_course(result)
 
         if course is None:
+            if self.person.group.is_any_course:
+                return False
+            return True
+
+        if self.person.group.is_any_course:
             return True
 
         return result.check(course)

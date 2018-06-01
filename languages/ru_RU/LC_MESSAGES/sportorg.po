@@ -1146,3 +1146,6 @@ msgstr "Минимальный год"
 
 msgid "Max year"
 msgstr "Максимальный год"
+
+msgid "Is any course"
+msgstr "Любая дистанция"
