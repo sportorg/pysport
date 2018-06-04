@@ -74,19 +74,18 @@
                 // SPLITS
                 var control_index = 0;
                 if (result.splits) {
+                    var getTrBlock = function (t, p) {
+                        var tr = document.createElement('tr');
+                        var td1 = document.createElement('td');
+                        td1.className = 'result-' + p;
+                        td1.appendChild(document.createTextNode(t));
+                        tr.appendChild(td1);
+                        return tr;
+                    };
                     var lastSplit = 0;
                     for (var _b = 0, _c = result.splits; _b < _c.length; _b++) {
                         var split = _c[_b];
                         if (split.is_correct) {
-
-                            var getTrBlock = function (t, p) {
-                                var tr = document.createElement('tr');
-                                var td1 = document.createElement('td');
-                                td1.className = 'result-' + p;
-                                td1.appendChild(document.createTextNode(t));
-                                tr.appendChild(td1);
-                                return tr;
-                            };
 
                             var tbl = document.createElement('table');
                             tbl.className = 'table-split';
@@ -109,6 +108,16 @@
                     }
                 }
 
+                var getMultipleTrBlock = function () {
+                    var tr = document.createElement('tr');
+                    for (var i = 0; i < arguments.length; i++) {
+                        var td1 = document.createElement('td');
+                        td1.appendChild(document.createTextNode(arguments[i]));
+                        tr.appendChild(td1);
+                    }
+                    return tr;
+                };
+
                 // ALL PUNCHES
                 var splitTable = document.createElement('table');
                 splitTable.className = 'table-split';
@@ -117,20 +126,10 @@
                 var prevTime = result.start_msec;
                 for (var _b = 0, _c = result.splits; _b < _c.length; _b++) {
                     var split = _c[_b];
-
-                    var getTrBlock = function () {
-                        var tr = document.createElement('tr');
-                        for (var i = 0; i < arguments.length; i++) {
-                            var td1 = document.createElement('td');
-                            td1.appendChild(document.createTextNode(arguments[i]));
-                            tr.appendChild(td1);
-                        }
-                        return tr;
-                    };
                     var tbl = document.createElement('table');
                     tbl.className = 'table-split';
-                    tbl.appendChild(getTrBlock('( ' + split.code + ' )', toHHMMSS(split.time - prevTime)));
-                    tbl.appendChild(getTrBlock('', toHHMMSS(split.time - result.start_msec)));
+                    tbl.appendChild(getMultipleTrBlock('( ' + split.code + ' )', toHHMMSS(split.time - prevTime)));
+                    tbl.appendChild(getMultipleTrBlock('', toHHMMSS(split.time - result.start_msec)));
                     var splitTd = document.createElement('td');
                     splitTd.appendChild(tbl);
                     splitTr.appendChild(splitTd);

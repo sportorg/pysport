@@ -166,6 +166,9 @@ class Widget(QtWidgets.QWidget):
         self.ResultCourseNameEdit.setText('')
         self.ResultCourseLengthEdit.setText('')
 
+        if result.is_manual():
+            return
+
         course = None
         if result.person:
             course = race().find_course(result)
