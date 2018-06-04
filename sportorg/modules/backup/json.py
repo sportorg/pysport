@@ -39,8 +39,10 @@ def load(file):
 
 def race_migrate(data):
     for person in data['persons']:
-        person['card_number'] = person['sportident_card']
-        person['is_rented_card'] = person['is_rented_sportident_card']
+        if 'sportident_card' in person:
+            person['card_number'] = person['sportident_card']
+        if 'is_rented_sportident_card' in person:
+            person['is_rented_card'] = person['is_rented_sportident_card']
     for result in data['results']:
         if 'sportident_card' in result:
             result['card_number'] = result['sportident_card']
