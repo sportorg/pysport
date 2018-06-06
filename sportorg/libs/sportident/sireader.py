@@ -20,6 +20,7 @@ sireader.py - Classes to read out si card data from BSM-7/8 stations.
 """
 
 from __future__ import print_function
+from math import trunc
 from six import int2byte, byte2int, iterbytes, PY3
 
 if PY3:
@@ -737,7 +738,7 @@ class SIReader(object):
             return nr
 
     @staticmethod
-    def _decode_time(raw_time, raw_ptd=None, reftime=None):
+    def _decode_time(raw_time, raw_ptd=None, reftime=None, raw_cn=None):
         """Decodes a raw time value read from an si card into a datetime object.
         The returned time is the nearest time matching the data before reftime."""
 
@@ -781,6 +782,17 @@ class SIReader(object):
             else:
                 # adjust reftime according to weekday information
                 reftime -= timedelta(days=(reftime.weekday() - dow) % 7)
+
+            # set ms for start and finish from control code
+            #  4 byte punching record for start, start_r, finish, finish_r
+            #  record structure: TD – TSS - TH – TL
+            #  TD – halfday
+            #  bit 0 - am/pm
+            #  bit 7 „1“ subsecond marker
+            #  punching time TH-TL - 12h binary [sec]
+            if raw_cn and ptd >> 7:
+                ms = trunc(byte2int(raw_cn) * 1000.0 / 256)
+                punchtime += timedelta(milliseconds=ms)
 
             ref_day = reftime.replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=None)
             return ref_day + punchtime
@@ -830,10 +842,12 @@ class SIReader(object):
 
         ret['start'] = SIReader._decode_time(data[card['ST']:card['ST'] + 2],
                                              data[card['STD']] if card['STD'] else None,
-                                             reftime)
+                                             reftime,
+                                             data[card['STD'] + 1] if card['STD'] else None)
         ret['finish'] = SIReader._decode_time(data[card['FT']:card['FT'] + 2],
                                               data[card['FTD']] if card['FTD'] is not None else None,
-                                              reftime)
+                                              reftime,
+                                              data[card['FTD'] + 1] if card['FTD'] else None)
         ret['check'] = SIReader._decode_time(data[card['CT']:card['CT'] + 2],
                                              data[card['CTD']] if card['CTD'] is not None else None,
                                              reftime)
