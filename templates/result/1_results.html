@@ -231,7 +231,7 @@
         fields: [
             {key: 'index', title: '№', size: 4},
             {key: 'name', title: 'Фамилия, имя', size: 30},
-            {key: 'org', title: 'Коллектив', size: 30},
+            {key: 'org', title: 'Коллектив', size: 20},
             {key: 'year', title: 'ГР', size: 5},
             {key: 'qual', title: 'Разряд', size: 7},
             {key: 'bib', title: 'Номер', size: 6},
@@ -292,7 +292,7 @@
     };
 
     try {
-        store.splitsShow = location.href.indexOf('splits=1') > -1;
+        store.splitsShow = location.href.indexOf('s_splits=1') > -1;
         store.rankingShow = location.href.indexOf('ranking=1') > -1;
     } catch (e) {}
 
@@ -336,7 +336,7 @@
             }
         }
         var query = {
-            splits: store.splitsShow ? 1 : 0,
+            s_splits: store.splitsShow ? 1 : 0,
             ranking: store.rankingShow ? 1 : 0,
             all_splits: Fields.isActive('all_splits') ? 1 : 0,
             scores: Fields.isActive('scores') ? 1 : 0,
@@ -346,6 +346,7 @@
         Object.keys(query).forEach(function (key) {
             queryString += key + '=' + query[key] + '&';
         });
+        queryString += 'sportorg=1';
         try {
             var href = location.href.split('?')[0];
             history.pushState({}, null, href + queryString);

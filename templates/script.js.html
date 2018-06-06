@@ -184,9 +184,9 @@
             text = String(text);
             if (size) {
                 text = text.slice(0, size);
-                if (text.length < size) {
+                if (text.length < size + 1) {
                     var arr = [];
-                    for (var i = 0; i < size - text.length; i++) {
+                    for (var i = 0; i < size + 1 - text.length; i++) {
                         arr.push(' ');
                     }
                     text += arr.join('');
