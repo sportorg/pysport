@@ -91,14 +91,14 @@
     var Fields = {
         localId: 'race_' + race.id + '_start_fields',
         fields: [
-            {key: 'index', title: '№'},
-            {key: 'name', title: 'Фамилия, имя'},
-            {key: 'org', title: 'Коллектив'},
-            {key: 'year', title: 'ГР'},
-            {key: 'qual', title: 'Разряд'},
-            {key: 'bib', title: 'Номер'},
-            {key: 'card_number', title: 'Номер чипа'},
-            {key: 'start', title: 'Время старта'}
+            {key: 'index', title: '№', size: 4},
+            {key: 'name', title: 'Фамилия, имя', size: 30},
+            {key: 'org', title: 'Коллектив', size: 30},
+            {key: 'year', title: 'ГР', size: 5},
+            {key: 'qual', title: 'Разряд', size: 7},
+            {key: 'bib', title: 'Номер', size: 6},
+            {key: 'card_number', title: 'Номер чипа', size: 11},
+            {key: 'start', title: 'Время старта', size: 13}
         ],
         active: function (key, val) {
             for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
@@ -122,32 +122,12 @@
             }
             return false;
         },
-        save: function () {
-            if (localStorage) {
-                localStorage.setItem(this.localId, JSON.stringify(this.fields));
-            }
+        init: function () {
             return this;
-        },
-        load: function () {
-            try {
-                var fields = localStorage ? JSON.parse(localStorage.getItem(this.localId)) : undefined;
-                if (fields) {
-                    for (var _i = 0, fields_ = fields; _i < fields_.length; _i++) {
-                        var f = fields_[_i];
-                        this.active(f.key, f.active);
-                    }
-                }
-            } catch (e) {
-                console.log(e)
-            }
-            return this;
-        },
-        clear: function () {
-            if (localStorage) {
-                localStorage.clear()
-            }
         }
-    }.load();
+    }.init();
+
+    var store = {};
 
     function render() {
         var resultBlock = document.getElementById('start-list-tables');
@@ -159,13 +139,24 @@
             titleBlock.appendChild(document.createTextNode(group.name));
             resultBlock.appendChild(titleBlock);
             resultBlock.appendChild(getGroupsBlockElement(race));
-            resultBlock.appendChild(new TableGenerator(getStartListByGroup(group), Fields.fields).getTable({className: 'sportorg-table'}));
+            if (store.tableView) {
+                resultBlock.appendChild(new TableGenerator(getStartListByGroup(group), Fields.fields).getTable({className: 'sportorg-table'}));
+            } else {
+                resultBlock.appendChild(new TableTextGenerator(getStartListByGroup(group), Fields.fields).getTable());
+            }
         }
-        Fields.save();
     }
-
     render();
+
     new SettingsGenerator([
+        {
+            title: 'Табличный вид',
+            value: !!store.tableView,
+            change: function (checked) {
+                store.tableView = checked;
+                render()
+            }
+        },
         {
             title: 'Номер',
             value: Fields.isActive('bib'),
