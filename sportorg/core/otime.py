@@ -69,21 +69,8 @@ class OTime:
     def __int__(self):
         return self.to_msec()
 
-    def __str__(self, time_accuracy=0):
-        hour = self.hour + self.day*24
-        if time_accuracy == 0:
-            return '{}:{}:{}'.format(
-                hour if hour > 9 else '0' + str(hour),
-                self.minute if self.minute > 9 else '0' + str(self.minute),
-                self.sec if self.sec > 9 else '0' + str(self.sec)
-            )
-        else:
-            return '{}:{}:{}.{}'.format(
-                ('0' + str(self.hour))[-2:],
-                ('0' + str(self.minute))[-2:],
-                ('0' + str(self.sec))[-2:],
-                ('00' + str(self.msec))[-3:][:time_accuracy]
-            )
+    def __str__(self):
+        return self.to_str()
 
     def __repr__(self):
         return self.__str__()
