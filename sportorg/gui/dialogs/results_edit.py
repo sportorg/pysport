@@ -352,11 +352,12 @@ class SplitsText(SplitsObject):
     def show(self):
         splits = self._splits if self._splits is not None else []
         text = ''
+        time_accuracy = race().get_setting('time_accuracy', 0)
         for split in splits:
             if self._more24:
-                text += '{} {} {}\n'.format(split.code, str(split.time), split.days)
+                text += '{} {} {}\n'.format(split.code, split.time.to_str(time_accuracy), split.days)
             else:
-                text += '{} {}\n'.format(split.code, str(split.time))
+                text += '{} {}\n'.format(split.code, split.time.to_str(time_accuracy))
 
         self._text.setText(text)
 

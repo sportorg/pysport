@@ -180,6 +180,7 @@ class Widget(QtWidgets.QWidget):
 
         code = ''
         index = 1
+        time_accuracy = race().get_setting('time_accuracy', 0)
         for split in result.splits:
             str_fmt = '{index:02d} {code} {time} {diff}'
             if not split.is_correct:
@@ -188,8 +189,8 @@ class Widget(QtWidgets.QWidget):
             s = str_fmt.format(
                 index=index,
                 code=('(' + str(split.code) + ')   ')[:5],
-                time=time_to_hhmmss(split.time),
-                diff=time_to_hhmmss(split.leg_time),
+                time=split.time.to_str(time_accuracy),
+                diff=split.leg_time.to_str(time_accuracy),
                 leg_place=split.leg_place,
                 speed=split.speed,
             )
