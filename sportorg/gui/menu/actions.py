@@ -290,7 +290,7 @@ class ManualFinishAction(Action):
         result = race().new_result(ResultManual)
         Teamwork().send(result.to_dict())
         race().add_new_result(result)
-        logging.info('Manual finish')
+        logging.info(_('Manual finish'))
         self.app.get_result_table().model().init_cache()
         self.app.refresh()
         self.app.auto_save()

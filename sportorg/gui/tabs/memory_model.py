@@ -351,8 +351,8 @@ class GroupMemoryModel(AbstractSportOrgMemoryModel):
         super().__init__()
 
     def get_headers(self):
-        return [_('Name'), _('Full name'), _('Course name'), _('Start fee'), _('Type'), _('Length'), _('Point count'), _('Climb'), _('Sex'), _('Min age'),
-                _('Max age'), _('Start interval'), _('Start corridor'), _('Order in corridor')]
+        return [_('Name'), _('Full name'), _('Course name'), _('Start fee'), _('Type'), _('Length'), _('Point count'), _('Climb'), _('Sex'), _('Min year'),
+                _('Max year'), _('Start interval'), _('Start corridor'), _('Order in corridor')]
 
     def init_cache(self):
         self.cache.clear()
@@ -381,8 +381,8 @@ class GroupMemoryModel(AbstractSportOrgMemoryModel):
             control_count,
             course.climb,
             group.sex.get_title(),
-            group.min_age,
-            group.max_age,
+            group.min_year,
+            group.max_year,
             group.start_interval,
             group.start_corridor,
             group.order_in_corridor,

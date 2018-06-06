@@ -2,7 +2,7 @@ import json
 import uuid
 
 from sportorg import config
-from sportorg.models.memory import races, new_event, Race, race
+from sportorg.models.memory import races, new_event, Race, race, get_current_race_index, set_current_race_index
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.result_checker import ResultChecker
 from sportorg.models.result.score_calculation import ScoreCalculation
@@ -12,6 +12,7 @@ from sportorg.models.result.split_calculation import RaceSplits
 def dump(file):
     data = {
         'version': config.VERSION.file,
+        'current_race': get_current_race_index(),
         'races': [race_downgrade(r.to_dict()) for r in races()]
     }
     json.dump(data, file, sort_keys=True, indent=2)
@@ -27,6 +28,8 @@ def load(file):
         obj.update_data(race_dict)
         event.append(obj)
     new_event(event)
+    if 'current_race' in data:
+        set_current_race_index(data['current_race'])
     obj = race()
     ResultChecker.check_all()
     ResultCalculation(obj).process_results()
@@ -36,11 +39,18 @@ def load(file):
 
 def race_migrate(data):
     for person in data['persons']:
-        person['card_number'] = person['sportident_card']
-        person['is_rented_card'] = person['is_rented_sportident_card']
+        if 'sportident_card' in person:
+            person['card_number'] = person['sportident_card']
+        if 'is_rented_sportident_card' in person:
+            person['is_rented_card'] = person['is_rented_sportident_card']
     for result in data['results']:
         if 'sportident_card' in result:
             result['card_number'] = result['sportident_card']
+    for group in data['groups']:
+        if 'min_year' not in group:
+            group['min_year'] = 0
+        if 'max_year' not in group:
+            group['max_year'] = 0
     settings = data['settings']
     if 'sportident_zero_time' in settings:
         settings['system_zero_time'] = settings['sportident_zero_time']

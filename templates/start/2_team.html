@@ -70,16 +70,16 @@
     var Fields = {
         localId: 'race_' + race.id + '_org_fields',
         fields: [
-            {key: 'index', title: '№'},
-            {key: 'name', title: 'Фамилия, имя'},
-            {key: 'group', title: 'Группа'},
-            {key: 'year', title: 'ГР'},
-            {key: 'qual', title: 'Разряд'},
-            {key: 'bib', title: 'Номер'},
-            {key: 'card_number', title: 'Номер чипа'},
-            {key: 'start', title: 'Время старта'},
-            {key: 'price', title: 'Взнос'},
-            {key: 'comment', title: 'Прим.', active: false},
+            {key: 'index', title: '№', size: 4},
+            {key: 'name', title: 'Фамилия, имя', size: 40},
+            {key: 'group', title: 'Группа', size: 20},
+            {key: 'year', title: 'ГР', size: 5},
+            {key: 'qual', title: 'Разряд', size: 7},
+            {key: 'bib', title: 'Номер', size: 6},
+            {key: 'card_number', title: 'Номер чипа', size: 11},
+            {key: 'start', title: 'Время старта', size: 13},
+            {key: 'price', title: 'Взнос', size: 6},
+            {key: 'comment', title: 'Прим.', size: 30, active: false}
         ],
         active: function (key, val) {
             for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
@@ -103,28 +103,10 @@
             }
             return false;
         },
-        save: function () {
-            if (localStorage) {
-                localStorage.setItem(this.localId, JSON.stringify(this.fields));
-            }
+        init: function () {
             return this;
-        },
-        load: function () {
-            var fields = localStorage ? JSON.parse(localStorage.getItem(this.localId)) : undefined;
-            if (fields) {
-                for (var _i = 0, fields_ = fields; _i < fields_.length; _i++) {
-                    var f = fields_[_i];
-                    this.active(f.key, f.active);
-                }
-            }
-            return this;
-        },
-        clear: function () {
-            if (localStorage) {
-                localStorage.clear()
-            }
         }
-    }.load();
+    }.init();
 
     var store = {};
 
@@ -160,7 +142,11 @@
         resultBlock.innerHTML = '';
         if (store.noCombine) {
             var rows = getStartListByOrg(null, store.sort);
-            resultBlock.appendChild(new TableGenerator(rows, Fields.fields).getTable({className: 'sportorg-table'}));
+            if (store.tableView) {
+                resultBlock.appendChild(new TableGenerator(rows, Fields.fields).getTable({className: 'sportorg-table'}));
+            } else {
+                resultBlock.appendChild(new TableTextGenerator(rows, Fields.fields).getTable());
+            }
             resultBlock.appendChild(getInfoBlock(rows));
         } else {
             var i = 0;
@@ -174,7 +160,11 @@
                 titleBlock.id = org.name;
                 titleBlock.appendChild(document.createTextNode(dateFormat(race.data.start_datetime) + ' / ' + org.name));
                 resultBlock.appendChild(titleBlock);
-                resultBlock.appendChild(new TableGenerator(rows, Fields.fields).getTable({ className: 'sportorg-table' }));
+                if (store.tableView) {
+                    resultBlock.appendChild(new TableGenerator(rows, Fields.fields).getTable({className: 'sportorg-table'}));
+                } else {
+                    resultBlock.appendChild(new TableTextGenerator(rows, Fields.fields).getTable());
+                }
                 resultBlock.appendChild(getInfoBlock(rows));
                 if (i < race.organizations.length - 1) {
                     var newPage = document.createElement('div');
@@ -184,10 +174,17 @@
                 i++;
             }
         }
-        Fields.save();
     }
     render();
     new SettingsGenerator([
+        {
+            title: 'Табличный вид',
+            value: !!store.tableView,
+            change: function (checked) {
+                store.tableView = checked;
+                render()
+            }
+        },
         {
             title: 'Номер',
             value: Fields.isActive('bib'),
@@ -232,7 +229,7 @@
             value: [
                 {text: 'имени', value: 'name'},
                 {text: 'номеру', value: 'bib'},
-                {text: 'группе', value: 'group'},
+                {text: 'группе', value: 'group'}
             ],
             change: function (arr) {
                 render(arr[0]);

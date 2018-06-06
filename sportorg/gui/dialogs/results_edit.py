@@ -319,6 +319,7 @@ class SplitsText(SplitsObject):
         self._box = QGroupBox(_('Splits'))
         self._layout = QFormLayout()
         self._text = QTextEdit()
+        self._text.setTabChangesFocus(True)
         self._text.setMinimumHeight(200)
         self._layout.addRow(QLabel(self._get_example_text()), self._text)
         self._box.setLayout(self._layout)

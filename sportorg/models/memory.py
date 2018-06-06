@@ -352,9 +352,13 @@ class Group(Model):
         self.id = uuid.uuid4()
         self.name = ''
         self.course = None  # type: Course
+        self.is_any_course = False
         self.price = 0
         self.long_name = ''
         self.sex = Sex.MF
+
+        self.min_year = 0
+        self.max_year = 0
 
         self.min_age = 0
         self.max_age = 0
@@ -397,9 +401,12 @@ class Group(Model):
             'id': str(self.id),
             'name': self.name,
             'course_id': str(self.course.id) if self.course else None,
+            'is_any_course': self.is_any_course,
             'long_name': self.long_name,
             'price': self.price,
             'sex': self.sex.value,
+            'min_year': self.min_year,
+            'max_year': self.max_year,
             'min_age': self.min_age,
             'max_age': self.max_age,
             'max_time': self.max_time.to_msec(),
@@ -420,6 +427,8 @@ class Group(Model):
         self.long_name = str(data['long_name'])
         self.price = int(data['price'])
         self.sex = Sex(int(data['sex']))
+        self.min_year = int(data['min_year'])
+        self.max_year = int(data['max_year'])
         self.min_age = int(data['min_age'])
         self.max_age = int(data['max_age'])
         self.max_time = OTime(msec=int(data['max_time']))
@@ -432,6 +441,8 @@ class Group(Model):
             if data['ranking']:
                 self.ranking = Ranking()
                 self.ranking.update_data(data['ranking'])
+        if 'is_any_course' in data:
+            self.is_any_course = bool(data['is_any_course'])
         if data['__type']:
             self.__type = RaceType(int(data['__type']))
 
@@ -440,7 +451,7 @@ class Split(Model):
     def __init__(self):
         self.index = 0
         self.course_index = -1
-        self.code = '0'
+        self.code = ''
         self.days = 0
         self._time = OTime()  # type: OTime
         self.leg_time = OTime()  # type: OTime
@@ -1223,7 +1234,12 @@ class Race(Model):
                 ret = find(self.courses, name=course_name)
             # usual connection via group
             if not ret and person.group:
-                ret = person.group.course
+                if person.group.is_any_course:
+                    for course in self.courses:
+                        if result.check(course):
+                            return course
+                else:
+                    ret = person.group.course
             return ret
 
     def find_group(self, group_name):
@@ -1683,8 +1699,8 @@ class RelayLeg(object):
 class RelayTeam(object):
     def __init__(self, r):
         self.race = r
-        self.group = None  # type:Group
-        self.legs = []  # type:list[RelayLeg]
+        self.group = None  # type: Group
+        self.legs = []  # type: List[RelayLeg]
         self.description = ''  # Name of team, optional
         self.bib_number = None  # bib
         self.last_finished_leg = 0
@@ -1885,14 +1901,13 @@ def races():
     return _event
 
 
-def race(day=None):
-    if day is None:
-        # TODO: from settings
-        day = get_current_race_index()
+def race(i=None):
+    if i is None:
+        i = get_current_race_index()
     else:
-        day -= 1
+        i = 0
 
-    if day < len(_event):
-        return _event[day]
+    if i < len(_event):
+        return _event[i]
     else:
         return Race()

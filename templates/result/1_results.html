@@ -36,12 +36,13 @@
     var selected = {% endraw %}{{selected|tojson}}{%raw %};
     racePreparation(race);
 
-    function getResultsByGroup(group) {
+    function getResultsByGroup(group, count) {
+        count = +count || 0;
         var isRelay = group.__type ? group.__type === 3 : race.data.race_type === 3;
         var results = [];
         for (var _i = 0, _a = race.results; _i < _a.length; _i++) {
             var result = _a[_i];
-            if (result.status !== 13 && result.person && result.person.group && result.person.group.id === group.id) {
+            if (result.status !== 13 && result.person && result.person.group && result.person.group.id === group.id && (count ? result.place <= count && result.place > 0 : 1)) {
                 var r = {
                     index: 0,
                     name: (result.person.surname + ' ' + result.person.name).slice(0, MAX_PERSON_NAME),
@@ -69,21 +70,22 @@
                     r.penalty_time = '';
                     r.penalty_laps = '';
                 }
+
+                // SPLITS
                 var control_index = 0;
                 if (result.splits) {
+                    var getTrBlock = function (t, p) {
+                        var tr = document.createElement('tr');
+                        var td1 = document.createElement('td');
+                        td1.className = 'result-' + p;
+                        td1.appendChild(document.createTextNode(t));
+                        tr.appendChild(td1);
+                        return tr;
+                    };
                     var lastSplit = 0;
                     for (var _b = 0, _c = result.splits; _b < _c.length; _b++) {
                         var split = _c[_b];
                         if (split.is_correct) {
-
-                            var getTrBlock = function (t, p) {
-                                var tr = document.createElement('tr');
-                                var td1 = document.createElement('td');
-                                td1.className = 'result-' + p;
-                                td1.appendChild(document.createTextNode(t));
-                                tr.appendChild(td1);
-                                return tr;
-                            };
 
                             var tbl = document.createElement('table');
                             tbl.className = 'table-split';
@@ -105,6 +107,36 @@
                         r.finish_split = tblF;
                     }
                 }
+
+                var getMultipleTrBlock = function () {
+                    var tr = document.createElement('tr');
+                    for (var i = 0; i < arguments.length; i++) {
+                        var td1 = document.createElement('td');
+                        td1.appendChild(document.createTextNode(arguments[i]));
+                        tr.appendChild(td1);
+                    }
+                    return tr;
+                };
+
+                // ALL PUNCHES
+                var splitTable = document.createElement('table');
+                splitTable.className = 'table-split';
+                var splitTr = document.createElement('tr');
+                splitTable.appendChild(splitTr);
+                var prevTime = result.start_msec;
+                for (var _b = 0, _c = result.splits; _b < _c.length; _b++) {
+                    var split = _c[_b];
+                    var tbl = document.createElement('table');
+                    tbl.className = 'table-split';
+                    tbl.appendChild(getMultipleTrBlock('( ' + split.code + ' )', toHHMMSS(split.time - prevTime)));
+                    tbl.appendChild(getMultipleTrBlock('', toHHMMSS(split.time - result.start_msec)));
+                    var splitTd = document.createElement('td');
+                    splitTd.appendChild(tbl);
+                    splitTr.appendChild(splitTd);
+                    prevTime = split.time;
+                }
+                r.all_splits = splitTable;
+
                 results.push(r);
             }
         }
@@ -197,19 +229,20 @@
     var Fields = {
         localId: 'race_' + race.id + '_result_fields',
         fields: [
-            {key: 'index', title: '№'},
-            {key: 'name', title: 'Фамилия, имя'},
-            {key: 'org', title: 'Коллектив'},
-            {key: 'year', title: 'ГР'},
-            {key: 'qual', title: 'Разряд'},
-            {key: 'bib', title: 'Номер'},
-            {key: 'penalty_time', title: 'Штраф', active: false},
-            {key: 'penalty_laps', title: 'Штраф', active: false},
-            {key: 'result', title: 'Результат'},
-            {key: 'diff', title: 'Отставание'},
-            {key: 'speed', title: 'Темп', active: false},
-            {key: 'place_show', title: 'Место'},
-            {key: 'scores', title: 'Очки', active: false}
+            {key: 'index', title: '№', size: 4},
+            {key: 'name', title: 'Фамилия, имя', size: 30},
+            {key: 'org', title: 'Коллектив', size: 20},
+            {key: 'year', title: 'ГР', size: 5},
+            {key: 'qual', title: 'Разряд', size: 7},
+            {key: 'bib', title: 'Номер', size: 6},
+            {key: 'penalty_time', title: 'Штраф', size: 9, active: false},
+            {key: 'penalty_laps', title: 'Штраф', size: 9, active: false},
+            {key: 'result', title: 'Результат', size: 15},
+            {key: 'diff', title: 'Отставание', size: 11},
+            {key: 'speed', title: 'Темп', size: 12, active: false},
+            {key: 'place_show', title: 'Место', size: 6},
+            {key: 'scores', title: 'Очки', size: 5, active: false},
+            {key: 'all_splits', title: 'Сплиты', active: false}
         ],
         active: function (key, val) {
             for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
@@ -233,44 +266,42 @@
             }
             return false;
         },
-        getCopyFileds: function () {
+        getField: function (key) {
+            for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+                var obj = _a[_i];
+                if (key === obj.key) {
+                    return obj
+                }
+            }
+        },
+        getCopyFields: function () {
             return JSON.parse(JSON.stringify(this.fields))
         },
-        save: function () {
-            if (localStorage) {
-                localStorage.setItem(this.localId, JSON.stringify(this.fields));
-            }
-            return this;
-        },
-        load: function () {
+        init: function () {
             try {
-                var fields = localStorage ? JSON.parse(localStorage.getItem(this.localId)) : undefined;
-                if (fields) {
-                    for (var _i = 0, fields_ = fields; _i < fields_.length; _i++) {
-                        var f = fields_[_i];
-                        this.active(f.key, f.active);
-                    }
-                }
-            } catch (e) {
-                console.log(e)
-            }
+                this.getField('all_splits').active = location.href.indexOf('all_splits=1') > -1;
+                this.getField('scores').active = location.href.indexOf('scores=1') > -1;
+                this.getField('penalty_time').active = location.href.indexOf('penalty_time=1') > -1;
+            } catch (e){}
             return this;
-        },
-        clear: function () {
-            if (localStorage) {
-                localStorage.clear()
-            }
         }
-    }.load();
+    }.init();
 
-    store = {};
+    store = {
+        showLinkForGroups: true
+    };
+
+    try {
+        store.splitsShow = location.href.indexOf('s_splits=1') > -1;
+        store.rankingShow = location.href.indexOf('ranking=1') > -1;
+    } catch (e) {}
 
     function render() {
         var resultBlock = document.getElementById('results-tables');
         resultBlock.innerHTML = '';
         for (var _i = 0, _a = race.groups; _i < _a.length; _i++) {
             var group = _a[_i];
-            var rows = getResultsByGroup(group);
+            var rows = getResultsByGroup(group, store.count);
             if (!rows.length) {
                 continue;
             }
@@ -278,15 +309,21 @@
             titleBlock.id = group.name;
             titleBlock.appendChild(document.createTextNode(group.name));
             resultBlock.appendChild(titleBlock);
-            resultBlock.appendChild(getGroupsBlockElement(race));
-            var fields = Fields.getCopyFileds();
+            if (store.showLinkForGroups) {
+                resultBlock.appendChild(getGroupsBlockElement(race));
+            }
+            var fields = Fields.getCopyFields();
             if (store.splitsShow && group.course) {
                 group.course.controls.forEach(function (control, index) {
                     fields.push({key: index + '_' + control.code, title: control.code})
                 });
                 fields.push({key: 'finish_split', title: 'F'})
             }
-            resultBlock.appendChild(new TableGenerator(rows, fields).getTable({className: 'sportorg-table'}));
+            if (!store.tableView && !store.splitsShow && !Fields.isActive('all_splits')) {
+                resultBlock.appendChild(new TableTextGenerator(rows, fields).getTable());
+            } else {
+                resultBlock.appendChild(new TableGenerator(rows, fields).getTable({className: 'sportorg-table'}));
+            }
 
             //show ranking information
             if (store.rankingShow) {
@@ -298,12 +335,43 @@
                 resultBlock.appendChild(newPage);
             }
         }
-        Fields.save();
+        var query = {
+            s_splits: store.splitsShow ? 1 : 0,
+            ranking: store.rankingShow ? 1 : 0,
+            all_splits: Fields.isActive('all_splits') ? 1 : 0,
+            scores: Fields.isActive('scores') ? 1 : 0,
+            penalty_time: Fields.isActive('penalty_time') ? 1 : 0
+        };
+        var queryString = '?';
+        Object.keys(query).forEach(function (key) {
+            queryString += key + '=' + query[key] + '&';
+        });
+        queryString += 'sportorg=1';
+        try {
+            var href = location.href.split('?')[0];
+            history.pushState({}, null, href + queryString);
+        } catch (e) {}
     }
 
     render();
 
     new SettingsGenerator([
+        {
+            title: 'Ссылки на группы',
+            value: !!store.showLinkForGroups,
+            change: function (checked) {
+                store.showLinkForGroups = checked;
+                render()
+            }
+        },
+        {
+            title: 'Табличный вид',
+            value: !!store.tableView,
+            change: function (checked) {
+                store.tableView = checked;
+                render()
+            }
+        },
         {
             title: 'Номер',
             value: Fields.isActive('bib'),
@@ -345,10 +413,18 @@
             }
         },
         {
-            title: 'Сплиты',
-            value: false,
+            title: 'Сплиты (заданное направление)',
+            value: !!store.splitsShow,
             change: function (checked) {
                 store.splitsShow = checked;
+                render()
+            }
+        },
+        {
+            title: 'Сплиты (все отметки)',
+            value: Fields.isActive('all_splits'),
+            change: function (checked) {
+                Fields.active('all_splits', checked);
                 render()
             }
         },
@@ -362,10 +438,26 @@
         },
         {
             title: 'Выполнение',
-            value: false,
+            value: store.rankingShow,
             change: function (checked) {
                 store.rankingShow = checked;
                 render()
+            }
+        },
+        {
+            title: 'Показать первые: ',
+            value: [
+                {text: 'Все результаты', value: 0},
+                {text: '1', value: 1},
+                {text: '3', value: 3},
+                {text: '4', value: 4},
+                {text: '5', value: 5},
+                {text: '6', value: 6},
+                {text: '10', value: 10}
+            ],
+            change: function (arr) {
+                store.count = arr[0];
+                render();
             }
         },
         {

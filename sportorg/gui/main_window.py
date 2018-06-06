@@ -235,6 +235,8 @@ class MainWindow(QMainWindow):
         main_title = '{} {}'.format(config.NAME, config.VERSION)
         if title:
             self.setWindowTitle('{} - {}'.format(title, main_title))
+        elif self.file:
+            self.set_title('{} [{}]'.format(race().data.get_start_datetime(), self.file))
         else:
             self.setWindowTitle(main_title)
 
@@ -308,6 +310,7 @@ class MainWindow(QMainWindow):
             table = self.get_organization_table()
             table.model().init_cache()
             table.model().layoutChanged.emit()
+            self.set_title()
             Broker().produce('refresh')
         except Exception as e:
             logging.error(str(e))
@@ -331,11 +334,7 @@ class MainWindow(QMainWindow):
     def auto_save(self):
         if not self.get_configuration().get('autosave'):
             return
-        if self.file:
-            self.save_file()
-            logging.info(_('Auto save'))
-        else:
-            logging.warning(_('No file to auto save'))
+        self.saving = True
 
     def add_recent_file(self, file):
         self.delete_from_recent_files(file)
@@ -451,6 +450,8 @@ class MainWindow(QMainWindow):
         False: 'network-off.svg',
     }
 
+    saving = False
+
     def interval(self):
         if SIReaderClient().is_alive() != self.sportident_status:
             self.toolbar_property['sportident'].setIcon(
@@ -460,6 +461,14 @@ class MainWindow(QMainWindow):
             self.toolbar_property['teamwork'].setIcon(
                 QtGui.QIcon(config.icon_dir(self.teamwork_icon[Teamwork().is_alive()])))
             self.teamwork_status = Teamwork().is_alive()
+
+        if self.saving:
+            if self.file:
+                self.save_file()
+                logging.info(_('Auto save'))
+            else:
+                logging.warning(_('No file to auto save'))
+            self.saving = False
 
         while not self.log_queue.empty():
             text = self.log_queue.get()
@@ -483,7 +492,7 @@ class MainWindow(QMainWindow):
                 self.apply_filters()
                 self.file = file_name
                 self.add_recent_file(self.file)
-                self.set_title(file_name)
+                self.set_title()
                 self.init_model()
             except Exception as e:
                 logging.error(str(e))
@@ -511,7 +520,7 @@ class MainWindow(QMainWindow):
             try:
                 File(file_name, logging.root, File.JSON).open()
                 self.file = file_name
-                self.set_title(file_name)
+                self.set_title()
                 self.add_recent_file(self.file)
                 self.init_model()
             except Exception as e:

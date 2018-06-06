@@ -60,6 +60,7 @@ class CourseEditDialog(QDialog):
 
         self.label_controls = QLabel('{}\n\n31 150\n32 200\n33\n34 500\n...\n90 150'.format(_('Controls')))
         self.item_controls = QTextEdit()
+        self.item_controls.setTabChangesFocus(True)
         self.layout.addRow(self.label_controls, self.item_controls)
 
         def cancel_changes():

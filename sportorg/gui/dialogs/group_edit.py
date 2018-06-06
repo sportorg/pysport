@@ -1,4 +1,5 @@
 import logging
+from datetime import date
 
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, QPushButton, QSpinBox, QTimeEdit, QCheckBox, \
@@ -51,6 +52,11 @@ class GroupEditDialog(QDialog):
         self.item_course.addItems(get_race_courses())
         self.layout.addRow(self.label_course, self.item_course)
 
+        self.label_is_any_course = QLabel(_('Is any course'))
+        self.item_is_any_course = QCheckBox()
+        self.item_is_any_course.stateChanged.connect(self.is_any_course_update)
+        self.layout.addRow(self.label_is_any_course, self.item_is_any_course)
+
         self.label_sex = QLabel(_('Sex'))
         self.item_sex = AdvComboBox()
         self.item_sex.addItems(Sex.get_titles())
@@ -58,11 +64,23 @@ class GroupEditDialog(QDialog):
 
         self.label_age_min = QLabel(_('Min age'))
         self.item_age_min = QSpinBox()
-        self.layout.addRow(self.label_age_min, self.item_age_min)
+        # self.layout.addRow(self.label_age_min, self.item_age_min)
 
         self.label_age_max = QLabel(_('Max age'))
         self.item_age_max = QSpinBox()
-        self.layout.addRow(self.label_age_max, self.item_age_max)
+        # self.layout.addRow(self.label_age_max, self.item_age_max)
+
+        self.label_year_min = QLabel(_('Min year'))
+        self.item_year_min = QSpinBox()
+        self.item_year_min.setMaximum(date.today().year)
+        self.item_year_min.editingFinished.connect(self.year_change)
+        self.layout.addRow(self.label_year_min, self.item_year_min)
+
+        self.label_year_max = QLabel(_('Max year'))
+        self.item_year_max = QSpinBox()
+        self.item_year_max.setMaximum(date.today().year)
+        self.item_year_max.editingFinished.connect(self.year_change)
+        self.layout.addRow(self.label_year_max, self.item_year_max)
 
         self.label_max_time = QLabel(_('Max time'))
         self.item_max_time = QTimeEdit()
@@ -127,6 +145,32 @@ class GroupEditDialog(QDialog):
             if group:
                 self.button_ok.setDisabled(True)
 
+    def year_change(self):
+        """
+        Convert 2 digits of year to 4
+        2 -> 2002
+        11 - > 2011
+        33 -> 1933
+        56 -> 1956
+        98 - > 1998
+        0 -> 0 exception!
+        """
+        widget = self.sender()
+        assert isinstance(widget, QSpinBox)
+        year = widget.value()
+        if 0 < year < 100:
+            cur_year = date.today().year
+            new_year = cur_year - cur_year % 100 + year
+            if new_year > cur_year:
+                new_year -= 100
+            widget.setValue(new_year)
+
+    def is_any_course_update(self):
+        if self.item_is_any_course.isChecked():
+            self.item_course.setDisabled(True)
+        else:
+            self.item_course.setDisabled(False)
+
     def set_values_from_model(self):
 
         self.item_name.setText(self.current_object.name)
@@ -141,6 +185,10 @@ class GroupEditDialog(QDialog):
             self.item_age_min.setValue(self.current_object.min_age)
         if self.current_object.max_age:
             self.item_age_max.setValue(self.current_object.max_age)
+        if self.current_object.min_year:
+            self.item_year_min.setValue(self.current_object.min_year)
+        if self.current_object.max_year:
+            self.item_year_max.setValue(self.current_object.max_year)
         if self.current_object.max_time:
             self.item_max_time.setTime(time_to_qtime(self.current_object.max_time))
         if self.current_object.start_interval:
@@ -152,6 +200,7 @@ class GroupEditDialog(QDialog):
         if self.current_object.price:
             self.item_price.setValue(self.current_object.price)
 
+        self.item_is_any_course.setChecked(self.current_object.is_any_course)
         self.rank_checkbox.setChecked(self.current_object.ranking.is_active)
         self.type_combo.setCurrentText(race().get_type(self.current_object).get_title())
 
@@ -186,6 +235,12 @@ class GroupEditDialog(QDialog):
         if group.max_age != self.item_age_max.value():
             group.max_age = self.item_age_max.value()
 
+        if group.min_year != self.item_year_min.value():
+            group.min_year = self.item_year_min.value()
+
+        if group.max_year != self.item_year_max.value():
+            group.max_year = self.item_year_max.value()
+
         if group.start_corridor != self.item_corridor.value():
             group.start_corridor = self.item_corridor.value()
 
@@ -211,6 +266,8 @@ class GroupEditDialog(QDialog):
         selected_type = t if t is not None else group.get_type()
         if group.get_type() != selected_type:
             group.set_type(selected_type)
+
+        group.is_any_course = self.item_is_any_course.isChecked()
 
         ResultCalculation(race()).set_rank(group)
         GlobalAccess().get_main_window().refresh()

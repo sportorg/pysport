@@ -155,7 +155,7 @@ class MultidayTab(Tab):
         self.item_races.clear()
         for cur_race in races():
             assert isinstance(cur_race, Race)
-            race_list.append(str(cur_race.data.start_datetime))
+            race_list.append(str(cur_race.data.get_start_datetime()))
         self.item_races.addItems(race_list)
 
         self.item_races.setCurrentIndex(index)

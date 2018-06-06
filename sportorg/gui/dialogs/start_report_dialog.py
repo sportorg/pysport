@@ -12,7 +12,7 @@ from sportorg.gui.dialogs.file_dialog import get_open_file_name, get_save_file_n
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
-from sportorg.models.memory import race
+from sportorg.models.memory import race, races, get_current_race_index
 
 _settings = {
     'last_template': None,
@@ -119,7 +119,15 @@ class StartReportDialog(QDialog):
             for i in mw.get_selected_rows():
                 selected_items[map_names[mw.current_tab]].append(cur_items[i].to_dict())
 
-        template = get_text_from_file(template_path, race=obj.to_dict(), selected=selected_items)
+        races_dict = [r.to_dict() for r in races()]
+
+        template = get_text_from_file(
+            template_path,
+            race=races_dict[get_current_race_index()],
+            races=races_dict,
+            current_race=get_current_race_index(),
+            selected=selected_items
+        )
 
         if _settings['save_to_last_file']:
             file_name = _settings['last_file']
