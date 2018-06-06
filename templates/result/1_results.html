@@ -229,19 +229,19 @@
     var Fields = {
         localId: 'race_' + race.id + '_result_fields',
         fields: [
-            {key: 'index', title: '№'},
-            {key: 'name', title: 'Фамилия, имя'},
-            {key: 'org', title: 'Коллектив'},
-            {key: 'year', title: 'ГР'},
-            {key: 'qual', title: 'Разряд'},
-            {key: 'bib', title: 'Номер'},
-            {key: 'penalty_time', title: 'Штраф', active: false},
-            {key: 'penalty_laps', title: 'Штраф', active: false},
-            {key: 'result', title: 'Результат'},
-            {key: 'diff', title: 'Отставание'},
-            {key: 'speed', title: 'Темп', active: false},
-            {key: 'place_show', title: 'Место'},
-            {key: 'scores', title: 'Очки', active: false},
+            {key: 'index', title: '№', size: 4},
+            {key: 'name', title: 'Фамилия, имя', size: 30},
+            {key: 'org', title: 'Коллектив', size: 20},
+            {key: 'year', title: 'ГР', size: 5},
+            {key: 'qual', title: 'Разряд', size: 7},
+            {key: 'bib', title: 'Номер', size: 6},
+            {key: 'penalty_time', title: 'Штраф', size: 9, active: false},
+            {key: 'penalty_laps', title: 'Штраф', size: 9, active: false},
+            {key: 'result', title: 'Результат', size: 15},
+            {key: 'diff', title: 'Отставание', size: 11},
+            {key: 'speed', title: 'Темп', size: 12, active: false},
+            {key: 'place_show', title: 'Место', size: 6},
+            {key: 'scores', title: 'Очки', size: 5, active: false},
             {key: 'all_splits', title: 'Сплиты', active: false}
         ],
         active: function (key, val) {
@@ -266,37 +266,35 @@
             }
             return false;
         },
-        getCopyFileds: function () {
+        getField: function (key) {
+            for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+                var obj = _a[_i];
+                if (key === obj.key) {
+                    return obj
+                }
+            }
+        },
+        getCopyFields: function () {
             return JSON.parse(JSON.stringify(this.fields))
         },
-        save: function () {
-            if (localStorage) {
-                localStorage.setItem(this.localId, JSON.stringify(this.fields));
-            }
-            return this;
-        },
-        load: function () {
+        init: function () {
             try {
-                var fields = localStorage ? JSON.parse(localStorage.getItem(this.localId)) : undefined;
-                if (fields) {
-                    for (var _i = 0, fields_ = fields; _i < fields_.length; _i++) {
-                        var f = fields_[_i];
-                        this.active(f.key, f.active);
-                    }
-                }
-            } catch (e) {
-                console.log(e)
-            }
+                this.getField('all_splits').active = location.href.indexOf('all_splits=1') > -1;
+                this.getField('scores').active = location.href.indexOf('scores=1') > -1;
+                this.getField('penalty_time').active = location.href.indexOf('penalty_time=1') > -1;
+            } catch (e){}
             return this;
-        },
-        clear: function () {
-            if (localStorage) {
-                localStorage.clear()
-            }
         }
-    }.load();
+    }.init();
 
-    store = {};
+    store = {
+        showLinkForGroups: true
+    };
+
+    try {
+        store.splitsShow = location.href.indexOf('s_splits=1') > -1;
+        store.rankingShow = location.href.indexOf('ranking=1') > -1;
+    } catch (e) {}
 
     function render() {
         var resultBlock = document.getElementById('results-tables');
@@ -311,15 +309,21 @@
             titleBlock.id = group.name;
             titleBlock.appendChild(document.createTextNode(group.name));
             resultBlock.appendChild(titleBlock);
-            resultBlock.appendChild(getGroupsBlockElement(race));
-            var fields = Fields.getCopyFileds();
+            if (store.showLinkForGroups) {
+                resultBlock.appendChild(getGroupsBlockElement(race));
+            }
+            var fields = Fields.getCopyFields();
             if (store.splitsShow && group.course) {
                 group.course.controls.forEach(function (control, index) {
                     fields.push({key: index + '_' + control.code, title: control.code})
                 });
                 fields.push({key: 'finish_split', title: 'F'})
             }
-            resultBlock.appendChild(new TableGenerator(rows, fields).getTable({className: 'sportorg-table'}));
+            if (!store.tableView && !store.splitsShow && !Fields.isActive('all_splits')) {
+                resultBlock.appendChild(new TableTextGenerator(rows, fields).getTable());
+            } else {
+                resultBlock.appendChild(new TableGenerator(rows, fields).getTable({className: 'sportorg-table'}));
+            }
 
             //show ranking information
             if (store.rankingShow) {
@@ -331,12 +335,43 @@
                 resultBlock.appendChild(newPage);
             }
         }
-        Fields.save();
+        var query = {
+            s_splits: store.splitsShow ? 1 : 0,
+            ranking: store.rankingShow ? 1 : 0,
+            all_splits: Fields.isActive('all_splits') ? 1 : 0,
+            scores: Fields.isActive('scores') ? 1 : 0,
+            penalty_time: Fields.isActive('penalty_time') ? 1 : 0
+        };
+        var queryString = '?';
+        Object.keys(query).forEach(function (key) {
+            queryString += key + '=' + query[key] + '&';
+        });
+        queryString += 'sportorg=1';
+        try {
+            var href = location.href.split('?')[0];
+            history.pushState({}, null, href + queryString);
+        } catch (e) {}
     }
 
     render();
 
     new SettingsGenerator([
+        {
+            title: 'Ссылки на группы',
+            value: !!store.showLinkForGroups,
+            change: function (checked) {
+                store.showLinkForGroups = checked;
+                render()
+            }
+        },
+        {
+            title: 'Табличный вид',
+            value: !!store.tableView,
+            change: function (checked) {
+                store.tableView = checked;
+                render()
+            }
+        },
         {
             title: 'Номер',
             value: Fields.isActive('bib'),
@@ -379,7 +414,7 @@
         },
         {
             title: 'Сплиты (заданное направление)',
-            value: false,
+            value: !!store.splitsShow,
             change: function (checked) {
                 store.splitsShow = checked;
                 render()
@@ -403,7 +438,7 @@
         },
         {
             title: 'Выполнение',
-            value: false,
+            value: store.rankingShow,
             change: function (checked) {
                 store.rankingShow = checked;
                 render()
