@@ -7,10 +7,18 @@ python:
 # command to install dependencies
 install:
   - pip install -r requirements.txt
+before_script:
+  - gem install travis-artifacts
 # command to run tests
 script:
   - python SportOrg_test.py
   - python setup.py build
+  - tar -czvf build/sportorg.tar.gz build/exe.win32-3.6/
+after_script:
+  - travis-artifacts upload --path log/sportorg.log
+  - travis-artifacts upload --path log/sportorg-errors.log
+after_success:
+  - travis-artifacts upload --path build/sportorg.tar.gz
 branches:
   only:
     - dev
