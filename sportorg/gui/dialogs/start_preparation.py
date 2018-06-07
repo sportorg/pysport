@@ -290,10 +290,12 @@ class StartPreparationDialog(QDialog):
         obj.set_setting('is_start_preparation_time', self.start_check_box.isChecked())
         obj.set_setting('is_fixed_start_interval', self.start_interval_radio_button.isChecked())
         obj.set_setting('start_interval', time_to_otime(self.start_interval_time_edit.time()).to_msec())
+        obj.set_setting('start_first_time', time_to_otime(self.start_first_time_edit.time()).to_msec())
 
         obj.set_setting('is_start_preparation_numbers', self.numbers_check_box.isChecked())
         obj.set_setting('is_fixed_number_interval', self.numbers_interval_radio_button.isChecked())
         obj.set_setting('numbers_interval', self.numbers_interval_spin_box.value())
+        obj.set_setting('numbers_first', self.numbers_first_spin_box.value())
 
     def recover_state(self):
         obj = race()
@@ -310,13 +312,23 @@ class StartPreparationDialog(QDialog):
         self.draw_mix_groups_check_box.setChecked(obj.get_setting('is_mix_groups', False))
 
         self.start_check_box.setChecked(obj.get_setting('is_start_preparation_time', False))
-        self.start_interval_radio_button.setChecked(obj.get_setting('is_fixed_start_interval', False))
-        t = OTime(msec=obj.get_setting('start_interval', 0))
-        self.start_interval_time_edit.setTime(QTime(t.hour, t.minute))
+
+        if obj.get_setting('is_fixed_start_interval', True):
+            self.start_interval_radio_button.setChecked(True)
+        else:
+            self.start_group_settings_radion_button.setChecked(True)
+        t = OTime(msec=obj.get_setting('start_interval', 60000))
+        self.start_interval_time_edit.setTime(QTime(t.hour, t.minute, t.sec))
+        t = OTime(msec=obj.get_setting('start_first_time', 60000))
+        self.start_first_time_edit.setTime(QTime(t.hour, t.minute, t.sec))
 
         self.numbers_check_box.setChecked(obj.get_setting('is_start_preparation_numbers', False))
-        self.numbers_interval_radio_button.setChecked(obj.get_setting('is_fixed_number_interval', False))
+        if obj.get_setting('is_fixed_number_interval', True):
+            self.numbers_interval_radio_button.setChecked(True)
+        else:
+            self.numbers_minute_radio_button.setChecked(True)
         self.numbers_interval_spin_box.setValue(obj.get_setting('numbers_interval', 1))
+        self.numbers_first_spin_box.setValue(obj.get_setting('numbers_first', 1))
 
 
 def guess_courses_for_groups():

@@ -266,16 +266,21 @@ class StartNumberManager(object):
         persons = current_race.get_persons_by_group(group)
         if persons is not None and len(persons) > 0:
             first_start = persons[0].start_time
+            if not first_start:
+                first_start = OTime()
             minute = first_start.minute
             min_num = int(first_number / 100) * 100 + minute
             if min_num < first_number:
                 min_num += 100
 
             for current_person in persons:
-                start_time = current_person.start_time
-                time_delta = (start_time - first_start)
-                delta = time_delta.to_sec() // 60
-                current_person.bib = int(min_num + delta)
+                if current_person.start_time:
+                    start_time = current_person.start_time
+                    time_delta = (start_time - first_start)
+                    delta = time_delta.to_sec() // 60
+                    current_person.bib = int(min_num + delta)
+                else:
+                    current_person.bib = 0
             return persons[-1].bib
 
         return first_number
