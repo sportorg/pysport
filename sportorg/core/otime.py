@@ -1,5 +1,7 @@
 import datetime
 
+from math import trunc
+
 
 class OTime:
     def __init__(self, day=0, hour=0, minute=0, sec=0, msec=0):
@@ -93,13 +95,16 @@ class OTime:
         return OTime(msec=self.to_msec())
 
     def to_minute(self):
-        return round(self.to_msec()/(1000*60))
+        return trunc(self.to_msec()/(1000*60))
 
     def to_sec(self):
-        return round(self.to_msec()/1000)
+        return trunc(self.to_msec()/1000)
 
-    def to_msec(self):
-        return self._msec
+    def to_msec(self, sub_sec=3):
+        if not 0 <= sub_sec <= 3:
+            sub_sec = 3
+        mlt = 10 ** (3 - sub_sec)
+        return self._msec // mlt * mlt
 
     def to_time(self):
         return datetime.time(self.hour, self.minute, self.sec, self.msec*1000)
