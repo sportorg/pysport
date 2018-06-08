@@ -1149,3 +1149,15 @@ msgstr "Максимальный год"
 
 msgid "Is any course"
 msgstr "Любая дистанция"
+
+msgid "Check updates"
+msgstr "Проверить обновления"
+
+msgid "Update available"
+msgstr "Доступно обновление"
+
+msgid "Info"
+msgstr "Информация"
+
+msgid "You are using the latest version"
+msgstr "Вы используете последнюю версию"

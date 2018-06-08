@@ -62,7 +62,8 @@ class Factory:
             TeamworkSendAction(),
             TelegramSettingsAction(),
             TelegramSendAction(),
-            IOFEntryListImportAction()
+            IOFEntryListImportAction(),
+            CheckUpdatesAction()
         ]
         self._map = {}
         for action in self.actions:
