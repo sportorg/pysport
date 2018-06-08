@@ -632,7 +632,6 @@ class Result:
             return ''
 
         time_accuracy = race().get_setting('time_accuracy', 0)
-
         return self.get_result_otime().to_str(time_accuracy)
 
     def get_result_for_sort(self):
@@ -640,7 +639,10 @@ class Result:
         return self.status, ret.to_msec()
 
     def get_result_otime(self):
-        return self.get_finish_time() - self.get_start_time() + self.get_penalty_time()
+        time_accuracy = race().get_setting('time_accuracy', 0)
+        ret_ms = self.get_finish_time().to_msec(time_accuracy) - self.get_start_time().to_msec(time_accuracy)
+        ret_ms +=  self.get_penalty_time().to_msec(time_accuracy)
+        return OTime(msec=ret_ms)
 
     def get_start_time(self):
         if self.start_time and self.start_time.to_msec():
