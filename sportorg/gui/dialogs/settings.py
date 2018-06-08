@@ -45,6 +45,10 @@ class MainTab(Tab):
         self.item_use_birthday.setChecked(Config().configuration.get('use_birthday'))
         self.layout.addRow(self.item_use_birthday)
 
+        self.item_check_updates = QCheckBox(_('Check updates'))
+        self.item_check_updates.setChecked(Config().configuration.get('check_updates'))
+        # self.layout.addRow(self.item_check_updates)
+
         self.widget.setLayout(self.layout)
 
     def save(self):
@@ -53,6 +57,7 @@ class MainTab(Tab):
         Config().configuration.set('autosave', self.item_auto_save.isChecked())
         Config().configuration.set('open_recent_file', self.item_open_recent_file.isChecked())
         Config().configuration.set('use_birthday', self.item_use_birthday.isChecked())
+        Config().configuration.set('check_updates', self.item_check_updates.isChecked())
 
 
 class SoundTab(Tab):

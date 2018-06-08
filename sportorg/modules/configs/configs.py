@@ -76,6 +76,7 @@ class Config(metaclass=Singleton):
                 'autoconnect': False,
                 'open_recent_file': False,
                 'use_birthday': False,
+                'check_updates': True,
             }),
             ConfigFile.SOUND: Configurations({
                 'enabled': False,

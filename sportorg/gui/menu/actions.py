@@ -6,6 +6,7 @@ from PyQt5 import QtCore
 
 from PyQt5.QtWidgets import QMessageBox, QApplication, QTableView
 
+from sportorg import config
 from sportorg.core.otime import OTime
 from sportorg.gui.dialogs.about import AboutDialog
 from sportorg.gui.dialogs.cp_delete import CPDeleteDialog
@@ -45,6 +46,7 @@ from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.modules.sportiduino.sportiduino import SportiduinoClient
 from sportorg.modules.teamwork import Teamwork
 from sportorg.modules.telegram.telegram import TelegramClient
+from sportorg.modules.updater import checker
 from sportorg.modules.winorient import winorient
 from sportorg.modules.winorient.wdb import WDBImportError, WinOrientBinary
 from sportorg.language import _
@@ -502,6 +504,20 @@ class TelegramSendAction(Action):
 class AboutAction(Action):
     def execute(self):
         AboutDialog().exec()
+
+
+class CheckUpdatesAction(Action):
+    def execute(self):
+        try:
+            if not checker.check_version(config.VERSION):
+                message = _('Update available') + ' ' + checker.get_version()
+            else:
+                message = _('You are using the latest version')
+
+            QMessageBox.information(self.app, _('Info'), message)
+        except Exception as e:
+            logging.error(str(e))
+            QMessageBox.warning(self.app, _('Error'), str(e))
 
 
 class TestingAction(Action):
