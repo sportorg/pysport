@@ -127,7 +127,7 @@ class OcadTXTv8ImportAction(Action):
 class WDBWinorientExportAction(Action):
     def execute(self):
         file_name = get_save_file_name(_('Save As WDB file'), _("WDB file (*.wdb)"),
-                                       '{}_sportorg_export'.format(time.strftime("%Y%m%d")))
+                                       '{}_sportorg_export'.format(race().data.get_start_datetime().strftime("%Y%m%d")))
         if file_name is not '':
             try:
                 wb = WinOrientBinary()
@@ -145,7 +145,7 @@ class WDBWinorientExportAction(Action):
 class IOFResultListExportAction(Action):
     def execute(self):
         file_name = get_save_file_name(_('Save As IOF xml'), _('IOF xml (*.xml)'),
-                                       '{}_resultList'.format(time.strftime("%Y%m%d")))
+                                       '{}_resultList'.format(race().data.get_start_datetime().strftime("%Y%m%d")))
         if file_name is not '':
             try:
                 iof_xml.export_result_list(file_name)
