@@ -1,6 +1,5 @@
 import codecs
 import logging
-import time
 import webbrowser
 
 from PyQt5.QtGui import QIcon
@@ -140,7 +139,7 @@ class ReportDialog(QDialog):
             file_name = _settings['last_file']
         else:
             file_name = get_save_file_name(_('Save As HTML file'), _("HTML file (*.html)"),
-                                           '{}_report'.format(time.strftime("%Y%m%d")))
+                                           '{}_report'.format(obj.data.get_start_datetime().strftime("%Y%m%d")))
         if file_name:
             _settings['last_file'] = file_name
             with codecs.open(file_name, 'w', 'utf-8') as file:
