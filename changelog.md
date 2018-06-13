@@ -1,5 +1,9 @@
 # Changelog
 
+# 2018-06-13 v1.2.0
+
++ pass
+
 ## 2018-04-24 v1.1.1
 
 + Added margins when printing
