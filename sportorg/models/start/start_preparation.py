@@ -334,7 +334,7 @@ class StartTimeManager(object):
             current_start = first_start
             for current_person in persons:
                 current_person.start_time = current_start
-                current_start = current_start + timedelta(seconds=start_interval.second, minutes=start_interval.minute)
+                current_start = current_start + start_interval
 
 
 def get_corridors():
