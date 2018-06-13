@@ -14,7 +14,7 @@ from sportorg.gui.dialogs.entry_edit import EntryEditDialog
 from sportorg.gui.dialogs.group_edit import GroupEditDialog
 from sportorg.gui.dialogs.organization_edit import OrganizationEditDialog
 from sportorg.gui.menu.factory import Factory
-from sportorg.models.memory import Race, races, race, NotEmptyException
+from sportorg.models.memory import Race, race, NotEmptyException, new_event, set_current_race_index
 
 from sportorg import config
 from sportorg.models.result.result_calculation import ResultCalculation
@@ -486,7 +486,8 @@ class MainWindow(QMainWindow):
         if file_name is not '':
             try:
                 if update_data:
-                    races()[0] = Race()
+                    new_event([Race()])
+                    set_current_race_index(0)
                 self.clear_filters(remove_condition=False)
                 File(file_name, logging.root, File.JSON).create()
                 self.apply_filters()
