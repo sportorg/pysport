@@ -2,7 +2,16 @@
 
 # 2018-06-13 v1.2.0
 
-+ pass
++ New JavaScript-based templates
++ Added new template (results_live) to manage DNF persons
++ "Rent" field it result table
++ Labyrinth mode, auto-define correct course  
++ Handicap. Calculation of start time from results
++ Multi day support
++ Dictionary of regions (file `regions.txt`) 
++ Dictionary of given names (file `names.txt`)
+- Fixed error with last record in SFR card readout
+- Fixed error with mixed toss (all athletes of course)
 
 ## 2018-04-24 v1.1.1
 
