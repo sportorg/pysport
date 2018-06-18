@@ -296,12 +296,11 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
         team = ''
         first_name = ''
         last_name = ''
-        bib = 0
+        bib = result.get_bib()
         rented_card = ''
         if person:
             first_name = person.name
             last_name = person.surname
-            bib = person.bib
 
             if person.group:
                 group = person.group.name

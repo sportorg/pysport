@@ -514,6 +514,7 @@ class Result:
             raise Exception("<Result> is abstracted")
         self.id = uuid.uuid4()
         self.days = 0
+        self.bib = 0
         self.start_time = None  # type: OTime
         self.finish_time = OTime.now()  # type: OTime
         self.person = None  # type: Person
@@ -563,6 +564,7 @@ class Result:
         return {
             'object': self.__class__.__name__,
             'id': str(self.id),
+            'bib': self.bib,
             'system_type': self.system_type.value,
             'person_id': str(self.person.id) if self.person else None,
             'days': self.days,
@@ -610,6 +612,9 @@ class Result:
         else:
             self.created_at = time.time()
 
+        if 'bib' in data:
+            self.bib = int(data['bib'])
+
         if 'card_number' in data:
             self.card_number = int(data['card_number'])
         if 'splits' in data:
@@ -621,6 +626,11 @@ class Result:
 
     def clear(self):
         pass
+
+    def get_bib(self):
+        if self.person:
+            return self.person.bib
+        return self.bib
 
     def get_result(self):
         if not self.is_status_ok():
