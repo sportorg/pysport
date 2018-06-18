@@ -63,7 +63,9 @@ class Factory:
             TelegramSettingsAction(),
             TelegramSendAction(),
             IOFEntryListImportAction(),
-            CheckUpdatesAction()
+            CheckUpdatesAction(),
+            AssignResultByBibAction(),
+            AssignResultByCardNumberAction()
         ]
         self._map = {}
         for action in self.actions:

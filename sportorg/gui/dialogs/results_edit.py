@@ -150,7 +150,6 @@ class ResultEditDialog(QDialog):
     def show_person_info(self):
         bib = self.item_bib.value()
         self.label_person_info.setText('')
-        self.button_ok.setEnabled(True)
         if bib:
             person = find(race().persons, bib=bib)
             if person:
@@ -162,7 +161,6 @@ class ResultEditDialog(QDialog):
                 self.label_person_info.setText(info)
             else:
                 self.label_person_info.setText(_('not found'))
-                self.button_ok.setDisabled(True)
 
     def set_values_from_model(self):
         if self.current_object.is_punch():
@@ -182,8 +180,7 @@ class ResultEditDialog(QDialog):
             self.item_penalty.setTime(time_to_qtime(self.current_object.penalty_time))
         if self.current_object.penalty_laps:
             self.item_penalty_laps.setValue(self.current_object.penalty_laps)
-        if self.current_object.person:
-            self.item_bib.setValue(self.current_object.person.bib)
+        self.item_bib.setValue(self.current_object.get_bib())
 
         self.item_days.setValue(self.current_object.days)
 
@@ -259,6 +256,7 @@ class ResultEditDialog(QDialog):
                 result.person = new_person
                 if result.is_punch():
                     race().person_card_number(result.person, result.card_number)
+            result.bib = new_bib
 
             GlobalAccess().get_main_window().get_result_table().model().init_cache()
 
