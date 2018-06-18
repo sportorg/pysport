@@ -5,7 +5,7 @@ import logging.config
 from sportorg.core.version import Version
 
 NAME = 'SportOrg'
-VERSION = Version(1, 2, 0, 0, 'v', 'beta')
+VERSION = Version(1, 2, 0, 0, 'v')
 DEBUG = True
 
 
