@@ -260,6 +260,14 @@ def menu_list():
                     'title': _('Delete CP'),
                     'action': 'CPDeleteAction'
                 },
+                {
+                    'title': _('Assign result by bib'),
+                    'action': 'AssignResultByBibAction'
+                },
+                {
+                    'title': _('Assign result by card number'),
+                    'action': 'AssignResultByCardNumberAction'
+                },
             ]
         },
         {

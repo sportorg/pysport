@@ -1161,3 +1161,9 @@ msgstr "Информация"
 
 msgid "You are using the latest version"
 msgstr "Вы используете последнюю версию"
+
+msgid "Assign result by bib"
+msgstr "Присвоить результат по номеру"
+
+msgid "Assign result by card number"
+msgstr "Присвоить результат по номеру чипа"

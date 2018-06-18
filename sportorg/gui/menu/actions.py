@@ -32,7 +32,7 @@ from sportorg.gui.dialogs.timekeeping_properties import TimekeepingPropertiesDia
 from sportorg.gui.menu.action import Action
 from sportorg.gui.utils.custom_controls import messageBoxQuestion
 from sportorg.libs.winorient.wdb import write_wdb
-from sportorg.models.memory import race, ResultStatus, ResultManual
+from sportorg.models.memory import race, ResultStatus, ResultManual, find
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.result_checker import ResultChecker
 from sportorg.models.start.start_preparation import guess_corridors_for_groups, copy_bib_to_card_number
@@ -523,3 +523,19 @@ class CheckUpdatesAction(Action):
 class TestingAction(Action):
     def execute(self):
         testing.test()
+
+
+class AssignResultByBibAction(Action):
+    def execute(self):
+        for result in race().results:
+            if result.person is None and result.bib:
+                result.person = find(race().persons, bib=result.bib)
+        self.app.refresh()
+
+
+class AssignResultByCardNumberAction(Action):
+    def execute(self):
+        for result in race().results:
+            if result.person is None and result.card_number:
+                result.person = find(race().persons, card_number=result.card_number)
+        self.app.refresh()

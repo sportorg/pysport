@@ -256,8 +256,7 @@ class ResultEditDialog(QDialog):
                 result.person = new_person
                 if result.is_punch():
                     race().person_card_number(result.person, result.card_number)
-            else:
-                result.bib = new_bib
+            result.bib = new_bib
 
             GlobalAccess().get_main_window().get_result_table().model().init_cache()
 
