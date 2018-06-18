@@ -916,6 +916,7 @@ class Person(Model):
 
         self.start_time = None  # type: OTime
         self.start_group = 0
+        self.result_count = 0
 
     def __repr__(self):
         return '{} {} {}'.format(self.full_name, self.bib, self.group)

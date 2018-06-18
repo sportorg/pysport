@@ -12,6 +12,11 @@ class ResultCalculation(object):
     def process_results(self):
         logging.debug('Process results')
         self.race.relay_teams.clear()
+        for person in self.race.persons:
+            person.result_count = 0
+        for result in self.race.results:
+            if result.person:
+                result.person.result_count += 1
         for i in self.race.groups:
             if not self.race.get_type(i) == RaceType.RELAY:
                 # single race

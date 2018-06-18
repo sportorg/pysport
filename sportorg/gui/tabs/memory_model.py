@@ -212,8 +212,9 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
         self.init_cache()
 
     def get_headers(self):
-        return [_('Last name'), _('First name'), _('Sex'), _('Qualification'), _('Group'), _('Team'), _('Year'), _('Bib'), _('Start'),
-                _('Start group'), _('Card'), _('Rented card'), _('Comment'), _('World code'), _('National code'), _('Out of competition')]
+        return [_('Last name'), _('First name'), _('Sex'), _('Qualification'), _('Group'), _('Team'), _('Year'),
+                _('Bib'), _('Start'), _('Start group'), _('Card'), _('Rented card'), _('Comment'), _('World code'),
+                _('National code'), _('Out of competition'), _('Result count')]
 
     def init_cache(self):
         self.cache.clear()
@@ -259,6 +260,7 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
         if person.is_out_of_competition:
             out_of_comp_status = _('o/c')
         ret.append(out_of_comp_status)
+        ret.append(person.result_count)
 
         return ret
 
@@ -276,8 +278,8 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
         self.count = None
 
     def get_headers(self):
-        return [_('Last name'), _('First name'), _('Group'), _('Team'), _('Bib'), _('Card'), _('Start'), _('Finish'), _('Result'),
-                _('Status'), _('Penalty'), _('Penalty legs'), _('Place'), _('Type'), _('Rented card')]
+        return [_('Last name'), _('First name'), _('Group'), _('Team'), _('Bib'), _('Card'), _('Start'), _('Finish'),
+                _('Result'), _('Status'), _('Penalty'), _('Penalty legs'), _('Place'), _('Type'), _('Rented card')]
 
     def init_cache(self):
         self.cache.clear()
