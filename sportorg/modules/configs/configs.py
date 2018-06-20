@@ -72,11 +72,11 @@ class Config(metaclass=Singleton):
             ConfigFile.CONFIGURATION: Configurations({
                 'current_locale': 'ru_RU',
                 'show_toolbar': True,
-                'autosave': False,
                 'autoconnect': False,
                 'open_recent_file': False,
                 'use_birthday': False,
                 'check_updates': True,
+                'autosave_interval': 0,
             }),
             ConfigFile.SOUND: Configurations({
                 'enabled': False,
