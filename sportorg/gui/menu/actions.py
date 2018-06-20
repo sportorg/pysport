@@ -21,6 +21,7 @@ from sportorg.gui.dialogs.relay_number_dialog import RelayNumberDialog
 from sportorg.gui.dialogs.report_dialog import ReportDialog
 from sportorg.gui.dialogs.search_dialog import SearchDialog
 from sportorg.gui.dialogs.settings import SettingsDialog
+from sportorg.gui.dialogs.sportorg_import_dialog import SportOrgImportDialog
 from sportorg.gui.dialogs.start_handicap_dialog import StartHandicapDialog
 from sportorg.gui.dialogs.start_preparation import StartPreparationDialog, guess_courses_for_groups
 from sportorg.gui.dialogs.start_report_dialog import StartReportDialog
@@ -37,6 +38,7 @@ from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.result_checker import ResultChecker
 from sportorg.models.start.start_preparation import guess_corridors_for_groups, copy_bib_to_card_number
 from sportorg.modules import testing
+from sportorg.modules.backup.json import get_races_from_file
 from sportorg.modules.iof import iof_xml
 from sportorg.modules.live.orgeo import OrgeoClient
 from sportorg.modules.ocad import ocad
@@ -539,3 +541,13 @@ class AssignResultByCardNumberAction(Action):
             if result.person is None and result.card_number:
                 result.person = find(race().persons, card_number=result.card_number)
         self.app.refresh()
+
+
+class ImportSportOrgAction(Action):
+    def execute(self):
+        file_name = get_open_file_name(_('Open SportOrg json'), _('SportOrg (*.json)'))
+        if file_name is not '':
+            with open(file_name) as f:
+                attr = get_races_from_file(f)
+            SportOrgImportDialog(*attr).exec()
+            self.app.refresh()

@@ -19,6 +19,17 @@ def dump(file):
 
 
 def load(file):
+    event, current_race = get_races_from_file(file)
+    new_event(event)
+    set_current_race_index(current_race)
+    obj = race()
+    ResultChecker.check_all()
+    ResultCalculation(obj).process_results()
+    RaceSplits(obj).generate()
+    ScoreCalculation(obj).calculate_scores()
+
+
+def get_races_from_file(file):
     data = json.load(file)
     event = []
     for race_dict in data['races']:
@@ -27,14 +38,10 @@ def load(file):
         obj.id = uuid.UUID(str(race_dict['id']))
         obj.update_data(race_dict)
         event.append(obj)
-    new_event(event)
+    current_race = 0
     if 'current_race' in data:
-        set_current_race_index(data['current_race'])
-    obj = race()
-    ResultChecker.check_all()
-    ResultCalculation(obj).process_results()
-    RaceSplits(obj).generate()
-    ScoreCalculation(obj).calculate_scores()
+        current_race = int(data['current_race'])
+    return event, current_race
 
 
 def race_migrate(data):
