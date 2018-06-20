@@ -488,7 +488,7 @@ msgid "Start time change"
 msgstr "Смещение времени старта"
 
 msgid "Add"
-msgstr "Добавлять"
+msgstr "Добавить"
 
 msgid "Reduce"
 msgstr "Отнять"
@@ -1170,3 +1170,18 @@ msgstr "Присвоить результат по номеру чипа"
 
 msgid "Result count"
 msgstr "Количество результатов"
+
+msgid "Import from SportOrg file"
+msgstr "Импортировать из файла SportOrg"
+
+msgid "Choose race"
+msgstr "Выберите гонку"
+
+msgid "Unique id"
+msgstr "Уникальный идентификатор"
+
+msgid "Action"
+msgstr "Действие"
+
+msgid "Overwrite"
+msgstr "Перезаписать"

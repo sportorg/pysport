@@ -52,6 +52,10 @@ def menu_list():
                     'title': _('Import'),
                     'actions': [
                         {
+                            'title': _('Import from SportOrg file'),
+                            'action': 'ImportSportOrgAction'
+                        },
+                        {
                             'title': _('CSV Winorient'),
                             'icon': config.icon_dir('csv.svg'),
                             'action': 'CSVWinorientImportAction'

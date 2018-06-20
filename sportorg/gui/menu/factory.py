@@ -65,7 +65,8 @@ class Factory:
             IOFEntryListImportAction(),
             CheckUpdatesAction(),
             AssignResultByBibAction(),
-            AssignResultByCardNumberAction()
+            AssignResultByCardNumberAction(),
+            ImportSportOrgAction()
         ]
         self._map = {}
         for action in self.actions:
