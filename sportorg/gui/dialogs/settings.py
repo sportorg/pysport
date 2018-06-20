@@ -1,7 +1,8 @@
 import logging
 
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QFormLayout, QDialog, QCheckBox, QDialogButtonBox, QLabel, QTabWidget, QWidget, QPushButton
+from PyQt5.QtWidgets import QFormLayout, QDialog, QCheckBox, QDialogButtonBox, QLabel, QTabWidget, QWidget, QPushButton, \
+    QSpinBox
 
 from sportorg import config
 from sportorg.core.audio import get_sounds
@@ -29,13 +30,14 @@ class MainTab(Tab):
         self.item_lang.setCurrentText(Config().configuration.get('current_locale', 'ru_RU'))
         self.layout.addRow(self.label_lang, self.item_lang)
 
+        self.item_auto_save = QSpinBox()
+        self.item_auto_save.setMaximum(3600*24)
+        self.item_auto_save.setValue(Config().configuration.get('autosave_interval'))
+        self.layout.addRow(_('Auto save') + ' (sec)', self.item_auto_save)
+
         self.item_show_toolbar = QCheckBox(_('Show toolbar'))
         self.item_show_toolbar.setChecked(Config().configuration.get('show_toolbar'))
         self.layout.addRow(self.item_show_toolbar)
-
-        self.item_auto_save = QCheckBox(_('Auto save'))
-        self.item_auto_save.setChecked(Config().configuration.get('autosave'))
-        self.layout.addRow(self.item_auto_save)
 
         self.item_open_recent_file = QCheckBox(_('Open recent file'))
         self.item_open_recent_file.setChecked(Config().configuration.get('open_recent_file'))
@@ -53,8 +55,8 @@ class MainTab(Tab):
 
     def save(self):
         Config().configuration.set('current_locale', self.item_lang.currentText())
+        Config().configuration.set('autosave_interval', self.item_auto_save.value())
         Config().configuration.set('show_toolbar', self.item_show_toolbar.isChecked())
-        Config().configuration.set('autosave', self.item_auto_save.isChecked())
         Config().configuration.set('open_recent_file', self.item_open_recent_file.isChecked())
         Config().configuration.set('use_birthday', self.item_use_birthday.isChecked())
         Config().configuration.set('check_updates', self.item_check_updates.isChecked())

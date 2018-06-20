@@ -80,6 +80,7 @@ class MainWindow(QMainWindow):
         self.log_queue = Queue()
         handler = ConsolePanelHandler(self)
         logging.root.addHandler(handler)
+        self.last_update = time.time()
 
     def show_window(self):
         try:
@@ -331,11 +332,6 @@ class MainWindow(QMainWindow):
             self.get_course_table().model().apply_filter()
             self.get_organization_table().model().apply_filter()
 
-    def auto_save(self):
-        if not self.get_configuration().get('autosave'):
-            return
-        self.saving = True
-
     def add_recent_file(self, file):
         self.delete_from_recent_files(file)
         self.recent_files.insert(0, file)
@@ -404,7 +400,6 @@ class MainWindow(QMainWindow):
                     elif result.person and result.person.group:
                         GroupSplits(race(), result.person.group).generate(True)
                     Teamwork().send(result.to_dict())
-                    self.auto_save()
                     OrgeoClient().send_results()
                     TelegramClient().send_result(result)
                     if result.person:
@@ -450,8 +445,6 @@ class MainWindow(QMainWindow):
         False: 'network-off.svg',
     }
 
-    saving = False
-
     def interval(self):
         if SIReaderClient().is_alive() != self.sportident_status:
             self.toolbar_property['sportident'].setIcon(
@@ -462,13 +455,16 @@ class MainWindow(QMainWindow):
                 QtGui.QIcon(config.icon_dir(self.teamwork_icon[Teamwork().is_alive()])))
             self.teamwork_status = Teamwork().is_alive()
 
-        if self.saving:
-            if self.file:
-                self.save_file()
-                logging.info(_('Auto save'))
-            else:
-                logging.warning(_('No file to auto save'))
-            self.saving = False
+        try:
+            if self.get_configuration().get('autosave_interval'):
+                if self.file:
+                    if time.time() - self.last_update > int(self.get_configuration().get('autosave_interval')):
+                        self.save_file()
+                        logging.info(_('Auto save'))
+                else:
+                    logging.warning(_('No file to auto save'))
+        except Exception as e:
+            logging.error(str(e))
 
         while not self.log_queue.empty():
             text = self.log_queue.get()
@@ -511,6 +507,7 @@ class MainWindow(QMainWindow):
                 self.clear_filters(remove_condition=False)
                 File(self.file, logging.root, File.JSON).save()
                 self.apply_filters()
+                self.last_update = time.time()
             except Exception as e:
                 logging.error(str(e))
         else:
@@ -524,6 +521,7 @@ class MainWindow(QMainWindow):
                 self.set_title()
                 self.add_recent_file(self.file)
                 self.init_model()
+                self.last_update = time.time()
             except Exception as e:
                 logging.exception(str(e))
                 self.delete_from_recent_files(file_name)

@@ -297,7 +297,6 @@ class ManualFinishAction(Action):
         logging.info(_('Manual finish'))
         self.app.get_result_table().model().init_cache()
         self.app.refresh()
-        self.app.auto_save()
 
 
 class SPORTidentReadoutAction(Action):
@@ -410,7 +409,6 @@ class AddSPORTidentResultAction(Action):
         logging.info('SPORTident result')
         self.app.get_result_table().model().init_cache()
         self.app.refresh()
-        self.app.auto_save()
 
 
 class TimekeepingSettingsAction(Action):
