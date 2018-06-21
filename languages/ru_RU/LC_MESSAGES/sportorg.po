@@ -1185,3 +1185,6 @@ msgstr "Действие"
 
 msgid "Overwrite"
 msgstr "Перезаписать"
+
+msgid "Ask for a bib when re-reading the card"
+msgstr "Спрашивать номер при повторном считывании чипа"

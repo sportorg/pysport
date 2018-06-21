@@ -91,6 +91,9 @@ class TimekeepingPropertiesDialog(QDialog):
         self.chip_reading_box.setLayout(self.chip_reading_layout)
         self.tk_layout.addRow(self.chip_reading_box)
 
+        self.chip_re_reading = QCheckBox(_('Ask for a bib when re-reading the card'))
+        self.chip_reading_layout.addRow(self.chip_re_reading)
+
         self.assignment_mode = QCheckBox(_('Assignment mode'))
         self.assignment_mode.stateChanged.connect(self.on_assignment_mode)
         self.tk_layout.addRow(self.assignment_mode)
@@ -237,6 +240,7 @@ class TimekeepingPropertiesDialog(QDialog):
         finish_source = cur_race.get_setting('system_finish_source', 'station')
         finish_cp_number = cur_race.get_setting('system_finish_cp_number', 90)
         assign_chip_reading = cur_race.get_setting('system_assign_chip_reading', 'off')
+        card_read_repeated = cur_race.get_setting('system_card_read_repeated', False)
         assignment_mode = cur_race.get_setting('system_assignment_mode', False)
         si_port = cur_race.get_setting('system_port', '')
 
@@ -271,6 +275,7 @@ class TimekeepingPropertiesDialog(QDialog):
         elif assign_chip_reading == 'always':
             self.chip_reading_always.setChecked(True)
 
+        self.chip_re_reading.setChecked(card_read_repeated)
         self.assignment_mode.setChecked(assignment_mode)
 
         # result processing
@@ -382,6 +387,7 @@ class TimekeepingPropertiesDialog(QDialog):
 
         obj.set_setting('system_assign_chip_reading', assign_chip_reading)
 
+        obj.set_setting('system_card_read_repeated', self.chip_re_reading.isChecked())
         obj.set_setting('system_assignment_mode', self.assignment_mode.isChecked())
 
         # result processing

@@ -11,6 +11,7 @@ class ResultSportidentGeneration:
         self._result = result
         self._person = None
         self.assign_chip_reading = race().get_setting('system_assign_chip_reading', 'off')
+        self.card_read_repeated = race().get_setting('system_card_read_repeated', False)
 
     def _add_result_to_race(self):
         race().add_result(self._result)
@@ -48,6 +49,7 @@ class ResultSportidentGeneration:
             self._person = bib_dialog.get_person()
             if not self._person:
                 self.assign_chip_reading = 'off'
+                self.card_read_repeated = False
         except Exception as e:
             logging.error(str(e))
 
@@ -56,6 +58,8 @@ class ResultSportidentGeneration:
             logging.info('Result already exist')
             return False
         if self.assign_chip_reading == 'always':
+            self._bib_dialog()
+        elif self.card_read_repeated and self._has_sportident_card():
             self._bib_dialog()
         self._add_result()
         return True
