@@ -55,7 +55,10 @@ class Widget(QtWidgets.QWidget):
         assert (isinstance(hor_header, QHeaderView))
         hor_header.setSectionsMovable(True)
         hor_header.setDropIndicatorShown(True)
-        hor_header.setSectionResizeMode(QHeaderView.Interactive)
+        hor_header.setSectionResizeMode(QHeaderView.ResizeToContents)
+
+        ver_header = self.EntryTable.verticalHeader()
+        ver_header.setSectionResizeMode(QHeaderView.ResizeToContents)
 
         def entry_double_clicked(index):
             # show_edit_dialog(index)
