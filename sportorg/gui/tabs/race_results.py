@@ -57,6 +57,7 @@ class ResultTable(TableView):
             if index.row() < len(race().results):
                 dialog = ResultEditDialog(race().results[index.row()])
                 dialog.exec()
+                # self.selectRow(index.row()+1)
         except Exception as e:
             logging.error(str(e))
 
@@ -139,6 +140,9 @@ class Widget(QtWidgets.QWidget):
         hor_header.setDropIndicatorShown(True)
         hor_header.setSectionResizeMode(QHeaderView.ResizeToContents)
         Broker().subscribe('refresh', lambda: hor_header.setSectionResizeMode(QHeaderView.ResizeToContents))
+
+        ver_header = self.ResultTable.verticalHeader()
+        ver_header.setSectionResizeMode(QHeaderView.ResizeToContents)
 
         self.gridLayout.addWidget(self.ResultSplitter)
         self.ResultCourseGroupBox.setTitle(_("Course"))

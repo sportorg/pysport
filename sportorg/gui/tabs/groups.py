@@ -39,6 +39,9 @@ class Widget(QtWidgets.QWidget):
         hor_header.setDropIndicatorShown(True)
         hor_header.setSectionResizeMode(QHeaderView.Interactive)
 
+        ver_header = self.GroupTable.verticalHeader()
+        ver_header.setSectionResizeMode(QHeaderView.ResizeToContents)
+
         def group_double_clicked(index):
             try:
                 if index.row() < len(race().groups):
