@@ -1186,6 +1186,11 @@ class Race(Model):
     def delete_persons(self, indexes):
         indexes = sorted(indexes, reverse=True)
         for i in indexes:
+            person = self.persons[i]
+            for result in self.results:
+                if result.person is person:
+                    result.person = None
+                    result.bib = person.bib
             del self.persons[i]
 
     def delete_results(self, indexes):

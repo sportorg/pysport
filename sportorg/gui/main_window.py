@@ -317,7 +317,7 @@ class MainWindow(QMainWindow):
             logging.error(str(e))
 
     def clear_filters(self, remove_condition=True):
-        if(self.get_person_table()):
+        if self.get_person_table():
             self.get_person_table().model().clear_filter(remove_condition)
             self.get_result_table().model().clear_filter(remove_condition)
             self.get_person_table().model().clear_filter(remove_condition)
@@ -325,7 +325,7 @@ class MainWindow(QMainWindow):
             self.get_organization_table().model().clear_filter(remove_condition)
 
     def apply_filters(self):
-        if (self.get_person_table()):
+        if self.get_person_table():
             self.get_person_table().model().apply_filter()
             self.get_result_table().model().apply_filter()
             self.get_person_table().model().apply_filter()
