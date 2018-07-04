@@ -1,7 +1,6 @@
 import logging
 import math
 import random
-from datetime import timedelta
 from sportorg.core.otime import OTime
 
 from sportorg.models.memory import race, Group, Person, Result, ResultStatus
@@ -222,52 +221,42 @@ class StartNumberManager(object):
         Assign new start numbers
 
     """
-    def process(self, is_interval, first_number=None, interval=None, mix_groups=False):
-        if is_interval:
+    def process(self, mode='interval', first_number=None, interval=None, mix_groups=False):
+        if mode == 'interval':
             cur_num = first_number
             for cur_corridor in get_corridors():
-                if mix_groups:
-                    cur_num = self.process_corridor(cur_corridor, cur_num, interval)
-                else:
-                    for cur_group in get_groups_by_corridor(cur_corridor):
-                        cur_num = self.process_group(cur_group, cur_num, interval)
+                cur_num = self.process_corridor_by_order(cur_corridor, cur_num, interval)
         else:
-            corridors = get_corridors()
-            first_number = 1  # TODO calculate from first start minute
+            first_number = 1
             cur_num = first_number
-            for cur_corridor in corridors:
-                groups = get_groups_by_corridor(cur_corridor)
-                for cur_group in groups:
-                    cur_num = self.process_group_number_by_minute(cur_group, cur_num) + 1
-                cur_num = cur_num - (cur_num % 100) + 100
+            for cur_corridor in get_corridors():
+                if mode == 'corridor_minute':
+                    cur_num = self.process_corridor_by_minute(cur_corridor, cur_num)
+                elif mode == 'corridor_order':
+                    cur_num = self.process_corridor_by_order(cur_corridor, cur_num)
+                cur_num = cur_num - (cur_num % 100) + 101
 
-    def process_group(self, group, first_number, interval):
+    def process_corridor_by_order(self, corridor, first_number=1, interval=1):
         current_race = self.race
-        persons = current_race.get_persons_by_group(group)
-        current_num = first_number
-        if persons is not None:
-            for current_person in persons:
-                current_person.bib = current_num
-                current_num += interval
-        return current_num
+        persons = current_race.get_persons_by_corridor(corridor)  # get persons of current corridor
+        persons = sorted(persons, key=lambda item: item.start_time)  # sort by start time
+        return self.set_numbers_by_order(persons, first_number, interval)
 
-    def process_corridor(self, corridor, first_number, interval):
+    def process_corridor_by_minute(self, corridor, first_number=1):
         current_race = self.race
         persons = current_race.get_persons_by_corridor(corridor)
-        current_num = first_number
-        if persons is not None:
-            for current_person in persons:
-                current_person.bib = current_num
-                current_num += interval
-        return current_num
+        return self.set_numbers_by_minute(persons, first_number)
 
-    def process_group_number_by_minute(self, group, first_number):
-        current_race = self.race
-        persons = current_race.get_persons_by_group(group)
-        if persons is not None and len(persons) > 0:
-            first_start = persons[0].start_time
+    def set_numbers_by_minute(self, persons, first_number=1):
+        max_assigned_num = first_number
+        if persons and len(persons) > 0:
+
+            # first find minimal start time
+            first_start = min(persons, key=lambda x: x.start_time).start_time
             if not first_start:
                 first_start = OTime()
+
+            # find number >= initial first number and have %100 = first start minute
             minute = first_start.minute
             min_num = int(first_number / 100) * 100 + minute
             if min_num < first_number:
@@ -276,15 +265,23 @@ class StartNumberManager(object):
             for current_person in persons:
                 if current_person.start_time:
                     start_time = current_person.start_time
-                    time_delta = (start_time - first_start)
-                    delta = time_delta.to_sec() // 60
+                    delta = (start_time - first_start).to_minute()
                     current_person.bib = int(min_num + delta)
+                    max_assigned_num = max(max_assigned_num, current_person.bib)
                 else:
                     current_person.bib = 0
-            return persons[-1].bib
 
+        if max_assigned_num > first_number:
+            return max_assigned_num + 1
         return first_number
 
+    def set_numbers_by_order(self, persons, first_number=1, interval=1):
+        cur_number = first_number
+        if persons and len(persons) > 0:
+            for current_person in persons:
+                current_person.bib = cur_number
+                cur_number += interval
+        return cur_number
 
 class StartTimeManager(object):
 
