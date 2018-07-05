@@ -478,6 +478,9 @@ msgstr "интервал"
 msgid "Number = corridor + minute"
 msgstr "Номер = коридор + минута"
 
+msgid "Number = corridor + order"
+msgstr "Номер = коридор + порядковый номер"
+
 msgid "Start list"
 msgstr "Протокол старта"
 
