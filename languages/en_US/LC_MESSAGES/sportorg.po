@@ -19,3 +19,54 @@ msgstr ""
 
 msgid "SportOrg"
 msgstr "SportOrg"
+
+msgid "Qualification title"
+msgstr "Qual"
+
+msgid "Year title"
+msgstr "Year"
+
+msgid "Card title"
+msgstr "Card"
+
+msgid "World code title"
+msgstr "World code"
+
+msgid "National code title"
+msgstr "National code"
+
+msgid "Out of competition title"
+msgstr "Out of competition"
+
+msgid "Result count title"
+msgstr "Result count"
+
+msgid "Start fee title"
+msgstr "Start fee"
+
+msgid "Point count title"
+msgstr "Point count"
+
+msgid "Climb title"
+msgstr "Climb,m"
+
+msgid "Min year title"
+msgstr "Min year"
+
+msgid "Max year title"
+msgstr "Max year"
+
+msgid "Start interval title"
+msgstr "Start interval"
+
+msgid "Start corridor title"
+msgstr "Start corridor"
+
+msgid "Order in corridor title"
+msgstr "Order in corridor"
+
+msgid "Length title"
+msgstr "Length,m"
+
+msgid "Penalty legs title"
+msgstr "Penalty legs"
