@@ -106,11 +106,9 @@ class TimekeepingPropertiesDialog(QDialog):
         self.rp_time_radio = QRadioButton(_('by time'))
         self.result_proc_layout.addRow(self.rp_time_radio)
         self.rp_scores_radio = QRadioButton(_('by scores'))
-        self.rp_scores_radio.setDisabled(True)  # TODO
         self.result_proc_layout.addRow(self.rp_scores_radio)
 
         self.rp_scores_group = QGroupBox()
-        self.rp_scores_group.setDisabled(True)  # TODO
         self.rp_scores_layout = QFormLayout(self.rp_scores_group)
         self.rp_rogain_scores_radio = QRadioButton(_('rogain scores'))
         self.rp_scores_layout.addRow(self.rp_rogain_scores_radio)

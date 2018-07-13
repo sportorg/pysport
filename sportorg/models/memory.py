@@ -266,6 +266,17 @@ class CourseControl(Model):
         self.length = int(data['length'])
 
 
+class ControlPoint(Model):
+    """Description of independent control point. Used for score calculation in rogain"""
+    def __init__(self):
+        self.code = ''
+        self.description = ''
+        self.score = 1.0
+        self.x = 0.0
+        self.y = 0.0
+        self.altitude = 0.0
+
+
 class CoursePart(Model):
     def __init__(self):
         self.controls = []  # type: List[CourseControl]
@@ -542,18 +553,34 @@ class Result:
 
     def __eq__(self, other):
         eq = self.system_type and other.system_type
-        if self.start_time and other.start_time:
-            eq = eq and self.start_time == other.start_time
-        if self.finish_time and other.finish_time:
-            eq = eq and self.finish_time == other.finish_time
-        else:
-            return False
+
+        if race().get_setting('result_processing_mode', 'time') == 'time':
+            if self.start_time and other.start_time:
+                eq = eq and self.start_time == other.start_time
+            if self.finish_time and other.finish_time:
+                eq = eq and self.finish_time == other.finish_time
+            else:
+                return False
+        else:  # process by score (rogain)
+            eq = eq and self.scores == other.scores
+            if eq and self.start_time and other.start_time:
+                eq = eq and self.start_time == other.start_time
+            if eq and self.finish_time and other.finish_time:
+                eq = eq and self.finish_time == other.finish_time
+            else:
+                return False
         return eq
 
-    def __gt__(self, other):
+    def __gt__(self, other):  # greater is worse
         if self.status != other.status:
             return self.status.value > other.status.value
-        return self.get_result_otime() > other.get_result_otime()
+        if race().get_setting('result_processing_mode', 'time') == 'time':
+            return self.get_result_otime() > other.get_result_otime()
+        else:  # process by score (rogain)
+            if self.scores == other.scores:
+                return self.get_result_otime() > other.get_result_otime()
+            else:
+                return self.scores < other.scores
 
     @property
     @abstractmethod
@@ -641,8 +668,13 @@ class Result:
         if not self.person:
             return ''
 
+        ret = ''
+        if race().get_setting('result_processing_mode', 'time') == 'scores':
+            ret += str(self.scores) + ' ' + _('points') + ' '
+
         time_accuracy = race().get_setting('time_accuracy', 0)
-        return self.get_result_otime().to_str(time_accuracy)
+        ret += self.get_result_otime().to_str(time_accuracy)
+        return ret
 
     def get_result_for_sort(self):
         ret = self.get_result_otime()
@@ -1082,6 +1114,7 @@ class Race(Model):
         self.persons = []  # type: List[Person]
         self.relay_teams = []  # type: List[RelayTeam]
         self.settings = {}  # type: Dict[str, Any]
+        self.controls = []  # type: List[ControlPoint]
 
     def __repr__(self):
         return repr(self.data)

@@ -2,7 +2,7 @@ import logging
 
 from sportorg.core.otime import OTime
 from sportorg.models.constant import StatusComments
-from sportorg.models.memory import Person, ResultStatus, race, Result
+from sportorg.models.memory import Person, ResultStatus, race, Result, find
 
 
 class ResultCheckerException(Exception):
@@ -18,6 +18,11 @@ class ResultChecker:
         if self.person is None:
             return True
         if self.person.group is None:
+            return True
+
+        if race().get_setting('result_processing_mode', 'time') == 'scores':
+            # process by score (rogain)
+            result.scores = self.calculate_scores_rogain(result)
             return True
 
         course = race().find_course(result)
@@ -45,7 +50,8 @@ class ResultChecker:
                     result.status_comment = StatusComments().remove_hint(StatusComments().get())
             elif result.person.group and result.person.group.max_time.to_msec():
                 if result.get_result_otime() > result.person.group.max_time:
-                    result.status = ResultStatus.OVERTIME
+                    if race().get_setting('result_processing_mode', 'time') == 'time':
+                        result.status = ResultStatus.OVERTIME
 
         return o
 
@@ -128,3 +134,39 @@ class ResultChecker:
         res += len(user_array)
 
         return res
+
+    @staticmethod
+    def get_control_score(code):
+        obj = race()
+        control = find(obj.controls, code=str(code))
+        if control and control.score:
+            return control.score
+
+        if obj.get_setting('result_processing_score_mode', 'fixed') == 'fixed':
+            return obj.get_setting('result_processing_fixed_score_value', 1.0)  # fixed score per control
+        else:
+            return int(code) // 10  # score = code / 10
+
+    @staticmethod
+    def calculate_scores_rogain(result):
+        user_array = []
+        ret = 0
+        for cur_split in result.splits:
+            code = str(cur_split.code)
+            if code not in user_array:
+                user_array.append(code)
+                ret += ResultChecker.get_control_score(code)
+        if result.person and result.person.group:
+            user_time = result.get_result_otime()
+            max_time = result.person.group.max_time
+            if max_time < user_time and max_time > OTime():
+                time_diff = user_time - max_time
+                seconds_diff = time_diff.to_sec()
+                minutes_diff = (seconds_diff + 59) // 60  # note, 1:01 = 2 minutes
+                penalty_step = race().get_setting('result_processing_scores_minute_penalty', 1.0)
+                ret -= minutes_diff * penalty_step
+        if ret < 0:
+            ret = 0
+        return ret
+
+
