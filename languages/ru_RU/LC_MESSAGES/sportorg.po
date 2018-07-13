@@ -1245,3 +1245,6 @@ msgstr "Длина,м"
 
 msgid "Penalty legs title"
 msgstr "Штр.круги"
+
+msgid "points"
+msgstr "очк."
