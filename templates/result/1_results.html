@@ -163,7 +163,13 @@
                 if (b.status !== 1) {
                     return -1
                 }
-                return a.resultMsec - b.resultMsec
+                if (a.place < 1) {
+                    return 1
+                }
+                if (b.place < 1) {
+                    return -1
+                }
+                return a.place - b.place
             }
         });
         var index = 0;
@@ -237,7 +243,7 @@
             {key: 'bib', title: 'Номер', size: 6},
             {key: 'penalty_time', title: 'Штраф', size: 9, active: false},
             {key: 'penalty_laps', title: 'Штраф', size: 9, active: false},
-            {key: 'result', title: 'Результат', size: 15},
+            {key: 'result', title: 'Результат', size: 16},
             {key: 'diff', title: 'Отставание', size: 11},
             {key: 'speed', title: 'Темп', size: 12, active: false},
             {key: 'place_show', title: 'Место', size: 6},
