@@ -168,7 +168,13 @@
                     if (b.status !== 1) {
                         return -1
                     }
-                    return a.resultMsec - b.resultMsec
+                    if (a.place < 1) {
+                        return 1
+                    }
+                    if (b.place < 1) {
+                        return -1
+                    }
+                    return a.place - b.place
                 }
             });
             var index = 0;
