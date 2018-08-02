@@ -1,12 +1,12 @@
+import datetime
+import time
 import uuid
 from abc import abstractmethod
-import dateutil.parser
-import datetime
 from datetime import date
-import time
 from enum import IntEnum, Enum
 from typing import Dict, List, Any
 
+import dateutil.parser
 
 from sportorg.core.model import Model
 from sportorg.core.otime import OTime
@@ -89,7 +89,7 @@ class ResultStatus(_TitleType):
     NONE = PrintableValue(0, _('None'))
     OK = PrintableValue(1, _('OK'))
     FINISHED = PrintableValue(2, _('Finished'))
-    MISSING_PUNCH = PrintableValue(3,  _('Missing punch'))
+    MISSING_PUNCH = PrintableValue(3, _('Missing punch'))
     DISQUALIFIED = PrintableValue(4, _('DSQ'))
     DID_NOT_FINISH = PrintableValue(5, _('DNF'))
     ACTIVE = PrintableValue(6, _('Active'))
@@ -215,6 +215,8 @@ class Organization(Model):
 class CourseControl(Model):
     def __init__(self):
         self.code = ''
+        self.is_exclude = True
+        self.is_additional = False
         self.length = 0
         self.order = 0
 
@@ -258,16 +260,23 @@ class CourseControl(Model):
         return {
             'object': self.__class__.__name__,
             'code': self.code,
-            'length': self.length
+            'length': self.length,
+            'is_exclude': self.is_exclude,
+            'is_additional': self.is_additional,
         }
 
     def update_data(self, data):
         self.code = str(data['code'])
         self.length = int(data['length'])
+        if 'is_exclude' in data:
+            self.is_exclude = bool(data['is_exclude'])
+        if 'is_additional' in data:
+            self.is_additional = bool(data['is_additional'])
 
 
 class ControlPoint(Model):
     """Description of independent control point. Used for score calculation in rogain"""
+
     def __init__(self):
         self.code = ''
         self.description = ''
@@ -514,7 +523,7 @@ class Split(Model):
     def update_data(self, data):
         self.code = str(data['code'])
         if data['time']:
-            self.time = OTime(msec=data['time'])
+            self._time = OTime(msec=data['time'])
         if 'days' in data:
             self.days = int(data['days'])
 
@@ -683,7 +692,7 @@ class Result:
     def get_result_otime(self):
         time_accuracy = race().get_setting('time_accuracy', 0)
         ret_ms = self.get_finish_time().to_msec(time_accuracy) - self.get_start_time().to_msec(time_accuracy)
-        ret_ms +=  self.get_penalty_time().to_msec(time_accuracy)
+        ret_ms += self.get_penalty_time().to_msec(time_accuracy)
         return OTime(msec=ret_ms)
 
     def get_start_time(self):
@@ -939,7 +948,7 @@ class Person(Model):
         self.contact = []  # type: List[Contact]
         self.world_code = None  # WRE ID for orienteering and the same
         self.national_code = None
-        self.qual = Qualification.NOT_QUALIFIED  # type: Qualification 'qualification, used in Russia only'
+        self.qual = Qualification.NOT_QUALIFIED  # type: Qualification # 'qualification, used in Russia only'
         self.is_out_of_competition = False  # e.g. 20-years old person, running in M12
         self.is_paid = False
         self.is_rented_card = False
@@ -1805,7 +1814,7 @@ class RelayTeam(object):
         if len(self.legs):
             last_correct_leg = self.get_correct_lap_count()
             if last_correct_leg > 0:
-                last_finish = self.legs[last_correct_leg-1].get_finish_time()
+                last_finish = self.legs[last_correct_leg - 1].get_finish_time()
                 start = self.legs[0].get_start_time()
                 return last_finish - start
         return OTime()

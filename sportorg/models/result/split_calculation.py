@@ -42,7 +42,7 @@ class PersonSplits(object):
 
         if not len(self.course.controls):
             prev_split = start_time
-            for i, split in self.result.splits:
+            for i, split in enumerate(self.result.splits):
                 split.index = i
                 split.course_index = i
                 split.relative_time = split.time - start_time
