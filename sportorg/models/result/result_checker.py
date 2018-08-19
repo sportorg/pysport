@@ -87,7 +87,7 @@ class ResultChecker:
     @staticmethod
     def penalty_calculation(splits, controls, check_existence=False):
         user_array = [i.code for i in splits]
-        origin_array = [i.get_int_code() for i in controls]
+        origin_array = [str(i.get_int_code()) for i in controls]
         return ResultChecker.penalty_calculation_int(user_array, origin_array, check_existence)
 
     @staticmethod
