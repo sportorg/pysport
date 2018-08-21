@@ -1768,7 +1768,7 @@ class RelayTeam(object):
         self.place = 0
 
     def __eq__(self, other):
-        if self.get_is_status_ok() == self.get_is_status_ok():
+        if self.get_is_status_ok() == other.get_is_status_ok():
             if self.get_correct_lap_count() == other.get_correct_lap_count():
                 if self.get_time() == other.get_time():
                     return True
