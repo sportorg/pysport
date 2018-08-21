@@ -229,7 +229,7 @@ class CourseControl(Model):
     def __eq__(self, other):
         return self.code == other.code
 
-    def get_int_code(self):
+    def get_number_code(self):
         """ Get int code
         31 933 -> 31
         31(31,32,33) 933 -> 31
@@ -237,15 +237,12 @@ class CourseControl(Model):
         % -> 0
         """
         if not self.code:
-            return 0
-
-        if isinstance(self.code, int):
-            return self.code
+            return '0'
 
         tmp = str(self.code)
         char = tmp[0]
         if char == '*' or char == '%':
-            return 0
+            return '0'
         res = ''
 
         index = 0
@@ -254,7 +251,7 @@ class CourseControl(Model):
             index += 1
             if index < len(tmp):
                 char = tmp[index]
-        return int(res)
+        return str(res)
 
     def to_dict(self):
         return {

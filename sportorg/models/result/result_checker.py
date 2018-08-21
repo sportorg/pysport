@@ -92,12 +92,6 @@ class ResultChecker:
 
     @staticmethod
     def penalty_calculation(splits, controls, check_existence=False):
-        user_array = [i.code for i in splits]
-        origin_array = [i.get_int_code() for i in controls]
-        return ResultChecker.penalty_calculation_int(user_array, origin_array, check_existence)
-
-    @staticmethod
-    def penalty_calculation_int(user_array, origin_array, check_existence=False):
         """:return quantity of incorrect or duplicated punches, order is ignored
             origin: 31,41,51; athlete: 31,41,51; result:0
             origin: 31,41,51; athlete: 31; result:0
@@ -120,6 +114,8 @@ class ResultChecker:
             origin: 31,41,51; athlete: 31; result:2
             origin: 31,41,51; athlete: no punches; result:3
         """
+        user_array = [i.code for i in splits]
+        origin_array = [i.get_number_code() for i in controls]
         res = 0
         if check_existence and len(user_array) < len(origin_array):
             # add 1 penalty score for missing points
@@ -159,7 +155,7 @@ class ResultChecker:
         if result.person and result.person.group:
             user_time = result.get_result_otime()
             max_time = result.person.group.max_time
-            if max_time < user_time and max_time > OTime():
+            if OTime() < max_time < user_time:
                 time_diff = user_time - max_time
                 seconds_diff = time_diff.to_sec()
                 minutes_diff = (seconds_diff + 59) // 60  # note, 1:01 = 2 minutes
