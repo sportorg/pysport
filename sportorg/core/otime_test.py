@@ -27,7 +27,11 @@ class TestOTime(unittest.TestCase):
         otime1 = OTime(0, 0, 25, 44)
         otime2 = OTime(0, 0, 25, 44)
         otime3 = OTime(0, 0, 26, 44)
-        self.assertEqual(True, otime2-otime3 < OTime(), 'Error 0 >')
+
+        # TODO: real day difference, now we have limitation of 24h for race and add 1 day to negative value
+        self.assertEqual(True, otime2 - otime3 > OTime(), 'Error 0 >')
+
+        self.assertEqual(True, otime3 - otime2 > OTime(), 'Error 0 >')
         self.assertEqual(True, otime1 == otime2, 'Error ==')
         self.assertEqual(True, otime1 <= otime2, 'Error <=')
         self.assertEqual(True, otime1 <= otime3, 'Error <=')
