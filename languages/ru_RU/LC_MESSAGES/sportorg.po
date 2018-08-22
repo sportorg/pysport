@@ -1248,3 +1248,6 @@ msgstr "Штр.круги"
 
 msgid "points"
 msgstr "очк."
+
+msgid "Credit"
+msgstr "Отсечка"
