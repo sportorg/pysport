@@ -10,7 +10,7 @@ from sportorg.utils.time import time_to_hhmmss, hhmmss_to_time
 
 
 def get_value_options():
-    return [_('Start'), _('Finish'), _('Result'), _('Penalty time'), _('Penalty legs'), _('Card number'),
+    return [_('Start'), _('Finish'), _('Result'), _('Credit'), _('Penalty time'), _('Penalty legs'), _('Card number'),
             _('Group'), _('Team'), _('Qualification'), _('Bib')]
 
 
@@ -240,6 +240,12 @@ def get_property(person, key):
         result = race().find_person_result(person)
         if result:
             return result.get_result()
+    elif key == _('Credit'):
+        result = race().find_person_result(person)
+        if result:
+            return time_to_hhmmss(result.get_credit_time())
+        else:
+            return '00:00:00'
     elif key == _('Penalty time'):
         result = race().find_person_result(person)
         if result:
@@ -282,6 +288,10 @@ def set_property(person, key, value):
             result.finish_time = hhmmss_to_time(value)
     elif key == _('Result'):
         pass
+    elif key == _('Credit'):
+        result = race().find_person_result(person)
+        if result:
+            result.credit_time = hhmmss_to_time(value)
     elif key == _('Penalty time'):
         result = race().find_person_result(person)
         if result:
