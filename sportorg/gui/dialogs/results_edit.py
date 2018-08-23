@@ -72,6 +72,9 @@ class ResultEditDialog(QDialog):
         self.item_result = QLineEdit()
         self.item_result.setEnabled(False)
 
+        self.item_credit = QTimeEdit()
+        self.item_credit.setDisplayFormat(self.time_format)
+
         self.item_penalty = QTimeEdit()
         self.item_penalty.setDisplayFormat(self.time_format)
 
@@ -101,6 +104,7 @@ class ResultEditDialog(QDialog):
             self.layout.addRow(QLabel(_('Days')), self.item_days)
         self.layout.addRow(QLabel(_('Start')), self.item_start)
         self.layout.addRow(QLabel(_('Finish')), self.item_finish)
+        self.layout.addRow(QLabel(_('Credit')), self.item_credit)
         self.layout.addRow(QLabel(_('Penalty')), self.item_penalty)
         self.layout.addRow(QLabel(_('Penalty legs')), self.item_penalty_laps)
         self.layout.addRow(QLabel(_('Result')), self.item_result)
@@ -176,6 +180,8 @@ class ResultEditDialog(QDialog):
             self.item_start.setTime(time_to_qtime(self.current_object.start_time))
         if self.current_object.finish_time:
             self.item_result.setText(str(self.current_object.get_result()))
+        if self.current_object.credit_time is not None:
+            self.item_credit.setTime(time_to_qtime(self.current_object.credit_time))
         if self.current_object.penalty_time is not None:
             self.item_penalty.setTime(time_to_qtime(self.current_object.penalty_time))
         if self.current_object.penalty_laps:
@@ -228,6 +234,10 @@ class ResultEditDialog(QDialog):
         time_ = time_to_otime(self.item_start.time())
         if result.start_time != time_:
             result.start_time = time_
+
+        time_ = time_to_otime(self.item_credit.time())
+        if result.credit_time != time_:
+            result.credit_time = time_
 
         time_ = time_to_otime(self.item_penalty.time())
         if result.penalty_time != time_:

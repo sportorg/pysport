@@ -539,6 +539,7 @@ class Result:
         self.status = ResultStatus.OK
         self.status_comment = ''
         self.penalty_time = None  # type: OTime
+        self.credit_time = None  # type: OTime
         self.penalty_laps = 0  # count of penalty legs (marked route)
         self.place = 0
         self.scores = 0
@@ -606,6 +607,7 @@ class Result:
             'finish_time': self.finish_time.to_msec() if self.finish_time else None,
             'diff': self.diff.to_msec() if self.diff else None,
             'penalty_time': self.penalty_time.to_msec() if self.penalty_time else None,
+            'credit_time': self.credit_time.to_msec() if self.credit_time else None,
             'status': self.status.value,
             'status_comment': self.status_comment,
             'penalty_laps': self.penalty_laps,
@@ -637,6 +639,8 @@ class Result:
             self.finish_time = OTime(msec=data['finish_time'])
         if data['penalty_time']:
             self.penalty_time = OTime(msec=data['penalty_time'])
+        if 'credit_time' in data and data['credit_time']:
+            self.credit_time = OTime(msec=data['credit_time'])
         if 'status_comment' in data:
             self.status_comment = data['status_comment']
         if 'days' in data:
@@ -691,6 +695,7 @@ class Result:
         time_accuracy = race().get_setting('time_accuracy', 0)
         ret_ms = self.get_finish_time().to_msec(time_accuracy) - self.get_start_time().to_msec(time_accuracy)
         ret_ms += self.get_penalty_time().to_msec(time_accuracy)
+        ret_ms -= self.get_credit_time().to_msec(time_accuracy)
         return OTime(msec=ret_ms)
 
     def get_start_time(self):
@@ -709,6 +714,11 @@ class Result:
     def get_penalty_time(self):
         if self.penalty_time:
             return self.penalty_time
+        return OTime()
+
+    def get_credit_time(self):
+        if self.credit_time:
+            return self.credit_time
         return OTime()
 
     def get_place(self):
