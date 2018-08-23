@@ -600,7 +600,7 @@ class WDBInfo:
         self.multi_day = []
         self.is_print_relay_number_dashed = False  # 123-1 for relay number
         self.is_si_usb = True  # Baudrate for BSM-7/8: 0 - COM, 1 - USB
-        self.is_get_scores_personally = False
+        self.is_get_score_personally = False
         self.dsq_reason = []
         self.dsq_text = []
         self.note = ''
@@ -714,7 +714,7 @@ class WDBInfo:
             self.multi_day.append(byte_array[1124 + i] == 0x01)
         self.is_print_relay_number_dashed = byte_array[1134] == 0x01
         self.is_si_usb = byte_array[1135] == 0x01
-        self.is_get_scores_personally = byte_array[1136] == 0x01
+        self.is_get_score_personally = byte_array[1136] == 0x01
         dsq_count = 9
         dsq_size = 12
         for i in range(dsq_count):
@@ -840,7 +840,7 @@ class WDBInfo:
 
         ret[1134:1135] = self.is_print_relay_number_dashed.to_bytes(1, byteorder)
         ret[1135:1136] = self.is_si_usb.to_bytes(1, byteorder)
-        ret[1136:1137] = self.is_get_scores_personally.to_bytes(1, byteorder)
+        ret[1136:1137] = self.is_get_score_personally.to_bytes(1, byteorder)
         obj_size = 12
         for i in range(9):
             dsq_reason = ""

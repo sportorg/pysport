@@ -11,6 +11,7 @@ import dateutil.parser
 from sportorg.core.model import Model
 from sportorg.core.otime import OTime
 from sportorg.language import _
+from sportorg.modules.configs.configs import Config
 
 
 class NotEmptyException(Exception):
@@ -1484,23 +1485,11 @@ class Qualification(IntEnum):
         }
         return qual[self.value]
 
-    # see https://www.minsport.gov.ru/sportorentir.xls - Russian orienteering only!
-    # http://www.minsport.gov.ru/2017/doc/Sportivnoe-orentirovanie-evsk2021.xls
-    def get_scores(self):
-        scores = {
-            '': 0,
-            0: 0,
-            3: 1,
-            2: 2,
-            1: 3,
-            6: 6,
-            5: 25,
-            4: 50,
-            7: 80,
-            8: 100,
-            9: 100
-        }
-        return scores[self.value]
+    # get score for ranking, stored in config.ini file
+    def get_score(self):
+        ret = Config().ranking.get(self.name.lower(), 0)
+        ret = float(ret)
+        return ret
 
 
 class RankingItem(object):
@@ -1561,7 +1550,7 @@ class Ranking(object):
             assert isinstance(i, RankingItem)
             if i.is_active:
                 if i.max_place or (i.max_time and i.max_time.to_msec() > 0):
-                    if max_qual.get_scores() < i.qual.get_scores():
+                    if max_qual.get_score() < i.qual.get_score():
                         max_qual = i.qual
         return max_qual
 

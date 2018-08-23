@@ -236,7 +236,7 @@ msgid "Configuration"
 msgstr "Настройка"
 
 msgid "Rank"
-msgstr "Ранг (ориентирование)"
+msgstr "Ранг"
 
 msgid "Max place"
 msgstr "Макс. место"

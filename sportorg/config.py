@@ -83,6 +83,8 @@ REGIONS_FILE = base_dir('regions.txt')
 
 STATUS_COMMENTS_FILE = base_dir('status_comments.txt')
 
+RANKING_SCORE_FILE = base_dir('ranking.txt')
+
 DIRS = [
     IMG_DIR,
     ICON_DIR,
