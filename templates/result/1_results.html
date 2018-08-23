@@ -199,8 +199,8 @@
     function getRankingByGroup(group) {
         var rankingBlock = document.createElement('span');
         var ranking = group.ranking;
-        if (ranking && ranking.is_active) {
-            var text = 'Квалификационный уровень (баллы): ' + ranking.rank_scores;
+        if (ranking && ranking.is_active && ranking.rank_scores > 0) {
+            var text = 'Квалификационный уровень (баллы): ' + ranking.rank_scores.toFixed(0);
             rankingBlock.appendChild(document.createTextNode(text));
 
             for (var _i = 0; _i < ranking.rank.length; _i++) {
@@ -313,7 +313,14 @@
             }
             var titleBlock = document.createElement('h2');
             titleBlock.id = group.name;
-            titleBlock.appendChild(document.createTextNode(group.name));
+            var groupTitle = group.name;
+            if (group.course && group.course.controls){
+                groupTitle += ', ' + group.course.controls.length + ' КП';
+            }
+            if (group.course && group.course.length){
+                groupTitle += ', ' + group.course.length / 1000 + ' км';
+            }
+            titleBlock.appendChild(document.createTextNode(groupTitle));
             resultBlock.appendChild(titleBlock);
             if (store.showLinkForGroups) {
                 resultBlock.appendChild(getGroupsBlockElement(race));

@@ -7,7 +7,7 @@ from sportorg import config
 from sportorg.core.singleton import Singleton
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.main_window import MainWindow
-from sportorg.models.constant import StatusComments, PersonNames, Regions
+from sportorg.models.constant import StatusComments, PersonNames, Regions, RankingTable
 
 
 class Application(metaclass=Singleton):
@@ -25,6 +25,7 @@ class Application(metaclass=Singleton):
         self.set_status_comments()
         self.set_names()
         self.set_regions()
+        self.set_ranking()
         self.main_window.show_window()
         sys.exit(self.app.exec())
 
@@ -52,5 +53,14 @@ class Application(metaclass=Singleton):
             with open(config.REGIONS_FILE, encoding='utf-8') as f:
                 content = f.readlines()
             Regions().set([x.strip() for x in content])
+        except Exception as e:
+            print(str(e))
+
+    @staticmethod
+    def set_ranking():
+        try:
+            with open(config.RANKING_SCORE_FILE, encoding='utf-8') as f:
+                content = f.readlines()
+            RankingTable().set([x.strip().split(';') for x in content])
         except Exception as e:
             print(str(e))

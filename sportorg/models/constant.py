@@ -1,7 +1,8 @@
 import logging
+import operator
 
 from sportorg.core.singleton import singleton
-from sportorg.models.memory import race
+from sportorg.models.memory import race, Qualification
 
 
 def get_countries():
@@ -283,3 +284,48 @@ class StatusComments(object):
     @staticmethod
     def remove_hint(full_str):
         return str(full_str).split('#')[0].strip()
+
+
+@singleton
+class RankingTable(object):
+    """
+    Ranking is read from configuration file called 'ranking_score.txt'
+    Format: RANK;I;II;III;I_Y;II_Y[;III_Y[;KMS[;MS]]]
+    e.g. 1000;136;151;169;;
+    e.g. 850;133;148;166;;
+    e.g. 5;;;;;100
+    """
+    RANKING = []
+    column_mapping = {Qualification.I: 1,
+                      Qualification.II: 2,
+                      Qualification.III: 3,
+                      Qualification.I_Y: 4,
+                      Qualification.II_Y: 5,
+                      Qualification.III_Y: 6,
+                      Qualification.KMS: 7,
+                      Qualification.MS: 8
+                      }
+
+    def get_all(self):
+        return self.RANKING
+
+    def get_qual_table(self, qual):
+        # get only 2 columns from whole table, corresponding to specified qualification
+        try:
+            columns = [0, self.column_mapping[qual]]
+            my_items = operator.itemgetter(*columns)
+            return [my_items(x) for x in self.RANKING]
+        except Exception as e:
+            # logging.exception(e)
+            return [[0,0]]
+
+    def set(self, items):
+        self.RANKING = []
+        for i in items:
+            row = []
+            for j in i:
+                if str(j).isdecimal():
+                    row.append(int(j))
+                else:
+                    row.append(0)
+            self.RANKING.append(row)

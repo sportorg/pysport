@@ -12,6 +12,7 @@ class ConfigFile(object):
     PATH = 'path'
     SOUND = 'sound'
     PRINTER = 'printer'
+    RANKING = 'ranking'
 
 
 class Parser:
@@ -86,8 +87,29 @@ class Config(metaclass=Singleton):
             ConfigFile.PRINTER: Configurations({
                 'main': '',
                 'split': '',
-            })
+            }),
+            ConfigFile.RANKING: Configurations({
+                'not_qualified': 0,
+                'iii_y': 1,
+                'ii_y': 2,
+                'i_y': 3,
+                'iii': 6,
+                'ii': 25,
+                'i': 50,
+                'kms': 80,
+                'ms': 100,
+                'msmk': 100,
+                'zms': 100,
+                'start_limit': 10,
+                'finish_limit': 5,
+                'start_limit_relay': 6,
+                'finish_limit_relay': 4,
+                'sum_count': 10,
+                'sum_count_relay': 10,
+                'relay_ranking_method': 'personal'  # also use 'average' to get average
+            }),
         }
+
 
     @property
     def parser(self):
@@ -104,6 +126,10 @@ class Config(metaclass=Singleton):
     @property
     def printer(self):
         return self._configurations[ConfigFile.PRINTER]
+
+    @property
+    def ranking(self):
+        return self._configurations[ConfigFile.RANKING]
 
     def read(self):
         self.parser.read(sportorg_config.CONFIG_INI)
