@@ -40,7 +40,6 @@ from sportorg.models.start.start_preparation import guess_corridors_for_groups, 
 from sportorg.modules import testing
 from sportorg.modules.backup.json import get_races_from_file
 from sportorg.modules.iof import iof_xml
-from sportorg.modules.live.orgeo import OrgeoClient
 from sportorg.modules.ocad import ocad
 from sportorg.modules.ocad.ocad import OcadImportException
 from sportorg.modules.sfr.sfrreader import SFRReaderClient
@@ -442,12 +441,14 @@ class TeamworkSendAction(Action):
                 return
             items = data_list[self.app.current_tab]
             indexes = self.app.get_selected_rows()
+            items_dict = []
             for index in indexes:
                 if index < 0:
                     continue
                 if index >= len(items):
-                    pass
-                Teamwork().send(items[index].to_dict())
+                    break
+                items_dict.append(items[index].to_dict())
+            Teamwork().send(items_dict)
         except Exception as e:
             logging.error(str(e))
 
@@ -460,22 +461,6 @@ class PrinterSettingsAction(Action):
 class LiveSettingsAction(Action):
     def execute(self):
         LiveDialog().exec()
-
-
-class LiveSendStartListAction(Action):
-    def execute(self):
-        OrgeoClient().send_start_list()
-
-
-class LiveSendResultsAction(Action):
-    def execute(self):
-        OrgeoClient().send_results()
-
-
-class LiveResendResultsAction(Action):
-    def execute(self):
-        OrgeoClient().clear()
-        OrgeoClient().send_results()
 
 
 class TelegramSettingsAction(Action):

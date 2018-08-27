@@ -120,9 +120,18 @@ class Teamwork(object):
             self._logger.info('{} starting'.format(self.connection_type.upper()))
 
     def send(self, data):
-        Broker().produce('teamwork_sending', self.is_alive())
+        """data is Dict or List[Dict]"""
+        Broker().produce('teamwork_sending', data)
         if self.is_alive():
-            if isinstance(data, Command):
-                self._in_queue.put(data)
+            if isinstance(data, list):
+                for item in data:
+                    self._in_queue.put(Command(item))
                 return
+
             self._in_queue.put(Command(data))
+
+    def delete(self, data):
+        """data is Dict or List[Dict]"""
+        Broker().produce('teamwork_deleting', data)
+        if self.is_alive():
+            pass
