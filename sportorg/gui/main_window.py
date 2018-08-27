@@ -20,7 +20,7 @@ from sportorg import config
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.split_calculation import GroupSplits
 from sportorg.modules.backup.file import File
-from sportorg.modules.live.orgeo import OrgeoClient
+from sportorg.modules.live.live import LiveClient
 from sportorg.modules.printing.model import NoResultToPrintException, split_printout, NoPrinterSelectedException
 from sportorg.modules.configs.configs import Config as Configuration, ConfigFile
 from sportorg.modules.sfr.sfrreader import SFRReaderClient
@@ -142,6 +142,7 @@ class MainWindow(QMainWindow):
 
         ServiceListenerThread().interval.connect(self.interval)
         ServiceListenerThread().start()
+        LiveClient().init()
 
     def _setup_ui(self):
         geometry = ConfigFile.GEOMETRY
@@ -400,7 +401,6 @@ class MainWindow(QMainWindow):
                     elif result.person and result.person.group:
                         GroupSplits(race(), result.person.group).generate(True)
                     Teamwork().send(result.to_dict())
-                    OrgeoClient().send_results()
                     TelegramClient().send_result(result)
                     if result.person:
                         if result.is_status_ok():
@@ -599,18 +599,18 @@ class MainWindow(QMainWindow):
         if confirm == QMessageBox.No:
             return
         tab = self.current_tab
-
+        res = []
         if tab == 0:
-            race().delete_persons(indexes)
+            res = race().delete_persons(indexes)
             ResultCalculation(race()).process_results()
             self.refresh()
         elif tab == 1:
-            race().delete_results(indexes)
+            res = race().delete_results(indexes)
             ResultCalculation(race()).process_results()
             self.refresh()
         elif tab == 2:
             try:
-                race().delete_groups(indexes)
+                res = race().delete_groups(indexes)
             except NotEmptyException as e:
                 logging.warning(str(e))
                 QMessageBox.question(self.get_group_table(),
@@ -619,7 +619,7 @@ class MainWindow(QMainWindow):
             self.refresh()
         elif tab == 3:
             try:
-                race().delete_courses(indexes)
+                res = race().delete_courses(indexes)
             except NotEmptyException as e:
                 logging.warning(str(e))
                 QMessageBox.question(self.get_course_table(),
@@ -628,10 +628,12 @@ class MainWindow(QMainWindow):
             self.refresh()
         elif tab == 4:
             try:
-                race().delete_organizations(indexes)
+                res = race().delete_organizations(indexes)
             except NotEmptyException as e:
                 logging.warning(str(e))
                 QMessageBox.question(self.get_organization_table(),
                                      _('Error'),
                                      _('Cannot remove organization'))
             self.refresh()
+        if len(res):
+            Teamwork().delete([r.to_dict() for r in res])

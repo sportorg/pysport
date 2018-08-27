@@ -71,6 +71,13 @@ def sound_dir(*paths):
     return os.path.join(SOUND_DIR, *paths)
 
 
+SCRIPT_DIR = base_dir('scripts')
+
+
+def script_dir(*paths):
+    return os.path.join(SCRIPT_DIR, *paths)
+
+
 ICON = icon_dir('sportorg.ico')
 
 CONFIG_INI = data_dir('config.ini')

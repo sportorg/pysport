@@ -298,6 +298,7 @@ def menu_list():
                     'actions': [
                         {
                             'title': _('Send selected'),
+                            'shortcut': 'Ctrl+K',
                             'action': 'TeamworkSendAction'
                         },
                         {
@@ -307,24 +308,6 @@ def menu_list():
                             'title': _('On/Off'),
                             'action': 'TeamworkEnableAction'
                         }
-                    ]
-                },
-                {
-                    'title': _('Live'),
-                    'icon': config.icon_dir('live.svg'),
-                    'actions': [
-                        {
-                            'title': _('Send start list'),
-                            'action': 'LiveSendStartListAction'
-                        },
-                        {
-                            'title': _('Send results'),
-                            'action': 'LiveSendResultsAction'
-                        },
-                        {
-                            'title': _('Resend results'),
-                            'action': 'LiveResendResultsAction'
-                        },
                     ]
                 },
                 {
