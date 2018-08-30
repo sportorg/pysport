@@ -132,14 +132,22 @@ class ReportDialog(QDialog):
         races_dict = [r.to_dict() for r in races()]
 
         if template_path.endswith('.docx'):
-            #DOCX template processing
+            # DOCX template processing
             full_path = config.template_dir() + template_path
             doc = DocxTemplate(full_path)
             context = {}
             context['race'] = races_dict[get_current_race_index()]
+            context['name'] = config.NAME
+            context['version'] = str(config.VERSION)
             doc.render(context)
-            doc.save("generated_doc.docx")
-            os.system('winword generated_doc.docx')
+
+            if _settings['save_to_last_file']:
+                file_name = _settings['last_file']
+            else:
+                file_name = get_save_file_name(_('Save As MS Word file'), _("MS Word file (*.docx)"),
+                                               '{}_official_report'.format(time.strftime("%Y%m%d")))
+            doc.save(file_name)
+            os.startfile(file_name)
 
         else:
             template = get_text_from_file(

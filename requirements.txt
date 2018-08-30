@@ -8,3 +8,4 @@ cx_Freeze==5.1.1
 requests==2.18.4
 pywinusb==0.4.2
 playsound==1.2.2
+docxtpl==0.5.0
