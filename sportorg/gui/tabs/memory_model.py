@@ -212,8 +212,10 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
         self.init_cache()
 
     def get_headers(self):
-        return [_('Last name'), _('First name'), _('Sex'), _('Qualification'), _('Group'), _('Team'), _('Year'), _('Bib'), _('Start'),
-                _('Start group'), _('Card'), _('Rented card'), _('Comment'), _('World code'), _('National code'), _('Out of competition')]
+        return [_('Last name'), _('First name'), _('Sex'), _('Qualification title'), _('Group'), _('Team'),
+                _('Year title'), _('Bib'), _('Start'), _('Start group'), _('Card title'), _('Rented card'),
+                _('Comment'), _('World code title'), _('National code title'), _('Out of competition title'),
+                _('Result count title')]
 
     def init_cache(self):
         self.cache.clear()
@@ -259,6 +261,7 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
         if person.is_out_of_competition:
             out_of_comp_status = _('o/c')
         ret.append(out_of_comp_status)
+        ret.append(person.result_count)
 
         return ret
 
@@ -276,8 +279,9 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
         self.count = None
 
     def get_headers(self):
-        return [_('Last name'), _('First name'), _('Group'), _('Team'), _('Bib'), _('Card'), _('Start'), _('Finish'), _('Result'),
-                _('Status'), _('Penalty'), _('Penalty legs'), _('Place'), _('Type'), _('Rented card')]
+        return [_('Last name'), _('First name'), _('Group'), _('Team'), _('Bib'), _('Card title'),
+                _('Start'), _('Finish'), _('Result'), _('Status'), _('Credit'), _('Penalty'), _('Penalty legs title'),
+                _('Place'), _('Type'), _('Rented card')]
 
     def init_cache(self):
         self.cache.clear()
@@ -296,12 +300,11 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
         team = ''
         first_name = ''
         last_name = ''
-        bib = 0
+        bib = result.get_bib()
         rented_card = ''
         if person:
             first_name = person.name
             last_name = person.surname
-            bib = person.bib
 
             if person.group:
                 group = person.group.name
@@ -313,11 +316,13 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
 
         start = ''
         if i.get_start_time():
-            start = str(i.get_start_time())
+            time_accuracy = race().get_setting('time_accuracy', 0)
+            start = i.get_start_time().to_str(time_accuracy)
 
         finish = ''
         if i.get_finish_time():
-            finish = str(i.get_finish_time())
+            time_accuracy = race().get_setting('time_accuracy', 0)
+            finish = i.get_finish_time().to_str(time_accuracy)
 
         return [
             last_name,
@@ -330,6 +335,7 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
             finish,
             i.get_result(),
             i.status.get_title(),
+            time_to_hhmmss(i.get_credit_time()),
             time_to_hhmmss(i.get_penalty_time()),
             i.penalty_laps,
             i.get_place(),
@@ -349,8 +355,10 @@ class GroupMemoryModel(AbstractSportOrgMemoryModel):
         super().__init__()
 
     def get_headers(self):
-        return [_('Name'), _('Full name'), _('Course name'), _('Start fee'), _('Type'), _('Length'), _('Point count'), _('Climb'), _('Sex'), _('Min year'),
-                _('Max year'), _('Start interval'), _('Start corridor'), _('Order in corridor')]
+        return [_('Name'), _('Full name'), _('Course name'), _('Start fee title'), _('Type'), _('Length title'),
+                _('Point count title'), _('Climb title'), _('Sex'), _('Min year title'),
+                _('Max year title'), _('Start interval title'), _('Start corridor title'),
+                _('Order in corridor title')]
 
     def init_cache(self):
         self.cache.clear()
@@ -398,7 +406,7 @@ class CourseMemoryModel(AbstractSportOrgMemoryModel):
         super().__init__()
 
     def get_headers(self):
-        return [_('Name'), _('Length'), _('Point count'), _('Climb'), _('Controls')]
+        return [_('Name'), _('Length title'), _('Point count title'), _('Climb title'), _('Controls')]
 
     def init_cache(self):
         self.cache.clear()

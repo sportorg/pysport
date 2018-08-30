@@ -236,7 +236,7 @@ msgid "Configuration"
 msgstr "Настройка"
 
 msgid "Rank"
-msgstr "Ранг (ориентирование)"
+msgstr "Ранг"
 
 msgid "Max place"
 msgstr "Макс. место"
@@ -478,6 +478,9 @@ msgstr "интервал"
 msgid "Number = corridor + minute"
 msgstr "Номер = коридор + минута"
 
+msgid "Number = corridor + order"
+msgstr "Номер = коридор + порядковый номер"
+
 msgid "Start list"
 msgstr "Протокол старта"
 
@@ -488,7 +491,7 @@ msgid "Start time change"
 msgstr "Смещение времени старта"
 
 msgid "Add"
-msgstr "Добавлять"
+msgstr "Добавить"
 
 msgid "Reduce"
 msgstr "Отнять"
@@ -1149,3 +1152,102 @@ msgstr "Максимальный год"
 
 msgid "Is any course"
 msgstr "Любая дистанция"
+
+msgid "Check updates"
+msgstr "Проверить обновления"
+
+msgid "Update available"
+msgstr "Доступно обновление"
+
+msgid "Info"
+msgstr "Информация"
+
+msgid "You are using the latest version"
+msgstr "Вы используете последнюю версию"
+
+msgid "Assign result by bib"
+msgstr "Присвоить результат по номеру"
+
+msgid "Assign result by card number"
+msgstr "Присвоить результат по номеру чипа"
+
+msgid "Result count"
+msgstr "Количество результатов"
+
+msgid "Import from SportOrg file"
+msgstr "Импортировать из файла SportOrg"
+
+msgid "Choose race"
+msgstr "Выберите гонку"
+
+msgid "Unique id"
+msgstr "Уникальный идентификатор"
+
+msgid "Action"
+msgstr "Действие"
+
+msgid "Overwrite"
+msgstr "Перезаписать"
+
+msgid "Ask for a bib when re-reading the card"
+msgstr "Спрашивать номер при повторном считывании чипа"
+
+msgid "Length(m)"
+msgstr "Длина(м)"
+
+msgid "Qualification title"
+msgstr "Квал."
+
+msgid "Year title"
+msgstr "ГР"
+
+msgid "Card title"
+msgstr "№ чипа"
+
+msgid "World code title"
+msgstr "Межд. код"
+
+msgid "National code title"
+msgstr "Нац. код"
+
+msgid "Out of competition title"
+msgstr "В/К"
+
+msgid "Result count title"
+msgstr "Финиш"
+
+msgid "Start fee title"
+msgstr "Взнос"
+
+msgid "Point count title"
+msgstr "КП"
+
+msgid "Climb title"
+msgstr "Набор,м"
+
+msgid "Min year title"
+msgstr "Мин. ГР"
+
+msgid "Max year title"
+msgstr "Макс. ГР"
+
+msgid "Start interval title"
+msgstr "Интервал"
+
+msgid "Start corridor title"
+msgstr "Коридор"
+
+msgid "Order in corridor title"
+msgstr "Порядок в кор."
+
+msgid "Length title"
+msgstr "Длина,м"
+
+msgid "Penalty legs title"
+msgstr "Штр.круги"
+
+msgid "points"
+msgstr "очк."
+
+msgid "Credit"
+msgstr "Отсечка"

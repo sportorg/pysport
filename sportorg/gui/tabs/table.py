@@ -7,6 +7,7 @@ class TableView(QtWidgets.QTableView):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.popup_items = []
+        self.setWordWrap(False)
 
     def mousePressEvent(self, qmouseevent):
         super().mousePressEvent(qmouseevent)
@@ -19,3 +20,7 @@ class TableView(QtWidgets.QTableView):
 
             point = QPoint(qmouseevent.globalX(), qmouseevent.globalY())
             menu.popup(point)
+
+    def setModel(self, QAbstractItemModel):
+        super(TableView, self).setModel(QAbstractItemModel)
+        self.resizeColumnsToContents()

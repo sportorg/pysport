@@ -99,7 +99,7 @@ class ResultThread(QThread):
             start_time = self.time_to_sec(self.start_time)
             for i in range(len(card_data['punches'])):
                 if self.time_to_sec(card_data['punches'][i][1]) < start_time:
-                    new_datetime = card_data['punches'][i][1].replace(hour=card_data['punches'][i][1].hour + 12)
+                    new_datetime = card_data['punches'][i][1].replace(hour=(card_data['punches'][i][1].hour + 12) % 24)
                     card_data['punches'][i] = (card_data['punches'][i][0], new_datetime)
 
                 # simple check for morning starts (10:00 a.m. was 22:00 in splits)
@@ -118,7 +118,7 @@ class ResultThread(QThread):
             t = card_data['punches'][i][1]
             if t:
                 split = memory.Split()
-                split.code = card_data['punches'][i][0]
+                split.code = str(card_data['punches'][i][0])
                 split.time = time_to_otime(t)
                 split.days = memory.race().get_days(t)
                 result.splits.append(split)

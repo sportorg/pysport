@@ -14,7 +14,7 @@ from sportorg.gui.dialogs.entry_edit import EntryEditDialog
 from sportorg.gui.dialogs.group_edit import GroupEditDialog
 from sportorg.gui.dialogs.organization_edit import OrganizationEditDialog
 from sportorg.gui.menu.factory import Factory
-from sportorg.models.memory import Race, races, race, NotEmptyException
+from sportorg.models.memory import Race, race, NotEmptyException, new_event, set_current_race_index
 
 from sportorg import config
 from sportorg.models.result.result_calculation import ResultCalculation
@@ -80,6 +80,7 @@ class MainWindow(QMainWindow):
         self.log_queue = Queue()
         handler = ConsolePanelHandler(self)
         logging.root.addHandler(handler)
+        self.last_update = time.time()
 
     def show_window(self):
         try:
@@ -316,7 +317,7 @@ class MainWindow(QMainWindow):
             logging.error(str(e))
 
     def clear_filters(self, remove_condition=True):
-        if(self.get_person_table()):
+        if self.get_person_table():
             self.get_person_table().model().clear_filter(remove_condition)
             self.get_result_table().model().clear_filter(remove_condition)
             self.get_person_table().model().clear_filter(remove_condition)
@@ -324,21 +325,12 @@ class MainWindow(QMainWindow):
             self.get_organization_table().model().clear_filter(remove_condition)
 
     def apply_filters(self):
-        if (self.get_person_table()):
+        if self.get_person_table():
             self.get_person_table().model().apply_filter()
             self.get_result_table().model().apply_filter()
             self.get_person_table().model().apply_filter()
             self.get_course_table().model().apply_filter()
             self.get_organization_table().model().apply_filter()
-
-    def auto_save(self):
-        if not self.get_configuration().get('autosave'):
-            return
-        if self.file:
-            self.save_file()
-            logging.info(_('Auto save'))
-        else:
-            logging.warning(_('No file to auto save'))
 
     def add_recent_file(self, file):
         self.delete_from_recent_files(file)
@@ -408,7 +400,6 @@ class MainWindow(QMainWindow):
                     elif result.person and result.person.group:
                         GroupSplits(race(), result.person.group).generate(True)
                     Teamwork().send(result.to_dict())
-                    self.auto_save()
                     OrgeoClient().send_results()
                     TelegramClient().send_result(result)
                     if result.person:
@@ -464,6 +455,17 @@ class MainWindow(QMainWindow):
                 QtGui.QIcon(config.icon_dir(self.teamwork_icon[Teamwork().is_alive()])))
             self.teamwork_status = Teamwork().is_alive()
 
+        try:
+            if self.get_configuration().get('autosave_interval'):
+                if self.file:
+                    if time.time() - self.last_update > int(self.get_configuration().get('autosave_interval')):
+                        self.save_file()
+                        logging.info(_('Auto save'))
+                else:
+                    logging.warning(_('No file to auto save'))
+        except Exception as e:
+            logging.error(str(e))
+
         while not self.log_queue.empty():
             text = self.log_queue.get()
             self.statusbar_message(text)
@@ -480,7 +482,8 @@ class MainWindow(QMainWindow):
         if file_name is not '':
             try:
                 if update_data:
-                    races()[0] = Race()
+                    new_event([Race()])
+                    set_current_race_index(0)
                 self.clear_filters(remove_condition=False)
                 File(file_name, logging.root, File.JSON).create()
                 self.apply_filters()
@@ -504,6 +507,7 @@ class MainWindow(QMainWindow):
                 self.clear_filters(remove_condition=False)
                 File(self.file, logging.root, File.JSON).save()
                 self.apply_filters()
+                self.last_update = time.time()
             except Exception as e:
                 logging.error(str(e))
         else:
@@ -517,6 +521,7 @@ class MainWindow(QMainWindow):
                 self.set_title()
                 self.add_recent_file(self.file)
                 self.init_model()
+                self.last_update = time.time()
             except Exception as e:
                 logging.exception(str(e))
                 self.delete_from_recent_files(file_name)

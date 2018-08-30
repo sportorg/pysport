@@ -39,7 +39,7 @@ class CourseEditDialog(QDialog):
         self.item_name.textChanged.connect(self.check_name)
         self.layout.addRow(self.label_name, self.item_name)
 
-        self.label_length = QLabel(_('Length'))
+        self.label_length = QLabel(_('Length(m)'))
         self.item_length = QSpinBox()
         self.item_length.setMaximum(100000)
         self.item_length.setSingleStep(100)

@@ -6,6 +6,7 @@ from PyQt5 import QtCore
 
 from PyQt5.QtWidgets import QMessageBox, QApplication, QTableView
 
+from sportorg import config
 from sportorg.core.otime import OTime
 from sportorg.gui.dialogs.about import AboutDialog
 from sportorg.gui.dialogs.cp_delete import CPDeleteDialog
@@ -20,6 +21,7 @@ from sportorg.gui.dialogs.relay_number_dialog import RelayNumberDialog
 from sportorg.gui.dialogs.report_dialog import ReportDialog
 from sportorg.gui.dialogs.search_dialog import SearchDialog
 from sportorg.gui.dialogs.settings import SettingsDialog
+from sportorg.gui.dialogs.sportorg_import_dialog import SportOrgImportDialog
 from sportorg.gui.dialogs.start_handicap_dialog import StartHandicapDialog
 from sportorg.gui.dialogs.start_preparation import StartPreparationDialog, guess_courses_for_groups
 from sportorg.gui.dialogs.start_report_dialog import StartReportDialog
@@ -31,11 +33,12 @@ from sportorg.gui.dialogs.timekeeping_properties import TimekeepingPropertiesDia
 from sportorg.gui.menu.action import Action
 from sportorg.gui.utils.custom_controls import messageBoxQuestion
 from sportorg.libs.winorient.wdb import write_wdb
-from sportorg.models.memory import race, ResultStatus, ResultManual
+from sportorg.models.memory import race, ResultStatus, ResultManual, find
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.result_checker import ResultChecker
 from sportorg.models.start.start_preparation import guess_corridors_for_groups, copy_bib_to_card_number
 from sportorg.modules import testing
+from sportorg.modules.backup.json import get_races_from_file
 from sportorg.modules.iof import iof_xml
 from sportorg.modules.live.orgeo import OrgeoClient
 from sportorg.modules.ocad import ocad
@@ -45,6 +48,7 @@ from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.modules.sportiduino.sportiduino import SportiduinoClient
 from sportorg.modules.teamwork import Teamwork
 from sportorg.modules.telegram.telegram import TelegramClient
+from sportorg.modules.updater import checker
 from sportorg.modules.winorient import winorient
 from sportorg.modules.winorient.wdb import WDBImportError, WinOrientBinary
 from sportorg.language import _
@@ -125,7 +129,7 @@ class OcadTXTv8ImportAction(Action):
 class WDBWinorientExportAction(Action):
     def execute(self):
         file_name = get_save_file_name(_('Save As WDB file'), _("WDB file (*.wdb)"),
-                                       '{}_sportorg_export'.format(time.strftime("%Y%m%d")))
+                                       '{}_sportorg_export'.format(race().data.get_start_datetime().strftime("%Y%m%d")))
         if file_name is not '':
             try:
                 wb = WinOrientBinary()
@@ -143,7 +147,7 @@ class WDBWinorientExportAction(Action):
 class IOFResultListExportAction(Action):
     def execute(self):
         file_name = get_save_file_name(_('Save As IOF xml'), _('IOF xml (*.xml)'),
-                                       '{}_resultList'.format(time.strftime("%Y%m%d")))
+                                       '{}_resultList'.format(race().data.get_start_datetime().strftime("%Y%m%d")))
         if file_name is not '':
             try:
                 iof_xml.export_result_list(file_name)
@@ -290,10 +294,9 @@ class ManualFinishAction(Action):
         result = race().new_result(ResultManual)
         Teamwork().send(result.to_dict())
         race().add_new_result(result)
-        logging.info('Manual finish')
+        logging.info(_('Manual finish'))
         self.app.get_result_table().model().init_cache()
         self.app.refresh()
-        self.app.auto_save()
 
 
 class SPORTidentReadoutAction(Action):
@@ -406,7 +409,6 @@ class AddSPORTidentResultAction(Action):
         logging.info('SPORTident result')
         self.app.get_result_table().model().init_cache()
         self.app.refresh()
-        self.app.auto_save()
 
 
 class TimekeepingSettingsAction(Action):
@@ -504,6 +506,46 @@ class AboutAction(Action):
         AboutDialog().exec()
 
 
+class CheckUpdatesAction(Action):
+    def execute(self):
+        try:
+            if not checker.check_version(config.VERSION):
+                message = _('Update available') + ' ' + checker.get_version()
+            else:
+                message = _('You are using the latest version')
+
+            QMessageBox.information(self.app, _('Info'), message)
+        except Exception as e:
+            logging.error(str(e))
+            QMessageBox.warning(self.app, _('Error'), str(e))
+
+
 class TestingAction(Action):
     def execute(self):
         testing.test()
+
+
+class AssignResultByBibAction(Action):
+    def execute(self):
+        for result in race().results:
+            if result.person is None and result.bib:
+                result.person = find(race().persons, bib=result.bib)
+        self.app.refresh()
+
+
+class AssignResultByCardNumberAction(Action):
+    def execute(self):
+        for result in race().results:
+            if result.person is None and result.card_number:
+                result.person = find(race().persons, card_number=result.card_number)
+        self.app.refresh()
+
+
+class ImportSportOrgAction(Action):
+    def execute(self):
+        file_name = get_open_file_name(_('Open SportOrg json'), _('SportOrg (*.json)'))
+        if file_name is not '':
+            with open(file_name) as f:
+                attr = get_races_from_file(f)
+            SportOrgImportDialog(*attr).exec()
+            self.app.refresh()

@@ -130,10 +130,12 @@ class StartPreparationDialog(QDialog):
         self.numbers_first_spin_box.setEnabled(False)
         self.numbers_first_spin_box.setMinimumWidth(47)
         self.numbers_first_spin_box.setMaximum(999999)
+        self.numbers_first_spin_box.setMinimumHeight(20)
         self.numbers_interval_hor_layout.addWidget(self.numbers_first_spin_box)
         self.numbers_interval_label = QtWidgets.QLabel(self.widget3)
         self.numbers_interval_hor_layout.addWidget(self.numbers_interval_label)
         self.numbers_interval_spin_box = QtWidgets.QSpinBox(self.widget3)
+        self.numbers_interval_spin_box.setMinimumHeight(20)
         self.numbers_interval_spin_box.setEnabled(False)
         self.numbers_interval_hor_layout.addWidget(self.numbers_interval_spin_box)
         self.numbers_vert_layout.addLayout(self.numbers_interval_hor_layout)
@@ -141,8 +143,13 @@ class StartPreparationDialog(QDialog):
         self.numbers_minute_radio_button.setEnabled(False)
         self.numbers_minute_radio_button.setChecked(False)
         self.numbers_vert_layout.addWidget(self.numbers_minute_radio_button)
+        self.numbers_order_radio_button = QtWidgets.QRadioButton(self.widget3)
+        self.numbers_order_radio_button.setEnabled(False)
+        self.numbers_order_radio_button.setChecked(False)
+        self.numbers_vert_layout.addWidget(self.numbers_order_radio_button)
         self.numbers_check_box.stateChanged.connect(self.number_activate)
         self.numbers_minute_radio_button.raise_()
+        self.numbers_order_radio_button.raise_()
         self.numbers_interval_radio_button.raise_()
         self.numbers_first_spin_box.raise_()
         self.numbers_interval_label.raise_()
@@ -191,6 +198,7 @@ class StartPreparationDialog(QDialog):
         self.numbers_interval_radio_button.setText(_("First number"))
         self.numbers_interval_label.setText(_("interval"))
         self.numbers_minute_radio_button.setText(_("Number = corridor + minute"))
+        self.numbers_order_radio_button.setText(_("Number = corridor + order"))
 
     def reserve_activate(self):
         status = self.reserve_check_box.isChecked()
@@ -203,6 +211,7 @@ class StartPreparationDialog(QDialog):
         self.numbers_first_spin_box.setEnabled(status)
         self.numbers_interval_radio_button.setEnabled(status)
         self.numbers_minute_radio_button.setEnabled(status)
+        self.numbers_order_radio_button.setEnabled(status)
         self.numbers_interval_spin_box.setEnabled(status)
 
     def start_activate(self):
@@ -261,11 +270,13 @@ class StartPreparationDialog(QDialog):
 
             if self.numbers_check_box.isChecked():
                 if self.numbers_minute_radio_button.isChecked():
-                    StartNumberManager(obj).process(False)
-                if self.numbers_interval_radio_button.isChecked():
+                    StartNumberManager(obj).process('corridor_minute')
+                elif self.numbers_order_radio_button.isChecked():
+                    StartNumberManager(obj).process('corridor_order')
+                elif self.numbers_interval_radio_button.isChecked():
                     first_number = self.numbers_first_spin_box.value()
                     interval = self.numbers_interval_spin_box.value()
-                    StartNumberManager(obj).process(True, first_number, interval, mix_groups=mix_groups)
+                    StartNumberManager(obj).process('interval', first_number, interval, mix_groups=mix_groups)
 
             self.progress_bar.setValue(100)
 
@@ -290,10 +301,14 @@ class StartPreparationDialog(QDialog):
         obj.set_setting('is_start_preparation_time', self.start_check_box.isChecked())
         obj.set_setting('is_fixed_start_interval', self.start_interval_radio_button.isChecked())
         obj.set_setting('start_interval', time_to_otime(self.start_interval_time_edit.time()).to_msec())
+        obj.set_setting('start_first_time', time_to_otime(self.start_first_time_edit.time()).to_msec())
 
         obj.set_setting('is_start_preparation_numbers', self.numbers_check_box.isChecked())
         obj.set_setting('is_fixed_number_interval', self.numbers_interval_radio_button.isChecked())
+        obj.set_setting('is_corridor_minute_number', self.numbers_minute_radio_button.isChecked())
+        obj.set_setting('is_corridor_order_number', self.numbers_order_radio_button.isChecked())
         obj.set_setting('numbers_interval', self.numbers_interval_spin_box.value())
+        obj.set_setting('numbers_first', self.numbers_first_spin_box.value())
 
     def recover_state(self):
         obj = race()
@@ -310,13 +325,25 @@ class StartPreparationDialog(QDialog):
         self.draw_mix_groups_check_box.setChecked(obj.get_setting('is_mix_groups', False))
 
         self.start_check_box.setChecked(obj.get_setting('is_start_preparation_time', False))
-        self.start_interval_radio_button.setChecked(obj.get_setting('is_fixed_start_interval', False))
-        t = OTime(msec=obj.get_setting('start_interval', 0))
-        self.start_interval_time_edit.setTime(QTime(t.hour, t.minute))
+
+        if obj.get_setting('is_fixed_start_interval', True):
+            self.start_interval_radio_button.setChecked(True)
+        else:
+            self.start_group_settings_radion_button.setChecked(True)
+        t = OTime(msec=obj.get_setting('start_interval', 60000))
+        self.start_interval_time_edit.setTime(QTime(t.hour, t.minute, t.sec))
+        t = OTime(msec=obj.get_setting('start_first_time', 60000))
+        self.start_first_time_edit.setTime(QTime(t.hour, t.minute, t.sec))
 
         self.numbers_check_box.setChecked(obj.get_setting('is_start_preparation_numbers', False))
-        self.numbers_interval_radio_button.setChecked(obj.get_setting('is_fixed_number_interval', False))
+        if obj.get_setting('is_fixed_number_interval', True):
+            self.numbers_interval_radio_button.setChecked(True)
+        elif obj.get_setting('is_corridor_minute_number', False):
+            self.numbers_minute_radio_button.setChecked(True)
+        elif obj.get_setting('is_corridor_order_number', False):
+            self.numbers_order_radio_button.setChecked(True)
         self.numbers_interval_spin_box.setValue(obj.get_setting('numbers_interval', 1))
+        self.numbers_first_spin_box.setValue(obj.get_setting('numbers_first', 1))
 
 
 def guess_courses_for_groups():

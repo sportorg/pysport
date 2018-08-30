@@ -1,18 +1,4 @@
-from sportorg.gui.menu.actions import NewAction, SaveAction, OpenAction, SaveAsAction, OpenRecentAction, \
-    SettingsAction, \
-    EventSettingsAction, CSVWinorientImportAction, WDBWinorientImportAction, OcadTXTv8ImportAction, \
-    WDBWinorientExportAction, IOFResultListExportAction, AddObjectAction, DeleteAction, TextExchangeAction, \
-    RefreshAction, FilterAction, SearchAction, ToStartPreparationAction, ToRaceResultsAction, ToGroupsAction, \
-    ToCoursesAction, ToTeamsAction, StartPreparationAction, GuessCoursesAction, GuessCorridorsAction, \
-    RelayNumberAction, \
-    NumberChangeAction, StartTimeChangeAction, StartListAction, \
-    ManualFinishAction, SPORTidentReadoutAction, SportiduinoReadoutAction, CreateReportAction, \
-    SplitPrintoutAction, \
-    RecheckingAction, PenaltyCalculationAction, PenaltyRemovingAction, ChangeStatusAction, SetDNSNumbersAction, \
-    AddSPORTidentResultAction, TimekeepingSettingsAction, PrinterSettingsAction, LiveSettingsAction, \
-    LiveSendStartListAction, LiveSendResultsAction, LiveResendResultsAction, AboutAction, TestingAction, CPDeleteAction, \
-    TeamworkSettingsAction, TeamworkEnableAction, TeamworkSendAction, TelegramSettingsAction, \
-    TelegramSendAction, SFRReadoutAction, CopyBibToCardNumber, StartHandicapAction, IOFEntryListImportAction
+from sportorg.gui.menu.actions import *
 
 
 class Factory:
@@ -76,7 +62,11 @@ class Factory:
             TeamworkSendAction(),
             TelegramSettingsAction(),
             TelegramSendAction(),
-            IOFEntryListImportAction()
+            IOFEntryListImportAction(),
+            CheckUpdatesAction(),
+            AssignResultByBibAction(),
+            AssignResultByCardNumberAction(),
+            ImportSportOrgAction()
         ]
         self._map = {}
         for action in self.actions:

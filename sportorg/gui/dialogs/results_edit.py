@@ -72,6 +72,9 @@ class ResultEditDialog(QDialog):
         self.item_result = QLineEdit()
         self.item_result.setEnabled(False)
 
+        self.item_credit = QTimeEdit()
+        self.item_credit.setDisplayFormat(self.time_format)
+
         self.item_penalty = QTimeEdit()
         self.item_penalty.setDisplayFormat(self.time_format)
 
@@ -101,6 +104,7 @@ class ResultEditDialog(QDialog):
             self.layout.addRow(QLabel(_('Days')), self.item_days)
         self.layout.addRow(QLabel(_('Start')), self.item_start)
         self.layout.addRow(QLabel(_('Finish')), self.item_finish)
+        self.layout.addRow(QLabel(_('Credit')), self.item_credit)
         self.layout.addRow(QLabel(_('Penalty')), self.item_penalty)
         self.layout.addRow(QLabel(_('Penalty legs')), self.item_penalty_laps)
         self.layout.addRow(QLabel(_('Result')), self.item_result)
@@ -150,7 +154,6 @@ class ResultEditDialog(QDialog):
     def show_person_info(self):
         bib = self.item_bib.value()
         self.label_person_info.setText('')
-        self.button_ok.setEnabled(True)
         if bib:
             person = find(race().persons, bib=bib)
             if person:
@@ -162,7 +165,6 @@ class ResultEditDialog(QDialog):
                 self.label_person_info.setText(info)
             else:
                 self.label_person_info.setText(_('not found'))
-                self.button_ok.setDisabled(True)
 
     def set_values_from_model(self):
         if self.current_object.is_punch():
@@ -178,12 +180,13 @@ class ResultEditDialog(QDialog):
             self.item_start.setTime(time_to_qtime(self.current_object.start_time))
         if self.current_object.finish_time:
             self.item_result.setText(str(self.current_object.get_result()))
+        if self.current_object.credit_time is not None:
+            self.item_credit.setTime(time_to_qtime(self.current_object.credit_time))
         if self.current_object.penalty_time is not None:
             self.item_penalty.setTime(time_to_qtime(self.current_object.penalty_time))
         if self.current_object.penalty_laps:
             self.item_penalty_laps.setValue(self.current_object.penalty_laps)
-        if self.current_object.person:
-            self.item_bib.setValue(self.current_object.person.bib)
+        self.item_bib.setValue(self.current_object.get_bib())
 
         self.item_days.setValue(self.current_object.days)
 
@@ -232,6 +235,10 @@ class ResultEditDialog(QDialog):
         if result.start_time != time_:
             result.start_time = time_
 
+        time_ = time_to_otime(self.item_credit.time())
+        if result.credit_time != time_:
+            result.credit_time = time_
+
         time_ = time_to_otime(self.item_penalty.time())
         if result.penalty_time != time_:
             result.penalty_time = time_
@@ -259,6 +266,7 @@ class ResultEditDialog(QDialog):
                 result.person = new_person
                 if result.is_punch():
                     race().person_card_number(result.person, result.card_number)
+            result.bib = new_bib
 
             GlobalAccess().get_main_window().get_result_table().model().init_cache()
 
@@ -353,11 +361,12 @@ class SplitsText(SplitsObject):
     def show(self):
         splits = self._splits if self._splits is not None else []
         text = ''
+        time_accuracy = race().get_setting('time_accuracy', 0)
         for split in splits:
             if self._more24:
-                text += '{} {} {}\n'.format(split.code, str(split.time), split.days)
+                text += '{} {} {}\n'.format(split.code, split.time.to_str(time_accuracy), split.days)
             else:
-                text += '{} {}\n'.format(split.code, str(split.time))
+                text += '{} {}\n'.format(split.code, split.time.to_str(time_accuracy))
 
         self._text.setText(text)
 

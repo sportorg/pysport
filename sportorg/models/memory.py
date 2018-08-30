@@ -1,16 +1,17 @@
+import datetime
+import time
 import uuid
 from abc import abstractmethod
-import dateutil.parser
-import datetime
 from datetime import date
-import time
 from enum import IntEnum, Enum
 from typing import Dict, List, Any
 
+import dateutil.parser
 
 from sportorg.core.model import Model
 from sportorg.core.otime import OTime
 from sportorg.language import _
+from sportorg.modules.configs.configs import Config
 
 
 class NotEmptyException(Exception):
@@ -89,7 +90,7 @@ class ResultStatus(_TitleType):
     NONE = PrintableValue(0, _('None'))
     OK = PrintableValue(1, _('OK'))
     FINISHED = PrintableValue(2, _('Finished'))
-    MISSING_PUNCH = PrintableValue(3,  _('Missing punch'))
+    MISSING_PUNCH = PrintableValue(3, _('Missing punch'))
     DISQUALIFIED = PrintableValue(4, _('DSQ'))
     DID_NOT_FINISH = PrintableValue(5, _('DNF'))
     ACTIVE = PrintableValue(6, _('Active'))
@@ -215,6 +216,8 @@ class Organization(Model):
 class CourseControl(Model):
     def __init__(self):
         self.code = ''
+        self.is_exclude = True
+        self.is_additional = False
         self.length = 0
         self.order = 0
 
@@ -227,7 +230,7 @@ class CourseControl(Model):
     def __eq__(self, other):
         return self.code == other.code
 
-    def get_int_code(self):
+    def get_number_code(self):
         """ Get int code
         31 933 -> 31
         31(31,32,33) 933 -> 31
@@ -235,15 +238,12 @@ class CourseControl(Model):
         % -> 0
         """
         if not self.code:
-            return 0
-
-        if isinstance(self.code, int):
-            return self.code
+            return '0'
 
         tmp = str(self.code)
         char = tmp[0]
         if char == '*' or char == '%':
-            return 0
+            return '0'
         res = ''
 
         index = 0
@@ -252,18 +252,36 @@ class CourseControl(Model):
             index += 1
             if index < len(tmp):
                 char = tmp[index]
-        return int(res)
+        return str(res)
 
     def to_dict(self):
         return {
             'object': self.__class__.__name__,
             'code': self.code,
-            'length': self.length
+            'length': self.length,
+            'is_exclude': self.is_exclude,
+            'is_additional': self.is_additional,
         }
 
     def update_data(self, data):
         self.code = str(data['code'])
         self.length = int(data['length'])
+        if 'is_exclude' in data:
+            self.is_exclude = bool(data['is_exclude'])
+        if 'is_additional' in data:
+            self.is_additional = bool(data['is_additional'])
+
+
+class ControlPoint(Model):
+    """Description of independent control point. Used for score calculation in rogain"""
+
+    def __init__(self):
+        self.code = ''
+        self.description = ''
+        self.score = 1.0
+        self.x = 0.0
+        self.y = 0.0
+        self.altitude = 0.0
 
 
 class CoursePart(Model):
@@ -503,7 +521,7 @@ class Split(Model):
     def update_data(self, data):
         self.code = str(data['code'])
         if data['time']:
-            self.time = OTime(msec=data['time'])
+            self._time = OTime(msec=data['time'])
         if 'days' in data:
             self.days = int(data['days'])
 
@@ -514,12 +532,14 @@ class Result:
             raise Exception("<Result> is abstracted")
         self.id = uuid.uuid4()
         self.days = 0
+        self.bib = 0
         self.start_time = None  # type: OTime
         self.finish_time = OTime.now()  # type: OTime
         self.person = None  # type: Person
         self.status = ResultStatus.OK
         self.status_comment = ''
         self.penalty_time = None  # type: OTime
+        self.credit_time = None  # type: OTime
         self.penalty_laps = 0  # count of penalty legs (marked route)
         self.place = 0
         self.scores = 0
@@ -541,18 +561,34 @@ class Result:
 
     def __eq__(self, other):
         eq = self.system_type and other.system_type
-        if self.start_time and other.start_time:
-            eq = eq and self.start_time == other.start_time
-        if self.finish_time and other.finish_time:
-            eq = eq and self.finish_time == other.finish_time
-        else:
-            return False
+
+        if race().get_setting('result_processing_mode', 'time') == 'time':
+            if self.start_time and other.start_time:
+                eq = eq and self.start_time == other.start_time
+            if self.finish_time and other.finish_time:
+                eq = eq and self.finish_time == other.finish_time
+            else:
+                return False
+        else:  # process by score (rogain)
+            eq = eq and self.scores == other.scores
+            if eq and self.start_time and other.start_time:
+                eq = eq and self.start_time == other.start_time
+            if eq and self.finish_time and other.finish_time:
+                eq = eq and self.finish_time == other.finish_time
+            else:
+                return False
         return eq
 
-    def __gt__(self, other):
+    def __gt__(self, other):  # greater is worse
         if self.status != other.status:
             return self.status.value > other.status.value
-        return self.get_result_otime() > other.get_result_otime()
+        if race().get_setting('result_processing_mode', 'time') == 'time':
+            return self.get_result_otime() > other.get_result_otime()
+        else:  # process by score (rogain)
+            if self.scores == other.scores:
+                return self.get_result_otime() > other.get_result_otime()
+            else:
+                return self.scores < other.scores
 
     @property
     @abstractmethod
@@ -563,6 +599,7 @@ class Result:
         return {
             'object': self.__class__.__name__,
             'id': str(self.id),
+            'bib': self.bib,
             'system_type': self.system_type.value,
             'person_id': str(self.person.id) if self.person else None,
             'days': self.days,
@@ -570,6 +607,7 @@ class Result:
             'finish_time': self.finish_time.to_msec() if self.finish_time else None,
             'diff': self.diff.to_msec() if self.diff else None,
             'penalty_time': self.penalty_time.to_msec() if self.penalty_time else None,
+            'credit_time': self.credit_time.to_msec() if self.credit_time else None,
             'status': self.status.value,
             'status_comment': self.status_comment,
             'penalty_laps': self.penalty_laps,
@@ -601,6 +639,8 @@ class Result:
             self.finish_time = OTime(msec=data['finish_time'])
         if data['penalty_time']:
             self.penalty_time = OTime(msec=data['penalty_time'])
+        if 'credit_time' in data and data['credit_time']:
+            self.credit_time = OTime(msec=data['credit_time'])
         if 'status_comment' in data:
             self.status_comment = data['status_comment']
         if 'days' in data:
@@ -609,6 +649,9 @@ class Result:
             self.created_at = float(data['created_at'])
         else:
             self.created_at = time.time()
+
+        if 'bib' in data:
+            self.bib = int(data['bib'])
 
         if 'card_number' in data:
             self.card_number = int(data['card_number'])
@@ -622,6 +665,11 @@ class Result:
     def clear(self):
         pass
 
+    def get_bib(self):
+        if self.person:
+            return self.person.bib
+        return self.bib
+
     def get_result(self):
         if not self.is_status_ok():
             if self.status_comment:
@@ -631,14 +679,24 @@ class Result:
         if not self.person:
             return ''
 
-        return str(self.get_finish_time() - self.get_start_time() + self.get_penalty_time())
+        ret = ''
+        if race().get_setting('result_processing_mode', 'time') == 'scores':
+            ret += str(self.scores) + ' ' + _('points') + ' '
+
+        time_accuracy = race().get_setting('time_accuracy', 0)
+        ret += self.get_result_otime().to_str(time_accuracy)
+        return ret
 
     def get_result_for_sort(self):
         ret = self.get_result_otime()
         return self.status, ret.to_msec()
 
     def get_result_otime(self):
-        return self.get_finish_time() - self.get_start_time() + self.get_penalty_time()
+        time_accuracy = race().get_setting('time_accuracy', 0)
+        ret_ms = self.get_finish_time().to_msec(time_accuracy) - self.get_start_time().to_msec(time_accuracy)
+        ret_ms += self.get_penalty_time().to_msec(time_accuracy)
+        ret_ms -= self.get_credit_time().to_msec(time_accuracy)
+        return OTime(msec=ret_ms)
 
     def get_start_time(self):
         if self.start_time and self.start_time.to_msec():
@@ -656,6 +714,11 @@ class Result:
     def get_penalty_time(self):
         if self.penalty_time:
             return self.penalty_time
+        return OTime()
+
+    def get_credit_time(self):
+        if self.credit_time:
+            return self.credit_time
         return OTime()
 
     def get_place(self):
@@ -893,7 +956,7 @@ class Person(Model):
         self.contact = []  # type: List[Contact]
         self.world_code = None  # WRE ID for orienteering and the same
         self.national_code = None
-        self.qual = Qualification.NOT_QUALIFIED  # type: Qualification 'qualification, used in Russia only'
+        self.qual = Qualification.NOT_QUALIFIED  # type: Qualification # 'qualification, used in Russia only'
         self.is_out_of_competition = False  # e.g. 20-years old person, running in M12
         self.is_paid = False
         self.is_rented_card = False
@@ -902,6 +965,7 @@ class Person(Model):
 
         self.start_time = None  # type: OTime
         self.start_group = 0
+        self.result_count = 0
 
     def __repr__(self):
         return '{} {} {}'.format(self.full_name, self.bib, self.group)
@@ -1067,6 +1131,7 @@ class Race(Model):
         self.persons = []  # type: List[Person]
         self.relay_teams = []  # type: List[RelayTeam]
         self.settings = {}  # type: Dict[str, Any]
+        self.controls = []  # type: List[ControlPoint]
 
     def __repr__(self):
         return repr(self.data)
@@ -1171,6 +1236,11 @@ class Race(Model):
     def delete_persons(self, indexes):
         indexes = sorted(indexes, reverse=True)
         for i in indexes:
+            person = self.persons[i]
+            for result in self.results:
+                if result.person is person:
+                    result.person = None
+                    result.bib = person.bib
             del self.persons[i]
 
     def delete_results(self, indexes):
@@ -1425,23 +1495,11 @@ class Qualification(IntEnum):
         }
         return qual[self.value]
 
-    # see https://www.minsport.gov.ru/sportorentir.xls - Russian orienteering only!
-    # http://www.minsport.gov.ru/2017/doc/Sportivnoe-orentirovanie-evsk2021.xls
-    def get_scores(self):
-        scores = {
-            '': 0,
-            0: 0,
-            3: 1,
-            2: 2,
-            1: 3,
-            6: 6,
-            5: 25,
-            4: 50,
-            7: 80,
-            8: 100,
-            9: 100
-        }
-        return scores[self.value]
+    # get score for ranking, stored in config.ini file
+    def get_score(self):
+        ret = Config().ranking.get(self.name.lower(), 0)
+        ret = float(ret)
+        return ret
 
 
 class RankingItem(object):
@@ -1502,7 +1560,7 @@ class Ranking(object):
             assert isinstance(i, RankingItem)
             if i.is_active:
                 if i.max_place or (i.max_time and i.max_time.to_msec() > 0):
-                    if max_qual.get_scores() < i.qual.get_scores():
+                    if max_qual.get_score() < i.qual.get_score():
                         max_qual = i.qual
         return max_qual
 
@@ -1706,7 +1764,7 @@ class RelayTeam(object):
         self.place = 0
 
     def __eq__(self, other):
-        if self.get_is_status_ok() == self.get_is_status_ok():
+        if self.get_is_status_ok() == other.get_is_status_ok():
             if self.get_correct_lap_count() == other.get_correct_lap_count():
                 if self.get_time() == other.get_time():
                     return True
@@ -1752,7 +1810,7 @@ class RelayTeam(object):
         if len(self.legs):
             last_correct_leg = self.get_correct_lap_count()
             if last_correct_leg > 0:
-                last_finish = self.legs[last_correct_leg-1].get_finish_time()
+                last_finish = self.legs[last_correct_leg - 1].get_finish_time()
                 start = self.legs[0].get_start_time()
                 return last_finish - start
         return OTime()

@@ -5,7 +5,7 @@ import logging.config
 from sportorg.core.version import Version
 
 NAME = 'SportOrg'
-VERSION = Version(1, 1, 1, 0, 'v')
+VERSION = Version(1, 2, 0, 0, 'v')
 DEBUG = True
 
 
@@ -82,6 +82,8 @@ NAMES_FILE = base_dir('names.txt')
 REGIONS_FILE = base_dir('regions.txt')
 
 STATUS_COMMENTS_FILE = base_dir('status_comments.txt')
+
+RANKING_SCORE_FILE = base_dir('ranking.txt')
 
 DIRS = [
     IMG_DIR,

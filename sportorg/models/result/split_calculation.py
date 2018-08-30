@@ -34,14 +34,20 @@ class PersonSplits(object):
     def generate(self):
         split_index = 0
         course_index = 0
-        course_code = 0
-        if len(self.course.controls) > course_index:
-            course_code = self.course.controls[course_index].code
         leg_start_time = self.result.get_start_time()
         start_time = self.result.get_start_time()
 
         if self.course.length:
             self.result.speed = get_speed_min_per_km(self.result.get_result_otime(), self.course.length)
+
+        if not len(self.course.controls):
+            prev_split = start_time
+            for i, split in enumerate(self.result.splits):
+                split.index = i
+                split.course_index = i
+                split.relative_time = split.time - start_time
+                split.leg_time = split.time - prev_split
+                prev_split = split.time
 
         while split_index < len(self.result.splits) and course_index < len(self.course.controls):
             cur_split = self.result.splits[split_index]

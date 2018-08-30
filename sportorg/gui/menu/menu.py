@@ -52,6 +52,10 @@ def menu_list():
                     'title': _('Import'),
                     'actions': [
                         {
+                            'title': _('Import from SportOrg file'),
+                            'action': 'ImportSportOrgAction'
+                        },
+                        {
                             'title': _('CSV Winorient'),
                             'icon': config.icon_dir('csv.svg'),
                             'action': 'CSVWinorientImportAction'
@@ -260,6 +264,14 @@ def menu_list():
                     'title': _('Delete CP'),
                     'action': 'CPDeleteAction'
                 },
+                {
+                    'title': _('Assign result by bib'),
+                    'action': 'AssignResultByBibAction'
+                },
+                {
+                    'title': _('Assign result by card number'),
+                    'action': 'AssignResultByCardNumberAction'
+                },
             ]
         },
         {
@@ -362,6 +374,10 @@ def menu_list():
                     'title': _('About'),
                     'shortcut': 'F1',
                     'action': 'AboutAction'
+                },
+                {
+                    'title': _('Check updates'),
+                    'action': 'CheckUpdatesAction'
                 },
                 {
                     'title': _('Testing'),

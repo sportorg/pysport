@@ -57,6 +57,7 @@ class ResultTable(TableView):
             if index.row() < len(race().results):
                 dialog = ResultEditDialog(race().results[index.row()])
                 dialog.exec()
+                # self.selectRow(index.row()+1)
         except Exception as e:
             logging.error(str(e))
 
@@ -140,6 +141,9 @@ class Widget(QtWidgets.QWidget):
         hor_header.setSectionResizeMode(QHeaderView.ResizeToContents)
         Broker().subscribe('refresh', lambda: hor_header.setSectionResizeMode(QHeaderView.ResizeToContents))
 
+        ver_header = self.ResultTable.verticalHeader()
+        ver_header.setSectionResizeMode(QHeaderView.ResizeToContents)
+
         self.gridLayout.addWidget(self.ResultSplitter)
         self.ResultCourseGroupBox.setTitle(_("Course"))
         self.ResultCourseNameLabel.setText(_("Name"))
@@ -166,6 +170,9 @@ class Widget(QtWidgets.QWidget):
         self.ResultCourseNameEdit.setText('')
         self.ResultCourseLengthEdit.setText('')
 
+        if result.is_manual():
+            return
+
         course = None
         if result.person:
             course = race().find_course(result)
@@ -180,6 +187,7 @@ class Widget(QtWidgets.QWidget):
 
         code = ''
         index = 1
+        time_accuracy = race().get_setting('time_accuracy', 0)
         for split in result.splits:
             str_fmt = '{index:02d} {code} {time} {diff}'
             if not split.is_correct:
@@ -188,8 +196,8 @@ class Widget(QtWidgets.QWidget):
             s = str_fmt.format(
                 index=index,
                 code=('(' + str(split.code) + ')   ')[:5],
-                time=time_to_hhmmss(split.time),
-                diff=time_to_hhmmss(split.leg_time),
+                time=split.time.to_str(time_accuracy),
+                diff=split.leg_time.to_str(time_accuracy),
                 leg_place=split.leg_place,
                 speed=split.speed,
             )
