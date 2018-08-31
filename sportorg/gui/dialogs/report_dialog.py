@@ -1,9 +1,13 @@
 import codecs
 import logging
+import os
+import time
+
 import webbrowser
 
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFormLayout, QLabel, QDialog, QPushButton, QDialogButtonBox, QCheckBox
+from docxtpl import DocxTemplate
 
 from sportorg import config
 from sportorg.core.template import get_templates, get_text_from_file
@@ -81,6 +85,7 @@ class ReportDialog(QDialog):
                 logging.error(str(e))
             except Exception as e:
                 logging.error(str(e))
+                logging.exception(e)
             self.close()
 
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
@@ -127,25 +132,45 @@ class ReportDialog(QDialog):
 
         races_dict = [r.to_dict() for r in races()]
 
-        template = get_text_from_file(
-            template_path,
-            race=races_dict[get_current_race_index()],
-            races=races_dict,
-            current_race=get_current_race_index(),
-            selected=selected_items
-        )
+        if template_path.endswith('.docx'):
+            # DOCX template processing
+            full_path = config.template_dir() + template_path
+            doc = DocxTemplate(full_path)
+            context = {}
+            context['race'] = races_dict[get_current_race_index()]
+            context['name'] = config.NAME
+            context['version'] = str(config.VERSION)
+            doc.render(context)
 
-        if _settings['save_to_last_file']:
-            file_name = _settings['last_file']
+            if _settings['save_to_last_file']:
+                file_name = _settings['last_file']
+            else:
+                file_name = get_save_file_name(_('Save As MS Word file'), _("MS Word file (*.docx)"),
+                                               '{}_official'.format(obj.data.get_start_datetime().strftime("%Y%m%d")))
+            if file_name:
+                doc.save(file_name)
+                os.startfile(file_name)
+
         else:
-            file_name = get_save_file_name(_('Save As HTML file'), _("HTML file (*.html)"),
-                                           '{}_report'.format(obj.data.get_start_datetime().strftime("%Y%m%d")))
-        if file_name:
-            _settings['last_file'] = file_name
-            with codecs.open(file_name, 'w', 'utf-8') as file:
-                file.write(template)
-                file.close()
+            template = get_text_from_file(
+                template_path,
+                race=races_dict[get_current_race_index()],
+                races=races_dict,
+                current_race=get_current_race_index(),
+                selected=selected_items
+            )
 
-            # Open file in your browser
-            if _settings['open_in_browser']:
-                webbrowser.open('file://' + file_name, new=2)
+            if _settings['save_to_last_file']:
+                file_name = _settings['last_file']
+            else:
+                file_name = get_save_file_name(_('Save As HTML file'), _("HTML file (*.html)"),
+                                               '{}_report'.format(obj.data.get_start_datetime().strftime("%Y%m%d")))
+            if file_name:
+                _settings['last_file'] = file_name
+                with codecs.open(file_name, 'w', 'utf-8') as file:
+                    file.write(template)
+                    file.close()
+
+                # Open file in your browser
+                if _settings['open_in_browser']:
+                    webbrowser.open('file://' + file_name, new=2)
