@@ -146,9 +146,10 @@ class ReportDialog(QDialog):
                 file_name = _settings['last_file']
             else:
                 file_name = get_save_file_name(_('Save As MS Word file'), _("MS Word file (*.docx)"),
-                                               '{}_official_report'.format(time.strftime("%Y%m%d")))
-            doc.save(file_name)
-            os.startfile(file_name)
+                                               '{}_official'.format(obj.data.get_start_datetime().strftime("%Y%m%d")))
+            if file_name:
+                doc.save(file_name)
+                os.startfile(file_name)
 
         else:
             template = get_text_from_file(
