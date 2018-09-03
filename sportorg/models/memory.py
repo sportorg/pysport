@@ -545,6 +545,7 @@ class Result:
         self.scores = 0
         self.assigned_rank = Qualification.NOT_QUALIFIED
         self.diff = None  # type: OTime
+        self.diff_scores = 0
         self.created_at = time.time()
         self.speed = ''
 
@@ -606,6 +607,7 @@ class Result:
             'start_time': self.start_time.to_msec() if self.start_time else None,
             'finish_time': self.finish_time.to_msec() if self.finish_time else None,
             'diff': self.diff.to_msec() if self.diff else None,
+            'diff_scores': self.diff_scores,
             'penalty_time': self.penalty_time.to_msec() if self.penalty_time else None,
             'credit_time': self.credit_time.to_msec() if self.credit_time else None,
             'status': self.status.value,
