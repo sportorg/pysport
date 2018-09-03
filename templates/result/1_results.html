@@ -54,7 +54,7 @@
                     penalty_laps: result.penalty_laps,
                     result: result.result,
                     resultMsec: result.result_msec,
-                    diff: toHHMMSS(result.diff),
+                    diff: race.settings.result_processing_mode === 'scores' ? result.diff_scores : toHHMMSS(result.diff),
                     place: result.place,
                     status: result.status,
                     scores: result.scores,
@@ -314,7 +314,7 @@
             var titleBlock = document.createElement('h2');
             titleBlock.id = group.name;
             var groupTitle = group.name;
-            if (group.course && group.course.controls){
+            if (group.course && group.course.controls && group.course.controls.length){
                 groupTitle += ', ' + group.course.controls.length + ' КП';
             }
             if (group.course && group.course.length){

@@ -31,6 +31,11 @@ def load(file):
 
 def get_races_from_file(file):
     data = json.load(file)
+    if 'races' not in data:
+        data = {
+            'races': [data] if not isinstance(data, list) else data,
+            'current_race': 0
+        }
     event = []
     for race_dict in data['races']:
         race_migrate(race_dict)
