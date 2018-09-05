@@ -20,7 +20,6 @@ class Orgeo:
         return '{}{}'.format(self._url, text)
 
     def send(self, data):
-        # print(data)
         response = self.requests.post(
             self._get_url(),
             headers=self._headers,
