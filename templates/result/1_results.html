@@ -53,12 +53,13 @@
                     penalty_time: toHHMMSS(result.penalty_time),
                     penalty_laps: result.penalty_laps,
                     result: result.result,
-                    resultMsec: result.result_msec,
+                    result_msec: result.result_msec,
                     diff: race.settings.result_processing_mode === 'scores' ? result.diff_scores : toHHMMSS(result.diff),
                     place: result.place,
                     status: result.status,
                     scores: result.scores,
                     place_show: result.person.is_out_of_competition ? 'в/к' : result.place === 0 ? '' : result.place === -1 ? '' : result.place,
+                    is_out_of_competition: result.person.is_out_of_competition,
                     speed: result.speed,
                     data: result
                 };
@@ -97,13 +98,13 @@
                         }
                     }
 
-                    var finishMsec = r.resultMsec - lastSplit;
+                    var finishMsec = r.result_msec - lastSplit;
 
                     if (r.status === 1 && finishMsec > 0) {
                         var tblF = document.createElement('table');
                         tblF.className = 'table-split';
                         tblF.appendChild(getTrBlock(toHHMMSS(finishMsec), 0));
-                        tblF.appendChild(getTrBlock(toHHMMSS(r.resultMsec) + ' (' + r.place + ')', r.place));
+                        tblF.appendChild(getTrBlock(toHHMMSS(r.result_msec) + ' (' + r.place + ')', r.place));
                         r.finish_split = tblF;
                     }
                 }
@@ -148,7 +149,7 @@
                 if (b.place < 1) {
                     return -1
                 }
-                if (isRelay && a.place === b.place) {
+                if (a.place === b.place) {
                     return ~~(a.bib / 1000) - ~~(b.bib / 1000)
                 }
                 return a.place - b.place
@@ -162,6 +163,12 @@
                 }
                 if (b.status !== 1) {
                     return -1
+                }
+                if (a.is_out_of_competition || b.is_out_of_competition) {
+                    if (race.settings.result_processing_mode === 'scores' && a.scores !== b.scores) {
+                        return a.scores - b.scores;
+                    }
+                    return a.result_msec - b.result_msec;
                 }
                 if (a.place < 1) {
                     return 1
