@@ -115,15 +115,22 @@
             return a.resultMsec - b.resultMsec;
         });
         var prevRes = results[0];
-        var place = 1;
+        var place = 0;
+        var doubleplace = 0;
         for (var _i = 0, results_1 = results; _i < results_1.length; _i++) {
             var result = results_1[_i];
             result.index = _i + 1;
             if (!result.person.dsq && !result.person.is_out_of_competition) {
-                if (result.resultMsec !== prevRes.resultMsec) {
-                    place++;
+               if (result.resultMsec === prevRes.resultMsec && _i != 0) {
+                    doubleplace++;
+                } else {
+                    place = place + 1 + doubleplace;
+                    doubleplace = 0;
                 }
                 result.place = place;
+                if (doubleplace != 0){
+                    result.place = place + ' =';
+                }
             } else if (!result.person.dsq && result.person.is_out_of_competition) {
                 result.place = 'в/к';
             }

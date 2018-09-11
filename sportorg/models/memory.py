@@ -545,6 +545,7 @@ class Result:
         self.scores = 0
         self.assigned_rank = Qualification.NOT_QUALIFIED
         self.diff = None  # type: OTime
+        self.diff_scores = 0
         self.created_at = time.time()
         self.speed = ''
 
@@ -606,6 +607,7 @@ class Result:
             'start_time': self.start_time.to_msec() if self.start_time else None,
             'finish_time': self.finish_time.to_msec() if self.finish_time else None,
             'diff': self.diff.to_msec() if self.diff else None,
+            'diff_scores': self.diff_scores,
             'penalty_time': self.penalty_time.to_msec() if self.penalty_time else None,
             'credit_time': self.credit_time.to_msec() if self.credit_time else None,
             'status': self.status.value,
@@ -1235,55 +1237,67 @@ class Race(Model):
 
     def delete_persons(self, indexes):
         indexes = sorted(indexes, reverse=True)
+        persons = []
         for i in indexes:
             person = self.persons[i]
+            persons.append(person)
             for result in self.results:
                 if result.person is person:
                     result.person = None
                     result.bib = person.bib
             del self.persons[i]
+        return persons
 
     def delete_results(self, indexes):
         indexes = sorted(indexes, reverse=True)
+        results = []
         for i in indexes:
+            result = self.results[i]
+            results.append(result)
             del self.results[i]
+        return results
 
     def delete_groups(self, indexes):
         self.update_counters()
+        groups = []
         for i in indexes:
             group = self.groups[i]  # type: Group
             if group.count_person > 0:
                 raise NotEmptyException('Cannot remove group')
+            groups.append(group)
 
         indexes = sorted(indexes, reverse=True)
         for i in indexes:
             del self.groups[i]
-        return True
+        return groups
 
     def delete_courses(self, indexes):
         self.update_counters()
+        courses = []
         for i in indexes:
             course = self.courses[i]  # type: Course
             if course.count_group > 0:
                 raise NotEmptyException('Cannot remove course')
+            courses.append(course)
 
         indexes = sorted(indexes, reverse=True)
-
         for i in indexes:
             del self.courses[i]
-        return True
+        return courses
 
     def delete_organizations(self, indexes):
         self.update_counters()
+        organizations = []
         for i in indexes:
             organization = self.organizations[i]  # type: Organization
             if organization.count_person > 0:
                 raise NotEmptyException('Cannot remove organization')
+            organizations.append(organization)
         indexes = sorted(indexes, reverse=True)
 
         for i in indexes:
             del self.organizations[i]
-        return True
+        return organizations
 
     def find_person_result(self, person):
         for i in self.results:

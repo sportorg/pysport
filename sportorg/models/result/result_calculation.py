@@ -70,6 +70,7 @@ class ResultCalculation(object):
             if res.is_status_ok():
                 current_result = res.get_result_otime()
                 res.diff = current_result - array[0].get_result_otime()
+                res.diff_scores = array[0].scores - res.scores
 
                 # skip if out of competition
                 if res.person.is_out_of_competition:
