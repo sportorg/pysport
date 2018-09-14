@@ -80,6 +80,8 @@ class WinOrientBinary:
             for i in range(course.point_quantity):
                 control = CourseControl()
                 control.code = str(course.point[i])
+                if control.code == '0':
+                    break
                 if i < len(course.leg):
                     control.length = course.leg[i]
                 new_course.controls.append(control)
@@ -99,8 +101,8 @@ class WinOrientBinary:
         for man in self.wdb_object.man:
             assert (isinstance(man, WDBMan))
             new_person = Person()
-            new_person.surname = man.name.split(" ")[0]
-            new_person.name = man.name.split(" ")[-1]
+            new_person.surname = man.name.strip().split(" ")[0]
+            new_person.name = man.name.strip().split(" ")[-1]
             new_person.bib = man.number
             if man.qualification:
                 if man.qualification == 10:
