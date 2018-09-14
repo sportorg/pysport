@@ -968,7 +968,7 @@ class WDB:
         initial_start = 4
         qty = int.from_bytes(byte_array[initial_start:initial_start + 4], byteorder)
         initial_start += 4
-        end_pos = 0
+        end_pos = initial_start
         self.man.clear()
         for i in range(qty):
             start_pos = initial_start + i * object_size
@@ -985,6 +985,7 @@ class WDB:
         initial_start = end_pos
         qty = int.from_bytes(byte_array[initial_start:initial_start + 4], byteorder)
         initial_start += 4
+        end_pos = initial_start
         self.team.clear()
         for i in range(qty):
             start_pos = initial_start + i * object_size
@@ -1001,6 +1002,7 @@ class WDB:
         initial_start = end_pos
         qty = int.from_bytes(byte_array[initial_start:initial_start + 4], byteorder)
         initial_start += 4
+        end_pos = initial_start
         self.group.clear()
         for i in range(qty):
             start_pos = initial_start + i * object_size
@@ -1018,6 +1020,7 @@ class WDB:
         initial_start = end_pos
         qty = int.from_bytes(byte_array[initial_start:initial_start + 4], byteorder)
         initial_start += 4
+        end_pos = initial_start
         self.dist.clear()
         for i in range(qty):
             start_pos = initial_start + i * object_size
@@ -1044,6 +1047,7 @@ class WDB:
         initial_start = end_pos
         qty = int.from_bytes(byte_array[initial_start:initial_start + 4], byteorder)
         initial_start += 4
+        end_pos = initial_start
         self.fin.clear()
         for i in range(qty):
             start_pos = initial_start + i * object_size
@@ -1068,6 +1072,7 @@ class WDB:
                 # reading of adventure objects - int (4 bytes) of quantity + set of 88 byte blocks
                 object_size = 88
                 initial_start += 4
+                end_pos = initial_start
                 self.adv.clear()
                 for i in range(check):
                     start_pos = initial_start + i * object_size

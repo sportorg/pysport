@@ -128,36 +128,50 @@ class WinOrientBinary:
 
             new_person.start_time = int_to_otime(man.start)
 
-            # result
-            fin = man.get_finish()
-            if fin is not None:
+        # result
+        for fin in self.wdb_object.fin:
+            assert (isinstance(fin, WDBFinish))
+            result = ResultSportident()
+            result.finish_time = int_to_otime(fin.time)
+            result.bib = fin.number
+
+            person = find(my_race.persons, bib=result.bib)
+            if person:
+                result.person = person
+                wdb_person = find(self.wdb_object.man, number=result.bib)
+                if wdb_person.status in self.status:
+                    result.status = self.status[wdb_person.status]
+                result.penalty_time = OTime(sec=wdb_person.penalty_second)
+
+            my_race.add_result(result)
+
+        # punches
+        for chip in self.wdb_object.chip:
+            assert (isinstance(chip, WDBChip))
+
+            person = find(my_race.persons, card_number=chip.id)
+            if person:
+                result = find(my_race.results, person=person)
+                if not result:
+                    result = ResultSportident()
+                    result.person = person
+                    my_race.add_result(result)
+            else:
                 result = ResultSportident()
-                result.person = new_person
-
-                result.card_number = int(man.si_card)
-                result.start_time = int_to_otime(man.start)
-                result.finish_time = int_to_otime(fin.time)
-                result.penalty_time = OTime(sec=man.penalty_second)
-
-                if man.status in self.status:
-                    result.status = self.status[man.status]
-
                 my_race.add_result(result)
 
-                # splits
-                chip = man.get_chip()
-                if chip is not None:
-                    result.splits = []
-                    for i in range(chip.quantity):
-                        p = chip.punch[i]
-                        assert isinstance(p, WDBPunch)
-                        code = p.code
-                        time = int_to_otime(p.time)
-                        split = Split()
-                        split.code = str(code)
-                        split.time = time
-                        if code > 0:
-                            result.splits.append(split)
+            result.card_number = chip.id
+            result.splits = []
+            for i in range(chip.quantity):
+                p = chip.punch[i]
+                assert isinstance(p, WDBPunch)
+                code = p.code
+                time = int_to_otime(p.time)
+                split = Split()
+                split.code = str(code)
+                split.time = time
+                if code > 0:
+                    result.splits.append(split)
 
         ResultCalculation(race()).process_results()
 

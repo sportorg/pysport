@@ -109,6 +109,7 @@ class WDBWinorientImportAction(Action):
                 winorient.import_wo_wdb(file_name)
             except WDBImportError as e:
                 logging.error(str(e))
+                logging.exception(e)
                 QMessageBox.warning(self.app, _('Error'), _('Import error') + ': ' + file_name)
             self.app.init_model()
 
