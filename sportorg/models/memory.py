@@ -564,18 +564,18 @@ class Result:
         eq = self.system_type and other.system_type
 
         if race().get_setting('result_processing_mode', 'time') == 'time':
-            if self.start_time and other.start_time:
-                eq = eq and self.start_time == other.start_time
-            if self.finish_time and other.finish_time:
-                eq = eq and self.finish_time == other.finish_time
+            if self.get_start_time() and other.get_start_time():
+                eq = eq and self.get_start_time() == other.get_start_time()
+            if self.get_finish_time() and other.get_finish_time():
+                eq = eq and self.get_finish_time() == other.get_finish_time()
             else:
                 return False
         else:  # process by score (rogain)
             eq = eq and self.scores == other.scores
-            if eq and self.start_time and other.start_time:
-                eq = eq and self.start_time == other.start_time
-            if eq and self.finish_time and other.finish_time:
-                eq = eq and self.finish_time == other.finish_time
+            if eq and self.get_start_time() and other.get_start_time():
+                eq = eq and self.get_start_time() == other.get_start_time()
+            if eq and self.get_finish_time() and other.get_finish_time():
+                eq = eq and self.get_finish_time() == other.get_finish_time()
             else:
                 return False
         return eq

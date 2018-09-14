@@ -745,7 +745,7 @@ class WDBInfo:
                 string = self.title[i]
             ret[i * 80:(i + 1) * 80] = format_string_to_bytes(string, 80)
         ret[800:825] = format_string_to_bytes(self.place, 25)
-        ret[825:850] = format_string_to_bytes(self.secretary, 25)
+        ret[825:850] = format_string_to_bytes(self.referee, 25)
         ret[850:875] = format_string_to_bytes(self.secretary, 25)
         ret[875:896] = format_string_to_bytes(self.date_str, 21)
         ret[896:897] = self.type.to_bytes(1, byteorder)
@@ -1097,6 +1097,11 @@ class WDB:
                 print('Error in Chip object')
 
     def get_bytes(self, is_new_format=True):
+
+        if len(self.adv) < 1:  # fictive 257 adventure objects
+            for i in range(257):
+                self.adv.append(WDBAdventure())
+
         byteorder = get_wdb_byteorder()
 
         ret = bytearray()
@@ -1135,7 +1140,6 @@ class WDB:
             # ret += int(257).to_bytes(4, byteorder)
 
             ret += len(self.adv).to_bytes(4, byteorder)
-
             for i in self.adv:
                 assert isinstance(i, WDBAdventure)
                 ret += i.get_bytes()

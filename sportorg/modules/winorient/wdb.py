@@ -111,6 +111,8 @@ class WinOrientBinary:
             new_person.is_out_of_competition = man.is_not_qualified
             new_person.comment = man.comment
             new_person.start_group = man.start_group
+            new_person.is_rented_card = not (man.is_own_card >> 1)
+            new_person.is_personal = man.is_without_team
 
             found_group = man.get_group()
             if found_group:
@@ -135,7 +137,7 @@ class WinOrientBinary:
                 result.card_number = int(man.si_card)
                 result.start_time = int_to_otime(man.start)
                 result.finish_time = int_to_otime(fin.time)
-                result.penalty_time = OTime(sec = man.penalty_second)
+                result.penalty_time = OTime(sec=man.penalty_second)
 
                 if man.status in self.status:
                     result.status = self.status[man.status]
@@ -164,7 +166,7 @@ class WinOrientBinary:
         my_race = race()
 
         title = my_race.data.description
-        wdb_object.info.title = title.split('\n')
+        wdb_object.info.title = title.replace("<br>", "").split('\n')
         wdb_object.info.place = my_race.data.location
         wdb_object.info.referee = my_race.data.chief_referee
         wdb_object.info.secretary = my_race.data.secretary
@@ -235,8 +237,11 @@ class WinOrientBinary:
                 new_person.year = man.get_year()
             if man.card_number:
                 new_person.si_card = int(man.card_number)
-                new_person.is_own_card = 2
             new_person.is_not_qualified = man.is_out_of_competition
+            if not man.is_rented_card:
+                new_person.is_own_card = 2
+            new_person.is_without_team = man.is_personal
+
             new_person.comment = man.comment
             if man.group:
                 group_found = wdb_object.find_group_by_name(man.group.name)
@@ -259,7 +264,7 @@ class WinOrientBinary:
             if result:
                 new_finish = WDBFinish()
 
-                new_finish.time = time_to_int(result.finish_time)
+                new_finish.time = time_to_int(result.get_finish_time())
                 new_finish.number = man.bib
 
                 if result.status in self.status_reverse:
