@@ -90,7 +90,8 @@ def _get_person_obj(data, race_data, result=None):
     if result is not None:
         obj['start'] = round(result['start_msec'] / 1000)
         obj['result_ms'] = round(result['result_msec'] / 10)  # 1/100 sec - proprietary format
-        obj['result_status'] = RESULT_STATUS[result['status']] if result['status'] in RESULT_STATUS else 'OK'
+        obj['result_status'] = RESULT_STATUS[int(result['status'])] \
+            if -1 < int(result['status']) < len(RESULT_STATUS) else 'OK'
         if len(result['splits']):
             obj['splits'] = []
             splits = []
