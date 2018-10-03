@@ -29,6 +29,7 @@
                         start_time: person.start_time,
                         comment: person.comment,
                         price: person.group && person.group.price,
+                        price_show: person.group && person.group.price + (person.is_paid ? ' *' : ''),
                         person: person
                     });
                 }
@@ -68,7 +69,6 @@
     }
 
     var Fields = {
-        localId: 'race_' + race.id + '_org_fields',
         fields: [
             {key: 'index', title: '№', size: 4},
             {key: 'name', title: 'Фамилия, имя', size: 40},
@@ -78,7 +78,7 @@
             {key: 'bib', title: 'Номер', size: 6},
             {key: 'card_number', title: 'Номер чипа', size: 11},
             {key: 'start', title: 'Время старта', size: 13},
-            {key: 'price', title: 'Взнос', size: 6},
+            {key: 'price_show', title: 'Взнос', size: 6},
             {key: 'comment', title: 'Прим.', size: 30, active: false}
         ],
         active: function (key, val) {
@@ -120,16 +120,20 @@
 
         var getInfoBlock = function (rows) {
             var price = 0;
+            var paid = 0;
             var rentedSportidentCards = 0;
             rows.forEach(function (row) {
-                price += row.price;
+                price += +row.price;
                 if (row.person.is_rented_card) {
                     rentedSportidentCards++;
+                }
+                if (row.person.is_paid) {
+                    paid += +row.price;
                 }
             });
             var infoBlock = document.createElement('div');
             if (price) {
-                infoBlock.appendChild(document.createTextNode('Стартовый взнос: ' + price));
+                infoBlock.appendChild(document.createTextNode('Стартовый взнос: ' + price + (paid ? ' - ' + paid + ' = ' + (price - paid) : '')));
                 infoBlock.appendChild(document.createElement('br'));
             }
             if (rentedSportidentCards) {
@@ -203,9 +207,9 @@
         },
         {
             title: 'Стартовый взнос',
-            value: Fields.isActive('price'),
+            value: Fields.isActive('price_show'),
             change: function (checked) {
-                Fields.active('price', checked);
+                Fields.active('price_show', checked);
                 render()
             }
         },
