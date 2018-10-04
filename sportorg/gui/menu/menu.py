@@ -347,7 +347,11 @@ def menu_list():
                 {
                     'title': _('Telegram'),
                     'action': 'TelegramSettingsAction'
-                }
+                },
+                {
+                    'title': _('Rent cards'),
+                    'action': 'RentCardsAction'
+                },
             ]
         },
         {

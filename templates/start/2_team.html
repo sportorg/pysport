@@ -7,6 +7,7 @@
 {% raw %}
 <script>
     var race = {% endraw %}{{race|tojson}}{% raw %};
+    var rent_cards = {% endraw %}{{rent_cards|tojson}}{% raw %};
     var selected = {% endraw %}{{selected|tojson}}{% raw %};
     racePreparation(race);
 
@@ -18,6 +19,7 @@
                 if (!selected.persons.length || selected.persons.some(function (elem) {
                             return elem.id === person.id;
                         })) {
+                    person.is_rented_card = person.is_rented_card || rent_cards.indexOf(person.card_number) !== -1;
                     results.push({
                         name: person.surname + ' ' + person.name + (person.is_out_of_competition ? ' *' : ''),
                         group: (person.group && person.group.name) || '',

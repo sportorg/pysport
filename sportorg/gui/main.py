@@ -9,7 +9,7 @@ from sportorg.core.singleton import Singleton
 from sportorg.core.scripts import SCRIPTS, Script
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.main_window import MainWindow
-from sportorg.models.constant import StatusComments, PersonNames, Regions, RankingTable
+from sportorg.models.constant import StatusComments, PersonNames, Regions, RankingTable, RentCards
 
 
 class Application(metaclass=Singleton):
@@ -29,6 +29,7 @@ class Application(metaclass=Singleton):
         self.set_regions()
         self.set_ranking()
         self.set_scripts()
+        self.set_rent_cards()
         self.main_window.show_window()
         sys.exit(self.app.exec())
 
@@ -65,6 +66,17 @@ class Application(metaclass=Singleton):
             with open(config.RANKING_SCORE_FILE, encoding='utf-8') as f:
                 content = f.readlines()
             RankingTable().set([x.strip().split(';') for x in content])
+        except Exception as e:
+            print(str(e))
+
+    @staticmethod
+    def set_rent_cards():
+        try:
+            with open(config.data_dir('rent_cards.txt'), encoding='utf-8') as f:
+                content = f.read()
+            RentCards().set_from_text(content)
+        except FileNotFoundError:
+            pass
         except Exception as e:
             print(str(e))
 
