@@ -11,6 +11,7 @@ from sportorg.gui.dialogs.file_dialog import get_open_file_name, get_save_file_n
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
+from sportorg.models.constant import RentCards
 from sportorg.models.memory import race, races, get_current_race_index
 
 _settings = {
@@ -124,6 +125,7 @@ class StartReportDialog(QDialog):
             template_path,
             race=races_dict[get_current_race_index()],
             races=races_dict,
+            rent_cards=list(RentCards().get()),
             current_race=get_current_race_index(),
             selected=selected_items
         )

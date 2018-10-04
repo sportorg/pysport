@@ -18,6 +18,7 @@ from sportorg.gui.dialogs.not_start_dialog import NotStartDialog
 from sportorg.gui.dialogs.number_change import NumberChangeDialog
 from sportorg.gui.dialogs.print_properties import PrintPropertiesDialog
 from sportorg.gui.dialogs.relay_number_dialog import RelayNumberDialog
+from sportorg.gui.dialogs.rent_cards_dialog import RentCardsDialog
 from sportorg.gui.dialogs.report_dialog import ReportDialog
 from sportorg.gui.dialogs.search_dialog import SearchDialog
 from sportorg.gui.dialogs.settings import SettingsDialog
@@ -535,3 +536,8 @@ class ImportSportOrgAction(Action):
                 attr = get_races_from_file(f)
             SportOrgImportDialog(*attr).exec()
             self.app.refresh()
+
+
+class RentCardsAction(Action):
+    def execute(self):
+        RentCardsDialog().exec()

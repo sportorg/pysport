@@ -287,6 +287,36 @@ class StatusComments(object):
 
 
 @singleton
+class RentCards(object):
+    CARDS = set()
+
+    def exists(self, item):
+        return item in self.CARDS
+
+    def append(self, *items):
+        for item in items:
+            self.CARDS.add(item)
+
+    def set(self, items):
+        self.CARDS = set(items)
+
+    def get(self):
+        return self.CARDS
+
+    def set_from_text(self, text, separator='\n'):
+        self.CARDS = set()
+        for item in text.split(separator):
+            if not len(item):
+                continue
+            for n_item in item.split():
+                if n_item.isdigit():
+                    self.append(int(n_item))
+
+    def to_text(self, separator='\n'):
+        return separator.join([str(x) for x in self.CARDS])
+
+
+@singleton
 class RankingTable(object):
     """
     Ranking is read from configuration file called 'ranking_score.txt'

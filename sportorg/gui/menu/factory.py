@@ -63,7 +63,8 @@ class Factory:
             CheckUpdatesAction(),
             AssignResultByBibAction(),
             AssignResultByCardNumberAction(),
-            ImportSportOrgAction()
+            ImportSportOrgAction(),
+            RentCardsAction(),
         ]
         self._map = {}
         for action in self.actions:

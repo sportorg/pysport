@@ -6,6 +6,7 @@ from PyQt5.QtCore import QVariant, QAbstractTableModel, Qt
 from typing import List
 
 from sportorg.language import _
+from sportorg.models.constant import RentCards
 from sportorg.models.memory import race, Result, Group, Course, Organization
 from sportorg.utils.time import time_to_hhmmss
 
@@ -229,6 +230,8 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
         ret = []
         person = obj
 
+        is_rented_card = person.is_rented_card or RentCards().exists(person.card_number)
+
         ret.append(person.surname)
         ret.append(person.name)
         ret.append(person.sex.get_title())
@@ -252,7 +255,7 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
             ret.append('')
         ret.append(person.start_group)
         ret.append(person.card_number)
-        ret.append(_('Rented card') if person.is_rented_card else _('Rented stub'))
+        ret.append(_('Rented card') if is_rented_card else _('Rented stub'))
         ret.append(person.comment)
         ret.append(str(person.world_code) if person.world_code else '')
         ret.append(str(person.national_code) if person.national_code else '')
@@ -296,6 +299,7 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
         i = result
         assert (isinstance(i, Result))
         person = i.person
+
         group = ''
         team = ''
         first_name = ''
@@ -303,6 +307,7 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
         bib = result.get_bib()
         rented_card = ''
         if person:
+            is_rented_card = person.is_rented_card or RentCards().exists(i.card_number)
             first_name = person.name
             last_name = person.surname
 
@@ -312,7 +317,7 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
             if person.organization:
                 team = person.organization.name
 
-            rented_card = _('Rented card') if person.is_rented_card else _('Rented stub')
+            rented_card = _('Rented card') if is_rented_card else _('Rented stub')
 
         start = ''
         if i.get_start_time():
