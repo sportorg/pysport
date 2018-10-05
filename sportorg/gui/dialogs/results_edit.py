@@ -86,6 +86,7 @@ class ResultEditDialog(QDialog):
         self.radio_dns = QRadioButton(_('DNS'))
         self.radio_dnf = QRadioButton(_('DNF'))
         self.radio_overtime = QRadioButton(_('Overtime'))
+        self.radio_missing_punch = QRadioButton(_('Missing punch'))
         self.radio_dsq = QRadioButton(_('DSQ'))
         self.item_status_comment = AdvComboBox()
         self.item_status_comment.setMaximumWidth(250)
@@ -113,6 +114,7 @@ class ResultEditDialog(QDialog):
         self.layout.addRow(self.radio_dns)
         self.layout.addRow(self.radio_dnf)
         self.layout.addRow(self.radio_overtime)
+        self.layout.addRow(self.radio_missing_punch)
         self.layout.addRow(self.radio_dsq, self.item_status_comment)
 
         if self.current_object.is_punch():
@@ -194,6 +196,8 @@ class ResultEditDialog(QDialog):
             self.radio_ok.setChecked(True)
         elif self.current_object.status == ResultStatus.DISQUALIFIED:
             self.radio_dsq.setChecked(True)
+        elif self.current_object.status == ResultStatus.MISSING_PUNCH:
+            self.radio_missing_punch.setChecked(True)
         elif self.current_object.status == ResultStatus.OVERTIME:
             self.radio_overtime.setChecked(True)
         elif self.current_object.status == ResultStatus.DID_NOT_FINISH:
@@ -278,6 +282,8 @@ class ResultEditDialog(QDialog):
             status = ResultStatus.OK
         elif self.radio_dsq.isChecked():
             status = ResultStatus.DISQUALIFIED
+        elif self.radio_missing_punch.isChecked():
+            status = ResultStatus.MISSING_PUNCH
         elif self.radio_overtime.isChecked():
             status = ResultStatus.OVERTIME
         elif self.radio_dnf.isChecked():
