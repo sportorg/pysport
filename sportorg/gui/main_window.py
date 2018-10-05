@@ -487,6 +487,7 @@ class MainWindow(QMainWindow):
                 self.clear_filters(remove_condition=False)
                 File(file_name, logging.root, File.JSON).create()
                 self.apply_filters()
+                self.last_update = time.time()
                 self.file = file_name
                 self.add_recent_file(self.file)
                 self.set_title()
