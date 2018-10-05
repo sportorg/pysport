@@ -1,4 +1,7 @@
 import configparser
+import logging
+import os
+
 from sportorg import config as sportorg_config
 
 from sportorg.core.singleton import Singleton
@@ -134,15 +137,21 @@ class Config(metaclass=Singleton):
     def read(self):
         self.parser.read(sportorg_config.CONFIG_INI)
 
-        for config_name in self._configurations.keys():
-            if self.parser.has_section(config_name):
-                for option in self.parser.options(config_name):
-                    self._configurations[config_name].set_parse(
-                        option,
-                        self.parser.get(config_name, option, fallback=self._configurations[config_name].get(option))
-                    )
+        try:
+            for config_name in self._configurations.keys():
+                if self.parser.has_section(config_name):
+                    for option in self.parser.options(config_name):
+                        self._configurations[config_name].set_parse(
+                            option,
+                            self.parser.get(config_name, option, fallback=self._configurations[config_name].get(option))
+                        )
 
-        self.configuration.set('current_locale', self.parser.get(ConfigFile.LOCALE, 'current', fallback='ru_RU'))
+            self.configuration.set('current_locale', self.parser.get(ConfigFile.LOCALE, 'current', fallback='ru_RU'))
+        except Exception as e:
+            logging.exception(e)
+            #remove incorrect config
+            if config_name:
+                os.remove(config_name)
 
     def save(self):
         for config_name in self._configurations.keys():

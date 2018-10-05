@@ -7,7 +7,12 @@ from sportorg import config
 
 def _get_conf_locale():
     conf = configparser.ConfigParser()
-    conf.read(config.CONFIG_INI)
+    try:
+        conf.read(config.CONFIG_INI)
+    except Exception as e:
+        logging.exception(e)
+        # remove incorrect config
+        os.remove(config.CONFIG_INI)
     return conf.get('locale', 'current', fallback='ru_RU')
 
 
