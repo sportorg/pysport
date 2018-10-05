@@ -160,6 +160,7 @@ class GroupSplits(object):
     def sort_by_result(self):
         status_priority = [
             ResultStatus.OVERTIME.value,
+            ResultStatus.MISSING_PUNCH.value,
             ResultStatus.DISQUALIFIED.value,
             ResultStatus.DID_NOT_FINISH.value,
             ResultStatus.DID_NOT_START.value,

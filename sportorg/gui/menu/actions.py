@@ -372,8 +372,7 @@ class ChangeStatusAction(Action):
             ResultStatus.OK: ResultStatus.DISQUALIFIED,
             ResultStatus.DISQUALIFIED: ResultStatus.DID_NOT_START,
             ResultStatus.DID_NOT_START: ResultStatus.DID_NOT_FINISH,
-            ResultStatus.DID_NOT_FINISH: ResultStatus.OVERTIME,
-            ResultStatus.OVERTIME: ResultStatus.OK,
+            ResultStatus.DID_NOT_FINISH: ResultStatus.OK,
         }
 
         table = self.app.get_result_table()
@@ -387,7 +386,10 @@ class ChangeStatusAction(Action):
             mes.exec()
             return
         result = obj.results[index]
-        result.status = status_dict[result.status]
+        if result.status in status_dict:
+            result.status = status_dict[result.status]
+        else:
+            result.status = ResultStatus.OK
         Teamwork().send(result.to_dict())
         self.app.refresh()
 
