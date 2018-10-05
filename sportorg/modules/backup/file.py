@@ -1,3 +1,5 @@
+from boltons.fileutils import atomic_rename
+
 from . import binary
 from . import json
 
@@ -30,11 +32,13 @@ class File:
 
     def create(self):
         self._logger.info('Create ' + self._file_name)
-        self.backup(self._file_name, self._factory[self._format].dump, self._factory_mode[self._format])
+        self.backup(self._file_name + '.tmp', self._factory[self._format].dump, self._factory_mode[self._format])
+        atomic_rename(self._file_name + '.tmp', self._file_name, overwrite=True)
 
     def save(self):
         self._logger.info('Save ' + self._file_name)
-        self.backup(self._file_name, self._factory[self._format].dump, self._factory_mode[self._format])
+        self.backup(self._file_name + '.tmp', self._factory[self._format].dump, self._factory_mode[self._format])
+        atomic_rename(self._file_name + '.tmp', self._file_name, overwrite=True)
 
     def open(self):
         self._logger.info('Open ' + self._file_name)

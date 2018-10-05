@@ -56,6 +56,7 @@ class SIReaderThread(QThread):
                 si.ack_sicard()
             except sireader.SIReaderException as e:
                 self._logger.error(str(e))
+                return
             except sireader.SIReaderCardChanged as e:
                 self._logger.error(str(e))
             except serial.serialutil.SerialException as e:

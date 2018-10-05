@@ -498,8 +498,6 @@ class MainWindow(QMainWindow):
 
     def save_file_as(self):
         self.create_file(update_data=False)
-        if self.file is not None:
-            self.save_file()
 
     def save_file(self):
         if self.file is not None:
