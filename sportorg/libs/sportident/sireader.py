@@ -1168,6 +1168,10 @@ class SIReaderReadout(SIReader):
                     self.sicard = 2
 
                 raise SIReaderCardChanged("SI-Card inserted during command.")
+            else:
+                self.sicard = None
+                self.cardtype = None
+                raise SIReaderCardChanged("SI-Card removed during command.")
 
         return (cmd, data)
 

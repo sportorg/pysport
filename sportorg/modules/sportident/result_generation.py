@@ -82,7 +82,7 @@ class ResultSportidentGeneration:
 
             self._add_result_to_race()
 
-            logging.info('{} {}'.format(self._result.system_type, self._result))
+            logging.info('{} {}'.format(self._result.system_type, self._result.card_number))
         else:
             if self._find_person_by_result():
                 self._result.person = self._person
