@@ -104,7 +104,8 @@ class ResultThread(QThread):
                 split.code = str(card_data['punches'][i][0])
                 split.time = time_to_otime(t)
                 split.days = memory.race().get_days(t)
-                result.splits.append(split)
+                if split.code != '0' and split.code != '':
+                    result.splits.append(split)
 
         if card_data['start']:
             result.start_time = time_to_otime(card_data['start'])
