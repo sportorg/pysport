@@ -1,5 +1,9 @@
 # Changelog
 
+# 2018-10-08 v1.3.0
+
++ pass
+
 # 2018-06-13 v1.2.0
 
 + New JavaScript-based templates
