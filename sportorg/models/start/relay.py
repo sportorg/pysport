@@ -1,3 +1,4 @@
+from sportorg.core.otime import OTime
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.models.memory import race, Person, find
 
@@ -60,4 +61,6 @@ def get_team_result(person):
     relay_team = find(race().relay_teams, bib_number=bib)
     if relay_team:
         if relay_team.get_lap_finished() == get_leg_count():
-            return relay_team.get_time()
+            if relay_team.get_is_status_ok():
+                return relay_team.get_time()
+    return OTime(0)

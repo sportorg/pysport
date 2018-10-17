@@ -1,5 +1,6 @@
 import logging
 
+from sportorg.core.otime import OTime
 from sportorg.models.memory import Result, Organization, RaceType
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.start.relay import get_team_result
@@ -18,6 +19,10 @@ class ScoreCalculation(object):
     def calculate_scores_result(self, result):
         if isinstance(result, Result):
             place = result.place
+            if result.person \
+                    and self.race.get_type(result.person.group) == RaceType.RELAY \
+                    and get_team_result(result.person) == OTime(0):
+                place = 0
             if place > 0:
                 place = int(place)
                 scores_type = self.race.get_setting('scores_mode', 'off')
@@ -31,8 +36,15 @@ class ScoreCalculation(object):
                     else:
                         result.scores = 0
                 elif scores_type == 'formula':
-                    time_value = result.get_result_otime().to_msec()
-                    leader_time_value = self.get_leader_time(result).to_msec()
+                    if self.race.get_type(result.person.group) == RaceType.RELAY:
+                        time_value = get_team_result(result.person).to_msec()
+                    else:
+                        time_value = result.get_result_otime().to_msec()
+                    leader_time = self.get_leader_time(result)
+                    if leader_time:
+                        leader_time_value = leader_time.to_msec()
+                    else:
+                        leader_time_value = 1000
 
                     time_phrase = 'time'
                     leader_time_phrase = 'leader'
@@ -54,12 +66,15 @@ class ScoreCalculation(object):
                 best_time = None
                 for cur_result in results:
                     assert isinstance(cur_result, Result)
+                    if not cur_result.is_status_ok():
+                        continue
                     if self.race.get_type(group) == RaceType.RELAY:
-                        cur_time = get_team_result(result.person)
+                        cur_time = get_team_result(cur_result.person)
                     else:
                         cur_time = cur_result.get_result_otime()
                     if not best_time or cur_time < best_time:
-                        best_time = cur_time
+                        if cur_time > OTime(0):
+                            best_time = cur_time
                 return best_time
         return None
 
