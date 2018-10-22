@@ -1,4 +1,4 @@
-[![Build Status](https://api.travis-ci.org/sportorg/pysport.svg?branch=dev)](https://api.travis-ci.org/sportorg/pysport)
+[![Build Status](https://api.travis-ci.org/sportorg/pysport.svg?branch=dev)](https://travis-ci.org/sportorg/pysport)
 
 # SportOrg
 
