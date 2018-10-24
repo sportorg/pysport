@@ -612,4 +612,4 @@ class ResultList(BaseElement):
         for class_result in self.class_result:
             childs.append(class_result)
 
-        return self.get_elem('StartList', attr=self.iof.to_attr(), childs=childs)
+        return self.get_elem('ResultList', attr=self.iof.to_attr(), childs=childs)

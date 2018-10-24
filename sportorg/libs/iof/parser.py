@@ -1,12 +1,54 @@
 import xml.etree.ElementTree as ET
 
 
+class IOFParseResult(object):
+    def __init__(self, name, data):
+        self.name = name
+        self.data = data
+
+
 def parse(file):
     ns = {
         'iof': 'http://www.orienteering.org/datastandard/3.0',
         'orgeo': 'http://orgeo.ru/iof-xml-extensions/3.0',
     }
     tree = ET.parse(file)
+
+    results = [
+        IOFParseResult('EntryList', entry_list(tree, ns)),
+        IOFParseResult('CourseData', course_data(tree, ns)),
+    ]
+
+    return [result for result in results if result.data is not None]
+
+
+def course_data(tree, ns):
+    root = tree.getroot()
+    if 'CourseData' not in root.tag:
+        return
+    courses = []
+    for course_el in root.find('iof:RaceCourseData', ns).findall('iof:Course', ns):
+        course = {
+            'name': course_el.find('iof:Name', ns).text,
+            'length': int(course_el.find('iof:Length', ns).text),
+            'climb': int(course_el.find('iof:Climb', ns).text),
+            'controls': []
+        }
+
+        for course_control_el in course_el.findall('iof:CourseControl', ns):
+            leg_length = 0
+            if course_control_el.find('iof:LegLength', ns) is not None:
+                leg_length = int(course_control_el.find('iof:LegLength', ns).text)
+            course['controls'].append({
+                'type': course_control_el.attrib['type'],  # Start, Control, Finish
+                'control': course_control_el.find('iof:Control', ns).text,
+                'leg_length': leg_length,
+            })
+        courses.append(course)
+    return courses
+
+
+def entry_list(tree, ns):
     root = tree.getroot()
     if 'EntryList' not in root.tag:
         return

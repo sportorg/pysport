@@ -5,9 +5,11 @@ import dateutil.parser
 
 from sportorg import config
 from sportorg.language import _
+
 from sportorg.libs.iof.iof import ResultList
 from sportorg.libs.iof.parser import parse
-from sportorg.models.memory import race, Group, find, Organization, Person, Qualification
+
+from sportorg.models.memory import race, Group, find, Organization, Person, Qualification, create, Course, CourseControl
 
 
 def export_result_list(file):
@@ -23,11 +25,44 @@ def export_result_list(file):
     result_list.write(open(file, 'wb'), xml_declaration=True, encoding='UTF-8')
 
 
-def import_entry_list(file):
-    entries = parse(file)
-    if not entries:
+def import_from_iof(file):
+    results = parse(file)
+    if not len(results):
         return
 
+    for result in results:
+        if result.name == 'EntryList':
+            import_from_entry_list(result.data)
+        elif result.name == 'CourseData':
+            import_from_course_data(result.data)
+
+
+def import_from_course_data(courses):
+    obj = race()
+    for course in courses:
+        if find(obj.courses, name=course['name']) is None:
+            c = create(
+                Course,
+                name=course['name'],
+                length=course['length'],
+                climb=course['climb']
+            )
+            controls = []
+            i = 1
+            for control in course['controls']:
+                if control['type'] == 'Control':
+                    controls.append(create(
+                        CourseControl,
+                        code=control['control'],
+                        order=i,
+                        length=control['leg_length']
+                    ))
+                    i += 1
+            c.controls = controls
+            obj.courses.append(c)
+
+
+def import_from_entry_list(entries):
     obj = race()
     for person_entry in entries:
         name = person_entry['group']['name']
