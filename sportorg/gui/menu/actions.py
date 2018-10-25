@@ -162,7 +162,7 @@ class IOFEntryListImportAction(Action):
         file_name = get_open_file_name(_('Open IOF xml'), _('IOF xml (*.xml)'))
         if file_name is not '':
             try:
-                iof_xml.import_entry_list(file_name)
+                iof_xml.import_from_iof(file_name)
             except Exception as e:
                 logging.error(str(e))
                 QMessageBox.warning(self.app, _('Error'), _('Import error') + ': ' + file_name)
