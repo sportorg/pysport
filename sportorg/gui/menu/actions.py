@@ -372,7 +372,8 @@ class ChangeStatusAction(Action):
             ResultStatus.OK: ResultStatus.DISQUALIFIED,
             ResultStatus.DISQUALIFIED: ResultStatus.DID_NOT_START,
             ResultStatus.DID_NOT_START: ResultStatus.DID_NOT_FINISH,
-            ResultStatus.DID_NOT_FINISH: ResultStatus.OK,
+            ResultStatus.DID_NOT_FINISH: ResultStatus.RESTORED,
+            ResultStatus.RESTORED: ResultStatus.OK,
         }
 
         table = self.app.get_result_table()
