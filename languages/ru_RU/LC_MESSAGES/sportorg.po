@@ -1254,3 +1254,6 @@ msgstr "Отсечка"
 
 msgid "Rent cards"
 msgstr "Аренда чипов"
+
+msgid "Restored"
+msgstr "Восстановлен"

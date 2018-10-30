@@ -430,6 +430,7 @@
         }
         for (var _b = 0, _c = race.results; _b < _c.length; _b++) {
             var obj = _c[_b];
+            obj.status = obj.status === 16 ? 1 : obj.status;
             obj.person = getById(race.persons, obj.person_id);
         }
         for (var _d = 0, _e = race.groups; _d < _e.length; _d++) {

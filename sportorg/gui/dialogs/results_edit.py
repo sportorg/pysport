@@ -88,6 +88,7 @@ class ResultEditDialog(QDialog):
         self.radio_overtime = QRadioButton(_('Overtime'))
         self.radio_missing_punch = QRadioButton(_('Missing punch'))
         self.radio_dsq = QRadioButton(_('DSQ'))
+        self.radio_restored = QRadioButton(_('Restored'))
         self.item_status_comment = AdvComboBox()
         self.item_status_comment.setMaximumWidth(250)
         self.item_status_comment.view().setMinimumWidth(650)
@@ -115,6 +116,7 @@ class ResultEditDialog(QDialog):
         self.layout.addRow(self.radio_dnf)
         self.layout.addRow(self.radio_overtime)
         self.layout.addRow(self.radio_missing_punch)
+        self.layout.addRow(self.radio_restored)
         self.layout.addRow(self.radio_dsq, self.item_status_comment)
 
         if self.current_object.is_punch():
@@ -192,7 +194,7 @@ class ResultEditDialog(QDialog):
 
         self.item_days.setValue(self.current_object.days)
 
-        if self.current_object.is_status_ok():
+        if self.current_object.status == ResultStatus.OK:
             self.radio_ok.setChecked(True)
         elif self.current_object.status == ResultStatus.DISQUALIFIED:
             self.radio_dsq.setChecked(True)
@@ -204,6 +206,8 @@ class ResultEditDialog(QDialog):
             self.radio_dnf.setChecked(True)
         elif self.current_object.status == ResultStatus.DID_NOT_START:
             self.radio_dns.setChecked(True)
+        elif self.current_object.status == ResultStatus.RESTORED:
+            self.radio_restored.setChecked(True)
 
         self.item_status_comment.setCurrentText(self.current_object.status_comment)
 
@@ -290,6 +294,8 @@ class ResultEditDialog(QDialog):
             status = ResultStatus.DID_NOT_FINISH
         elif self.radio_dns.isChecked():
             status = ResultStatus.DID_NOT_START
+        elif self.radio_restored.isChecked():
+            status = ResultStatus.RESTORED
         if result.status != status:
             result.status = status
 

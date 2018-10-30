@@ -3,7 +3,7 @@
 RESULT_STATUS = ['NONE', 'OK', 'FINISHED', 'DISQUALIFIED', 'MISSING_PUNCH',
                  'DID_NOT_FINISH', 'ACTIVE', 'INACTIVE', 'OVERTIME', 'SPORTING_WITHDRAWAL',
                  'NOT_COMPETING', 'MOVED', 'MOVED_UP', 'DID_NOT_START', 'DID_NOT_ENTER',
-                 'CANCELLED']
+                 'CANCELLED']  # 'RESTORED' is 'OK'
 
 
 class Orgeo:

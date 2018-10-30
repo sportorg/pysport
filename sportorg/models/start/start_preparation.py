@@ -418,7 +418,7 @@ def handicap_start_time():
             cur_time = result.get_result_otime()
             gap = cur_time - leader_time
 
-            if gap < handicap_max_gap and result.status == ResultStatus.OK:
+            if gap < handicap_max_gap and result.is_status_ok():
                 start_time = handicap_start + gap
             else:
                 start_time = current_second_group_time
@@ -450,7 +450,7 @@ def reverse_start_time():
 
         for result in results:
             assert isinstance(result, Result)
-            if result.status == ResultStatus.OK and result.person:
+            if result.is_status_ok() and result.person:
                 second_group.append(result.person)
 
         # reverse main group, leader should be last

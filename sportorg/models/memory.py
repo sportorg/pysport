@@ -103,6 +103,7 @@ class ResultStatus(_TitleType):
     DID_NOT_START = PrintableValue(13, _('DNS'))
     DID_NOT_ENTER = PrintableValue(14, _('Did not enter'))
     CANCELLED = PrintableValue(15, _('Cancelled'))
+    RESTORED = PrintableValue(16, _('Restored'))
 
 
 class Country(Model):
@@ -738,7 +739,7 @@ class Result:
         return True
 
     def is_status_ok(self):
-        return self.status == ResultStatus.OK
+        return self.status == ResultStatus.OK or self.status == ResultStatus.RESTORED
 
     def is_punch(self):
         return self.is_sportident() or self.is_sfr() or self.is_sportiduino()
