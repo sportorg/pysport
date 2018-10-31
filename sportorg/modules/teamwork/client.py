@@ -21,7 +21,7 @@ class ClientSenderThread(Thread):
             try:
                 cmd = self._in_queue.get(timeout=5)
                 data = json.dumps(cmd.data)
-                self.conn.sendall(b'0' + data.encode() + b'1')
+                self.conn.sendall(data.encode())
             except queue.Empty:
                 if not main_thread().is_alive() or self._stop_event.is_set():
                     break
@@ -56,11 +56,20 @@ class ClientReceiverThread(Thread):
                     break
                 full_data += data
                 while True:
-                    offset = full_data.find(b'}1')
+                    offset = 0
+                    while True:
+                        try:
+                            json.loads(full_data[:offset].decode())
+                            break
+                        except ValueError:
+                            if offset >= len(full_data):
+                                offset = -1
+                                break
+                            offset += 1
                     if offset != -1:
-                        command = Command(json.loads(full_data[1:offset+1].decode()))
+                        command = Command(json.loads(full_data[:offset].decode()))
                         self._out_queue.put(command)  # for local
-                        full_data = full_data[offset+2:]
+                        full_data = full_data[offset:]
                     else:
                         break
             except socket.timeout:
