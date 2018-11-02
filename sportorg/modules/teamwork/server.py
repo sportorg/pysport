@@ -51,13 +51,22 @@ class ServerReceiverThread(Thread):
                         break
                     full_data += data
                     while True:
-                        offset = full_data.find(b'}1')
+                        offset = 0
+                        while True:
+                            try:
+                                json.loads(full_data[:offset].decode())
+                                break
+                            except ValueError:
+                                if offset >= len(full_data):
+                                    offset = -1
+                                    break
+                                offset += 1
                         if offset != -1:
-                            command = Command(json.loads(full_data[1:offset+1].decode()), self.connect.addr)
+                            command = Command(json.loads(full_data[:offset].decode()), self.connect.addr)
                             command.exclude(self.connect.addr)
                             self._out_queue.put(command)  # for local
                             self._in_queue.put(command)  # for child
-                            full_data = full_data[offset+2:]
+                            full_data = full_data[offset:]
                         else:
                             break
                 except socket.timeout:
@@ -93,7 +102,7 @@ class ServerSenderThread(Thread):
                     try:
                         if connect.addr not in command.addr_exclude and connect.is_alive():
                             data = json.dumps(command.data)
-                            connect.conn.sendall(b'0' + data.encode() + b'1')
+                            connect.conn.sendall(data.encode())
                     except ConnectionResetError as e:
                         self._logger.error(str(e))
                         connect.died()
@@ -158,33 +167,3 @@ class ServerThread(Thread):
             for srt in connections:
                 srt.join()
             self._logger.info('Server shutdown')
-
-
-if __name__ == '__main__':
-    class Logger:
-        @staticmethod
-        def print(text):
-            print(text)
-
-        def debug(self, text):
-            self.print(text)
-
-        def info(self, text):
-            self.print(text)
-
-        def error(self, text):
-            self.print(text)
-
-
-    in_q = Queue()
-    out_q = Queue()
-    stop_e = Event()
-    server = ServerThread(('', 50010), in_q, out_q, stop_e, Logger())
-    server.start()
-
-    while True:
-        try:
-            cmd = out_q.get(timeout=5)
-            print(cmd.data, cmd.addr)
-        except Empty:
-            pass
