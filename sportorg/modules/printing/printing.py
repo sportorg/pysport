@@ -2,11 +2,10 @@ import sys
 import logging
 from multiprocessing import Process
 
-from PyQt5.QtCore import QSizeF
-from PyQt5.QtGui import QTextDocument
-from PyQt5.QtPrintSupport import QPrinter
-from PyQt5.QtWebEngineWidgets import QWebEnginePage
-from PyQt5.QtWidgets import QApplication
+from PySide2.QtCore import QSizeF
+from PySide2.QtGui import QTextDocument
+from PySide2.QtPrintSupport import QPrinter
+from PySide2.QtWidgets import QApplication
 
 from sportorg.core.fake_std import FakeStd
 
@@ -64,27 +63,3 @@ def print_html(printer_name, html, left=5.0, top=5.0, right=5.0, bottom=5.0):
     thread = PrintProcess(printer_name, html, left, top, right, bottom)
     thread.start()
     logging.info('printing poccess started')
-
-
-def print_html_webengine(printer_name, html):
-    printer = QPrinter()
-    if printer_name:
-        printer.setPrinterName(printer_name)
-
-    # printer.setOutputFormat(QPrinter.PdfFormat)
-    # printer.setResolution(printer.HighResolution)
-    printer.setResolution(200)
-
-    text_document = QWebEnginePage()
-
-    def callback(is_ok):
-        if is_ok:
-            print('printing finished')
-        else:
-            print('printing error')
-
-    def print_exec():
-        text_document.print(printer, callback)
-
-    text_document.loadFinished.connect(print_exec)
-    text_document.setHtml(html)

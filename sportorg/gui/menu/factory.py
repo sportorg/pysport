@@ -1,7 +1,7 @@
 from sportorg.gui.menu.actions import *
 
 
-class Factory:
+class Factory(object):
     def __init__(self, app):
         self.actions = [
             NewAction(),

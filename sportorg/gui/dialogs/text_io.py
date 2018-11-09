@@ -1,7 +1,7 @@
 import logging
 
-from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtWidgets import QDialog, QDialogButtonBox, QVBoxLayout, QWidget
+from PySide2 import QtCore, QtWidgets
+from PySide2.QtWidgets import QDialog, QDialogButtonBox, QVBoxLayout, QWidget
 
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import _
@@ -143,7 +143,7 @@ class TextExchangeDialog(QDialog):
         except Exception as e:
             logging.error(e)
 
-    def accept(self):
+    def accept(self, *args, **kwargs):
         try:
             index_type = 'bib'
             if self.name_radio_button.isChecked():
@@ -185,7 +185,7 @@ class TextExchangeDialog(QDialog):
         except Exception as e:
             logging.error(e)
 
-        self.close()
+        super().accept(*args, **kwargs)
 
 
 def get_text(key, value, separator):
@@ -304,15 +304,15 @@ def set_property(person, key, value):
         race().person_card_number(person, int(value))
     elif key == _('Group'):
         group = race().find_group(value)
-        if(group):
+        if group:
             person.group = group
     elif key == _('Team'):
         team = race().find_team(value)
-        if (team):
+        if team:
             person.organization = team
     elif key == _('Qualification'):
         qual = Qualification.get_qual_by_name(value)
-        if (qual):
+        if qual:
             person.qual = qual
     elif key == _('Bib'):
         if value.isdigit():

@@ -149,7 +149,7 @@ class Config(metaclass=Singleton):
             self.configuration.set('current_locale', self.parser.get(ConfigFile.LOCALE, 'current', fallback='ru_RU'))
         except Exception as e:
             logging.exception(e)
-            #remove incorrect config
+            # remove incorrect config
             if config_name:
                 os.remove(config_name)
 

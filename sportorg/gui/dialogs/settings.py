@@ -1,7 +1,7 @@
 import logging
 
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QFormLayout, QDialog, QCheckBox, QDialogButtonBox, QLabel, QTabWidget, QWidget, QPushButton, \
+from PySide2.QtGui import QIcon
+from PySide2.QtWidgets import QFormLayout, QDialog, QCheckBox, QDialogButtonBox, QLabel, QTabWidget, QWidget, QPushButton, \
     QSpinBox
 
 from sportorg import config
@@ -177,9 +177,9 @@ class SettingsDialog(QDialog):
             (MultidayTab(self), _('Multi day')),
         ]
 
-    def exec(self):
+    def exec_(self):
         self.init_ui()
-        return super().exec()
+        return super().exec_()
 
     def init_ui(self):
         self.setWindowTitle(_('Settings'))

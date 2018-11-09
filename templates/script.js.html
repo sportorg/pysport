@@ -2,13 +2,13 @@
 <style>
     /* SETTINGS */
     .sportorg-settings {
-        position: absolute;
+        position: fixed;
         border: 1px solid #dddddd;
         border-radius: 5px;
-        min-width: 350px;
         background: white;
         top: 3px;
         right: 3px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.5);
     }
 
     .sportorg-settings-row {
@@ -314,6 +314,7 @@
 
         SettingsGenerator.prototype.show = function () {
             var block = Block();
+            this.el = block;
             for (var _i = 0, _a = this.settings; _i < _a.length; _i++) {
                 var setting = _a[_i];
                 var row = Row();
@@ -374,8 +375,15 @@
                 var el = els_[_i];
                 if (this.isShow) {
                     el.style.display = 'none';
-                } else {
+                    if (this.el) {
+                        this.el.style.opacity = '.3';
+                    }
+                }
+                else {
                     el.style.display = 'block';
+                    if (this.el) {
+                        this.el.style.opacity = '1';
+                    }
                 }
             }
             this.isShow = !this.isShow;

@@ -1,7 +1,7 @@
 import logging
 
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QDialog, QPushButton, QFormLayout, QRadioButton, QCheckBox, QSpinBox, QLineEdit, QLabel, \
+from PySide2.QtGui import QIcon
+from PySide2.QtWidgets import QDialog, QPushButton, QFormLayout, QRadioButton, QCheckBox, QSpinBox, QLineEdit, QLabel, \
     QDialogButtonBox
 
 from sportorg import config
@@ -14,9 +14,9 @@ class ScoresDialog(QDialog):
     def __init__(self):
         super().__init__(GlobalAccess().get_main_window())
 
-    def exec(self):
+    def exec_(self):
         self.init_ui()
-        return super().exec()
+        return super().exec_()
 
     def init_ui(self):
         self.setWindowTitle(_('Scores assign'))

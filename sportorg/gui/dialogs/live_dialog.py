@@ -1,8 +1,8 @@
 import logging
 import re
 
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QFormLayout, QLabel, QDialog, QDialogButtonBox, QLineEdit, QCheckBox
+from PySide2.QtGui import QIcon
+from PySide2.QtWidgets import QFormLayout, QLabel, QDialog, QDialogButtonBox, QLineEdit, QCheckBox
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
@@ -21,10 +21,10 @@ class LiveDialog(QDialog):
             r'(?::\d+)?'  # optional port
             r'(?:/?|[/?]\S+)$', re.IGNORECASE)
 
-    def exec(self):
+    def exec_(self):
         self.init_ui()
         self.set_values()
-        return super().exec()
+        return super().exec_()
 
     def init_ui(self):
         self.setWindowTitle(_('Live'))

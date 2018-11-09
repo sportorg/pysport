@@ -5,6 +5,7 @@
 ```commandline
 pip install -r requirements.txt
 git submodule init
+git submodule update
 ```
 
 Run
@@ -16,7 +17,6 @@ python SportOrg.pyw
 ![Mainwindow sportorg](img/mainwindow.png)
 
 ![Dialogedit sportorg](img/dialogedit.png)
-![Result sportorg](img/result.png)
 ![Bibprintout sportorg](img/bibprintout.png)
 
 

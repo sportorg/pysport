@@ -2,7 +2,7 @@ import logging
 
 from sportorg.models.memory import Course, Group, Qualification, ResultStatus
 from sportorg.models.result.result_calculation import ResultCalculation
-from sportorg.utils.time import get_speed_min_per_km
+from sportorg.utils.time import get_speed_min_per_km, timeit
 
 
 class PersonSplits(object):
@@ -223,6 +223,7 @@ class RaceSplits(object):
     def __init__(self, r):
         self.race = r
 
+    @timeit
     def generate(self):
         logging.debug('Race splits generate')
         for group in self.race.groups:

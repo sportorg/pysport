@@ -1,8 +1,8 @@
 import logging
 
-from PyQt5 import QtCore
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QDialog, QTableView, QDialogButtonBox, QVBoxLayout, QLineEdit, QMessageBox
+from PySide2 import QtCore
+from PySide2.QtGui import QIcon
+from PySide2.QtWidgets import QDialog, QTableView, QDialogButtonBox, QVBoxLayout, QLineEdit, QMessageBox
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
@@ -17,9 +17,9 @@ class SearchDialog(QDialog):
             assert (isinstance(table, QTableView))
             self.table = table
 
-    def exec(self):
+    def exec_(self):
         self.init_ui()
-        return super().exec()
+        return super().exec_()
 
     def init_ui(self):
         self.setWindowModality(QtCore.Qt.WindowModal)
@@ -36,9 +36,9 @@ class SearchDialog(QDialog):
 
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         self.button_ok = button_box.button(QDialogButtonBox.Ok)
-        self.button_ok.clicked.connect(self.accept)
+        self.button_ok.clicked.connect(self.ok)
         self.button_cancel = button_box.button(QDialogButtonBox.Cancel)
-        self.button_cancel.clicked.connect(self.reject)
+        self.button_cancel.clicked.connect(self.cancel)
 
         self.layout.addWidget(self.item_serach)
         self.layout.addWidget(button_box)
@@ -47,7 +47,7 @@ class SearchDialog(QDialog):
 
         self.show()
 
-    def accept(self):
+    def ok(self):
         try:
             if self.table is not None:
                 proxy_model = self.table.model()
@@ -63,10 +63,10 @@ class SearchDialog(QDialog):
         except Exception as e:
             logging.error(str(e))
 
-    def reject(self):
-        self.destroy()
+    def cancel(self):
+        self.close()
 
     def retranslate_ui(self):
-        self.setWindowTitle(_("Search"))
+        self.setWindowTitle(_('Search'))
         self.button_ok.setText(_('OK'))
         self.button_cancel.setText(_('Cancel'))

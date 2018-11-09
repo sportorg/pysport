@@ -1,9 +1,9 @@
 import logging
 
-from PyQt5 import QtPrintSupport
-from PyQt5.QtGui import QIcon
-from PyQt5.QtPrintSupport import QPrinter, QPrintDialog, QAbstractPrintDialog
-from PyQt5.QtWidgets import QFormLayout, QLabel, QDialog, QPushButton, QCheckBox, QDialogButtonBox, QGroupBox, \
+from PySide2 import QtPrintSupport
+from PySide2.QtGui import QIcon
+from PySide2.QtPrintSupport import QPrinter, QPrintDialog, QAbstractPrintDialog
+from PySide2.QtWidgets import QFormLayout, QLabel, QDialog, QPushButton, QCheckBox, QDialogButtonBox, QGroupBox, \
     QDoubleSpinBox
 
 from sportorg import config
@@ -20,9 +20,9 @@ class PrintPropertiesDialog(QDialog):
     def __init__(self):
         super().__init__(GlobalAccess().get_main_window())
 
-    def exec(self):
+    def exec_(self):
         self.init_ui()
-        return super().exec()
+        return super().exec_()
 
     def init_ui(self):
         self.setWindowTitle(_('Printer settings'))
@@ -147,7 +147,7 @@ class PrintPropertiesDialog(QDialog):
             printer = QtPrintSupport.QPrinter()
             pd = QPrintDialog(printer)
             pd.setOption(QAbstractPrintDialog.PrintSelection)
-            pd.exec()
+            pd.exec_()
             return printer.printerName()
         except Exception as e:
             logging.error(str(e))

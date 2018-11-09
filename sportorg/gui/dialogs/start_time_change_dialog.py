@@ -1,7 +1,7 @@
 import logging
 
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QFormLayout, QDialog, QDialogButtonBox, QRadioButton, QTimeEdit
+from PySide2.QtGui import QIcon
+from PySide2.QtWidgets import QFormLayout, QDialog, QDialogButtonBox, QRadioButton, QTimeEdit
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
@@ -15,9 +15,9 @@ class StartTimeChangeDialog(QDialog):
         super().__init__(GlobalAccess().get_main_window())
         self.time_format = 'hh:mm:ss'
 
-    def exec(self):
+    def exec_(self):
         self.init_ui()
-        return super().exec()
+        return super().exec_()
 
     def init_ui(self):
         self.setWindowTitle(_('Start time change'))
@@ -60,4 +60,3 @@ class StartTimeChangeDialog(QDialog):
 
     def apply_changes_impl(self):
         change_start_time(self.time_add.isChecked(), time_to_otime(self.time_value.time()))
-        GlobalAccess().get_main_window().refresh()

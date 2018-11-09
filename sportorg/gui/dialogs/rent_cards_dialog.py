@@ -1,7 +1,7 @@
 import logging
 
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QFormLayout, QLabel, QDialog, QDialogButtonBox, QTextEdit
+from PySide2.QtGui import QIcon
+from PySide2.QtWidgets import QFormLayout, QLabel, QDialog, QDialogButtonBox, QTextEdit
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
@@ -13,9 +13,9 @@ class RentCardsDialog(QDialog):
     def __init__(self):
         super().__init__(GlobalAccess().get_main_window())
 
-    def exec(self):
+    def exec_(self):
         self.init_ui()
-        return super().exec()
+        return super().exec_()
 
     def init_ui(self):
         self.setWindowTitle(_('Rent cards'))
@@ -55,6 +55,5 @@ class RentCardsDialog(QDialog):
     def apply_changes_impl(self):
         text = self.item_cards.toPlainText()
         RentCards().set_from_text(text)
-        GlobalAccess().get_main_window().refresh()
         with open(config.data_dir('rent_cards.txt'), 'w', encoding='utf-8') as f:
             f.write(RentCards().to_text())

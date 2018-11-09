@@ -1,8 +1,8 @@
 import logging
 from datetime import date
 
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit, QSpinBox, QTimeEdit, QTextEdit, QCheckBox, QDialog, \
+from PySide2.QtGui import QIcon
+from PySide2.QtWidgets import QFormLayout, QLabel, QLineEdit, QSpinBox, QTimeEdit, QTextEdit, QCheckBox, QDialog, \
     QDialogButtonBox, QDateEdit
 
 from sportorg import config
@@ -17,7 +17,7 @@ from sportorg.modules.teamwork import Teamwork
 from sportorg.utils.time import time_to_qtime, time_to_otime, qdate_to_date
 
 
-class EntryEditDialog(QDialog):
+class PersonEditDialog(QDialog):
     GROUP_NAME = ''
     ORGANIZATION_NAME = ''
 
@@ -33,10 +33,10 @@ class EntryEditDialog(QDialog):
         if time_accuracy:
             self.time_format = 'hh:mm:ss.zzz'
 
-    def exec(self):
+    def exec_(self):
         self.init_ui()
         self.set_values_from_model()
-        return super().exec()
+        return super().exec_()
 
     def init_ui(self):
         self.setWindowTitle(_('Entry properties'))
@@ -68,14 +68,12 @@ class EntryEditDialog(QDialog):
         if use_birthday:
             self.label_birthday = QLabel(_('Birthday'))
             self.item_birthday = QDateEdit()
-            self.item_birthday.setObjectName('BirthdayDateEdit')
             self.item_birthday.setDate(date.today())
             self.item_birthday.setMaximumDate(date.today())
             self.layout.addRow(self.label_birthday, self.item_birthday)
         else:
             self.label_year = QLabel(_('Year of birth'))
             self.item_year = QSpinBox()
-            self.item_year.setObjectName('YearSpinBox')
             self.item_year.setMinimum(0)
             self.item_year.setMaximum(date.today().year)
             self.item_year.editingFinished.connect(self.year_change)
@@ -337,5 +335,4 @@ class EntryEditDialog(QDialog):
                 person.set_year(self.item_year.value())
 
         ResultCalculation(race()).process_results()
-        GlobalAccess().get_main_window().refresh()
         Teamwork().send(person.to_dict())

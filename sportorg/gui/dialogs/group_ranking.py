@@ -1,7 +1,7 @@
 import logging
 
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QFormLayout, QDialog, QCheckBox, QSpinBox, QTimeEdit, QHBoxLayout, \
+from PySide2.QtGui import QIcon
+from PySide2.QtWidgets import QFormLayout, QDialog, QCheckBox, QSpinBox, QTimeEdit, QHBoxLayout, \
     QDialogButtonBox
 
 from sportorg import config
@@ -18,9 +18,9 @@ class GroupRankingDialog(QDialog):
         super().__init__(GlobalAccess().get_main_window())
         self.group = group
 
-    def exec(self):
+    def exec_(self):
         self.init_ui()
-        return super().exec()
+        return super().exec_()
 
     def init_ui(self):
         self.setWindowTitle(_('Rank calculation'))
@@ -79,7 +79,7 @@ def get_widget_from_ranking(ranking):
     qual_checkbox.setObjectName(qual + '_checkbox')
 
     type_combo = AdvComboBox()
-    type_combo.addItems({_('Rank'), _('Max place'), _('Result time')})
+    type_combo.addItems([_('Rank'), _('Max place'), _('Result time')])
     type_combo.setFixedWidth(150)
     type_combo.setObjectName(qual + '_combo')
 

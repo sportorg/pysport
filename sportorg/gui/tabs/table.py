@@ -1,6 +1,6 @@
-from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QMenu
-from PyQt5.QtCore import QPoint
+from PySide2 import QtWidgets
+from PySide2.QtWidgets import QMenu
+from PySide2.QtCore import QPoint
 
 
 class TableView(QtWidgets.QTableView):

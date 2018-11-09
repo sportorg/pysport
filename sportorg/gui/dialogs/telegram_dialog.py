@@ -1,7 +1,7 @@
 import logging
 
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QFormLayout, QLabel, QDialog, QDialogButtonBox, QLineEdit, QCheckBox, QGroupBox, \
+from PySide2.QtGui import QIcon
+from PySide2.QtWidgets import QFormLayout, QLabel, QDialog, QDialogButtonBox, QLineEdit, QCheckBox, QGroupBox, \
     QRadioButton, QTextEdit
 
 from sportorg import config
@@ -14,10 +14,10 @@ class TelegramDialog(QDialog):
     def __init__(self):
         super().__init__(GlobalAccess().get_main_window())
 
-    def exec(self):
+    def exec_(self):
         self.init_ui()
         self.set_values()
-        return super().exec()
+        return super().exec_()
 
     def init_ui(self):
         self.setWindowTitle(_('Telegram'))

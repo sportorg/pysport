@@ -1,7 +1,7 @@
 import logging
 
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QFormLayout, QDialog, QDialogButtonBox, QLabel, QSpinBox
+from PySide2.QtGui import QIcon
+from PySide2.QtWidgets import QFormLayout, QDialog, QDialogButtonBox, QLabel, QSpinBox
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
@@ -13,9 +13,9 @@ class RelayNumberDialog(QDialog):
     def __init__(self):
         super().__init__(GlobalAccess().get_main_window())
 
-    def exec(self):
+    def exec_(self):
         self.init_ui()
-        return super().exec()
+        return super().exec_()
 
     def init_ui(self):
         self.setWindowTitle(_('Relay number'))

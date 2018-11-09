@@ -78,7 +78,14 @@ def script_dir(*paths):
     return os.path.join(SCRIPT_DIR, *paths)
 
 
-ICON = icon_dir('sportorg.ico')
+STYLE_DIR = base_dir('styles')
+
+
+def style_dir(*paths):
+    return os.path.join(STYLE_DIR, *paths)
+
+
+ICON = icon_dir('sportorg.svg')
 
 CONFIG_INI = data_dir('config.ini')
 
@@ -99,7 +106,9 @@ DIRS = [
     LOCALE_DIR,
     LOG_DIR,
     TEMPLATE_DIR,
-    SOUND_DIR
+    SOUND_DIR,
+    SCRIPT_DIR,
+    STYLE_DIR,
 ]
 
 for _DIR in DIRS:

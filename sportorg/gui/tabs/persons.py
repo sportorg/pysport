@@ -1,9 +1,9 @@
 import logging
 
-from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtWidgets import QAbstractItemView, QHeaderView
+from PySide2 import QtCore, QtWidgets
+from PySide2.QtWidgets import QAbstractItemView, QHeaderView
 
-from sportorg.gui.dialogs.entry_edit import EntryEditDialog
+from sportorg.gui.dialogs.person_edit import PersonEditDialog
 from sportorg.gui.global_access import GlobalAccess, NumberClicker
 from sportorg.gui.tabs.memory_model import PersonMemoryModel
 from sportorg.gui.tabs.table import TableView
@@ -11,7 +11,7 @@ from sportorg.models.memory import race
 from sportorg.models.start.relay import set_next_relay_number_to_person
 
 
-class StartPreparationTableView(TableView):
+class PersonsTableView(TableView):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.popup_items = []
@@ -25,6 +25,8 @@ class StartPreparationTableView(TableView):
 class Widget(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
+        self.person_table = PersonsTableView(self)
+        self.entry_layout = QtWidgets.QGridLayout(self)
         self.setup_ui()
 
     def keyPressEvent(self, e):
@@ -32,7 +34,7 @@ class Widget(QtWidgets.QWidget):
         key = e.key()
         try:
             if key in key_numbers:
-                self.EntryTable.set_start_group(NumberClicker().click(key_numbers.index(key)))
+                self.person_table.set_start_group(NumberClicker().click(key_numbers.index(key)))
                 GlobalAccess().get_main_window().refresh()
         except Exception as e:
             print(str(e))
@@ -41,31 +43,29 @@ class Widget(QtWidgets.QWidget):
         self.setAcceptDrops(False)
         self.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.setAutoFillBackground(False)
-        self.entry_layout = QtWidgets.QGridLayout(self)
-        self.entry_layout.setObjectName("entry_layout")
 
-        self.EntryTable = StartPreparationTableView(self)
-        self.EntryTable.setObjectName("EntryTable")
+        self.person_table.setObjectName('PersonTable')
 
-        self.EntryTable.setModel(PersonMemoryModel())
-        self.EntryTable.setSortingEnabled(True)
-        self.EntryTable.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.person_table.setModel(PersonMemoryModel())
+        self.person_table.setSortingEnabled(True)
+        self.person_table.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        hor_header = self.EntryTable.horizontalHeader()
+        hor_header = self.person_table.horizontalHeader()
         assert (isinstance(hor_header, QHeaderView))
         hor_header.setSectionsMovable(True)
         hor_header.setDropIndicatorShown(True)
         hor_header.setSectionResizeMode(QHeaderView.ResizeToContents)
 
-        ver_header = self.EntryTable.verticalHeader()
+        ver_header = self.person_table.verticalHeader()
         ver_header.setSectionResizeMode(QHeaderView.ResizeToContents)
 
         def entry_double_clicked(index):
             # show_edit_dialog(index)
             try:
                 if index.row() < len(race().persons):
-                    dialog = EntryEditDialog(race().persons[index.row()])
-                    dialog.exec()
+                    dialog = PersonEditDialog(race().persons[index.row()])
+                    dialog.exec_()
+                    GlobalAccess().get_main_window().refresh()
             except Exception as e:
                 logging.error(str(e))
 
@@ -79,9 +79,9 @@ class Widget(QtWidgets.QWidget):
             except Exception as e:
                 logging.error(str(e))
 
-        self.EntryTable.activated.connect(entry_double_clicked)
-        self.EntryTable.clicked.connect(entry_single_clicked)
-        self.entry_layout.addWidget(self.EntryTable)
+        self.person_table.activated.connect(entry_double_clicked)
+        self.person_table.clicked.connect(entry_single_clicked)
+        self.entry_layout.addWidget(self.person_table)
 
     def get_table(self):
-        return self.EntryTable
+        return self.person_table

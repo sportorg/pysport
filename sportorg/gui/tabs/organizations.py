@@ -1,15 +1,16 @@
 import logging
 
-from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtWidgets import QAbstractItemView, QHeaderView
+from PySide2 import QtCore, QtWidgets
+from PySide2.QtWidgets import QAbstractItemView, QHeaderView
 
 from sportorg.gui.dialogs.organization_edit import OrganizationEditDialog
-from sportorg.gui.tabs.memory_model import TeamMemoryModel
+from sportorg.gui.global_access import GlobalAccess
+from sportorg.gui.tabs.memory_model import OrganizationMemoryModel
 from sportorg.gui.tabs.table import TableView
 from sportorg.models.memory import race
 
 
-class TeamsTableView(TableView):
+class OrganizationsTableView(TableView):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.popup_items = []
@@ -18,41 +19,41 @@ class TeamsTableView(TableView):
 class Widget(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
+        self.organization_table = OrganizationsTableView(self)
+        self.organization_layout = QtWidgets.QGridLayout(self)
         self.setup_ui()
 
     def setup_ui(self):
         self.setAcceptDrops(False)
         self.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.setAutoFillBackground(False)
-        self.team_layout = QtWidgets.QGridLayout(self)
-        self.team_layout.setObjectName("team_layout")
 
-        self.TeamTable = TeamsTableView(self)
-        self.TeamTable.setObjectName("TeamTable")
+        self.organization_table.setObjectName('OrganizationTable')
 
-        self.TeamTable.setModel(TeamMemoryModel())
-        self.TeamTable.setSortingEnabled(True)
-        self.TeamTable.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.organization_table.setModel(OrganizationMemoryModel())
+        self.organization_table.setSortingEnabled(True)
+        self.organization_table.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        hor_header = self.TeamTable.horizontalHeader()
+        hor_header = self.organization_table.horizontalHeader()
         assert (isinstance(hor_header, QHeaderView))
         hor_header.setSectionsMovable(True)
         hor_header.setDropIndicatorShown(True)
         hor_header.setSectionResizeMode(QHeaderView.Interactive)
 
-        ver_header = self.TeamTable.verticalHeader()
+        ver_header = self.organization_table.verticalHeader()
         ver_header.setSectionResizeMode(QHeaderView.ResizeToContents)
 
         def team_double_clicked(index):
             try:
                 if index.row() < len(race().organizations):
                     dialog = OrganizationEditDialog(race().organizations[index.row()])
-                    dialog.exec()
+                    dialog.exec_()
+                    GlobalAccess().get_main_window().refresh()
             except Exception as e:
                 logging.error(str(e))
 
-        self.TeamTable.activated.connect(team_double_clicked)
-        self.team_layout.addWidget(self.TeamTable)
+        self.organization_table.activated.connect(team_double_clicked)
+        self.organization_layout.addWidget(self.organization_table)
 
     def get_table(self):
-        return self.TeamTable
+        return self.organization_table

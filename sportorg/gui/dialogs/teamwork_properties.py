@@ -1,7 +1,7 @@
 import logging
 import uuid
 
-from PyQt5.QtWidgets import QFormLayout, QLabel, QDialog, QSpinBox, QRadioButton, QDialogButtonBox, QWidget,\
+from PySide2.QtWidgets import QFormLayout, QLabel, QDialog, QSpinBox, QRadioButton, QDialogButtonBox, QWidget,\
     QTabWidget, QGroupBox, QLineEdit
 
 from sportorg.gui.global_access import GlobalAccess
@@ -14,9 +14,9 @@ class TeamworkPropertiesDialog(QDialog):
         super().__init__(GlobalAccess().get_main_window())
         self.time_format = 'hh:mm:ss'
 
-    def exec(self):
+    def exec_(self):
         self.init_ui()
-        return super().exec()
+        return super().exec_()
 
     def init_ui(self):
         # self.setFixedWidth(500)

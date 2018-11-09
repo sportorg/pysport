@@ -1,8 +1,8 @@
 import logging
 from datetime import date
 
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, QPushButton, QSpinBox, QTimeEdit, QCheckBox, \
+from PySide2.QtGui import QIcon
+from PySide2.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, QPushButton, QSpinBox, QTimeEdit, QCheckBox, \
     QDialogButtonBox
 
 from sportorg import config
@@ -25,10 +25,10 @@ class GroupEditDialog(QDialog):
         self.is_new = is_new
         self.time_format = 'hh:mm:ss'
 
-    def exec(self):
+    def exec_(self):
         self.init_ui()
         self.set_values_from_model()
-        return super().exec()
+        return super().exec_()
 
     def init_ui(self):
         self.setWindowTitle(_('Group properties'))
@@ -206,7 +206,7 @@ class GroupEditDialog(QDialog):
 
         def rank_configuration():
             group = self.current_object
-            GroupRankingDialog(group).exec()
+            GroupRankingDialog(group).exec_()
 
         self.rank_button.clicked.connect(rank_configuration)
 
@@ -270,5 +270,4 @@ class GroupEditDialog(QDialog):
         group.is_any_course = self.item_is_any_course.isChecked()
 
         ResultCalculation(race()).set_rank(group)
-        GlobalAccess().get_main_window().refresh()
         Teamwork().send(group.to_dict())

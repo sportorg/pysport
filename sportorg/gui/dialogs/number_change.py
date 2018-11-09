@@ -1,6 +1,6 @@
-from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QDialog
+from PySide2 import QtCore, QtWidgets
+from PySide2.QtGui import QIcon
+from PySide2.QtWidgets import QDialog
 
 from sportorg import config
 from sportorg.language import _
@@ -13,7 +13,6 @@ class NumberChangeDialog(QDialog):
         self.setupUi()
 
     def setupUi(self):
-        self.setObjectName("number_change")
         self.setWindowModality(QtCore.Qt.WindowModal)
         self.resize(319, 167)
         self.setSizeGripEnabled(False)
@@ -22,45 +21,32 @@ class NumberChangeDialog(QDialog):
         self.button_box.setGeometry(QtCore.QRect(70, 120, 161, 32))
         self.button_box.setOrientation(QtCore.Qt.Horizontal)
         self.button_box.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
-        self.button_box.setObjectName("button_box")
         self.layoutWidget = QtWidgets.QWidget(self)
         self.layoutWidget.setGeometry(QtCore.QRect(14, 10, 290, 48))
-        self.layoutWidget.setObjectName("layoutWidget")
         self.number_grid_layout = QtWidgets.QGridLayout(self.layoutWidget)
         self.number_grid_layout.setContentsMargins(0, 0, 0, 0)
-        self.number_grid_layout.setObjectName("number_grid_layout")
         self.source_num_label = QtWidgets.QLabel(self.layoutWidget)
-        self.source_num_label.setObjectName("source_num_label")
         self.number_grid_layout.addWidget(self.source_num_label, 0, 0, 1, 1)
         self.source_num_spin_box = QtWidgets.QSpinBox(self.layoutWidget)
         self.source_num_spin_box.setMaximum(100000)
-        self.source_num_spin_box.setObjectName("source_num_spin_box")
         self.number_grid_layout.addWidget(self.source_num_spin_box, 0, 1, 1, 1)
         self.source_info_label = QtWidgets.QLabel(self.layoutWidget)
-        self.source_info_label.setObjectName("source_info_label")
         self.number_grid_layout.addWidget(self.source_info_label, 0, 2, 1, 1)
         self.target_num_label = QtWidgets.QLabel(self.layoutWidget)
-        self.target_num_label.setObjectName("target_num_label")
         self.number_grid_layout.addWidget(self.target_num_label, 1, 0, 1, 1)
         self.target_num_spin_box = QtWidgets.QSpinBox(self.layoutWidget)
         self.target_num_spin_box.setMaximum(100000)
-        self.target_num_spin_box.setObjectName("target_num_spin_box")
         self.number_grid_layout.addWidget(self.target_num_spin_box, 1, 1, 1, 1)
         self.target_info_label = QtWidgets.QLabel(self.layoutWidget)
-        self.target_info_label.setObjectName("target_info_label")
         self.number_grid_layout.addWidget(self.target_info_label, 1, 2, 1, 1)
         self.layoutWidget1 = QtWidgets.QWidget(self)
         self.layoutWidget1.setGeometry(QtCore.QRect(14, 70, 256, 42))
-        self.layoutWidget1.setObjectName("layoutWidget1")
         self.options_vert_layout = QtWidgets.QVBoxLayout(self.layoutWidget1)
         self.options_vert_layout.setContentsMargins(0, 0, 0, 0)
-        self.options_vert_layout.setObjectName("options_vert_layout")
         self.remove_radio_button = QtWidgets.QRadioButton(self.layoutWidget1)
         self.remove_radio_button.setChecked(True)
-        self.remove_radio_button.setObjectName("remove_radio_button")
         self.options_vert_layout.addWidget(self.remove_radio_button)
         self.replace_radio_button = QtWidgets.QRadioButton(self.layoutWidget1)
-        self.replace_radio_button.setObjectName("replace_radio_button")
         self.options_vert_layout.addWidget(self.replace_radio_button)
 
         self.retranslateUi()

@@ -2,7 +2,7 @@ import logging
 from queue import Queue, Empty
 from threading import Event, main_thread
 
-from PyQt5.QtCore import QThread, pyqtSignal
+from PySide2.QtCore import QThread, Signal
 
 from sportorg.core.broker import Broker
 from sportorg.core.singleton import singleton
@@ -11,7 +11,7 @@ from .server import ServerThread, Command
 
 
 class ResultThread(QThread):
-    data_sender = pyqtSignal(object)
+    data_sender = Signal(object)
 
     def __init__(self, queue, stop_event, logger=None):
         super().__init__()

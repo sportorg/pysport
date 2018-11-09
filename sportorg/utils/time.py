@@ -1,9 +1,24 @@
 import datetime
 from datetime import date
+import time
 
-from PyQt5.QtCore import QTime, QDate
+from PySide2.QtCore import QTime, QDate
 
 from sportorg.core.otime import OTime
+
+
+def timeit(method):
+    def timed(*args, **kw):
+        ts = time.time()
+        result = method(*args, **kw)
+        te = time.time()
+        if 'log_time' in kw:
+            name = kw.get('log_name', method.__name__.upper())
+            kw['log_time'][name] = int((te - ts) * 1000)
+        else:
+            print('%r  %2.2f ms' % (method.__name__, (te - ts) * 1000))
+        return result
+    return timed
 
 
 def time_to_otime(t):
@@ -25,9 +40,9 @@ def time_to_datetime(t):
 
 def time_to_qtime(t):
     otime = time_to_otime(t)
-    time = QTime()
-    time.setHMS(otime.hour, otime.minute, otime.sec, otime.msec)
-    return time
+    time_ = QTime()
+    time_.setHMS(otime.hour, otime.minute, otime.sec, otime.msec)
+    return time_
 
 
 def _int_to_time(value):
@@ -52,13 +67,13 @@ def time_to_int(value):
 
 
 def time_to_mmss(value):
-    time = time_to_datetime(value)
-    return str(time.strftime("%M:%S"))
+    time_ = time_to_datetime(value)
+    return str(time_.strftime("%M:%S"))
 
 
 def time_to_hhmmss(value):
-    time = time_to_datetime(value)
-    return time.strftime("%H:%M:%S")
+    time_ = time_to_datetime(value)
+    return time_.strftime("%H:%M:%S")
 
 
 def hhmmss_to_time(value):

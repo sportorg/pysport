@@ -1,7 +1,7 @@
 import logging
 
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QFormLayout, QLabel, QDialog, QDialogButtonBox, QTextEdit
+from PySide2.QtGui import QIcon
+from PySide2.QtWidgets import QFormLayout, QLabel, QDialog, QDialogButtonBox, QTextEdit
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
@@ -16,9 +16,9 @@ class NotStartDialog(QDialog):
     def __init__(self):
         super().__init__(GlobalAccess().get_main_window())
 
-    def exec(self):
+    def exec_(self):
         self.init_ui()
-        return super().exec()
+        return super().exec_()
 
     def init_ui(self):
         self.setWindowTitle(_('Not started numbers'))
@@ -85,4 +85,3 @@ class NotStartDialog(QDialog):
                 else:
                     logging.info('{} not found'.format(number))
                 old_numbers.append(number)
-        GlobalAccess().get_main_window().refresh()
