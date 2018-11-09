@@ -13,7 +13,7 @@ from PyQt5.QtCore import QThread, pyqtSignal
 
 from sportorg.core.singleton import singleton
 from sportorg.language import _
-from sportorg.libs.sportident import sireader
+from sportorg.libs.sireader import sireader
 from sportorg.models import memory
 from sportorg.modules.sportident import backup
 from sportorg.utils.time import time_to_otime

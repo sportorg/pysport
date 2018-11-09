@@ -4,36 +4,13 @@
 
 ```commandline
 pip install -r requirements.txt
+git submodule init
 ```
 
 Run
 
 ```commandline
 python SportOrg.pyw
-```
-
-## Struct
-
-```
-<sportorg>/
-    data/
-    docs/
-    log/
-    templates/
-    test/
-    img/
-        icon/
-    languages/
-        <lang>/
-            LC_MESSAGES/
-                sportorg.po
-    sportorg/
-        core/
-        gui/
-        models/
-        modules/
-        libs/
-        utils/
 ```
 
 ![Mainwindow sportorg](img/mainwindow.png)
