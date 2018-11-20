@@ -99,7 +99,7 @@ def menu_list():
             'actions': [
                 {
                     'title': _('Add object'),
-                    'shortcut': 'insert',
+                    'shortcut': ['insert', 'i'],
                     'icon': config.icon_dir('add.svg'),
                     'action': 'AddObjectAction'
                 },

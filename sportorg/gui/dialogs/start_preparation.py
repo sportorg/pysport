@@ -1,15 +1,15 @@
 import logging
 from time import sleep
 
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import QTime
-from PyQt5.QtWidgets import QDialog
+from PySide2 import QtCore, QtGui, QtWidgets
+from PySide2.QtCore import QTime
+from PySide2.QtWidgets import QDialog
 
 from sportorg import config
 from sportorg.core.otime import OTime
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import _
-from sportorg.models.memory import race, Group
+from sportorg.models.memory import race, Group, Limit
 from sportorg.models.start.start_preparation import StartNumberManager, DrawManager, ReserveManager, \
     StartTimeManager
 from sportorg.utils.time import time_to_otime
@@ -20,39 +20,41 @@ class StartPreparationDialog(QDialog):
         super().__init__(GlobalAccess().get_main_window())
         self.time_format = 'hh:mm:ss'
 
-    def exec(self):
+    def exec_(self):
         self.setup_ui()
-        return super().exec()
+        return super().exec_()
 
     def setup_ui(self):
         self.setWindowIcon(QtGui.QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(True)
-        self.resize(639, 317)
+        self.resize(639, 322)
         self.setFixedSize(self.size())
+
         self.button_box = QtWidgets.QDialogButtonBox(self)
         self.button_box.setGeometry(QtCore.QRect(40, 280, 341, 32))
         self.button_box.setOrientation(QtCore.Qt.Horizontal)
-        self.button_box.setStandardButtons(QtWidgets.QDialogButtonBox.Close|QtWidgets.QDialogButtonBox.Ok)
+        self.button_box.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel | QtWidgets.QDialogButtonBox.Ok)
+
         self.reserve_group_box = QtWidgets.QGroupBox(self)
         self.reserve_group_box.setGeometry(QtCore.QRect(8, 0, 311, 121))
-        self.widget = QtWidgets.QWidget(self.reserve_group_box)
-        self.widget.setGeometry(QtCore.QRect(19, 20, 254, 97))
-        self.reserve_layout = QtWidgets.QFormLayout(self.widget)
+        self.widget_reserve = QtWidgets.QWidget(self.reserve_group_box)
+        self.widget_reserve.setGeometry(QtCore.QRect(19, 20, 254, 97))
+        self.reserve_layout = QtWidgets.QFormLayout(self.widget_reserve)
         self.reserve_layout.setContentsMargins(0, 0, 0, 0)
-        self.reserve_prefix_label = QtWidgets.QLabel(self.widget)
+        self.reserve_prefix_label = QtWidgets.QLabel(self.widget_reserve)
         self.reserve_layout.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.reserve_prefix_label)
-        self.reserve_prefix = QtWidgets.QLineEdit(self.widget)
+        self.reserve_prefix = QtWidgets.QLineEdit(self.widget_reserve)
         self.reserve_prefix.setEnabled(False)
         self.reserve_layout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.reserve_prefix)
-        self.reserve_group_count_label = QtWidgets.QLabel(self.widget)
+        self.reserve_group_count_label = QtWidgets.QLabel(self.widget_reserve)
         self.reserve_layout.setWidget(2, QtWidgets.QFormLayout.LabelRole, self.reserve_group_count_label)
-        self.reserve_group_count_spin_box = QtWidgets.QSpinBox(self.widget)
+        self.reserve_group_count_spin_box = QtWidgets.QSpinBox(self.widget_reserve)
         self.reserve_group_count_spin_box.setEnabled(False)
         self.reserve_layout.setWidget(2, QtWidgets.QFormLayout.FieldRole, self.reserve_group_count_spin_box)
-        self.reserve_group_percent_label = QtWidgets.QLabel(self.widget)
+        self.reserve_group_percent_label = QtWidgets.QLabel(self.widget_reserve)
         self.reserve_layout.setWidget(3, QtWidgets.QFormLayout.LabelRole, self.reserve_group_percent_label)
-        self.reserve_group_percent_spin_box = QtWidgets.QSpinBox(self.widget)
+        self.reserve_group_percent_spin_box = QtWidgets.QSpinBox(self.widget_reserve)
         self.reserve_group_percent_spin_box.setEnabled(False)
         self.reserve_group_percent_spin_box.setMaximum(100)
         self.reserve_group_percent_spin_box.setSingleStep(5)
@@ -63,23 +65,23 @@ class StartPreparationDialog(QDialog):
 
         self.draw_group_box = QtWidgets.QGroupBox(self)
         self.draw_group_box.setGeometry(QtCore.QRect(323, 0, 311, 121))
-        self.widget1 = QtWidgets.QWidget(self.draw_group_box)
-        self.widget1.setGeometry(QtCore.QRect(20, 16, 256, 88))
-        self.draw_layout = QtWidgets.QFormLayout(self.widget1)
+        self.widget_draw = QtWidgets.QWidget(self.draw_group_box)
+        self.widget_draw.setGeometry(QtCore.QRect(20, 16, 256, 88))
+        self.draw_layout = QtWidgets.QFormLayout(self.widget_draw)
         self.draw_layout.setContentsMargins(0, 0, 0, 0)
-        self.draw_check_box = QtWidgets.QCheckBox(self.widget1)
+        self.draw_check_box = QtWidgets.QCheckBox(self.widget_draw)
         self.draw_layout.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.draw_check_box)
-        self.draw_groups_check_box = QtWidgets.QCheckBox(self.widget1)
+        self.draw_groups_check_box = QtWidgets.QCheckBox(self.widget_draw)
         self.draw_groups_check_box.setEnabled(False)
         self.draw_layout.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.draw_groups_check_box)
-        self.draw_teams_check_box = QtWidgets.QCheckBox(self.widget1)
+        self.draw_teams_check_box = QtWidgets.QCheckBox(self.widget_draw)
         self.draw_teams_check_box.setEnabled(False)
         self.draw_layout.setWidget(2, QtWidgets.QFormLayout.LabelRole, self.draw_teams_check_box)
-        self.draw_regions_check_box = QtWidgets.QCheckBox(self.widget1)
+        self.draw_regions_check_box = QtWidgets.QCheckBox(self.widget_draw)
         self.draw_regions_check_box.setEnabled(False)
         self.draw_regions_check_box.setMinimumHeight(13)
         self.draw_layout.setWidget(3, QtWidgets.QFormLayout.LabelRole, self.draw_regions_check_box)
-        self.draw_mix_groups_check_box = QtWidgets.QCheckBox(self.widget1)
+        self.draw_mix_groups_check_box = QtWidgets.QCheckBox(self.widget_draw)
         self.draw_mix_groups_check_box.setEnabled(False)
         self.draw_mix_groups_check_box.setMinimumHeight(13)
         self.draw_layout.setWidget(4, QtWidgets.QFormLayout.LabelRole, self.draw_mix_groups_check_box)
@@ -88,26 +90,26 @@ class StartPreparationDialog(QDialog):
 
         self.start_group_box = QtWidgets.QGroupBox(self)
         self.start_group_box.setGeometry(QtCore.QRect(8, 120, 311, 121))
-        self.widget2 = QtWidgets.QWidget(self.start_group_box)
-        self.widget2.setGeometry(QtCore.QRect(18, 16, 256, 94))
-        self.start_layout = QtWidgets.QFormLayout(self.widget2)
+        self.widget_start = QtWidgets.QWidget(self.start_group_box)
+        self.widget_start.setGeometry(QtCore.QRect(18, 16, 256, 94))
+        self.start_layout = QtWidgets.QFormLayout(self.widget_start)
         self.start_layout.setContentsMargins(0, 0, 0, 0)
-        self.start_check_box = QtWidgets.QCheckBox(self.widget2)
+        self.start_check_box = QtWidgets.QCheckBox(self.widget_start)
         self.start_layout.setWidget(0, QtWidgets.QFormLayout.SpanningRole, self.start_check_box)
-        self.start_first_label = QtWidgets.QLabel(self.widget2)
+        self.start_first_label = QtWidgets.QLabel(self.widget_start)
         self.start_layout.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.start_first_label)
-        self.start_first_time_edit = QtWidgets.QTimeEdit(self.widget2)
+        self.start_first_time_edit = QtWidgets.QTimeEdit(self.widget_start)
         self.start_first_time_edit.setEnabled(False)
         self.start_first_time_edit.setDisplayFormat(self.time_format)
         self.start_layout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.start_first_time_edit)
-        self.start_interval_radio_button = QtWidgets.QRadioButton(self.widget2)
+        self.start_interval_radio_button = QtWidgets.QRadioButton(self.widget_start)
         self.start_interval_radio_button.setChecked(True)
         self.start_layout.setWidget(2, QtWidgets.QFormLayout.LabelRole, self.start_interval_radio_button)
-        self.start_interval_time_edit = QtWidgets.QTimeEdit(self.widget2)
+        self.start_interval_time_edit = QtWidgets.QTimeEdit(self.widget_start)
         self.start_interval_time_edit.setEnabled(False)
         self.start_interval_time_edit.setDisplayFormat(self.time_format)
         self.start_layout.setWidget(2, QtWidgets.QFormLayout.FieldRole, self.start_interval_time_edit)
-        self.start_group_settings_radion_button = QtWidgets.QRadioButton(self.widget2)
+        self.start_group_settings_radion_button = QtWidgets.QRadioButton(self.widget_start)
         self.start_group_settings_radion_button.setEnabled(False)
         self.start_group_settings_radion_button.setChecked(False)
         self.start_layout.setWidget(3, QtWidgets.QFormLayout.SpanningRole, self.start_group_settings_radion_button)
@@ -115,35 +117,35 @@ class StartPreparationDialog(QDialog):
 
         self.numbers_group_box = QtWidgets.QGroupBox(self)
         self.numbers_group_box.setGeometry(QtCore.QRect(322, 120, 311, 121))
-        self.widget3 = QtWidgets.QWidget(self.numbers_group_box)
-        self.widget3.setGeometry(QtCore.QRect(19, 17, 256, 70))
-        self.numbers_vert_layout = QtWidgets.QVBoxLayout(self.widget3)
+        self.widget_numbers = QtWidgets.QWidget(self.numbers_group_box)
+        self.widget_numbers.setGeometry(QtCore.QRect(18, 16, 256, 94))
+        self.numbers_vert_layout = QtWidgets.QVBoxLayout(self.widget_numbers)
         self.numbers_vert_layout.setContentsMargins(0, 0, 0, 0)
-        self.numbers_check_box = QtWidgets.QCheckBox(self.widget3)
+        self.numbers_check_box = QtWidgets.QCheckBox(self.widget_numbers)
         self.numbers_vert_layout.addWidget(self.numbers_check_box)
         self.numbers_interval_hor_layout = QtWidgets.QHBoxLayout()
-        self.numbers_interval_radio_button = QtWidgets.QRadioButton(self.widget3)
+        self.numbers_interval_radio_button = QtWidgets.QRadioButton(self.widget_numbers)
         self.numbers_interval_radio_button.setChecked(True)
         self.numbers_interval_radio_button.setMinimumWidth(70)
         self.numbers_interval_hor_layout.addWidget(self.numbers_interval_radio_button)
-        self.numbers_first_spin_box = QtWidgets.QSpinBox(self.widget3)
+        self.numbers_first_spin_box = QtWidgets.QSpinBox(self.widget_numbers)
         self.numbers_first_spin_box.setEnabled(False)
         self.numbers_first_spin_box.setMinimumWidth(47)
-        self.numbers_first_spin_box.setMaximum(999999)
+        self.numbers_first_spin_box.setMaximum(Limit.BIB)
         self.numbers_first_spin_box.setMinimumHeight(20)
         self.numbers_interval_hor_layout.addWidget(self.numbers_first_spin_box)
-        self.numbers_interval_label = QtWidgets.QLabel(self.widget3)
+        self.numbers_interval_label = QtWidgets.QLabel(self.widget_numbers)
         self.numbers_interval_hor_layout.addWidget(self.numbers_interval_label)
-        self.numbers_interval_spin_box = QtWidgets.QSpinBox(self.widget3)
+        self.numbers_interval_spin_box = QtWidgets.QSpinBox(self.widget_numbers)
         self.numbers_interval_spin_box.setMinimumHeight(20)
         self.numbers_interval_spin_box.setEnabled(False)
         self.numbers_interval_hor_layout.addWidget(self.numbers_interval_spin_box)
         self.numbers_vert_layout.addLayout(self.numbers_interval_hor_layout)
-        self.numbers_minute_radio_button = QtWidgets.QRadioButton(self.widget3)
+        self.numbers_minute_radio_button = QtWidgets.QRadioButton(self.widget_numbers)
         self.numbers_minute_radio_button.setEnabled(False)
         self.numbers_minute_radio_button.setChecked(False)
         self.numbers_vert_layout.addWidget(self.numbers_minute_radio_button)
-        self.numbers_order_radio_button = QtWidgets.QRadioButton(self.widget3)
+        self.numbers_order_radio_button = QtWidgets.QRadioButton(self.widget_numbers)
         self.numbers_order_radio_button.setEnabled(False)
         self.numbers_order_radio_button.setChecked(False)
         self.numbers_vert_layout.addWidget(self.numbers_order_radio_button)
@@ -167,14 +169,13 @@ class StartPreparationDialog(QDialog):
         self.start_group_box.raise_()
         self.numbers_group_box.raise_()
 
-        self.retranslateUi()
+        self.retranslate_ui()
         self.button_box.accepted.connect(self.accept)
         self.button_box.rejected.connect(self.reject)
-        QtCore.QMetaObject.connectSlotsByName(self)
 
         self.recover_state()
 
-    def retranslateUi(self):
+    def retranslate_ui(self):
         self.setWindowTitle(_("Start Preparation"))
         self.reserve_group_box.setTitle(_("Reserves insert"))
         self.reserve_prefix_label.setText(_("Reserve prefix"))
@@ -228,9 +229,8 @@ class StartPreparationDialog(QDialog):
         self.draw_teams_check_box.setEnabled(status)
         self.draw_mix_groups_check_box.setEnabled(status)
 
-    def accept(self):
+    def accept(self, *args, **kwargs):
         try:
-
             progressbar_delay = 0.01
             obj = race()
             obj.update_counters()
@@ -280,10 +280,10 @@ class StartPreparationDialog(QDialog):
 
             self.progress_bar.setValue(100)
 
-            GlobalAccess().get_main_window().refresh()
             self.save_state()
         except Exception as e:
             logging.error(str(e))
+        super().accept(*args, **kwargs)
 
     def save_state(self):
         obj = race()
@@ -358,4 +358,3 @@ def guess_courses_for_groups():
                     cur_group.course = cur_course
                     logging.debug('Connecting: group ' + group_name + ' with course ' + course_name)
                     break
-    GlobalAccess().get_main_window().refresh()

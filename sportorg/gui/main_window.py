@@ -4,19 +4,17 @@ import time
 from queue import Queue
 from threading import main_thread
 
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import QModelIndex, QItemSelectionModel, QThread, pyqtSignal
-from PyQt5.QtWidgets import QMainWindow, QTableView, QMessageBox
-
-from sportorg.core.singleton import singleton
-from sportorg.gui.dialogs.course_edit import CourseEditDialog
-from sportorg.gui.dialogs.entry_edit import EntryEditDialog
-from sportorg.gui.dialogs.group_edit import GroupEditDialog
-from sportorg.gui.dialogs.organization_edit import OrganizationEditDialog
-from sportorg.gui.menu.factory import Factory
-from sportorg.models.memory import Race, race, NotEmptyException, new_event, set_current_race_index
+from PySide2 import QtCore, QtGui, QtWidgets
+from PySide2.QtCore import QModelIndex, QItemSelectionModel, QThread, Signal
+from PySide2.QtWidgets import QMainWindow, QTableView, QMessageBox
 
 from sportorg import config
+from sportorg.core.singleton import singleton
+from sportorg.gui.dialogs.course_edit import CourseEditDialog
+from sportorg.gui.dialogs.person_edit import PersonEditDialog
+from sportorg.gui.dialogs.group_edit import GroupEditDialog
+from sportorg.gui.dialogs.organization_edit import OrganizationEditDialog
+from sportorg.models.memory import Race, race, NotEmptyException, new_event, set_current_race_index
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.split_calculation import GroupSplits
 from sportorg.modules.backup.file import File
@@ -28,10 +26,10 @@ from sportorg.modules.sound import Sound
 from sportorg.modules.sportident.result_generation import ResultSportidentGeneration
 from sportorg.core.broker import Broker
 from sportorg.gui.dialogs.file_dialog import get_save_file_name
-from sportorg.gui.menu.menu import menu_list
-from sportorg.gui.tabs import start_preparation, groups, teams, race_results, courses, log
+from sportorg.gui.menu import menu_list, Factory
+from sportorg.gui.tabs import persons, groups, organizations, results, courses, log
 from sportorg.gui.tabs.memory_model import PersonMemoryModel, ResultMemoryModel, GroupMemoryModel, \
-    CourseMemoryModel, TeamMemoryModel
+    CourseMemoryModel, OrganizationMemoryModel
 from sportorg.gui.toolbar import toolbar_list
 from sportorg.gui.utils.custom_controls import messageBoxQuestion
 from sportorg.language import _
@@ -43,7 +41,7 @@ from sportorg.modules.telegram.telegram import TelegramClient
 
 @singleton
 class ServiceListenerThread(QThread):
-    interval = pyqtSignal()
+    interval = Signal()
 
     def run(self):
         while True:
@@ -82,11 +80,16 @@ class MainWindow(QMainWindow):
         logging.root.addHandler(handler)
         self.last_update = time.time()
 
+    def _set_style(self):
+        with open(config.style_dir('style.qss')) as s:
+            self.setStyleSheet(s.read())
+
     def show_window(self):
         try:
             self.conf_read()
         except Exception as e:
             logging.error(e)
+        self._set_style()
         self._setup_ui()
         self._setup_menu()
         if Configuration().configuration.get('show_toolbar'):
@@ -174,7 +177,9 @@ class MainWindow(QMainWindow):
                 action.setText(action_item['title'])
                 action.triggered.connect(self.menu_factory.get_action(action_item['action']))
                 if 'shortcut' in action_item:
-                    action.setShortcut(action_item['shortcut'])
+                    shortcuts = [action_item['shortcut']] if isinstance(action_item['shortcut'], str)\
+                        else action_item['shortcut']
+                    action.setShortcuts(shortcuts)
                 if 'icon' in action_item:
                     action.setIcon(QtGui.QIcon(action_item['icon']))
                 if 'status_tip' in action_item:
@@ -217,11 +222,11 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.tabwidget)
         self.setCentralWidget(self.centralwidget)
 
-        self.tabwidget.addTab(start_preparation.Widget(), _('Competitors'))
-        self.tabwidget.addTab(race_results.Widget(), _('Race Results'))
+        self.tabwidget.addTab(persons.Widget(), _('Competitors'))
+        self.tabwidget.addTab(results.Widget(), _('Race Results'))
         self.tabwidget.addTab(groups.Widget(), _('Groups'))
         self.tabwidget.addTab(courses.Widget(), _('Courses'))
-        self.tabwidget.addTab(teams.Widget(), _('Teams'))
+        self.tabwidget.addTab(organizations.Widget(), _('Teams'))
         self.logging_tab = log.Widget()
         self.tabwidget.addTab(self.logging_tab, _('Logs'))
 
@@ -285,7 +290,7 @@ class MainWindow(QMainWindow):
             table = self.get_course_table()
             table.setModel(CourseMemoryModel())
             table = self.get_organization_table()
-            table.setModel(TeamMemoryModel())
+            table.setModel(OrganizationMemoryModel())
             Broker().produce('init_model')
         except Exception as e:
             logging.error(str(e))
@@ -293,6 +298,7 @@ class MainWindow(QMainWindow):
     def refresh(self):
         logging.debug('Refreshing interface')
         try:
+            t = time.time()
             table = self.get_person_table()
             table.model().init_cache()
             table.model().layoutChanged.emit()
@@ -313,6 +319,8 @@ class MainWindow(QMainWindow):
             table.model().init_cache()
             table.model().layoutChanged.emit()
             self.set_title()
+
+            print('Refresh in {:.3f} seconds.'.format(time.time() - t))
             Broker().produce('refresh')
         except Exception as e:
             logging.error(str(e))
@@ -348,7 +356,7 @@ class MainWindow(QMainWindow):
         return self.findChild(QtWidgets.QTableView, name)
 
     def get_person_table(self):
-        return self.get_table_by_name('EntryTable')
+        return self.get_table_by_name('PersonTable')
 
     def get_result_table(self):
         return self.get_table_by_name('ResultTable')
@@ -360,10 +368,10 @@ class MainWindow(QMainWindow):
         return self.get_table_by_name('CourseTable')
 
     def get_organization_table(self):
-        return self.get_table_by_name('TeamTable')
+        return self.get_table_by_name('OrganizationTable')
 
     def get_current_table(self):
-        map_ = ['EntryTable', 'ResultTable', 'GroupTable', 'CourseTable', 'TeamTable']
+        map_ = ['PersonTable', 'ResultTable', 'GroupTable', 'CourseTable', 'OrganizationTable']
         idx = self.current_tab
         if idx < len(map_):
             return self.get_table_by_name(map_[idx])
@@ -540,7 +548,7 @@ class MainWindow(QMainWindow):
                     pass
                 self.split_printout(obj.results[index])
         except Exception as e:
-            logging.error(str(e))
+            logging.exception(str(e))
 
     def split_printout(self, result):
         try:
@@ -549,35 +557,34 @@ class MainWindow(QMainWindow):
             logging.warning(str(e))
             mes = QMessageBox(self)
             mes.setText(_('No results to print'))
-            mes.exec()
+            mes.exec_()
         except NoPrinterSelectedException as e:
             logging.warning(str(e))
             mes = QMessageBox(self)
             mes.setText(_('No printer selected'))
-            mes.exec()
+            mes.exec_()
 
     def add_object(self):
         try:
             tab = self.current_tab
             if tab == 0:
                 p = race().add_new_person()
-                EntryEditDialog(p, True).exec()
-                self.get_person_table().model().init_cache()
+                PersonEditDialog(p, True).exec_()
+                self.refresh()
             elif tab == 1:
                 self.menu_factory.execute('ManualFinishAction')
             elif tab == 2:
                 g = race().add_new_group()
-                GroupEditDialog(g, True).exec()
-                self.get_group_table().model().init_cache()
+                GroupEditDialog(g, True).exec_()
+                self.refresh()
             elif tab == 3:
                 c = race().add_new_course()
-                CourseEditDialog(c, True).exec()
-                self.get_course_table().model().init_cache()
+                CourseEditDialog(c, True).exec_()
+                self.refresh()
             elif tab == 4:
                 o = race().add_new_organization()
-                OrganizationEditDialog(o, True).exec()
-                self.get_organization_table().model().init_cache()
-            self.refresh()
+                OrganizationEditDialog(o, True).exec_()
+                self.refresh()
         except Exception as e:
             logging.error(str(e))
 

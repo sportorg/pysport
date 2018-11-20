@@ -2,9 +2,9 @@ import logging
 import time
 import uuid
 
-from PyQt5 import QtCore
+from PySide2 import QtCore
 
-from PyQt5.QtWidgets import QMessageBox, QApplication, QTableView
+from PySide2.QtWidgets import QMessageBox, QApplication, QTableView
 
 from sportorg import config
 from sportorg.core.otime import OTime
@@ -82,12 +82,12 @@ class OpenRecentAction(Action):
 
 class SettingsAction(Action):
     def execute(self):
-        SettingsDialog().exec()
+        SettingsDialog().exec_()
 
 
 class EventSettingsAction(Action):
     def execute(self):
-        EventPropertiesDialog().exec()
+        EventPropertiesDialog().exec_()
 
 
 class CSVWinorientImportAction(Action):
@@ -181,7 +181,7 @@ class DeleteAction(Action):
 
 class TextExchangeAction(Action):
     def execute(self):
-        TextExchangeDialog().exec()
+        TextExchangeDialog().exec_()
         self.app.refresh()
 
 
@@ -195,7 +195,8 @@ class FilterAction(Action):
         if self.app.current_tab not in range(2):
             return
         table = self.app.get_current_table()
-        DialogFilter(table).exec()
+        DialogFilter(table).exec_()
+        self.app.refresh()
 
 
 class SearchAction(Action):
@@ -203,7 +204,8 @@ class SearchAction(Action):
         if self.app.current_tab not in range(5):
             return
         table = self.app.get_current_table()
-        SearchDialog(table).exec()
+        SearchDialog(table).exec_()
+        self.app.refresh()
 
 
 class ToStartPreparationAction(Action):
@@ -233,7 +235,8 @@ class ToTeamsAction(Action):
 
 class StartPreparationAction(Action):
     def execute(self):
-        StartPreparationDialog().exec()
+        StartPreparationDialog().exec_()
+        self.app.refresh()
 
 
 class GuessCoursesAction(Action):
@@ -257,23 +260,26 @@ class RelayNumberAction(Action):
         else:
             obj.set_setting('relay_number_assign', True)
             QApplication.setOverrideCursor(QtCore.Qt.PointingHandCursor)
-            RelayNumberDialog().exec()
+            RelayNumberDialog().exec_()
         self.app.refresh()
 
 
 class NumberChangeAction(Action):
     def execute(self):
-        NumberChangeDialog().exec()
+        NumberChangeDialog().exec_()
+        self.app.refresh()
 
 
 class StartTimeChangeAction(Action):
     def execute(self):
-        StartTimeChangeDialog().exec()
+        StartTimeChangeDialog().exec_()
+        self.app.refresh()
 
 
 class StartHandicapAction(Action):
     def execute(self):
-        StartHandicapDialog().exec()
+        StartHandicapDialog().exec_()
+        self.app.refresh()
 
 
 class CopyBibToCardNumber(Action):
@@ -287,7 +293,8 @@ class CopyBibToCardNumber(Action):
 
 class StartListAction(Action):
     def execute(self):
-        StartReportDialog().exec()
+        StartReportDialog().exec_()
+        self.app.refresh()
 
 
 class ManualFinishAction(Action):
@@ -296,7 +303,6 @@ class ManualFinishAction(Action):
         Teamwork().send(result.to_dict())
         race().add_new_result(result)
         logging.info(_('Manual finish'))
-        self.app.get_result_table().model().init_cache()
         self.app.refresh()
 
 
@@ -323,7 +329,7 @@ class SFRReadoutAction(Action):
 
 class CreateReportAction(Action):
     def execute(self):
-        ReportDialog().exec()
+        ReportDialog().exec_()
 
 
 class SplitPrintoutAction(Action):
@@ -384,7 +390,7 @@ class ChangeStatusAction(Action):
         if index >= len(obj.results):
             mes = QMessageBox()
             mes.setText(_('No results to change status'))
-            mes.exec()
+            mes.exec_()
             return
         result = obj.results[index]
         if result.status in status_dict:
@@ -397,12 +403,14 @@ class ChangeStatusAction(Action):
 
 class SetDNSNumbersAction(Action):
     def execute(self):
-        NotStartDialog().exec()
+        NotStartDialog().exec_()
+        self.app.refresh()
 
 
 class CPDeleteAction(Action):
     def execute(self):
-        CPDeleteDialog().exec()
+        CPDeleteDialog().exec_()
+        self.app.refresh()
 
 
 class AddSPORTidentResultAction(Action):
@@ -417,12 +425,13 @@ class AddSPORTidentResultAction(Action):
 
 class TimekeepingSettingsAction(Action):
     def execute(self):
-        TimekeepingPropertiesDialog().exec()
+        TimekeepingPropertiesDialog().exec_()
+        self.app.refresh()
 
 
 class TeamworkSettingsAction(Action):
     def execute(self):
-        TeamworkPropertiesDialog().exec()
+        TeamworkPropertiesDialog().exec_()
 
 
 class TeamworkEnableAction(Action):
@@ -460,17 +469,18 @@ class TeamworkSendAction(Action):
 
 class PrinterSettingsAction(Action):
     def execute(self):
-        PrintPropertiesDialog().exec()
+        PrintPropertiesDialog().exec_()
 
 
 class LiveSettingsAction(Action):
     def execute(self):
-        LiveDialog().exec()
+        LiveDialog().exec_()
+        self.app.refresh()
 
 
 class TelegramSettingsAction(Action):
     def execute(self):
-        TelegramDialog().exec()
+        TelegramDialog().exec_()
 
 
 class TelegramSendAction(Action):
@@ -493,7 +503,7 @@ class TelegramSendAction(Action):
 
 class AboutAction(Action):
     def execute(self):
-        AboutDialog().exec()
+        AboutDialog().exec_()
 
 
 class CheckUpdatesAction(Action):
@@ -537,10 +547,76 @@ class ImportSportOrgAction(Action):
         if file_name is not '':
             with open(file_name) as f:
                 attr = get_races_from_file(f)
-            SportOrgImportDialog(*attr).exec()
+            SportOrgImportDialog(*attr).exec_()
             self.app.refresh()
 
 
 class RentCardsAction(Action):
     def execute(self):
-        RentCardsDialog().exec()
+        RentCardsDialog().exec_()
+        self.app.refresh()
+
+
+__all__ = [
+    'NewAction',
+    'SaveAction',
+    'OpenAction',
+    'SaveAsAction',
+    'OpenRecentAction',
+    'SettingsAction',
+    'EventSettingsAction',
+    'CSVWinorientImportAction',
+    'WDBWinorientImportAction',
+    'OcadTXTv8ImportAction',
+    'WDBWinorientExportAction',
+    'IOFResultListExportAction',
+    'AddObjectAction',
+    'DeleteAction',
+    'TextExchangeAction',
+    'RefreshAction',
+    'FilterAction',
+    'SearchAction',
+    'ToStartPreparationAction',
+    'ToRaceResultsAction',
+    'ToGroupsAction',
+    'ToCoursesAction',
+    'ToTeamsAction',
+    'StartPreparationAction',
+    'GuessCoursesAction',
+    'GuessCorridorsAction',
+    'RelayNumberAction',
+    'NumberChangeAction',
+    'StartTimeChangeAction',
+    'StartHandicapAction',
+    'CopyBibToCardNumber',
+    'StartListAction',
+    'ManualFinishAction',
+    'SPORTidentReadoutAction',
+    'SportiduinoReadoutAction',
+    'SFRReadoutAction',
+    'CreateReportAction',
+    'SplitPrintoutAction',
+    'RecheckingAction',
+    'PenaltyCalculationAction',
+    'PenaltyRemovingAction',
+    'ChangeStatusAction',
+    'SetDNSNumbersAction',
+    'CPDeleteAction',
+    'AddSPORTidentResultAction',
+    'TimekeepingSettingsAction',
+    'TeamworkSettingsAction',
+    'PrinterSettingsAction',
+    'LiveSettingsAction',
+    'AboutAction',
+    'TestingAction',
+    'TeamworkEnableAction',
+    'TeamworkSendAction',
+    'TelegramSettingsAction',
+    'TelegramSendAction',
+    'IOFEntryListImportAction',
+    'CheckUpdatesAction',
+    'AssignResultByBibAction',
+    'AssignResultByCardNumberAction',
+    'ImportSportOrgAction',
+    'RentCardsAction',
+]

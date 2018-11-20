@@ -1,7 +1,7 @@
 import logging
 
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, QSpinBox, QTextEdit, QDialogButtonBox
+from PySide2.QtGui import QIcon
+from PySide2.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, QSpinBox, QTextEdit, QDialogButtonBox
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
@@ -21,10 +21,10 @@ class CourseEditDialog(QDialog):
         self.current_object = course
         self.is_new = is_new
 
-    def exec(self):
+    def exec_(self):
         self.init_ui()
         self.set_values_from_model()
-        return super().exec()
+        return super().exec_()
 
     def init_ui(self):
         self.setWindowTitle(_('Course properties'))
@@ -141,5 +141,4 @@ class CourseEditDialog(QDialog):
         ResultCalculation(obj).process_results()
         RaceSplits(obj).generate()
         ScoreCalculation(obj).calculate_scores()
-        GlobalAccess().get_main_window().refresh()
         Teamwork().send(course.to_dict())

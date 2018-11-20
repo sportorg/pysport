@@ -1,7 +1,7 @@
 # set numbers by name of athletes
 import sys
 
-from PyQt5.QtWidgets import QApplication
+from PySide2.QtWidgets import QApplication
 
 from sportorg.modules.winorient.wdb import WinOrientBinary
 from sportorg.gui.dialogs.file_dialog import get_open_file_name, get_save_file_name

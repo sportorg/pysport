@@ -1,7 +1,7 @@
 import logging
 
-from PyQt5.QtCore import QTime
-from PyQt5.QtWidgets import QFormLayout, QLabel, QDialog, \
+from PySide2.QtCore import QTime
+from PySide2.QtWidgets import QFormLayout, QLabel, QDialog, \
      QTimeEdit, QSpinBox, QRadioButton, QCheckBox, QDialogButtonBox, QWidget, QTabWidget, \
      QGroupBox, QLineEdit
 
@@ -20,9 +20,9 @@ class TimekeepingPropertiesDialog(QDialog):
         super().__init__(GlobalAccess().get_main_window())
         self.time_format = 'hh:mm:ss'
 
-    def exec(self):
+    def exec_(self):
         self.init_ui()
-        return super().exec()
+        return super().exec_()
 
     def init_ui(self):
         # self.setFixedWidth(500)
@@ -450,4 +450,3 @@ class TimekeepingPropertiesDialog(QDialog):
         obj.set_setting('time_format_24', time_format_24)
 
         ResultCalculation(race()).process_results()
-        GlobalAccess().get_main_window().refresh()

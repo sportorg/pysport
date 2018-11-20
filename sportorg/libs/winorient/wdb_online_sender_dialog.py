@@ -1,7 +1,7 @@
 import logging
 import sys
 
-from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, QPushButton, QApplication, QFileDialog, QTextEdit
+from PySide2.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, QPushButton, QApplication, QFileDialog, QTextEdit
 from sportorg.libs.winorient.wdb_online_sender import WdbOnlineSender
 
 
@@ -61,4 +61,4 @@ class WdbOnlineSenderDialog(QDialog):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     logging.basicConfig(level=logging.DEBUG)
-    WdbOnlineSenderDialog().exec()
+    WdbOnlineSenderDialog().exec_()

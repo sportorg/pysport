@@ -5,7 +5,7 @@ from threading import main_thread, Event
 
 import time
 
-from PyQt5.QtCore import QThread, pyqtSignal
+from PySide2.QtCore import QThread, Signal
 
 from sportorg.core.singleton import singleton
 from sportorg.language import _
@@ -62,7 +62,7 @@ class SFRReaderThread(QThread):
 
 
 class ResultThread(QThread):
-    data_sender = pyqtSignal(object)
+    data_sender = Signal(object)
 
     def __init__(self, queue, stop_event, logger, start_time=None):
         super().__init__()

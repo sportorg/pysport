@@ -1,6 +1,6 @@
 python-dateutil==2.6.1
 xmlschema==0.9.14
-PyQt5==5.8.2
+PySide2==5.11.2
 sireader==1.1.1
 jinja2==2.10
 polib==1.0.8

@@ -1,7 +1,7 @@
 import logging
 
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QFormLayout, QDialog, QDialogButtonBox, QTimeEdit, QLabel, QRadioButton
+from PySide2.QtGui import QIcon
+from PySide2.QtWidgets import QFormLayout, QDialog, QDialogButtonBox, QTimeEdit, QLabel, QRadioButton
 
 from sportorg import config
 from sportorg.core.otime import OTime
@@ -111,4 +111,3 @@ class StartHandicapDialog(QDialog):
             handicap_start_time()
         else:
             reverse_start_time()
-        GlobalAccess().get_main_window().refresh()

@@ -26,7 +26,7 @@ def split_printout(result):
 
     if person.group and course:
         printer = Config().printer.get('split')
-        template_path = obj.get_setting('split_template', template_dir('split', 'split_printout.html'))
+        template_path = obj.get_setting('split_template', template_dir('split', '1_split_printout.html'))
 
         organization = person.organization
         if not organization:

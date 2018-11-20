@@ -2,12 +2,12 @@ import logging
 import re
 from abc import abstractmethod
 
-from PyQt5.QtCore import QVariant, QAbstractTableModel, Qt
+from PySide2.QtCore import QAbstractTableModel, Qt
 from typing import List
 
 from sportorg.language import _
 from sportorg.models.constant import RentCards
-from sportorg.models.memory import race, Result, Group, Course, Organization
+from sportorg.models.memory import race
 from sportorg.utils.time import time_to_hhmmss
 
 
@@ -21,6 +21,8 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
         self.cache = []
         self.init_cache()
         self.filter = {}
+        self.r_count = 0
+        self.c_count = len(self.get_headers())
 
         # temporary list, used to keep records, that are not filtered
         # main list will have only filtered elements
@@ -52,11 +54,10 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
         pass
 
     def columnCount(self, parent=None, *args, **kwargs):
-        return len(self.get_headers())
+        return self.c_count
 
     def rowCount(self, parent=None, *args, **kwargs):
-        ret = len(self.cache)
-        return ret
+        return len(self.cache)
 
     def headerData(self, index, orientation, role=None):
         if role == Qt.DisplayRole:
@@ -68,22 +69,14 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
 
     def data(self, index, role=None):
         if role == Qt.DisplayRole:
-            # start = time.time()
-            # answer = str(index.row()) + ' ' + str(index.column())
-            answer = ''
             try:
-                # answer = self.get_participation_data(index.row())[index.column()]
                 row = index.row()
                 column = index.column()
                 answer = self.cache[row][column]
+                return answer
             except Exception as e:
                 logging.error(str(e))
-
-            # end = time.time()
-            # logging.debug('Data() ' + str(index.row()) + ' ' + str(index.column()) + ': ' + str(end - start) + ' s')
-            return QVariant(answer)
-
-        return QVariant()
+        return
 
     def clear_filter(self, remove_condition=True):
         if remove_condition:
@@ -297,7 +290,6 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
 
     def get_values_from_object(self, result):
         i = result
-        assert (isinstance(i, Result))
         person = i.person
 
         group = ''
@@ -375,22 +367,19 @@ class GroupMemoryModel(AbstractSportOrgMemoryModel):
         return ret
 
     def get_values_from_object(self, group):
-        assert (isinstance(group, Group))
         course = group.course
-        if course is None:
-            course = Course()
 
         control_count = len(course.controls)
 
         return [
             group.name,
             group.long_name,
-            course.name,
+            course.name if course else '',
             group.price,
             self.race.get_type(group).get_title(),
-            course.length,
+            course.length if course else 0,
             control_count,
-            course.climb,
+            course.climb if course else 0,
             group.sex.get_title(),
             group.min_year,
             group.max_year,
@@ -423,10 +412,6 @@ class CourseMemoryModel(AbstractSportOrgMemoryModel):
         return ret
 
     def get_values_from_object(self, course):
-        assert (isinstance(course, Course))
-        if course is None:
-            course = Course()
-
         return [
             course.name,
             course.length,
@@ -442,7 +427,7 @@ class CourseMemoryModel(AbstractSportOrgMemoryModel):
         race().courses = array
 
 
-class TeamMemoryModel(AbstractSportOrgMemoryModel):
+class OrganizationMemoryModel(AbstractSportOrgMemoryModel):
     def __init__(self):
         super().__init__()
 
@@ -458,18 +443,14 @@ class TeamMemoryModel(AbstractSportOrgMemoryModel):
         ret = self.get_values_from_object(race().organizations[position])
         return ret
 
-    def get_values_from_object(self, team):
-        assert (isinstance(team, Organization))
-        if team is None:
-            team = Organization()
-
+    def get_values_from_object(self, organization):
         return [
-            team.name,
-            team.address.street,
-            team.address.country.name,
-            team.address.state,
-            team.address.city,
-            team.contact.value
+            organization.name,
+            organization.address.street,
+            organization.address.country.name,
+            organization.address.state,
+            organization.address.city,
+            organization.contact.value
         ]
 
     def get_source_array(self):

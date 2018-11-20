@@ -1,7 +1,7 @@
 import logging
 
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, QTextEdit, QDateTimeEdit, \
+from PySide2.QtGui import QIcon
+from PySide2.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, QTextEdit, QDateTimeEdit, \
     QDialogButtonBox, QSpinBox
 
 from sportorg import config
@@ -16,9 +16,9 @@ class EventPropertiesDialog(QDialog):
     def __init__(self):
         super().__init__(GlobalAccess().get_main_window())
 
-    def exec(self):
+    def exec_(self):
         self.init_ui()
-        return super().exec()
+        return super().exec_()
 
     def init_ui(self):
         self.setFixedWidth(500)
@@ -149,4 +149,3 @@ class EventPropertiesDialog(QDialog):
         ))
 
         ResultCalculation(race()).process_results()
-        GlobalAccess().get_main_window().refresh()

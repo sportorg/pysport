@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="75"
+     height="75" viewBox="0 0 100 100">
+    <defs>
+        <linearGradient id="Gradient_2" gradientUnits="userSpaceOnUse" x1="10" y1="25" x2="90" y2="25"
+                        spreadMethod="pad">
+            <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.2"/>
+
+            <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.4"/>
+        </linearGradient>
+        <linearGradient id="Gradient_3" gradientUnits="userSpaceOnUse" x1="90" y1="32" x2="10" y2="32"
+                        spreadMethod="pad">
+            <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.1"/>
+
+            <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.7"/>
+        </linearGradient>
+        <linearGradient id="Gradient_4" gradientUnits="userSpaceOnUse" x1="10" y1="49" x2="61" y2="49"
+                        spreadMethod="pad">
+            <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.1"/>
+
+            <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.7"/>
+        </linearGradient>
+        <g id="background">
+            <path fill="url(#background-gradient)" stroke="none"
+                  d=" M 84.05 59.05 Q 89.85 55.3 89.85 50 89.85 44.7 84.05 40.95 L 24.2 2.35 Q 18.4 -1.4 14.3 0.85 10.15 3.15 10.15 10.05 L 10.15 89.95 Q 10.15 96.9 14.3 99.15 18.4 101.4 24.2 97.65 L 84.05 59.05 Z"/>
+        </g>
+        <g id="gloss-top">
+            <path fill="url(#Gradient_2)" stroke="none"
+                  d=" M 88.4 45.2 Q 86.9 42.75 84.05 40.95 L 24.2 2.35 Q 18.4 -1.4 14.3 0.85 10.15 3.15 10.15 10.05 L 10.15 50 89.85 50 Q 89.85 47.5 88.4 45.2 Z"/>
+        </g>
+        <g id="gloss-right">
+            <path fill="url(#Gradient_3)" stroke="none"
+                  d=" M 84.05 59.05 Q 89.85 55.3 89.85 50 89.85 44.7 84.05 40.95 L 24.2 2.35 Q 18.4 -1.4 14.3 0.85 10.15 3.15 10.15 10.05 L 10.15 41.6 75.45 64.6 84.05 59.05 Z"/>
+        </g>
+        <g id="gloss-left">
+            <path fill="url(#Gradient_4)" stroke="none"
+                  d=" M 14.3 0.85 Q 10.15 3.15 10.15 10.05 L 10.15 89.95 Q 10.15 93.1 11.05 95.35 12 97.55 13.65 98.7 L 61.2 26.2 24.2 2.35 Q 18.4 -1.4 14.3 0.85 Z"/>
+        </g>
+
+        <linearGradient id="background-gradient" x1="0" y1="0" y2="1" x2="0">
+            <stop stop-color="#00BCD4" offset="0%"/>
+            <stop stop-color="#042449" offset="100%"/>
+        </linearGradient>
+
+    </defs>
+    <use xlink:href="#background" fill="url(#background-gradient)"/>
+    <use xlink:href="#gloss-left" opacity="1"/>
+</svg>

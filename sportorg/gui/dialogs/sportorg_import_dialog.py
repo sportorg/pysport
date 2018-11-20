@@ -1,7 +1,7 @@
 import logging
 
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QFormLayout, QDialog, QDialogButtonBox, QLabel, QGroupBox, QRadioButton
+from PySide2.QtGui import QIcon
+from PySide2.QtWidgets import QFormLayout, QDialog, QDialogButtonBox, QLabel, QGroupBox, QRadioButton
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
@@ -16,10 +16,10 @@ class SportOrgImportDialog(QDialog):
         self.races = races
         self.current_race = current_race
 
-    def exec(self):
+    def exec_(self):
         self.init_ui()
         self.set_values()
-        return super().exec()
+        return super().exec_()
 
     def init_ui(self):
         self.setWindowTitle(_('Import'))

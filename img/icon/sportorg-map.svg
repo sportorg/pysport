@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="512"
+     height="512" viewBox="0 0 100 100">
+
+
+    <defs>
+        <linearGradient id="gloss-1-gradient" gradientUnits="userSpaceOnUse" x1="1764.2" y1="2393.75"
+                        x2="1718.1000000000001" y2="2439.8500000000004" spreadMethod="pad">
+            <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.2980392156862745"/>
+            <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.09803921568627451"/>
+        </linearGradient>
+        <linearGradient id="gloss-2-gradient" gradientUnits="userSpaceOnUse" x1="1803.8" y1="2365.65" x2="1803.8"
+                        y2="2475.35" spreadMethod="pad">
+            <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.2980392156862745"/>
+            <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.09803921568627451"/>
+        </linearGradient>
+        <linearGradient id="gloss-3-gradient" gradientUnits="userSpaceOnUse" x1="1843.4125" y1="2439.8875"
+                        x2="1912.7875" y2="2370.5125" spreadMethod="pad">
+            <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.2980392156862745"/>
+            <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.09803921568627451"/>
+        </linearGradient>
+        <linearGradient id="bottom-2-gradient" gradientUnits="userSpaceOnUse" x1="1720.2" y1="2417.85" x2="1720.2"
+                        y2="2365.65" spreadMethod="pad">
+            <stop offset="0%" stop-color="#BCBEC0"/>
+            <stop offset="100%" stop-color="#E6E7E8"/>
+        </linearGradient>
+        <g id="background" transform="matrix( 0.4557952880859375, 0, 0, 0.4556884765625, -772.15,-1078) ">
+            <path d=" M 1913.5 2375.2 Q 1913.5 2371.25 1910.7 2368.4 1907.9 2365.6 1903.95 2365.6 L 1746.3 2365.6 1727.65 2399.15 1694.1 2417.85 1694.1 2575.45 Q 1694.1 2579.45 1696.9 2582.25 1699.75 2585.05 1703.7 2585.05 L 1903.95 2585.05 Q 1907.9 2585.05 1910.7 2582.25 1913.5 2579.4 1913.5 2575.45 L 1913.5 2375.2 Z"/>
+        </g>
+        <mask id="mask">
+            <path fill="#FFFFFF" stroke="none"
+                  d=" M 98.75 1.25 Q 97.45 0 95.65 0 L 23.8 0 15.3 15.25 0 23.8 0 95.6 Q 0 97.45 1.3 98.7 2.6 100 4.4 100 L 95.65 100 Q 97.45 100 98.75 98.7 100 97.4 100 95.6 L 100 4.35 Q 100 2.55 98.75 1.25 Z"/>
+        </mask>
+        <g id="gloss-left" transform="matrix( 0.4557952880859375, 0, 0, 0.4556884765625, -772.15,-1078)">
+            <path fill="url(#gloss-1-gradient)" stroke="none"
+                  d=" M 1830.15 2365.6 L 1746.25 2365.6 1694.1 2417.8 1694.1 2509.95 1830.15 2365.6 Z"/>
+        </g>
+        <g id="gloss-top" transform="matrix( 0.4557952880859375, 0, 0, 0.4556884765625, -772.15,-1078)">
+            <path fill="url(#gloss-2-gradient)" stroke="none"
+                  d=" M 1910.7 2368.4 Q 1907.9 2365.6 1903.95 2365.6 L 1746.3 2365.6 1727.65 2399.15 1694.1 2417.85 1694.1 2475.35 1913.5 2475.35 1913.5 2375.2 Q 1913.5 2371.25 1910.7 2368.4 Z"/>
+        </g>
+        <g id="gloss-right" transform="matrix( 0.4557952880859375, 0, 0, 0.4556884765625, -772.15,-1078)">
+            <path fill="url(#gloss-3-gradient)" stroke="none"
+                  d=" M 1910.7 2368.4 Q 1907.9 2365.6 1903.95 2365.6 L 1777.45 2365.6 1913.5 2509.95 1913.5 2375.2 Q 1913.5 2371.25 1910.7 2368.4 Z"/>
+        </g>
+        <g id="bottom-1" transform="matrix( 0.4557952880859375, 0, 0, 0.4556884765625, 0,0)">
+            <path fill="#000000" fill-opacity="0.2980392156862745" stroke="none"
+                  d=" M 0 52.25 L 0 83.4 83.35 0 52.2 0 31.6 31.65 0 52.25 Z"/>
+        </g>
+        <g id="bottom-2" transform="matrix( 0.4557952880859375, 0, 0, 0.4556884765625, -772.15,-1078)">
+            <path fill="url(#bottom-2-gradient)" stroke="none"
+                  d=" M 1743.5 2415.05 Q 1746.3 2412.25 1746.3 2408.25 L 1746.3 2365.6 1694.1 2417.85 1736.75 2417.85 Q 1740.7 2417.85 1743.5 2415.05 Z"/>
+        </g>
+
+        <linearGradient id="background-gradient" x1="0" y1="0" y2="1" x2="0">
+            <stop stop-color="#00BCD4" offset="0%"/>
+            <stop stop-color="#01163E" offset="100%"/>
+        </linearGradient>
+
+
+        <g transform="scale(3.125) translate(0 4)" id="picture">
+            <path d="M31.6.2c-.2-.2-.6-.2-.9-.2l-7.2 2-7.2-2h-.5L8.5 2 1.3 0C1 0 .6 0 .4.2.1.4 0 .7 0 1v20c0 .5.3.8.7 1l7.5 2h.5l7.3-2 7.2 1.9h.6l7.5-2c.4-.1.7-.5.7-1V1c0-.3-.1-.6-.4-.8zm-1.6 20L23.5 22l-7.2-2h-.6l-7.2 2L2 20.2V2.3L8.2 4h.5L16 2l7.2 2h.5L30 2.3v17.9z M6 16c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 3c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1zM28 7a2 2 0 1 1-4 0 2 2 0 1 1 4 0zM6.5 15c.3 0 .5-.2.5-.5s.1-.6.1-.9c.1-.2-.1-.5-.3-.6-.3-.1-.5.1-.6.4-.1.3-.2.7-.2 1.1 0 .2.2.5.5.5zm1.1-4.5l-.6.9c-.1.2-.1.5.2.7.1 0 .2.1.3.1.2 0 .3-.1.4-.2.2-.3.3-.5.5-.8.2-.2.1-.5-.1-.7s-.5-.2-.7 0zm2.6-1.9c-.3.1-.6.3-.9.4l-.1.1c-.2.1-.3.5-.2.7.1.1.3.2.5.2h.2l.1-.1c.2-.1.5-.2.7-.3.3-.1.4-.4.3-.6-.1-.3-.4-.5-.6-.4zm15.5 1c-.3-.1-.5 0-.7.3l-.3.6c-.1.2-.1.5.1.7.1.1.2.1.3.1.2 0 .3-.1.4-.2.1-.2.3-.5.4-.7.2-.4.1-.7-.2-.8zm-4.8 2.9c-.3 0-.6 0-.8-.1-.3 0-.5.1-.6.4 0 .3.1.5.4.6s.7.1 1.1.1c.3 0 .5-.2.5-.5-.1-.3-.3-.5-.6-.5zm1.8-.3c-.3.1-.4.4-.3.7.1.2.3.3.5.3h.2c.3-.1.7-.3 1-.5.2-.2.3-.5.1-.7-.2-.2-.5-.3-.7-.1-.3 0-.5.1-.8.3zm-4.3-.4c-.2-.1-.4-.2-.5-.4l-.2-.2c-.2-.2-.5-.2-.7 0-.2.2-.2.5 0 .7.1.1.2.1.2.2.2.2.4.3.6.5.1.1.2.1.3.1.2 0 .3-.1.4-.2.2-.2.1-.5-.1-.7zm-2.6-2.4c-.1-.1-.2-.2-.4-.3-.2-.1-.5-.1-.7.2-.2.2-.1.5.1.7.2 0 .3.1.4.1.1.1.3.2.4.4.1.1.2.1.4.1.1 0 .3 0 .4-.1.2-.2.2-.5 0-.7-.3-.1-.4-.3-.6-.4zm-2.4-1.1c-.3-.1-.7-.1-1-.1v.5-.5c-.3 0-.5.2-.5.5s.2.5.5.5.6 0 .9.1h.1c.2 0 .4-.2.5-.4 0-.3-.2-.5-.5-.6z"/>
+        </g>
+
+        <linearGradient id="picture-gradient" x1="0" y1="0" y2="1" x2="0">
+            <stop stop-color="#ffffff" offset="0%"/>
+            <stop stop-color="#e5eff9" offset="100%"/>
+        </linearGradient>
+
+    </defs>
+
+
+    <use xlink:href="#background" fill="url(#background-gradient)"/>
+
+
+    <g mask="url(#mask)">
+        <g transform="
+				        translate(
+                                50 50
+)
+                            translate(0 0)  scale(0.6500000000000001)  
+                            translate(
+                                -50 -50
+)">
+            <use xlink:href="#picture" fill="url(#picture-gradient)"/>
+        </g>
+    </g>
+
+    <use xlink:href="#bottom-1"/>
+    <use xlink:href="#bottom-2"/>
+
+    <use xlink:href="#gloss-top" opacity="1"/>
+
+
+</svg>

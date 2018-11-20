@@ -2,7 +2,7 @@ import os
 import re
 import platform
 
-from PyQt5.QtWidgets import QFileDialog
+from PySide2.QtWidgets import QFileDialog
 
 from sportorg.modules.configs.configs import ConfigFile, Config
 

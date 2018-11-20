@@ -4,12 +4,13 @@ from abc import abstractmethod
 
 from datetime import datetime
 
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, \
-    QTimeEdit, QRadioButton, QSpinBox, QGroupBox, QTextEdit, QDialogButtonBox, QDateTimeEdit
+from PySide2.QtCore import Qt
+from PySide2.QtGui import QIcon
+from PySide2.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, \
+    QTimeEdit, QSpinBox, QGroupBox, QTextEdit, QDialogButtonBox, QComboBox
 
 from sportorg import config
-from sportorg.gui.dialogs.entry_edit import EntryEditDialog
+from sportorg.gui.dialogs.person_edit import PersonEditDialog
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
@@ -34,12 +35,13 @@ class ResultEditDialog(QDialog):
         if time_accuracy:
             self.time_format = 'hh:mm:ss.zzz'
 
-    def exec(self):
+    def exec_(self):
         self.init_ui()
         self.set_values_from_model()
-        return super().exec()
+        return super().exec_()
 
     def init_ui(self):
+        self.resize(300, 200)
         self.setWindowTitle(_('Result'))
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
@@ -81,18 +83,13 @@ class ResultEditDialog(QDialog):
         self.item_penalty_laps = QSpinBox()
         self.item_penalty_laps.setMaximum(1000000)
 
-        self.radio_ok = QRadioButton(_('OK'))
-        self.radio_ok.setChecked(True)
-        self.radio_dns = QRadioButton(_('DNS'))
-        self.radio_dnf = QRadioButton(_('DNF'))
-        self.radio_overtime = QRadioButton(_('Overtime'))
-        self.radio_missing_punch = QRadioButton(_('Missing punch'))
-        self.radio_dsq = QRadioButton(_('DSQ'))
-        self.radio_restored = QRadioButton(_('Restored'))
+        self.item_status = QComboBox()
+        self.item_status.addItems(ResultStatus.get_titles())
+
         self.item_status_comment = AdvComboBox()
-        self.item_status_comment.setMaximumWidth(250)
-        self.item_status_comment.view().setMinimumWidth(650)
         self.item_status_comment.addItems(StatusComments().get_all())
+        for i, k in enumerate(StatusComments().get_all()):
+            self.item_status_comment.setItemData(i, k, Qt.ToolTipRole)
 
         more24 = race().get_setting('time_format_24', 'less24') == 'more24'
         self.splits = SplitsText(more24=more24)
@@ -110,14 +107,8 @@ class ResultEditDialog(QDialog):
         self.layout.addRow(QLabel(_('Penalty')), self.item_penalty)
         self.layout.addRow(QLabel(_('Penalty legs')), self.item_penalty_laps)
         self.layout.addRow(QLabel(_('Result')), self.item_result)
-
-        self.layout.addRow(self.radio_ok)
-        self.layout.addRow(self.radio_dns)
-        self.layout.addRow(self.radio_dnf)
-        self.layout.addRow(self.radio_overtime)
-        self.layout.addRow(self.radio_missing_punch)
-        self.layout.addRow(self.radio_restored)
-        self.layout.addRow(self.radio_dsq, self.item_status_comment)
+        self.layout.addRow(QLabel(_('Status')), self.item_status)
+        self.layout.addRow(QLabel(_('Comment')), self.item_status_comment)
 
         if self.current_object.is_punch():
             start_source = race().get_setting('system_start_source', 'protocol')
@@ -194,20 +185,7 @@ class ResultEditDialog(QDialog):
 
         self.item_days.setValue(self.current_object.days)
 
-        if self.current_object.status == ResultStatus.OK:
-            self.radio_ok.setChecked(True)
-        elif self.current_object.status == ResultStatus.DISQUALIFIED:
-            self.radio_dsq.setChecked(True)
-        elif self.current_object.status == ResultStatus.MISSING_PUNCH:
-            self.radio_missing_punch.setChecked(True)
-        elif self.current_object.status == ResultStatus.OVERTIME:
-            self.radio_overtime.setChecked(True)
-        elif self.current_object.status == ResultStatus.DID_NOT_FINISH:
-            self.radio_dnf.setChecked(True)
-        elif self.current_object.status == ResultStatus.DID_NOT_START:
-            self.radio_dns.setChecked(True)
-        elif self.current_object.status == ResultStatus.RESTORED:
-            self.radio_restored.setChecked(True)
+        self.item_status.setCurrentText(self.current_object.status.get_title())
 
         self.item_status_comment.setCurrentText(self.current_object.status_comment)
 
@@ -215,7 +193,7 @@ class ResultEditDialog(QDialog):
 
     def open_person(self):
         try:
-            EntryEditDialog(self.current_object.person).exec()
+            PersonEditDialog(self.current_object.person).exec_()
         except Exception as e:
             logging.error(str(e))
 
@@ -281,23 +259,7 @@ class ResultEditDialog(QDialog):
         if self.item_days.value() != result.days:
             result.days = self.item_days.value()
 
-        status = ResultStatus.NONE
-        if self.radio_ok.isChecked():
-            status = ResultStatus.OK
-        elif self.radio_dsq.isChecked():
-            status = ResultStatus.DISQUALIFIED
-        elif self.radio_missing_punch.isChecked():
-            status = ResultStatus.MISSING_PUNCH
-        elif self.radio_overtime.isChecked():
-            status = ResultStatus.OVERTIME
-        elif self.radio_dnf.isChecked():
-            status = ResultStatus.DID_NOT_FINISH
-        elif self.radio_dns.isChecked():
-            status = ResultStatus.DID_NOT_START
-        elif self.radio_restored.isChecked():
-            status = ResultStatus.RESTORED
-        if result.status != status:
-            result.status = status
+        result.status = ResultStatus.get_by_name(self.item_status.currentText())
 
         status = StatusComments().remove_hint(self.item_status_comment.currentText())
         if result.status_comment != status:
@@ -313,7 +275,6 @@ class ResultEditDialog(QDialog):
             except ResultCheckerException as e:
                 logging.error(str(e))
         ResultCalculation(race()).process_results()
-        GlobalAccess().get_main_window().refresh()
         Teamwork().send(result.to_dict())
 
 

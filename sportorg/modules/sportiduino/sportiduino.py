@@ -6,7 +6,7 @@ from threading import main_thread, Event
 import time
 import serial
 
-from PyQt5.QtCore import QThread, pyqtSignal
+from PySide2.QtCore import QThread, Signal
 
 from sportorg.core.singleton import singleton
 from sportorg.libs.sportiduino import sportiduino
@@ -58,7 +58,7 @@ class SportiduinoThread(QThread):
 
 
 class ResultThread(QThread):
-    data_sender = pyqtSignal(object)
+    data_sender = Signal(object)
 
     def __init__(self, queue, stop_event, logger):
         super().__init__()

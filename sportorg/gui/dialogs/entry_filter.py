@@ -1,11 +1,11 @@
 import logging
 
-from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QDialog, QTableView, QDialogButtonBox, QFormLayout
+from PySide2 import QtCore, QtWidgets
+from PySide2.QtGui import QIcon
+from PySide2.QtWidgets import QDialog, QTableView, QDialogButtonBox, QFormLayout
 
 from sportorg import config
-from sportorg.gui.dialogs.entry_edit import EntryEditDialog
+from sportorg.gui.dialogs.person_edit import PersonEditDialog
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
@@ -19,14 +19,13 @@ class DialogFilter(QDialog):
         if table is not None:
             self.table = table
 
-    def exec(self):
+    def exec_(self):
         self.init_ui()
-        return super().exec()
+        return super().exec_()
 
     def init_ui(self):
         self.setWindowModality(QtCore.Qt.WindowModal)
         self.setWindowIcon(QIcon(config.ICON))
-        self.resize(300, 0)
         self.setSizeGripEnabled(False)
         self.setModal(True)
 
@@ -58,7 +57,7 @@ class DialogFilter(QDialog):
 
         self.show()
 
-    def accept(self):
+    def accept(self, *args, **kwargs):
 
         try:
             # apply filter here
@@ -79,17 +78,12 @@ class DialogFilter(QDialog):
 
                 proxy_model.apply_filter()
 
-                EntryEditDialog.GROUP_NAME = self.group_combo.currentText()
-                EntryEditDialog.ORGANIZATION_NAME = self.team_combo.currentText()
-
-                GlobalAccess().get_main_window().refresh()
+                PersonEditDialog.GROUP_NAME = self.group_combo.currentText()
+                PersonEditDialog.ORGANIZATION_NAME = self.team_combo.currentText()
         except Exception as e:
             logging.error(str(e))
 
-        self.destroy()
-
-    def reject(self):
-        self.destroy()
+        super().accept(*args, **kwargs)
 
     def retranslate_ui(self):
         self.setWindowTitle(_("Filter Dialog"))

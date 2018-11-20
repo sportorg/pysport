@@ -1,6 +1,6 @@
-from PyQt5 import QtCore
-from PyQt5.QtCore import QSortFilterProxyModel
-from PyQt5.QtWidgets import QComboBox, QCompleter, QMessageBox
+from PySide2 import QtCore
+from PySide2.QtCore import QSortFilterProxyModel
+from PySide2.QtWidgets import QComboBox, QCompleter, QMessageBox
 
 from sportorg.language import _
 
@@ -55,6 +55,6 @@ def messageBoxQuestion(parent=None, title='', text='', buttons=(QMessageBox.Yes 
     if button_no is not None:
         button_no.setText(_('No'))
 
-    return messageBox.exec()
+    return messageBox.exec_()
 
 

@@ -45,7 +45,7 @@ class ResultSportidentGeneration:
     def _bib_dialog(self):
         try:
             bib_dialog = BibDialog('{}'.format(self._result.card_number))
-            bib_dialog.exec()
+            bib_dialog.exec_()
             self._person = bib_dialog.get_person()
             if not self._person:
                 self.assign_chip_reading = 'off'

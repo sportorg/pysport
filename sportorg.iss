@@ -30,7 +30,7 @@ OutputBaseFilename={#MyAppName}-{#MyAppVersion}
 Compression=lzma
 SolidCompression=yes
 LicenseFile=LICENSE
-SetupIconFile="img\icon\sportorg.ico"
+SetupIconFile="img\icon\sportorg.svg"
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
