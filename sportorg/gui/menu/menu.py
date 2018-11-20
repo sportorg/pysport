@@ -217,6 +217,11 @@ def menu_list():
                     'action': 'ManualFinishAction'
                 },
                 {
+                    'title': _('Intermediate result'),
+                    'icon': config.icon_dir('flag.svg'),
+                    'action': 'IntermediateResultAction'
+                },
+                {
                     'title': _('Add SPORTident result'),
                     'action': 'AddSPORTidentResultAction'
                 },

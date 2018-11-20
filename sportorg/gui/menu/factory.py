@@ -37,6 +37,7 @@ class Factory:
             CopyBibToCardNumber(),
             StartListAction(),
             ManualFinishAction(),
+            IntermediateResultAction(),
             SPORTidentReadoutAction(),
             SportiduinoReadoutAction(),
             SFRReadoutAction(),

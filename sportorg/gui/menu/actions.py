@@ -34,7 +34,7 @@ from sportorg.gui.dialogs.timekeeping_properties import TimekeepingPropertiesDia
 from sportorg.gui.menu.action import Action
 from sportorg.gui.utils.custom_controls import messageBoxQuestion
 from sportorg.libs.winorient.wdb import write_wdb
-from sportorg.models.memory import race, ResultStatus, ResultManual, find
+from sportorg.models.memory import race, ResultStatus, ResultManual, find, ResultIntermediate
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.result_checker import ResultChecker
 from sportorg.models.start.start_preparation import guess_corridors_for_groups, copy_bib_to_card_number
@@ -296,6 +296,16 @@ class ManualFinishAction(Action):
         Teamwork().send(result.to_dict())
         race().add_new_result(result)
         logging.info(_('Manual finish'))
+        self.app.get_result_table().model().init_cache()
+        self.app.refresh()
+
+
+class IntermediateResultAction(Action):
+    def execute(self):
+        result = race().new_result(ResultIntermediate)
+        Teamwork().send(result.to_dict())
+        race().add_new_result(result)
+        logging.info(_('Intermediate result'))
         self.app.get_result_table().model().init_cache()
         self.app.refresh()
 

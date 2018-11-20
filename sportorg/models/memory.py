@@ -29,6 +29,7 @@ class SystemType(Enum):
     SPORTIDENT = 2
     SFR = 3
     SPORTIDUINO = 4
+    INTERMEDIATE = 5
 
     def __str__(self):
         return "%s" % self._name_
@@ -742,7 +743,7 @@ class Result:
         return self.status == ResultStatus.OK or self.status == ResultStatus.RESTORED
 
     def is_punch(self):
-        return self.is_sportident() or self.is_sfr() or self.is_sportiduino()
+        return self.is_sportident() or self.is_sfr() or self.is_sportiduino() or self.is_intermediate()
 
     def is_sportident(self):
         return self.system_type == SystemType.SPORTIDENT
@@ -756,10 +757,15 @@ class Result:
     def is_manual(self):
         return self.system_type == SystemType.MANUAL
 
+    def is_intermediate(self):
+        return self.system_type == SystemType.INTERMEDIATE
+
 
 class ResultManual(Result):
     system_type = SystemType.MANUAL
 
+class ResultIntermediate(Result):
+    system_type = SystemType.INTERMEDIATE
 
 class ResultSportident(Result):
     system_type = SystemType.SPORTIDENT
@@ -1116,6 +1122,7 @@ class Race(Model):
         'Person': Person,
         'Result': Result,
         'ResultManual': ResultManual,
+        'ResultIntermediate': ResultIntermediate,
         'ResultSportident': ResultSportident,
         'ResultSFR': ResultSFR,
         'ResultSportiduino': ResultSportiduino,

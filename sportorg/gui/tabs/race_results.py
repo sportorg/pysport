@@ -173,6 +173,9 @@ class Widget(QtWidgets.QWidget):
         if result.is_manual():
             return
 
+        if result.is_intermediate():
+            return
+
         course = None
         if result.person:
             course = race().find_course(result)

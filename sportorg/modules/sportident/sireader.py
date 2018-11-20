@@ -10,11 +10,13 @@ import time
 
 import serial
 from PyQt5.QtCore import QThread, pyqtSignal
+from sireader import SIReader
 
 from sportorg.core.singleton import singleton
 from sportorg.language import _
 from sportorg.libs.sireader import sireader
 from sportorg.models import memory
+from sportorg.models.memory import ResultIntermediate
 from sportorg.modules.sportident import backup
 from sportorg.utils.time import time_to_otime
 
@@ -38,31 +40,73 @@ class SIReaderThread(QThread):
 
     def run(self):
         try:
-            si = sireader.SIReaderReadout(port=self.port, logger=logging.root)
+            # First try to connect station as Control in autosend mode, then as readout
+            si = sireader.SIReaderControl(port=self.port, logger=logging.root)
+            if not si.proto_config['auto_send']:
+                if si.proto_config['mode'] == SIReader.M_READOUT:
+                    si.disconnect()
+                    si = sireader.SIReaderReadout(port=self.port, logger=logging.root)
+                else:
+                    self._logger.error('Incompatible station mode')
+                    return
+            si.get_type()
+
         except Exception as e:
             self._logger.error(str(e))
             return
-        while True:
-            try:
-                while not si.poll_sicard():
-                    time.sleep(0.2)
-                    if not main_thread().is_alive() or self._stop_event.is_set():
-                        si.disconnect()
-                        self._logger.debug('Stop sireader')
-                        return
-                card_data = si.read_sicard()
-                card_data['card_type'] = si.cardtype
-                self._queue.put(SIReaderCommand('card_data', card_data), timeout=1)
-                si.ack_sicard()
-            except sireader.SIReaderException as e:
-                self._logger.error(str(e))
-            except sireader.SIReaderCardChanged as e:
-                self._logger.error(str(e))
-            except serial.serialutil.SerialException as e:
-                self._logger.error(str(e))
-                return
-            except Exception as e:
-                self._logger.exception(str(e))
+        if isinstance(si, sireader.SIReaderReadout):
+            while True:
+                try:
+                    while not si.poll_sicard():
+                        time.sleep(0.2)
+                        if not main_thread().is_alive() or self._stop_event.is_set():
+                            si.disconnect()
+                            self._logger.debug('Stop sireader')
+                            return
+                    card_data = si.read_sicard()
+                    card_data['card_type'] = si.cardtype
+                    self._queue.put(SIReaderCommand('card_data', card_data), timeout=1)
+                    si.ack_sicard()
+                except sireader.SIReaderException as e:
+                    self._logger.error(str(e))
+                except sireader.SIReaderCardChanged as e:
+                    self._logger.error(str(e))
+                except serial.serialutil.SerialException as e:
+                    self._logger.error(str(e))
+                    return
+                except Exception as e:
+                    self._logger.exception(str(e))
+
+        elif isinstance(si, sireader.SIReaderControl):
+            while True:
+                try:
+                    data = si.poll_punch()
+                    while not data:
+                        data = si.poll_punch()
+                        time.sleep(0.2)
+
+                        if not main_thread().is_alive() or self._stop_event.is_set():
+                            si.disconnect()
+                            self._logger.debug('Stop sireader')
+                            return
+
+                    for data_item in data:  # can get several punches at a time
+                        card_data = {}
+                        card_data['card_number'] = data_item[0]
+                        card_data['date'] = data_item[1]
+                        card_data['station_code'] = si.station_code & 511
+
+                        self._queue.put(SIReaderCommand('intermediate', card_data), timeout=1)
+
+                except sireader.SIReaderException as e:
+                    self._logger.error(str(e))
+                except sireader.SIReaderCardChanged as e:
+                    self._logger.error(str(e))
+                except serial.serialutil.SerialException as e:
+                    self._logger.error(str(e))
+                    return
+                except Exception as e:
+                    self._logger.exception(str(e))
 
 
 class ResultThread(QThread):
@@ -86,11 +130,15 @@ class ResultThread(QThread):
                     result = self._get_result(self._check_data(cmd.data))
                     self.data_sender.emit(result)
                     backup.backup_data(cmd.data)
+                elif cmd.command == 'intermediate':
+                    result = self._get_intermediate_result(cmd.data)
+                    self.data_sender.emit(result)
+                    #backup.backup_data(cmd.data)
             except Empty:
                 if not main_thread().is_alive() or self._stop_event.is_set():
                     break
             except Exception as e:
-                self._logger.error(str(e))
+                self._logger.exception(e)
         self._logger.debug('Stop adder result')
 
     def _check_data(self, card_data):
@@ -127,6 +175,21 @@ class ResultThread(QThread):
             result.start_time = time_to_otime(card_data['start'])
         if card_data['finish']:
             result.finish_time = time_to_otime(card_data['finish'])
+
+        return result
+
+    @staticmethod
+    def _get_intermediate_result(card_data):
+        result = memory.race().new_result(ResultIntermediate)
+
+        result.card_number = int(card_data['card_number'])
+
+        split = memory.Split()
+        split.code = str(card_data['station_code'])
+        split.time = time_to_otime(card_data['date'])
+        result.splits.append(split)
+
+        result.finish_time = time_to_otime(card_data['date'])
 
         return result
 
