@@ -81,8 +81,11 @@ class MainWindow(QMainWindow):
         self.last_update = time.time()
 
     def _set_style(self):
-        with open(config.style_dir('style.qss')) as s:
-            self.setStyleSheet(s.read())
+        try:
+            with open(config.style_dir('default.qss')) as s:
+                self.setStyleSheet(s.read())
+        except FileNotFoundError:
+            pass
 
     def show_window(self):
         try:

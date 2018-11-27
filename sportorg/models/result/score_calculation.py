@@ -4,7 +4,6 @@ from sportorg.core.otime import OTime
 from sportorg.models.memory import Result, Organization, RaceType
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.start.relay import get_team_result
-from sportorg.utils.time import timeit
 
 
 class ScoreCalculation(object):
@@ -12,7 +11,6 @@ class ScoreCalculation(object):
     def __init__(self, r):
         self.race = r
 
-    @timeit
     def calculate_scores(self):
         logging.debug('Score calculation')
         for i in self.race.results:

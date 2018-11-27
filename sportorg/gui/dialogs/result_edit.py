@@ -41,11 +41,11 @@ class ResultEditDialog(QDialog):
         return super().exec_()
 
     def init_ui(self):
-        self.resize(300, 200)
         self.setWindowTitle(_('Result'))
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(True)
+        self.setMaximumWidth(300)
 
         self.layout = QFormLayout(self)
 
@@ -87,6 +87,8 @@ class ResultEditDialog(QDialog):
         self.item_status.addItems(ResultStatus.get_titles())
 
         self.item_status_comment = AdvComboBox()
+        self.item_status_comment.setMaximumWidth(300)
+        self.item_status_comment.view().setMinimumWidth(600)
         self.item_status_comment.addItems(StatusComments().get_all())
         for i, k in enumerate(StatusComments().get_all()):
             self.item_status_comment.setItemData(i, k, Qt.ToolTipRole)

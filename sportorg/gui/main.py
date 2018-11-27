@@ -1,4 +1,3 @@
-import time
 from multiprocessing import freeze_support
 import sys
 import glob
@@ -11,7 +10,6 @@ from sportorg.core.scripts import SCRIPTS, Script
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.main_window import MainWindow
 from sportorg.models.constant import StatusComments, PersonNames, Regions, RankingTable, RentCards
-from sportorg.utils.time import timeit
 
 
 class Application(metaclass=Singleton):
@@ -25,7 +23,6 @@ class Application(metaclass=Singleton):
         return self.main_window
 
     def run(self):
-        t = time.time()
         freeze_support()
         self.set_status_comments()
         self.set_names()
@@ -34,11 +31,9 @@ class Application(metaclass=Singleton):
         self.set_scripts()
         self.set_rent_cards()
         self.main_window.show_window()
-        print('Loaded in {:.3f} seconds.'.format(time.time() - t))
         sys.exit(self.app.exec_())
 
     @staticmethod
-    @timeit
     def set_status_comments():
         try:
             with open(config.STATUS_COMMENTS_FILE, encoding='utf-8') as f:
@@ -48,7 +43,6 @@ class Application(metaclass=Singleton):
             print(str(e))
 
     @staticmethod
-    @timeit
     def set_names():
         try:
             with open(config.NAMES_FILE, encoding='utf-8') as f:
@@ -58,7 +52,6 @@ class Application(metaclass=Singleton):
             print(str(e))
 
     @staticmethod
-    @timeit
     def set_regions():
         try:
             with open(config.REGIONS_FILE, encoding='utf-8') as f:
@@ -68,7 +61,6 @@ class Application(metaclass=Singleton):
             print(str(e))
 
     @staticmethod
-    @timeit
     def set_ranking():
         try:
             with open(config.RANKING_SCORE_FILE, encoding='utf-8') as f:
@@ -78,7 +70,6 @@ class Application(metaclass=Singleton):
             print(str(e))
 
     @staticmethod
-    @timeit
     def set_rent_cards():
         try:
             with open(config.data_dir('rent_cards.txt'), encoding='utf-8') as f:
@@ -90,7 +81,6 @@ class Application(metaclass=Singleton):
             print(str(e))
 
     @staticmethod
-    @timeit
     def set_scripts():
         try:
             for file in glob.glob(config.script_dir('*.py')):
