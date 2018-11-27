@@ -5,14 +5,12 @@ from sportorg.models.constant import RankingTable
 from sportorg.models.memory import Result, Person, Group, Qualification, RankingItem, \
     RelayTeam, RaceType, find
 from sportorg.modules.configs.configs import Config
-from sportorg.utils.time import timeit
 
 
 class ResultCalculation(object):
     def __init__(self, r):
         self.race = r
 
-    @timeit
     def process_results(self):
         logging.debug('Process results')
         self.race.relay_teams.clear()
