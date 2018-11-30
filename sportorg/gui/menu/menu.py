@@ -112,6 +112,10 @@ def menu_list():
                 {
                     'title': _('Text exchange'),
                     'action': 'TextExchangeAction'
+                },
+                {
+                    'title': _('Mass edit'),
+                    'action': 'MassEditAction'
                 }
             ]
         },

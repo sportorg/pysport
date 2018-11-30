@@ -1,4 +1,5 @@
 from sportorg.gui.menu.actions import *
+from sportorg.gui.menu.actions import MassEditAction
 
 
 class Factory(object):
@@ -19,6 +20,7 @@ class Factory(object):
             AddObjectAction(),
             DeleteAction(),
             TextExchangeAction(),
+            MassEditAction(),
             RefreshAction(),
             FilterAction(),
             SearchAction(),

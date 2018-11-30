@@ -11,6 +11,7 @@ from sportorg.core.otime import OTime
 from sportorg.gui.dialogs.about import AboutDialog
 from sportorg.gui.dialogs.cp_delete import CPDeleteDialog
 from sportorg.gui.dialogs.entry_filter import DialogFilter
+from sportorg.gui.dialogs.entry_mass_edit import MassEditDialog
 from sportorg.gui.dialogs.event_properties import EventPropertiesDialog
 from sportorg.gui.dialogs.file_dialog import get_open_file_name, get_save_file_name
 from sportorg.gui.dialogs.live_dialog import LiveDialog
@@ -184,6 +185,10 @@ class TextExchangeAction(Action):
         TextExchangeDialog().exec_()
         self.app.refresh()
 
+class MassEditAction(Action):
+    def execute(self):
+        MassEditDialog().exec_()
+        self.app.refresh()
 
 class RefreshAction(Action):
     def execute(self):
