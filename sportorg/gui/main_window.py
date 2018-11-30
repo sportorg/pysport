@@ -379,8 +379,9 @@ class MainWindow(QMainWindow):
         if idx < len(map_):
             return self.get_table_by_name(map_[idx])
 
-    def get_selected_rows(self):
-        table = self.get_current_table()
+    def get_selected_rows(self, table):
+        if not table:
+            table = self.get_current_table()
         assert isinstance(table, QTableView)
         sel_model = table.selectionModel()
         assert isinstance(sel_model, QItemSelectionModel)
