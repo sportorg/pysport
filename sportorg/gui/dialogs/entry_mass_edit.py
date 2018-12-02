@@ -13,7 +13,6 @@ from sportorg.models.memory import race, find
 
 
 class MassEditDialog(QDialog):
-
     def __init__(self):
         super().__init__(GlobalAccess().get_main_window())
 
@@ -29,11 +28,13 @@ class MassEditDialog(QDialog):
         self.setModal(True)
 
         self.layout = QFormLayout(self)
-        
+
         self.group_checkbox = QtWidgets.QCheckBox(self)
         self.group_combo = AdvComboBox(self)
 
         empty_value = ''
+        yes = _('Yes')
+        no = _('No')
 
         group_list = get_race_groups()
         if empty_value not in group_list:
@@ -55,6 +56,44 @@ class MassEditDialog(QDialog):
         self.start_group_spinbox.setMaximum(99)
         self.layout.addRow(self.start_group_checkbox, self.start_group_spinbox)
 
+        self.comment_checkbox = QtWidgets.QCheckBox(self)
+        self.comment_text = QtWidgets.QTextEdit()
+        self.comment_text.setTabChangesFocus(True)
+        self.comment_text.setMaximumHeight(44)
+        self.layout.addRow(self.comment_checkbox, self.comment_text)
+
+        self.rented_checkbox = QtWidgets.QCheckBox(self)
+        self.rented_combobox = AdvComboBox(self)
+        self.rented_combobox.addItem(yes)
+        self.rented_combobox.addItem(no)
+        self.rented_combobox.setEditable(False)
+        self.rented_combobox.setMaximumWidth(50)
+        self.layout.addRow(self.rented_checkbox, self.rented_combobox)
+
+        self.paid_checkbox = QtWidgets.QCheckBox(self)
+        self.paid_combobox = AdvComboBox(self)
+        self.paid_combobox.addItem(yes)
+        self.paid_combobox.addItem(no)
+        self.paid_combobox.setEditable(False)
+        self.paid_combobox.setMaximumWidth(50)
+        self.layout.addRow(self.paid_checkbox, self.paid_combobox)
+
+        self.out_of_competition_checkbox = QtWidgets.QCheckBox(self)
+        self.out_of_competition_combobox = AdvComboBox(self)
+        self.out_of_competition_combobox.addItem(yes)
+        self.out_of_competition_combobox.addItem(no)
+        self.out_of_competition_combobox.setEditable(False)
+        self.out_of_competition_combobox.setMaximumWidth(50)
+        self.layout.addRow(self.out_of_competition_checkbox, self.out_of_competition_combobox)
+
+        self.personal_checkbox = QtWidgets.QCheckBox(self)
+        self.personal_combobox = AdvComboBox(self)
+        self.personal_combobox.addItem(yes)
+        self.personal_combobox.addItem(no)
+        self.personal_combobox.setEditable(False)
+        self.personal_combobox.setMaximumWidth(50)
+        self.layout.addRow(self.personal_checkbox, self.personal_combobox)
+
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         self.button_ok = button_box.button(QDialogButtonBox.Ok)
         self.button_ok.clicked.connect(self.accept)
@@ -69,6 +108,7 @@ class MassEditDialog(QDialog):
 
     def accept(self, *args, **kwargs):
 
+        yes = _('Yes')
         try:
             # apply mass edit here
             mv = GlobalAccess().get_main_window()
@@ -79,6 +119,11 @@ class MassEditDialog(QDialog):
                 change_group = find(obj.groups, name=self.group_combo.currentText())
                 change_team = find(obj.organizations, name=self.team_combo.currentText())
                 start_group = int(self.start_group_spinbox.value())
+                change_comment = self.comment_text.toPlainText()
+                change_rented = self.rented_combobox.currentText() == yes
+                change_paid = self.paid_combobox.currentText() == yes
+                change_out_of_competition = self.out_of_competition_combobox.currentText() == yes
+                change_personal = self.personal_combobox.currentText() == yes
 
                 for i in selection:
                     if i < len(obj.persons):
@@ -93,6 +138,21 @@ class MassEditDialog(QDialog):
                         if self.start_group_checkbox.isChecked():
                             cur_person.start_group = start_group
 
+                        if self.comment_checkbox.isChecked():
+                            cur_person.comment = change_comment
+
+                        if self.rented_checkbox.isChecked():
+                            cur_person.is_rented_card = change_rented
+
+                        if self.paid_checkbox.isChecked():
+                            cur_person.is_paid = change_paid
+
+                        if self.out_of_competition_checkbox.isChecked():
+                            cur_person.is_out_of_competition = change_out_of_competition
+
+                        if self.personal_checkbox.isChecked():
+                            cur_person.is_personal = change_personal
+
         except Exception as e:
             logging.exception(e)
 
@@ -103,6 +163,11 @@ class MassEditDialog(QDialog):
         self.group_checkbox.setText(_("Group"))
         self.team_checkbox.setText(_("Team"))
         self.start_group_checkbox.setText(_("Start group"))
+        self.comment_checkbox.setText(_("Comment"))
+        self.rented_checkbox.setText(_("rented card"))
+        self.paid_checkbox.setText(_("is paid"))
+        self.out_of_competition_checkbox.setText(_("out of competition"))
+        self.personal_checkbox.setText(_("personal participation"))
 
         self.button_ok.setText(_('OK'))
         self.button_cancel.setText(_('Cancel'))

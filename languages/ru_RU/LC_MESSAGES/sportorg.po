@@ -1257,3 +1257,9 @@ msgstr "Аренда чипов"
 
 msgid "Restored"
 msgstr "Восстановлен"
+
+msgid "Mass edit"
+msgstr "Массовое редактирование"
+
+msgid "Mass Edit Dialog"
+msgstr "Диалог массового редактирования"
