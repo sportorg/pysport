@@ -185,10 +185,13 @@ class TextExchangeAction(Action):
         TextExchangeDialog().exec_()
         self.app.refresh()
 
+
 class MassEditAction(Action):
     def execute(self):
-        MassEditDialog().exec_()
-        self.app.refresh()
+        if self.app.current_tab == 0:
+            MassEditDialog().exec_()
+            self.app.refresh()
+
 
 class RefreshAction(Action):
     def execute(self):

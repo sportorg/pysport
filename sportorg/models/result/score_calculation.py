@@ -10,6 +10,22 @@ class ScoreCalculation(object):
 
     def __init__(self, r):
         self.race = r
+        self.formula = None
+        self.wrong_formula = False
+        if self.race.get_setting('scores_mode', 'off') == 'formula':
+            self.formula = str(self.race.get_setting('scores_formula', '0'))
+
+    def get_scores_by_formula(self, leader, time):
+        if self.formula is not None and not self.wrong_formula:
+            try:
+                return max(eval(self.formula, {}, {
+                    'leader': leader,
+                    'time': time
+                }), 0)
+            except Exception as e:
+                logging.error(str(e))
+                self.wrong_formula = True
+        return 0
 
     def calculate_scores(self):
         logging.debug('Score calculation')
@@ -45,15 +61,7 @@ class ScoreCalculation(object):
                         leader_time_value = leader_time.to_msec()
                     else:
                         leader_time_value = 1000
-
-                    time_phrase = 'time'
-                    leader_time_phrase = 'leader'
-                    expr = str(self.race.get_setting('scores_formula', '0'))
-                    expr = expr.replace(time_phrase, str(time_value))
-                    expr = expr.replace(leader_time_phrase, str(leader_time_value))
-                    value = eval(expr)
-                    value = max(round(value), 0)
-                    result.scores = value
+                    result.scores = self.get_scores_by_formula(leader_time_value, time_value)
             else:
                 result.scores = 0
 
