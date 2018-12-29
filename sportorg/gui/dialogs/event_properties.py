@@ -124,8 +124,8 @@ class EventPropertiesDialog(QDialog):
     def apply_changes_impl(self):
         obj = race()
 
-        start_date = self.item_start_date.dateTime().toPyDateTime()
-        end_date = self.item_end_date.dateTime().toPyDateTime()
+        start_date = self.item_start_date.dateTime().toPython()
+        end_date = self.item_end_date.dateTime().toPython()
 
         obj.data.title = self.item_main_title.text()
         obj.data.description = self.item_sub_title.toPlainText()

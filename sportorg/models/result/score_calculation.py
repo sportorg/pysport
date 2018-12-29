@@ -33,14 +33,11 @@ class ScoreCalculation(object):
             self.calculate_scores_result(i)
 
     def calculate_scores_result(self, result):
-        if isinstance(result, Result):
-            place = result.place
-            if result.person \
-                    and self.race.get_type(result.person.group) == RaceType.RELAY \
-                    and get_team_result(result.person) == OTime(0):
+        if isinstance(result, Result) and result.person and result.person.group:
+            place = int(result.place)
+            if self.race.get_type(result.person.group) == RaceType.RELAY and get_team_result(result.person) == OTime(0):
                 place = 0
             if place > 0:
-                place = int(place)
                 scores_type = self.race.get_setting('scores_mode', 'off')
                 if scores_type == 'array':
                     scores_array = str(self.race.get_setting('scores_array', '0')).split(',')

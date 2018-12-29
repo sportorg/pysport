@@ -21,6 +21,8 @@ class WinOrientBinary:
 
     status_reverse = {
         ResultStatus.OK: 0,
+        ResultStatus.RESTORED: 0,
+        ResultStatus.MISSING_PUNCH: 1,
         ResultStatus.DISQUALIFIED: 1,
         ResultStatus.OVERTIME: 2,
         ResultStatus.DID_NOT_FINISH: 7,
