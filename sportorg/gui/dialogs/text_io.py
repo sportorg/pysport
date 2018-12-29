@@ -11,7 +11,7 @@ from sportorg.utils.time import time_to_hhmmss, hhmmss_to_time
 
 def get_value_options():
     return [_('Start'), _('Finish'), _('Result'), _('Credit'), _('Penalty time'), _('Penalty legs'), _('Card number'),
-            _('Group'), _('Team'), _('Qualification'), _('Bib')]
+            _('Group'), _('Team'), _('Qualification'), _('Bib'), _('Comment')]
 
 
 class TextExchangeDialog(QDialog):
@@ -269,6 +269,8 @@ def get_property(person, key):
         return person.qual.get_title()
     elif key == _('Bib'):
         return str(person.bib)
+    elif key == _('Comment'):
+        return str(person.comment)
 
     return ''
 
@@ -318,3 +320,5 @@ def set_property(person, key, value):
         if value.isdigit():
             new_bib = int(value)
             person.bib = new_bib
+    elif key == _('Comment'):
+        person.comment = value

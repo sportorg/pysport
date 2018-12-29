@@ -582,8 +582,12 @@ class Result:
         return eq
 
     def __gt__(self, other):  # greater is worse
-        if self.status != other.status:
+        if self.is_status_ok() != other.is_status_ok():
+            return other.is_status_ok()
+        elif self.status != other.status and not self.is_status_ok():
+            #incorrect statuses sort
             return self.status.value > other.status.value
+
         if race().get_setting('result_processing_mode', 'time') == 'time':
             return self.get_result_otime() > other.get_result_otime()
         else:  # process by score (rogain)
