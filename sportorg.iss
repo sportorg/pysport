@@ -2,8 +2,8 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "SportOrg"
-#define MyAppVersion "v1.3.0"
-#define MyVersionInfoVersion "1.3.0.0"
+#define MyAppVersion "v1.4.0"
+#define MyVersionInfoVersion "1.4.0.0"
 #define MyAppPublisher "Danil Akhtarov, Sergei Kobelev"
 #define MyAppURL "http://sportorg.o-ural.ru/"
 #define MyAppExeName "SportOrg.exe"
@@ -30,7 +30,7 @@ OutputBaseFilename={#MyAppName}-{#MyAppVersion}
 Compression=lzma
 SolidCompression=yes
 LicenseFile=LICENSE
-SetupIconFile="img\icon\sportorg.svg"
+SetupIconFile="img\icon\sportorg.ico"
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
