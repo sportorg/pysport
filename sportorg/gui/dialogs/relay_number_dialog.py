@@ -34,7 +34,6 @@ class RelayNumberDialog(QDialog):
 
         self.layout.addRow(self.number_label, self.number_item)
 
-
         def cancel_changes():
             self.close()
 
