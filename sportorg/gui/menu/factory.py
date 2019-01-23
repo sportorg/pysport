@@ -1,5 +1,4 @@
 from sportorg.gui.menu.actions import *
-from sportorg.gui.menu.actions import MassEditAction
 
 
 class Factory(object):

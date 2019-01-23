@@ -68,6 +68,7 @@ class MainWindow(QMainWindow):
         self.menu_factory = Factory(self)
         self.recent_files = []
         self.menu_property = {}
+        self.menu_list_for_disabled = []
         self.toolbar_property = {}
         try:
             self.file = argv[1]
@@ -79,6 +80,7 @@ class MainWindow(QMainWindow):
         handler = ConsolePanelHandler(self)
         logging.root.addHandler(handler)
         self.last_update = time.time()
+        self.relay_number_assign = False
 
     def _set_style(self):
         try:
@@ -149,6 +151,7 @@ class MainWindow(QMainWindow):
         ServiceListenerThread().interval.connect(self.interval)
         ServiceListenerThread().start()
         LiveClient().init()
+        self._menu_disable(self.current_tab)
 
     def _setup_ui(self):
         geometry = ConfigFile.GEOMETRY
@@ -187,6 +190,11 @@ class MainWindow(QMainWindow):
                     action.setIcon(QtGui.QIcon(action_item['icon']))
                 if 'status_tip' in action_item:
                     action.setStatusTip(action_item['status_tip'])
+                if 'tabs' in action_item:
+                    self.menu_list_for_disabled.append((
+                        action,
+                        action_item['tabs']
+                    ))
                 if 'property' in action_item:
                     self.menu_property[action_item['property']] = action
                 if ('debug' in action_item and action_item['debug']) or 'debug' not in action_item:
@@ -196,6 +204,11 @@ class MainWindow(QMainWindow):
                 menu.setTitle(action_item['title'])
                 if 'icon' in action_item:
                     menu.setIcon(QtGui.QIcon(action_item['icon']))
+                if 'tabs' in action_item:
+                    self.menu_list_for_disabled.append((
+                        menu,
+                        action_item['tabs']
+                    ))
                 self._create_menu(menu, action_item['actions'])
                 parent.addAction(menu.menuAction())
 
@@ -232,6 +245,14 @@ class MainWindow(QMainWindow):
         self.tabwidget.addTab(organizations.Widget(), _('Teams'))
         self.logging_tab = log.Widget()
         self.tabwidget.addTab(self.logging_tab, _('Logs'))
+        self.tabwidget.currentChanged.connect(self._menu_disable)
+
+    def _menu_disable(self, tab_index):
+        for item in self.menu_list_for_disabled:
+            if tab_index not in item[1]:
+                item[0].setDisabled(True)
+            else:
+                item[0].setDisabled(False)
 
     def get_size(self):
         return {
