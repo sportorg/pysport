@@ -1,17 +1,21 @@
 import logging
 
 from PySide2 import QtCore, QtWidgets
-from PySide2.QtWidgets import QDialog, QDialogButtonBox, QVBoxLayout, QWidget
+from PySide2.QtWidgets import QDialog, QDialogButtonBox, QVBoxLayout, QWidget, QCheckBox
 
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import _
-from sportorg.models.memory import race, Person, Qualification
+from sportorg.models.memory import race, Person, Qualification, ResultManual
 from sportorg.utils.time import time_to_hhmmss, hhmmss_to_time
 
 
 def get_value_options():
     return [_('Start'), _('Finish'), _('Result'), _('Credit'), _('Penalty time'), _('Penalty legs'), _('Card number'),
             _('Group'), _('Team'), _('Qualification'), _('Bib'), _('Comment')]
+
+
+def get_readonly_options():
+    return [_('Result')]
 
 
 class TextExchangeDialog(QDialog):
@@ -59,17 +63,17 @@ class TextExchangeDialog(QDialog):
         self.grid_layout.addWidget(self.value_group_box, 0, 0, 1, 1)
         self.separator_group_box = QtWidgets.QGroupBox(self)
 
-        self.gridLayout = QtWidgets.QGridLayout(self.separator_group_box)
+        self.separator_grid_layout = QtWidgets.QGridLayout(self.separator_group_box)
 
         self.space_radio_button = QtWidgets.QRadioButton(self.separator_group_box)
-        self.gridLayout.addWidget(self.space_radio_button, 0, 0, 1, 1)
+        self.separator_grid_layout.addWidget(self.space_radio_button, 0, 0, 1, 1)
 
         self.tab_radio_button = QtWidgets.QRadioButton(self.separator_group_box)
         self.tab_radio_button.setChecked(True)
-        self.gridLayout.addWidget(self.tab_radio_button, 1, 0, 1, 1)
+        self.separator_grid_layout.addWidget(self.tab_radio_button, 1, 0, 1, 1)
 
         self.semicolon_radio_button = QtWidgets.QRadioButton(self.separator_group_box)
-        self.gridLayout.addWidget(self.semicolon_radio_button, 2, 0, 1, 1)
+        self.separator_grid_layout.addWidget(self.semicolon_radio_button, 2, 0, 1, 1)
 
         self.custom_layout = QtWidgets.QHBoxLayout()
 
@@ -79,11 +83,17 @@ class TextExchangeDialog(QDialog):
         self.custom_edit = QtWidgets.QLineEdit(self.separator_group_box)
 
         self.custom_layout.addWidget(self.custom_edit)
-        self.gridLayout.addLayout(self.custom_layout, 3, 0, 1, 1)
+        self.separator_grid_layout.addLayout(self.custom_layout, 3, 0, 1, 1)
         self.grid_layout.addWidget(self.separator_group_box, 0, 1, 1, 1)
 
+        self.options_group_box = QtWidgets.QGroupBox(self)
+        self.options_grid_layout = QtWidgets.QGridLayout(self.options_group_box)
+        self.option_creating_new_result_checkbox = QCheckBox(_("Create new result, if doesn't exist"))
+        self.options_grid_layout.addWidget(self.option_creating_new_result_checkbox, 0, 0, 1, 1)
+        self.grid_layout.addWidget(self.options_group_box, 1, 0, 1, 2)
+
         self.text_edit = QtWidgets.QPlainTextEdit(self)
-        self.grid_layout.addWidget(self.text_edit, 1, 0, 1, 2)
+        self.grid_layout.addWidget(self.text_edit, 2, 0, 1, 2)
 
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         self.button_ok = button_box.button(QDialogButtonBox.Ok)
@@ -110,6 +120,7 @@ class TextExchangeDialog(QDialog):
         self.tab_radio_button.setText(_("tab"))
         self.semicolon_radio_button.setText(_("semicolon"))
         self.custom_radio_button.setText(_("custom"))
+        self.options_group_box.setTitle(_("Options"))
         self.text_edit.setPlainText('')
 
         self.get_text_wrapper()
@@ -130,6 +141,18 @@ class TextExchangeDialog(QDialog):
                 index = 'person name'
 
             key = self.value_combo_box.currentText()
+
+            readonly = key in get_readonly_options()
+
+            if readonly:
+                self.button_ok.setDisabled(True)
+            else:
+                self.button_ok.setDisabled(False)
+
+            if key == _('Finish'):
+                self.option_creating_new_result_checkbox.setDisabled(False)
+            else:
+                self.option_creating_new_result_checkbox.setDisabled(True)
 
             separator = ' '
             if self.tab_radio_button.isChecked():
@@ -175,7 +198,12 @@ class TextExchangeDialog(QDialog):
                     if value:
                         person = get_person_by_id(index_type, index)
                         if person:
-                            set_property(person, key, value)
+                            set_property(
+                                person,
+                                key,
+                                value,
+                                creating_new_result=self.option_creating_new_result_checkbox.isChecked()
+                            )
                             success_count += 1
                         else:
                             logging.debug('text_io: no person found for line ' + i)
@@ -275,7 +303,7 @@ def get_property(person, key):
     return ''
 
 
-def set_property(person, key, value):
+def set_property(person, key, value, **options):
     assert isinstance(person, Person)
     if key == _('Start'):
         result = race().find_person_result(person)
@@ -288,6 +316,12 @@ def set_property(person, key, value):
         result = race().find_person_result(person)
         if result:
             result.finish_time = hhmmss_to_time(value)
+        elif options.get('creating_new_result', False):
+            result = race().new_result(ResultManual)
+            result.person = person
+            result.bib = person.bib
+            result.finish_time = hhmmss_to_time(value)
+            race().add_new_result(result)
     elif key == _('Result'):
         pass
     elif key == _('Credit'):
