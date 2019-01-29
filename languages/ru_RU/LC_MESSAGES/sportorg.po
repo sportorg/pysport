@@ -1263,3 +1263,6 @@ msgstr "Массовое редактирование"
 
 msgid "Mass Edit Dialog"
 msgstr "Диалог массового редактирования"
+
+msgid "Create new result, if doesn't exist"
+msgstr "Создать новый результат, если не существует"
