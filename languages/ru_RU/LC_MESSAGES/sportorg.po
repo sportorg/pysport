@@ -1266,3 +1266,6 @@ msgstr "Диалог массового редактирования"
 
 msgid "Create new result, if doesn't exist"
 msgstr "Создать новый результат, если не существует"
+
+msgid "Max rows count"
+msgstr "Максимальное количество строк"
