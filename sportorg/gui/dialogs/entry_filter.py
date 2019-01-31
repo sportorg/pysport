@@ -45,6 +45,13 @@ class DialogFilter(QDialog):
         self.team_combo.addItems(get_race_teams())
         self.layout.addRow(self.team_label, self.team_combo)
 
+        self.max_rows_count_label = QtWidgets.QLabel(self)
+
+        self.max_rows_count_spin_box = QtWidgets.QSpinBox(self)
+        self.max_rows_count_spin_box.setMaximum(100000)
+        self.max_rows_count_spin_box.setValue(5000)
+        self.layout.addRow(self.max_rows_count_label, self.max_rows_count_spin_box)
+
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         self.button_ok = button_box.button(QDialogButtonBox.Ok)
         self.button_ok.clicked.connect(self.accept)
@@ -65,6 +72,7 @@ class DialogFilter(QDialog):
                 assert (isinstance(self.table, QTableView))
                 proxy_model = self.table.model()
                 proxy_model.clear_filter()
+                proxy_model.max_rows_count = self.max_rows_count_spin_box.value()
 
                 group_column = 4
                 team_column = 5
@@ -89,5 +97,6 @@ class DialogFilter(QDialog):
         self.setWindowTitle(_("Filter Dialog"))
         self.group_label.setText(_("Group"))
         self.team_label.setText(_("Team"))
+        self.max_rows_count_label.setText(_("Max rows count"))
         self.button_ok.setText(_('OK'))
         self.button_cancel.setText(_('Cancel'))

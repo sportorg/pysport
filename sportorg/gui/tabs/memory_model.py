@@ -22,6 +22,7 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
         self.init_cache()
         self.filter = {}
         self.r_count = 0
+        self.max_rows_count = 5000
         self.c_count = len(self.get_headers())
 
         # temporary list, used to keep records, that are not filtered
@@ -57,7 +58,7 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
         return self.c_count
 
     def rowCount(self, parent=None, *args, **kwargs):
-        return len(self.cache)
+        return min(len(self.cache), self.max_rows_count)
 
     def headerData(self, index, orientation, role=None):
         if role == Qt.DisplayRole:
@@ -128,9 +129,9 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
 
         # 1 phase - full match
         i = 0
-        max = len(current_array)
-        while i < max:
-            cur_pos = (self.search_offset + i) % max
+        maximum = len(current_array)
+        while i < maximum:
+            cur_pos = (self.search_offset + i) % maximum
             obj = self.get_values_from_object(current_array[cur_pos])
             for column in columns:
                 value = str(obj[column])
@@ -142,9 +143,9 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
 
         # 2 phase - match
         i = 0
-        max = len(current_array)
-        while i < max:
-            cur_pos = (self.search_offset + i) % max
+        maximum = len(current_array)
+        while i < maximum:
+            cur_pos = (self.search_offset + i) % maximum
             obj = self.get_values_from_object(current_array[cur_pos])
             for column in columns:
                 value = str(obj[column])
@@ -156,9 +157,9 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
 
         # 3 phase - search
         i = 0
-        max = len(current_array)
-        while i < max:
-            cur_pos = (self.search_offset + i) % max
+        maximum = len(current_array)
+        while i < maximum:
+            cur_pos = (self.search_offset + i) % maximum
             obj = self.get_values_from_object(current_array[cur_pos])
             for column in columns:
                 value = str(obj[column])
@@ -173,16 +174,16 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
     def sort(self, p_int, order=None):
         """Sort table by given column number.
         """
+        def sort_key(x):
+            item = self.get_item(x, p_int)
+            return item is None, str(type(item)), item
         try:
             self.layoutAboutToBeChanged.emit()
 
             source_array = self.get_source_array()
 
             if len(source_array):
-                source_array = sorted(source_array,
-                                      key=lambda x: (self.get_item(x, p_int) is None,
-                                                     str(type(self.get_item(x, p_int))),
-                                                     self.get_item(x, p_int)))
+                source_array = sorted(source_array, key=sort_key)
                 if order == Qt.DescendingOrder:
                     source_array = source_array[::-1]
 
@@ -213,11 +214,11 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
 
     def init_cache(self):
         self.cache.clear()
-        for i in range(len(race().persons)):
+        for i in range(len(self.race.persons)):
             self.cache.append(self.get_participation_data(i))
 
     def get_participation_data(self, position):
-        return self.get_values_from_object(race().persons[position])
+        return self.get_values_from_object(self.race.persons[position])
 
     def get_values_from_object(self, obj):
         ret = []
@@ -262,10 +263,10 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
         return ret
 
     def get_source_array(self):
-        return race().persons
+        return self.race.persons
 
     def set_source_array(self, array):
-        race().persons = array
+        self.race.persons = array
 
 
 class ResultMemoryModel(AbstractSportOrgMemoryModel):
@@ -281,11 +282,11 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
 
     def init_cache(self):
         self.cache.clear()
-        for i in range(len(race().results)):
+        for i in range(len(self.race.results)):
             self.cache.append(self.get_participation_data(i))
 
     def get_participation_data(self, position):
-        ret = self.get_values_from_object(race().results[position])
+        ret = self.get_values_from_object(self.race.results[position])
         return ret
 
     def get_values_from_object(self, result):
@@ -313,12 +314,12 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
 
         start = ''
         if i.get_start_time():
-            time_accuracy = race().get_setting('time_accuracy', 0)
+            time_accuracy = self.race.get_setting('time_accuracy', 0)
             start = i.get_start_time().to_str(time_accuracy)
 
         finish = ''
         if i.get_finish_time():
-            time_accuracy = race().get_setting('time_accuracy', 0)
+            time_accuracy = self.race.get_setting('time_accuracy', 0)
             finish = i.get_finish_time().to_str(time_accuracy)
 
         return [
@@ -341,10 +342,10 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
         ]
 
     def get_source_array(self):
-        return race().results
+        return self.race.results
 
     def set_source_array(self, array):
-        race().results = array
+        self.race.results = array
 
 
 class GroupMemoryModel(AbstractSportOrgMemoryModel):
@@ -359,11 +360,11 @@ class GroupMemoryModel(AbstractSportOrgMemoryModel):
 
     def init_cache(self):
         self.cache.clear()
-        for i in range(len(race().groups)):
+        for i in range(len(self.race.groups)):
             self.cache.append(self.get_data(i))
 
     def get_data(self, position):
-        ret = self.get_values_from_object(race().groups[position])
+        ret = self.get_values_from_object(self.race.groups[position])
         return ret
 
     def get_values_from_object(self, group):
@@ -389,10 +390,10 @@ class GroupMemoryModel(AbstractSportOrgMemoryModel):
         ]
 
     def get_source_array(self):
-        return race().groups
+        return self.race.groups
 
     def set_source_array(self, array):
-        race().groups = array
+        self.race.groups = array
 
 
 class CourseMemoryModel(AbstractSportOrgMemoryModel):
@@ -404,11 +405,11 @@ class CourseMemoryModel(AbstractSportOrgMemoryModel):
 
     def init_cache(self):
         self.cache.clear()
-        for i in range(len(race().courses)):
+        for i in range(len(self.race.courses)):
             self.cache.append(self.get_data(i))
 
     def get_data(self, position):
-        ret = self.get_values_from_object(race().courses[position])
+        ret = self.get_values_from_object(self.race.courses[position])
         return ret
 
     def get_values_from_object(self, course):
@@ -421,10 +422,10 @@ class CourseMemoryModel(AbstractSportOrgMemoryModel):
         ]
 
     def get_source_array(self):
-        return race().courses
+        return self.race.courses
 
     def set_source_array(self, array):
-        race().courses = array
+        self.race.courses = array
 
 
 class OrganizationMemoryModel(AbstractSportOrgMemoryModel):
@@ -436,11 +437,11 @@ class OrganizationMemoryModel(AbstractSportOrgMemoryModel):
 
     def init_cache(self):
         self.cache.clear()
-        for i in range(len(race().organizations)):
+        for i in range(len(self.race.organizations)):
             self.cache.append(self.get_data(i))
 
     def get_data(self, position):
-        ret = self.get_values_from_object(race().organizations[position])
+        ret = self.get_values_from_object(self.race.organizations[position])
         return ret
 
     def get_values_from_object(self, organization):
@@ -454,7 +455,7 @@ class OrganizationMemoryModel(AbstractSportOrgMemoryModel):
         ]
 
     def get_source_array(self):
-        return race().organizations
+        return self.race.organizations
 
     def set_source_array(self, array):
-        race().organizations = array
+        self.race.organizations = array
