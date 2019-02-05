@@ -188,7 +188,6 @@ class GroupSplits(object):
         if not len(self.person_splits):
             return
 
-        leader = self.person_splits[0].result.person
         leader_time = self.person_splits[0].get_leg_time(index)
 
         for i in range(len(self.person_splits)):
@@ -199,7 +198,6 @@ class GroupSplits(object):
                     leg.relative_place = i + 1
                 else:
                     leg.leg_place = i + 1
-                    leg.leader = leader
                     leg.leader_time = leader_time
 
     def set_leg_leader(self, index, person_split):
