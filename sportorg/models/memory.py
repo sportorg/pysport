@@ -205,7 +205,7 @@ class Organization(Model):
             'name': self.name,
             'address': self.address.to_dict(),
             'contact': self.contact.to_dict(),
-            'count_person': self.count_person,
+            'count_person': self.count_person,  # readonly
         }
 
     def update_data(self, data):
@@ -217,8 +217,6 @@ class Organization(Model):
 class CourseControl(Model):
     def __init__(self):
         self.code = ''
-        self.is_exclude = True
-        self.is_additional = False
         self.length = 0
         self.order = 0
 
@@ -260,17 +258,11 @@ class CourseControl(Model):
             'object': self.__class__.__name__,
             'code': self.code,
             'length': self.length,
-            'is_exclude': self.is_exclude,
-            'is_additional': self.is_additional,
         }
 
     def update_data(self, data):
         self.code = str(data['code'])
         self.length = int(data['length'])
-        if 'is_exclude' in data:
-            self.is_exclude = bool(data['is_exclude'])
-        if 'is_additional' in data:
-            self.is_additional = bool(data['is_additional'])
 
 
 class ControlPoint(Model):
@@ -283,22 +275,6 @@ class ControlPoint(Model):
         self.x = 0.0
         self.y = 0.0
         self.altitude = 0.0
-
-
-class CoursePart(Model):
-    def __init__(self):
-        self.controls = []  # type: List[CourseControl]
-        self.control_count = 0
-        self.is_free = False
-
-    def to_dict(self):
-        controls = [control.to_dict() for control in self.controls]
-        return {
-            'object': self.__class__.__name__,
-            'controls': controls,
-            'control_count': self.control_count,
-            'is_free': self.is_free,
-        }
 
 
 class Course(Model):
@@ -433,8 +409,8 @@ class Group(Model):
             'start_corridor': self.start_corridor,
             'order_in_corridor': self.order_in_corridor,
             'first_number': self.first_number,
-            'count_person': self.count_person,
-            'count_finished': self.count_finished,
+            'count_person': self.count_person,  # readonly
+            'count_finished': self.count_finished,  # readonly
             'ranking': self.ranking.to_dict() if self.ranking else None,
             '__type': self.__type.value if self.__type else None,
             'relay_legs': self.relay_legs,
@@ -480,7 +456,6 @@ class Split(Model):
         self.is_correct = True
         self.speed = ''
         self.length_leg = 0
-        self.leader = None
 
     @property
     def time(self):
@@ -507,16 +482,15 @@ class Split(Model):
             'code': self.code,
             'time': self.time.to_msec() if self.time else None,
 
-            'index': self.index,
-            'course_index': self.course_index + 1,
-            'leg_time': self.leg_time.to_msec() if self.leg_time else None,
-            'relative_time': self.relative_time.to_msec() if self.relative_time else None,
-            'leg_place': self.leg_place,
-            'relative_place': self.relative_place,
+            'index': self.index,  # readonly
+            'course_index': self.course_index + 1,  # readonly
+            'leg_time': self.leg_time.to_msec() if self.leg_time else None,  # readonly
+            'relative_time': self.relative_time.to_msec() if self.relative_time else None,  # readonly
+            'leg_place': self.leg_place,  # readonly
+            'relative_place': self.relative_place,  # readonly
             'is_correct': self.is_correct,
-            'speed': self.speed,
+            'speed': self.speed,  # readonly
             'length_leg': self.length_leg,
-            'leader_id': str(self.leader.id) if self.leader else None
         }
 
     def update_data(self, data):
@@ -545,8 +519,8 @@ class Result:
         self.place = 0
         self.scores = 0
         self.assigned_rank = Qualification.NOT_QUALIFIED
-        self.diff = None  # type: OTime
-        self.diff_scores = 0
+        self.diff = None  # type: OTime  # readonly
+        self.diff_scores = 0  # readonly
         self.created_at = time.time()
         self.speed = ''
 
@@ -585,7 +559,7 @@ class Result:
         if self.is_status_ok() != other.is_status_ok():
             return other.is_status_ok()
         elif self.status != other.status and not self.is_status_ok():
-            #incorrect statuses sort
+            # incorrect statuses sort
             return self.status.value > other.status.value
 
         if race().get_setting('result_processing_mode', 'time') == 'time':
@@ -624,13 +598,13 @@ class Result:
             'splits': [split.to_dict() for split in self.splits],
             'card_number': self.card_number,
 
-            'speed': self.speed,
-            'scores': self.scores,
-            'created_at': self.created_at,
-            'result': self.get_result(),
-            'start_msec': self.get_start_time().to_msec(),
-            'finish_msec': self.get_finish_time().to_msec(),
-            'result_msec': self.get_result_otime().to_msec(),
+            'speed': self.speed,  # readonly
+            'scores': self.scores,  # readonly
+            'created_at': self.created_at,  # readonly
+            'result': self.get_result(),  # readonly
+            'start_msec': self.get_start_time().to_msec(),  # readonly
+            'finish_msec': self.get_finish_time().to_msec(),  # readonly
+            'result_msec': self.get_result_otime().to_msec(),  # readonly
         }
 
     def update_data(self, data):
