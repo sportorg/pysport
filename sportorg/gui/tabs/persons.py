@@ -72,7 +72,7 @@ class Widget(QtWidgets.QWidget):
         def entry_single_clicked(index):
             try:
                 obj = race()
-                if obj.get_setting('relay_number_assign', False):
+                if GlobalAccess().get_main_window().relay_number_assign:
                     if index.row() < len(obj.persons):
                         set_next_relay_number_to_person(obj.persons[index.row()])
 

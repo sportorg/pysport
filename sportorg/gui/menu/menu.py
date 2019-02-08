@@ -115,6 +115,7 @@ def menu_list():
                 },
                 {
                     'title': _('Mass edit'),
+                    'tabs': [0],
                     'action': 'MassEditAction'
                 }
             ]
@@ -131,12 +132,14 @@ def menu_list():
                 {
                     'title': _('Filter'),
                     'shortcut': 'F2',
+                    'tabs': [0, 1],
                     'icon': config.icon_dir('filter.svg'),
                     'action': 'FilterAction'
                 },
                 {
                     'title': _('Search'),
                     'shortcut': 'Ctrl+F',
+                    'tabs': list(range(5)),
                     'icon': config.icon_dir('search.svg'),
                     'action': 'SearchAction'
                 },
@@ -187,6 +190,7 @@ def menu_list():
                 },
                 {
                     'title': _('Relay number assign mode'),
+                    'tabs': [0],
                     'action': 'RelayNumberAction'
                 },
                 {
@@ -258,6 +262,7 @@ def menu_list():
                 {
                     'title': _('Change status'),
                     'shortcut': 'F4',
+                    'tabs': [1],
                     'action': 'ChangeStatusAction'
                 },
                 {
@@ -303,6 +308,7 @@ def menu_list():
                         {
                             'title': _('Send selected'),
                             'shortcut': 'Ctrl+K',
+                            'tabs': list(range(5)),
                             'action': 'TeamworkSendAction'
                         },
                         {
@@ -319,6 +325,7 @@ def menu_list():
                     'actions': [
                         {
                             'title': _('Send results'),
+                            'tabs': [1],
                             'action': 'TelegramSendAction'
                         },
                     ]

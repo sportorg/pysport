@@ -22,6 +22,13 @@ class CSVReader:
         return self._data
 
     def append(self, person):
+        if not person or len(person) < 8:
+            return
+
+        if str(person[3]).isdigit():
+            # support of old WO format, without representative, emulate it
+            person.insert(3, '')
+
         person_dict = {
             'group_name': person[0],
             'team_name': person[2],
@@ -29,9 +36,10 @@ class CSVReader:
             'qual_id': person[4],
             'bib': int(person[5]) if len(person[5]) else 0,
             'year': int(person[6]) if len(person[6]) else 0,
-            'sportident_card': int(person[7]) if len(person[7]) else 0,
+            'sportident_card': int(person[7]) if str(person[7]).isdigit() else 0,
             'comment': person[8]
         }
+
         if len(str(person[1]).split(' ')) == 2:
             person_dict['name'] = str(person[1]).split(' ')[1]
             person_dict['surname'] = str(person[1]).split(' ')[0]

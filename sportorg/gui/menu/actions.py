@@ -261,12 +261,11 @@ class GuessCorridorsAction(Action):
 
 class RelayNumberAction(Action):
     def execute(self):
-        obj = race()
-        if obj.get_setting('relay_number_assign', False):
-            obj.set_setting('relay_number_assign', False)
+        if self.app.relay_number_assign:
+            self.app.relay_number_assign = False
             QApplication.restoreOverrideCursor()
         else:
-            obj.set_setting('relay_number_assign', True)
+            self.app.relay_number_assign = True
             QApplication.setOverrideCursor(QtCore.Qt.PointingHandCursor)
             RelayNumberDialog().exec_()
         self.app.refresh()
@@ -573,6 +572,7 @@ __all__ = [
     'OpenRecentAction',
     'SettingsAction',
     'EventSettingsAction',
+    'MassEditAction',
     'CSVWinorientImportAction',
     'WDBWinorientImportAction',
     'OcadTXTv8ImportAction',

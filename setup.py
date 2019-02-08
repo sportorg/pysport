@@ -26,7 +26,7 @@ executables = [
     Executable(
         'SportOrg.pyw',
         base=base,
-        icon=config.ICON,
+        icon=config.icon_dir('sportorg.ico'),
         shortcutDir=config.NAME.lower(),
         copyright='GNU GENERAL PUBLIC LICENSE {}'.format(config.NAME)
     )
