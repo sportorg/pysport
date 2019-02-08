@@ -25,6 +25,10 @@ class ResultChecker:
             result.scores = self.calculate_scores_rogain(result)
             return True
 
+        if race().get_setting('marked_route_dont_dsq', False):
+            # mode: competition without disqualification for mispunching (add penalty for missing cp)
+            return True
+
         course = race().find_course(result)
 
         if course is None:
@@ -84,6 +88,10 @@ class ResultChecker:
 
         penalty = ResultChecker.penalty_calculation(result.splits, controls, check_existence=True)
 
+        if race().get_setting('marked_route_max_penalty_by_cp', False):
+            # limit the penalty by quantity of controls
+            penalty = min (len(controls), penalty)
+
         if mode == 'laps':
             result.penalty_laps = penalty
         elif mode == 'time':
@@ -113,6 +121,11 @@ class ResultChecker:
             with existence checking (if athlete has less punches, each missing add penalty):
             origin: 31,41,51; athlete: 31; result:2
             origin: 31,41,51; athlete: no punches; result:3
+
+            wildcard support for free order
+            origin: *,*,* athlete: 31; result:2
+            origin: *,*,* athlete: 31,31; result:2
+            origin: *,*,* athlete: 31,31,31,31; result:3
         """
         user_array = [i.code for i in splits]
         origin_array = [i.get_number_code() for i in controls]
@@ -123,7 +136,11 @@ class ResultChecker:
 
         for i in origin_array:
             # remove correct points (only one object per loop)
-            if i in user_array:
+
+            if i == '0' and len(user_array):
+                del user_array[0]
+
+            elif i in user_array:
                 user_array.remove(i)
 
         # now user_array contains only incorrect and duplicated values
