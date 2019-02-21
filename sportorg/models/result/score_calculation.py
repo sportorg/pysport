@@ -1,6 +1,6 @@
 import logging
 
-from sportorg.core.otime import OTime
+from sportorg.common.otime import OTime
 from sportorg.models.memory import Result, Organization, RaceType
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.start.relay import get_team_result

@@ -1,4 +1,4 @@
-from sportorg.core.template import get_text_from_file
+from sportorg.common.template import get_text_from_file
 from sportorg.models.memory import race, Organization
 from sportorg.modules.configs.configs import Config
 

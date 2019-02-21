@@ -1,5 +1,4 @@
-from sportorg.core.otime import OTime
-from sportorg.gui.global_access import GlobalAccess
+from sportorg.common.otime import OTime
 from sportorg.models.memory import race, Person, find
 
 
@@ -53,7 +52,6 @@ def set_next_relay_number_to_person(person):
     assert isinstance(person, Person)
     person.bib = get_next_relay_number_setting()
     set_next_relay_number(get_next_relay_number(person.bib))
-    GlobalAccess().get_main_window().refresh()
 
 
 def get_team_result(person):

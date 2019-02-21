@@ -1,6 +1,6 @@
 import time
 
-from sportorg.core.singleton import singleton
+from sportorg.common.singleton import singleton
 
 
 @singleton

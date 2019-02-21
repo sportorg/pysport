@@ -5,7 +5,7 @@ from multiprocessing import Process
 
 
 from sportorg import config
-from sportorg.core.fake_std import FakeStd
+from sportorg.common.fake_std import FakeStd
 from sportorg.utils.time import time_to_hhmmss
 
 

@@ -8,8 +8,8 @@ print('Test {} {}'.format(config.NAME, config.VERSION))
 testmodules = [
     'iss_test',
     'sportorg.language_test',
-    'sportorg.core.otime_test',
-    'sportorg.core.version_test',
+    'sportorg.common.otime_test',
+    'sportorg.common.version_test',
     'sportorg.libs.winorient.wdb_test',
     'sportorg.libs.ocad.ocad_test',
     'sportorg.modules.backup.json_test',

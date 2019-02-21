@@ -1,5 +1,5 @@
 import unittest
-from sportorg.core.version import *
+from sportorg.common.version import *
 
 
 class TestVersion(unittest.TestCase):

@@ -1,4 +1,4 @@
-from sportorg.core.otime import OTime
+from sportorg.common.otime import OTime
 from sportorg.libs.winorient.wdb import WDB, WDBMan, WDBTeam, WDBGroup, WDBDistance, WDBPunch, WDBFinish, WDBChip
 from sportorg.models.memory import Race, Organization, Group, Person, race, find, Course, \
     CourseControl, Contact, Address, ResultStatus, Qualification, ResultSportident, Split

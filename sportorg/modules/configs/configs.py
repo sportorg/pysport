@@ -4,7 +4,7 @@ import os
 
 from sportorg import config as sportorg_config
 
-from sportorg.core.singleton import Singleton
+from sportorg.common.singleton import Singleton
 
 
 class ConfigFile(object):

@@ -1,6 +1,6 @@
 import logging
 
-from sportorg.core.otime import OTime
+from sportorg.common.otime import OTime
 from sportorg.models.constant import StatusComments
 from sportorg.models.memory import Person, ResultStatus, race, Result, find
 

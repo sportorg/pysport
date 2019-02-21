@@ -3,8 +3,8 @@ import logging
 import sys
 from threading import Thread
 
-from sportorg.core.fake_std import FakeStd
-from sportorg.core.singleton import singleton
+from sportorg.common.fake_std import FakeStd
+from sportorg.common.singleton import singleton
 from sportorg.libs.telegram.telegram import Telegram
 from sportorg.models.memory import race
 

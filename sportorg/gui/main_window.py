@@ -9,7 +9,7 @@ from PySide2.QtCore import QModelIndex, QItemSelectionModel, QThread, Signal
 from PySide2.QtWidgets import QMainWindow, QTableView, QMessageBox
 
 from sportorg import config
-from sportorg.core.singleton import singleton
+from sportorg.common.singleton import singleton
 from sportorg.gui.dialogs.course_edit import CourseEditDialog
 from sportorg.gui.dialogs.person_edit import PersonEditDialog
 from sportorg.gui.dialogs.group_edit import GroupEditDialog
@@ -24,7 +24,7 @@ from sportorg.modules.configs.configs import Config as Configuration, ConfigFile
 from sportorg.modules.sfr.sfrreader import SFRReaderClient
 from sportorg.modules.sound import Sound
 from sportorg.modules.sportident.result_generation import ResultSportidentGeneration
-from sportorg.core.broker import Broker
+from sportorg.common.broker import Broker
 from sportorg.gui.dialogs.file_dialog import get_save_file_name
 from sportorg.gui.menu import menu_list, Factory
 from sportorg.gui.tabs import persons, groups, organizations, results, courses, log

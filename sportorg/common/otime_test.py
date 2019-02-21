@@ -1,5 +1,5 @@
 import unittest
-from sportorg.core.otime import *
+from sportorg.common.otime import *
 
 
 class TestOTime(unittest.TestCase):

@@ -7,7 +7,7 @@ from PySide2.QtGui import QTextDocument
 from PySide2.QtPrintSupport import QPrinter
 from PySide2.QtWidgets import QApplication
 
-from sportorg.core.fake_std import FakeStd
+from sportorg.common.fake_std import FakeStd
 
 
 class PrintProcess(Process):
