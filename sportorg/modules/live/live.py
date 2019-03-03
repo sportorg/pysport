@@ -3,9 +3,9 @@ import logging
 
 import requests
 
-from sportorg.core.broker import Broker
-from sportorg.core.scripts import SCRIPTS
-from sportorg.core.singleton import Singleton
+from sportorg.common.broker import Broker
+from sportorg.common.scripts import SCRIPTS
+from sportorg.common.singleton import Singleton
 from sportorg.models.memory import race
 
 

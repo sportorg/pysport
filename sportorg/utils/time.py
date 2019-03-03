@@ -4,7 +4,7 @@ import time
 
 from PySide2.QtCore import QTime, QDate
 
-from sportorg.core.otime import OTime
+from sportorg.common.otime import OTime
 
 
 def timeit(method):

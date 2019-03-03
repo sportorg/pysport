@@ -7,7 +7,7 @@ import time
 
 from PySide2.QtCore import QThread, Signal
 
-from sportorg.core.singleton import singleton
+from sportorg.common.singleton import singleton
 from sportorg.language import _
 from sportorg.libs.sfr import sfrreader
 from sportorg.libs.sfr.sfrreader import SFRReaderException, SFRReaderCardChanged

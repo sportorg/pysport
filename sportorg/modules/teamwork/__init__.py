@@ -4,8 +4,8 @@ from threading import Event, main_thread
 
 from PySide2.QtCore import QThread, Signal
 
-from sportorg.core.broker import Broker
-from sportorg.core.singleton import singleton
+from sportorg.common.broker import Broker
+from sportorg.common.singleton import singleton
 from .client import ClientThread
 from .server import ServerThread, Command
 

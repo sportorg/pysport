@@ -1,7 +1,7 @@
 import logging
 import operator
 
-from sportorg.core.singleton import singleton
+from sportorg.common.singleton import singleton
 from sportorg.models.memory import race, Qualification
 
 
@@ -347,7 +347,7 @@ class RankingTable(object):
             return [my_items(x) for x in self.RANKING]
         except Exception as e:
             # logging.exception(e)
-            return [[0,0]]
+            return [[0, 0]]
 
     def set(self, items):
         self.RANKING = []

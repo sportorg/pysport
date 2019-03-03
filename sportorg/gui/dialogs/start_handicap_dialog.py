@@ -4,7 +4,7 @@ from PySide2.QtGui import QIcon
 from PySide2.QtWidgets import QFormLayout, QDialog, QDialogButtonBox, QTimeEdit, QLabel, QRadioButton
 
 from sportorg import config
-from sportorg.core.otime import OTime
+from sportorg.common.otime import OTime
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import _
 from sportorg.models.memory import race

@@ -2,7 +2,7 @@ import os
 import sys
 import logging.config
 
-from sportorg.core.version import Version
+from sportorg.common.version import Version
 
 NAME = 'SportOrg'
 VERSION = Version(1, 4, 0, 0, 'v')

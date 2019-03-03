@@ -11,7 +11,7 @@ import time
 import serial
 from PySide2.QtCore import QThread, Signal
 
-from sportorg.core.singleton import singleton
+from sportorg.common.singleton import singleton
 from sportorg.language import _
 from sportorg.libs.sireader import sireader
 from sportorg.models import memory

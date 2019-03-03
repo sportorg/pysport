@@ -5,8 +5,8 @@ import glob
 from PySide2.QtWidgets import QApplication
 
 from sportorg import config
-from sportorg.core.singleton import Singleton
-from sportorg.core.scripts import SCRIPTS, Script
+from sportorg.common.singleton import Singleton
+from sportorg.common.scripts import SCRIPTS, Script
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.main_window import MainWindow
 from sportorg.models.constant import StatusComments, PersonNames, Regions, RankingTable, RentCards

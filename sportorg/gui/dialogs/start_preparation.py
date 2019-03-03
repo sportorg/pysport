@@ -6,7 +6,7 @@ from PySide2.QtCore import QTime
 from PySide2.QtWidgets import QDialog
 
 from sportorg import config
-from sportorg.core.otime import OTime
+from sportorg.common.otime import OTime
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import _
 from sportorg.models.memory import race, Group, Limit

@@ -10,7 +10,7 @@ from PySide2.QtWidgets import QFormLayout, QLabel, QDialog, QPushButton, QDialog
 from docxtpl import DocxTemplate
 
 from sportorg import config
-from sportorg.core.template import get_templates, get_text_from_file
+from sportorg.common.template import get_templates, get_text_from_file
 from sportorg.gui.dialogs.file_dialog import get_open_file_name, get_save_file_name
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox

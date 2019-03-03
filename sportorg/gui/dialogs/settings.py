@@ -5,7 +5,7 @@ from PySide2.QtWidgets import QFormLayout, QDialog, QCheckBox, QDialogButtonBox,
     QSpinBox
 
 from sportorg import config
-from sportorg.core.audio import get_sounds
+from sportorg.common.audio import get_sounds
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _, get_languages

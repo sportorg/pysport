@@ -7,7 +7,7 @@ from PySide2 import QtCore
 from PySide2.QtWidgets import QMessageBox, QApplication, QTableView
 
 from sportorg import config
-from sportorg.core.otime import OTime
+from sportorg.common.otime import OTime
 from sportorg.gui.dialogs.about import AboutDialog
 from sportorg.gui.dialogs.cp_delete import CPDeleteDialog
 from sportorg.gui.dialogs.entry_filter import DialogFilter

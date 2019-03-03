@@ -5,7 +5,7 @@ from PySide2.QtWidgets import QFormLayout, QLabel, QDialog, \
      QTimeEdit, QSpinBox, QRadioButton, QCheckBox, QDialogButtonBox, QWidget, QTabWidget, \
      QGroupBox, QLineEdit
 
-from sportorg.core.otime import OTime
+from sportorg.common.otime import OTime
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _

@@ -8,8 +8,8 @@ from typing import Dict, List, Any
 
 import dateutil.parser
 
-from sportorg.core.model import Model
-from sportorg.core.otime import OTime
+from sportorg.common.model import Model
+from sportorg.common.otime import OTime
 from sportorg.language import _
 from sportorg.modules.configs.configs import Config
 

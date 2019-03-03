@@ -1,7 +1,7 @@
 import logging
 import math
 import random
-from sportorg.core.otime import OTime
+from sportorg.common.otime import OTime
 
 from sportorg.models.memory import race, Group, Person, Result, ResultStatus
 from sportorg.models.result.result_calculation import ResultCalculation

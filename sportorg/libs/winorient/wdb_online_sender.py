@@ -5,7 +5,7 @@ import os
 import logging
 from pip._vendor import requests
 
-from sportorg.core.otime import OTime
+from sportorg.common.otime import OTime
 from sportorg.libs.winorient.wdb import WDB, parse_wdb, WDBFinish, WDBMan, WDBPunch
 from sportorg.utils.time import int_to_otime, time_to_hhmmss
 

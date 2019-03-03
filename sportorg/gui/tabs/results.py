@@ -4,7 +4,7 @@ from PySide2 import QtCore, QtGui, QtWidgets
 from PySide2.QtCore import QModelIndex
 from PySide2.QtWidgets import QAbstractItemView, QHeaderView, QTextEdit
 
-from sportorg.core.broker import Broker
+from sportorg.common.broker import Broker
 from sportorg.gui.dialogs.result_edit import ResultEditDialog
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.tabs.memory_model import ResultMemoryModel

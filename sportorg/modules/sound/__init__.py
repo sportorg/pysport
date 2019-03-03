@@ -1,5 +1,5 @@
-from sportorg.core.audio import Audio
-from sportorg.core.singleton import singleton
+from sportorg.common.audio import Audio
+from sportorg.common.singleton import singleton
 from sportorg.modules.configs.configs import Config
 
 

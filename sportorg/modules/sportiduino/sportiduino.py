@@ -8,7 +8,7 @@ import serial
 
 from PySide2.QtCore import QThread, Signal
 
-from sportorg.core.singleton import singleton
+from sportorg.common.singleton import singleton
 from sportorg.libs.sportiduino import sportiduino
 from sportorg.models import memory
 from sportorg.utils.time import time_to_otime

@@ -75,6 +75,7 @@ class Widget(QtWidgets.QWidget):
                 if GlobalAccess().get_main_window().relay_number_assign:
                     if index.row() < len(obj.persons):
                         set_next_relay_number_to_person(obj.persons[index.row()])
+                        GlobalAccess().get_main_window().refresh()
 
             except Exception as e:
                 logging.error(str(e))
