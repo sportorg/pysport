@@ -1,6 +1,8 @@
 import logging
 import re
+import uuid
 from abc import abstractmethod
+from copy import copy, deepcopy
 
 from PySide2.QtCore import QAbstractTableModel, Qt
 from typing import List
@@ -52,6 +54,14 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
 
     @abstractmethod
     def get_headers(self) -> List:
+        pass
+
+    @abstractmethod
+    def get_data(self, position):
+        pass
+
+    @abstractmethod
+    def duplicate(self, position):
         pass
 
     def columnCount(self, parent=None, *args, **kwargs):
@@ -215,10 +225,18 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
     def init_cache(self):
         self.cache.clear()
         for i in range(len(self.race.persons)):
-            self.cache.append(self.get_participation_data(i))
+            self.cache.append(self.get_data(i))
 
-    def get_participation_data(self, position):
+    def get_data(self, position):
         return self.get_values_from_object(self.race.persons[position])
+
+    def duplicate(self, position):
+        person = self.race.persons[position]
+        new_person = copy(person)
+        new_person.id = uuid.uuid4()
+        new_person.bib = 0
+        new_person.card_number = 0
+        self.race.persons.insert(position, new_person)
 
     def get_values_from_object(self, obj):
         ret = []
@@ -283,11 +301,18 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
     def init_cache(self):
         self.cache.clear()
         for i in range(len(self.race.results)):
-            self.cache.append(self.get_participation_data(i))
+            self.cache.append(self.get_data(i))
 
-    def get_participation_data(self, position):
+    def get_data(self, position):
         ret = self.get_values_from_object(self.race.results[position])
         return ret
+
+    def duplicate(self, position):
+        result = self.race.results[position]
+        new_result = copy(result)
+        new_result.id = uuid.uuid4()
+        new_result.splits = deepcopy(result.splits)
+        self.race.results.insert(position, new_result)
 
     def get_values_from_object(self, result):
         i = result
@@ -367,6 +392,13 @@ class GroupMemoryModel(AbstractSportOrgMemoryModel):
         ret = self.get_values_from_object(self.race.groups[position])
         return ret
 
+    def duplicate(self, position):
+        group = self.race.groups[position]
+        new_group = copy(group)
+        new_group.id = uuid.uuid4()
+        new_group.name = new_group.name + '_'
+        self.race.groups.insert(position, new_group)
+
     def get_values_from_object(self, group):
         course = group.course
 
@@ -412,6 +444,14 @@ class CourseMemoryModel(AbstractSportOrgMemoryModel):
         ret = self.get_values_from_object(self.race.courses[position])
         return ret
 
+    def duplicate(self, position):
+        course = self.race.courses[position]
+        new_course = copy(course)
+        new_course.id = uuid.uuid4()
+        new_course.name = new_course.name + '_'
+        new_course.controls = deepcopy(course.controls)
+        self.race.courses.insert(position, new_course)
+
     def get_values_from_object(self, course):
         return [
             course.name,
@@ -433,7 +473,7 @@ class OrganizationMemoryModel(AbstractSportOrgMemoryModel):
         super().__init__()
 
     def get_headers(self):
-        return [_('Name'), _('Address'), _('Country'), _('Region'), _('City'), _('Contact')]
+        return [_('Name'), _('Code'), _('Country'), _('Region'), _('Contact')]
 
     def init_cache(self):
         self.cache.clear()
@@ -444,14 +484,20 @@ class OrganizationMemoryModel(AbstractSportOrgMemoryModel):
         ret = self.get_values_from_object(self.race.organizations[position])
         return ret
 
+    def duplicate(self, position):
+        organization = self.race.organizations[position]
+        new_organization = copy(organization)
+        new_organization.id = uuid.uuid4()
+        new_organization.name = new_organization.name + '_'
+        self.race.organizations.insert(position, new_organization)
+
     def get_values_from_object(self, organization):
         return [
             organization.name,
-            organization.address.street,
-            organization.address.country.name,
-            organization.address.state,
-            organization.address.city,
-            organization.contact.value
+            organization.code,
+            organization.country,
+            organization.region,
+            organization.contact
         ]
 
     def get_source_array(self):

@@ -2,7 +2,7 @@ import logging
 import time
 import uuid
 
-from PySide2 import QtCore
+from PySide2 import QtCore, QtGui
 
 from PySide2.QtWidgets import QMessageBox, QApplication, QTableView
 
@@ -79,6 +79,32 @@ class SaveAsAction(Action):
 class OpenRecentAction(Action):
     def execute(self):
         pass
+
+
+class CopyAction(Action):
+    def execute(self):
+        if self.app.current_tab not in range(5):
+            return
+        table = self.app.get_current_table()
+        sel_model = table.selectionModel()
+        data = '\t'.join(sel_model.model().get_headers()) + '\n'
+        indexes = sel_model.selectedRows()
+        for index in indexes:
+            row = [str(row) for row in sel_model.model().get_data(index.row())]
+            data += '\t'.join(row) + '\n'
+        QtGui.qApp.clipboard().setText(data)
+
+
+class DuplicateAction(Action):
+    def execute(self):
+        if self.app.current_tab not in range(5):
+            return
+        table = self.app.get_current_table()
+        sel_model = table.selectionModel()
+        indexes = sel_model.selectedRows()
+        if len(indexes):
+            sel_model.model().duplicate(indexes[0].row())
+            self.app.refresh()
 
 
 class SettingsAction(Action):
@@ -570,6 +596,8 @@ __all__ = [
     'OpenAction',
     'SaveAsAction',
     'OpenRecentAction',
+    'CopyAction',
+    'DuplicateAction',
     'SettingsAction',
     'EventSettingsAction',
     'MassEditAction',
