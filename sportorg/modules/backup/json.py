@@ -90,26 +90,4 @@ def race_migrate(data):
 
 
 def race_downgrade(data):
-    for person in data['persons']:
-        person['sportident_card'] = person['card_number']
-        person['is_rented_sportident_card'] = person['is_rented_card']
-    for result in data['results']:
-        result['sportident_card'] = result['card_number']
-    settings = data['settings']
-    if 'system_zero_time' in settings:
-        settings['sportident_zero_time'] = settings['system_zero_time']
-    if 'system_start_source' in settings:
-        settings['sportident_start_source'] = settings['system_start_source']
-    if 'system_start_cp_number' in settings:
-        settings['sportident_start_cp_number'] = settings['system_start_cp_number']
-    if 'system_finish_source' in settings:
-        settings['sportident_finish_source'] = settings['system_finish_source']
-    if 'system_finish_cp_number' in settings:
-        settings['sportident_finish_cp_number'] = settings['system_finish_cp_number']
-    if 'system_assign_chip_reading' in settings:
-        settings['sportident_assign_chip_reading'] = settings['system_assign_chip_reading']
-    if 'system_assignment_mode' in settings:
-        settings['sportident_assignment_mode'] = settings['system_assignment_mode']
-    if 'system_port' in settings:
-        settings['sportident_port'] = settings['system_port']
     return data
