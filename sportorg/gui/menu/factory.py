@@ -7,6 +7,8 @@ class Factory(object):
             NewAction(),
             SaveAction(),
             OpenAction(),
+            CopyAction(),
+            DuplicateAction(),
             SaveAsAction(),
             OpenRecentAction(),
             SettingsAction(),

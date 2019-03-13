@@ -34,7 +34,7 @@ def import_csv(source):
         else:
             qual_id = 0
         person_org = memory.find(obj.organizations, name=person_dict['team_name'])
-        person_org.contact.value = person_dict['representative']
+        person_org.contact = person_dict['representative']
 
         person = memory.Person()
         person.name = person_dict['name']

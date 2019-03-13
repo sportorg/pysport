@@ -1,7 +1,7 @@
 from sportorg.common.otime import OTime
 from sportorg.libs.winorient.wdb import WDB, WDBMan, WDBTeam, WDBGroup, WDBDistance, WDBPunch, WDBFinish, WDBChip
 from sportorg.models.memory import Race, Organization, Group, Person, race, find, Course, \
-    CourseControl, Contact, Address, ResultStatus, Qualification, ResultSportident, Split
+    CourseControl, ResultStatus, Qualification, ResultSportident, Split
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.utils.time import int_to_otime, time_to_int
 
@@ -65,8 +65,6 @@ class WinOrientBinary:
             assert (isinstance(team, WDBTeam))
             new_team = Organization()
             new_team.name = team.name
-            new_team.address = Address()
-            new_team.contact = Contact()
             my_race.organizations.append(new_team)
 
         for course in self.wdb_object.dist:

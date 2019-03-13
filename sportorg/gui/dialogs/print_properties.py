@@ -32,15 +32,6 @@ class PrintPropertiesDialog(QDialog):
 
         self.layout = QFormLayout(self)
 
-        self.label_printer = QLabel(_('Default printer'))
-        self.printer_selector = QPushButton(_('select'))
-
-        def select_main_printer():
-            printer = self.select_printer()
-            self.selected_printer.setText(printer)
-
-        self.printer_selector.clicked.connect(select_main_printer)
-
         self.label_split_printer = QLabel(_('Default split printer'))
         self.split_printer_selector = QPushButton(_('select'))
 
@@ -52,9 +43,6 @@ class PrintPropertiesDialog(QDialog):
 
         self.selected_printer = QLabel()
         self.selected_split_printer = QLabel()
-
-        self.layout.addRow(self.label_printer, self.printer_selector)
-        self.layout.addRow(self.selected_printer)
 
         self.layout.addRow(self.label_split_printer, self.split_printer_selector)
         self.layout.addRow(self.selected_split_printer)
@@ -116,12 +104,6 @@ class PrintPropertiesDialog(QDialog):
     def set_values(self):
         obj = race()
         default_printer_name = QPrinter().printerName()
-        printer_name = Config().printer.get('main', default_printer_name)
-        # try:
-        #     QPrinter().setPrinterName(printer_name)
-        # except Exception as e:
-        #     printer_name = default_printer_name
-        self.selected_printer.setText(printer_name)
 
         printer_name = Config().printer.get('split', default_printer_name)
         # try:
@@ -155,8 +137,6 @@ class PrintPropertiesDialog(QDialog):
 
     def apply_changes_impl(self):
         obj = race()
-        main_printer = self.selected_printer.text()
-        Config().printer.set('main', main_printer)
         split_printer = self.selected_split_printer.text()
         Config().printer.set('split', split_printer)
         obj.set_setting('split_printout', self.print_splits_checkbox.isChecked())

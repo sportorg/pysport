@@ -1120,6 +1120,9 @@ msgstr "Многодневные соревнования"
 msgid "Copy"
 msgstr "Копировать"
 
+msgid "Duplicate"
+msgstr "Дублировать"
+
 msgid "Move up"
 msgstr "Сдвинуть вверх"
 

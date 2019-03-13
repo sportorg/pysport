@@ -106,90 +106,14 @@ class ResultStatus(_TitleType):
     RESTORED = PrintableValue(16, _('Restored'))
 
 
-class Country(Model):
-    def __init__(self):
-        self.name = ''
-        self.code2 = ''
-        self.code3 = ''
-        self.digital_code = ''
-        self.code = ''
-
-    def __repr__(self):
-        return self.name
-
-    def to_dict(self):
-        return {
-            'object': self.__class__.__name__,
-            'name': self.name,
-            'code2': self.code2,
-            'code3': self.code3,
-            'digital_code': self.digital_code,
-            'code': self.code,
-        }
-
-    def update_data(self, data):
-        self.name = str(data['name'])
-        self.code2 = str(data['code2'])
-        self.code3 = str(data['code3'])
-        self.digital_code = str(data['digital_code'])
-        self.code = str(data['code'])
-
-
-class Address(Model):
-    def __init__(self):
-        self.care_of = ''
-        self.street = ''
-        self.zip_code = ''
-        self.city = ''
-        self.state = ''
-        self.country = Country()
-
-    def to_dict(self):
-        return {
-            'object': self.__class__.__name__,
-            'care_of': self.care_of,
-            'street': self.street,
-            'zip_code': self.zip_code,
-            'city': self.city,
-            'state': self.state,
-            'country': self.country.to_dict()
-        }
-
-    def update_data(self, data):
-        self.care_of = str(data['care_of'])
-        self.street = str(data['street'])
-        self.zip_code = str(data['zip_code'])
-        self.city = str(data['city'])
-        self.state = str(data['state'])
-        self.country.update_data(data['country'])
-
-
-class Contact(Model):
-    def __init__(self):
-        self.name = ''
-        self.value = ''
-
-    def __repr__(self):
-        return '{} {}'.format(self.name, self.value)
-
-    def to_dict(self):
-        return {
-            'object': self.__class__.__name__,
-            'name': self.name,
-            'value': self.value,
-        }
-
-    def update_data(self, data):
-        self.name = str(data['name'])
-        self.value = str(data['value'])
-
-
 class Organization(Model):
     def __init__(self):
         self.id = uuid.uuid4()
         self.name = ''
-        self.address = Address()
-        self.contact = Contact()
+        self.country = ''
+        self.region = ''
+        self.contact = ''
+        self.code = ''
         self.count_person = 0
 
     def __str__(self):
@@ -203,15 +127,19 @@ class Organization(Model):
             'object': self.__class__.__name__,
             'id': str(self.id),
             'name': self.name,
-            'address': self.address.to_dict(),
-            'contact': self.contact.to_dict(),
+            'country': self.country,
+            'region': self.region,
+            'contact': self.contact,
+            'code': self.code,
             'count_person': self.count_person,  # readonly
         }
 
     def update_data(self, data):
-        self.name = str(data['name'])
-        self.contact.update_data(data['contact'])
-        self.address.update_data(data['address'])
+        self.name = str(data['name']) if 'name' in data else ''
+        self.country = str(data['country']) if 'country' in data else ''
+        self.region = str(data['region']) if 'region' in data else ''
+        self.code = str(data['code']) if 'code' in data else ''
+        self.contact = str(data['contact']) if 'contact' in data else ''
 
 
 class CourseControl(Model):
@@ -932,9 +860,6 @@ class Person(Model):
         self.birth_date = None  # type: date
         self.organization = None  # type: Organization
         self.group = None  # type: Group
-        self.nationality = None  # type: Country
-        self.address = None  # type: Address
-        self.contact = []  # type: List[Contact]
         self.world_code = None  # WRE ID for orienteering and the same
         self.national_code = None
         self.qual = Qualification.NOT_QUALIFIED  # type: Qualification # 'qualification, used in Russia only'
@@ -985,12 +910,9 @@ class Person(Model):
             'card_number': self.card_number,
             'bib': self.bib,
             'birth_date': str(self.birth_date) if self.birth_date else None,
-            'year': self.get_year() if self.get_year() else '0',  # back compatibility with 1.0
+            'year': self.get_year() if self.get_year() else 0,  # back compatibility with 1.0
             'group_id': str(self.group.id) if self.group else None,
             'organization_id': str(self.organization.id) if self.organization else None,
-            'nationality': self.nationality.to_dict() if self.nationality else None,
-            'address': self.address.to_dict() if self.address else None,
-            'contact': [],
             'world_code': self.world_code,
             'national_code': self.national_code,
             'qual': self.qual.value,

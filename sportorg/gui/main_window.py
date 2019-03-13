@@ -46,9 +46,9 @@ class ServiceListenerThread(QThread):
     def run(self):
         while True:
             time.sleep(1)
-            self.interval.emit()
             if not main_thread().is_alive():
                 break
+            self.interval.emit()
 
 
 class ConsolePanelHandler(logging.Handler):
@@ -495,7 +495,7 @@ class MainWindow(QMainWindow):
                         self.save_file()
                         logging.info(_('Auto save'))
                 else:
-                    logging.warning(_('No file to auto save'))
+                    logging.debug(_('No file to auto save'))
         except Exception as e:
             logging.error(str(e))
 

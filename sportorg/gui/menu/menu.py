@@ -99,6 +99,7 @@ def menu_list():
             'actions': [
                 {
                     'title': _('Add object'),
+                    'tabs': list(range(5)),
                     'shortcut': ['insert', 'i'],
                     'icon': config.icon_dir('add.svg'),
                     'action': 'AddObjectAction'
@@ -106,8 +107,21 @@ def menu_list():
                 {
                     'title': _('Delete'),
                     'shortcut': 'Del',
+                    'tabs': list(range(5)),
                     'icon': config.icon_dir('delete.svg'),
                     'action': 'DeleteAction'
+                },
+                {
+                    'title': _('Copy'),
+                    'shortcut': 'Ctrl+C',
+                    'tabs': list(range(5)),
+                    'action': 'CopyAction'
+                },
+                {
+                    'title': _('Duplicate'),
+                    'shortcut': 'Ctrl+D',
+                    'tabs': list(range(5)),
+                    'action': 'DuplicateAction'
                 },
                 {
                     'title': _('Text exchange'),
