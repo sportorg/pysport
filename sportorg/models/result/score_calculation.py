@@ -103,9 +103,8 @@ class ScoreCalculation(object):
     def get_region_for_organization(org):
         if org:
             assert isinstance(org, Organization)
-            if org.address:
-                if org.address.state:
-                    return org.address.state
+            if org.region:
+                return org.region
         return None
 
     def get_all_regions(self):
