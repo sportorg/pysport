@@ -106,7 +106,7 @@ class MultidayTab(Tab):
         def select_race():
             index = self.item_races.currentIndex()
             set_current_race_index(index)
-            GlobalAccess().get_main_window().refresh()
+            GlobalAccess().get_main_window().init_model()
         self.item_races.currentIndexChanged.connect(select_race)
         self.layout.addRow(self.item_races)
 

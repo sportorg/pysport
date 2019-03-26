@@ -64,7 +64,7 @@ def race_migrate(data):
         if 'max_year' not in group:
             group['max_year'] = 0
     for org in data['organizations']:
-        if org['address']:
+        if 'address' in org and org['address']:
             org['country'] = org['address']['country']['name']
             org['region'] = org['address']['state']
             if org['contact']:
