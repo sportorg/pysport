@@ -718,8 +718,8 @@ msgstr "Расчет штрафа из сплитов"
 msgid "Time settings"
 msgstr "Настройки времени"
 
-msgid "Are you sure you want to exit the program?"
-msgstr "Вы действительно хотите закрыть приложение?"
+msgid "Save file before exit?"
+msgstr "Сохранить изменения в файле?"
 
 msgid "Question"
 msgstr "Вопрос"

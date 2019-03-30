@@ -109,10 +109,17 @@ class MainWindow(QMainWindow):
         Broker().produce('close')
 
     def closeEvent(self, _event):
-        quit_msg = _('Are you sure you want to exit the program?')
-        reply = messageBoxQuestion(self, _('Question'), quit_msg, QMessageBox.Yes | QMessageBox.No)
+        quit_msg = _('Save file before exit?')
+        reply = messageBoxQuestion(self, _('Question'), quit_msg,
+                                   QMessageBox.Save
+                                   | QMessageBox.No
+                                   | QMessageBox.Cancel)
 
-        if reply == QMessageBox.Yes:
+        if reply == QMessageBox.Save:
+            self.save_file()
+            self.close()
+            _event.accept()
+        elif reply == QMessageBox.No:
             self.close()
             _event.accept()
         else:
