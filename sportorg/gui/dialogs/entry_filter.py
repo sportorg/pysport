@@ -2,7 +2,7 @@ import logging
 
 from PySide2 import QtCore, QtWidgets
 from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QDialog, QTableView, QDialogButtonBox, QFormLayout
+from PySide2.QtWidgets import QDialog, QDialogButtonBox, QFormLayout, QTreeView
 
 from sportorg import config
 from sportorg.gui.dialogs.person_edit import PersonEditDialog
@@ -69,7 +69,7 @@ class DialogFilter(QDialog):
         try:
             # apply filter here
             if self.table is not None:
-                assert (isinstance(self.table, QTableView))
+                assert (isinstance(self.table, QTreeView))
                 proxy_model = self.table.model()
                 proxy_model.clear_filter()
                 proxy_model.max_rows_count = self.max_rows_count_spin_box.value()

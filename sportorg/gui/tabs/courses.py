@@ -33,14 +33,14 @@ class Widget(QtWidgets.QWidget):
         self.course_table.setSortingEnabled(True)
         self.course_table.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        hor_header = self.course_table.horizontalHeader()
-        assert (isinstance(hor_header, QHeaderView))
-        hor_header.setSectionsMovable(True)
-        hor_header.setDropIndicatorShown(True)
-        hor_header.setSectionResizeMode(QHeaderView.Interactive)
-
-        ver_header = self.course_table.verticalHeader()
-        ver_header.setSectionResizeMode(QHeaderView.ResizeToContents)
+        # hor_header = self.course_table.horizontalHeader()
+        # assert (isinstance(hor_header, QHeaderView))
+        # hor_header.setSectionsMovable(True)
+        # hor_header.setDropIndicatorShown(True)
+        # hor_header.setSectionResizeMode(QHeaderView.Interactive)
+        #
+        # ver_header = self.course_table.verticalHeader()
+        # ver_header.setSectionResizeMode(QHeaderView.ResizeToContents)
 
         def course_double_clicked(index):
             try:

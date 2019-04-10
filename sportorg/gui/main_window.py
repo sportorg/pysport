@@ -6,7 +6,7 @@ from threading import main_thread
 
 from PySide2 import QtCore, QtGui, QtWidgets
 from PySide2.QtCore import QModelIndex, QItemSelectionModel, QThread, Signal
-from PySide2.QtWidgets import QMainWindow, QTableView, QMessageBox
+from PySide2.QtWidgets import QMainWindow, QMessageBox, QTreeView
 
 from sportorg import config
 from sportorg.common.singleton import singleton
@@ -384,7 +384,7 @@ class MainWindow(QMainWindow):
             self.recent_files.remove(file)
 
     def get_table_by_name(self, name):
-        return self.findChild(QtWidgets.QTableView, name)
+        return self.findChild(QtWidgets.QTreeView, name)
 
     def get_person_table(self):
         return self.get_table_by_name('PersonTable')
@@ -410,7 +410,7 @@ class MainWindow(QMainWindow):
     def get_selected_rows(self, table=None):
         if table is None:
             table = self.get_current_table()
-        assert isinstance(table, QTableView)
+        assert isinstance(table, QTreeView)
         sel_model = table.selectionModel()
         assert isinstance(sel_model, QItemSelectionModel)
         indexes = sel_model.selectedRows()

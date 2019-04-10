@@ -33,15 +33,6 @@ class Widget(QtWidgets.QWidget):
         self.group_table.setSortingEnabled(True)
         self.group_table.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        hor_header = self.group_table.horizontalHeader()
-        assert (isinstance(hor_header, QHeaderView))
-        hor_header.setSectionsMovable(True)
-        hor_header.setDropIndicatorShown(True)
-        hor_header.setSectionResizeMode(QHeaderView.Interactive)
-
-        ver_header = self.group_table.verticalHeader()
-        ver_header.setSectionResizeMode(QHeaderView.ResizeToContents)
-
         def group_double_clicked(index):
             try:
                 if index.row() < len(race().groups):

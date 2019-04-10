@@ -4,7 +4,7 @@ import uuid
 
 from PySide2 import QtCore, QtGui
 
-from PySide2.QtWidgets import QMessageBox, QApplication, QTableView
+from PySide2.QtWidgets import QMessageBox, QApplication, QTreeView
 
 from sportorg import config
 from sportorg.common.otime import OTime
@@ -416,7 +416,7 @@ class ChangeStatusAction(Action):
         }
 
         table = self.app.get_result_table()
-        assert isinstance(table, QTableView)
+        assert isinstance(table, QTreeView)
         index = table.currentIndex().row()
         if index < 0:
             index = 0

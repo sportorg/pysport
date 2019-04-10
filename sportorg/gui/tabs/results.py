@@ -122,16 +122,6 @@ class Widget(QtWidgets.QWidget):
         self.result_card_details.setFont(font)
         self.vertical_layout_card.addWidget(self.result_card_details)
 
-        hor_header = self.result_table.horizontalHeader()
-        assert (isinstance(hor_header, QHeaderView))
-        hor_header.setSectionsMovable(True)
-        hor_header.setDropIndicatorShown(True)
-        hor_header.setSectionResizeMode(QHeaderView.ResizeToContents)
-        Broker().subscribe('refresh', lambda: hor_header.setSectionResizeMode(QHeaderView.ResizeToContents))
-
-        ver_header = self.result_table.verticalHeader()
-        ver_header.setSectionResizeMode(QHeaderView.ResizeToContents)
-
         self.grid_layout.addWidget(self.result_splitter)
         self.result_course_group_box.setTitle(_('Course'))
         self.result_course_name_label.setText(_('Name'))

@@ -2,7 +2,7 @@ import logging
 
 from PySide2 import QtCore
 from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QDialog, QTableView, QDialogButtonBox, QVBoxLayout, QLineEdit, QMessageBox
+from PySide2.QtWidgets import QDialog, QTreeView, QDialogButtonBox, QVBoxLayout, QLineEdit, QMessageBox
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
@@ -14,7 +14,7 @@ class SearchDialog(QDialog):
     def __init__(self, table=None):
         super().__init__(GlobalAccess().get_main_window())
         if table is not None:
-            assert (isinstance(table, QTableView))
+            assert (isinstance(table, QTreeView))
             self.table = table
 
     def exec_(self):

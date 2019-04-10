@@ -193,16 +193,15 @@ QTabWidget::pane {
 /* Table */
 
 QTableWidget,
-QTableView {
+QTreeView {
   background: white;
-  border: none;
 }
 
-QTableView::item {
-  border: 0 solid #E0E0E0;
+QTreeView::item {
+  border: 1px ; border-style: solid ; border-color: lightgray ;
 }
 
-QTableView::item::selected {
+QTreeView::item::selected {
   color: #000;
   background: #00BCD4;
 }

@@ -1,13 +1,27 @@
 from PySide2 import QtWidgets
-from PySide2.QtWidgets import QMenu
+from PySide2.QtWidgets import QMenu, QAbstractItemView
 from PySide2.QtCore import QPoint
 
 
-class TableView(QtWidgets.QTableView):
+class TableView(QtWidgets.QTreeView):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.popup_items = []
         self.setWordWrap(False)
+        self.setSortingEnabled(True)
+        self.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.setSelectionMode(QAbstractItemView.ContiguousSelection)
+        self.setStyleSheet("*::item{"
+                           "    border-top-width: 0px;"
+                           "    border-right-width: 1px;"
+                           "    border-bottom-width: 1px;"
+                           "    border-left-width: 0px;"
+                           "    border-style: solid;"
+                           "    border-color: silver;"
+                           "}"
+                           "*::item:selected{"
+                           "    background: palette(Highlight);"
+                           "}")
 
     def mousePressEvent(self, qmouseevent):
         super().mousePressEvent(qmouseevent)
@@ -23,4 +37,4 @@ class TableView(QtWidgets.QTableView):
 
     def setModel(self, QAbstractItemModel):
         super(TableView, self).setModel(QAbstractItemModel)
-        self.resizeColumnsToContents()
+        # self.resizeColumnsToContents()
