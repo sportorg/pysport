@@ -1,7 +1,7 @@
 import logging
 
 from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QFormLayout, QLabel, QDialog, QSpinBox, QDialogButtonBox
+from PySide2.QtWidgets import QFormLayout, QLabel, QDialog, QDialogButtonBox, QLineEdit
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
@@ -12,7 +12,6 @@ from sportorg.models import memory
 class BibDialog(QDialog):
     def __init__(self, text=''):
         super().__init__(GlobalAccess().get_main_window())
-        self.bib = 0
         self.text = text
         self.person = None
 
@@ -21,7 +20,7 @@ class BibDialog(QDialog):
         return super().exec_()
 
     def init_ui(self):
-        self.setWindowTitle(_('Bib'))
+        self.setWindowTitle(_('Bib or Name'))
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(True)
@@ -32,13 +31,11 @@ class BibDialog(QDialog):
             self.label_text = QLabel(self.text)
             self.layout.addRow(self.label_text)
 
-        self.label_bib = QLabel(_('Bib'))
-        self.item_bib = QSpinBox()
-        self.item_bib.setMaximum(memory.Limit.BIB)
-        self.item_bib.setValue(self.bib)
-        self.item_bib.selectAll()
-        self.item_bib.valueChanged.connect(self.show_person_info)
-        self.layout.addRow(self.label_bib, self.item_bib)
+        self.label_bib_or_name = QLabel(_('Bib or Name'))
+        self.item_bib_or_name = QLineEdit()
+        self.item_bib_or_name.selectAll()
+        self.item_bib_or_name.textChanged.connect(self.show_person_info)
+        self.layout.addRow(self.label_bib_or_name, self.item_bib_or_name)
 
         self.label_person_info = QLabel('')
         self.layout.addRow(self.label_person_info)
@@ -66,10 +63,18 @@ class BibDialog(QDialog):
         self.show()
 
     def show_person_info(self):
-        bib = self.item_bib.value()
+        bib_or_name = self.item_bib_or_name.text()  # type: str
         self.label_person_info.setText('')
-        if bib:
-            person = memory.find(memory.race().persons, bib=bib)
+        if bib_or_name:
+            person = None
+            if bib_or_name.isdigit():
+                person = memory.find(memory.race().persons, bib=int(bib_or_name))
+            else:
+                for p in memory.race().persons:
+                    if bib_or_name.lower() in p.full_name.lower():
+                        person = p
+                        break
+
             if person:
                 info = person.full_name
                 if person.group:
@@ -80,9 +85,6 @@ class BibDialog(QDialog):
                 self.person = person
             else:
                 self.label_person_info.setText(_('not found'))
-
-    def get_bib(self):
-        return self.bib
 
     def get_person(self):
         return self.person

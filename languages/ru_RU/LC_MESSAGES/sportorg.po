@@ -1255,6 +1255,9 @@ msgstr "очк."
 msgid "Credit"
 msgstr "Отсечка"
 
+msgid "Bib or Name"
+msgstr "Номер или Имя"
+
 msgid "Rent cards"
 msgstr "Аренда чипов"
 
