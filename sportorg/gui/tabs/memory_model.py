@@ -65,7 +65,7 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
         pass
 
     def columnCount(self, parent=None, *args, **kwargs):
-        return self.c_count
+        return self.c_count + 1
 
     def rowCount(self, parent=None, *args, **kwargs):
         return min(len(self.cache), self.max_rows_count)
@@ -73,8 +73,10 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
     def headerData(self, index, orientation, role=None):
         if role == Qt.DisplayRole:
             if orientation == Qt.Horizontal:
+                if index == 0:
+                    return _('#')
                 columns = self.get_headers()
-                return columns[index]
+                return columns[index - 1]
             if orientation == Qt.Vertical:
                 return str(index+1)
 
@@ -83,7 +85,10 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
             try:
                 row = index.row()
                 column = index.column()
-                answer = self.cache[row][column]
+                if column == 0:
+                    answer = row + 1
+                else:
+                    answer = self.cache[row][column - 1]
                 return answer
             except Exception as e:
                 logging.error(str(e))
@@ -184,6 +189,10 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
     def sort(self, p_int, order=None):
         """Sort table by given column number.
         """
+
+        if p_int > 0:  # process vertical header
+            p_int -= 1
+
         def sort_key(x):
             item = self.get_item(x, p_int)
             return item is None, str(type(item)), item

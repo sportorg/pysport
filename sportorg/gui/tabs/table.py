@@ -22,6 +22,7 @@ class TableView(QtWidgets.QTreeView):
                            "*::item:selected{"
                            "    background: palette(Highlight);"
                            "}")
+        self.setRootIsDecorated(False)
 
     def mousePressEvent(self, qmouseevent):
         super().mousePressEvent(qmouseevent)
@@ -37,4 +38,5 @@ class TableView(QtWidgets.QTreeView):
 
     def setModel(self, QAbstractItemModel):
         super(TableView, self).setModel(QAbstractItemModel)
-        # self.resizeColumnsToContents()
+        for i in range(self.model().columnCount()):
+            self.resizeColumnToContents(i)
