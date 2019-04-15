@@ -58,9 +58,11 @@ class SearchDialog(QDialog):
                 offset = proxy_model.search_offset
                 if offset == -1 and proxy_model.search:
                     QMessageBox.warning(self, _('Search'), _('The search has not given any results'))
-                self.table.selectRow(offset)
+
+                self.table.setCurrentIndex(proxy_model.index(offset, 0))
+
         except Exception as e:
-            logging.error(str(e))
+            logging.exception(str(e))
 
     def cancel(self):
         self.close()
