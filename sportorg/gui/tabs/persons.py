@@ -1,6 +1,7 @@
 import logging
 
 from PySide2 import QtCore, QtWidgets
+from PySide2.QtCore import QAbstractTableModel
 from PySide2.QtWidgets import QAbstractItemView, QHeaderView
 
 from sportorg.gui.dialogs.person_edit import PersonEditDialog
@@ -16,11 +17,25 @@ class PersonsTableView(TableView):
         super().__init__(*args, **kwargs)
         self.popup_items = []
 
-    def set_start_group(self, number):
-        if -1 < self.currentIndex().row() < len(race().persons):
-            person = race().persons[self.currentIndex().row()]
+    def set_start_group(self, number, index):
+        if -1 < index.row() < len(race().persons):
+            person = race().persons[index.row()]
             person.start_group = number
+            person.generate_cache()
 
+    def keyPressEvent(self, e):
+        key_numbers = [i for i in range(48, 58)]
+        key = e.key()
+        try:
+            if key in key_numbers:
+                index = self.currentIndex()
+                self.set_start_group(NumberClicker().click(key_numbers.index(key)), index)
+
+                self.updateRow(index)
+            else:
+                super().keyPressEvent(e)
+        except Exception as ex:
+            print(str(ex))
 
 class Widget(QtWidgets.QWidget):
     def __init__(self):
@@ -28,16 +43,6 @@ class Widget(QtWidgets.QWidget):
         self.person_table = PersonsTableView(self)
         self.entry_layout = QtWidgets.QGridLayout(self)
         self.setup_ui()
-
-    def keyPressEvent(self, e):
-        key_numbers = [i for i in range(48, 58)]
-        key = e.key()
-        try:
-            if key in key_numbers:
-                self.person_table.set_start_group(NumberClicker().click(key_numbers.index(key)))
-                GlobalAccess().get_main_window().refresh()
-        except Exception as e:
-            print(str(e))
 
     def setup_ui(self):
         self.setAcceptDrops(False)
@@ -56,7 +61,6 @@ class Widget(QtWidgets.QWidget):
                 if index.row() < len(race().persons):
                     dialog = PersonEditDialog(race().persons[index.row()])
                     dialog.exec_()
-                    GlobalAccess().get_main_window().refresh()
             except Exception as e:
                 logging.error(str(e))
 
@@ -66,7 +70,7 @@ class Widget(QtWidgets.QWidget):
                 if GlobalAccess().get_main_window().relay_number_assign:
                     if index.row() < len(obj.persons):
                         set_next_relay_number_to_person(obj.persons[index.row()])
-                        GlobalAccess().get_main_window().refresh()
+                        self.person_table.updateRow(index)
 
             except Exception as e:
                 logging.error(str(e))

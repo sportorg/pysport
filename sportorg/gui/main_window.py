@@ -328,33 +328,18 @@ class MainWindow(QMainWindow):
 
     def refresh(self):
         logging.debug('Refreshing interface')
-        try:
-            t = time.time()
-            table = self.get_person_table()
-            table.model().init_cache()
-            table.model().layoutChanged.emit()
 
-            table = self.get_result_table()
-            table.model().init_cache()
-            table.model().layoutChanged.emit()
+        t = time.time()
+        self.set_title()
 
-            table = self.get_group_table()
-            table.model().init_cache()
-            table.model().layoutChanged.emit()
+        self.refresh_table(self.get_person_table(), True)
+        self.refresh_table(self.get_result_table(), True)
+        self.refresh_table(self.get_course_table(), True)
+        self.refresh_table(self.get_group_table(), True)
+        self.refresh_table(self.get_organization_table(), True)
 
-            table = self.get_course_table()
-            table.model().init_cache()
-            table.model().layoutChanged.emit()
-
-            table = self.get_organization_table()
-            table.model().init_cache()
-            table.model().layoutChanged.emit()
-            self.set_title()
-
-            print('Refresh in {:.3f} seconds.'.format(time.time() - t))
-            Broker().produce('refresh')
-        except Exception as e:
-            logging.error(str(e))
+        print('Refresh in {:.3f} seconds.'.format(time.time() - t))
+        Broker().produce('refresh')
 
     def clear_filters(self, remove_condition=True):
         if self.get_person_table():
@@ -456,7 +441,7 @@ class MainWindow(QMainWindow):
                         person.is_rented_card = True
                         Teamwork().send(person.to_dict())
                         break
-            self.refresh()
+            self.refresh_table(self.get_result_table())
         except Exception as e:
             logging.error(str(e))
 
@@ -596,29 +581,36 @@ class MainWindow(QMainWindow):
             mes.setText(_('No printer selected'))
             mes.exec_()
 
+    def refresh_table(self, table, generate_cache=False):
+        if generate_cache:
+            for obj in table.model().cache:
+                obj.generate_cache()
+        table.model().layoutChanged.emit()
+
     def add_object(self):
         try:
             tab = self.current_tab
             if tab == 0:
                 p = race().add_new_person()
                 PersonEditDialog(p, True).exec_()
-                self.refresh()
+                self.refresh_table(self.get_person_table())
             elif tab == 1:
                 self.menu_factory.execute('ManualFinishAction')
+                self.refresh_table(self.get_result_table())
             elif tab == 2:
                 g = race().add_new_group()
                 GroupEditDialog(g, True).exec_()
-                self.refresh()
+                self.refresh_table(self.get_group_table())
             elif tab == 3:
                 c = race().add_new_course()
                 CourseEditDialog(c, True).exec_()
-                self.refresh()
+                self.refresh_table(self.get_course_table())
             elif tab == 4:
                 o = race().add_new_organization()
                 OrganizationEditDialog(o, True).exec_()
-                self.refresh()
+                self.refresh_table(self.get_organization_table())
         except Exception as e:
-            logging.error(str(e))
+            logging.exception(str(e))
 
     def delete_object(self):
         try:
@@ -626,7 +618,7 @@ class MainWindow(QMainWindow):
                 return
             self._delete_object()
         except Exception as e:
-            logging.error(str(e))
+            logging.exception(str(e))
 
     def _delete_object(self):
         indexes = self.get_selected_rows()
@@ -641,37 +633,37 @@ class MainWindow(QMainWindow):
         if tab == 0:
             res = race().delete_persons(indexes)
             ResultCalculation(race()).process_results()
-            self.refresh()
+            self.refresh_table(self.get_person_table())
         elif tab == 1:
             res = race().delete_results(indexes)
             ResultCalculation(race()).process_results()
-            self.refresh()
+            self.refresh_table(self.get_result_table())
         elif tab == 2:
             try:
                 res = race().delete_groups(indexes)
+                self.refresh_table(self.get_group_table())
             except NotEmptyException as e:
                 logging.warning(str(e))
                 QMessageBox.question(self.get_group_table(),
                                      _('Error'),
                                      _('Cannot remove group'))
-            self.refresh()
         elif tab == 3:
             try:
                 res = race().delete_courses(indexes)
+                self.refresh_table(self.get_course_table())
             except NotEmptyException as e:
                 logging.warning(str(e))
                 QMessageBox.question(self.get_course_table(),
                                      _('Error'),
                                      _('Cannot remove course'))
-            self.refresh()
         elif tab == 4:
             try:
                 res = race().delete_organizations(indexes)
+                self.refresh_table(self.get_organization_table())
             except NotEmptyException as e:
                 logging.warning(str(e))
                 QMessageBox.question(self.get_organization_table(),
                                      _('Error'),
                                      _('Cannot remove organization'))
-            self.refresh()
         if len(res):
             Teamwork().delete([r.to_dict() for r in res])

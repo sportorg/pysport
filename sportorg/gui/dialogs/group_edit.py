@@ -270,4 +270,6 @@ class GroupEditDialog(QDialog):
         group.is_any_course = self.item_is_any_course.isChecked()
 
         ResultCalculation(race()).set_rank(group)
+
+        group.generate_cache()
         Teamwork().send(group.to_dict())

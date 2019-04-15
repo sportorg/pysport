@@ -12,6 +12,7 @@ from sportorg.common.model import Model
 from sportorg.common.otime import OTime
 from sportorg.language import _
 from sportorg.modules.configs.configs import Config
+from sportorg.utils.time import time_to_hhmmss
 
 
 class NotEmptyException(Exception):
@@ -141,6 +142,18 @@ class Organization(Model):
         self.code = str(data['code']) if 'code' in data else ''
         self.contact = str(data['contact']) if 'contact' in data else ''
 
+        self.generate_cache()
+
+    def generate_cache(self):
+        organization = self
+        self.cached_values = [
+            organization.name,
+            organization.country,
+            organization.region,
+            organization.contact,
+            organization.code,
+            organization.count_person
+        ]
 
 class CourseControl(Model):
     def __init__(self):
@@ -269,6 +282,17 @@ class Course(Model):
             control.update_data(item)
             self.controls.append(control)
 
+        self.generate_cache()
+
+    def generate_cache(self):
+        course = self
+        self.cached_values = [
+            course.name,
+            course.length,
+            len(course.controls),
+            course.climb,
+            ' '.join(course.get_code_list()),
+        ]
 
 class Group(Model):
     def __init__(self):
@@ -369,6 +393,30 @@ class Group(Model):
         if data['__type']:
             self.__type = RaceType(int(data['__type']))
 
+        self.generate_cache()
+
+    def generate_cache(self):
+        group = self
+        course = group.course
+
+        control_count = len(course.controls) if course else 0
+
+        self.cached_values = [
+            group.name,
+            group.long_name,
+            course.name if course else '',
+            group.price,
+            race().get_type(group).get_title(),
+            course.length if course else 0,
+            control_count,
+            course.climb if course else 0,
+            group.sex.get_title(),
+            group.min_year,
+            group.max_year,
+            group.start_interval,
+            group.start_corridor,
+            group.order_in_corridor,
+        ]
 
 class Split(Model):
     def __init__(self):
@@ -429,7 +477,7 @@ class Split(Model):
             self.days = int(data['days'])
 
 
-class Result:
+class Result(Model):
     def __init__(self):
         if type(self) == Result:
             raise Exception("<Result> is abstracted")
@@ -456,6 +504,8 @@ class Result:
         self.splits = []  # type: List[Split]
         self.__start_time = None
         self.__finish_time = None
+
+        self.generate_cache()
 
     def __str__(self):
         return str(self.system_type)
@@ -571,6 +621,8 @@ class Result:
                 split.update_data(item)
                 self.splits.append(split)
 
+        self.generate_cache()
+
     def clear(self):
         pass
 
@@ -661,6 +713,58 @@ class Result:
 
     def is_manual(self):
         return self.system_type == SystemType.MANUAL
+
+    def generate_cache(self):
+        i = self
+        person = self.person
+
+        group = ''
+        team = ''
+        first_name = ''
+        last_name = ''
+        bib = i.get_bib()
+        rented_card = ''
+        if person:
+            is_rented_card = person.is_rented_card #or RentCards().exists(i.card_number)
+            first_name = person.name
+            last_name = person.surname
+
+            if person.group:
+                group = person.group.name
+
+            if person.organization:
+                team = person.organization.name
+
+            rented_card = _('Rented card') if is_rented_card else _('Rented stub')
+
+        start = ''
+        if i.get_start_time():
+            time_accuracy = race().get_setting('time_accuracy', 0)
+            start = i.get_start_time().to_str(time_accuracy)
+
+        finish = ''
+        if i.get_finish_time():
+            time_accuracy = race().get_setting('time_accuracy', 0)
+            finish = i.get_finish_time().to_str(time_accuracy)
+
+        self.cached_values = [
+            last_name,
+            first_name,
+            group,
+            team,
+            bib,
+            i.card_number,
+            start,
+            finish,
+            i.get_result(),
+            i.status.get_title(),
+            time_to_hhmmss(i.get_credit_time()),
+            time_to_hhmmss(i.get_penalty_time()),
+            i.penalty_laps,
+            i.get_place(),
+            str(i.system_type),
+            rented_card
+        ]
 
 
 class ResultManual(Result):
@@ -873,6 +977,8 @@ class Person(Model):
         self.start_group = 0
         self.result_count = 0
 
+        self.generate_cache()
+
     def __repr__(self):
         return '{} {} {}'.format(self.full_name, self.bib, self.group)
 
@@ -948,6 +1054,48 @@ class Person(Model):
         elif 'year' in data and data['year']:  # back compatibility with v 1.0.0
             self.set_year(int(data['year']))
 
+        self.generate_cache()
+
+    def generate_cache(self):
+        self.cached_values = []
+        ret = self.cached_values
+        person = self
+
+        is_rented_card = person.is_rented_card #or RentCards().exists(person.card_number) TODO
+
+        ret.append(person.surname)
+        ret.append(person.name)
+        ret.append(person.sex.get_title())
+        if person.qual:
+            ret.append(person.qual.get_title())
+        else:
+            ret.append('')
+        if person.group:
+            ret.append(person.group.name)
+        else:
+            ret.append('')
+        if person.organization:
+            ret.append(person.organization.name)
+        else:
+            ret.append('')
+        ret.append(person.get_year())
+        ret.append(person.bib)
+        if person.start_time:
+            ret.append(time_to_hhmmss(person.start_time))
+        else:
+            ret.append('')
+        ret.append(person.start_group)
+        ret.append(person.card_number)
+        ret.append(_('Rented card') if is_rented_card else _('Rented stub'))
+        ret.append(person.comment)
+        ret.append(str(person.world_code) if person.world_code else '')
+        ret.append(str(person.national_code) if person.national_code else '')
+
+        out_of_comp_status = ''
+        if person.is_out_of_competition:
+            out_of_comp_status = _('o/c')
+        ret.append(out_of_comp_status)
+        ret.append(person.result_count)
 
 class RaceData(Model):
     def __init__(self):

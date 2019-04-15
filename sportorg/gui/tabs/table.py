@@ -10,7 +10,7 @@ class TableView(QtWidgets.QTreeView):
         self.setWordWrap(False)
         self.setSortingEnabled(True)
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.setSelectionMode(QAbstractItemView.ContiguousSelection)
+        self.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.setStyleSheet("*::item{"
                            "    border-top-width: 0px;"
                            "    border-right-width: 1px;"
@@ -40,3 +40,10 @@ class TableView(QtWidgets.QTreeView):
         super(TableView, self).setModel(QAbstractItemModel)
         for i in range(self.model().columnCount()):
             self.resizeColumnToContents(i)
+
+    def updateRow(self, index):
+        #  Refresh QTreeView row
+        model = self.model()
+        model.beginInsertRows(index.parent(), 0, 0)
+        model.endInsertRows()
+        self.setCurrentIndex(index)

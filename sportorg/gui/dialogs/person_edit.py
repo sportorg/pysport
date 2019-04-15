@@ -334,5 +334,6 @@ class PersonEditDialog(QDialog):
             if person.get_year() != self.item_year.value():
                 person.set_year(self.item_year.value())
 
+        person.generate_cache()
         ResultCalculation(race()).process_results()
         Teamwork().send(person.to_dict())

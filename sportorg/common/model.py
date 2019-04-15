@@ -1,4 +1,10 @@
 class Model(object):
+    def __init__(self):
+        self.cached_values = []
+
+    def generate_cache(self):
+        self.cached_values = []
+
     @classmethod
     def create(cls, **kwargs):
         o = cls()

@@ -19,6 +19,7 @@ def import_csv(source):
             group = memory.Group()
             group.name = group_name
             group.long_name = group_name
+            group.generate_cache()
             obj.groups.append(group)
 
     for team_name in wo_csv.teams:
@@ -26,6 +27,7 @@ def import_csv(source):
         if org is None:
             org = memory.Organization()
             org.name = team_name
+            org.generate_cache()
             obj.organizations.append(org)
 
     for person_dict in wo_csv.data:
@@ -46,6 +48,8 @@ def import_csv(source):
         person.organization = person_org
         person.qual = Qualification(qual_id)
         person.comment = person_dict['comment']
+
+        person.generate_cache()
         obj.persons.append(person)
 
     new_lengths = obj.get_lengths()

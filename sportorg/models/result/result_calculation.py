@@ -86,6 +86,8 @@ class ResultCalculation(object):
                 res.place = last_place
                 current_place += 1
 
+            res.generate_cache()
+
     def process_relay_results(self, group):
         if group and isinstance(group, Group):
             results = self.get_group_finishes(group)

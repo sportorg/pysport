@@ -141,4 +141,6 @@ class CourseEditDialog(QDialog):
         ResultCalculation(obj).process_results()
         RaceSplits(obj).generate()
         ScoreCalculation(obj).calculate_scores()
+
+        course.generate_cache()
         Teamwork().send(course.to_dict())

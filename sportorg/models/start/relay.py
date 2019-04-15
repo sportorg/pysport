@@ -52,6 +52,7 @@ def set_next_relay_number_to_person(person):
     assert isinstance(person, Person)
     person.bib = get_next_relay_number_setting()
     set_next_relay_number(get_next_relay_number(person.bib))
+    person.generate_cache()
 
 
 def get_team_result(person):

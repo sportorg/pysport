@@ -32,6 +32,7 @@ from sportorg.gui.dialogs.teamwork_properties import TeamworkPropertiesDialog
 from sportorg.gui.dialogs.telegram_dialog import TelegramDialog
 from sportorg.gui.dialogs.text_io import TextExchangeDialog
 from sportorg.gui.dialogs.timekeeping_properties import TimekeepingPropertiesDialog
+from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.menu.action import Action
 from sportorg.gui.utils.custom_controls import messageBoxQuestion
 from sportorg.libs.winorient.wdb import write_wdb
@@ -230,7 +231,7 @@ class FilterAction(Action):
             return
         table = self.app.get_current_table()
         DialogFilter(table).exec_()
-        self.app.refresh()
+        self.app.refresh_table(table)
 
 
 class SearchAction(Action):
@@ -239,7 +240,7 @@ class SearchAction(Action):
             return
         table = self.app.get_current_table()
         SearchDialog(table).exec_()
-        self.app.refresh()
+        # self.app.refresh()
 
 
 class ToStartPreparationAction(Action):
@@ -294,7 +295,6 @@ class RelayNumberAction(Action):
             self.app.relay_number_assign = True
             QApplication.setOverrideCursor(QtCore.Qt.PointingHandCursor)
             RelayNumberDialog().exec_()
-        self.app.refresh()
 
 
 class NumberChangeAction(Action):
@@ -327,7 +327,6 @@ class CopyBibToCardNumber(Action):
 class StartListAction(Action):
     def execute(self):
         StartReportDialog().exec_()
-        self.app.refresh()
 
 
 class ManualFinishAction(Action):
@@ -336,13 +335,12 @@ class ManualFinishAction(Action):
         Teamwork().send(result.to_dict())
         race().add_new_result(result)
         logging.info(_('Manual finish'))
-        self.app.refresh()
 
 
 class SPORTidentReadoutAction(Action):
     def execute(self):
         SIReaderClient().toggle()
-        time.sleep(0.5)
+        time.sleep(0.5  )
         self.app.interval()
 
 
@@ -430,8 +428,12 @@ class ChangeStatusAction(Action):
             result.status = status_dict[result.status]
         else:
             result.status = ResultStatus.OK
+
+        result.generate_cache()
+        table.updateRow(table.currentIndex())
+
         Teamwork().send(result.to_dict())
-        self.app.refresh()
+
 
 
 class SetDNSNumbersAction(Action):
@@ -452,8 +454,7 @@ class AddSPORTidentResultAction(Action):
         race().add_new_result(result)
         Teamwork().send(result.to_dict())
         logging.info('SPORTident result')
-        self.app.get_result_table().model().init_cache()
-        self.app.refresh()
+        GlobalAccess().get_main_window().refresh_table(GlobalAccess().get_main_window().get_result_table())
 
 
 class TimekeepingSettingsAction(Action):

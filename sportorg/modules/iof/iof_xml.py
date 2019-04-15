@@ -106,6 +106,8 @@ def import_from_entry_list(entries):
             person.bib = int(person_entry['person']['extensions']['bib'])
         if 'qual' in person_entry['person']['extensions'] and person_entry['person']['extensions']['qual']:
             person.qual = Qualification.get_qual_by_name(person_entry['person']['extensions']['qual'])
+
+        person.generate_cache()
         obj.persons.append(person)
 
     persons_dupl_cards = obj.get_duplicate_card_numbers()

@@ -4,19 +4,22 @@ import uuid
 from abc import abstractmethod
 from copy import copy, deepcopy
 
+from PySide2.QtCore import QModelIndex
 from PySide2.QtCore import QAbstractTableModel, Qt
 from typing import List
 
 from sportorg.language import _
-from sportorg.models.constant import RentCards
 from sportorg.models.memory import race
-from sportorg.utils.time import time_to_hhmmss
+
 
 
 class AbstractSportOrgMemoryModel(QAbstractTableModel):
     """
     Used to specify common table behavior
     """
+
+    INITIAL_LOAD_QTY = 200000
+
     def __init__(self):
         super().__init__()
         self.race = race()
@@ -36,17 +39,14 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
         self.search_old = ''
         self.search_offset = 0
 
-    @abstractmethod
-    def init_cache(self):
-        pass
+        self.rows_loaded = self.INITIAL_LOAD_QTY
 
     @abstractmethod
     def get_values_from_object(self, obj):
         pass
 
-    @abstractmethod
     def get_source_array(self) -> List:
-        pass
+        return self.cache
 
     @abstractmethod
     def set_source_array(self, array):
@@ -68,7 +68,21 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
         return self.c_count + 1
 
     def rowCount(self, parent=None, *args, **kwargs):
-        return min(len(self.cache), self.max_rows_count)
+        return min(len(self.cache), self.rows_loaded)
+        #return min(len(self.cache), self.max_rows_count)
+
+    def canFetchMore(self, *args, **kwargs):
+        if len(self.cache) > self.rows_loaded:
+            return True
+        else:
+            return False
+
+    def fetchMore(self, *args, **kwargs):
+        reminder = len(self.cache) - self.rows_loaded
+        itemsToFetch = min(reminder, self.INITIAL_LOAD_QTY)
+        self.beginInsertRows(QModelIndex(), self.rows_loaded, self.rows_loaded + itemsToFetch - 1)
+        self.rows_loaded += itemsToFetch
+        self.endInsertRows()
 
     def headerData(self, index, orientation, role=None):
         if role == Qt.DisplayRole:
@@ -88,10 +102,11 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
                 if column == 0:
                     answer = row + 1
                 else:
-                    answer = self.cache[row][column - 1]
+                    obj = self.cache[index.row()]
+                    answer = obj.cached_values[index.column() - 1]
                 return answer
             except Exception as e:
-                logging.error(str(e))
+                logging.exception(str(e))
         return
 
     def clear_filter(self, remove_condition=True):
@@ -126,7 +141,6 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
         # set main list to result
         # note, unfiltered items are in filter_backup
         self.set_source_array(current_array)
-        self.init_cache()
 
     def apply_search(self):
         if not self.search:
@@ -147,7 +161,7 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
         maximum = len(current_array)
         while i < maximum:
             cur_pos = (self.search_offset + i) % maximum
-            obj = self.get_values_from_object(current_array[cur_pos])
+            obj = self.cache[cur_pos].cached_values
             for column in columns:
                 value = str(obj[column])
                 if value == self.search:
@@ -161,7 +175,7 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
         maximum = len(current_array)
         while i < maximum:
             cur_pos = (self.search_offset + i) % maximum
-            obj = self.get_values_from_object(current_array[cur_pos])
+            obj = self.cache[cur_pos].cached_values
             for column in columns:
                 value = str(obj[column])
                 if check.match(value):
@@ -175,7 +189,7 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
         maximum = len(current_array)
         while i < maximum:
             cur_pos = (self.search_offset + i) % maximum
-            obj = self.get_values_from_object(current_array[cur_pos])
+            obj = self.cache[cur_pos].cached_values
             for column in columns:
                 value = str(obj[column])
                 if check.search(value):
@@ -202,13 +216,9 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
             source_array = self.get_source_array()
 
             if len(source_array):
-                source_array = sorted(source_array, key=sort_key)
-                if order == Qt.DescendingOrder:
-                    source_array = source_array[::-1]
-
+                source_array = sorted(source_array, key=sort_key, reverse=(order == Qt.DescendingOrder))
                 self.set_source_array(source_array)
 
-                self.init_cache()
             self.layoutChanged.emit()
         except Exception as e:
             logging.error(str(e))
@@ -217,7 +227,8 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
         self.values[index] = self.get_values_from_object(part)
 
     def get_item(self, obj, n_col):
-        return self.get_values_from_object(obj)[n_col]
+        # return self.get_values_from_object(obj)[n_col]
+        return obj.cached_values[n_col]
 
 
 class PersonMemoryModel(AbstractSportOrgMemoryModel):
@@ -232,12 +243,7 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
                 _('Result count title')]
 
     def init_cache(self):
-        self.cache.clear()
-        for i in range(len(self.race.persons)):
-            self.cache.append(self.get_data(i))
-
-    def get_data(self, position):
-        return self.get_values_from_object(self.race.persons[position])
+        self.cache = self.race.persons
 
     def duplicate(self, position):
         person = self.race.persons[position]
@@ -247,53 +253,9 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
         new_person.card_number = 0
         self.race.persons.insert(position, new_person)
 
-    def get_values_from_object(self, obj):
-        ret = []
-        person = obj
-
-        is_rented_card = person.is_rented_card or RentCards().exists(person.card_number)
-
-        ret.append(person.surname)
-        ret.append(person.name)
-        ret.append(person.sex.get_title())
-        if person.qual:
-            ret.append(person.qual.get_title())
-        else:
-            ret.append('')
-        if person.group:
-            ret.append(person.group.name)
-        else:
-            ret.append('')
-        if person.organization:
-            ret.append(person.organization.name)
-        else:
-            ret.append('')
-        ret.append(person.get_year())
-        ret.append(person.bib)
-        if person.start_time:
-            ret.append(time_to_hhmmss(person.start_time))
-        else:
-            ret.append('')
-        ret.append(person.start_group)
-        ret.append(person.card_number)
-        ret.append(_('Rented card') if is_rented_card else _('Rented stub'))
-        ret.append(person.comment)
-        ret.append(str(person.world_code) if person.world_code else '')
-        ret.append(str(person.national_code) if person.national_code else '')
-
-        out_of_comp_status = ''
-        if person.is_out_of_competition:
-            out_of_comp_status = _('o/c')
-        ret.append(out_of_comp_status)
-        ret.append(person.result_count)
-
-        return ret
-
-    def get_source_array(self):
-        return self.race.persons
-
     def set_source_array(self, array):
         self.race.persons = array
+        self.init_cache()
 
 
 class ResultMemoryModel(AbstractSportOrgMemoryModel):
@@ -301,6 +263,7 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
         super().__init__()
         self.values = None
         self.count = None
+        self.init_cache()
 
     def get_headers(self):
         return [_('Last name'), _('First name'), _('Group'), _('Team'), _('Bib'), _('Card title'),
@@ -308,13 +271,11 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
                 _('Place'), _('Type'), _('Rented card')]
 
     def init_cache(self):
-        self.cache.clear()
-        for i in range(len(self.race.results)):
-            self.cache.append(self.get_data(i))
+        self.cache = self.race.results
 
-    def get_data(self, position):
-        ret = self.get_values_from_object(self.race.results[position])
-        return ret
+    def set_source_array(self, array):
+        self.race.results = array
+        self.init_cache()
 
     def duplicate(self, position):
         result = self.race.results[position]
@@ -323,68 +284,15 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
         new_result.splits = deepcopy(result.splits)
         self.race.results.insert(position, new_result)
 
-    def get_values_from_object(self, result):
-        i = result
-        person = i.person
-
-        group = ''
-        team = ''
-        first_name = ''
-        last_name = ''
-        bib = result.get_bib()
-        rented_card = ''
-        if person:
-            is_rented_card = person.is_rented_card or RentCards().exists(i.card_number)
-            first_name = person.name
-            last_name = person.surname
-
-            if person.group:
-                group = person.group.name
-
-            if person.organization:
-                team = person.organization.name
-
-            rented_card = _('Rented card') if is_rented_card else _('Rented stub')
-
-        start = ''
-        if i.get_start_time():
-            time_accuracy = self.race.get_setting('time_accuracy', 0)
-            start = i.get_start_time().to_str(time_accuracy)
-
-        finish = ''
-        if i.get_finish_time():
-            time_accuracy = self.race.get_setting('time_accuracy', 0)
-            finish = i.get_finish_time().to_str(time_accuracy)
-
-        return [
-            last_name,
-            first_name,
-            group,
-            team,
-            bib,
-            i.card_number,
-            start,
-            finish,
-            i.get_result(),
-            i.status.get_title(),
-            time_to_hhmmss(i.get_credit_time()),
-            time_to_hhmmss(i.get_penalty_time()),
-            i.penalty_laps,
-            i.get_place(),
-            str(i.system_type),
-            rented_card
-        ]
-
-    def get_source_array(self):
-        return self.race.results
-
     def set_source_array(self, array):
         self.race.results = array
+        self.init_cache()
 
 
 class GroupMemoryModel(AbstractSportOrgMemoryModel):
     def __init__(self):
         super().__init__()
+        self.init_cache()
 
     def get_headers(self):
         return [_('Name'), _('Full name'), _('Course name'), _('Start fee title'), _('Type'), _('Length title'),
@@ -393,65 +301,23 @@ class GroupMemoryModel(AbstractSportOrgMemoryModel):
                 _('Order in corridor title')]
 
     def init_cache(self):
-        self.cache.clear()
-        for i in range(len(self.race.groups)):
-            self.cache.append(self.get_data(i))
-
-    def get_data(self, position):
-        ret = self.get_values_from_object(self.race.groups[position])
-        return ret
-
-    def duplicate(self, position):
-        group = self.race.groups[position]
-        new_group = copy(group)
-        new_group.id = uuid.uuid4()
-        new_group.name = new_group.name + '_'
-        self.race.groups.insert(position, new_group)
-
-    def get_values_from_object(self, group):
-        course = group.course
-
-        control_count = len(course.controls) if course else 0
-
-        return [
-            group.name,
-            group.long_name,
-            course.name if course else '',
-            group.price,
-            self.race.get_type(group).get_title(),
-            course.length if course else 0,
-            control_count,
-            course.climb if course else 0,
-            group.sex.get_title(),
-            group.min_year,
-            group.max_year,
-            group.start_interval,
-            group.start_corridor,
-            group.order_in_corridor,
-        ]
-
-    def get_source_array(self):
-        return self.race.groups
+        self.cache = self.race.groups
 
     def set_source_array(self, array):
         self.race.groups = array
+        self.init_cache()
 
 
 class CourseMemoryModel(AbstractSportOrgMemoryModel):
     def __init__(self):
         super().__init__()
+        self.init_cache()
 
     def get_headers(self):
         return [_('Name'), _('Length title'), _('Point count title'), _('Climb title'), _('Controls')]
 
     def init_cache(self):
-        self.cache.clear()
-        for i in range(len(self.race.courses)):
-            self.cache.append(self.get_data(i))
-
-    def get_data(self, position):
-        ret = self.get_values_from_object(self.race.courses[position])
-        return ret
+        self.cache=self.race.courses
 
     def duplicate(self, position):
         course = self.race.courses[position]
@@ -461,37 +327,21 @@ class CourseMemoryModel(AbstractSportOrgMemoryModel):
         new_course.controls = deepcopy(course.controls)
         self.race.courses.insert(position, new_course)
 
-    def get_values_from_object(self, course):
-        return [
-            course.name,
-            course.length,
-            len(course.controls),
-            course.climb,
-            ' '.join(course.get_code_list()),
-        ]
-
-    def get_source_array(self):
-        return self.race.courses
-
     def set_source_array(self, array):
         self.race.courses = array
+        self.init_cache()
 
 
 class OrganizationMemoryModel(AbstractSportOrgMemoryModel):
     def __init__(self):
         super().__init__()
+        self.init_cache()
 
     def get_headers(self):
         return [_('Name'), _('Code'), _('Country'), _('Region'), _('Contact')]
 
     def init_cache(self):
-        self.cache.clear()
-        for i in range(len(self.race.organizations)):
-            self.cache.append(self.get_data(i))
-
-    def get_data(self, position):
-        ret = self.get_values_from_object(self.race.organizations[position])
-        return ret
+        self.cache = self.race.organizations
 
     def duplicate(self, position):
         organization = self.race.organizations[position]
@@ -500,17 +350,6 @@ class OrganizationMemoryModel(AbstractSportOrgMemoryModel):
         new_organization.name = new_organization.name + '_'
         self.race.organizations.insert(position, new_organization)
 
-    def get_values_from_object(self, organization):
-        return [
-            organization.name,
-            organization.code,
-            organization.country,
-            organization.region,
-            organization.contact
-        ]
-
-    def get_source_array(self):
-        return self.race.organizations
-
     def set_source_array(self, array):
         self.race.organizations = array
+        self.init_cache()

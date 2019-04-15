@@ -280,6 +280,8 @@ class StartPreparationDialog(QDialog):
 
             self.progress_bar.setValue(100)
 
+            GlobalAccess().get_main_window().refresh()
+
             self.save_state()
         except Exception as e:
             logging.error(str(e))

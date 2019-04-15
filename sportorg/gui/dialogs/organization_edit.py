@@ -106,4 +106,5 @@ class OrganizationEditDialog(QDialog):
         org.region = self.item_region.currentText()
         org.contact = self.item_contact.text()
 
+        org.generate_cache()
         Teamwork().send(org.to_dict())

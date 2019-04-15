@@ -86,6 +86,7 @@ class WinOrientBinary:
                     control.length = course.leg[i]
                 new_course.controls.append(control)
 
+            new_course.generate_cache()
             my_race.courses.append(new_course)
 
         for group in self.wdb_object.group:
@@ -96,6 +97,8 @@ class WinOrientBinary:
             course = group.get_course()
             if course is not None:
                 new_group.course = find(race().courses, name=course.name)
+
+            new_group.generate_cache()
             my_race.groups.append(new_group)
 
         for man in self.wdb_object.man:
@@ -126,6 +129,7 @@ class WinOrientBinary:
                 team_name = found_team.name
                 new_person.organization = find(race().organizations, name=team_name)
 
+            new_person.generate_cache()
             my_race.persons.append(new_person)
 
             new_person.start_time = int_to_otime(man.start)
