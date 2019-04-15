@@ -14,6 +14,7 @@ class BibDialog(QDialog):
         super().__init__(GlobalAccess().get_main_window())
         self.text = text
         self.person = None
+        self.tmp_person = None
 
     def exec_(self):
         self.init_ui()
@@ -41,7 +42,6 @@ class BibDialog(QDialog):
         self.layout.addRow(self.label_person_info)
 
         def cancel_changes():
-            self.person = None
             self.close()
 
         def apply_changes():
@@ -65,8 +65,8 @@ class BibDialog(QDialog):
     def show_person_info(self):
         bib_or_name = self.item_bib_or_name.text()  # type: str
         self.label_person_info.setText('')
+        person = None
         if bib_or_name:
-            person = None
             if bib_or_name.isdigit():
                 person = memory.find(memory.race().persons, bib=int(bib_or_name))
             else:
@@ -82,9 +82,9 @@ class BibDialog(QDialog):
                 if person.card_number:
                     info = '{}\n{}: {}'.format(info, _('Card'), person.card_number)
                 self.label_person_info.setText(info)
-                self.person = person
             else:
                 self.label_person_info.setText(_('not found'))
+        self.tmp_person = person
 
     def get_person(self):
         return self.person
@@ -93,4 +93,4 @@ class BibDialog(QDialog):
         return self.person is not None
 
     def apply_changes_impl(self):
-        pass
+        self.person = self.tmp_person
