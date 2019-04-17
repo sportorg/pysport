@@ -191,7 +191,7 @@ class IOFEntryListImportAction(Action):
             try:
                 iof_xml.import_from_iof(file_name)
             except Exception as e:
-                logging.error(str(e))
+                logging.exception(str(e))
                 QMessageBox.warning(self.app, _('Error'), _('Import error') + ': ' + file_name)
             self.app.init_model()
 

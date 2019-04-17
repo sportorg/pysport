@@ -82,9 +82,8 @@ def import_from_entry_list(entries):
         if org is None:
             org = Organization()
             org.name = person_entry['organization']['name']
-            org.contact.name = 'name'
             if 'role_person' in person_entry['organization']:
-                org.contact.value = person_entry['organization']['role_person']
+                org.contact = person_entry['organization']['role_person']
             obj.organizations.append(org)
 
     for person_entry in entries:
