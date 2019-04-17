@@ -128,7 +128,7 @@
                         status: result.status,
                         place_show: result.person.is_out_of_competition ? 'в/к' : result.place === 0 ? '' : result.place <= -1 ? '' : result.place,
                         speed: result.speed,
-                        contact: result.person.organization && result.person.organization.contact.value,
+                        contact: result.person.organization && result.person.organization.contact,
                         start: toHHMMSS(result.start_msec),
                         data: result
                     };
@@ -212,7 +212,7 @@
                         qual: Qualification[result.person.qual],
                         bib: result.person.bib,
                         start: toHHMMSS(result.start_msec),
-                        contact: result.person.organization && result.person.organization.contact.value,
+                        contact: result.person.organization && result.person.organization.contact,
                         year: result.person.birth_date ? (new Date(result.person.birth_date)).getFullYear() : '',
                         data: result
                     };
