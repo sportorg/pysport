@@ -58,6 +58,7 @@ class ResultsTable(TableView):
             if index.row() < len(race().results):
                 dialog = ResultEditDialog(race().results[index.row()])
                 dialog.exec_()
+                GlobalAccess().get_main_window().refresh_table(self, True)
         except Exception as e:
             logging.error(str(e))
 

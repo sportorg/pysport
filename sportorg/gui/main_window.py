@@ -322,6 +322,7 @@ class MainWindow(QMainWindow):
             table.setModel(CourseMemoryModel())
             table = self.get_organization_table()
             table.setModel(OrganizationMemoryModel())
+            self.refresh()
             Broker().produce('init_model')
         except Exception as e:
             logging.error(str(e))
@@ -515,12 +516,10 @@ class MainWindow(QMainWindow):
                 self.last_update = time.time()
                 self.file = file_name
                 self.add_recent_file(self.file)
-                self.set_title()
                 self.init_model()
             except Exception as e:
                 logging.error(str(e))
                 QMessageBox.warning(self, _('Error'), _('Cannot create file') + ': ' + file_name)
-            self.refresh()
 
     def save_file_as(self):
         self.create_file(update_data=False)
@@ -544,8 +543,8 @@ class MainWindow(QMainWindow):
                 self.file = file_name
                 self.set_title()
                 self.add_recent_file(self.file)
-                self.init_model()
                 self.last_update = time.time()
+                self.init_model()
             except Exception as e:
                 logging.exception(str(e))
                 self.delete_from_recent_files(file_name)
@@ -593,22 +592,21 @@ class MainWindow(QMainWindow):
             if tab == 0:
                 p = race().add_new_person()
                 PersonEditDialog(p, True).exec_()
-                self.refresh_table(self.get_person_table())
+                self.get_person_table().update_row(self.get_person_table().model().index(0, 0))
             elif tab == 1:
                 self.menu_factory.execute('ManualFinishAction')
-                self.refresh_table(self.get_result_table())
             elif tab == 2:
                 g = race().add_new_group()
                 GroupEditDialog(g, True).exec_()
-                self.refresh_table(self.get_group_table())
+                self.get_group_table().update_row(self.get_group_table().model().index(0, 0))
             elif tab == 3:
                 c = race().add_new_course()
                 CourseEditDialog(c, True).exec_()
-                self.refresh_table(self.get_course_table())
+                self.get_course_table().update_row(self.get_course_table().model().index(0, 0))
             elif tab == 4:
                 o = race().add_new_organization()
                 OrganizationEditDialog(o, True).exec_()
-                self.refresh_table(self.get_organization_table())
+                self.get_organization_table().update_row(self.get_organization_table().model().index(0, 0))
         except Exception as e:
             logging.exception(str(e))
 

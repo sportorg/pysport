@@ -27,7 +27,6 @@ def import_csv(source):
         if org is None:
             org = memory.Organization()
             org.name = team_name
-            org.generate_cache()
             obj.organizations.append(org)
 
     for person_dict in wo_csv.data:

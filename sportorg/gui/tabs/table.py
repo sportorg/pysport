@@ -41,7 +41,7 @@ class TableView(QtWidgets.QTreeView):
         for i in range(self.model().columnCount()):
             self.resizeColumnToContents(i)
 
-    def updateRow(self, index):
+    def update_row(self, index):
         #  Refresh QTreeView row
         model = self.model()
         model.beginInsertRows(index.parent(), 0, 0)

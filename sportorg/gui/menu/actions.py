@@ -105,7 +105,7 @@ class DuplicateAction(Action):
         indexes = sel_model.selectedRows()
         if len(indexes):
             sel_model.model().duplicate(indexes[0].row())
-            self.app.refresh()
+            self.app.refresh_table(self.app.get_person_table(), True)
 
 
 class SettingsAction(Action):
@@ -124,10 +124,10 @@ class CSVWinorientImportAction(Action):
         if file_name is not '':
             try:
                 winorient.import_csv(file_name)
+                self.app.refresh()
             except Exception as e:
                 logging.error(str(e))
                 QMessageBox.warning(self.app, _('Error'), _('Import error') + ': ' + file_name)
-            self.app.init_model()
 
 
 class WDBWinorientImportAction(Action):
@@ -136,11 +136,11 @@ class WDBWinorientImportAction(Action):
         if file_name is not '':
             try:
                 winorient.import_wo_wdb(file_name)
+                self.app.refresh()
             except WDBImportError as e:
                 logging.error(str(e))
                 logging.exception(e)
                 QMessageBox.warning(self.app, _('Error'), _('Import error') + ': ' + file_name)
-            self.app.init_model()
 
 
 class OcadTXTv8ImportAction(Action):
@@ -149,10 +149,10 @@ class OcadTXTv8ImportAction(Action):
         if file_name is not '':
             try:
                 ocad.import_txt_v8(file_name)
+                self.app.refresh_table(self.app.get_course_table(), True)
             except OcadImportException as e:
                 logging.error(str(e))
                 QMessageBox.warning(self.app, _('Error'), _('Import error') + ': ' + file_name)
-            self.app.init_model()
 
 
 class WDBWinorientExportAction(Action):
@@ -191,10 +191,10 @@ class IOFEntryListImportAction(Action):
         if file_name is not '':
             try:
                 iof_xml.import_from_iof(file_name)
+                self.app.refresh()
             except Exception as e:
                 logging.error(str(e))
                 QMessageBox.warning(self.app, _('Error'), _('Import error') + ': ' + file_name)
-            self.app.init_model()
 
 
 class AddObjectAction(Action):
@@ -283,7 +283,7 @@ class GuessCoursesAction(Action):
 class GuessCorridorsAction(Action):
     def execute(self):
         guess_corridors_for_groups()
-        self.app.refresh()
+        self.app.refresh_table(self.app.get_group_table(), True)
 
 
 class RelayNumberAction(Action):
@@ -321,7 +321,7 @@ class CopyBibToCardNumber(Action):
         reply = messageBoxQuestion(self.app, _('Question'), msg, QMessageBox.Yes | QMessageBox.No)
         if reply == QMessageBox.Yes:
             copy_bib_to_card_number()
-            self.app.refresh()
+            self.app.refresh_table(self.app.get_person_table(), True)
 
 
 class StartListAction(Action):
@@ -332,15 +332,16 @@ class StartListAction(Action):
 class ManualFinishAction(Action):
     def execute(self):
         result = race().new_result(ResultManual)
+        result.generate_cache()
         Teamwork().send(result.to_dict())
         race().add_new_result(result)
         logging.info(_('Manual finish'))
-
+        self.app.get_result_table().update_row(self.app.get_result_table().model().index(0, 0))
 
 class SPORTidentReadoutAction(Action):
     def execute(self):
         SIReaderClient().toggle()
-        time.sleep(0.5  )
+        time.sleep(0.5)
         self.app.interval()
 
 
@@ -372,7 +373,7 @@ class RecheckingAction(Action):
     def execute(self):
         ResultChecker.check_all()
         ResultCalculation(race()).process_results()
-        self.app.refresh()
+        self.app.refresh_table(self.app.get_result_table(), True)
 
 
 class PenaltyCalculationAction(Action):
@@ -383,7 +384,7 @@ class PenaltyCalculationAction(Action):
                 ResultChecker.calculate_penalty(result)
         logging.debug('Penalty calculation finish')
         ResultCalculation(race()).process_results()
-        self.app.refresh()
+        self.app.refresh_table(self.app.get_result_table(), True)
 
 
 class PenaltyRemovingAction(Action):
@@ -394,7 +395,7 @@ class PenaltyRemovingAction(Action):
             result.penalty_laps = 0
         logging.debug('Penalty removing finish')
         ResultCalculation(race()).process_results()
-        self.app.refresh()
+        self.app.refresh_table(self.app.get_result_table(), True)
 
 
 class ChangeStatusAction(Action):
@@ -430,7 +431,7 @@ class ChangeStatusAction(Action):
             result.status = ResultStatus.OK
 
         result.generate_cache()
-        table.updateRow(table.currentIndex())
+        table.update_row(table.currentIndex())
 
         Teamwork().send(result.to_dict())
 
@@ -439,13 +440,13 @@ class ChangeStatusAction(Action):
 class SetDNSNumbersAction(Action):
     def execute(self):
         NotStartDialog().exec_()
-        self.app.refresh()
+        self.app.refresh_table(self.app.get_result_table(), True)
 
 
 class CPDeleteAction(Action):
     def execute(self):
         CPDeleteDialog().exec_()
-        self.app.refresh()
+        self.app.refresh_table(self.app.get_result_table(), True)
 
 
 class AddSPORTidentResultAction(Action):
@@ -454,13 +455,13 @@ class AddSPORTidentResultAction(Action):
         race().add_new_result(result)
         Teamwork().send(result.to_dict())
         logging.info('SPORTident result')
-        GlobalAccess().get_main_window().refresh_table(GlobalAccess().get_main_window().get_result_table())
+        self.app.refresh_table(self.app.get_result_table(), True)
 
 
 class TimekeepingSettingsAction(Action):
     def execute(self):
         TimekeepingPropertiesDialog().exec_()
-        self.app.refresh()
+        self.app.refresh_table(self.app.get_result_table(), True)
 
 
 class TeamworkSettingsAction(Action):
@@ -509,7 +510,6 @@ class PrinterSettingsAction(Action):
 class LiveSettingsAction(Action):
     def execute(self):
         LiveDialog().exec_()
-        self.app.refresh()
 
 
 class TelegramSettingsAction(Action):
@@ -564,7 +564,7 @@ class AssignResultByBibAction(Action):
         for result in race().results:
             if result.person is None and result.bib:
                 result.person = find(race().persons, bib=result.bib)
-        self.app.refresh()
+        self.app.refresh_table(self.app.get_result_table(), True)
 
 
 class AssignResultByCardNumberAction(Action):
@@ -572,7 +572,7 @@ class AssignResultByCardNumberAction(Action):
         for result in race().results:
             if result.person is None and result.card_number:
                 result.person = find(race().persons, card_number=result.card_number)
-        self.app.refresh()
+        self.app.refresh_table(self.app.get_result_table(), True)
 
 
 class ImportSportOrgAction(Action):

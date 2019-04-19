@@ -256,8 +256,6 @@ class ResultEditDialog(QDialog):
                     race().person_card_number(result.person, result.card_number)
             result.bib = new_bib
 
-            GlobalAccess().get_main_window().refresh_table(GlobalAccess().get_main_window().get_result_table())
-
         if self.item_days.value() != result.days:
             result.days = self.item_days.value()
 

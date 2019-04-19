@@ -38,6 +38,7 @@ class Widget(QtWidgets.QWidget):
                 if index.row() < len(race().groups):
                     dialog = GroupEditDialog(race().groups[index.row()])
                     dialog.exec_()
+                    GlobalAccess().get_main_window().refresh()
             except Exception as e:
                 logging.error(str(e))
 

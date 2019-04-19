@@ -39,6 +39,7 @@ class Widget(QtWidgets.QWidget):
                 if index.row() < len(race().organizations):
                     dialog = OrganizationEditDialog(race().organizations[index.row()])
                     dialog.exec_()
+                    GlobalAccess().get_main_window().refresh()
             except Exception as e:
                 logging.error(str(e))
 

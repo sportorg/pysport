@@ -30,8 +30,7 @@ class PersonsTableView(TableView):
             if key in key_numbers:
                 index = self.currentIndex()
                 self.set_start_group(NumberClicker().click(key_numbers.index(key)), index)
-
-                self.updateRow(index)
+                self.update_row(index)
             else:
                 super().keyPressEvent(e)
         except Exception as ex:
@@ -61,6 +60,8 @@ class Widget(QtWidgets.QWidget):
                 if index.row() < len(race().persons):
                     dialog = PersonEditDialog(race().persons[index.row()])
                     dialog.exec_()
+                    GlobalAccess().get_main_window().refresh_table(GlobalAccess().get_main_window().get_result_table(),
+                                                                   True)
             except Exception as e:
                 logging.error(str(e))
 
@@ -70,7 +71,7 @@ class Widget(QtWidgets.QWidget):
                 if GlobalAccess().get_main_window().relay_number_assign:
                     if index.row() < len(obj.persons):
                         set_next_relay_number_to_person(obj.persons[index.row()])
-                        self.person_table.updateRow(index)
+                        self.person_table.update_row(index)
 
             except Exception as e:
                 logging.error(str(e))
