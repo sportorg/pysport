@@ -137,7 +137,7 @@ class PersonEditDialog(QDialog):
             try:
                 self.apply_changes_impl()
             except Exception as e:
-                logging.error(str(e))
+                logging.exception(str(e))
             self.close()
 
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
@@ -290,6 +290,7 @@ class PersonEditDialog(QDialog):
             if organization is None:
                 organization = Organization()
                 organization.name = self.item_team.currentText()
+                organization.generate_cache()
                 race().organizations.append(organization)
                 Teamwork().send(organization.to_dict())
             person.organization = organization
