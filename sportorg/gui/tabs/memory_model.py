@@ -18,7 +18,7 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
     Used to specify common table behavior
     """
 
-    INITIAL_LOAD_QTY = 200000
+    INITIAL_LOAD_QTY = 100
 
     def __init__(self):
         super().__init__()

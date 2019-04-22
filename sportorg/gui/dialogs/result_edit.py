@@ -243,6 +243,8 @@ class ResultEditDialog(QDialog):
             if result.person and result.is_punch():
                 if result.person.card_number == result.card_number:
                     result.person.card_number = 0
+                    result.person.result_count -= 1
+                    result.person.generate_cache()
             result.person = None
         elif cur_bib != new_bib:
             new_person = find(race().persons, bib=new_bib)
@@ -251,9 +253,14 @@ class ResultEditDialog(QDialog):
                 if result.person:
                     if result.is_punch():
                         result.person.card_number = 0
+                        result.person.result_count -= 1
+                        result.person.generate_cache()
                 result.person = new_person
+
                 if result.is_punch():
                     race().person_card_number(result.person, result.card_number)
+                new_person.result_count += 1
+                new_person.generate_cache()
             result.bib = new_bib
 
         if self.item_days.value() != result.days:
