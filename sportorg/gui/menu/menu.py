@@ -219,14 +219,6 @@ def menu_list():
                     'title': _('Use bib as card number'),
                     'action': 'CopyBibToCardNumber'
                 },
-                {
-                    'type': 'separator',
-                },
-                {
-                    'title': _('Start list'),
-                    'shortcut': 'Ctrl+Shift+P',
-                    'action': 'StartListAction'
-                },
             ]
         },
         {

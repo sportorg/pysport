@@ -26,7 +26,6 @@ from sportorg.gui.dialogs.settings import SettingsDialog
 from sportorg.gui.dialogs.sportorg_import_dialog import SportOrgImportDialog
 from sportorg.gui.dialogs.start_handicap_dialog import StartHandicapDialog
 from sportorg.gui.dialogs.start_preparation import StartPreparationDialog, guess_courses_for_groups
-from sportorg.gui.dialogs.start_report_dialog import StartReportDialog
 from sportorg.gui.dialogs.start_time_change_dialog import StartTimeChangeDialog
 from sportorg.gui.dialogs.teamwork_properties import TeamworkPropertiesDialog
 from sportorg.gui.dialogs.telegram_dialog import TelegramDialog
@@ -324,12 +323,6 @@ class CopyBibToCardNumber(Action):
             self.app.refresh()
 
 
-class StartListAction(Action):
-    def execute(self):
-        StartReportDialog().exec_()
-        self.app.refresh()
-
-
 class ManualFinishAction(Action):
     def execute(self):
         result = race().new_result(ResultManual)
@@ -625,7 +618,6 @@ __all__ = [
     'StartTimeChangeAction',
     'StartHandicapAction',
     'CopyBibToCardNumber',
-    'StartListAction',
     'ManualFinishAction',
     'SPORTidentReadoutAction',
     'SportiduinoReadoutAction',

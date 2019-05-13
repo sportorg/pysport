@@ -38,7 +38,6 @@ class Factory(object):
             StartTimeChangeAction(),
             StartHandicapAction(),
             CopyBibToCardNumber(),
-            StartListAction(),
             ManualFinishAction(),
             SPORTidentReadoutAction(),
             SportiduinoReadoutAction(),
