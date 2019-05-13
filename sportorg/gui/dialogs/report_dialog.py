@@ -1,7 +1,6 @@
 import codecs
 import logging
 import os
-import time
 
 import webbrowser
 
@@ -48,7 +47,7 @@ class ReportDialog(QDialog):
 
         self.label_template = QLabel(_('Template'))
         self.item_template = AdvComboBox()
-        self.item_template.addItems(get_templates(config.template_dir('result')))
+        self.item_template.addItems(get_templates(config.template_dir('reports')))
         self.layout.addRow(self.label_template, self.item_template)
         if _settings['last_template'] is not None:
             self.item_template.setCurrentText(_settings['last_template'])
@@ -167,7 +166,7 @@ class ReportDialog(QDialog):
             else:
                 file_name = get_save_file_name(_('Save As HTML file'), _("HTML file (*.html)"),
                                                '{}_report'.format(obj.data.get_start_datetime().strftime("%Y%m%d")))
-            if file_name:
+            if len(file_name):
                 _settings['last_file'] = file_name
                 with codecs.open(file_name, 'w', 'utf-8') as file:
                     file.write(template)
