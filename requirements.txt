@@ -2,7 +2,7 @@ python-dateutil==2.6.1
 xmlschema==0.9.14
 PySide2==5.11.2
 sireader==1.1.1
-jinja2==2.10
+jinja2==2.10.1
 polib==1.0.8
 cx_Freeze==5.1.1
 requests>=2.20.0
