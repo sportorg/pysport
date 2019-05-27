@@ -3,7 +3,7 @@ import logging
 from sportorg.gui.dialogs.bib_dialog import BibDialog
 from sportorg.models.result.result_checker import ResultChecker, ResultCheckerException
 from sportorg.models.memory import race, Person, Result, ResultSportident
-
+from sportorg.language import _
 
 class ResultSportidentGeneration:
     def __init__(self, result: ResultSportident):
@@ -57,7 +57,11 @@ class ResultSportidentGeneration:
         if self._has_result():
             logging.info('Result already exist')
             return False
-        if self.assign_chip_reading == 'always':
+
+        if self.assign_chip_reading == 'autocreate':
+            # generate new person
+            self._create_person()
+        elif self.assign_chip_reading == 'always':
             self._bib_dialog()
         elif self.card_read_repeated and self._has_sportident_card():
             self._bib_dialog()
@@ -90,3 +94,29 @@ class ResultSportidentGeneration:
                 self._add_result()
             else:
                 self._no_person()
+
+    def _create_person(self):
+        new_person = Person()
+        new_person.bib = self._get_max_bib() + 1
+        new_person.surname = _('Competitor') + ' #' + str(new_person.bib)
+        new_person.group = self._find_group_by_punches()
+        self._result.person = new_person
+
+        race().persons.append(new_person)
+
+    def _get_max_bib(self):
+        max_bib = 0
+        for i in race().persons:
+            max_bib = max(max_bib, i.bib)
+        return max_bib
+
+    def _find_group_by_punches(self):
+        for i in race().groups:
+            if i.course:
+                if self._result.check(i.course):
+                    return i
+
+        if len(race().groups) > 0:
+            return race().groups[0]
+
+        return None

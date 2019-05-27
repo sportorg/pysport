@@ -616,6 +616,9 @@ msgstr "Только неизвестные чипы"
 msgid "Always"
 msgstr "Всегда"
 
+msgid "Athlete auto create"
+msgstr "Создавать новых спортсменов"
+
 msgid "Assignment mode"
 msgstr "Режим присвоения"
 
@@ -1146,6 +1149,9 @@ msgstr "Повторяющиеся имена"
 
 msgid "Competitors"
 msgstr "Участники"
+
+msgid "Competitor"
+msgstr "Участник"
 
 msgid "Min year"
 msgstr "Минимальный год"
