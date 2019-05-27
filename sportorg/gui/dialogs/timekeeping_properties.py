@@ -88,6 +88,8 @@ class TimekeepingPropertiesDialog(QDialog):
         self.chip_reading_layout.addRow(self.chip_reading_unknown)
         self.chip_reading_always = QRadioButton(_('Always'))
         self.chip_reading_layout.addRow(self.chip_reading_always)
+        self.chip_reading_autocreate = QRadioButton(_('Athlete auto create'))
+        self.chip_reading_layout.addRow(self.chip_reading_autocreate)
         self.chip_reading_box.setLayout(self.chip_reading_layout)
         self.tk_layout.addRow(self.chip_reading_box)
 
@@ -276,6 +278,8 @@ class TimekeepingPropertiesDialog(QDialog):
             self.chip_reading_unknown.setChecked(True)
         elif assign_chip_reading == 'always':
             self.chip_reading_always.setChecked(True)
+        elif assign_chip_reading == 'autocreate':
+            self.chip_reading_autocreate.setChecked(True)
 
         self.chip_re_reading.setChecked(card_read_repeated)
         self.assignment_mode.setChecked(assignment_mode)
@@ -373,6 +377,8 @@ class TimekeepingPropertiesDialog(QDialog):
             assign_chip_reading = 'only_unknown_members'
         elif self.chip_reading_always.isChecked():
             assign_chip_reading = 'always'
+        elif self.chip_reading_autocreate.isChecked():
+            assign_chip_reading = 'autocreate'
 
         start_cp_number = self.item_start_cp_value.value()
         finish_cp_number = self.item_finish_cp_value.value()

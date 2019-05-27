@@ -180,6 +180,9 @@
             {% for control in course.controls %}
                 {{control.code}}
             {% endfor %}<br>
+			<h1>ПЛОХАЯ ОТМЕТКА</h1>
+		{% else %}
+			<h1>ОТМЕТКА - OK</h1>
         {% endif %}
         <table>
             {% for item in items %}
