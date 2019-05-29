@@ -403,6 +403,12 @@ msgstr "Успешный результат"
 msgid "Unsuccessful result"
 msgstr "Неуспешный результат"
 
+msgid "Enable rented card sound"
+msgstr "Включить звук при аренде чипа"
+
+msgid "Rented card sound"
+msgstr "Звук при аренде чипа"
+
 msgid "Main settings"
 msgstr "Основные настройки"
 

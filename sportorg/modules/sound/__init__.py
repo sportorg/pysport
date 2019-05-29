@@ -9,6 +9,10 @@ class Sound(object):
     def is_enabled():
         return Config().sound.get('enabled')
 
+    @staticmethod
+    def is_enabled_rented_card():
+        return Config().sound.get('enabled_rented_card')
+
     def _play(self, name):
         sound = Config().sound.get(name)
         if self.is_enabled() and sound:
@@ -19,3 +23,7 @@ class Sound(object):
 
     def fail(self):
         self._play('unsuccessful')
+
+    def rented_card(self):
+        if self.is_enabled_rented_card():
+            self._play('rented_card')
