@@ -85,12 +85,24 @@ class SoundTab(Tab):
         self.item_unsuccessful.setCurrentText(Config().sound.get('unsuccessful') or config.sound_dir('failure.wav'))
         self.layout.addRow(self.label_unsuccessful, self.item_unsuccessful)
 
+        self.item_enabled_rented_card = QCheckBox(_('Enable rented card sound'))
+        self.item_enabled_rented_card.setChecked(Config().sound.get('enabled_rented_card', Config().sound.get('enabled')))
+        self.layout.addRow(self.item_enabled_rented_card)
+  
+        self.label_rented_card = QLabel(_('Rented card sound'))
+        self.item_rented_card = AdvComboBox()
+        self.item_rented_card.addItems(self.sounds)
+        self.item_rented_card.setCurrentText(Config().sound.get('rented_card') or config.sound_dir('rented_card.wav'))
+        self.layout.addRow(self.label_rented_card, self.item_rented_card)
+        
         self.widget.setLayout(self.layout)
 
     def save(self):
         Config().sound.set('enabled', self.item_enabled.isChecked())
         Config().sound.set('successful', self.item_successful.currentText())
         Config().sound.set('unsuccessful', self.item_unsuccessful.currentText())
+        Config().sound.set('enabled_rented_card', self.item_enabled_rented_card.isChecked())
+        Config().sound.set('rented_card', self.item_rented_card.currentText())
 
 
 class MultidayTab(Tab):
@@ -213,7 +225,7 @@ class SettingsDialog(QDialog):
         self.button_cancel.setText(_('Cancel'))
         self.button_cancel.clicked.connect(cancel_changes)
         self.layout.addRow(button_box)
-
+        
         self.show()
 
     def apply_changes_impl(self):

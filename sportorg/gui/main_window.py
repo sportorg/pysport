@@ -447,6 +447,8 @@ class MainWindow(QMainWindow):
                             Sound().ok()
                         else:
                             Sound().fail()
+                        if result.person.is_rented_card:
+                            Sound().rented_card()
             else:
                 for person in race().persons:
                     if not person.card_number:
