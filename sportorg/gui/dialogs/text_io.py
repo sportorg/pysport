@@ -103,10 +103,24 @@ class TextExchangeDialog(QDialog):
         self.button_cancel.setText(_('Cancel'))
         self.button_cancel.clicked.connect(self.reject)
 
+        stf_button = button_box.addButton(_('Save to file'), QDialogButtonBox.ActionRole)
+        stf_button.clicked.connect(self.save_to_file)
+        stf_button.setDisabled(True)
+
+        lff_button = button_box.addButton(_('Load from file'), QDialogButtonBox.ActionRole)
+        lff_button.clicked.connect(self.load_from_file)
+        lff_button.setDisabled(True)
+
         self.layout.addWidget(widget)
         self.layout.addWidget(button_box)
 
         self.retranslate_ui(self)
+
+    def save_to_file(self):
+        pass
+
+    def load_from_file(self):
+        pass
 
     def retranslate_ui(self, text_io):
         text_io.setWindowTitle(_("Dialog"))

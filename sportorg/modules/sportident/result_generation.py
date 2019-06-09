@@ -5,6 +5,7 @@ from sportorg.models.result.result_checker import ResultChecker, ResultCheckerEx
 from sportorg.models.memory import race, Person, Result, ResultSportident
 from sportorg.language import _
 
+
 class ResultSportidentGeneration:
     def __init__(self, result: ResultSportident):
         assert result, Result
@@ -16,11 +17,29 @@ class ResultSportidentGeneration:
     def _add_result_to_race(self):
         race().add_result(self._result)
 
+    def _compare_result(self, result):
+        eq = self._result.card_number == result.card_number
+        if not eq:
+            return False
+        if self._result.start_time and result.start_time:
+            eq = eq and self._result.start_time == result.start_time
+        if self._result.finish_time and result.finish_time:
+            eq = eq and self._result.finish_time == result.finish_time
+        else:
+            return False
+        if len(self._result.splits) == len(result.splits):
+            for i in range(len(self._result.splits)):
+                eq = eq and self._result.splits[i].code == result.splits[i].code
+                eq = eq and self._result.splits[i].time == result.splits[i].time
+        else:
+            return False
+        return eq
+
     def _has_result(self):
         for result in race().results:
             if result is None:
                 continue
-            if result == self._result:
+            if self._compare_result(result):
                 return True
         return False
 

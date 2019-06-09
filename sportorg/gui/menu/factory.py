@@ -67,6 +67,7 @@ class Factory(object):
             AssignResultByCardNumberAction(),
             ImportSportOrgAction(),
             RentCardsAction(),
+            GroupFinderAction(),
         ]
         self._map = {}
         for action in self.actions:

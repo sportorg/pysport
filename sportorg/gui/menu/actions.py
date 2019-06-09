@@ -370,6 +370,26 @@ class RecheckingAction(Action):
         self.app.refresh()
 
 
+class GroupFinderAction(Action):
+    def execute(self):
+        obj = race()
+        indices = self.app.get_selected_rows()
+        results = obj.results
+        for index in indices:
+            if index < 0:
+                continue
+            if index >= len(results):
+                break
+            result = results[index]
+            if result.person and result.status in [ResultStatus.MISSING_PUNCH]:
+                for group in obj.groups:
+                    if result.check(group.course):
+                        result.person.group = group
+                        result.status = ResultStatus.OK
+                        break
+        self.app.refresh()
+
+
 class PenaltyCalculationAction(Action):
     def execute(self):
         logging.debug('Penalty calculation start')
@@ -647,4 +667,5 @@ __all__ = [
     'AssignResultByCardNumberAction',
     'ImportSportOrgAction',
     'RentCardsAction',
+    'GroupFinderAction',
 ]

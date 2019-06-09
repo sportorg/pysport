@@ -14,6 +14,7 @@ from sportorg.gui.dialogs.course_edit import CourseEditDialog
 from sportorg.gui.dialogs.person_edit import PersonEditDialog
 from sportorg.gui.dialogs.group_edit import GroupEditDialog
 from sportorg.gui.dialogs.organization_edit import OrganizationEditDialog
+from sportorg.models.constant import RentCards
 from sportorg.models.memory import Race, race, NotEmptyException, new_event, set_current_race_index
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.split_calculation import GroupSplits
@@ -447,7 +448,7 @@ class MainWindow(QMainWindow):
                             Sound().ok()
                         else:
                             Sound().fail()
-                        if result.person.is_rented_card:
+                        if result.person.is_rented_card or RentCards().exists(result.person.card_number):
                             Sound().rented_card()
             else:
                 for person in race().persons:
