@@ -33,6 +33,9 @@ def split_printout(result):
             organization = Organization()
 
         s = GroupSplits(obj, person.group).generate(True)
+
+        result.check_who_can_win()
+
         template = get_text_from_file(
             template_path,
             race=obj.to_dict(),

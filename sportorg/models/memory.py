@@ -451,6 +451,8 @@ class Result:
         self.diff_scores = 0  # readonly
         self.created_at = time.time()
         self.speed = ''
+        self.can_win_count = 0  # quantity of athletes who can win at current time
+        self.final_result_time = None  # type: OTime real time, when nobody can win
 
         self.card_number = 0
         self.splits = []  # type: List[Split]
@@ -533,6 +535,9 @@ class Result:
             'start_msec': self.get_start_time().to_msec(),  # readonly
             'finish_msec': self.get_finish_time().to_msec(),  # readonly
             'result_msec': self.get_result_otime().to_msec(),  # readonly
+
+            'can_win_count': self.can_win_count,
+            'final_result_time': self.final_result_time.to_str() if self.final_result_time else None,
         }
 
     def update_data(self, data):
@@ -661,6 +666,27 @@ class Result:
 
     def is_manual(self):
         return self.system_type == SystemType.MANUAL
+
+
+    def check_who_can_win(self):
+        """Generate statistic about unfinished athletes in the group for current person.
+           Calculate, how much people can win and at what time current result will be final (nobody can win).
+        """
+        if self.person and self.person.group:
+            who_can_win_count = 0
+            max_unfinished_start_time = OTime()
+
+            for cur_person in race().get_persons_by_group(self.person.group):
+
+                if cur_person.result_count == 0:
+                    if not cur_person.is_out_of_competition:
+                        if cur_person.start_time > self.person.start_time:
+                            if self.get_result_otime() > OTime.now() - cur_person.start_time:
+                                who_can_win_count += 1
+                                max_unfinished_start_time = max(cur_person.start_time, max_unfinished_start_time)
+
+            self.can_win_count = who_can_win_count
+            self.final_result_time = max_unfinished_start_time + self.get_result_otime()
 
 
 class ResultManual(Result):
