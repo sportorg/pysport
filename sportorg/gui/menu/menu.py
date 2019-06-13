@@ -258,6 +258,11 @@ def menu_list():
                     'action': 'RecheckingAction'
                 },
                 {
+                    'title': _('Find group by punches'),
+                    'tabs': [1],
+                    'action': 'GroupFinderAction'
+                },
+                {
                     'title': _('Penalty calculation'),
                     'action': 'PenaltyCalculationAction'
                 },
@@ -295,6 +300,7 @@ def menu_list():
                 {
                     'title': _('on/off SPORTident readout'),
                     'icon': config.icon_dir('sportident.png'),
+                    'shortcut': 'F8',
                     'action': 'SPORTidentReadoutAction'
                 },
                 {
