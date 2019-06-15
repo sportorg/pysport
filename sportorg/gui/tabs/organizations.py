@@ -24,24 +24,9 @@ class Widget(QtWidgets.QWidget):
         self.setup_ui()
 
     def setup_ui(self):
-        self.setAcceptDrops(False)
-        self.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.setAutoFillBackground(False)
 
         self.organization_table.setObjectName('OrganizationTable')
-
         self.organization_table.setModel(OrganizationMemoryModel())
-        self.organization_table.setSortingEnabled(True)
-        self.organization_table.setSelectionBehavior(QAbstractItemView.SelectRows)
-
-        hor_header = self.organization_table.horizontalHeader()
-        assert (isinstance(hor_header, QHeaderView))
-        hor_header.setSectionsMovable(True)
-        hor_header.setDropIndicatorShown(True)
-        hor_header.setSectionResizeMode(QHeaderView.Interactive)
-
-        ver_header = self.organization_table.verticalHeader()
-        ver_header.setSectionResizeMode(QHeaderView.ResizeToContents)
 
         def team_double_clicked(index):
             try:

@@ -149,3 +149,4 @@ class EventPropertiesDialog(QDialog):
         ))
 
         ResultCalculation(race()).process_results()
+        GlobalAccess().get_main_window().set_title()

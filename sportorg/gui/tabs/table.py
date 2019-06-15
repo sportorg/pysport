@@ -1,5 +1,5 @@
-from PySide2 import QtWidgets
-from PySide2.QtWidgets import QMenu
+from PySide2 import QtWidgets, QtCore
+from PySide2.QtWidgets import QMenu, QAbstractItemView, QHeaderView
 from PySide2.QtCore import QPoint
 
 
@@ -8,6 +8,21 @@ class TableView(QtWidgets.QTableView):
         super().__init__(*args, **kwargs)
         self.popup_items = []
         self.setWordWrap(False)
+        self.setAcceptDrops(False)
+        self.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.setAutoFillBackground(False)
+        self.setSortingEnabled(True)
+        self.setSelectionBehavior(QAbstractItemView.SelectRows)
+
+        hor_header = self.horizontalHeader()
+        assert (isinstance(hor_header, QHeaderView))
+        hor_header.setSectionsMovable(True)
+        hor_header.setDropIndicatorShown(True)
+        hor_header.setSectionResizeMode(QHeaderView.Interactive)
+
+        ver_header = self.verticalHeader()
+        ver_header.setSectionResizeMode(QHeaderView.Fixed)
+        ver_header.setDefaultSectionSize(20)
 
     def mousePressEvent(self, qmouseevent):
         super().mousePressEvent(qmouseevent)
