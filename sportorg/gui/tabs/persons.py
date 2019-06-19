@@ -40,24 +40,9 @@ class Widget(QtWidgets.QWidget):
             print(str(e))
 
     def setup_ui(self):
-        self.setAcceptDrops(False)
-        self.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.setAutoFillBackground(False)
 
         self.person_table.setObjectName('PersonTable')
-
         self.person_table.setModel(PersonMemoryModel())
-        self.person_table.setSortingEnabled(True)
-        self.person_table.setSelectionBehavior(QAbstractItemView.SelectRows)
-
-        hor_header = self.person_table.horizontalHeader()
-        assert (isinstance(hor_header, QHeaderView))
-        hor_header.setSectionsMovable(True)
-        hor_header.setDropIndicatorShown(True)
-        hor_header.setSectionResizeMode(QHeaderView.ResizeToContents)
-
-        ver_header = self.person_table.verticalHeader()
-        ver_header.setSectionResizeMode(QHeaderView.ResizeToContents)
 
         def entry_double_clicked(index):
             # show_edit_dialog(index)

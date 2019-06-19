@@ -24,23 +24,9 @@ class Widget(QtWidgets.QWidget):
         self.setup_ui()
 
     def setup_ui(self):
-        self.setAcceptDrops(False)
-        self.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.setAutoFillBackground(False)
 
         self.course_table.setObjectName('CourseTable')
         self.course_table.setModel(CourseMemoryModel())
-        self.course_table.setSortingEnabled(True)
-        self.course_table.setSelectionBehavior(QAbstractItemView.SelectRows)
-
-        hor_header = self.course_table.horizontalHeader()
-        assert (isinstance(hor_header, QHeaderView))
-        hor_header.setSectionsMovable(True)
-        hor_header.setDropIndicatorShown(True)
-        hor_header.setSectionResizeMode(QHeaderView.Interactive)
-
-        ver_header = self.course_table.verticalHeader()
-        ver_header.setSectionResizeMode(QHeaderView.ResizeToContents)
 
         def course_double_clicked(index):
             try:
