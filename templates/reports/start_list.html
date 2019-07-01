@@ -147,6 +147,46 @@
     }
     render();
 
+    var Scrolling = {
+        direction: 1,
+        enabled: false,
+        lock: false,
+        prev: 0,
+        intervalTimer: 0,
+        init: function () {
+            var _this = this;
+            if (_this.intervalTimer) {
+                clearInterval(_this.intervalTimer)
+            }
+            _this.intervalTimer = setInterval(function () {
+                _this.lock = !_this.lock;
+            }, 5000);
+            window.onscroll = function () {
+                var d = document.documentElement;
+                var offset = d.scrollTop + window.innerHeight;
+                var height = d.offsetHeight;
+
+                if (offset === height) {
+                    _this.direction = -1;
+                }
+                if (offset <= window.innerHeight) {
+                    _this.direction = 1;
+                }
+            };
+            this.pageScroll();
+            return this;
+        },
+        pageScroll: function () {
+            var _this = this;
+            if (_this.enabled && ! _this.lock) {
+                window.scrollBy(10, _this.direction);
+            }
+            setTimeout(function () {
+                _this.pageScroll();
+            }, 10);
+        }
+    }.init();
+
     new SettingsGenerator([
         {
             title: 'Табличный вид',
@@ -171,7 +211,14 @@
                 Fields.active('card_number', checked);
                 render()
             }
-        }
+        },
+        {
+            title: 'Автоскролл',
+            value: Scrolling.enabled,
+            change: function (checked) {
+                Scrolling.enabled = checked;
+            }
+        },
     ]).show();
 </script>
 {% endraw %}

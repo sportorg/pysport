@@ -11,6 +11,7 @@ from sportorg.models.memory import race
 
 class LiveClient(metaclass=Singleton):
     def init(self):
+        Broker().subscribe('teamwork_recieving', self.send)
         Broker().subscribe('teamwork_sending', self.send)
         Broker().subscribe('teamwork_deleting', self.delete)
 
