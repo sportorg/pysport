@@ -11,6 +11,7 @@ data/*
 /*.exe
 *.bat
 *.cmd
+*.pyc
 SportOrg.spec
 
 resource.syso
