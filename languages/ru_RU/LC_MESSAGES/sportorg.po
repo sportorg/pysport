@@ -1299,3 +1299,6 @@ msgstr "Загрузить из файла"
 
 msgid "Find group by punches"
 msgstr "Найти группу по отметкам"
+
+msgid "Are you sure you want to reassign the chip number"
+msgstr "Вы уверены, что хотите переприсвоить номер чипа"

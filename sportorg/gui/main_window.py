@@ -9,6 +9,7 @@ from PySide2.QtCore import QModelIndex, QItemSelectionModel, QThread, Signal
 from PySide2.QtWidgets import QMainWindow, QTableView, QMessageBox
 
 from sportorg import config
+from sportorg.gui.global_access import GlobalAccess
 from sportorg.common.singleton import singleton
 from sportorg.gui.dialogs.course_edit import CourseEditDialog
 from sportorg.gui.dialogs.person_edit import PersonEditDialog
@@ -451,14 +452,27 @@ class MainWindow(QMainWindow):
                         if result.person.is_rented_card or RentCards().exists(result.person.card_number):
                             Sound().rented_card()
             else:
-                for person in race().persons:
-                    if not person.card_number:
-                        old_person = race().person_card_number(person, result.card_number)
-                        if old_person is not None:
-                            Teamwork().send(old_person.to_dict())
-                        person.is_rented_card = True
-                        Teamwork().send(person.to_dict())
-                        break
+                mv = GlobalAccess().get_main_window()
+                selection = mv.get_selected_rows(mv.get_table_by_name('PersonTable'))
+                if selection:
+                    for i in selection:
+                        if i < len(race().persons):
+                            cur_person = race().persons[i]
+                            if cur_person.card_number:
+                                confirm = messageBoxQuestion(self, _('Question'), _('Are you sure you want to reassign the chip number'), QMessageBox.Yes | QMessageBox.No)
+                                if confirm == QMessageBox.No:
+                                    break
+                            race().person_card_number(cur_person, result.card_number)
+                            break
+                else:
+                    for person in race().persons:
+                        if not person.card_number:
+                            old_person = race().person_card_number(person, result.card_number)
+                            if old_person is not None:
+                                Teamwork().send(old_person.to_dict())
+                            person.is_rented_card = True
+                            Teamwork().send(person.to_dict())
+                            break
             self.refresh()
         except Exception as e:
             logging.error(str(e))
