@@ -209,8 +209,8 @@
         var splits_recalc_times = {};
         var splits_recalc_times_total = {};
         group.controls.forEach(function (control, index) {
-            splits_recalc_times[control.code] = [];
-            splits_recalc_times_total[control.code] = [];
+            splits_recalc_times[index + '_' + control.code] = [];
+            splits_recalc_times_total[index + '_' + control.code] = [];
         });
         for (var _i = 0, _a = race.results; _i < _a.length; _i++) {
             var result = _a[_i];
@@ -250,9 +250,11 @@
                 if (result.splits) {
                     for (var _b = 0, _c = result.splits; _b < _c.length; _b++) {
                         var split = _c[_b];
-                        if (split.is_correct && split.code in splits_recalc_times) {
-                            splits_recalc_times[split.code].push(split.leg_time);
-                            splits_recalc_times_total[split.code].push(split.relative_time);
+                        if (split.is_correct) {
+                            if ((control_index + '_' + split.code) in splits_recalc_times){
+                                splits_recalc_times[control_index + '_' + split.code].push(split.leg_time);
+                                splits_recalc_times_total[control_index + '_' + split.code].push(split.relative_time);
+                            }
                             control_index++;
                         }
                     }
@@ -331,8 +333,8 @@
             return a-b;
         }
         group.controls.forEach(function (control, index) {
-            splits_recalc_times[control.code].sort(sort_splits_recalc_fnc);
-            splits_recalc_times_total[control.code].sort(sort_splits_recalc_fnc);
+            splits_recalc_times[index + '_' + control.code].sort(sort_splits_recalc_fnc);
+            splits_recalc_times_total[index + '_' + control.code].sort(sort_splits_recalc_fnc);
         });
         var index = 0;
         if (isRelay) {
@@ -402,8 +404,8 @@
                     for (var _b = 0, _c = elem.data.splits; _b < _c.length; _b++) {
                         var split = _c[_b];
                         if (split.is_correct) {
-                            var leg_place = binary_search(splits_recalc_times[split.code],split.leg_time);
-                            var relative_place = binary_search(splits_recalc_times_total[split.code],split.relative_time);
+                            var leg_place = binary_search(splits_recalc_times[control_index + '_' + split.code],split.leg_time);
+                            var relative_place = binary_search(splits_recalc_times_total[control_index + '_' + split.code],split.relative_time);
                             if (leg_place>0 && relative_place>0){
                                 var tbl = document.createElement('table');
                                 tbl.className = 'table-split';
