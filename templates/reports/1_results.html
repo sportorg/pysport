@@ -53,6 +53,7 @@
                     penalty_time: toHHMMSS(result.penalty_time),
                     penalty_laps: result.penalty_laps,
                     result: result.result,
+                    result_relay: result.result_relay,
                     result_msec: result.result_msec,
                     diff: race.settings.result_processing_mode === 'scores' ? result.diff_scores : toHHMMSS(result.diff),
                     place: result.place,
@@ -478,7 +479,8 @@
             {key: 'bib', title: 'Номер', size: 6},
             {key: 'penalty_time', title: 'Штраф', size: 9, active: false},
             {key: 'penalty_laps', title: 'Штраф', size: 9, active: false},
-            {key: 'result', title: 'Результат', size: 16},
+            {key: 'result', title: 'Результат', size: 14},
+            {key: 'result_relay', title: 'Ком. рез-т', size: 14},
             {key: 'diff', title: 'Отставание', size: 11},
             {key: 'speed', title: 'Темп', size: 12, active: false},
             {key: 'place_show', title: 'Место', size: 6},
@@ -523,6 +525,8 @@
                 this.getField('all_splits').active = location.href.indexOf('all_splits=1') > -1;
                 this.getField('scores').active = location.href.indexOf('scores=1') > -1;
                 this.getField('penalty_time').active = location.href.indexOf('penalty_time=1') > -1;
+
+                this.getField('result_relay').active = isRelay
             } catch (e){}
             return this;
         }

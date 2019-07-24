@@ -532,6 +532,7 @@ class Result:
             'scores': self.scores,  # readonly
             'created_at': self.created_at,  # readonly
             'result': self.get_result(),  # readonly
+            'result_relay': self.get_result_relay(),
             'start_msec': self.get_start_time().to_msec(),  # readonly
             'finish_msec': self.get_finish_time().to_msec(),  # readonly
             'result_msec': self.get_result_otime().to_msec(),  # readonly
@@ -601,6 +602,33 @@ class Result:
         ret += self.get_result_otime().to_str(time_accuracy)
         return ret
 
+    def get_result_relay(self):
+        if not self.is_status_ok():
+            if self.status_comment:
+                return self.status_comment
+            return self.status.get_title()
+
+        if not self.person:
+            return ''
+
+        # Check previous legs not to be disqualified
+        if self.person.bib > 2000 and self.person.group and self.person.group.is_relay():
+            cur_bib = self.person.bib - 1000
+            while cur_bib > 1000:
+                prev_person = find(race().persons, bib=cur_bib)
+                res = race().find_person_result(prev_person)
+                if res and not res.is_status_ok():
+                    return res.status.get_title()
+                cur_bib -= 1000
+
+        ret = ''
+        if race().get_setting('result_processing_mode', 'time') == 'scores':
+            ret += str(self.scores) + ' ' + _('points') + ' '
+
+        time_accuracy = race().get_setting('time_accuracy', 0)
+        ret += self.get_result_otime_relay().to_str(time_accuracy)
+        return ret
+
     def get_result_for_sort(self):
         ret = self.get_result_otime()
         return self.status, ret.to_msec()
@@ -612,11 +640,30 @@ class Result:
         ret_ms -= self.get_credit_time().to_msec(time_accuracy)
         return OTime(msec=ret_ms)
 
+    def get_result_otime_relay(self):
+        time_accuracy = race().get_setting('time_accuracy', 0)
+        ret_ms = self.get_finish_time().to_msec(time_accuracy) - self.get_start_time_relay().to_msec(time_accuracy)
+        ret_ms += self.get_penalty_time().to_msec(time_accuracy)
+        ret_ms -= self.get_credit_time().to_msec(time_accuracy)
+        return OTime(msec=ret_ms)
+
     def get_start_time(self):
         if self.start_time and self.start_time.to_msec():
             return self.start_time
         if self.person and self.person.start_time and self.person.start_time.to_msec():
             return self.person.start_time
+        return OTime()
+
+    # Find the start time or relay team = start time of first leg
+    def get_start_time_relay(self):
+        if self.person:
+            first_leg_person = self.person
+            if self.person.bib > 2000 and self.person.group and self.person.group.is_relay():
+                bib_to_find = 1000 + self.person.bib % 1000
+                first_leg_person = find(race().persons, bib=bib_to_find)
+            if first_leg_person:
+                if first_leg_person.start_time and first_leg_person.start_time.to_msec():
+                    return first_leg_person.start_time
         return OTime()
 
     def get_finish_time(self):
@@ -1561,6 +1608,12 @@ class RelayLeg(object):
         self.course = None  # optional link to the course, prefer to use variant and bib to find course
         self.team = team
 
+    def __eq__(self, other):
+        return self.leg == other.leg
+
+    def __gt__(self, other):
+        return self.leg > other.leg
+
     def get_course(self):
         """Get the course to check control order. Try to use bib and variant to find course"""
         bib = self.get_bib()
@@ -1593,7 +1646,9 @@ class RelayLeg(object):
         if self.leg > 1:
             team = self.get_relay_team()
             if team and isinstance(team, RelayTeam):
-                return team.legs[self.leg - 1]
+                for cur_leg in team.legs:
+                    if cur_leg.leg == self.leg - 1:
+                        return cur_leg
         return None
 
     def get_bib(self):
@@ -1732,6 +1787,7 @@ class RelayTeam(object):
         leg = RelayLeg(self)
         leg.set_result(result)
         leg.set_person(result.person)
+        leg.leg = result.person.bib // 1000
         self.legs.append(leg)
 
     def set_leg_for_person(self, person, leg):
@@ -1747,12 +1803,18 @@ class RelayTeam(object):
             assert isinstance(i, RelayLeg)
             i.set_start_time_from_previous()
 
+    def get_leg(self, leg_number):
+        for i in self.legs:
+            if i.leg == leg_number:
+                return i
+        return None
+
     def get_time(self):
         if len(self.legs):
             last_correct_leg = self.get_correct_lap_count()
             if last_correct_leg > 0:
-                last_finish = self.legs[last_correct_leg - 1].get_finish_time()
-                start = self.legs[0].get_start_time()
+                last_finish = self.get_leg(last_correct_leg).get_finish_time()
+                start = self.get_leg(1).get_start_time()
                 return last_finish - start
         return OTime()
 
@@ -1763,14 +1825,13 @@ class RelayTeam(object):
             assert isinstance(leg, RelayLeg)
             if leg.is_finished():
                 finished_qty += 1
-            else:
-                return finished_qty
         return finished_qty
 
     def get_correct_lap_count(self):
         """quantity of successfully finished laps"""
         correct_qty = 0
-        for leg in self.legs:
+        for i in range(len(self.legs)):
+            leg = self.get_leg(i + 1)
             assert isinstance(leg, RelayLeg)
             if leg.is_correct():
                 correct_qty += 1
