@@ -93,8 +93,19 @@ class TimekeepingPropertiesDialog(QDialog):
         self.chip_reading_box.setLayout(self.chip_reading_layout)
         self.tk_layout.addRow(self.chip_reading_box)
 
-        self.chip_re_reading = QCheckBox(_('Ask for a bib when re-reading the card'))
-        self.chip_reading_layout.addRow(self.chip_re_reading)
+        self.chip_duplicate_box = QGroupBox(_('Several readout of chip'))
+        self.chip_duplicate_layout = QFormLayout()
+        self.chip_duplicate_serveral_results = QRadioButton(_('Several results'))
+        self.chip_duplicate_layout.addRow(self.chip_duplicate_serveral_results)
+        self.chip_duplicate_bib_request = QRadioButton(_('Ask for a bib when re-reading the card'))
+        self.chip_duplicate_layout.addRow(self.chip_duplicate_bib_request)
+        self.chip_duplicate_relay_find_leg = QRadioButton(_('Find next relay leg'))
+        self.chip_duplicate_layout.addRow(self.chip_duplicate_relay_find_leg)
+        self.chip_duplicate_merge = QRadioButton(_('Merge punches'))
+        self.chip_duplicate_merge.setDisabled(True)  # TODO implement punch merging
+        self.chip_duplicate_layout.addRow(self.chip_duplicate_merge)
+        self.chip_duplicate_box.setLayout(self.chip_duplicate_layout)
+        self.tk_layout.addRow(self.chip_duplicate_box)
 
         self.assignment_mode = QCheckBox(_('Assignment mode'))
         self.assignment_mode.stateChanged.connect(self.on_assignment_mode)
@@ -244,7 +255,7 @@ class TimekeepingPropertiesDialog(QDialog):
         finish_source = cur_race.get_setting('system_finish_source', 'station')
         finish_cp_number = cur_race.get_setting('system_finish_cp_number', 90)
         assign_chip_reading = cur_race.get_setting('system_assign_chip_reading', 'off')
-        card_read_repeated = cur_race.get_setting('system_card_read_repeated', False)
+        duplicate_chip_processing = cur_race.get_setting('system_duplicate_chip_processing', 'several_results')
         assignment_mode = cur_race.get_setting('system_assignment_mode', False)
         si_port = cur_race.get_setting('system_port', '')
 
@@ -281,7 +292,15 @@ class TimekeepingPropertiesDialog(QDialog):
         elif assign_chip_reading == 'autocreate':
             self.chip_reading_autocreate.setChecked(True)
 
-        self.chip_re_reading.setChecked(card_read_repeated)
+        if duplicate_chip_processing == 'several_results':
+            self.chip_duplicate_serveral_results.setChecked(True)
+        elif duplicate_chip_processing == 'bib_request':
+            self.chip_duplicate_bib_request.setChecked(True)
+        elif duplicate_chip_processing == 'relay_find_leg':
+            self.chip_duplicate_relay_find_leg.setChecked(True)
+        elif duplicate_chip_processing == 'merge':
+            self.chip_duplicate_merge.setChecked(True)
+
         self.assignment_mode.setChecked(assignment_mode)
 
         # result processing
@@ -380,6 +399,14 @@ class TimekeepingPropertiesDialog(QDialog):
         elif self.chip_reading_autocreate.isChecked():
             assign_chip_reading = 'autocreate'
 
+        duplicate_chip_processing = 'several_results'
+        if self.chip_duplicate_bib_request.isChecked():
+            duplicate_chip_processing = 'bib_request'
+        elif self.chip_duplicate_relay_find_leg.isChecked():
+            duplicate_chip_processing = 'relay_find_leg'
+        elif self.chip_duplicate_merge.isChecked():
+            duplicate_chip_processing = 'merge'
+
         start_cp_number = self.item_start_cp_value.value()
         finish_cp_number = self.item_finish_cp_value.value()
 
@@ -399,7 +426,7 @@ class TimekeepingPropertiesDialog(QDialog):
 
         obj.set_setting('system_assign_chip_reading', assign_chip_reading)
 
-        obj.set_setting('system_card_read_repeated', self.chip_re_reading.isChecked())
+        obj.set_setting('system_duplicate_chip_processing', duplicate_chip_processing)
         obj.set_setting('system_assignment_mode', self.assignment_mode.isChecked())
 
         # result processing

@@ -1,6 +1,9 @@
 import logging
 import math
 import random
+import uuid
+from copy import copy
+
 from sportorg.common.otime import OTime
 
 from sportorg.models.memory import race, Group, Person, Result, ResultStatus
@@ -485,3 +488,18 @@ def copy_bib_to_card_number():
     for person in obj.persons:
         if person.bib:
             person.card_number = person.bib
+
+
+def clone_relay_legs(min_bib, max_bib, increment):
+    """Clone existing relay legs to new (the same names, bib += increment"""
+    if min_bib + increment < max_bib:
+        return
+
+    obj = race()
+    for person in obj.persons:
+        if person.bib and person.bib >= min_bib and person.bib <= max_bib:
+            new_person = copy(person)
+            new_person.id = uuid.uuid4()
+            new_person.bib = person.bib + increment
+            new_person.card_number = 0
+            obj.persons.append(new_person)

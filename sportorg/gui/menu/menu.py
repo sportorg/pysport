@@ -216,6 +216,10 @@ def menu_list():
                     'action': 'StartHandicapAction'
                 },
                 {
+                    'title': _('Clone relay regs'),
+                    'action': 'RelayCloneAction'
+                },
+                {
                     'title': _('Use bib as card number'),
                     'action': 'CopyBibToCardNumber'
                 },

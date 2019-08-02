@@ -114,6 +114,10 @@ class SportorgPrinter(object):
 
         if result.is_status_ok():
             self.print_line('Результат' + ': ' + result.get_result() + ' '*4 + result.speed, fn, fs_main)
+            try:
+                self.print_line('Чистый Результат' + ': ' + result.get_result_start_in_comment(), fn, fs_main)
+            except:
+                pass
         else:
             self.print_line('Результат' + ': ' + result.get_result(), fn, fs_main)
 

@@ -12,6 +12,7 @@ from sportorg.common.model import Model
 from sportorg.common.otime import OTime
 from sportorg.language import _
 from sportorg.modules.configs.configs import Config
+from sportorg.utils.time import hhmmss_to_time
 
 
 class NotEmptyException(Exception):
@@ -600,6 +601,26 @@ class Result:
 
         time_accuracy = race().get_setting('time_accuracy', 0)
         ret += self.get_result_otime().to_str(time_accuracy)
+        return ret
+
+    def get_result_start_in_comment(self):
+        if not self.is_status_ok():
+            if self.status_comment:
+                return self.status_comment
+            return self.status.get_title()
+
+        if not self.person:
+            return ''
+
+        ret = ''
+        if race().get_setting('result_processing_mode', 'time') == 'scores':
+            ret += str(self.scores) + ' ' + _('points') + ' '
+
+        time_accuracy = race().get_setting('time_accuracy', 0)
+        start = hhmmss_to_time(self.person.comment)
+        if start == OTime():
+            raise ValueError
+        ret += str(self.get_finish_time() - start)
         return ret
 
     def get_result_relay(self):
@@ -1832,6 +1853,8 @@ class RelayTeam(object):
         correct_qty = 0
         for i in range(len(self.legs)):
             leg = self.get_leg(i + 1)
+            if not leg:
+                return correct_qty
             assert isinstance(leg, RelayLeg)
             if leg.is_correct():
                 correct_qty += 1
