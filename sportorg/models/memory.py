@@ -932,6 +932,57 @@ class ResultSportident(Result):
 
         return False
 
+    def merge_with(self, new_result):
+        # Merge with new result (merge splits, backup old finish/start, use new finish/start as finish/start)
+        tolerance_sec = 10
+        start_code = '10'
+        finish_code = '20'
+
+        is_changed = False
+
+        # backup old start as punch
+        if self.start_time and new_result.start_time and self.start_time > OTime():
+            if abs(new_result.start_time.to_sec() - self.start_time.to_sec()) > tolerance_sec:
+                i = 0
+                while i < len(self.splits) and self.splits[i].code == start_code:
+                    i += 1
+                backup_start = Split()
+                backup_start.code = start_code
+                backup_start.time = self.start_time
+                self.splits.insert(i, backup_start)
+                self.start_time = new_result.start_time
+                is_changed = True
+
+        # backup old finish as punch
+        if self.finish_time and new_result.finish_time and self.finish_time > OTime():
+            if abs(new_result.finish_time.to_sec() - self.finish_time.to_sec()) > tolerance_sec:
+                backup_finish = Split()
+                backup_finish.time = self.finish_time
+                backup_finish.code = finish_code
+                self.splits.append(backup_finish)
+                self.finish_time = new_result.finish_time
+                is_changed = True
+
+        # skip duplicated punches, then append different
+        offset = 0
+        for punch_new in new_result.splits:
+            exists = False
+            for punch_old in self.splits:
+                if punch_new.code == punch_old.code:
+                    if abs(punch_new.time.to_sec() - punch_old.time.to_sec()) < tolerance_sec:
+                        exists = True
+                        break
+            if not exists:
+                break
+            offset += 1
+        if offset < len(new_result.splits):
+            is_changed = True
+            for split in new_result.splits[offset:]:
+                self.splits.append(split)
+
+        return is_changed
+
+
 
 class ResultSFR(ResultSportident):
     system_type = SystemType.SFR

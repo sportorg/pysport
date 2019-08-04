@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: SportOrg\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-04-12 11:13+0300\n"
-"PO-Revision-Date: 2019-02-08 00:50+0500\n"
+"PO-Revision-Date: 2019-08-03 09:39+0500\n"
 "Last-Translator: SportOrg\n"
 "Language-Team: SportOrg\n"
 "Language: ru_RU\n"
@@ -1299,3 +1299,51 @@ msgstr "Загрузить из файла"
 
 msgid "Find group by punches"
 msgstr "Найти группу по отметкам"
+
+msgid "SportOrg printing"
+msgstr "SportOrg - сплиты"
+
+msgid "Team result"
+msgstr "Командный результат"
+
+msgid "from"
+msgstr "из"
+
+msgid "total"
+msgstr "всего"
+
+msgid "Who can win you"
+msgstr "Вас могут выиграть"
+
+msgid "Final result will be known"
+msgstr "Результат определится в"
+
+msgid "Result is final"
+msgstr "Вас уже никто не обгонит"
+
+msgid "Status: OK"
+msgstr "Отметка: OK"
+
+msgid "Status: DSQ"
+msgstr "Отметка: ПЛОХАЯ"
+
+msgid "Draft results"
+msgstr "Предварительные результаты"
+
+msgid "Several readout of chip"
+msgstr "Повторное чтение чипов"
+
+msgid "Several results"
+msgstr "Новый результат"
+
+msgid "Find next relay leg"
+msgstr "Поиск следующего эстафетного этапа"
+
+msgid "Merge punches"
+msgstr "Объединение отметок"
+
+msgid "Internal printing"
+msgstr "Стандартный шаблон"
+
+msgid "scale"
+msgstr "масштаб"

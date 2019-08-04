@@ -428,7 +428,9 @@ class MainWindow(QMainWindow):
             assignment_mode = race().get_setting('system_assignment_mode', False)
             if not assignment_mode:
                 self.clear_filters(remove_condition=False)
-                if ResultSportidentGeneration(result).add_result():
+                rg = ResultSportidentGeneration(result)
+                if rg.add_result():
+                    result = rg.get_result()
                     ResultCalculation(race()).process_results()
                     if race().get_setting('split_printout', False):
                         try:

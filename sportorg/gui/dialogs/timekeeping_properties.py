@@ -102,7 +102,6 @@ class TimekeepingPropertiesDialog(QDialog):
         self.chip_duplicate_relay_find_leg = QRadioButton(_('Find next relay leg'))
         self.chip_duplicate_layout.addRow(self.chip_duplicate_relay_find_leg)
         self.chip_duplicate_merge = QRadioButton(_('Merge punches'))
-        self.chip_duplicate_merge.setDisabled(True)  # TODO implement punch merging
         self.chip_duplicate_layout.addRow(self.chip_duplicate_merge)
         self.chip_duplicate_box.setLayout(self.chip_duplicate_layout)
         self.tk_layout.addRow(self.chip_duplicate_box)
@@ -246,6 +245,7 @@ class TimekeepingPropertiesDialog(QDialog):
         self.start_group_box.setDisabled(mode)
         self.finish_group_box.setDisabled(mode)
         self.chip_reading_box.setDisabled(mode)
+        self.chip_duplicate_box.setDisabled(mode)
 
     def set_values_from_model(self):
         cur_race = race()

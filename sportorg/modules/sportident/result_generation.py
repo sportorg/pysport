@@ -95,6 +95,23 @@ class ResultSportidentGeneration:
             self.assign_chip_reading = 'off'
             self.card_read_repeated = False
 
+    def _merge_punches(self):
+        card_number = self._result.card_number
+        existing_res = find(race().results, card_number=card_number)
+
+        if not existing_res:
+            self._add_result()
+            return True
+        else:
+            if existing_res.merge_with(self._result):
+                # existing result changed, recalculate group results and printout
+                self._result = existing_res
+                ResultChecker.calculate_penalty(self._result)
+                ResultChecker.checking(self._result)
+
+            return True
+
+
     def add_result(self):
         if self._has_result():
             logging.info('Result already exist')
@@ -112,10 +129,13 @@ class ResultSportidentGeneration:
             elif self.duplicate_chip_processing == 'relay_find_leg' and race().is_relay():
                 self._relay_find_leg()  # assign chip to the next unfinished leg of a relay team
             elif self.duplicate_chip_processing == 'merge':
-                stub = 1  # TODO merge splits within existing result
+                return self._merge_punches()
 
         self._add_result()
         return True
+
+    def get_result(self):
+        return self._result
 
     def _no_person(self):
         if self.assign_chip_reading == 'off':

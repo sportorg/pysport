@@ -5,6 +5,8 @@ import win32con
 from sportorg.models.memory import race, Race, Result, ResultStatus
 from sportorg.models.result.result_calculation import ResultCalculation
 
+from sportorg.language import _
+
 
 class SportorgPrinter(object):
     def __init__(self, printer_name=win32print.GetDefaultPrinter(), scale_factor=60, x_offset=5, y_offset=5):
@@ -20,7 +22,7 @@ class SportorgPrinter(object):
         self.y = -1 * y_offset * self.scale_factor
 
     def start_page(self):
-        self.dc.StartDoc("SportOrg printing")
+        self.dc.StartDoc(_("SportOrg printing"))
         self.dc.StartPage()
 
     def end_page(self):
@@ -71,11 +73,12 @@ class SportorgPrinter(object):
 
         # Athlete info, bib, card number, start time
         self.print_line(person.full_name,  fn, fs_large, 700)
-        self.print_line('Группа' + ': ' + group.name, fn, fs_main)
+        self.print_line(_('Group') + ': ' + group.name, fn, fs_main)
         if person.organization:
-            self.print_line('Команда' + ': ' + person.organization.name,  fn, fs_main)
-        self.print_line('Номер' + ': ' + str(person.bib) + ' '*5 + 'ЧИП' + ': ' + str(person.card_number), fn, fs_main)
-        self.print_line('Старт' + ': ' + result.get_start_time().to_str(), fn, fs_main)
+            self.print_line(_('Team') + ': ' + person.organization.name,  fn, fs_main)
+        self.print_line(_('Bib') + ': ' + str(person.bib) + ' '*5 +
+                        _('Card') + ': ' + str(person.card_number), fn, fs_main)
+        self.print_line(_('Start') + ': ' + result.get_start_time().to_str(), fn, fs_main)
 
         # Splits
         for split in result.splits:
@@ -106,46 +109,43 @@ class SportorgPrinter(object):
             finish_split = (result.get_finish_time() - result.splits[-1].time).to_str()
 
         # Finish
-        self.print_line('Финиш' + ': ' + result.get_finish_time().to_str() + ' '*4 + finish_split, fn, fs_main)
+        self.print_line(_('Finish') + ': ' + result.get_finish_time().to_str() + ' '*4 + finish_split, fn, fs_main)
 
         # Result
         if is_penalty_used:
-            self.print_line('Штраф' + ': ' + result.get_penalty_time().to_str(), fn, fs_main)
+            self.print_line(_('Penalty') + ': ' + result.get_penalty_time().to_str(), fn, fs_main)
 
         if result.is_status_ok():
-            self.print_line('Результат' + ': ' + result.get_result() + ' '*4 + result.speed, fn, fs_main)
-            try:
-                self.print_line('Чистый Результат' + ': ' + result.get_result_start_in_comment(), fn, fs_main)
-            except:
-                pass
+            self.print_line(_('Result') + ': ' + result.get_result() + ' '*4 + result.speed, fn, fs_main)
         else:
-            self.print_line('Результат' + ': ' + result.get_result(), fn, fs_main)
+            self.print_line(_('Result') + ': ' + result.get_result(), fn, fs_main)
 
         if is_relay and person.bib > 1000:
-            self.print_line('Результат команды' + ': ' + result.get_result_relay(), fn, fs_main)
+            self.print_line(_('Team result') + ': ' + result.get_result_relay(), fn, fs_main)
 
         # Place
         if result.place > 0:
-            place = 'Место' + ': ' + str(result.place)
+            place = _('Place') + ': ' + str(result.place)
             if not is_relay:
-                place += ' ' + 'из' + ' ' + str(group.count_finished) + \
-                         ' (' + 'всего' + ' ' + str(group.count_person) + ')'
+                place += ' ' + _('from') + ' ' + str(group.count_finished) + \
+                         ' (' + _('total') + ' ' + str(group.count_person) + ')'
             self.print_line(place, fn, fs_main)
 
         # Info about competitors, who can win current person
         if result.is_status_ok() and not is_relay:
             if hasattr(result, 'can_win_count'):
                 if result.can_win_count > 0:
-                    self.print_line('Вас могут выиграть' + ': ' + str(result.can_win_count), fn, fs_main)
-                    self.print_line('Результат определится в' + ': ' + result.final_result_time.to_str(), fn, fs_main)
+                    self.print_line(_('Who can win you') + ': ' + str(result.can_win_count), fn, fs_main)
+                    self.print_line(_('Final result will be known') + ': '
+                                    + result.final_result_time.to_str(), fn, fs_main)
                 else:
-                    self.print_line('Вас уже никто не обгонит!', fn, fs_main)
+                    self.print_line(_('Result is final'), fn, fs_main)
 
         # Punch checking info
         if result.is_status_ok():
-            self.print_line('ОТМЕТКА - OK', fn, fs_large, 700)
+            self.print_line(_('Status: OK'), fn, fs_large, 700)
         else:
-            self.print_line('ПЛОХАЯ ОТМЕТКА', fn, fs_large, 700)
+            self.print_line(_('Status: DSQ'), fn, fs_large, 700)
             cp_list = ''
             line_limit = 35
             for cp in course.controls:
@@ -160,7 +160,7 @@ class SportorgPrinter(object):
             relay_stub = 1
         else:
             res = ResultCalculation(obj).get_group_finishes(group)
-            self.print_line('Предварительные результаты', fn, fs_main)
+            self.print_line(_('Draft results'), fn, fs_main)
             for cur_res in res[:10]:
                 assert isinstance(cur_res, Result)
                 self.print_line(
