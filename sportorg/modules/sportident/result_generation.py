@@ -2,7 +2,7 @@ import logging
 
 from sportorg.gui.dialogs.bib_dialog import BibDialog
 from sportorg.models.result.result_checker import ResultChecker, ResultCheckerException
-from sportorg.models.memory import race, Person, Result, ResultSportident
+from sportorg.models.memory import race, Person, Result, ResultSportident, find
 from sportorg.language import _
 
 
@@ -12,7 +12,8 @@ class ResultSportidentGeneration:
         self._result = result
         self._person = None
         self.assign_chip_reading = race().get_setting('system_assign_chip_reading', 'off')
-        self.card_read_repeated = race().get_setting('system_card_read_repeated', False)
+        self.duplicate_chip_processing = race().get_setting('system_duplicate_chip_processing', 'several_results')
+        self.card_read_repeated = self.duplicate_chip_processing == 'bib_request'
 
     def _add_result_to_race(self):
         race().add_result(self._result)
@@ -72,9 +73,49 @@ class ResultSportidentGeneration:
         except Exception as e:
             logging.error(str(e))
 
+    def _relay_find_leg(self):
+        if self._find_person_by_result():
+            bib = self._person.bib % 1000
+
+            while True:
+                bib += 1000
+                next_leg = find(race().persons, bib=bib)
+                if next_leg:
+                    next_leg_res = race().find_person_result(next_leg)
+                    if not next_leg_res:
+                        self._person = next_leg
+                        self._result.person = next_leg
+                        logging.info('Relay: Card {} assigned to bib {}'.format(self._result.card_number, bib))
+                        break
+                else:
+                    # All legs of relay team finished
+                    break
+
+        if not self._person:
+            self.assign_chip_reading = 'off'
+            self.card_read_repeated = False
+
+    def _merge_punches(self):
+        card_number = self._result.card_number
+        existing_res = find(race().results, card_number=card_number)
+
+        if not existing_res:
+            self._add_result()
+            return True
+        else:
+            if existing_res.merge_with(self._result):
+                # existing result changed, recalculate group results and printout
+                self._result = existing_res
+                ResultChecker.calculate_penalty(self._result)
+                ResultChecker.checking(self._result)
+
+            return True
+
+
     def add_result(self):
         if self._has_result():
             logging.info('Result already exist')
+            # Comment next line to allow duplicates during readout
             return False
 
         if self.assign_chip_reading == 'autocreate':
@@ -82,10 +123,19 @@ class ResultSportidentGeneration:
             self._create_person()
         elif self.assign_chip_reading == 'always':
             self._bib_dialog()
-        elif self.card_read_repeated and self._has_sportident_card():
-            self._bib_dialog()
+        elif self._has_sportident_card():
+            if self.duplicate_chip_processing == 'bib_request':
+                self._bib_dialog()
+            elif self.duplicate_chip_processing == 'relay_find_leg' and race().is_relay():
+                self._relay_find_leg()  # assign chip to the next unfinished leg of a relay team
+            elif self.duplicate_chip_processing == 'merge':
+                return self._merge_punches()
+
         self._add_result()
         return True
+
+    def get_result(self):
+        return self._result
 
     def _no_person(self):
         if self.assign_chip_reading == 'off':

@@ -18,6 +18,7 @@ from sportorg.gui.dialogs.live_dialog import LiveDialog
 from sportorg.gui.dialogs.not_start_dialog import NotStartDialog
 from sportorg.gui.dialogs.number_change import NumberChangeDialog
 from sportorg.gui.dialogs.print_properties import PrintPropertiesDialog
+from sportorg.gui.dialogs.relay_clone_dialog import RelayCloneDialog
 from sportorg.gui.dialogs.relay_number_dialog import RelayNumberDialog
 from sportorg.gui.dialogs.rent_cards_dialog import RentCardsDialog
 from sportorg.gui.dialogs.report_dialog import ReportDialog
@@ -311,6 +312,12 @@ class StartTimeChangeAction(Action):
 class StartHandicapAction(Action):
     def execute(self):
         StartHandicapDialog().exec_()
+        self.app.refresh()
+
+
+class RelayCloneAction(Action):
+    def execute(self):
+        RelayCloneDialog().exec_()
         self.app.refresh()
 
 
@@ -637,6 +644,7 @@ __all__ = [
     'NumberChangeAction',
     'StartTimeChangeAction',
     'StartHandicapAction',
+    'RelayCloneAction',
     'CopyBibToCardNumber',
     'ManualFinishAction',
     'SPORTidentReadoutAction',
