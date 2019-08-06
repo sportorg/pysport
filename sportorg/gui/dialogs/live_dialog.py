@@ -2,7 +2,7 @@ import logging
 import re
 
 from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QFormLayout, QLabel, QDialog, QDialogButtonBox, QLineEdit, QCheckBox
+from PySide2.QtWidgets import QFormLayout, QLabel, QDialog, QDialogButtonBox, QLineEdit, QCheckBox, QTextEdit
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
@@ -48,6 +48,12 @@ class LiveDialog(QDialog):
 
         self.item_live_enabled = QCheckBox(_('Enabled'))
         self.layout.addRow(self.item_live_enabled)
+
+        self.hint = QTextEdit(_('Ctrl+K - send selected'))
+        self.hint.append(_('Ctrl+K on groups - send start list'))
+        self.hint.setDisabled(True)
+        self.hint.setMaximumHeight(70)
+        self.layout.addRow(self.hint)
 
         def cancel_changes():
             self.close()
