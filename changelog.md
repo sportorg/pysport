@@ -1,12 +1,47 @@
 # Changelog
 
+# 2019-08-07 v1.5.0
+
++ Table refresh speed increased (comfortable work with >1000 rows)
++ Fast split printout (predefined standard template) with scaling
++ 2x2 relay support
++ SPORTident SRR Dongle support - touchless readout, intermediate
++ Merging punches while several readout
++ Split printout: added information, how many athletes can win current person
++ Athlete autocreate while readout (labyrinth)
++ Results by course
++ Results autoscroll
++ Search athlete by name while unknown chip readout
+- Relays: set first leg finish as seond leg start etc.
+- Improved SI-6 support
+- Fixing in *.docx template for relays (last teams was missed)
+* Data model was changed. Use exchange formats to downgrade (xml, wdb)
+
 # 2019-01-18 v1.4.0
 
-+ pass
++ Added import of CourseData (courses) for IOF xml 
++ New status "Forced OK" to recover 
++ Mass edit possibility for selected athletes
+- Calculating scores from leader time - ignoring mispunched athletes
+- Team work data exchange format changed. Previous: `0{}1`, now: `{}`
+- Search window freezing was fixed
+ 
 
 # 2018-10-08 v1.3.0
-
-+ pass
++ Added MSP (mispunch) status, calculated by punches automatically
++ List or electronic cards to rent
++ Reduced row height in tables
++ Bib is stored in result even if athlete is deleted
++ Possibility of non-existing bib assigning for result
++ Reassigning results by bib
++ Reassigning results by card number
++ Import from another sportorg file
++ Result by score (rogain, free order with time limit, trail-o).
++ File auto-saving
++ Show quantity of results for each athlete
++ Jinja2 templates .docx (MS Word)
+- Safe file saving (first write to file.sportorg.tmp, if it written correctly, rename to file.sportorg)
+* Introduced custom scripts for online sending 
 
 # 2018-06-13 v1.2.0
 
