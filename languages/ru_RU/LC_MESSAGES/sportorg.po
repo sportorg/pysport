@@ -1347,3 +1347,21 @@ msgstr "Стандартный шаблон"
 
 msgid "scale"
 msgstr "масштаб"
+
+msgid "Clone relay legs"
+msgstr "Дублировать этапы для эстафет 2x2"
+
+msgid "Minimal bib"
+msgstr "Минимальный номер"
+
+msgid "Maximal bib"
+msgstr "Максимальный номер"
+
+msgid "Increment"
+msgstr "Увеличение"
+
+msgid "Ctrl+K - send selected"
+msgstr "Ctrl+K - отправка выделенных участников"
+
+msgid "Ctrl+K on groups - send start list"
+msgstr "Ctrl+K на группах - отправка стартового протокола"

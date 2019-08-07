@@ -216,7 +216,7 @@ def menu_list():
                     'action': 'StartHandicapAction'
                 },
                 {
-                    'title': _('Clone relay regs'),
+                    'title': _('Clone relay legs'),
                     'action': 'RelayCloneAction'
                 },
                 {
