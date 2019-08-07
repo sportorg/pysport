@@ -14,6 +14,7 @@ from PySide2.QtCore import QThread, Signal
 from sportorg.common.singleton import singleton
 from sportorg.language import _
 from sportorg.libs.sireader import sireader
+from sportorg.libs.sireader.sireader import SIReader
 from sportorg.models import memory
 from sportorg.modules.sportident import backup
 from sportorg.utils.time import time_to_otime
@@ -39,9 +40,21 @@ class SIReaderThread(QThread):
     def run(self):
         try:
             si = sireader.SIReaderReadout(port=self.port, logger=logging.root)
+            if si.get_type() == SIReader.M_SRR:
+                si.disconnect()  # release port
+                si = sireader.SIReaderSRR(port=self.port, logger=logging.root)
+            elif si.get_type() == SIReader.M_CONTROL or si.get_type() == SIReader.M_BC_CONTROL:
+                si.disconnect()  # release port
+                si = sireader.SIReaderControl(port=self.port, logger=logging.root)
+
+            si.poll_sicard() # try to poll immediately to catch an exception
         except Exception as e:
-            self._logger.error(str(e))
+            self._logger.debug(str(e))
             return
+
+        max_error = 2000
+        error_count = 0
+
         while True:
             try:
                 while not si.poll_sicard():
@@ -55,7 +68,10 @@ class SIReaderThread(QThread):
                 self._queue.put(SIReaderCommand('card_data', card_data), timeout=1)
                 si.ack_sicard()
             except sireader.SIReaderException as e:
+                error_count += 1
                 self._logger.error(str(e))
+                if error_count > max_error:
+                    return
             except sireader.SIReaderCardChanged as e:
                 self._logger.error(str(e))
             except serial.serialutil.SerialException as e:
@@ -222,7 +238,7 @@ class SIReaderClient(object):
             scan_ports = [os.path.join('/dev', f) for f in os.listdir('/dev') if
                      re.match('ttyS.*|ttyUSB.*', f)]
         elif platform.system() == 'Windows':
-            scan_ports = ['COM' + str(i) for i in range(32)]
+            scan_ports = ['COM' + str(i) for i in range(48)]
 
         for p in scan_ports:
             try:
