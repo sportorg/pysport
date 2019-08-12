@@ -133,13 +133,14 @@ class SportorgPrinter(object):
 
         # Info about competitors, who can win current person
         if result.is_status_ok() and not is_relay:
-            if hasattr(result, 'can_win_count'):
-                if result.can_win_count > 0:
-                    self.print_line(_('Who can win you') + ': ' + str(result.can_win_count), fn, fs_main)
-                    self.print_line(_('Final result will be known') + ': '
-                                    + result.final_result_time.to_str(), fn, fs_main)
-                else:
-                    self.print_line(_('Result is final'), fn, fs_main)
+            if obj.get_setting('system_start_source', 'protocol') == 'protocol':
+                if hasattr(result, 'can_win_count'):
+                    if result.can_win_count > 0:
+                        self.print_line(_('Who can win you') + ': ' + str(result.can_win_count), fn, fs_main)
+                        self.print_line(_('Final result will be known') + ': '
+                                        + result.final_result_time.to_str(), fn, fs_main)
+                    else:
+                        self.print_line(_('Result is final'), fn, fs_main)
 
         # Punch checking info
         if result.is_status_ok():
