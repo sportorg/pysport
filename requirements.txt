@@ -10,3 +10,4 @@ pywinusb==0.4.2
 playsound==1.2.2
 docxtpl==0.5.0
 boltons==18.0.1
+pywin32>=224
