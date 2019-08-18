@@ -383,6 +383,7 @@ class Split(Model):
         self.leg_place = 0
         self.relative_place = 0
         self.is_correct = True
+        self.has_penalty = False
         self.speed = ''
         self.length_leg = 0
 
@@ -859,12 +860,13 @@ class ResultSportident(Result):
         if count_controls == 0:
             return True
 
-        # list of indexes, coincide with course, used for mixed course order1
+        # list of indexes, coincide with course, used for mixed course order
         recognized_indexes = []
 
         # invalidate all splits before check
         for i in self.splits:
             i.is_correct = False
+            i.has_penalty = True
 
         for i in range(len(self.splits)):
             try:
@@ -888,6 +890,7 @@ class ResultSportident(Result):
                     if not list_exists or list_contains:
                         # any control '%' or '%(31,32,33)' or '31%'
                         split.is_correct = True
+                        split.has_penalty = False
                         recognized_indexes.append(i)
                         course_index += 1
 
@@ -905,6 +908,7 @@ class ResultSportident(Result):
                             break
                     if is_unique:
                         split.is_correct = True
+                        split.has_penalty = False
                         recognized_indexes.append(i)
                         course_index += 1
 
@@ -915,12 +919,18 @@ class ResultSportident(Result):
                         if list_contains:
                             split.is_correct = True
                             recognized_indexes.append(i)
+
+                            correct_code = str(controls[course_index].code).split('(')[0].strip()
+                            if split.code == correct_code:
+                                split.has_penalty = False
+
                             course_index += 1
                     else:
                         # just cp '31 989'
                         is_equal = str(cur_code) == controls[course_index].code
                         if is_equal:
                             split.is_correct = True
+                            split.has_penalty = False
                             recognized_indexes.append(i)
                             course_index += 1
 
