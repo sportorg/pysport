@@ -1,6 +1,9 @@
-import win32print
-import win32ui
-import win32con
+import platform
+
+if platform.system() == 'Windows':  # current realisation works on Windows only
+    import win32print
+    import win32ui
+    import win32con
 
 from sportorg.models.memory import race, Race, Result, ResultStatus
 from sportorg.models.result.result_calculation import ResultCalculation
@@ -9,7 +12,11 @@ from sportorg.language import _
 
 
 class SportorgPrinter(object):
-    def __init__(self, printer_name=win32print.GetDefaultPrinter(), scale_factor=60, x_offset=5, y_offset=5):
+    def __init__(self, printer_name, scale_factor=60, x_offset=5, y_offset=5):
+
+        if not printer_name:
+            printer_name = win32print.GetDefaultPrinter()
+
         self.dc = win32ui.CreateDC()
         self.dc.CreatePrinterDC(printer_name)
         self.dc.SetMapMode(win32con.MM_TWIPS)  # 1440 units per inch, 1/20 of dot with 72dpi
@@ -158,7 +165,7 @@ class SportorgPrinter(object):
 
         # Short result list
         if is_relay:
-            relay_stub = 1
+            pass
         else:
             res = ResultCalculation(obj).get_group_finishes(group)
             self.print_line(_('Draft results'), fn, fs_main)
