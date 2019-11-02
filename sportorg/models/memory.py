@@ -867,6 +867,7 @@ class ResultSportident(Result):
         for i in self.splits:
             i.is_correct = False
             i.has_penalty = True
+            i.course_index = -1
 
         for i in range(len(self.splits)):
             try:
@@ -901,9 +902,19 @@ class ResultSportident(Result):
                         continue
                     # test previous splits
                     is_unique = True
+                    course_index_current = -1
                     for j in range(i):
                         prev_split = self.splits[j]
+
+                        if prev_split.is_correct:
+                            course_index_current += 1
+
                         if prev_split.code == cur_code and j in recognized_indexes:
+
+                            if course_index_current < 0 or str(controls[course_index_current].code).find('*') < 0:
+                                # check only free order controls to be duplicated
+                                continue
+
                             is_unique = False
                             break
                     if is_unique:
