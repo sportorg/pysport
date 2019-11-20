@@ -881,10 +881,16 @@ class ResultSportident(Result):
                 ind_end = template.find(')')
                 if ind_begin > 0 and ind_end > 0:
                     list_exists = True
-                    # any control from the list e.g. '%(31,32,33)'
-                    arr = template[ind_begin + 1:ind_end].split(',')
-                    if str(cur_code) in arr:
-                        list_contains = True
+                    if template.find('-'):
+                        # any control from the range e.g. '%(31-36)'
+                        begin_cp, end_cp = template[ind_begin + 1:ind_end].split('-')
+                        if int(cur_code) >= int(begin_cp) and int(cur_code) <= int(end_cp):
+                            list_contains = True
+                    else:
+                        # any control from the list e.g. '%(31,32,33)'
+                        arr = template[ind_begin + 1:ind_end].split(',')
+                        if str(cur_code) in arr:
+                            list_contains = True
 
                 if template.find('%') > -1:
                     # non-unique control
