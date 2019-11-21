@@ -223,6 +223,10 @@ def menu_list():
                     'title': _('Use bib as card number'),
                     'action': 'CopyBibToCardNumber'
                 },
+                {
+                    'title': _('Use card number as bib'),
+                    'action': 'CopyCardNumberToBib'
+                },
             ]
         },
         {

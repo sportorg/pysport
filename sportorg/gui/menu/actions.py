@@ -38,7 +38,7 @@ from sportorg.libs.winorient.wdb import write_wdb
 from sportorg.models.memory import race, ResultStatus, ResultManual, find
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.result_checker import ResultChecker
-from sportorg.models.start.start_preparation import guess_corridors_for_groups, copy_bib_to_card_number
+from sportorg.models.start.start_preparation import guess_corridors_for_groups, copy_bib_to_card_number, copy_card_number_to_bib
 from sportorg.modules import testing
 from sportorg.modules.backup.json import get_races_from_file
 from sportorg.modules.iof import iof_xml
@@ -327,6 +327,15 @@ class CopyBibToCardNumber(Action):
         reply = messageBoxQuestion(self.app, _('Question'), msg, QMessageBox.Yes | QMessageBox.No)
         if reply == QMessageBox.Yes:
             copy_bib_to_card_number()
+            self.app.refresh()
+
+
+class CopyCardNumberToBib(Action):
+    def execute(self):
+        msg = _('Use card number as bib') + '?'
+        reply = messageBoxQuestion(self.app, _('Question'), msg, QMessageBox.Yes | QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            copy_card_number_to_bib()
             self.app.refresh()
 
 
@@ -646,6 +655,7 @@ __all__ = [
     'StartHandicapAction',
     'RelayCloneAction',
     'CopyBibToCardNumber',
+    'CopyCardNumberToBib',
     'ManualFinishAction',
     'SPORTidentReadoutAction',
     'SportiduinoReadoutAction',

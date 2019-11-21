@@ -490,6 +490,13 @@ def copy_bib_to_card_number():
             person.card_number = person.bib
 
 
+def copy_card_number_to_bib():
+    obj = race()
+    for person in obj.persons:
+        if person.card_number:
+            person.bib = person.card_number
+
+
 def clone_relay_legs(min_bib, max_bib, increment):
     """Clone existing relay legs to new (the same names, bib += increment"""
     if min_bib + increment < max_bib:
