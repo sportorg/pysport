@@ -1,13 +1,13 @@
 python-dateutil==2.6.1
 xmlschema==0.9.14
-PySide2==5.11.2
-sireader==1.1.1
+PySide2==5.13.2
+sportident==1.2.2
 jinja2==2.10.1
 polib==1.0.8
-cx_Freeze==5.1.1
+cx_Freeze==6.0
 requests>=2.20.0
 pywinusb==0.4.2
 playsound==1.2.2
 docxtpl==0.5.0
 boltons==18.0.1
-pywin32>=224
+# pywin32>=227

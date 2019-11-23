@@ -13,8 +13,7 @@ from PySide2.QtCore import QThread, Signal
 
 from sportorg.common.singleton import singleton
 from sportorg.language import _
-from sportorg.libs.sireader import sireader
-from sportorg.libs.sireader.sireader import SIReader
+from sportident import SIReader, SIReaderReadout, SIReaderSRR, SIReaderControl, SIReaderException, SIReaderCardChanged
 from sportorg.models import memory
 from sportorg.modules.sportident import backup
 from sportorg.utils.time import time_to_otime
@@ -39,13 +38,13 @@ class SIReaderThread(QThread):
 
     def run(self):
         try:
-            si = sireader.SIReaderReadout(port=self.port, logger=logging.root)
+            si = SIReaderReadout(port=self.port, logger=logging.root)
             if si.get_type() == SIReader.M_SRR:
                 si.disconnect()  # release port
-                si = sireader.SIReaderSRR(port=self.port, logger=logging.root)
+                si = SIReaderSRR(port=self.port, logger=logging.root)
             elif si.get_type() == SIReader.M_CONTROL or si.get_type() == SIReader.M_BC_CONTROL:
                 si.disconnect()  # release port
-                si = sireader.SIReaderControl(port=self.port, logger=logging.root)
+                si = SIReaderControl(port=self.port, logger=logging.root)
 
             si.poll_sicard() # try to poll immediately to catch an exception
         except Exception as e:
@@ -67,12 +66,12 @@ class SIReaderThread(QThread):
                 card_data['card_type'] = si.cardtype
                 self._queue.put(SIReaderCommand('card_data', card_data), timeout=1)
                 si.ack_sicard()
-            except sireader.SIReaderException as e:
+            except SIReaderException as e:
                 error_count += 1
                 self._logger.error(str(e))
                 if error_count > max_error:
                     return
-            except sireader.SIReaderCardChanged as e:
+            except SIReaderCardChanged as e:
                 self._logger.error(str(e))
             except serial.serialutil.SerialException as e:
                 self._logger.error(str(e))
