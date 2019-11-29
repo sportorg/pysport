@@ -39,6 +39,7 @@ class Factory(object):
             StartHandicapAction(),
             RelayCloneAction(),
             CopyBibToCardNumber(),
+            CopyCardNumberToBib(),
             ManualFinishAction(),
             SPORTidentReadoutAction(),
             SportiduinoReadoutAction(),

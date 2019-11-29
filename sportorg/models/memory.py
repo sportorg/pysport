@@ -1,3 +1,4 @@
+import re
 import datetime
 import time
 import uuid
@@ -881,10 +882,15 @@ class ResultSportident(Result):
                 ind_end = template.find(')')
                 if ind_begin > 0 and ind_end > 0:
                     list_exists = True
-                    # any control from the list e.g. '%(31,32,33)'
-                    arr = template[ind_begin + 1:ind_end].split(',')
-                    if str(cur_code) in arr:
-                        list_contains = True
+                    # any control from the list e.g. '%(31,32,35-45)'
+                    arr = re.split(r'\s*,\s*', template[ind_begin + 1:ind_end])
+                    for cp in arr:
+                        cp_range = re.split(r'\s*-\s*', cp)
+                        if int(cur_code) == int(cp_range[0]):
+                            list_contains = True
+                        elif len(cp_range) > 1:
+                            if int(cur_code) > int(cp_range[0]) and int(cur_code) <= int(cp_range[len(cp_range)-1]):
+                                list_contains = True
 
                 if template.find('%') > -1:
                     # non-unique control

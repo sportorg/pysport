@@ -829,6 +829,9 @@ msgstr "Файл IOF xml (*.xml)"
 msgid "Use bib as card number"
 msgstr "Заменить номера чипов нагрудными номерами"
 
+msgid "Use card number as bib"
+msgstr "Заменить нагрудные номера номерами чипов"
+
 msgid "No results to change status"
 msgstr "Нет результата для изменения статуса"
 
