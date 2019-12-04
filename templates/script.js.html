@@ -172,20 +172,19 @@
             return node;
         };
 
-        TableTextGenerator.prototype.getSliceText = function (text, size) {
+        TableTextGenerator.prototype.getSliceText = function (text, size, align_right=false) {
             if (text === undefined) {
                 text = '';
             }
             text = String(text);
             if (size) {
-                text = text.slice(0, size);
-                if (text.length < size + 1) {
-                    var arr = [];
-                    for (var i = 0; i < size + 1 - text.length; i++) {
-                        arr.push(' ');
-                    }
-                    text += arr.join('');
+                if (align_right) {
+                    text = text.padStart(size);
+                } else {
+                    text = text.padEnd(size);
                 }
+                text = text.slice(0, size);
+                text += ' ';
             } else {
                 text += '\t';
             }
@@ -199,8 +198,9 @@
                 var h = this.getHeaderObj(key);
                 var title = h && h.title;
                 var size = h && h.size;
+                var align_right = h && h.align_right;
                 if (size) {
-                    text += this.getSliceText(title, size);
+                    text += this.getSliceText(title, size, align_right);
                 } else {
                     text += title;
                 }
@@ -224,8 +224,9 @@
                         var key = _a[_i];
                         var h = this.getHeaderObj(key);
                         var size = h && h.size;
+                        var align_right = h && h.align_right;
                         if (size) {
-                            text += this.getSliceText(obj[key], size);
+                            text += this.getSliceText(obj[key], size, align_right);
                         } else {
                             text += obj[key];
                         }
@@ -393,24 +394,36 @@
         return SettingsGenerator;
     }());
 
+    function make_date(msec) {
+        msec /= 1000;
+        var hours = Math.floor(msec / 3600);
+        msec %= 3600;
+        var minutes = Math.floor(msec / 60);
+        var seconds = ~~(msec % 60);
+
+        return new Date(2000, 0, 1, hours, minutes, seconds);
+    }
+
+    var with0 = function (dd) {
+        return (dd < 10 ? '0' + dd : dd) + '';
+    }
+
     function toHHMMSS(value) {
         if (value === 0) {
             return '00:00:00'
         }
         if (!value) return '';
-        value /= 1000;
-        var hours = Math.floor(value / 3600);
-        value %= 3600;
-        var minutes = Math.floor(value / 60);
-        var seconds = ~~(value % 60);
-
-        var date = new Date(2000, 0, 1, hours, minutes, seconds);
-
-        var with0 = function (dd) {
-            return (dd < 10 ? '0' + dd : dd) + '';
-        };
-
+        date = make_date(value);
         return with0(date.getHours()) + ':' + with0(date.getMinutes()) + ':' + with0(date.getSeconds());
+    }
+
+    function toMMSS(value) {
+        if (value === 0) {
+            return '00:00'
+        }
+        if (!value) return '';
+        date = make_date(value);
+        return with0(date.getMinutes()) + ':' + with0(date.getSeconds());
     }
 
     function getById(list, id) {
@@ -439,16 +452,6 @@
         for (var _d = 0, _e = race.groups; _d < _e.length; _d++) {
             var obj = _e[_d];
             obj.course = getById(race.courses, obj.course_id);
-        }
-        for (var _f = 0, _g = ['groups', 'courses', 'organizations']; _f < _g.length; _f++) {
-            var itemName = _g[_f];
-            race[itemName].sort(function (a, b) {
-                if (a.name.toUpperCase() < b.name.toUpperCase())
-                    return -1;
-                if (a.name.toUpperCase() > b.name.toUpperCase())
-                    return 1;
-                return 0;
-            });
         }
         return race;
     }

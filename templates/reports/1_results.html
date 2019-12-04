@@ -47,15 +47,15 @@
                     index: 0,
                     name: (result.person.surname + ' ' + result.person.name).slice(0, MAX_PERSON_NAME),
                     org: (result.person.organization && String(result.person.organization.name).slice(0, MAX_ORG_NAME)) || '',
-                    qual: Qualification[result.person.qual],
+                    qual: result.person.qual ? Qualification[result.person.qual] : '',
                     bib: result.person.bib,
                     year: result.person.birth_date ? (new Date(result.person.birth_date)).getFullYear() : '',
-                    penalty_time: toHHMMSS(result.penalty_time),
+                    penalty_time: toMMSS(result.penalty_time),
                     penalty_laps: result.penalty_laps,
                     result: result.result,
                     result_relay: result.result_relay,
                     result_msec: result.result_msec,
-                    diff: race.settings.result_processing_mode === 'scores' ? result.diff_scores : toHHMMSS(result.diff),
+                    diff: race.settings.result_processing_mode === 'scores' ? result.diff_scores : '+' + toMMSS(result.diff),
                     place: result.place,
                     status: result.status,
                     scores: result.scores,
@@ -220,14 +220,14 @@
                     index: 0,
                     name: (result.person.surname + ' ' + result.person.name).slice(0, MAX_PERSON_NAME),
                     org: (result.person.organization && String(result.person.organization.name).slice(0, MAX_ORG_NAME)) || '',
-                    qual: Qualification[result.person.qual],
+                    qual: result.person.qual ? Qualification[result.person.qual] : '',
                     bib: result.person.bib,
                     year: result.person.birth_date ? (new Date(result.person.birth_date)).getFullYear() : '',
-                    penalty_time: toHHMMSS(result.penalty_time),
+                    penalty_time: toMMSS(result.penalty_time),
                     penalty_laps: result.penalty_laps,
                     result: result.result,
                     result_msec: result.result_msec,
-                    diff: race.settings.result_processing_mode === 'scores' ? result.diff_scores : toHHMMSS(result.diff),
+                    diff: race.settings.result_processing_mode === 'scores' ? result.diff_scores : '+' + toMMSS(result.diff),
                     place: result.place,
                     status: result.status,
                     scores: result.scores,
@@ -472,21 +472,21 @@
 
     var Fields = {
         fields: [
-            {key: 'index', title: '№', size: 4},
+            {key: 'index', title: '№', size: 4, align_right: true},
             {key: 'group', title: 'Группа', size: 10, active: false},
             {key: 'name', title: 'Фамилия, имя', size: 30},
             {key: 'org', title: 'Коллектив', size: 20},
-            {key: 'year', title: 'ГР', size: 5},
-            {key: 'qual', title: 'Разряд', size: 7},
-            {key: 'bib', title: 'Номер', size: 6},
-            {key: 'penalty_time', title: 'Штраф', size: 9, active: false},
-            {key: 'penalty_laps', title: 'Штраф', size: 9, active: false},
-            {key: 'result', title: 'Результат', size: 14},
-            {key: 'result_relay', title: 'Ком. рез-т', size: 14},
-            {key: 'diff', title: 'Отставание', size: 11},
-            {key: 'speed', title: 'Темп', size: 12, active: false},
-            {key: 'place_show', title: 'Место', size: 6},
-            {key: 'scores', title: 'Очки', size: 5, active: false},
+            {key: 'qual', title: 'Разряд', size: 6},
+            {key: 'year', title: 'ГР ', size: 4, align_right: true},
+            {key: 'bib', title: 'Номер', size: 5, align_right: true},
+            {key: 'penalty_time', title: 'Штраф', size: 6, active: false},
+            {key: 'penalty_laps', title: 'Штраф', size: 6, align_right: true, active: false},
+            {key: 'result', title: 'Результат', size: 13},
+            {key: 'result_relay', title: 'Ком. рез-т', size: 13},
+            {key: 'diff', title: 'Отставан', size: 8},
+            {key: 'speed', title: 'Темп', size: 8, align_right: true, active: false},
+            {key: 'place_show', title: 'Место', size: 5, align_right: true},
+            {key: 'scores', title: 'Очки', size: 4, align_right: true, active: false},
             {key: 'all_splits', title: 'Сплиты', active: false}
         ],
         active: function (key, val) {
@@ -689,6 +689,14 @@
             value: !!store.tableView,
             change: function (checked) {
                 store.tableView = checked;
+                render()
+            }
+        },
+        {
+            title: 'Разряд',
+            value: Fields.isActive('qual'),
+            change: function (checked) {
+                Fields.active('qual', checked);
                 render()
             }
         },
