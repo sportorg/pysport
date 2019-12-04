@@ -45,6 +45,7 @@ def get_text_from_template(searchpath, path, **kwargs):
     )
     env.filters['tohhmmss'] = to_hhmmss
     env.filters['date'] = date
+    env.policies['json.dumps_kwargs']['ensure_ascii'] = False
     template = env.get_template(path)
 
     return template.render(**kwargs)

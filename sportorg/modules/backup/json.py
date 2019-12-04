@@ -15,7 +15,7 @@ def dump(file):
         'current_race': get_current_race_index(),
         'races': [race_downgrade(r.to_dict()) for r in races()]
     }
-    json.dump(data, file, sort_keys=True, indent=2)
+    json.dump(data, file, sort_keys=True, indent=2, ensure_ascii=False)
 
 
 def load(file):
