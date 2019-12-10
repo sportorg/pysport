@@ -4,7 +4,6 @@ python:
 # command to install dependencies
 install:
   - pip install -r requirements.txt
-  - git submodule init
 # command to run tests
 script:
   - python SportOrg_test.py
