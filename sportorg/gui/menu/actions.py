@@ -1,6 +1,7 @@
 import logging
 import time
 import uuid
+from typing import Any
 
 from PySide2 import QtCore, QtGui
 
@@ -55,33 +56,42 @@ from sportorg.modules.winorient.wdb import WDBImportError, WinOrientBinary
 from sportorg.language import _
 
 
-class NewAction(Action):
+class ActionFactory(type):
+    actions = {}
+
+    def __new__(mcs, name, *args, **kwargs) -> Any:
+        cls = super().__new__(mcs, name, *args, **kwargs)
+        ActionFactory.actions[name] = cls
+        return cls
+
+
+class NewAction(Action, metaclass=ActionFactory):
     def execute(self):
         self.app.create_file()
 
 
-class SaveAction(Action):
+class SaveAction(Action, metaclass=ActionFactory):
     def execute(self):
         self.app.save_file()
 
 
-class OpenAction(Action):
+class OpenAction(Action, metaclass=ActionFactory):
     def execute(self):
         file_name = get_open_file_name(_('Open SportOrg file'), _("SportOrg file (*.json)"))
         self.app.open_file(file_name)
 
 
-class SaveAsAction(Action):
+class SaveAsAction(Action, metaclass=ActionFactory):
     def execute(self):
         self.app.save_file_as()
 
 
-class OpenRecentAction(Action):
+class OpenRecentAction(Action, metaclass=ActionFactory):
     def execute(self):
         pass
 
 
-class CopyAction(Action):
+class CopyAction(Action, metaclass=ActionFactory):
     def execute(self):
         if self.app.current_tab not in range(5):
             return
@@ -95,7 +105,7 @@ class CopyAction(Action):
         QtGui.qApp.clipboard().setText(data)
 
 
-class DuplicateAction(Action):
+class DuplicateAction(Action, metaclass=ActionFactory):
     def execute(self):
         if self.app.current_tab not in range(5):
             return
@@ -107,17 +117,17 @@ class DuplicateAction(Action):
             self.app.refresh()
 
 
-class SettingsAction(Action):
+class SettingsAction(Action, metaclass=ActionFactory):
     def execute(self):
         SettingsDialog().exec_()
 
 
-class EventSettingsAction(Action):
+class EventSettingsAction(Action, metaclass=ActionFactory):
     def execute(self):
         EventPropertiesDialog().exec_()
 
 
-class CSVWinorientImportAction(Action):
+class CSVWinorientImportAction(Action, metaclass=ActionFactory):
     def execute(self):
         file_name = get_open_file_name(_('Open CSV Winorient file'), _("CSV Winorient (*.csv)"))
         if file_name is not '':
@@ -129,7 +139,7 @@ class CSVWinorientImportAction(Action):
             self.app.init_model()
 
 
-class WDBWinorientImportAction(Action):
+class WDBWinorientImportAction(Action, metaclass=ActionFactory):
     def execute(self):
         file_name = get_open_file_name(_('Open WDB Winorient file'), _("WDB Winorient (*.wdb)"))
         if file_name is not '':
@@ -142,7 +152,7 @@ class WDBWinorientImportAction(Action):
             self.app.init_model()
 
 
-class OcadTXTv8ImportAction(Action):
+class OcadTXTv8ImportAction(Action, metaclass=ActionFactory):
     def execute(self):
         file_name = get_open_file_name(_('Open Ocad txt v8 file'), _("Ocad classes v8 (*.txt)"))
         if file_name is not '':
@@ -154,7 +164,7 @@ class OcadTXTv8ImportAction(Action):
             self.app.init_model()
 
 
-class WDBWinorientExportAction(Action):
+class WDBWinorientExportAction(Action, metaclass=ActionFactory):
     def execute(self):
         file_name = get_save_file_name(_('Save As WDB file'), _("WDB file (*.wdb)"),
                                        '{}_sportorg_export'.format(race().data.get_start_datetime().strftime("%Y%m%d")))
@@ -172,7 +182,7 @@ class WDBWinorientExportAction(Action):
                 QMessageBox.warning(self.app, _('Error'), _('Export error') + ': ' + file_name)
 
 
-class IOFResultListExportAction(Action):
+class IOFResultListExportAction(Action, metaclass=ActionFactory):
     def execute(self):
         file_name = get_save_file_name(_('Save As IOF xml'), _('IOF xml (*.xml)'),
                                        '{}_resultList'.format(race().data.get_start_datetime().strftime("%Y%m%d")))
@@ -184,7 +194,7 @@ class IOFResultListExportAction(Action):
                 QMessageBox.warning(self.app, _('Error'), _('Export error') + ': ' + file_name)
 
 
-class IOFEntryListImportAction(Action):
+class IOFEntryListImportAction(Action, metaclass=ActionFactory):
     def execute(self):
         file_name = get_open_file_name(_('Open IOF xml'), _('IOF xml (*.xml)'))
         if file_name is not '':
@@ -196,35 +206,35 @@ class IOFEntryListImportAction(Action):
             self.app.init_model()
 
 
-class AddObjectAction(Action):
+class AddObjectAction(Action, metaclass=ActionFactory):
     def execute(self):
         self.app.add_object()
 
 
-class DeleteAction(Action):
+class DeleteAction(Action, metaclass=ActionFactory):
     def execute(self):
         self.app.delete_object()
 
 
-class TextExchangeAction(Action):
+class TextExchangeAction(Action, metaclass=ActionFactory):
     def execute(self):
         TextExchangeDialog().exec_()
         self.app.refresh()
 
 
-class MassEditAction(Action):
+class MassEditAction(Action, metaclass=ActionFactory):
     def execute(self):
         if self.app.current_tab == 0:
             MassEditDialog().exec_()
             self.app.refresh()
 
 
-class RefreshAction(Action):
+class RefreshAction(Action, metaclass=ActionFactory):
     def execute(self):
         self.app.refresh()
 
 
-class FilterAction(Action):
+class FilterAction(Action, metaclass=ActionFactory):
     def execute(self):
         if self.app.current_tab not in range(2):
             return
@@ -233,7 +243,7 @@ class FilterAction(Action):
         self.app.refresh()
 
 
-class SearchAction(Action):
+class SearchAction(Action, metaclass=ActionFactory):
     def execute(self):
         if self.app.current_tab not in range(5):
             return
@@ -242,50 +252,50 @@ class SearchAction(Action):
         self.app.refresh()
 
 
-class ToStartPreparationAction(Action):
+class ToStartPreparationAction(Action, metaclass=ActionFactory):
     def execute(self):
         self.app.select_tab(0)
 
 
-class ToRaceResultsAction(Action):
+class ToRaceResultsAction(Action, metaclass=ActionFactory):
     def execute(self):
         self.app.select_tab(1)
 
 
-class ToGroupsAction(Action):
+class ToGroupsAction(Action, metaclass=ActionFactory):
     def execute(self):
         self.app.select_tab(2)
 
 
-class ToCoursesAction(Action):
+class ToCoursesAction(Action, metaclass=ActionFactory):
     def execute(self):
         self.app.select_tab(3)
 
 
-class ToTeamsAction(Action):
+class ToTeamsAction(Action, metaclass=ActionFactory):
     def execute(self):
         self.app.select_tab(4)
 
 
-class StartPreparationAction(Action):
+class StartPreparationAction(Action, metaclass=ActionFactory):
     def execute(self):
         StartPreparationDialog().exec_()
         self.app.refresh()
 
 
-class GuessCoursesAction(Action):
+class GuessCoursesAction(Action, metaclass=ActionFactory):
     def execute(self):
         guess_courses_for_groups()
         self.app.refresh()
 
 
-class GuessCorridorsAction(Action):
+class GuessCorridorsAction(Action, metaclass=ActionFactory):
     def execute(self):
         guess_corridors_for_groups()
         self.app.refresh()
 
 
-class RelayNumberAction(Action):
+class RelayNumberAction(Action, metaclass=ActionFactory):
     def execute(self):
         if self.app.relay_number_assign:
             self.app.relay_number_assign = False
@@ -297,31 +307,31 @@ class RelayNumberAction(Action):
         self.app.refresh()
 
 
-class NumberChangeAction(Action):
+class NumberChangeAction(Action, metaclass=ActionFactory):
     def execute(self):
         NumberChangeDialog().exec_()
         self.app.refresh()
 
 
-class StartTimeChangeAction(Action):
+class StartTimeChangeAction(Action, metaclass=ActionFactory):
     def execute(self):
         StartTimeChangeDialog().exec_()
         self.app.refresh()
 
 
-class StartHandicapAction(Action):
+class StartHandicapAction(Action, metaclass=ActionFactory):
     def execute(self):
         StartHandicapDialog().exec_()
         self.app.refresh()
 
 
-class RelayCloneAction(Action):
+class RelayCloneAction(Action, metaclass=ActionFactory):
     def execute(self):
         RelayCloneDialog().exec_()
         self.app.refresh()
 
 
-class CopyBibToCardNumber(Action):
+class CopyBibToCardNumber(Action, metaclass=ActionFactory):
     def execute(self):
         msg = _('Use bib as card number') + '?'
         reply = messageBoxQuestion(self.app, _('Question'), msg, QMessageBox.Yes | QMessageBox.No)
@@ -330,7 +340,7 @@ class CopyBibToCardNumber(Action):
             self.app.refresh()
 
 
-class CopyCardNumberToBib(Action):
+class CopyCardNumberToBib(Action, metaclass=ActionFactory):
     def execute(self):
         msg = _('Use card number as bib') + '?'
         reply = messageBoxQuestion(self.app, _('Question'), msg, QMessageBox.Yes | QMessageBox.No)
@@ -339,7 +349,7 @@ class CopyCardNumberToBib(Action):
             self.app.refresh()
 
 
-class ManualFinishAction(Action):
+class ManualFinishAction(Action, metaclass=ActionFactory):
     def execute(self):
         result = race().new_result(ResultManual)
         Teamwork().send(result.to_dict())
@@ -348,45 +358,45 @@ class ManualFinishAction(Action):
         self.app.refresh()
 
 
-class SPORTidentReadoutAction(Action):
+class SPORTidentReadoutAction(Action, metaclass=ActionFactory):
     def execute(self):
         SIReaderClient().toggle()
         time.sleep(0.5)
         self.app.interval()
 
 
-class SportiduinoReadoutAction(Action):
+class SportiduinoReadoutAction(Action, metaclass=ActionFactory):
     def execute(self):
         SportiduinoClient().toggle()
         time.sleep(0.5)
         self.app.interval()
 
 
-class SFRReadoutAction(Action):
+class SFRReadoutAction(Action, metaclass=ActionFactory):
     def execute(self):
         SFRReaderClient().toggle()
         time.sleep(0.5)
         self.app.interval()
 
 
-class CreateReportAction(Action):
+class CreateReportAction(Action, metaclass=ActionFactory):
     def execute(self):
         ReportDialog().exec_()
 
 
-class SplitPrintoutAction(Action):
+class SplitPrintoutAction(Action, metaclass=ActionFactory):
     def execute(self):
         self.app.split_printout_selected()
 
 
-class RecheckingAction(Action):
+class RecheckingAction(Action, metaclass=ActionFactory):
     def execute(self):
         ResultChecker.check_all()
         ResultCalculation(race()).process_results()
         self.app.refresh()
 
 
-class GroupFinderAction(Action):
+class GroupFinderAction(Action, metaclass=ActionFactory):
     def execute(self):
         obj = race()
         indices = self.app.get_selected_rows()
@@ -406,7 +416,7 @@ class GroupFinderAction(Action):
         self.app.refresh()
 
 
-class PenaltyCalculationAction(Action):
+class PenaltyCalculationAction(Action, metaclass=ActionFactory):
     def execute(self):
         logging.debug('Penalty calculation start')
         for result in race().results:
@@ -417,7 +427,7 @@ class PenaltyCalculationAction(Action):
         self.app.refresh()
 
 
-class PenaltyRemovingAction(Action):
+class PenaltyRemovingAction(Action, metaclass=ActionFactory):
     def execute(self):
         logging.debug('Penalty removing start')
         for result in race().results:
@@ -428,7 +438,7 @@ class PenaltyRemovingAction(Action):
         self.app.refresh()
 
 
-class ChangeStatusAction(Action):
+class ChangeStatusAction(Action, metaclass=ActionFactory):
     def execute(self):
         if self.app.current_tab != 1:
             logging.warning(_('No result selected'))
@@ -463,19 +473,19 @@ class ChangeStatusAction(Action):
         self.app.refresh()
 
 
-class SetDNSNumbersAction(Action):
+class SetDNSNumbersAction(Action, metaclass=ActionFactory):
     def execute(self):
         NotStartDialog().exec_()
         self.app.refresh()
 
 
-class CPDeleteAction(Action):
+class CPDeleteAction(Action, metaclass=ActionFactory):
     def execute(self):
         CPDeleteDialog().exec_()
         self.app.refresh()
 
 
-class AddSPORTidentResultAction(Action):
+class AddSPORTidentResultAction(Action, metaclass=ActionFactory):
     def execute(self):
         result = race().new_result()
         race().add_new_result(result)
@@ -485,18 +495,18 @@ class AddSPORTidentResultAction(Action):
         self.app.refresh()
 
 
-class TimekeepingSettingsAction(Action):
+class TimekeepingSettingsAction(Action, metaclass=ActionFactory):
     def execute(self):
         TimekeepingPropertiesDialog().exec_()
         self.app.refresh()
 
 
-class TeamworkSettingsAction(Action):
+class TeamworkSettingsAction(Action, metaclass=ActionFactory):
     def execute(self):
         TeamworkPropertiesDialog().exec_()
 
 
-class TeamworkEnableAction(Action):
+class TeamworkEnableAction(Action, metaclass=ActionFactory):
     def execute(self):
         host = race().get_setting('teamwork_host', 'localhost')
         port = race().get_setting('teamwork_port', 50010)
@@ -508,7 +518,7 @@ class TeamworkEnableAction(Action):
         self.app.interval()
 
 
-class TeamworkSendAction(Action):
+class TeamworkSendAction(Action, metaclass=ActionFactory):
     def execute(self):
         try:
             obj = race()
@@ -529,23 +539,23 @@ class TeamworkSendAction(Action):
             logging.error(str(e))
 
 
-class PrinterSettingsAction(Action):
+class PrinterSettingsAction(Action, metaclass=ActionFactory):
     def execute(self):
         PrintPropertiesDialog().exec_()
 
 
-class LiveSettingsAction(Action):
+class LiveSettingsAction(Action, metaclass=ActionFactory):
     def execute(self):
         LiveDialog().exec_()
         self.app.refresh()
 
 
-class TelegramSettingsAction(Action):
+class TelegramSettingsAction(Action, metaclass=ActionFactory):
     def execute(self):
         TelegramDialog().exec_()
 
 
-class TelegramSendAction(Action):
+class TelegramSendAction(Action, metaclass=ActionFactory):
     def execute(self):
         try:
             if not self.app.current_tab == 1:
@@ -563,12 +573,12 @@ class TelegramSendAction(Action):
             logging.error(str(e))
 
 
-class AboutAction(Action):
+class AboutAction(Action, metaclass=ActionFactory):
     def execute(self):
         AboutDialog().exec_()
 
 
-class CheckUpdatesAction(Action):
+class CheckUpdatesAction(Action, metaclass=ActionFactory):
     def execute(self):
         try:
             if not checker.check_version(config.VERSION):
@@ -582,12 +592,12 @@ class CheckUpdatesAction(Action):
             QMessageBox.warning(self.app, _('Error'), str(e))
 
 
-class TestingAction(Action):
+class TestingAction(Action, metaclass=ActionFactory):
     def execute(self):
         testing.test()
 
 
-class AssignResultByBibAction(Action):
+class AssignResultByBibAction(Action, metaclass=ActionFactory):
     def execute(self):
         for result in race().results:
             if result.person is None and result.bib:
@@ -595,7 +605,7 @@ class AssignResultByBibAction(Action):
         self.app.refresh()
 
 
-class AssignResultByCardNumberAction(Action):
+class AssignResultByCardNumberAction(Action, metaclass=ActionFactory):
     def execute(self):
         for result in race().results:
             if result.person is None and result.card_number:
@@ -603,7 +613,7 @@ class AssignResultByCardNumberAction(Action):
         self.app.refresh()
 
 
-class ImportSportOrgAction(Action):
+class ImportSportOrgAction(Action, metaclass=ActionFactory):
     def execute(self):
         file_name = get_open_file_name(_('Open SportOrg json'), _('SportOrg (*.json)'))
         if file_name is not '':
@@ -613,77 +623,7 @@ class ImportSportOrgAction(Action):
             self.app.refresh()
 
 
-class RentCardsAction(Action):
+class RentCardsAction(Action, metaclass=ActionFactory):
     def execute(self):
         RentCardsDialog().exec_()
         self.app.refresh()
-
-
-__all__ = [
-    'NewAction',
-    'SaveAction',
-    'OpenAction',
-    'SaveAsAction',
-    'OpenRecentAction',
-    'CopyAction',
-    'DuplicateAction',
-    'SettingsAction',
-    'EventSettingsAction',
-    'MassEditAction',
-    'CSVWinorientImportAction',
-    'WDBWinorientImportAction',
-    'OcadTXTv8ImportAction',
-    'WDBWinorientExportAction',
-    'IOFResultListExportAction',
-    'AddObjectAction',
-    'DeleteAction',
-    'TextExchangeAction',
-    'RefreshAction',
-    'FilterAction',
-    'SearchAction',
-    'ToStartPreparationAction',
-    'ToRaceResultsAction',
-    'ToGroupsAction',
-    'ToCoursesAction',
-    'ToTeamsAction',
-    'StartPreparationAction',
-    'GuessCoursesAction',
-    'GuessCorridorsAction',
-    'RelayNumberAction',
-    'NumberChangeAction',
-    'StartTimeChangeAction',
-    'StartHandicapAction',
-    'RelayCloneAction',
-    'CopyBibToCardNumber',
-    'CopyCardNumberToBib',
-    'ManualFinishAction',
-    'SPORTidentReadoutAction',
-    'SportiduinoReadoutAction',
-    'SFRReadoutAction',
-    'CreateReportAction',
-    'SplitPrintoutAction',
-    'RecheckingAction',
-    'PenaltyCalculationAction',
-    'PenaltyRemovingAction',
-    'ChangeStatusAction',
-    'SetDNSNumbersAction',
-    'CPDeleteAction',
-    'AddSPORTidentResultAction',
-    'TimekeepingSettingsAction',
-    'TeamworkSettingsAction',
-    'PrinterSettingsAction',
-    'LiveSettingsAction',
-    'AboutAction',
-    'TestingAction',
-    'TeamworkEnableAction',
-    'TeamworkSendAction',
-    'TelegramSettingsAction',
-    'TelegramSendAction',
-    'IOFEntryListImportAction',
-    'CheckUpdatesAction',
-    'AssignResultByBibAction',
-    'AssignResultByCardNumberAction',
-    'ImportSportOrgAction',
-    'RentCardsAction',
-    'GroupFinderAction',
-]

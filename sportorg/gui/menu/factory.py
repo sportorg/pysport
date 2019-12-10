@@ -1,87 +1,15 @@
-from sportorg.gui.menu.actions import *
+from sportorg.gui.menu.actions import ActionFactory
 
 
 class Factory(object):
     def __init__(self, app):
-        self.actions = [
-            NewAction(),
-            SaveAction(),
-            OpenAction(),
-            CopyAction(),
-            DuplicateAction(),
-            SaveAsAction(),
-            OpenRecentAction(),
-            SettingsAction(),
-            EventSettingsAction(),
-            CSVWinorientImportAction(),
-            WDBWinorientImportAction(),
-            OcadTXTv8ImportAction(),
-            WDBWinorientExportAction(),
-            IOFResultListExportAction(),
-            AddObjectAction(),
-            DeleteAction(),
-            TextExchangeAction(),
-            MassEditAction(),
-            RefreshAction(),
-            FilterAction(),
-            SearchAction(),
-            ToStartPreparationAction(),
-            ToRaceResultsAction(),
-            ToGroupsAction(),
-            ToCoursesAction(),
-            ToTeamsAction(),
-            StartPreparationAction(),
-            GuessCoursesAction(),
-            GuessCorridorsAction(),
-            RelayNumberAction(),
-            NumberChangeAction(),
-            StartTimeChangeAction(),
-            StartHandicapAction(),
-            RelayCloneAction(),
-            CopyBibToCardNumber(),
-            CopyCardNumberToBib(),
-            ManualFinishAction(),
-            SPORTidentReadoutAction(),
-            SportiduinoReadoutAction(),
-            SFRReadoutAction(),
-            CreateReportAction(),
-            SplitPrintoutAction(),
-            RecheckingAction(),
-            PenaltyCalculationAction(),
-            PenaltyRemovingAction(),
-            ChangeStatusAction(),
-            SetDNSNumbersAction(),
-            CPDeleteAction(),
-            AddSPORTidentResultAction(),
-            TimekeepingSettingsAction(),
-            TeamworkSettingsAction(),
-            PrinterSettingsAction(),
-            LiveSettingsAction(),
-            AboutAction(),
-            TestingAction(),
-            TeamworkEnableAction(),
-            TeamworkSendAction(),
-            TelegramSettingsAction(),
-            TelegramSendAction(),
-            IOFEntryListImportAction(),
-            CheckUpdatesAction(),
-            AssignResultByBibAction(),
-            AssignResultByCardNumberAction(),
-            ImportSportOrgAction(),
-            RentCardsAction(),
-            GroupFinderAction(),
-        ]
-        self._map = {}
-        for action in self.actions:
-            action.app = app
-            action_id = action.id
-            if not action_id:
-                action_id = action.__class__.__name__
-            self._map[action_id] = action.callback
+        self._actions = {}
+        for key, cls in ActionFactory.actions.items():
+            self._actions[key] = cls(app)
 
     def get_action(self, key):
-        if key in self._map:
-            return self._map[key]
+        if key in self._actions:
+            return self._actions[key]
         return lambda: print('...')
 
     def execute(self, key):
