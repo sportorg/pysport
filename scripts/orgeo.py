@@ -83,14 +83,15 @@ def _get_person_obj(data, race_data, result=None):
         'out_of_competition': data['is_out_of_competition'],
         'start': round(data['start_time'] / 1000) if data['start_time'] else 0
     }
-    if group and group['__type'] == 3 or race_data['data']['race_type'] == 3:
+    is_relay = group and group['__type'] == 3 or race_data['data']['race_type'] == 3
+    if is_relay:
         # send relay fields only for relay events (requested by Ivan Churakoff)
         obj['relay_team'] = data['bib'] % 1000
         obj['lap'] = max(data['bib'] // 1000, 1)
     if result is not None:
         obj['start'] = round(result['start_msec'] / 1000)
 
-        if group and group['__type'] == 3 or race_data['data']['race_type'] == 3:
+        if is_relay:
             obj['result_ms'] = round(result['result_relay_msec'] / 10)  # 1/100 sec - proprietary format
         else:
             obj['result_ms'] = round(result['result_msec'] / 10)  # 1/100 sec - proprietary format
