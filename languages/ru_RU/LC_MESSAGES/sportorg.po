@@ -1368,3 +1368,6 @@ msgstr "Ctrl+K - отправка выделенных участников"
 
 msgid "Ctrl+K on groups - send start list"
 msgstr "Ctrl+K на группах - отправка стартового протокола"
+
+msgid "Several athletes on one minute"
+msgstr "Несколько участников на 1 минуте"
