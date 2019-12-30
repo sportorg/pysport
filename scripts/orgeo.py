@@ -89,9 +89,15 @@ def _get_person_obj(data, race_data, result=None):
         obj['lap'] = max(data['bib'] // 1000, 1)
     if result is not None:
         obj['start'] = round(result['start_msec'] / 1000)
-        obj['result_ms'] = round(result['result_msec'] / 10)  # 1/100 sec - proprietary format
+
+        if group and group['__type'] == 3 or race_data['data']['race_type'] == 3:
+            obj['result_ms'] = round(result['result_relay_msec'] / 10)  # 1/100 sec - proprietary format
+        else:
+            obj['result_ms'] = round(result['result_msec'] / 10)  # 1/100 sec - proprietary format
+
         obj['result_status'] = RESULT_STATUS[int(result['status'])] \
             if -1 < int(result['status']) < len(RESULT_STATUS) else 'OK'
+
         if len(result['splits']):
             obj['splits'] = []
             splits = []

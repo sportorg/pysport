@@ -538,6 +538,7 @@ class Result:
             'start_msec': self.get_start_time().to_msec(),  # readonly
             'finish_msec': self.get_finish_time().to_msec(),  # readonly
             'result_msec': self.get_result_otime().to_msec(),  # readonly
+            'result_relay_msec': self.get_result_otime_relay().to_msec(),  # readonly
 
             'can_win_count': self.can_win_count,
             'final_result_time': self.final_result_time.to_str() if self.final_result_time else None,
