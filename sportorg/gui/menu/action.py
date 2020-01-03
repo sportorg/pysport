@@ -3,14 +3,10 @@ from abc import abstractmethod
 
 
 class Action:
-    def __init__(self):
-        self.app = None
+    def __init__(self, app):
+        self.app = app
 
-    @property
-    def id(self):
-        return ''
-
-    def callback(self):
+    def __call__(self):
         try:
             self.execute()
         except Exception as e:

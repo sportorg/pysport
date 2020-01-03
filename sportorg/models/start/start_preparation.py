@@ -294,7 +294,8 @@ class StartTimeManager(object):
         Set new start time for athletes
 
     """
-    def process(self, corridor_first_start, is_group_start_interval, fixed_start_interval=None, mix_groups=False):
+    def process(self, corridor_first_start, is_group_start_interval, fixed_start_interval=None, one_minute_qty=1,
+                mix_groups=False):
         current_race = self.race
         current_race.update_counters()
 
@@ -303,7 +304,7 @@ class StartTimeManager(object):
             cur_start = corridor_first_start
 
             if mix_groups:
-                self.process_corridor(cur_corridor, cur_start, fixed_start_interval)
+                self.process_corridor(cur_corridor, cur_start, fixed_start_interval, one_minute_qty)
             else:
                 groups = get_groups_by_corridor(cur_corridor)
                 for cur_group in groups:
@@ -315,26 +316,37 @@ class StartTimeManager(object):
                         if cur_group.start_interval is not None:
                             start_interval = cur_group.start_interval
 
-                    cur_start = self.process_group(cur_group, cur_start, start_interval)
+                    cur_start = self.process_group(cur_group, cur_start, start_interval, one_minute_qty)
 
-    def process_group(self, group, first_start, start_interval):
+    def process_group(self, group, first_start, start_interval, one_minute_qty):
         current_race = self.race
         persons = current_race.get_persons_by_group(group)
         current_start = first_start
+        one_minute_count = 0
         if persons is not None:
             for current_person in persons:
                 current_person.start_time = current_start
-                current_start = current_start + start_interval
+                one_minute_count += 1
+                if one_minute_count >= one_minute_qty:
+                    current_start = current_start + start_interval
+                    one_minute_count = 0
+
+        if one_minute_count > 0:
+            current_start = current_start + start_interval
         return current_start
 
-    def process_corridor(self, corridor, first_start, start_interval):
+    def process_corridor(self, corridor, first_start, start_interval, one_minute_qty):
         current_race = self.race
         persons = current_race.get_persons_by_corridor(corridor)
         if persons is not None:
             current_start = first_start
+            one_minute_count = 0
             for current_person in persons:
                 current_person.start_time = current_start
-                current_start = current_start + start_interval
+                one_minute_count += 1
+                if one_minute_count >= one_minute_qty:
+                    current_start = current_start + start_interval
+                    one_minute_count = 0
 
 
 def get_corridors():
@@ -488,6 +500,13 @@ def copy_bib_to_card_number():
     for person in obj.persons:
         if person.bib:
             person.card_number = person.bib
+
+
+def copy_card_number_to_bib():
+    obj = race()
+    for person in obj.persons:
+        if person.card_number:
+            person.bib = person.card_number
 
 
 def clone_relay_legs(min_bib, max_bib, increment):
