@@ -189,16 +189,23 @@ class GroupSplits(object):
             return
 
         leader_time = self.person_splits[0].get_leg_time(index)
-
+        
+        double_places_counter = 0
+        prev_split_time = leader_time
         for i in range(len(self.person_splits)):
             person = self.person_splits[i]
             leg = person.get_leg_by_course_index(index)
             if leg:
-                if relative:
-                    leg.relative_place = i + 1
+                if i != 0 and prev_split_time == leg.leg_time:
+                    double_places_counter += 1
                 else:
-                    leg.leg_place = i + 1
+                    double_places_counter = 0
+                if relative:
+                    leg.relative_place = i + 1 - double_places_counter
+                else:
+                    leg.leg_place = i + 1 - double_places_counter
                     leg.leader_time = leader_time
+                prev_split_time = leg.leg_time
 
     def set_leg_leader(self, index, person_split):
         self.leader[str(index)] = (person_split.person.name, person_split.get_leg_time(index))

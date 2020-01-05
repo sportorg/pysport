@@ -3,6 +3,7 @@
 __pycache__/
 build
 Output
+venv
 dist
 log/
 
@@ -11,6 +12,7 @@ data/*
 /*.exe
 *.bat
 *.cmd
+*.pyc
 SportOrg.spec
 
 resource.syso

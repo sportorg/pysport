@@ -28,11 +28,11 @@ class StartPreparationDialog(QDialog):
         self.setWindowIcon(QtGui.QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(True)
-        self.resize(639, 322)
+        self.resize(639, 352)
         self.setFixedSize(self.size())
 
         self.button_box = QtWidgets.QDialogButtonBox(self)
-        self.button_box.setGeometry(QtCore.QRect(40, 280, 341, 32))
+        self.button_box.setGeometry(QtCore.QRect(40, 310, 341, 32))
         self.button_box.setOrientation(QtCore.Qt.Horizontal)
         self.button_box.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel | QtWidgets.QDialogButtonBox.Ok)
 
@@ -89,9 +89,9 @@ class StartPreparationDialog(QDialog):
         self.draw_check_box.stateChanged.connect(self.draw_activate)
 
         self.start_group_box = QtWidgets.QGroupBox(self)
-        self.start_group_box.setGeometry(QtCore.QRect(8, 120, 311, 121))
+        self.start_group_box.setGeometry(QtCore.QRect(8, 120, 311, 151))
         self.widget_start = QtWidgets.QWidget(self.start_group_box)
-        self.widget_start.setGeometry(QtCore.QRect(18, 16, 256, 94))
+        self.widget_start.setGeometry(QtCore.QRect(18, 16, 256, 124))
         self.start_layout = QtWidgets.QFormLayout(self.widget_start)
         self.start_layout.setContentsMargins(0, 0, 0, 0)
         self.start_check_box = QtWidgets.QCheckBox(self.widget_start)
@@ -109,14 +109,20 @@ class StartPreparationDialog(QDialog):
         self.start_interval_time_edit.setEnabled(False)
         self.start_interval_time_edit.setDisplayFormat(self.time_format)
         self.start_layout.setWidget(2, QtWidgets.QFormLayout.FieldRole, self.start_interval_time_edit)
-        self.start_group_settings_radion_button = QtWidgets.QRadioButton(self.widget_start)
-        self.start_group_settings_radion_button.setEnabled(False)
-        self.start_group_settings_radion_button.setChecked(False)
-        self.start_layout.setWidget(3, QtWidgets.QFormLayout.SpanningRole, self.start_group_settings_radion_button)
+        self.start_group_settings_radio_button = QtWidgets.QRadioButton(self.widget_start)
+        self.start_group_settings_radio_button.setEnabled(False)
+        self.start_group_settings_radio_button.setChecked(False)
+        self.start_layout.setWidget(3, QtWidgets.QFormLayout.SpanningRole, self.start_group_settings_radio_button)
+        self.start_one_minute_qty_label = QtWidgets.QLabel(self.widget_start)
+        self.start_layout.setWidget(4, QtWidgets.QFormLayout.LabelRole, self.start_one_minute_qty_label)
+        self.start_one_minute_qty = QtWidgets.QSpinBox(self.widget_start)
+        self.start_one_minute_qty.setValue(1)
+        self.start_one_minute_qty.setMaximum(100)
+        self.start_layout.setWidget(4, QtWidgets.QFormLayout.FieldRole, self.start_one_minute_qty)
         self.start_check_box.stateChanged.connect(self.start_activate)
 
         self.numbers_group_box = QtWidgets.QGroupBox(self)
-        self.numbers_group_box.setGeometry(QtCore.QRect(322, 120, 311, 121))
+        self.numbers_group_box.setGeometry(QtCore.QRect(322, 120, 311, 151))
         self.widget_numbers = QtWidgets.QWidget(self.numbers_group_box)
         self.widget_numbers.setGeometry(QtCore.QRect(18, 16, 256, 94))
         self.numbers_vert_layout = QtWidgets.QVBoxLayout(self.widget_numbers)
@@ -159,7 +165,7 @@ class StartPreparationDialog(QDialog):
         self.numbers_interval_radio_button.raise_()
 
         self.progress_bar = QtWidgets.QProgressBar(self)
-        self.progress_bar.setGeometry(QtCore.QRect(10, 250, 621, 23))
+        self.progress_bar.setGeometry(QtCore.QRect(10, 280, 621, 23))
         self.progress_bar.setProperty("value", 0)
 
         self.button_box.raise_()
@@ -193,7 +199,8 @@ class StartPreparationDialog(QDialog):
         self.start_check_box.setText(_("Change start time"))
         self.start_first_label.setText(_("First start in corridor"))
         self.start_interval_radio_button.setText(_("Fixed start interval"))
-        self.start_group_settings_radion_button.setText(_("Take start interval from group settings"))
+        self.start_group_settings_radio_button.setText(_("Take start interval from group settings"))
+        self.start_one_minute_qty_label.setText(_("Several athletes on one minute"))
         self.numbers_group_box.setTitle(_("Start numbers"))
         self.numbers_check_box.setText(_("Change start numbers"))
         self.numbers_interval_radio_button.setText(_("First number"))
@@ -217,10 +224,13 @@ class StartPreparationDialog(QDialog):
 
     def start_activate(self):
         status = self.start_check_box.isChecked()
+        self.start_first_label.setEnabled(status)
         self.start_first_time_edit.setEnabled(status)
-        self.start_group_settings_radion_button.setEnabled(status)
+        self.start_group_settings_radio_button.setEnabled(status)
         self.start_interval_radio_button.setEnabled(status)
         self.start_interval_time_edit.setEnabled(status)
+        self.start_one_minute_qty_label.setEnabled(status)
+        self.start_one_minute_qty.setEnabled(status)
 
     def draw_activate(self):
         status = self.draw_check_box.isChecked()
@@ -259,11 +269,13 @@ class StartPreparationDialog(QDialog):
 
                 corridor_first_start = time_to_otime(self.start_first_time_edit.time())
                 fixed_start_interval = time_to_otime(self.start_interval_time_edit.time())
+                one_minute_qty = self.start_one_minute_qty.value()
                 if self.start_interval_radio_button.isChecked():
-                    StartTimeManager(obj).process(corridor_first_start, False, fixed_start_interval, mix_groups=mix_groups)
+                    StartTimeManager(obj).process(corridor_first_start, False, fixed_start_interval, one_minute_qty,
+                                                  mix_groups=mix_groups)
 
-                if self.start_group_settings_radion_button.isChecked():
-                    StartTimeManager(obj).process(corridor_first_start, True, fixed_start_interval)
+                if self.start_group_settings_radio_button.isChecked():
+                    StartTimeManager(obj).process(corridor_first_start, True, fixed_start_interval, one_minute_qty)
 
             self.progress_bar.setValue(75)
             sleep(progressbar_delay)
@@ -302,6 +314,7 @@ class StartPreparationDialog(QDialog):
         obj.set_setting('is_fixed_start_interval', self.start_interval_radio_button.isChecked())
         obj.set_setting('start_interval', time_to_otime(self.start_interval_time_edit.time()).to_msec())
         obj.set_setting('start_first_time', time_to_otime(self.start_first_time_edit.time()).to_msec())
+        obj.set_setting('start_one_minute_qty', self.start_one_minute_qty.value())
 
         obj.set_setting('is_start_preparation_numbers', self.numbers_check_box.isChecked())
         obj.set_setting('is_fixed_number_interval', self.numbers_interval_radio_button.isChecked())
@@ -329,11 +342,12 @@ class StartPreparationDialog(QDialog):
         if obj.get_setting('is_fixed_start_interval', True):
             self.start_interval_radio_button.setChecked(True)
         else:
-            self.start_group_settings_radion_button.setChecked(True)
+            self.start_group_settings_radio_button.setChecked(True)
         t = OTime(msec=obj.get_setting('start_interval', 60000))
         self.start_interval_time_edit.setTime(QTime(t.hour, t.minute, t.sec))
         t = OTime(msec=obj.get_setting('start_first_time', 60000))
         self.start_first_time_edit.setTime(QTime(t.hour, t.minute, t.sec))
+        self.start_one_minute_qty.setValue(obj.get_setting('start_one_minute_qty', 1))
 
         self.numbers_check_box.setChecked(obj.get_setting('is_start_preparation_numbers', False))
         if obj.get_setting('is_fixed_number_interval', True):
@@ -345,6 +359,10 @@ class StartPreparationDialog(QDialog):
         self.numbers_interval_spin_box.setValue(obj.get_setting('numbers_interval', 1))
         self.numbers_first_spin_box.setValue(obj.get_setting('numbers_first', 1))
 
+        self.draw_activate()
+        self.number_activate()
+        self.start_activate()
+        self.reserve_activate()
 
 def guess_courses_for_groups():
     obj = race()

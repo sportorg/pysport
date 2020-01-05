@@ -2,7 +2,7 @@ import logging
 
 from sportorg.common.otime import OTime
 from sportorg.models.constant import StatusComments
-from sportorg.models.memory import Person, ResultStatus, race, Result, find
+from sportorg.models.memory import Person, ResultStatus, race, Result, find, Split
 
 
 class ResultCheckerException(Exception):
@@ -25,11 +25,12 @@ class ResultChecker:
             result.scores = self.calculate_scores_rogain(result)
             return True
 
+        course = race().find_course(result)
+
         if race().get_setting('marked_route_dont_dsq', False):
             # mode: competition without disqualification for mispunching (add penalty for missing cp)
+            result.check(course)
             return True
-
-        course = race().find_course(result)
 
         if course is None:
             if self.person.group.is_any_course:
@@ -86,11 +87,16 @@ class ResultChecker:
 
         controls = course.controls
 
-        penalty = ResultChecker.penalty_calculation(result.splits, controls, check_existence=True)
+        if race().get_setting('marked_route_dont_dsq', False):
+            # free order, don't penalty for extra cp
+            penalty = ResultChecker.penalty_calculation_free_order(result.splits, controls)
+        else:
+            # marked route with penalty
+            penalty = ResultChecker.penalty_calculation(result.splits, controls, check_existence=True)
 
         if race().get_setting('marked_route_max_penalty_by_cp', False):
             # limit the penalty by quantity of controls
-            penalty = min (len(controls), penalty)
+            penalty = min(len(controls), penalty)
 
         if mode == 'laps':
             result.penalty_laps = penalty
@@ -145,6 +151,38 @@ class ResultChecker:
 
         # now user_array contains only incorrect and duplicated values
         res += len(user_array)
+
+        return res
+
+    @staticmethod
+    def penalty_calculation_free_order(splits, controls):
+        """:return quantity penalty, duplication checked
+            origin: * ,* ,* ; athlete: 31,41,51; result:0
+            origin: * ,* ,* ; athlete: 31,31,51; result:1
+            origin: * ,* ,* ; athlete: 31,31,31; result:2
+            origin: * ,* ,* ; athlete: 31; result:2
+
+            support of first/last mandatory cp
+            origin: 40,* ,* ,90; athlete: 40,31,32,90; result:0
+            origin: 40,* ,* ,90; athlete: 40,31,40,90; result:1
+            origin: 40,* ,* ,90; athlete: 40,40,40,90; result:2
+            origin: 40,* ,* ,90; athlete: 40,90,90,90; result:2
+            origin: 40,* ,* ,90; athlete: 31,32,33,90; result:4
+            origin: 40,* ,* ,90; athlete: 31,40,31,90; result:1
+            origin: 40,* ,* ,90; athlete: 31,40,90,41; result:1
+            origin: 40,* ,* ,90; athlete: 31,40,31,32; result:1
+            origin: 40,* ,* ,90; athlete: 31,40,31,40; result:2
+            origin: 40,* ,* ,90; athlete: 40,40,90,90; result:2
+            origin: 40,* ,* ,90; athlete: 40,41,90,90; result:0 TODO:1 - only one incorrect case
+        """
+        res = 0
+        correct_count = 0
+        for i in splits:
+            assert isinstance(i, Split)
+            if not i.has_penalty:
+                correct_count += 1
+
+        res += len(controls) - correct_count
 
         return res
 

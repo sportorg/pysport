@@ -110,6 +110,7 @@ class ResultCalculation(object):
             for cur_team in teams_sorted:
                 cur_team.set_place(place)
                 place += 1
+                cur_team.set_start_times()
             return relay_teams.values()
 
     def set_rank(self, group):

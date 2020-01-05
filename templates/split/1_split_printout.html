@@ -155,7 +155,11 @@
                     <td>{{leg.relative_time|tohhmmss}}</td>
                     <td>{{leg.leg_time|tohhmmss('%M:%S')}}</td>
                     <td>{{leg.speed}}</td>
-                    <td>{{leg.leg_place}}</td>
+                    {% if leg.leg_place %}
+                        <td>{{leg.leg_place}}</td>
+                     {% else %}
+                        <td></td>
+                    {% endif %}    
                     <td></td>
                 </tr>
             {% else %}

@@ -1,3 +1,4 @@
+import re
 import datetime
 import time
 import uuid
@@ -12,6 +13,7 @@ from sportorg.common.model import Model
 from sportorg.common.otime import OTime
 from sportorg.language import _
 from sportorg.modules.configs.configs import Config
+from sportorg.utils.time import hhmmss_to_time
 
 
 class NotEmptyException(Exception):
@@ -382,6 +384,7 @@ class Split(Model):
         self.leg_place = 0
         self.relative_place = 0
         self.is_correct = True
+        self.has_penalty = False
         self.speed = ''
         self.length_leg = 0
 
@@ -532,9 +535,11 @@ class Result:
             'scores': self.scores,  # readonly
             'created_at': self.created_at,  # readonly
             'result': self.get_result(),  # readonly
+            'result_relay': self.get_result_relay(),
             'start_msec': self.get_start_time().to_msec(),  # readonly
             'finish_msec': self.get_finish_time().to_msec(),  # readonly
             'result_msec': self.get_result_otime().to_msec(),  # readonly
+            'result_relay_msec': self.get_result_otime_relay().to_msec(),  # readonly
 
             'can_win_count': self.can_win_count,
             'final_result_time': self.final_result_time.to_str() if self.final_result_time else None,
@@ -601,6 +606,53 @@ class Result:
         ret += self.get_result_otime().to_str(time_accuracy)
         return ret
 
+    def get_result_start_in_comment(self):
+        if not self.is_status_ok():
+            if self.status_comment:
+                return self.status_comment
+            return self.status.get_title()
+
+        if not self.person:
+            return ''
+
+        ret = ''
+        if race().get_setting('result_processing_mode', 'time') == 'scores':
+            ret += str(self.scores) + ' ' + _('points') + ' '
+
+        time_accuracy = race().get_setting('time_accuracy', 0)
+        start = hhmmss_to_time(self.person.comment)
+        if start == OTime():
+            raise ValueError
+        ret += str(self.get_finish_time() - start)
+        return ret
+
+    def get_result_relay(self):
+        if not self.is_status_ok():
+            if self.status_comment:
+                return self.status_comment
+            return self.status.get_title()
+
+        if not self.person:
+            return ''
+
+        # Check previous legs not to be disqualified
+        if self.person.bib > 2000 and self.person.group and self.person.group.is_relay():
+            cur_bib = self.person.bib - 1000
+            while cur_bib > 1000:
+                prev_person = find(race().persons, bib=cur_bib)
+                res = race().find_person_result(prev_person)
+                if res and not res.is_status_ok():
+                    return res.status.get_title()
+                cur_bib -= 1000
+
+        ret = ''
+        if race().get_setting('result_processing_mode', 'time') == 'scores':
+            ret += str(self.scores) + ' ' + _('points') + ' '
+
+        time_accuracy = race().get_setting('time_accuracy', 0)
+        ret += self.get_result_otime_relay().to_str(time_accuracy)
+        return ret
+
     def get_result_for_sort(self):
         ret = self.get_result_otime()
         return self.status, ret.to_msec()
@@ -612,11 +664,30 @@ class Result:
         ret_ms -= self.get_credit_time().to_msec(time_accuracy)
         return OTime(msec=ret_ms)
 
+    def get_result_otime_relay(self):
+        time_accuracy = race().get_setting('time_accuracy', 0)
+        ret_ms = self.get_finish_time().to_msec(time_accuracy) - self.get_start_time_relay().to_msec(time_accuracy)
+        ret_ms += self.get_penalty_time().to_msec(time_accuracy)
+        ret_ms -= self.get_credit_time().to_msec(time_accuracy)
+        return OTime(msec=ret_ms)
+
     def get_start_time(self):
         if self.start_time and self.start_time.to_msec():
             return self.start_time
         if self.person and self.person.start_time and self.person.start_time.to_msec():
             return self.person.start_time
+        return OTime()
+
+    # Find the start time or relay team = start time of first leg
+    def get_start_time_relay(self):
+        if self.person:
+            first_leg_person = self.person
+            if self.person.bib > 2000 and self.person.group and self.person.group.is_relay():
+                bib_to_find = 1000 + self.person.bib % 1000
+                first_leg_person = find(race().persons, bib=bib_to_find)
+            if first_leg_person:
+                if first_leg_person.start_time and first_leg_person.start_time.to_msec():
+                    return first_leg_person.start_time
         return OTime()
 
     def get_finish_time(self):
@@ -791,12 +862,14 @@ class ResultSportident(Result):
         if count_controls == 0:
             return True
 
-        # list of indexes, coincide with course, used for mixed course order1
+        # list of indexes, coincide with course, used for mixed course order
         recognized_indexes = []
 
         # invalidate all splits before check
         for i in self.splits:
             i.is_correct = False
+            i.has_penalty = True
+            i.course_index = -1
 
         for i in range(len(self.splits)):
             try:
@@ -810,16 +883,22 @@ class ResultSportident(Result):
                 ind_end = template.find(')')
                 if ind_begin > 0 and ind_end > 0:
                     list_exists = True
-                    # any control from the list e.g. '%(31,32,33)'
-                    arr = template[ind_begin + 1:ind_end].split(',')
-                    if str(cur_code) in arr:
-                        list_contains = True
+                    # any control from the list e.g. '%(31,32,35-45)'
+                    arr = re.split(r'\s*,\s*', template[ind_begin + 1:ind_end])
+                    for cp in arr:
+                        cp_range = re.split(r'\s*-\s*', cp)
+                        if int(cur_code) == int(cp_range[0]):
+                            list_contains = True
+                        elif len(cp_range) > 1:
+                            if int(cur_code) > int(cp_range[0]) and int(cur_code) <= int(cp_range[len(cp_range)-1]):
+                                list_contains = True
 
                 if template.find('%') > -1:
                     # non-unique control
                     if not list_exists or list_contains:
                         # any control '%' or '%(31,32,33)' or '31%'
                         split.is_correct = True
+                        split.has_penalty = False
                         recognized_indexes.append(i)
                         course_index += 1
 
@@ -830,13 +909,24 @@ class ResultSportident(Result):
                         continue
                     # test previous splits
                     is_unique = True
+                    course_index_current = -1
                     for j in range(i):
                         prev_split = self.splits[j]
+
+                        if prev_split.is_correct:
+                            course_index_current += 1
+
                         if prev_split.code == cur_code and j in recognized_indexes:
+
+                            if course_index_current < 0 or str(controls[course_index_current].code).find('*') < 0:
+                                # check only free order controls to be duplicated
+                                continue
+
                             is_unique = False
                             break
                     if is_unique:
                         split.is_correct = True
+                        split.has_penalty = False
                         recognized_indexes.append(i)
                         course_index += 1
 
@@ -847,12 +937,18 @@ class ResultSportident(Result):
                         if list_contains:
                             split.is_correct = True
                             recognized_indexes.append(i)
+
+                            correct_code = str(controls[course_index].code).split('(')[0].strip()
+                            if split.code == correct_code:
+                                split.has_penalty = False
+
                             course_index += 1
                     else:
                         # just cp '31 989'
                         is_equal = str(cur_code) == controls[course_index].code
                         if is_equal:
                             split.is_correct = True
+                            split.has_penalty = False
                             recognized_indexes.append(i)
                             course_index += 1
 
@@ -863,6 +959,57 @@ class ResultSportident(Result):
                 return False
 
         return False
+
+    def merge_with(self, new_result):
+        # Merge with new result (merge splits, backup old finish/start, use new finish/start as finish/start)
+        tolerance_sec = 10
+        start_code = '10'
+        finish_code = '20'
+
+        is_changed = False
+
+        # backup old start as punch
+        if self.start_time and new_result.start_time and self.start_time > OTime():
+            if abs(new_result.start_time.to_sec() - self.start_time.to_sec()) > tolerance_sec:
+                i = 0
+                while i < len(self.splits) and self.splits[i].code == start_code:
+                    i += 1
+                backup_start = Split()
+                backup_start.code = start_code
+                backup_start.time = self.start_time
+                self.splits.insert(i, backup_start)
+                self.start_time = new_result.start_time
+                is_changed = True
+
+        # backup old finish as punch
+        if self.finish_time and new_result.finish_time and self.finish_time > OTime():
+            if abs(new_result.finish_time.to_sec() - self.finish_time.to_sec()) > tolerance_sec:
+                backup_finish = Split()
+                backup_finish.time = self.finish_time
+                backup_finish.code = finish_code
+                self.splits.append(backup_finish)
+                self.finish_time = new_result.finish_time
+                is_changed = True
+
+        # skip duplicated punches, then append different
+        offset = 0
+        for punch_new in new_result.splits:
+            exists = False
+            for punch_old in self.splits:
+                if punch_new.code == punch_old.code:
+                    if abs(punch_new.time.to_sec() - punch_old.time.to_sec()) < tolerance_sec:
+                        exists = True
+                        break
+            if not exists:
+                break
+            offset += 1
+        if offset < len(new_result.splits):
+            is_changed = True
+            for split in new_result.splits[offset:]:
+                self.splits.append(split)
+
+        return is_changed
+
 
 
 class ResultSFR(ResultSportident):
@@ -1561,6 +1708,12 @@ class RelayLeg(object):
         self.course = None  # optional link to the course, prefer to use variant and bib to find course
         self.team = team
 
+    def __eq__(self, other):
+        return self.leg == other.leg
+
+    def __gt__(self, other):
+        return self.leg > other.leg
+
     def get_course(self):
         """Get the course to check control order. Try to use bib and variant to find course"""
         bib = self.get_bib()
@@ -1593,7 +1746,9 @@ class RelayLeg(object):
         if self.leg > 1:
             team = self.get_relay_team()
             if team and isinstance(team, RelayTeam):
-                return team.legs[self.leg - 1]
+                for cur_leg in team.legs:
+                    if cur_leg.leg == self.leg - 1:
+                        return cur_leg
         return None
 
     def get_bib(self):
@@ -1732,6 +1887,7 @@ class RelayTeam(object):
         leg = RelayLeg(self)
         leg.set_result(result)
         leg.set_person(result.person)
+        leg.leg = result.person.bib // 1000
         self.legs.append(leg)
 
     def set_leg_for_person(self, person, leg):
@@ -1747,12 +1903,18 @@ class RelayTeam(object):
             assert isinstance(i, RelayLeg)
             i.set_start_time_from_previous()
 
+    def get_leg(self, leg_number):
+        for i in self.legs:
+            if i.leg == leg_number:
+                return i
+        return None
+
     def get_time(self):
         if len(self.legs):
             last_correct_leg = self.get_correct_lap_count()
             if last_correct_leg > 0:
-                last_finish = self.legs[last_correct_leg - 1].get_finish_time()
-                start = self.legs[0].get_start_time()
+                last_finish = self.get_leg(last_correct_leg).get_finish_time()
+                start = self.get_leg(1).get_start_time()
                 return last_finish - start
         return OTime()
 
@@ -1763,14 +1925,15 @@ class RelayTeam(object):
             assert isinstance(leg, RelayLeg)
             if leg.is_finished():
                 finished_qty += 1
-            else:
-                return finished_qty
         return finished_qty
 
     def get_correct_lap_count(self):
         """quantity of successfully finished laps"""
         correct_qty = 0
-        for leg in self.legs:
+        for i in range(len(self.legs)):
+            leg = self.get_leg(i + 1)
+            if not leg:
+                return correct_qty
             assert isinstance(leg, RelayLeg)
             if leg.is_correct():
                 correct_qty += 1

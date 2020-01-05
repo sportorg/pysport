@@ -2,10 +2,8 @@ import ast
 import logging
 import time
 from queue import Queue
-from threading import main_thread
-
 from PySide2 import QtCore, QtGui, QtWidgets
-from PySide2.QtCore import QModelIndex, QItemSelectionModel, QThread, Signal
+from PySide2.QtCore import QModelIndex, QItemSelectionModel, QTimer, Signal
 from PySide2.QtWidgets import QMainWindow, QTableView, QMessageBox
 
 from sportorg import config
@@ -39,18 +37,6 @@ from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.modules.sportiduino.sportiduino import SportiduinoClient
 from sportorg.modules.teamwork import Teamwork
 from sportorg.modules.telegram.telegram import TelegramClient
-
-
-@singleton
-class ServiceListenerThread(QThread):
-    interval = Signal()
-
-    def run(self):
-        while True:
-            time.sleep(1)
-            if not main_thread().is_alive():
-                break
-            self.interval.emit()
 
 
 class ConsolePanelHandler(logging.Handler):
@@ -157,8 +143,9 @@ class MainWindow(QMainWindow):
         SportiduinoClient().set_call(self.add_sportiduino_result_from_reader)
         SFRReaderClient().set_call(self.add_sfr_result_from_reader)
 
-        ServiceListenerThread().interval.connect(self.interval)
-        ServiceListenerThread().start()
+        self.service_timer = QTimer(self)
+        self.service_timer.timeout.connect(self.interval)
+        self.service_timer.start(1000) # msec
         LiveClient().init()
         self._menu_disable(self.current_tab)
 
@@ -429,7 +416,9 @@ class MainWindow(QMainWindow):
             assignment_mode = race().get_setting('system_assignment_mode', False)
             if not assignment_mode:
                 self.clear_filters(remove_condition=False)
-                if ResultSportidentGeneration(result).add_result():
+                rg = ResultSportidentGeneration(result)
+                if rg.add_result():
+                    result = rg.get_result()
                     ResultCalculation(race()).process_results()
                     if race().get_setting('split_printout', False):
                         try:
@@ -487,6 +476,9 @@ class MainWindow(QMainWindow):
         try:
             race().update_data(command.data)
             logging.info(repr(command.data))
+            if 'object' in command.data and command.data['object'] in ['ResultManual', 'ResultSportident', 'ResultSFR', 'ResultSportiduino']:
+                ResultCalculation(race()).process_results()
+            Broker().produce('teamwork_recieving', command.data)
             self.refresh()
         except Exception as e:
             logging.error(str(e))
