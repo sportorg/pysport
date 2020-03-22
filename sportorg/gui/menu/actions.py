@@ -190,7 +190,7 @@ class IOFResultListExportAction(Action, metaclass=ActionFactory):
             try:
                 iof_xml.export_result_list(file_name)
             except Exception as e:
-                logging.error(str(e))
+                logging.exception(str(e))
                 QMessageBox.warning(self.app, _('Error'), _('Export error') + ': ' + file_name)
 
 

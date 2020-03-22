@@ -81,15 +81,15 @@ def menu_list():
                             'title': _('WDB Winorient'),
                             'action': 'WDBWinorientExportAction'
                         },
-                        # {
-                        #     'title': 'IOF xml',
-                        #     'actions': [
-                        #         {
-                        #             'title': _('ResultList'),
-                        #             'action': 'IOFResultListExportAction'
-                        #         }
-                        #     ]
-                        # },
+                        {
+                            'title': 'IOF xml',
+                            'actions': [
+                                {
+                                    'title': _('ResultList'),
+                                    'action': 'IOFResultListExportAction'
+                                }
+                            ]
+                        },
                     ]
                 }
             ]

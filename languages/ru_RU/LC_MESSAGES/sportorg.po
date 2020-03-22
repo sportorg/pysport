@@ -1374,3 +1374,9 @@ msgstr "Ctrl+K на группах - отправка стартового пр�
 
 msgid "Several athletes on one minute"
 msgstr "Несколько участников на 1 минуте"
+
+msgid "IOF id"
+msgstr "Код IOF Id"
+
+msgid "National id"
+msgstr "Национальный Id"

@@ -11,7 +11,8 @@ from sportorg.utils.time import time_to_hhmmss, hhmmss_to_time
 
 def get_value_options():
     return [_('Start'), _('Finish'), _('Result'), _('Credit'), _('Penalty time'), _('Penalty legs'), _('Card number'),
-            _('Group'), _('Team'), _('Qualification'), _('Bib'), _('Comment')]
+            _('Group'), _('Team'), _('Qualification'), _('Bib'), _('Comment'), _('Start group'), _('IOF id'),
+            _('National id')]
 
 
 def get_readonly_options():
@@ -313,6 +314,12 @@ def get_property(person, key):
         return str(person.bib)
     elif key == _('Comment'):
         return str(person.comment)
+    elif key == _('IOF id'):
+        return str(person.world_code)
+    elif key == _('National id'):
+        return str(person.national_code)
+    elif key == _('Start group'):
+        return str(person.start_group)
 
     return ''
 
@@ -370,3 +377,12 @@ def set_property(person, key, value, **options):
             person.bib = new_bib
     elif key == _('Comment'):
         person.comment = value
+    elif key == _('IOF id'):
+        if str(value).isdigit():
+            person.world_code = int(value)
+    elif key == _('National id'):
+        if str(value).isdigit():
+            person.national_code = int(value)
+    elif key == _('Start group'):
+        if str(value).isdigit():
+            person.start_group = int(value)

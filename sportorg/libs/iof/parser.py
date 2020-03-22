@@ -64,6 +64,7 @@ def entry_list(tree, ns):
     for person_entry_el in root.findall('iof:PersonEntry', ns):
         person_el = person_entry_el.find('iof:Person', ns)
         birth_date_el = person_el.find('iof:BirthDate', ns)
+        id_el = person_el.find('iof:Id', ns)
         person = {
             'family': person_el.find('iof:Name', ns).find('iof:Family', ns).text,
             'given': person_el.find('iof:Name', ns).find('iof:Given', ns).text,
@@ -71,6 +72,9 @@ def entry_list(tree, ns):
         }
         if birth_date_el is not None:
             person['birth_date'] = birth_date_el.text
+        if id_el is not None:
+            person['id'] = id_el.text
+
         extensions_el = person_el.find('iof:Extensions', ns)
         if extensions_el:
             qual_el = extensions_el.find('orgeo:Qual', ns)

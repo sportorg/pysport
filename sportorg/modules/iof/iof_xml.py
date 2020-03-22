@@ -1,12 +1,10 @@
 import logging
-from datetime import datetime
 
 import dateutil.parser
 
-from sportorg import config
 from sportorg.language import _
+from sportorg.libs.iof.generator import generate_result_list
 
-from sportorg.libs.iof.iof import ResultList
 from sportorg.libs.iof.parser import parse
 
 from sportorg.models.memory import race, Group, find, Organization, Person, Qualification, create, Course, CourseControl
@@ -14,14 +12,9 @@ from sportorg.models.memory import race, Group, find, Organization, Person, Qual
 
 def export_result_list(file):
     obj = race()
-    result_list = ResultList()
-    result_list.iof.creator = config.NAME
-    result_list.iof.create_time = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
-    result_list.event.name.value = obj.data.name
-    if obj.data.start_time is not None:
-        result_list.event.start_time.date.value = obj.data.start_time.strftime("%Y-%m-%d")
-        result_list.event.start_time.time.value = obj.data.start_time.strftime("%H:%M:%S")
-    # TODO
+
+    result_list = generate_result_list(obj)
+
     result_list.write(open(file, 'wb'), xml_declaration=True, encoding='UTF-8')
 
 
@@ -90,6 +83,10 @@ def import_from_entry_list(entries):
         person = Person()
         person.surname = person_entry['person']['family']
         person.name = person_entry['person']['given']
+
+        if 'id' in person_entry['person']:
+            person.world_code = int(person_entry['person']['id'])
+
         name = person_entry['group']['name']
         if 'short_name' in person_entry['group']:
             name = person_entry['group']['short_name']
