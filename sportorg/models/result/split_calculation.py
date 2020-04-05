@@ -194,8 +194,7 @@ class GroupSplits(object):
 
             double_places_counter = 0
             prev_split_time = leader_time
-            for i in range(len(self.person_splits)):
-                person = self.person_splits[i]
+            for i, person in enumerate(self.person_splits):
                 leg = person.get_leg_by_course_index(index)
                 if leg:
                     if i != 0 and prev_split_time == leg.relative_time:
@@ -211,8 +210,7 @@ class GroupSplits(object):
 
             double_places_counter = 0
             prev_split_time = leader_time
-            for i in range(len(self.person_splits)):
-                person = self.person_splits[i]
+            for i, person in enumerate(self.person_splits):
                 leg = person.get_leg_by_course_index(index)
                 if leg:
                     if i != 0 and prev_split_time == leg.leg_time:
