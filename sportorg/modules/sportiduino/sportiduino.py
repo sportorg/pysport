@@ -96,9 +96,9 @@ class ResultThread(QThread):
                 split.days = memory.race().get_days(t)
                 result.splits.append(split)
 
-        if card_data['start']:
+        if 'start' in card_data and card_data['start']:
             result.start_time = time_to_otime(card_data['start'])
-        if card_data['finish']:
+        if 'finish' in card_data and card_data['finish']:
             result.finish_time = time_to_otime(card_data['finish'])
 
         return result
