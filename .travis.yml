@@ -10,4 +10,4 @@ script:
   - python setup.py build
 branches:
   only:
-    - dev
+    - develop
