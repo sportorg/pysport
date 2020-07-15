@@ -397,13 +397,6 @@ def menu_list():
                     'title': _('Check updates'),
                     'action': 'CheckUpdatesAction'
                 },
-                {
-                    'title': _('Testing'),
-                    'show': config.DEBUG and not config.is_executable(),
-                    'shortcut': 'F10',
-                    'action': 'TestingAction',
-                    'debug': True
-                }
             ]
         },
     ]

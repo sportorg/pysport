@@ -40,7 +40,6 @@ from sportorg.models.memory import race, ResultStatus, ResultManual, find
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.result_checker import ResultChecker
 from sportorg.models.start.start_preparation import guess_corridors_for_groups, copy_bib_to_card_number, copy_card_number_to_bib
-from sportorg.modules import testing
 from sportorg.modules.backup.json import get_races_from_file
 from sportorg.modules.iof import iof_xml
 from sportorg.modules.ocad import ocad
@@ -590,11 +589,6 @@ class CheckUpdatesAction(Action, metaclass=ActionFactory):
         except Exception as e:
             logging.error(str(e))
             QMessageBox.warning(self.app, _('Error'), str(e))
-
-
-class TestingAction(Action, metaclass=ActionFactory):
-    def execute(self):
-        testing.test()
 
 
 class AssignResultByBibAction(Action, metaclass=ActionFactory):
