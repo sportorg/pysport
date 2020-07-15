@@ -91,13 +91,13 @@ CONFIG_INI = data_dir('config.ini')
 
 LOCALE_DIR = base_dir('languages')
 
-NAMES_FILE = base_dir('names.txt')
+NAMES_FILE = base_dir('configs', 'names.txt')
 
-REGIONS_FILE = base_dir('regions.txt')
+REGIONS_FILE = base_dir('configs', 'regions.txt')
 
-STATUS_COMMENTS_FILE = base_dir('status_comments.txt')
+STATUS_COMMENTS_FILE = base_dir('configs', 'status_comments.txt')
 
-RANKING_SCORE_FILE = base_dir('ranking.txt')
+RANKING_SCORE_FILE = base_dir('configs', 'ranking.txt')
 
 DIRS = [
     IMG_DIR,
