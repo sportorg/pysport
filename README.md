@@ -1,5 +1,5 @@
 [![Build Status](https://api.travis-ci.org/sportorg/pysport.svg?branch=develop)](https://travis-ci.org/sportorg/pysport)
-[![Python 3.7](https://img.shields.io/badge/python-v3.7-blue.svg?logo=pythonlang)](https://www.python.org/downloads/)
+[![Python 3.8](https://img.shields.io/badge/python-v3.8-blue.svg?logo=pythonlang)](https://www.python.org/downloads/)
 [![License: GPL v3](https://img.shields.io/badge/license-GPLv3-blue.svg)](https://github.com/sportorg/pysport/blob/develop/LICENSE)
 [![Orienteering](https://img.shields.io/badge/sport-orienteering-blue.svg)](https://github.com/sportorg)
 [![Sportorg version](https://img.shields.io/github/v/release/sportorg/pysport)](https://github.com/sportorg/pysport)
