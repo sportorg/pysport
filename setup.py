@@ -8,8 +8,8 @@ if sys.platform == 'win32':
 
 include_files = [config.LOCALE_DIR, config.TEMPLATE_DIR, config.IMG_DIR, config.SOUND_DIR, config.base_dir('LICENSE'),
                  config.base_dir('changelog.md'), config.base_dir('changelog_ru.md'),
-                 config.base_dir('status_comments.txt'), config.base_dir('regions.txt'), config.base_dir('names.txt'),
-                 config.base_dir('ranking.txt'), config.SCRIPT_DIR, config.STYLE_DIR]
+                 config.STATUS_COMMENTS_FILE, config.REGIONS_FILE, config.NAMES_FILE,
+                 config.RANKING_SCORE_FILE, config.SCRIPT_DIR, config.STYLE_DIR]
 includes = ['atexit', 'codecs']
 excludes = ['Tkinter']
 

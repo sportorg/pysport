@@ -4,9 +4,10 @@ python:
 # command to install dependencies
 install:
   - pip install -r requirements.txt
+  - pip install pytest
 # command to run tests
 script:
-  - python SportOrg_test.py
+  - pytest --verbosity=2 --showlocals --strict --log-level=DEBUG
   - python setup.py build
 branches:
   only:
