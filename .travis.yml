@@ -1,14 +1,18 @@
 language: python
+
+cache: pip
+
 python:
-  - "3.7"
-# command to install dependencies
+  - "3.8"
+
 install:
-  - pip install -r requirements.txt
-  - pip install pytest
-# command to run tests
+  - pip install poetry codecov
+  - poetry install
+
 script:
   - pytest --verbosity=2 --showlocals --strict --log-level=DEBUG
-  - python setup.py build
+  - python setup_.py build
+
 branches:
   only:
     - develop

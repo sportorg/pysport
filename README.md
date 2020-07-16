@@ -8,7 +8,8 @@
 # SportOrg
 
 ```commandline
-pip install -r requirements.txt
+pip install poetry
+poetry install
 ```
 
 Run
@@ -27,4 +28,4 @@ python SportOrg.pyw
 
 ### cx_Freeze
 
-`python setup.py build`
+`python setup_.py build`
