@@ -33,33 +33,21 @@ class SystemType(Enum):
     SPORTIDUINO = 4
 
     def __str__(self):
-        return "%s" % self._name_
+        return self._name_
 
     def __repr__(self):
         return self.__str__()
 
 
-class PrintableValue(object):
-    def __init__(self, value, printable_name):
-        self.value = value
-        self.printable_name = printable_name
-
-
 class _TitleType(Enum):
-    def __new__(cls, value):
-        obj = object.__new__(cls)
-        obj._value_ = value.value
-        obj._title = value.printable_name
-        return obj
-
     def __str__(self):
-        return "%s" % self._name_
+        return self._name_
 
     def __repr__(self):
         return self.__str__()
 
     def get_title(self):
-        return self._title
+        return _(str(self).lower().capitalize().replace('_', ' '))
 
     @classmethod
     def get_titles(cls):
@@ -74,38 +62,38 @@ class _TitleType(Enum):
 
 
 class Sex(_TitleType):
-    MF = PrintableValue(0, _('MF'))
-    M = PrintableValue(1, _('M'))
-    F = PrintableValue(2, _('F'))
+    MF = 0
+    M = 1
+    F = 2
 
 
 class RaceType(_TitleType):
-    INDIVIDUAL_RACE = PrintableValue(0, _('Individual race'))
-    # MASS_START = PrintableValue(1, _('Mass start'))
-    # PURSUIT = PrintableValue(2, _('Pursuit'))
-    RELAY = PrintableValue(3, _('Relay'))
-    # ONE_MAN_RELAY = PrintableValue(4, _('One man relay'))
-    # SPRINT_RELAY = PrintableValue(5, _('Sprint relay'))
+    INDIVIDUAL_RACE = 0
+    # MASS_START = 1
+    # PURSUIT = 2
+    RELAY = 3
+    # ONE_MAN_RELAY = 4
+    # SPRINT_RELAY = 5
 
 
 class ResultStatus(_TitleType):
-    NONE = PrintableValue(0, _('None'))
-    OK = PrintableValue(1, _('OK'))
-    FINISHED = PrintableValue(2, _('Finished'))
-    DISQUALIFIED = PrintableValue(3, _('DSQ'))
-    MISSING_PUNCH = PrintableValue(4, _('Missing punch'))
-    DID_NOT_FINISH = PrintableValue(5, _('DNF'))
-    ACTIVE = PrintableValue(6, _('Active'))
-    INACTIVE = PrintableValue(7, _('Inactive'))
-    OVERTIME = PrintableValue(8, _('Overtime'))
-    SPORTING_WITHDRAWAL = PrintableValue(9, _('Sporting withdrawal'))
-    NOT_COMPETING = PrintableValue(10, _('Not competing'))
-    MOVED = PrintableValue(11, _('Moved'))
-    MOVED_UP = PrintableValue(12, _('Moved up'))
-    DID_NOT_START = PrintableValue(13, _('DNS'))
-    DID_NOT_ENTER = PrintableValue(14, _('Did not enter'))
-    CANCELLED = PrintableValue(15, _('Cancelled'))
-    RESTORED = PrintableValue(16, _('Restored'))
+    NONE = 0
+    OK = 1
+    FINISHED = 2
+    DISQUALIFIED = 3
+    MISSING_PUNCH = 4
+    DID_NOT_FINISH = 5
+    ACTIVE = 6
+    INACTIVE = 7
+    OVERTIME = 8
+    SPORTING_WITHDRAWAL = 9
+    NOT_COMPETING = 1
+    MOVED = 1
+    MOVED_UP = 1
+    DID_NOT_START = 1
+    DID_NOT_ENTER = 1
+    CANCELLED = 1
+    RESTORED = 1
 
 
 class Organization(Model):
