@@ -87,13 +87,13 @@ class ResultStatus(_TitleType):
     INACTIVE = 7
     OVERTIME = 8
     SPORTING_WITHDRAWAL = 9
-    NOT_COMPETING = 1
-    MOVED = 1
-    MOVED_UP = 1
-    DID_NOT_START = 1
-    DID_NOT_ENTER = 1
-    CANCELLED = 1
-    RESTORED = 1
+    NOT_COMPETING = 10
+    MOVED = 11
+    MOVED_UP = 12
+    DID_NOT_START = 13
+    DID_NOT_ENTER = 14
+    CANCELLED = 15
+    RESTORED = 16
 
 
 class Organization(Model):
