@@ -150,7 +150,6 @@ class SportOrgImportDialog(QDialog):
 
         self.item_races.clear()
         for cur_race in self.races:
-            assert isinstance(cur_race, Race)
             race_list.append(str(cur_race.data.get_start_datetime()))
         self.item_races.addItems(race_list)
 

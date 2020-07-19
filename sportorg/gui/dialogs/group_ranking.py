@@ -63,7 +63,6 @@ class GroupRankingDialog(QDialog):
             name = i.name
             if i in self.group.ranking.rank:
                 rank = self.group.ranking.rank[i]
-                assert isinstance(rank, RankingItem)
                 rank.is_active = self.findChild(QCheckBox, name + '_checkbox').isChecked()
                 rank.max_place = self.findChild(QSpinBox, name + '_place').value()
                 rank.max_time = time_to_otime(self.findChild(QTimeEdit, name + '_time').time())
@@ -72,7 +71,6 @@ class GroupRankingDialog(QDialog):
 
 
 def get_widget_from_ranking(ranking):
-    assert isinstance(ranking, RankingItem)
     qual = ranking.qual.name
     qual_checkbox = QCheckBox(ranking.qual.get_title())
     qual_checkbox.setFixedWidth(50)

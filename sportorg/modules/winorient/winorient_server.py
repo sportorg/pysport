@@ -26,7 +26,6 @@ Format of WDB data package
 def int_to_time(value):
     """ convert value from 1/100 s to time """
     today = datetime.datetime.now()
-    assert (isinstance(today, datetime.datetime))
     ret = datetime.datetime(today.year, today.month, today.day, value // 360000 % 24, (value % 360000) // 6000,
                             (value % 6000) // 100, (value % 100) * 10000)
 

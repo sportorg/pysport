@@ -233,7 +233,6 @@ class TextExchangeDialog(QDialog):
 def get_text(key, value, separator):
     ret = []
     for i in race().persons:
-        assert isinstance(i, Person)
         id_str = get_id(i, key)
         if id_str:
             value_str = get_property(i, value)
@@ -244,7 +243,6 @@ def get_text(key, value, separator):
 
 
 def get_id(person, index):
-    assert isinstance(person, Person)
     if index == 'bib':
         return str(person.bib)
     elif index == 'person name':
@@ -255,7 +253,6 @@ def get_id(person, index):
 
 def get_person_by_id(index, value):
     for i in race().persons:
-        assert isinstance(i, Person)
         if index == 'bib':
             if i.bib == int(value):
                 return i
@@ -266,8 +263,6 @@ def get_person_by_id(index, value):
 
 
 def get_property(person, key):
-    assert isinstance(person, Person)
-
     if key == _('Start'):
         result = race().find_person_result(person)
         if result:
@@ -318,7 +313,6 @@ def get_property(person, key):
 
 
 def set_property(person, key, value, **options):
-    assert isinstance(person, Person)
     if key == _('Start'):
         result = race().find_person_result(person)
         if result:

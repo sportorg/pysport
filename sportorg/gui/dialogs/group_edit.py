@@ -20,7 +20,6 @@ from sportorg.utils.time import time_to_qtime, time_to_otime
 class GroupEditDialog(QDialog):
     def __init__(self, group, is_new=False):
         super().__init__(GlobalAccess().get_main_window())
-        assert (isinstance(group, Group))
         self.current_object = group
         self.is_new = is_new
         self.time_format = 'hh:mm:ss'
@@ -156,7 +155,6 @@ class GroupEditDialog(QDialog):
         0 -> 0 exception!
         """
         widget = self.sender()
-        assert isinstance(widget, QSpinBox)
         year = widget.value()
         if 0 < year < 100:
             cur_year = date.today().year
@@ -212,7 +210,6 @@ class GroupEditDialog(QDialog):
 
     def apply_changes_impl(self):
         group = self.current_object
-        assert (isinstance(group, Group))
         if self.is_new:
             race().groups.insert(0, group)
 

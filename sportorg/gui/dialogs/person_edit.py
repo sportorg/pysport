@@ -24,7 +24,6 @@ class PersonEditDialog(QDialog):
     def __init__(self, person, is_new=False):
         super().__init__(GlobalAccess().get_main_window())
         self.is_ok = {}
-        assert (isinstance(person, Person))
         self.current_object = person
         self.is_new = is_new
 
@@ -162,7 +161,6 @@ class PersonEditDialog(QDialog):
         0 -> 0 exception!
         """
         widget = self.sender()
-        assert isinstance(widget, QSpinBox)
         year = widget.value()
         if 0 < year < 100:
             cur_year = date.today().year
@@ -274,7 +272,6 @@ class PersonEditDialog(QDialog):
 
     def apply_changes_impl(self):
         person = self.current_object
-        assert (isinstance(person, Person))
         if self.is_new:
             race().persons.insert(0, person)
         if person.name != self.item_name.currentText():

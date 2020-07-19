@@ -11,7 +11,6 @@ class ResultCheckerException(Exception):
 
 class ResultChecker:
     def __init__(self, person: Person):
-        assert person, Person
         self.person = person
 
     def check_result(self, result):
@@ -69,7 +68,6 @@ class ResultChecker:
 
     @staticmethod
     def calculate_penalty(result):
-        assert isinstance(result, Result)
         mode = race().get_setting('marked_route_mode', 'off')
         if mode == 'off':
             return
@@ -178,7 +176,6 @@ class ResultChecker:
         res = 0
         correct_count = 0
         for i in splits:
-            assert isinstance(i, Split)
             if not i.has_penalty:
                 correct_count += 1
 

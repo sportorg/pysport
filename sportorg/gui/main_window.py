@@ -399,14 +399,11 @@ class MainWindow(QMainWindow):
     def get_selected_rows(self, table=None):
         if table is None:
             table = self.get_current_table()
-        assert isinstance(table, QTableView)
         sel_model = table.selectionModel()
-        assert isinstance(sel_model, QItemSelectionModel)
         indexes = sel_model.selectedRows()
 
         ret = []
         for i in indexes:
-            assert isinstance(i, QModelIndex)
             orig_index_int = i.row()
             ret.append(orig_index_int)
         return ret

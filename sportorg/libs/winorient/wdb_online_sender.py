@@ -94,7 +94,6 @@ class WdbOnlineSender(object):
     def send(self, finish):
         if finish and isinstance(finish, WDBFinish):
             man = self.current_wdb.find_man_by_number(finish.number)
-            assert isinstance(man, WDBMan)
             ret = self.url
             ret += ONLINE_NUMBER + "=" + str(finish.number)
             ret += "&" + ONLINE_RESULT + "=" + time_to_hhmmss(int_to_otime(man.result))
@@ -115,14 +114,11 @@ class WdbOnlineSender(object):
              TTTTTT - время в 16-чной системе
              СС - номер КП в 16-чной системе
         """
-        assert isinstance(wdb, WDB)
-        assert isinstance(man, WDBMan)
 
         chip = man.get_chip()
         separator = ''
         ret = ''
         for cur_punch in chip.punch:
-            assert isinstance(cur_punch, WDBPunch)
             if cur_punch.code:
                 split = '{:06x}{:06x}{:02x}'.format(chip.id, int(cur_punch.time / 100), cur_punch.code)
                 ret += split + separator

@@ -15,7 +15,6 @@ class TableView(QtWidgets.QTableView):
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         hor_header = self.horizontalHeader()
-        assert (isinstance(hor_header, QHeaderView))
         hor_header.setSectionsMovable(True)
         hor_header.setDropIndicatorShown(True)
         hor_header.setSectionResizeMode(QHeaderView.Interactive)

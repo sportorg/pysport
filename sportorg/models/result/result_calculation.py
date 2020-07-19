@@ -34,10 +34,8 @@ class ResultCalculation(object):
     def get_group_finishes(self, group):
         ret = []
         for i in self.race.results:
-            assert isinstance(i, Result)
             person = i.person
             if person:
-                assert isinstance(person, Person)
                 if person.group is group:
                     ret.append(i)
         ret.sort()
@@ -45,11 +43,9 @@ class ResultCalculation(object):
         return ret
 
     def get_group_persons(self, group):
-        assert isinstance(group, Group)
         ret = []
         for i in self.race.persons:
             person = i
-            assert isinstance(person, Person)
             if person.group is group:
                 ret.append(i)
         group.count_person = len(ret)
@@ -57,13 +53,11 @@ class ResultCalculation(object):
 
     @staticmethod
     def set_places(array):
-        assert isinstance(array, list)
         current_place = 1
         last_place = 1
         last_result = 0
         for i in range(len(array)):
             res = array[i]
-            assert isinstance(res, Result)
 
             res.place = -1
             # give place only if status = OK
@@ -92,7 +86,6 @@ class ResultCalculation(object):
 
             relay_teams = {}
             for res in results:
-                assert isinstance(res, Result)
                 bib = res.person.bib
 
                 team_number = bib % 1000
@@ -103,7 +96,6 @@ class ResultCalculation(object):
                     relay_teams[str(team_number)] = new_team
 
                 team = relay_teams[str(team_number)]
-                assert isinstance(team, RelayTeam)
                 team.add_result(res)
             teams_sorted = sorted(relay_teams.values())
             place = 1
@@ -114,7 +106,6 @@ class ResultCalculation(object):
             return relay_teams.values()
 
     def set_rank(self, group):
-        assert isinstance(group, Group)
         ranking = group.ranking
         results = self.get_group_finishes(group)
 
@@ -131,7 +122,6 @@ class ResultCalculation(object):
             if rank > 0:
                 leader_time = self.get_group_leader_time(group)
                 for i in ranking.rank.values():
-                    assert isinstance(i, RankingItem)
                     if i.is_active and i.use_scores:
                         i.max_time = self.get_time_for_rank(leader_time, i.qual, rank)
                         i.percent = self.get_percent_for_rank(i.qual, rank)
@@ -141,7 +131,6 @@ class ResultCalculation(object):
 
             # Rank assigning for all athletes
             for i in results:
-                assert isinstance(i, Result)
                 result_time = i.get_result_otime()
                 place = i.place
 
@@ -150,7 +139,6 @@ class ResultCalculation(object):
 
                 qual_list = sorted(ranking.rank.values(), reverse=True, key=lambda item: item.qual.get_score())
                 for j in qual_list:
-                    assert isinstance(j, RankingItem)
                     if j.is_active:
                         if isinstance(place, int) and j.max_place >= place:
                             i.assigned_rank = j.qual
@@ -194,7 +182,6 @@ class ResultCalculation(object):
             return -1
 
         for i in array:
-            assert isinstance(i, Result)
             if i.is_status_ok():
                 person = i.person
                 if not person.is_out_of_competition:
@@ -230,7 +217,6 @@ class ResultCalculation(object):
         started_teams = 0
         if teams:
             for cur_team in teams:
-                assert isinstance(cur_team, RelayTeam)
                 if cur_team.get_is_out_of_competition():
                     continue
                 if not cur_team.get_is_all_legs_finished():
@@ -288,7 +274,6 @@ class ResultCalculation(object):
     def get_time_for_rank(self, leader_time, qual, rank):
         percent = self.get_percent_for_rank(qual, rank)
         if leader_time:
-            assert isinstance(leader_time, OTime)
             msec_new = round(leader_time.to_msec() * percent / 100)
             ret = OTime(msec=msec_new)
             return ret

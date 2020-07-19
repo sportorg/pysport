@@ -137,9 +137,7 @@ class Widget(QtWidgets.QWidget):
 
     def show_splits(self, index):
         self.resize_event()
-        assert (isinstance(index, QModelIndex))
         result = race().results[index.row()]
-        assert isinstance(result, Result)
         self.result_card_details.clear()
         self.result_card_finish_edit.setText('')
         self.result_card_start_edit.setText('')
@@ -159,7 +157,6 @@ class Widget(QtWidgets.QWidget):
         control_codes = []
         is_highlight = True
         if course:
-            assert isinstance(course, Course)
             is_highlight = not course.is_unknown()
             for control in course.controls:
                 control_codes.append(str(control.code))
@@ -201,7 +198,6 @@ class Widget(QtWidgets.QWidget):
         if course:
             index = 1
             for control in course.controls:
-                assert control, CourseControl
                 s = '{index:02d} ({code}) {length}'.format(
                     index=index,
                     code=control.code,

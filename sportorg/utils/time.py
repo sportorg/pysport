@@ -49,7 +49,6 @@ def _int_to_time(value):
     """ convert value from 1/100 s to time """
 
     today = datetime.datetime.now()
-    assert (isinstance(today, datetime.datetime))
     ret = datetime.datetime(today.year, today.month, today.day, value // 360000 % 24, (value % 360000) // 6000,
                             (value % 6000) // 100, (value % 100) * 10)
     return ret
@@ -93,7 +92,6 @@ def hhmmss_to_time(value):
 
 
 def time_remove_day(value):
-    assert isinstance(value, datetime.datetime)
     new_value = datetime.datetime(year=2000, month=1, day=1, hour=value.hour, minute=value.minute,
                                   second=value.second, microsecond=value.microsecond)
     return new_value
@@ -132,12 +130,10 @@ def get_speed_min_per_km(time, length_m):
 
 
 def qdate_to_date(value):
-    assert isinstance(value, QDate)
     return date(year=value.year(), month=value.month(), day=value.day())
 
 
 def date_to_qdate(value):
-    assert isinstance(value, date)
     return QDate(value.year, value.month, value.day)
 
 

@@ -367,7 +367,6 @@ class StartPreparationDialog(QDialog):
 def guess_courses_for_groups():
     obj = race()
     for cur_group in obj.groups:
-        assert isinstance(cur_group, Group)
         if not cur_group.course or True:  # TODO check empty courses after export!
             for cur_course in obj.courses:
                 course_name = cur_course.name

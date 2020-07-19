@@ -230,7 +230,6 @@ class Course(Model):
     def get_code_list(self):
         ret = []
         for i in self.controls:
-            assert isinstance(i, CourseControl)
             ret.append(str(i.code))
         return ret
 
@@ -387,7 +386,6 @@ class Split(Model):
         self._time = value
 
     def __eq__(self, other):
-        assert isinstance(other, Split)
         if self.code == 0 or other.code == 0:
             return False
         if self.time is None or other.time is None:
@@ -1289,7 +1287,6 @@ class Race(Model):
         return self.data.get_days(date_)
 
     def person_card_number(self, person, number=0):
-        assert isinstance(person, Person)
         person.card_number = number
         for p in self.persons:
             if p.card_number == number and p != person:
@@ -1443,7 +1440,6 @@ class Race(Model):
             i.count_person = 0
 
         for i in self.persons:
-            assert isinstance(i, Person)
             if i.group is not None:
                 i.group.count_person += 1
 
@@ -1453,7 +1449,6 @@ class Race(Model):
             i.count_group = 0
 
         for i in self.groups:
-            assert isinstance(i, Group)
             if i.course is not None:
                 i.course.count_person += i.count_person
                 i.course.count_group += 1
@@ -1463,7 +1458,6 @@ class Race(Model):
             i.count_person = 0
 
         for i in self.persons:
-            assert isinstance(i, Person)
             if i.organization is not None:
                 i.organization.count_person += 1
 
@@ -1482,7 +1476,6 @@ class Race(Model):
         self.results.insert(0, result)
 
     def add_result(self, result):
-        assert isinstance(result, Result)
         add = True
         for r in self.results:
             if r is result:
@@ -1633,7 +1626,6 @@ class Ranking(object):
     def get_max_qual(self):
         max_qual = Qualification.NOT_QUALIFIED
         for i in self.rank.values():
-            assert isinstance(i, RankingItem)
             if i.is_active:
                 if i.max_place or (i.max_time and i.max_time.to_msec() > 0):
                     if max_qual.get_score() < i.qual.get_score():
@@ -1774,7 +1766,6 @@ class RelayLeg(object):
     def is_correct(self):
         res = self.get_result()
         if res:
-            assert isinstance(res, Result)
             return res.is_status_ok()
         return True
 
@@ -1786,7 +1777,6 @@ class RelayLeg(object):
 
     def set_bib(self):
         if self.person:
-            assert isinstance(self.person, Person)
             self.person.bib = self.get_bib()
 
     def set_person(self, person):
@@ -1809,14 +1799,12 @@ class RelayLeg(object):
     def get_finish_time(self):
         res = self.get_result()
         if res:
-            assert isinstance(res, Result)
             return res.get_finish_time()
         return None
 
     def get_start_time(self):
         res = self.get_result()
         if res:
-            assert isinstance(res, Result)
             return res.get_start_time()
         return None
 
@@ -1824,7 +1812,6 @@ class RelayLeg(object):
         if self.leg > 1:
             prev_leg = self.get_prev_leg()
             if prev_leg:
-                assert isinstance(prev_leg, RelayLeg)
                 if prev_leg.is_finished():
                     self.set_start_time(prev_leg.get_finish_time())
                     return 1
@@ -1888,7 +1875,6 @@ class RelayTeam(object):
     def set_start_times(self):
         """Set start time as finish of previous leg for all members"""
         for i in self.legs:
-            assert isinstance(i, RelayLeg)
             i.set_start_time_from_previous()
 
     def get_leg(self, leg_number):
@@ -1910,7 +1896,6 @@ class RelayTeam(object):
         """quantity of already finished laps"""
         finished_qty = 0
         for leg in self.legs:
-            assert isinstance(leg, RelayLeg)
             if leg.is_finished():
                 finished_qty += 1
         return finished_qty
@@ -1922,7 +1907,6 @@ class RelayTeam(object):
             leg = self.get_leg(i + 1)
             if not leg:
                 return correct_qty
-            assert isinstance(leg, RelayLeg)
             if leg.is_correct():
                 correct_qty += 1
             else:
@@ -1932,7 +1916,6 @@ class RelayTeam(object):
     def get_is_status_ok(self):
         """get the whole status of team - OK if all laps are OK"""
         for leg in self.legs:
-            assert isinstance(leg, RelayLeg)
             if not leg.is_correct():
                 return False
         return True
@@ -1945,7 +1928,6 @@ class RelayTeam(object):
     def get_is_out_of_competition(self):
         """get the whole status of team - OK if any lap is out of competition"""
         for leg in self.legs:
-            assert isinstance(leg, RelayLeg)
             if leg.is_out_of_competition():
                 return True
         return False

@@ -109,7 +109,6 @@ class PersonSplits(object):
 class GroupSplits(object):
     def __init__(self, r, group):
         self.race = r
-        assert isinstance(group, Group)
         self.group = group
         self.cp_count = len(self.group.course.controls) if self.group.course else 0
 

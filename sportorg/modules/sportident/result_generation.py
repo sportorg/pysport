@@ -8,7 +8,6 @@ from sportorg.language import _
 
 class ResultSportidentGeneration:
     def __init__(self, result: ResultSportident):
-        assert result, Result
         self._result = result
         self._person = None
         self.assign_chip_reading = race().get_setting('system_assign_chip_reading', 'off')

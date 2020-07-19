@@ -88,13 +88,13 @@ class SoundTab(Tab):
         self.item_enabled_rented_card = QCheckBox(_('Enable rented card sound'))
         self.item_enabled_rented_card.setChecked(Config().sound.get('enabled_rented_card', Config().sound.get('enabled')))
         self.layout.addRow(self.item_enabled_rented_card)
-  
+
         self.label_rented_card = QLabel(_('Rented card sound'))
         self.item_rented_card = AdvComboBox()
         self.item_rented_card.addItems(self.sounds)
         self.item_rented_card.setCurrentText(Config().sound.get('rented_card') or config.sound_dir('rented_card.wav'))
         self.layout.addRow(self.label_rented_card, self.item_rented_card)
-        
+
         self.widget.setLayout(self.layout)
 
     def save(self):
@@ -147,7 +147,7 @@ class MultidayTab(Tab):
         self.item_move_up.clicked.connect(move_up_race_function)
         self.item_move_up.setMaximumWidth(max_button_width)
         self.layout.addRow(self.item_move_up)
-        
+
         def move_down_race_function():
             move_down_race()
             self.fill_race_list()
@@ -175,7 +175,6 @@ class MultidayTab(Tab):
 
         self.item_races.clear()
         for cur_race in races():
-            assert isinstance(cur_race, Race)
             race_list.append(str(cur_race.data.get_start_datetime()))
         self.item_races.addItems(race_list)
 
@@ -227,7 +226,7 @@ class SettingsDialog(QDialog):
         self.button_cancel.setText(_('Cancel'))
         self.button_cancel.clicked.connect(cancel_changes)
         self.layout.addRow(button_box)
-        
+
         self.show()
 
     def apply_changes_impl(self):

@@ -106,7 +106,6 @@ class SFRReader(object):
 
     def is_device_connected(self):
         if self._device and isinstance(self._device, HidDevice):
-            assert isinstance(self._device, HidDevice)
             if self._device.is_plugged() and self._device.is_opened():
                 return True
         return False
@@ -119,7 +118,6 @@ class SFRReader(object):
         buffer = self.get_hid_buffer(command)
 
         hid_device = self._device
-        assert isinstance(hid_device, HidDevice)
         if self.is_device_connected():
             if callback:
                 # Wait for the data response, callback is processed in HID data handler

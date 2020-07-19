@@ -14,7 +14,6 @@ class SearchDialog(QDialog):
     def __init__(self, table=None):
         super().__init__(GlobalAccess().get_main_window())
         if table is not None:
-            assert (isinstance(table, QTableView))
             self.table = table
 
     def exec_(self):

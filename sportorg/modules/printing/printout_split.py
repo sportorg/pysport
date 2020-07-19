@@ -53,9 +53,7 @@ class SportorgPrinter(object):
         self.move_cursor(font_size * 1.3)
 
     def print_split(self, result):
-        assert isinstance(result, Result)
         obj = race()
-        assert isinstance(obj, Race)
 
         person = result.person
         if person is None or result.status in [ResultStatus.DID_NOT_START, ResultStatus.DID_NOT_FINISH]:
@@ -170,7 +168,6 @@ class SportorgPrinter(object):
             res = ResultCalculation(obj).get_group_finishes(group)
             self.print_line(_('Draft results'), fn, fs_main)
             for cur_res in res[:10]:
-                assert isinstance(cur_res, Result)
                 self.print_line(
                     ('  ' + str(cur_res.get_place()))[-2:] + ' ' + (cur_res.person.full_name + ' ' * 22)[:22] +
                     ' ' + cur_res.get_result(), fn, fs_main)

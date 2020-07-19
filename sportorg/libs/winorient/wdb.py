@@ -380,7 +380,6 @@ class WDBGroup:
 
     def get_course(self):
         if self.wdb is not None:
-            assert (isinstance(self.wdb, WDB))
             return self.wdb.find_course_by_id(self.distance_id)
         return None
 
@@ -490,25 +489,21 @@ class WDBMan:
 
     def get_group(self):
         if self.wdb is not None:
-            assert (isinstance(self.wdb, WDB))
             return self.wdb.find_group_by_id(self.group)
         return None
 
     def get_finish(self):
         if self.wdb is not None:
-            assert (isinstance(self.wdb, WDB))
             return self.wdb.find_finish_by_number(self.number)
         return None
 
     def get_team(self):
         if self.wdb is not None:
-            assert (isinstance(self.wdb, WDB))
             return self.wdb.find_team_by_id(self.team)
         return None
 
     def get_chip(self):
         if self.wdb is not None:
-            assert (isinstance(self.wdb, WDB))
             return self.wdb.find_chip_by_id(self.si_card)
         return None
 
@@ -835,7 +830,6 @@ class WDBInfo:
             cur_object = True
             if len(self.multi_day) > i:
                 cur_object = self.multi_day[i]
-            assert isinstance(cur_object, bool)
             ret[1124 + i:1125 + i] = cur_object.to_bytes(1, byteorder)
 
         ret[1134:1135] = self.is_print_relay_number_dashed.to_bytes(1, byteorder)
@@ -858,7 +852,6 @@ class WDBInfo:
             cur_object = 0
             if len(self.reserve) > i:
                 cur_object = self.reserve[i]
-            assert isinstance(cur_object, int)
             ret[1456 + i: 1457 + i] = cur_object.to_bytes(1, byteorder)
         ret[1466:1525] = format_string_to_bytes(self.online_url, 59)
         ret[1526:1540] = format_string_to_bytes(self.server_name, 14)
@@ -1114,29 +1107,24 @@ class WDB:
 
         ret += len(self.man).to_bytes(4, byteorder)
         for i in self.man:
-            assert isinstance(i, WDBMan)
             ret += i.get_bytes()
 
         ret += len(self.team).to_bytes(4, byteorder)
         for i in self.team:
-            assert isinstance(i, WDBTeam)
             ret += i.get_bytes()
 
         ret += len(self.group).to_bytes(4, byteorder)
         for i in self.group:
-            assert isinstance(i, WDBGroup)
             ret += i.get_bytes()
 
         ret += len(self.dist).to_bytes(4, byteorder)
         for i in self.dist:
-            assert isinstance(i, WDBDistance)
             ret += i.get_bytes()
 
         ret += self.info.get_bytes()
 
         ret += len(self.fin).to_bytes(4, byteorder)
         for i in self.fin:
-            assert isinstance(i, WDBFinish)
             ret += i.get_bytes()
 
         if is_new_format:  # format changing of 2009/03-2010/09: 64 -> 200 punches + added Adventure block
@@ -1146,16 +1134,13 @@ class WDB:
 
             ret += len(self.adv).to_bytes(4, byteorder)
             for i in self.adv:
-                assert isinstance(i, WDBAdventure)
                 ret += i.get_bytes()
 
             ret += len(self.chip).to_bytes(4, byteorder)
             for i in self.chip:
-                assert isinstance(i, WDBChip)
                 ret += i.get_bytes()
         else:
             for i in self.chip:
-                assert isinstance(i, WDBChip)
                 ret += i.get_bytes(False)
 
         # ending of wdb file - 20 * 0x00
@@ -1166,63 +1151,54 @@ class WDB:
 
     def find_group_by_id(self, idx):
         for group in self.group:
-            assert (isinstance(group, WDBGroup))
             if group.id == idx:
                 return group
         return None
 
     def find_group_by_name(self, name):
         for group in self.group:
-            assert (isinstance(group, WDBGroup))
             if group.name == name:
                 return group
         return None
 
     def find_finish_by_number(self, number):
         for finish in self.fin:
-            assert (isinstance(finish, WDBFinish))
             if finish.number == number:
                 return finish
         return None
 
     def find_team_by_id(self, idx):
         for team in self.team:
-            assert (isinstance(team, WDBTeam))
             if team.id == idx:
                 return team
         return None
 
     def find_team_by_name(self, name):
         for team in self.team:
-            assert (isinstance(team, WDBTeam))
             if team.name == name:
                 return team
         return None
 
     def find_chip_by_id(self, idx):
         for chip in self.chip:
-            assert (isinstance(chip, WDBChip))
             if chip.id == idx:
                 return chip
         return None
 
     def find_course_by_id(self, idx):
         for course in self.dist:
-            assert (isinstance(course, WDBDistance))
             if course.id == idx:
                 return course
         return None
 
     def find_course_by_name(self, name):
         for course in self.dist:
-            assert (isinstance(course, WDBDistance))
             if course.name == name:
                 return course
         return None
 
     def find_man_by_name(self, name):
         for man in self.man:
-            assert (isinstance(man, WDBMan))
             if man.name == name:
                 return man
         return None

@@ -454,7 +454,6 @@ class ChangeStatusAction(Action, metaclass=ActionFactory):
         }
 
         table = self.app.get_result_table()
-        assert isinstance(table, QTableView)
         index = table.currentIndex().row()
         if index < 0:
             index = 0

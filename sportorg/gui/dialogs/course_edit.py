@@ -17,7 +17,6 @@ from sportorg.modules.teamwork import Teamwork
 class CourseEditDialog(QDialog):
     def __init__(self, course, is_new=False):
         super().__init__(GlobalAccess().get_main_window())
-        assert (isinstance(course, Course))
         self.current_object = course
         self.is_new = is_new
 
@@ -103,7 +102,6 @@ class CourseEditDialog(QDialog):
         if self.current_object.controls:
             self.item_control_qty.setValue(len(self.current_object.controls))
         for i in self.current_object.controls:
-            assert isinstance(i, CourseControl)
             self.item_controls.append('{} {}'.format(i.code, i.length if i.length else ''))
 
     def apply_changes_impl(self):

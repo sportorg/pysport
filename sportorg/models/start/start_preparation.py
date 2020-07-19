@@ -24,7 +24,6 @@ class ReserveManager(object):
         current_race = self.race
 
         for current_group in current_race.groups:
-            assert isinstance(current_group, Group)
             count = current_group.count_person
 
             percent_count = math.ceil(count * reserve_percent / 100)
@@ -33,7 +32,6 @@ class ReserveManager(object):
             existing_reserves = 0
             if count > 0:
                 for current_person in persons:
-                    assert isinstance(current_person, Person)
                     str_name = "" + str(current_person.surname) + str(current_person.name)
                     if str.find(str_name, reserve_prefix) > -1:
                         existing_reserves += 1
@@ -65,7 +63,6 @@ class DrawManager(object):
 
         for i in range(len(persons)):
             current_person = persons[i]
-            assert isinstance(current_person, Person)
             index = i
             group = ''
             if current_person.group:
@@ -168,7 +165,6 @@ class DrawManager(object):
                         return False
                     else:
                         # insert j after checked_index i
-                        assert isinstance(self.person_array, list)
                         tmp = self.person_array.pop(j)
                         if j < i:
                             i -= 1
@@ -308,7 +304,6 @@ class StartTimeManager(object):
             else:
                 groups = get_groups_by_corridor(cur_corridor)
                 for cur_group in groups:
-                    assert isinstance(cur_group, Group)
                     start_interval = fixed_start_interval
 
                     # try to take start interval from group properties
@@ -353,7 +348,6 @@ def get_corridors():
         current_race = race()
         ret = []
         for current_group in current_race.groups:
-            assert isinstance(current_group, Group)
             cur_corridor = current_group.start_corridor
             if not cur_corridor:
                 cur_corridor = 0
@@ -366,7 +360,6 @@ def get_groups_by_corridor(corridor):
     current_race = race()
     ret = []
     for current_group in current_race.groups:
-        assert isinstance(current_group, Group)
         cur_corridor = current_group.start_corridor
         if not cur_corridor:
             cur_corridor = 0
@@ -378,7 +371,6 @@ def get_groups_by_corridor(corridor):
 def guess_courses_for_groups():
     obj = race()
     for cur_group in obj.groups:
-        assert isinstance(cur_group, Group)
         if not cur_group.course or True:  # TODO check empty courses after export!
             for cur_course in obj.courses:
                 course_name = cur_course.name
@@ -397,7 +389,6 @@ def guess_corridors_for_groups():
         course_index += 1
 
     for cur_group in obj.groups:
-        assert isinstance(cur_group, Group)
         if cur_group.course:
             cur_group.start_corridor = cur_group.course.corridor
 
@@ -429,7 +420,6 @@ def handicap_start_time():
         current_second_group_time = handicap_second_start
 
         for result in results:
-            assert isinstance(result, Result)
             cur_time = result.get_result_otime()
             gap = cur_time - leader_time
 
@@ -464,7 +454,6 @@ def reverse_start_time():
         second_group = []
 
         for result in results:
-            assert isinstance(result, Result)
             if result.is_status_ok() and result.person:
                 second_group.append(result.person)
 
@@ -481,7 +470,6 @@ def reverse_start_time():
 
         cur_time = handicap_start
         for person in first_group:
-            assert isinstance(person, Person)
             person.start_time = cur_time
             cur_time += handicap_interval
 
@@ -490,7 +478,6 @@ def reverse_start_time():
 
         # set time for main group
         for person in second_group:
-            assert isinstance(person, Person)
             person.start_time = cur_time
             cur_time += handicap_interval
 

@@ -30,7 +30,7 @@ class DialogFilter(QDialog):
         self.setModal(True)
 
         self.layout = QFormLayout(self)
-        
+
         self.group_label = QtWidgets.QLabel(self)
 
         self.group_combo = AdvComboBox(self)
@@ -69,7 +69,6 @@ class DialogFilter(QDialog):
         try:
             # apply filter here
             if self.table is not None:
-                assert (isinstance(self.table, QTableView))
                 proxy_model = self.table.model()
                 proxy_model.clear_filter()
                 proxy_model.max_rows_count = self.max_rows_count_spin_box.value()

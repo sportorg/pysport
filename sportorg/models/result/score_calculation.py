@@ -70,7 +70,6 @@ class ScoreCalculation(object):
                 results = ResultCalculation(self.race).get_group_finishes(group)
                 best_time = None
                 for cur_result in results:
-                    assert isinstance(cur_result, Result)
                     if not cur_result.is_status_ok():
                         continue
                     if self.race.get_type(group) == RaceType.RELAY:
@@ -102,7 +101,6 @@ class ScoreCalculation(object):
     @staticmethod
     def get_region_for_organization(org):
         if org:
-            assert isinstance(org, Organization)
             if org.region:
                 return org.region
         return None

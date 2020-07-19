@@ -26,7 +26,6 @@ from sportorg.utils.time import time_to_qtime, time_to_otime, hhmmss_to_time
 class ResultEditDialog(QDialog):
     def __init__(self, result, is_new=False):
         super().__init__(GlobalAccess().get_main_window())
-        assert (isinstance(result, Result))
         self.current_object = result
         self.is_new = is_new
 
@@ -247,7 +246,6 @@ class ResultEditDialog(QDialog):
         elif cur_bib != new_bib:
             new_person = find(race().persons, bib=new_bib)
             if new_person is not None:
-                assert isinstance(new_person, Person)
                 if result.person:
                     if result.is_punch():
                         result.person.card_number = 0
