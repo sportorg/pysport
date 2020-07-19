@@ -379,7 +379,7 @@ class WDBGroup:
         return ret
 
     def get_course(self):
-        if self.wdb is not None:
+        if self.wdb:
             return self.wdb.find_course_by_id(self.distance_id)
         return None
 
@@ -488,22 +488,22 @@ class WDBMan:
         return ret
 
     def get_group(self):
-        if self.wdb is not None:
+        if self.wdb:
             return self.wdb.find_group_by_id(self.group)
         return None
 
     def get_finish(self):
-        if self.wdb is not None:
+        if self.wdb:
             return self.wdb.find_finish_by_number(self.number)
         return None
 
     def get_team(self):
-        if self.wdb is not None:
+        if self.wdb:
             return self.wdb.find_team_by_id(self.team)
         return None
 
     def get_chip(self):
-        if self.wdb is not None:
+        if self.wdb:
             return self.wdb.find_chip_by_id(self.si_card)
         return None
 

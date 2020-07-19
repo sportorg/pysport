@@ -16,7 +16,7 @@ class ScoreCalculation(object):
             self.formula = str(self.race.get_setting('scores_formula', '0'))
 
     def get_scores_by_formula(self, leader, time):
-        if self.formula is not None and not self.wrong_formula:
+        if self.formula and not self.wrong_formula:
             try:
                 return max(eval(self.formula, {}, {
                     'leader': leader,

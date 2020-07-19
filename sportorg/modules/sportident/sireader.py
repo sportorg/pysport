@@ -110,7 +110,7 @@ class ResultThread(QThread):
 
     def _check_data(self, card_data):
         # TODO requires more complex checking for long starts > 12 hours
-        if self.start_time is not None and card_data['card_type'] == 'SI5':
+        if self.start_time and card_data['card_type'] == 'SI5':
             start_time = self.time_to_sec(self.start_time)
             for i in range(len(card_data['punches'])):
                 if self.time_to_sec(card_data['punches'][i][1]) < start_time:
@@ -195,7 +195,7 @@ class SIReaderClient(object):
                 self._logger,
                 self.get_start_time()
             )
-            if self._call_back is not None:
+            if self._call_back:
                 self._result_thread.data_sender.connect(self._call_back)
             self._result_thread.start()
         # elif not self._result_thread.is_alive():
@@ -204,7 +204,7 @@ class SIReaderClient(object):
             self._start_result_thread()
 
     def is_alive(self):
-        if self._si_reader_thread is not None and self._result_thread is not None:
+        if self._si_reader_thread and self._result_thread:
             # return self._si_reader_thread.is_alive() and self._result_thread.is_alive()
             return not self._si_reader_thread.isFinished() and not self._result_thread.isFinished()
 

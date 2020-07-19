@@ -88,7 +88,7 @@ def _get_person_obj(data, race_data, result=None):
         # send relay fields only for relay events (requested by Ivan Churakoff)
         obj['relay_team'] = data['bib'] % 1000
         obj['lap'] = max(data['bib'] // 1000, 1)
-    if result is not None:
+    if result:
         obj['start'] = round(result['start_msec'] / 1000)
 
         if is_relay:
@@ -107,7 +107,7 @@ def _get_person_obj(data, race_data, result=None):
                     splits.append(split)
             for i in range(len(splits)):
                 """
-                Orgeo Splits format: 
+                Orgeo Splits format:
                 Option 	Type 	Description
                 code 	string 	CP code
                 time 	int 	seconds of current split - time from previous CP to this CP

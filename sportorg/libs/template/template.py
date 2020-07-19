@@ -25,7 +25,7 @@ def date(value, fmt=None):
 
 
 def finalize(thing):
-    return thing if thing is not None else ''
+    return thing if thing else ''
 
 
 def get_text_from_path(path, **kwargs):

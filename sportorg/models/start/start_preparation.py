@@ -70,7 +70,7 @@ class DrawManager(object):
             start_group = current_person.start_group
             team = ''
             region = ''
-            if current_person.organization is not None:
+            if current_person.organization:
                 team = current_person.organization.name
                 region = current_person.organization.region
 
@@ -308,7 +308,7 @@ class StartTimeManager(object):
 
                     # try to take start interval from group properties
                     if is_group_start_interval:
-                        if cur_group.start_interval is not None:
+                        if cur_group.start_interval:
                             start_interval = cur_group.start_interval
 
                     cur_start = self.process_group(cur_group, cur_start, start_interval, one_minute_qty)
@@ -318,7 +318,7 @@ class StartTimeManager(object):
         persons = current_race.get_persons_by_group(group)
         current_start = first_start
         one_minute_count = 0
-        if persons is not None:
+        if persons:
             for current_person in persons:
                 current_person.start_time = current_start
                 one_minute_count += 1
@@ -333,7 +333,7 @@ class StartTimeManager(object):
     def process_corridor(self, corridor, first_start, start_interval, one_minute_qty):
         current_race = self.race
         persons = current_race.get_persons_by_corridor(corridor)
-        if persons is not None:
+        if persons:
             current_start = first_start
             one_minute_count = 0
             for current_person in persons:

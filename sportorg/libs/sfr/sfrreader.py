@@ -67,7 +67,7 @@ class SFRReader(object):
         """
         self._device = None  # Type HidDevice
         self._debug = debug
-        if logfile is not None:
+        if logfile:
             self._logfile = open(logfile, 'ab')
         else:
             self._logfile = None
@@ -278,7 +278,7 @@ class SFRReader(object):
                 self._logger.debug("SFR station not found or unavailable")
 
     def __del__(self):
-        if self._device is not None:
+        if self._device:
             self._device.close()
 
     @staticmethod

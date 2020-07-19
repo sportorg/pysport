@@ -419,7 +419,7 @@ class PenaltyCalculationAction(Action, metaclass=ActionFactory):
     def execute(self):
         logging.debug('Penalty calculation start')
         for result in race().results:
-            if result.person is not None:
+            if result.person:
                 ResultChecker.calculate_penalty(result)
         logging.debug('Penalty calculation finish')
         ResultCalculation(race()).process_results()

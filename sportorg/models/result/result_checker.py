@@ -63,7 +63,7 @@ class ResultChecker:
     def check_all(cls):
         logging.debug('Checking all results')
         for result in race().results:
-            if result.person is not None:
+            if result.person:
                 ResultChecker.checking(result)
 
     @staticmethod

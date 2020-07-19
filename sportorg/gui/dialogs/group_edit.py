@@ -219,7 +219,7 @@ class GroupEditDialog(QDialog):
         if group.long_name != self.item_full_name.text():
             group.long_name = self.item_full_name.text()
 
-        if (group.course is not None and group.course.name != self.item_course.currentText()) \
+        if (group.course and group.course.name != self.item_course.currentText()) \
                 or (group.course is None and len(self.item_course.currentText()) > 0):
             group.course = find(race().courses, name=self.item_course.currentText())
 
@@ -260,7 +260,7 @@ class GroupEditDialog(QDialog):
             group.ranking.is_active = self.rank_checkbox.isChecked()
 
         t = RaceType.get_by_name(self.type_combo.currentText())
-        selected_type = t if t is not None else group.get_type()
+        selected_type = t if t else group.get_type()
         if group.get_type() != selected_type:
             group.set_type(selected_type)
 

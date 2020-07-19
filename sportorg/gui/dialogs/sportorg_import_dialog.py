@@ -99,7 +99,7 @@ class SportOrgImportDialog(QDialog):
                 old_org = find(obj.organizations, id=org.id)
                 old_org_by_name = find(obj.organizations, name=org.name)
                 if old_org is None:
-                    if old_org_by_name is not None:
+                    if old_org_by_name:
                         org.name = '_' + org.name
                     organizations.append(org)
             obj.organizations.extend(organizations)
@@ -109,7 +109,7 @@ class SportOrgImportDialog(QDialog):
                 old_course = find(obj.courses, id=course.id)
                 old_course_by_name = find(obj.courses, name=course.name)
                 if old_course is None:
-                    if old_course_by_name is not None:
+                    if old_course_by_name:
                         course.name = '_' + course.name
                     courses.append(course)
             obj.courses.extend(courses)
@@ -119,7 +119,7 @@ class SportOrgImportDialog(QDialog):
                 old_group = find(obj.groups, id=group.id)
                 old_group_by_name = find(obj.groups, name=group.name)
                 if old_group is None:
-                    if old_group_by_name is not None:
+                    if old_group_by_name:
                         group.name = '_' + group.name
                     if group.course:
                         group.course = find(obj.courses, id=group.course.id)

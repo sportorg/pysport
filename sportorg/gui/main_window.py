@@ -454,7 +454,7 @@ class MainWindow(QMainWindow):
                     for person in race().persons:
                         if not person.card_number:
                             old_person = race().person_card_number(person, result.card_number)
-                            if old_person is not None:
+                            if old_person:
                                 Teamwork().send(old_person.to_dict())
                             person.is_rented_card = True
                             Teamwork().send(person.to_dict())
@@ -547,7 +547,7 @@ class MainWindow(QMainWindow):
         self.create_file(update_data=False)
 
     def save_file(self):
-        if self.file is not None:
+        if self.file:
             try:
                 self.clear_filters(remove_condition=False)
                 File(self.file, logging.root, File.JSON).save()

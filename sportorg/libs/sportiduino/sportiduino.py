@@ -109,14 +109,14 @@ class Sportiduino(object):
         if debug:
             self._log_debug = print_
 
-        if logger is not None:
+        if logger:
             if callable(logger.debug):
                 self._log_debug = logger.debug
             if callable(logger.info):
                 self._log_info = logger.info
 
         errors = ''
-        if port is not None:
+        if port:
             self._connect_master_station(port)
             return
         else:
@@ -325,7 +325,7 @@ class Sportiduino(object):
         self.port = port
         self.baudrate = self._serial.baudrate
         version = self.read_version()
-        if version is not None:
+        if version:
             self._log_info("Master station %s on port '%s' connected" % (version, port))
 
 
@@ -354,7 +354,7 @@ class Sportiduino(object):
 
     def _read_response(self, timeout=None, wait_fragment=None):
         try:
-            if timeout is not None:
+            if timeout:
                 old_timeout = self._serial.timeout
                 self._serial.timeout = timeout
 
@@ -366,8 +366,8 @@ class Sportiduino(object):
                 elif byte == Sportiduino.START_BYTE:
                     break
 
-            if timeout is not None:
-                self._serial.timeout = old_timeout 
+            if timeout:
+                self._serial.timeout = old_timeout
 
             code = self._serial.read()
             length_byte = self._serial.read()
@@ -377,7 +377,7 @@ class Sportiduino(object):
             if length >= Sportiduino.OFFSET:
                 more_fragments = True
                 fragment_num = length - Sportiduino.OFFSET
-                if fragment_num > 0 and (wait_fragment is not None):
+                if fragment_num > 0 and (wait_fragment):
                     if fragment_num != wait_fragment:
                         raise SportiduinoException('Waiting fragment %d, receive %d' % (wait_fragment, fragment_num))
                 length = Sportiduino.MAX_DATA_LEN
@@ -404,7 +404,7 @@ class Sportiduino(object):
 
 
     def __del__(self):
-        if self._serial is not None:
+        if self._serial:
             self._serial.close()
 
 
@@ -468,7 +468,7 @@ class Sportiduino(object):
     def _cs_check(s, checksum):
         return Sportiduino._checsum(s) == checksum
 
- 
+
     @staticmethod
     def _parse_card_data(data):
         # TODO check data length

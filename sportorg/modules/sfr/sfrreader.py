@@ -162,7 +162,7 @@ class SFRReaderClient(object):
                 self._logger,
                 self.get_start_time()
             )
-            if self._call_back is not None:
+            if self._call_back:
                 self._result_thread.data_sender.connect(self._call_back)
             self._result_thread.start()
         # elif not self._result_thread.is_alive():
@@ -171,7 +171,7 @@ class SFRReaderClient(object):
             self._start_result_thread()
 
     def is_alive(self):
-        if self._reader_thread is not None and self._result_thread is not None:
+        if self._reader_thread and self._result_thread:
             # return self._reader_thread.is_alive() and self._result_thread.is_alive()
             return not self._reader_thread.isFinished() and not self._result_thread.isFinished()
 

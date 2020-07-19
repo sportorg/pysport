@@ -48,19 +48,19 @@ def messageBoxQuestion(parent=None, title='', text='', buttons=(QMessageBox.Yes 
     messageBox = QMessageBox(QMessageBox.Question, title, text, buttons, parent)
 
     button_yes = messageBox.button(QMessageBox.Yes)
-    if button_yes is not None:
+    if button_yes:
         button_yes.setText(_('Yes'))
 
     button_no = messageBox.button(QMessageBox.No)
-    if button_no is not None:
+    if button_no:
         button_no.setText(_('No'))
 
     button_save = messageBox.button(QMessageBox.Save)
-    if button_save is not None:
+    if button_save:
         button_save.setText(_('Save'))
 
     button_cancel = messageBox.button(QMessageBox.Cancel)
-    if button_cancel is not None:
+    if button_cancel:
         button_cancel.setText(_('Cancel'))
 
     return messageBox.exec_()

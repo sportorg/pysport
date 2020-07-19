@@ -138,7 +138,7 @@ class EventPropertiesDialog(QDialog):
         obj.data.end_datetime = end_date
 
         t = RaceType.get_by_name(self.item_type.currentText())
-        if t is not None:
+        if t:
             obj.data.race_type = t
         obj.data.relay_leg_count = self.item_relay_legs.value()
 

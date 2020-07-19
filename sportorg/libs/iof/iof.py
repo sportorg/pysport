@@ -34,11 +34,11 @@ class BaseElement(object):
     @staticmethod
     def get_elem(tag, value=None, attr=None, childs=None):
         el = ET.Element(tag)
-        if attr is not None:
+        if attr:
             el.attrib = attr
-        if value is not None:
+        if value:
             el.text = value
-        if childs is not None:
+        if childs:
             for child in childs:
                 if isinstance(child, BaseElement):
                     el.append(child.to_elem())

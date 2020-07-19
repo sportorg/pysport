@@ -605,7 +605,7 @@ class Result:
         if race().get_setting('result_processing_mode', 'time') == 'scores':
             ret += str(self.scores) + ' ' + _('points') + ' '
 
-        time_accuracy = race().get_setting('time_accuracy', 0)
+        # time_accuracy = race().get_setting('time_accuracy', 0)
         start = hhmmss_to_time(self.person.comment)
         if start == OTime():
             raise ValueError
@@ -762,7 +762,7 @@ class ResultSportident(Result):
         splits = ''
         for split in self.splits:
             splits += '{} — {}\n'.format(split[0], split[1])
-        person = self.person.full_name if self.person is not None else ''
+        person = self.person.full_name if self.person else ''
         return "Card: {}\nStart: {}\nFinish: {}\nPerson: {}\nSplits:\n{}".format(
             self.card_number, self.start_time, self.finish_time, person, splits)
 
@@ -788,7 +788,7 @@ class ResultSportident(Result):
             elif self.person and self.person.start_time and self.person.start_time.to_msec():
                 return self.person.start_time
         elif start_source == 'cp':
-            if self.__start_time is not None:
+            if self.__start_time:
                 return self.__start_time
             if len(self.splits):
                 start_cp_number = obj.get_setting('system_start_cp_number', 31)
@@ -811,7 +811,7 @@ class ResultSportident(Result):
             if self.finish_time:
                 return self.finish_time
         elif finish_source == 'cp':
-            if self.__finish_time is not None:
+            if self.__finish_time:
                 return self.__finish_time
             if len(self.splits):
                 finish_cp_number = obj.get_setting('system_finish_cp_number', 90)
@@ -1100,7 +1100,7 @@ class Person(Model):
         self.is_personal = bool(data['is_personal'])
         self.comment = str(data['comment'])
         self.start_group = int(data['start_group'])
-        if data['start_time'] is not None:
+        if data['start_time']:
             self.start_time = OTime(msec=int(data['start_time']))
         if data['birth_date']:
             self.birth_date = dateutil.parser.parse(data['birth_date']).date()
@@ -1440,7 +1440,7 @@ class Race(Model):
             i.count_person = 0
 
         for i in self.persons:
-            if i.group is not None:
+            if i.group:
                 i.group.count_person += 1
 
         # recalculate course counters
@@ -1449,7 +1449,7 @@ class Race(Model):
             i.count_group = 0
 
         for i in self.groups:
-            if i.course is not None:
+            if i.course:
                 i.course.count_person += i.count_person
                 i.course.count_group += 1
 
@@ -1458,7 +1458,7 @@ class Race(Model):
             i.count_person = 0
 
         for i in self.persons:
-            if i.organization is not None:
+            if i.organization:
                 i.organization.count_person += 1
 
     def get_persons_by_group(self, group):

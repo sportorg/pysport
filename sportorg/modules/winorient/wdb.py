@@ -90,7 +90,7 @@ class WinOrientBinary:
             new_group.name = group.name
             new_group.price = group.owner_cost
             course = group.get_course()
-            if course is not None:
+            if course:
                 new_group.course = find(race().courses, name=course.name)
             my_race.groups.append(new_group)
 

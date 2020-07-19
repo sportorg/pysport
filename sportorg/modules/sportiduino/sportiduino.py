@@ -149,7 +149,7 @@ class SportiduinoClient(object):
                 self._stop_event,
                 self._logger,
             )
-            if self._call_back is not None:
+            if self._call_back:
                 self._result_thread.data_sender.connect(self._call_back)
             self._result_thread.start()
         # elif not self._result_thread.is_alive():
@@ -158,7 +158,7 @@ class SportiduinoClient(object):
             self._start_result_thread()
 
     def is_alive(self):
-        if self._sportiduino_thread is not None and self._result_thread is not None:
+        if self._sportiduino_thread and self._result_thread:
             return not self._sportiduino_thread.isFinished() and not self._result_thread.isFinished()
 
         return False

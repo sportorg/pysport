@@ -16,7 +16,7 @@ class DialogFilter(QDialog):
 
     def __init__(self, table=None):
         super().__init__(GlobalAccess().get_main_window())
-        if table is not None:
+        if table:
             self.table = table
 
     def exec_(self):
@@ -68,7 +68,7 @@ class DialogFilter(QDialog):
 
         try:
             # apply filter here
-            if self.table is not None:
+            if self.table:
                 proxy_model = self.table.model()
                 proxy_model.clear_filter()
                 proxy_model.max_rows_count = self.max_rows_count_spin_box.value()

@@ -233,11 +233,11 @@ class PersonEditDialog(QDialog):
         self.item_surname.setText(self.current_object.surname)
         self.item_surname.selectAll()
         self.item_name.setCurrentText(self.current_object.name)
-        if self.current_object.group is not None:
+        if self.current_object.group:
             self.item_group.setCurrentText(self.current_object.group.name)
         else:
             self.item_group.setCurrentText(self.GROUP_NAME)
-        if self.current_object.organization is not None:
+        if self.current_object.organization:
             self.item_team.setCurrentText(self.current_object.organization.name)
         else:
             self.item_team.setCurrentText(self.ORGANIZATION_NAME)
@@ -245,10 +245,10 @@ class PersonEditDialog(QDialog):
             self.item_qual.setCurrentText(self.current_object.qual.get_title())
         if self.current_object.bib:
             self.item_bib.setValue(int(self.current_object.bib))
-        if self.current_object.start_time is not None:
+        if self.current_object.start_time:
             time = time_to_qtime(self.current_object.start_time)
             self.item_start.setTime(time)
-        if self.current_object.start_group is not None:
+        if self.current_object.start_group:
             self.item_start_group.setValue(int(self.current_object.start_group))
 
         if self.current_object.card_number:
@@ -278,10 +278,10 @@ class PersonEditDialog(QDialog):
             person.name = self.item_name.currentText()
         if person.surname != self.item_surname.text():
             person.surname = self.item_surname.text()
-        if (person.group is not None and person.group.name != self.item_group.currentText()) or\
+        if (person.group and person.group.name != self.item_group.currentText()) or\
                 (person.group is None and len(self.item_group.currentText()) > 0):
             person.group = find(race().groups, name=self.item_group.currentText())
-        if (person.organization is not None and person.organization.name != self.item_team.currentText()) or \
+        if (person.organization and person.organization.name != self.item_team.currentText()) or \
                 (person.organization is None and len(self.item_team.currentText()) > 0):
             organization = find(race().organizations, name=self.item_team.currentText())
             if organization is None:

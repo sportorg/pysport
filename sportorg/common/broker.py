@@ -56,7 +56,7 @@ class Broker(object):
                     self._logger.error("Class `{}` does not implement `{}`".format(cls.__class__.__name__, method_name))
                     r = None
 
-            if r is not None:
+            if r:
                 result.append(r)
 
         return result if len(result) else None

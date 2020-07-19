@@ -49,7 +49,7 @@ class ReportDialog(QDialog):
         self.item_template = AdvComboBox()
         self.item_template.addItems(get_templates(config.template_dir('reports')))
         self.layout.addRow(self.label_template, self.item_template)
-        if _settings['last_template'] is not None:
+        if _settings['last_template']:
             self.item_template.setCurrentText(_settings['last_template'])
 
         self.item_custom_path = QPushButton(_('Choose template'))

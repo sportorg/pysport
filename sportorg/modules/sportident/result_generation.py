@@ -44,7 +44,7 @@ class ResultSportidentGeneration:
         return False
 
     def _find_person_by_result(self):
-        if self._person is not None:
+        if self._person:
             return True
         for person in race().persons:
             if person.card_number and person.card_number == self._result.card_number:

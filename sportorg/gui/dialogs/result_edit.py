@@ -172,13 +172,13 @@ class ResultEditDialog(QDialog):
             self.item_created_at.setTime(time_to_qtime(datetime.fromtimestamp(self.current_object.created_at)))
         if self.current_object.finish_time:
             self.item_finish.setTime(time_to_qtime(self.current_object.finish_time))
-        if self.current_object.start_time is not None:
+        if self.current_object.start_time:
             self.item_start.setTime(time_to_qtime(self.current_object.start_time))
         if self.current_object.finish_time:
             self.item_result.setText(str(self.current_object.get_result()))
-        if self.current_object.credit_time is not None:
+        if self.current_object.credit_time:
             self.item_credit.setTime(time_to_qtime(self.current_object.credit_time))
-        if self.current_object.penalty_time is not None:
+        if self.current_object.penalty_time:
             self.item_penalty.setTime(time_to_qtime(self.current_object.penalty_time))
         if self.current_object.penalty_laps:
             self.item_penalty_laps.setValue(self.current_object.penalty_laps)
@@ -245,7 +245,7 @@ class ResultEditDialog(QDialog):
             result.person = None
         elif cur_bib != new_bib:
             new_person = find(race().persons, bib=new_bib)
-            if new_person is not None:
+            if new_person:
                 if result.person:
                     if result.is_punch():
                         result.person.card_number = 0
@@ -332,7 +332,7 @@ class SplitsText(SplitsObject):
         return self._splits
 
     def show(self):
-        splits = self._splits if self._splits is not None else []
+        splits = self._splits if self._splits else []
         text = ''
         time_accuracy = race().get_setting('time_accuracy', 0)
         for split in splits:

@@ -13,7 +13,7 @@ class SearchDialog(QDialog):
 
     def __init__(self, table=None):
         super().__init__(GlobalAccess().get_main_window())
-        if table is not None:
+        if table:
             self.table = table
 
     def exec_(self):
@@ -29,7 +29,7 @@ class SearchDialog(QDialog):
         self.layout = QVBoxLayout(self)
 
         self.item_serach = QLineEdit()
-        if self.table is not None:
+        if self.table:
             self.item_serach.setText(self.table.model().search)
             self.item_serach.selectAll()
 
@@ -48,7 +48,7 @@ class SearchDialog(QDialog):
 
     def ok(self):
         try:
-            if self.table is not None:
+            if self.table:
                 proxy_model = self.table.model()
 
                 proxy_model.search = self.item_serach.text()

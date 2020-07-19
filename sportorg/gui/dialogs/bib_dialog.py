@@ -90,7 +90,7 @@ class BibDialog(QDialog):
         return self.person
 
     def found_person(self):
-        return self.person is not None
+        return self.person
 
     def apply_changes_impl(self):
         self.person = self.tmp_person

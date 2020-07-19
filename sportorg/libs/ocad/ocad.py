@@ -156,7 +156,7 @@ class ClassesV8:
         def ifempty(o, default=None):
             if len(o):
                 return 0
-            if default is not None:
+            if default:
                 return default
             return None
 

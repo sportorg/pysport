@@ -19,7 +19,7 @@ def parse(file):
         IOFParseResult('CourseData', course_data(tree, ns)),
     ]
 
-    return [result for result in results if result.data is not None]
+    return [result for result in results if result.data]
 
 
 def course_data(tree, ns):
@@ -37,7 +37,7 @@ def course_data(tree, ns):
 
         for course_control_el in course_el.findall('iof:CourseControl', ns):
             leg_length = 0
-            if course_control_el.find('iof:LegLength', ns) is not None:
+            if course_control_el.find('iof:LegLength', ns):
                 leg_length = int(course_control_el.find('iof:LegLength', ns).text)
             course['controls'].append({
                 'type': course_control_el.attrib['type'],  # Start, Control, Finish
@@ -69,15 +69,15 @@ def entry_list(tree, ns):
             'given': person_el.find('iof:Name', ns).find('iof:Given', ns).text,
             'extensions': {}
         }
-        if birth_date_el is not None:
+        if birth_date_el:
             person['birth_date'] = birth_date_el.text
         extensions_el = person_el.find('iof:Extensions', ns)
         if extensions_el:
             qual_el = extensions_el.find('orgeo:Qual', ns)
-            if qual_el is not None:
+            if qual_el:
                 person['extensions']['qual'] = qual_el.text
             bib_el = extensions_el.find('orgeo:BibNumber', ns)
-            if bib_el is not None:
+            if bib_el:
                 person['extensions']['bib'] = bib_el.text
 
         org_el = person_entry_el.find('iof:Organisation', ns)
@@ -101,7 +101,7 @@ def entry_list(tree, ns):
 
         control_card_el = person_entry_el.find('iof:ControlCard', ns)
         control_card = ''
-        if control_card_el is not None:
+        if control_card_el:
             control_card = control_card_el.text
 
         race_numbers = []

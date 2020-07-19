@@ -88,7 +88,7 @@ class Teamwork(object):
                 self._stop_event,
                 self._logger
             )
-            if self._call_back is not None:
+            if self._call_back:
                 self._result_thread.data_sender.connect(self._call_back)
             self._result_thread.start()
         # elif not self._result_thread.is_alive():
@@ -97,8 +97,8 @@ class Teamwork(object):
             self._start_result_thread()
 
     def is_alive(self):
-        return self._thread is not None and self._thread.is_alive() \
-               and self._result_thread is not None and not self._result_thread.isFinished()
+        return self._thread and self._thread.is_alive() \
+               and self._result_thread and not self._result_thread.isFinished()
 
     def stop(self):
         self._stop_event.set()
