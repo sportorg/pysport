@@ -3,7 +3,7 @@ import logging
 import time
 from queue import Queue
 from PySide2 import QtCore, QtGui, QtWidgets
-from PySide2.QtCore import QModelIndex, QItemSelectionModel, QTimer, Signal
+from PySide2.QtCore import QModelIndex, QItemSelectionModel
 from PySide2.QtWidgets import QMainWindow, QTableView, QMessageBox
 
 from sportorg import config
@@ -143,9 +143,6 @@ class MainWindow(QMainWindow):
         SportiduinoClient().set_call(self.add_sportiduino_result_from_reader)
         SFRReaderClient().set_call(self.add_sfr_result_from_reader)
 
-        self.service_timer = QTimer(self)
-        self.service_timer.timeout.connect(self.interval)
-        self.service_timer.start(1000) # msec
         LiveClient().init()
         self._menu_disable(self.current_tab)
 
@@ -239,8 +236,8 @@ class MainWindow(QMainWindow):
         self.tabwidget.addTab(groups.Widget(), _('Groups'))
         self.tabwidget.addTab(courses.Widget(), _('Courses'))
         self.tabwidget.addTab(organizations.Widget(), _('Teams'))
-        self.logging_tab = log.Widget()
-        self.tabwidget.addTab(self.logging_tab, _('Logs'))
+        # self.logging_tab = log.Widget()
+        # self.tabwidget.addTab(self.logging_tab, _('Logs'))
         self.tabwidget.currentChanged.connect(self._menu_disable)
 
     def _menu_disable(self, tab_index):
@@ -479,44 +476,6 @@ class MainWindow(QMainWindow):
             self.refresh()
         except Exception as e:
             logging.error(str(e))
-
-    sportident_status = False
-    sportident_icon = {
-        True: 'sportident-on.png',
-        False: 'sportident.png',
-    }
-    teamwork_status = False
-    teamwork_icon = {
-        True: 'network.svg',
-        False: 'network-off.svg',
-    }
-
-    def interval(self):
-        if SIReaderClient().is_alive() != self.sportident_status:
-            self.toolbar_property['sportident'].setIcon(
-                QtGui.QIcon(config.icon_dir(self.sportident_icon[SIReaderClient().is_alive()])))
-            self.sportident_status = SIReaderClient().is_alive()
-        if Teamwork().is_alive() != self.teamwork_status:
-            self.toolbar_property['teamwork'].setIcon(
-                QtGui.QIcon(config.icon_dir(self.teamwork_icon[Teamwork().is_alive()])))
-            self.teamwork_status = Teamwork().is_alive()
-
-        try:
-            if self.get_configuration().get('autosave_interval'):
-                if self.file:
-                    if time.time() - self.last_update > int(self.get_configuration().get('autosave_interval')):
-                        self.save_file()
-                        logging.info(_('Auto save'))
-                else:
-                    logging.debug(_('No file to auto save'))
-        except Exception as e:
-            logging.error(str(e))
-
-        while not self.log_queue.empty():
-            text = self.log_queue.get()
-            self.statusbar_message(text)
-            if hasattr(self, 'logging_tab'):
-                self.logging_tab.write(text)
 
     # Actions
     def create_file(self, *args, update_data=True):
