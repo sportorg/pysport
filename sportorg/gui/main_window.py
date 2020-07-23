@@ -27,7 +27,7 @@ from sportorg.modules.sportident.result_generation import ResultSportidentGenera
 from sportorg.common.broker import Broker
 from sportorg.gui.dialogs.file_dialog import get_save_file_name
 from sportorg.gui.menu import menu_list, Factory
-from sportorg.gui.tabs import persons, groups, organizations, results, courses, log
+from sportorg.gui.tabs import persons, groups, organizations, results, courses
 from sportorg.gui.tabs.memory_model import PersonMemoryModel, ResultMemoryModel, GroupMemoryModel, \
     CourseMemoryModel, OrganizationMemoryModel
 from sportorg.gui.toolbar import toolbar_list
@@ -85,8 +85,6 @@ class MainWindow(QMainWindow):
         self._set_style()
         self._setup_ui()
         self._setup_menu()
-        if Configuration().configuration.get('show_toolbar'):
-            self._setup_toolbar()
         self._setup_tab()
         self._setup_statusbar()
         self.show()
@@ -179,8 +177,6 @@ class MainWindow(QMainWindow):
                     shortcuts = [action_item['shortcut']] if isinstance(action_item['shortcut'], str)\
                         else action_item['shortcut']
                     action.setShortcuts(shortcuts)
-                if 'icon' in action_item:
-                    action.setIcon(QtGui.QIcon(action_item['icon']))
                 if 'status_tip' in action_item:
                     action.setStatusTip(action_item['status_tip'])
                 if 'tabs' in action_item:
@@ -195,8 +191,6 @@ class MainWindow(QMainWindow):
             else:
                 menu = QtWidgets.QMenu(parent)
                 menu.setTitle(action_item['title'])
-                if 'icon' in action_item:
-                    menu.setIcon(QtGui.QIcon(action_item['icon']))
                 if 'tabs' in action_item:
                     self.menu_list_for_disabled.append((
                         menu,
@@ -210,15 +204,6 @@ class MainWindow(QMainWindow):
         self.menubar.setGeometry(QtCore.QRect(0, 0, 880, 21))
         self.setMenuBar(self.menubar)
         self._create_menu(self.menubar, menu_list())
-
-    def _setup_toolbar(self):
-        self.toolbar = self.addToolBar(_('Toolbar'))
-        for tb in toolbar_list():
-            tb_action = QtWidgets.QAction(QtGui.QIcon(tb[0]), tb[1], self)
-            tb_action.triggered.connect(self.menu_factory.get_action(tb[2]))
-            if len(tb) == 4:
-                self.toolbar_property[tb[3]] = tb_action
-            self.toolbar.addAction(tb_action)
 
     def _setup_statusbar(self):
         self.statusbar = QtWidgets.QStatusBar()
@@ -236,8 +221,6 @@ class MainWindow(QMainWindow):
         self.tabwidget.addTab(groups.Widget(), _('Groups'))
         self.tabwidget.addTab(courses.Widget(), _('Courses'))
         self.tabwidget.addTab(organizations.Widget(), _('Teams'))
-        # self.logging_tab = log.Widget()
-        # self.tabwidget.addTab(self.logging_tab, _('Logs'))
         self.tabwidget.currentChanged.connect(self._menu_disable)
 
     def _menu_disable(self, tab_index):

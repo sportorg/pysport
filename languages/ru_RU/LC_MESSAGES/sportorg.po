@@ -391,9 +391,6 @@ msgstr "Поиск не дал результатов"
 msgid "Languages"
 msgstr "Язык интерфейса"
 
-msgid "Show toolbar"
-msgstr "Показать панель инструментов"
-
 msgid "Auto save"
 msgstr "Автосохранение"
 

@@ -75,7 +75,6 @@ class Config(metaclass=Singleton):
         self._configurations = {
             ConfigFile.CONFIGURATION: Configurations({
                 'current_locale': 'ru_RU',
-                'show_toolbar': True,
                 'autoconnect': False,
                 'open_recent_file': False,
                 'use_birthday': False,
