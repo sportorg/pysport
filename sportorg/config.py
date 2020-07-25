@@ -2,11 +2,19 @@ import os
 import sys
 import logging.config
 
+from pydantic import BaseSettings
+
 from sportorg.common.version import Version
+
+
+class Env(BaseSettings):
+    DEBUG: bool = False
+
+    class Config:
+        env_file = '.env'
 
 NAME = 'SportOrg'
 VERSION = Version(1, 5, 0, 0, 'v')
-DEBUG = True
 
 
 def is_executable():
@@ -84,6 +92,8 @@ STYLE_DIR = base_dir('styles')
 def style_dir(*paths):
     return os.path.join(STYLE_DIR, *paths)
 
+env = Env(_env_file=base_dir('.env'))
+DEBUG = env.DEBUG
 
 ICON = icon_dir('sportorg.svg')
 
