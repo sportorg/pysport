@@ -360,22 +360,16 @@ class ManualFinishAction(Action, metaclass=ActionFactory):
 class SPORTidentReadoutAction(Action, metaclass=ActionFactory):
     def execute(self):
         SIReaderClient().toggle()
-        time.sleep(0.5)
-        self.app.interval()
 
 
 class SportiduinoReadoutAction(Action, metaclass=ActionFactory):
     def execute(self):
         SportiduinoClient().toggle()
-        time.sleep(0.5)
-        self.app.interval()
 
 
 class SFRReadoutAction(Action, metaclass=ActionFactory):
     def execute(self):
         SFRReaderClient().toggle()
-        time.sleep(0.5)
-        self.app.interval()
 
 
 class CreateReportAction(Action, metaclass=ActionFactory):
@@ -512,8 +506,6 @@ class TeamworkEnableAction(Action, metaclass=ActionFactory):
         connection_type = race().get_setting('teamwork_type_connection', 'client')
         Teamwork().set_options(host, port, token, connection_type)
         Teamwork().toggle()
-        time.sleep(0.5)
-        self.app.interval()
 
 
 class TeamworkSendAction(Action, metaclass=ActionFactory):
