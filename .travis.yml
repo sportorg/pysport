@@ -10,6 +10,7 @@ install:
   - poetry export --dev --without-hashes -f requirements.txt > requirements.txt
   - sed -i '/win32/d' requirements.txt
   - pip install -r requirements.txt
+  - cp .env.example .env
 
 script:
   - pytest --verbosity=2 --showlocals --strict --log-level=DEBUG
