@@ -467,7 +467,7 @@ class MainWindow(QMainWindow):
             _('SportOrg file (*.json)'),
             time.strftime("%Y%m%d")
         )
-        if not file_name:
+        if file_name:
             try:
                 if update_data:
                     new_event([Race()])
