@@ -1,17 +1,29 @@
 import logging
 
 from PySide2 import QtCore, QtWidgets
-from PySide2.QtWidgets import QDialog, QDialogButtonBox, QVBoxLayout, QWidget, QCheckBox
+from PySide2.QtWidgets import QCheckBox, QDialog, QDialogButtonBox, QVBoxLayout, QWidget
 
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import _
-from sportorg.models.memory import race, Person, Qualification, ResultManual
-from sportorg.utils.time import time_to_hhmmss, hhmmss_to_time
+from sportorg.models.memory import Qualification, ResultManual, race
+from sportorg.utils.time import hhmmss_to_time, time_to_hhmmss
 
 
 def get_value_options():
-    return [_('Start'), _('Finish'), _('Result'), _('Credit'), _('Penalty time'), _('Penalty legs'), _('Card number'),
-            _('Group'), _('Team'), _('Qualification'), _('Bib'), _('Comment')]
+    return [
+        _('Start'),
+        _('Finish'),
+        _('Result'),
+        _('Credit'),
+        _('Penalty time'),
+        _('Penalty legs'),
+        _('Card number'),
+        _('Group'),
+        _('Team'),
+        _('Qualification'),
+        _('Bib'),
+        _('Comment'),
+    ]
 
 
 def get_readonly_options():
@@ -88,8 +100,12 @@ class TextExchangeDialog(QDialog):
 
         self.options_group_box = QtWidgets.QGroupBox(self)
         self.options_grid_layout = QtWidgets.QGridLayout(self.options_group_box)
-        self.option_creating_new_result_checkbox = QCheckBox(_("Create new result, if doesn't exist"))
-        self.options_grid_layout.addWidget(self.option_creating_new_result_checkbox, 0, 0, 1, 1)
+        self.option_creating_new_result_checkbox = QCheckBox(
+            _("Create new result, if doesn't exist")
+        )
+        self.options_grid_layout.addWidget(
+            self.option_creating_new_result_checkbox, 0, 0, 1, 1
+        )
         self.grid_layout.addWidget(self.options_group_box, 1, 0, 1, 2)
 
         self.text_edit = QtWidgets.QPlainTextEdit(self)
@@ -115,18 +131,18 @@ class TextExchangeDialog(QDialog):
         pass
 
     def retranslate_ui(self, text_io):
-        text_io.setWindowTitle(_("Dialog"))
-        self.value_group_box.setTitle(_("Values"))
-        self.id_label.setText(_("Identifier"))
-        self.bib_radio_button.setText(_("Bib"))
-        self.name_radio_button.setText(_("Person name"))
-        self.value_label.setText(_("Value"))
-        self.separator_group_box.setTitle(_("Separator"))
-        self.space_radio_button.setText(_("space"))
-        self.tab_radio_button.setText(_("tab"))
-        self.semicolon_radio_button.setText(_("semicolon"))
-        self.custom_radio_button.setText(_("custom"))
-        self.options_group_box.setTitle(_("Options"))
+        text_io.setWindowTitle(_('Dialog'))
+        self.value_group_box.setTitle(_('Values'))
+        self.id_label.setText(_('Identifier'))
+        self.bib_radio_button.setText(_('Bib'))
+        self.name_radio_button.setText(_('Person name'))
+        self.value_label.setText(_('Value'))
+        self.separator_group_box.setTitle(_('Separator'))
+        self.space_radio_button.setText(_('space'))
+        self.tab_radio_button.setText(_('tab'))
+        self.semicolon_radio_button.setText(_('semicolon'))
+        self.custom_radio_button.setText(_('custom'))
+        self.options_group_box.setTitle(_('Options'))
         self.text_edit.setPlainText('')
 
         self.get_text_wrapper()
@@ -208,14 +224,20 @@ class TextExchangeDialog(QDialog):
                                 person,
                                 key,
                                 value,
-                                creating_new_result=self.option_creating_new_result_checkbox.isChecked()
+                                creating_new_result=self.option_creating_new_result_checkbox.isChecked(),
                             )
                             success_count += 1
                         else:
                             logging.debug('text_io: no person found for line ' + i)
                     else:
                         logging.debug('text_io: empty value for line ' + i)
-            logging.debug('text_io: processed ' + str(success_count) + ' from ' + str(len(lines)) + ' lines')
+            logging.debug(
+                'text_io: processed '
+                + str(success_count)
+                + ' from '
+                + str(len(lines))
+                + ' lines'
+            )
         except Exception as e:
             logging.error(e)
 

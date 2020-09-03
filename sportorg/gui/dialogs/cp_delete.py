@@ -1,7 +1,15 @@
 import logging
 
 from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QFormLayout, QDialog, QDialogButtonBox, QCheckBox, QSpinBox, QLabel, QTextEdit
+from PySide2.QtWidgets import (
+    QCheckBox,
+    QDialog,
+    QDialogButtonBox,
+    QFormLayout,
+    QLabel,
+    QSpinBox,
+    QTextEdit,
+)
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
@@ -88,7 +96,7 @@ class CPDeleteDialog(QDialog):
                 if len(courses_has_number):
                     text += '{}:\n{}\n'.format(
                         _('Courses'),
-                        '\n'.join([course.name for course in courses_has_number])
+                        '\n'.join([course.name for course in courses_has_number]),
                     )
             is_result = self.item_is_result.isChecked()
             if is_result:
@@ -102,7 +110,9 @@ class CPDeleteDialog(QDialog):
                 if len(results_has_number):
                     text += '{}:\n{}'.format(
                         _('Results'),
-                        '\n'.join([str(result.card_number) for result in results_has_number])
+                        '\n'.join(
+                            [str(result.card_number) for result in results_has_number]
+                        ),
                     )
             self.item_info.setText(text)
         except Exception as e:
@@ -123,8 +133,8 @@ class CPDeleteDialog(QDialog):
                 controls = []
                 for i, control in enumerate(course.controls):
                     if str(number) == control.code:
-                        if i < len(course.controls)-1:
-                            course.controls[i+1].length += control.length
+                        if i < len(course.controls) - 1:
+                            course.controls[i + 1].length += control.length
                         logging.info('Del {} from {}'.format(number, course.name))
                     else:
                         controls.append(control)
@@ -137,7 +147,11 @@ class CPDeleteDialog(QDialog):
                 splits = []
                 for split in result.splits:
                     if str(number) == str(split.code):
-                        logging.info('Del {} from {} {}'.format(number, result.card_number, split.time))
+                        logging.info(
+                            'Del {} from {} {}'.format(
+                                number, result.card_number, split.time
+                            )
+                        )
                     else:
                         splits.append(split)
                 result.splits = splits

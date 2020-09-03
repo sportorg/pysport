@@ -1,8 +1,8 @@
-import locale
 import datetime
+import locale
 
 import dateutil.parser
-from jinja2 import Template, Environment, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader, Template
 
 
 def to_hhmmss(value, fmt=None):
@@ -11,8 +11,15 @@ def to_hhmmss(value, fmt=None):
         return ''
     if not fmt:
         fmt = '%H:%M:%S'
-    dt = datetime.datetime(2000, 1, 1, value // 3600000 % 24, (value % 3600000) // 60000,
-                           (value % 60000) // 1000, (value % 1000) * 10)
+    dt = datetime.datetime(
+        2000,
+        1,
+        1,
+        value // 3600000 % 24,
+        (value % 3600000) // 60000,
+        (value % 60000) // 1000,
+        (value % 1000) * 10,
+    )
     return dt.strftime(fmt)
 
 
@@ -39,10 +46,7 @@ def get_text_from_path(path, **kwargs):
 
 
 def get_text_from_template(searchpath, path, **kwargs):
-    env = Environment(
-        loader=FileSystemLoader(searchpath),
-        finalize=finalize
-    )
+    env = Environment(loader=FileSystemLoader(searchpath), finalize=finalize)
     env.filters['tohhmmss'] = to_hhmmss
     env.filters['date'] = date
     env.policies['json.dumps_kwargs']['ensure_ascii'] = False

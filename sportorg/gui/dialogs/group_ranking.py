@@ -1,14 +1,21 @@
 import logging
 
 from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QFormLayout, QDialog, QCheckBox, QSpinBox, QTimeEdit, QHBoxLayout, \
-    QDialogButtonBox
+from PySide2.QtWidgets import (
+    QCheckBox,
+    QDialog,
+    QDialogButtonBox,
+    QFormLayout,
+    QHBoxLayout,
+    QSpinBox,
+    QTimeEdit,
+)
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
-from sportorg.models.memory import RankingItem, Qualification, race
+from sportorg.models.memory import Qualification, race
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.utils.time import time_to_otime, time_to_qtime
 
@@ -63,10 +70,16 @@ class GroupRankingDialog(QDialog):
             name = i.name
             if i in self.group.ranking.rank:
                 rank = self.group.ranking.rank[i]
-                rank.is_active = self.findChild(QCheckBox, name + '_checkbox').isChecked()
+                rank.is_active = self.findChild(
+                    QCheckBox, name + '_checkbox'
+                ).isChecked()
                 rank.max_place = self.findChild(QSpinBox, name + '_place').value()
-                rank.max_time = time_to_otime(self.findChild(QTimeEdit, name + '_time').time())
-                rank.use_scores = self.findChild(AdvComboBox, name + '_combo').currentText() == _('Rank')
+                rank.max_time = time_to_otime(
+                    self.findChild(QTimeEdit, name + '_time').time()
+                )
+                rank.use_scores = self.findChild(
+                    AdvComboBox, name + '_combo'
+                ).currentText() == _('Rank')
         ResultCalculation(race()).set_rank(self.group)
 
 
@@ -88,7 +101,7 @@ def get_widget_from_ranking(ranking):
 
     max_time = QTimeEdit()
     max_time.setFixedWidth(70)
-    max_time.setDisplayFormat("hh:mm:ss")
+    max_time.setDisplayFormat('hh:mm:ss')
     max_time.setObjectName(qual + '_time')
 
     def select_type():

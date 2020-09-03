@@ -2,7 +2,15 @@ import logging
 import re
 
 from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QFormLayout, QLabel, QDialog, QDialogButtonBox, QLineEdit, QCheckBox, QTextEdit
+from PySide2.QtWidgets import (
+    QCheckBox,
+    QDialog,
+    QDialogButtonBox,
+    QFormLayout,
+    QLabel,
+    QLineEdit,
+    QTextEdit,
+)
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
@@ -19,7 +27,9 @@ class LiveDialog(QDialog):
             r'localhost|'  # localhost...
             r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'  # ...or ip
             r'(?::\d+)?'  # optional port
-            r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+            r'(?:/?|[/?]\S+)$',
+            re.IGNORECASE,
+        )
 
     def exec_(self):
         self.init_ui()

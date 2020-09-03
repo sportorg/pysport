@@ -1,16 +1,33 @@
 import logging
 
 from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QFormLayout, QDialog, QCheckBox, QDialogButtonBox, QLabel, QTabWidget, QWidget, QPushButton, \
-    QSpinBox
+from PySide2.QtWidgets import (
+    QCheckBox,
+    QDialog,
+    QDialogButtonBox,
+    QFormLayout,
+    QLabel,
+    QPushButton,
+    QSpinBox,
+    QTabWidget,
+    QWidget,
+)
 
 from sportorg import config
 from sportorg.common.audio import get_sounds
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _, get_languages
-from sportorg.models.memory import races, Race, set_current_race_index, add_race, copy_race, get_current_race_index, \
-    del_race, move_up_race, move_down_race
+from sportorg.models.memory import (
+    add_race,
+    copy_race,
+    del_race,
+    get_current_race_index,
+    move_down_race,
+    move_up_race,
+    races,
+    set_current_race_index,
+)
 from sportorg.modules.configs.configs import Config
 
 
@@ -27,16 +44,20 @@ class MainTab(Tab):
         self.label_lang = QLabel(_('Languages'))
         self.item_lang = AdvComboBox()
         self.item_lang.addItems(get_languages())
-        self.item_lang.setCurrentText(Config().configuration.get('current_locale', 'ru_RU'))
+        self.item_lang.setCurrentText(
+            Config().configuration.get('current_locale', 'ru_RU')
+        )
         self.layout.addRow(self.label_lang, self.item_lang)
 
         self.item_auto_save = QSpinBox()
-        self.item_auto_save.setMaximum(3600*24)
+        self.item_auto_save.setMaximum(3600 * 24)
         self.item_auto_save.setValue(Config().configuration.get('autosave_interval'))
         self.layout.addRow(_('Auto save') + ' (sec)', self.item_auto_save)
 
         self.item_open_recent_file = QCheckBox(_('Open recent file'))
-        self.item_open_recent_file.setChecked(Config().configuration.get('open_recent_file'))
+        self.item_open_recent_file.setChecked(
+            Config().configuration.get('open_recent_file')
+        )
         self.layout.addRow(self.item_open_recent_file)
 
         self.item_use_birthday = QCheckBox(_('Use birthday'))
@@ -52,7 +73,9 @@ class MainTab(Tab):
     def save(self):
         Config().configuration.set('current_locale', self.item_lang.currentText())
         Config().configuration.set('autosave_interval', self.item_auto_save.value())
-        Config().configuration.set('open_recent_file', self.item_open_recent_file.isChecked())
+        Config().configuration.set(
+            'open_recent_file', self.item_open_recent_file.isChecked()
+        )
         Config().configuration.set('use_birthday', self.item_use_birthday.isChecked())
         Config().configuration.set('check_updates', self.item_check_updates.isChecked())
 
@@ -71,23 +94,31 @@ class SoundTab(Tab):
         self.label_successful = QLabel(_('Successful result'))
         self.item_successful = AdvComboBox()
         self.item_successful.addItems(self.sounds)
-        self.item_successful.setCurrentText(Config().sound.get('successful') or config.sound_dir('ok.wav'))
+        self.item_successful.setCurrentText(
+            Config().sound.get('successful') or config.sound_dir('ok.wav')
+        )
         self.layout.addRow(self.label_successful, self.item_successful)
 
         self.label_unsuccessful = QLabel(_('Unsuccessful result'))
         self.item_unsuccessful = AdvComboBox()
         self.item_unsuccessful.addItems(self.sounds)
-        self.item_unsuccessful.setCurrentText(Config().sound.get('unsuccessful') or config.sound_dir('failure.wav'))
+        self.item_unsuccessful.setCurrentText(
+            Config().sound.get('unsuccessful') or config.sound_dir('failure.wav')
+        )
         self.layout.addRow(self.label_unsuccessful, self.item_unsuccessful)
 
         self.item_enabled_rented_card = QCheckBox(_('Enable rented card sound'))
-        self.item_enabled_rented_card.setChecked(Config().sound.get('enabled_rented_card', Config().sound.get('enabled')))
+        self.item_enabled_rented_card.setChecked(
+            Config().sound.get('enabled_rented_card', Config().sound.get('enabled'))
+        )
         self.layout.addRow(self.item_enabled_rented_card)
 
         self.label_rented_card = QLabel(_('Rented card sound'))
         self.item_rented_card = AdvComboBox()
         self.item_rented_card.addItems(self.sounds)
-        self.item_rented_card.setCurrentText(Config().sound.get('rented_card') or config.sound_dir('rented_card.wav'))
+        self.item_rented_card.setCurrentText(
+            Config().sound.get('rented_card') or config.sound_dir('rented_card.wav')
+        )
         self.layout.addRow(self.label_rented_card, self.item_rented_card)
 
         self.widget.setLayout(self.layout)
@@ -96,7 +127,9 @@ class SoundTab(Tab):
         Config().sound.set('enabled', self.item_enabled.isChecked())
         Config().sound.set('successful', self.item_successful.currentText())
         Config().sound.set('unsuccessful', self.item_unsuccessful.currentText())
-        Config().sound.set('enabled_rented_card', self.item_enabled_rented_card.isChecked())
+        Config().sound.set(
+            'enabled_rented_card', self.item_enabled_rented_card.isChecked()
+        )
         Config().sound.set('rented_card', self.item_rented_card.currentText())
 
 
@@ -122,6 +155,7 @@ class MultidayTab(Tab):
         def add_race_function():
             add_race()
             self.fill_race_list()
+
         self.item_new = QPushButton(_('New'))
         self.item_new.clicked.connect(add_race_function)
         self.item_new.setMaximumWidth(max_button_width)
@@ -130,6 +164,7 @@ class MultidayTab(Tab):
         def copy_race_function():
             copy_race()
             self.fill_race_list()
+
         self.item_copy = QPushButton(_('Copy'))
         self.item_copy.clicked.connect(copy_race_function)
         self.item_copy.setMaximumWidth(max_button_width)
@@ -138,6 +173,7 @@ class MultidayTab(Tab):
         def move_up_race_function():
             move_up_race()
             self.fill_race_list()
+
         self.item_move_up = QPushButton(_('Move up'))
         self.item_move_up.clicked.connect(move_up_race_function)
         self.item_move_up.setMaximumWidth(max_button_width)
@@ -146,6 +182,7 @@ class MultidayTab(Tab):
         def move_down_race_function():
             move_down_race()
             self.fill_race_list()
+
         self.item_move_down = QPushButton(_('Move down'))
         self.item_move_down.clicked.connect(move_down_race_function)
         self.item_move_down.setMaximumWidth(max_button_width)
@@ -154,6 +191,7 @@ class MultidayTab(Tab):
         def del_race_function():
             del_race()
             self.fill_race_list()
+
         self.item_del = QPushButton(_('Delete'))
         self.item_del.clicked.connect(del_race_function)
         self.item_del.setMaximumWidth(max_button_width)

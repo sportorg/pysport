@@ -1,12 +1,15 @@
 import logging
 
 from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QFormLayout, QDialog, QDialogButtonBox, QLabel, QSpinBox
+from PySide2.QtWidgets import QDialog, QDialogButtonBox, QFormLayout, QLabel, QSpinBox
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import _
-from sportorg.models.start.relay import set_next_relay_number, get_next_relay_number_protocol
+from sportorg.models.start.relay import (
+    get_next_relay_number_protocol,
+    set_next_relay_number,
+)
 
 
 class RelayNumberDialog(QDialog):

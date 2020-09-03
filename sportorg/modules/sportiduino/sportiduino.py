@@ -1,11 +1,10 @@
 import datetime
 import logging
-from queue import Queue, Empty
-from threading import main_thread, Event
-
 import time
-import serial
+from queue import Empty, Queue
+from threading import Event, main_thread
 
+import serial
 from PySide2.QtCore import QThread, Signal
 
 from sportorg.common.singleton import singleton
@@ -106,7 +105,12 @@ class ResultThread(QThread):
     @staticmethod
     def time_to_sec(value):
         if isinstance(value, datetime.datetime):
-            ret = value.hour * 3600 + value.minute * 60 + value.second + value.microsecond / 1000000
+            ret = (
+                value.hour * 3600
+                + value.minute * 60
+                + value.second
+                + value.microsecond / 1000000
+            )
             return ret
 
         return 0
@@ -131,23 +135,17 @@ class SportiduinoClient(object):
     def _start_sportiduino_thread(self):
         if self._sportiduino_thread is None:
             self._sportiduino_thread = SportiduinoThread(
-                self.port,
-                self._queue,
-                self._stop_event,
-                self._logger,
-                debug=True
+                self.port, self._queue, self._stop_event, self._logger, debug=True
             )
             self._sportiduino_thread.start()
         elif self._sportiduino_thread.isFinished():
-            self._sportiduino_thread= None
+            self._sportiduino_thread = None
             self._start_sportiduino_thread()
 
     def _start_result_thread(self):
         if self._result_thread is None:
             self._result_thread = ResultThread(
-                self._queue,
-                self._stop_event,
-                self._logger,
+                self._queue, self._stop_event, self._logger,
             )
             if self._call_back:
                 self._result_thread.data_sender.connect(self._call_back)
@@ -159,7 +157,10 @@ class SportiduinoClient(object):
 
     def is_alive(self):
         if self._sportiduino_thread and self._result_thread:
-            return not self._sportiduino_thread.isFinished() and not self._result_thread.isFinished()
+            return (
+                not self._sportiduino_thread.isFinished()
+                and not self._result_thread.isFinished()
+            )
 
         return False
 
@@ -180,4 +181,3 @@ class SportiduinoClient(object):
 
     def choose_port(self):
         return memory.race().get_setting('system_port', None)
-

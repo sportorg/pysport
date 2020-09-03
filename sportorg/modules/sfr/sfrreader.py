@@ -1,16 +1,15 @@
 import datetime
 import logging
-from queue import Queue, Empty
-from threading import main_thread, Event
-
 import time
+from queue import Empty, Queue
+from threading import Event, main_thread
 
 from PySide2.QtCore import QThread, Signal
 
 from sportorg.common.singleton import singleton
 from sportorg.language import _
 from sportorg.libs.sfr import sfrreader
-from sportorg.libs.sfr.sfrreader import SFRReaderException, SFRReaderCardChanged
+from sportorg.libs.sfr.sfrreader import SFRReaderCardChanged, SFRReaderException
 from sportorg.models import memory
 from sportorg.modules.sportident import backup
 from sportorg.utils.time import time_to_otime
@@ -117,7 +116,12 @@ class ResultThread(QThread):
     @staticmethod
     def time_to_sec(value, max_val=86400):
         if isinstance(value, datetime.datetime):
-            ret = value.hour * 3600 + value.minute * 60 + value.second + value.microsecond / 1000000
+            ret = (
+                value.hour * 3600
+                + value.minute * 60
+                + value.second
+                + value.microsecond / 1000000
+            )
             if max_val:
                 ret = ret % max_val
             return ret
@@ -143,10 +147,7 @@ class SFRReaderClient(object):
     def _start_reader_thread(self):
         if self._reader_thread is None:
             self._reader_thread = SFRReaderThread(
-                self._queue,
-                self._stop_event,
-                self._logger,
-                debug=True
+                self._queue, self._stop_event, self._logger, debug=True
             )
             self._reader_thread.start()
         # elif not self._reader_thread.is_alive():
@@ -157,10 +158,7 @@ class SFRReaderClient(object):
     def _start_result_thread(self):
         if self._result_thread is None:
             self._result_thread = ResultThread(
-                self._queue,
-                self._stop_event,
-                self._logger,
-                self.get_start_time()
+                self._queue, self._stop_event, self._logger, self.get_start_time()
             )
             if self._call_back:
                 self._result_thread.data_sender.connect(self._call_back)
@@ -173,7 +171,10 @@ class SFRReaderClient(object):
     def is_alive(self):
         if self._reader_thread and self._result_thread:
             # return self._reader_thread.is_alive() and self._result_thread.is_alive()
-            return not self._reader_thread.isFinished() and not self._result_thread.isFinished()
+            return (
+                not self._reader_thread.isFinished()
+                and not self._result_thread.isFinished()
+            )
 
         return False
 
@@ -199,5 +200,5 @@ class SFRReaderClient(object):
             hour=start_time[0],
             minute=start_time[1],
             second=start_time[2],
-            microsecond=0
+            microsecond=0,
         )

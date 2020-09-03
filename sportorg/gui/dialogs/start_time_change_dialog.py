@@ -1,7 +1,13 @@
 import logging
 
 from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QFormLayout, QDialog, QDialogButtonBox, QRadioButton, QTimeEdit
+from PySide2.QtWidgets import (
+    QDialog,
+    QDialogButtonBox,
+    QFormLayout,
+    QRadioButton,
+    QTimeEdit,
+)
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
@@ -36,7 +42,6 @@ class StartTimeChangeDialog(QDialog):
         self.layout.addRow(self.time_reduce)
         self.layout.addRow(self.time_value)
 
-
         def cancel_changes():
             self.close()
 
@@ -59,4 +64,6 @@ class StartTimeChangeDialog(QDialog):
         self.show()
 
     def apply_changes_impl(self):
-        change_start_time(self.time_add.isChecked(), time_to_otime(self.time_value.time()))
+        change_start_time(
+            self.time_add.isChecked(), time_to_otime(self.time_value.time())
+        )

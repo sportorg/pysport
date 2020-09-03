@@ -1,12 +1,20 @@
 import logging
 
 from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, QSpinBox, QTextEdit, QDialogButtonBox
+from PySide2.QtWidgets import (
+    QDialog,
+    QDialogButtonBox,
+    QFormLayout,
+    QLabel,
+    QLineEdit,
+    QSpinBox,
+    QTextEdit,
+)
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import _
-from sportorg.models.memory import race, Course, CourseControl, find
+from sportorg.models.memory import CourseControl, find, race
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.result_checker import ResultChecker
 from sportorg.models.result.score_calculation import ScoreCalculation
@@ -57,7 +65,9 @@ class CourseEditDialog(QDialog):
         self.item_control_qty.setDisabled(True)
         self.layout.addRow(self.label_control_qty, self.item_control_qty)
 
-        self.label_controls = QLabel('{}\n\n31 150\n32 200\n33\n34 500\n...\n90 150'.format(_('Controls')))
+        self.label_controls = QLabel(
+            '{}\n\n31 150\n32 200\n33\n34 500\n...\n90 150'.format(_('Controls'))
+        )
         self.item_controls = QTextEdit()
         self.item_controls.setTabChangesFocus(True)
         self.layout.addRow(self.label_controls, self.item_controls)
@@ -102,7 +112,9 @@ class CourseEditDialog(QDialog):
         if self.current_object.controls:
             self.item_control_qty.setValue(len(self.current_object.controls))
         for i in self.current_object.controls:
-            self.item_controls.append('{} {}'.format(i.code, i.length if i.length else ''))
+            self.item_controls.append(
+                '{} {}'.format(i.code, i.length if i.length else '')
+            )
 
     def apply_changes_impl(self):
         course = self.current_object

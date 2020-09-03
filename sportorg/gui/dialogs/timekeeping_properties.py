@@ -1,9 +1,20 @@
 import logging
 
 from PySide2.QtCore import QTime
-from PySide2.QtWidgets import QFormLayout, QLabel, QDialog, \
-     QTimeEdit, QSpinBox, QRadioButton, QCheckBox, QDialogButtonBox, QWidget, QTabWidget, \
-     QGroupBox, QLineEdit
+from PySide2.QtWidgets import (
+    QCheckBox,
+    QDialog,
+    QDialogButtonBox,
+    QFormLayout,
+    QGroupBox,
+    QLabel,
+    QLineEdit,
+    QRadioButton,
+    QSpinBox,
+    QTabWidget,
+    QTimeEdit,
+    QWidget,
+)
 
 from sportorg.common.otime import OTime
 from sportorg.gui.global_access import GlobalAccess
@@ -39,7 +50,7 @@ class TimekeepingPropertiesDialog(QDialog):
 
         self.label_zero_time = QLabel(_('Zero time'))
         self.item_zero_time = QTimeEdit()
-        self.item_zero_time.setDisplayFormat("HH:mm")
+        self.item_zero_time.setDisplayFormat('HH:mm')
         self.item_zero_time.setMaximumSize(60, 20)
         self.item_zero_time.setDisabled(True)
         self.tk_layout.addRow(self.label_zero_time, self.item_zero_time)
@@ -99,7 +110,9 @@ class TimekeepingPropertiesDialog(QDialog):
         self.chip_duplicate_layout = QFormLayout()
         self.chip_duplicate_serveral_results = QRadioButton(_('Several results'))
         self.chip_duplicate_layout.addRow(self.chip_duplicate_serveral_results)
-        self.chip_duplicate_bib_request = QRadioButton(_('Ask for a bib when re-reading the card'))
+        self.chip_duplicate_bib_request = QRadioButton(
+            _('Ask for a bib when re-reading the card')
+        )
         self.chip_duplicate_layout.addRow(self.chip_duplicate_bib_request)
         self.chip_duplicate_relay_find_leg = QRadioButton(_('Find next relay leg'))
         self.chip_duplicate_layout.addRow(self.chip_duplicate_relay_find_leg)
@@ -129,11 +142,15 @@ class TimekeepingPropertiesDialog(QDialog):
         self.rp_fixed_scores_radio = QRadioButton(_('fixed scores'))
         self.rp_fixed_scores_edit = QSpinBox()
         self.rp_fixed_scores_edit.setMaximumWidth(50)
-        self.rp_scores_layout.addRow(self.rp_fixed_scores_radio, self.rp_fixed_scores_edit)
+        self.rp_scores_layout.addRow(
+            self.rp_fixed_scores_radio, self.rp_fixed_scores_edit
+        )
         self.rp_scores_minute_penalty_label = QLabel(_('minute penalty'))
         self.rp_scores_minute_penalty_edit = QSpinBox()
         self.rp_scores_minute_penalty_edit.setMaximumWidth(50)
-        self.rp_scores_layout.addRow(self.rp_scores_minute_penalty_label, self.rp_scores_minute_penalty_edit)
+        self.rp_scores_layout.addRow(
+            self.rp_scores_minute_penalty_label, self.rp_scores_minute_penalty_edit
+        )
         self.result_proc_layout.addRow(self.rp_scores_group)
         self.result_proc_tab.setLayout(self.result_proc_layout)
 
@@ -158,7 +175,7 @@ class TimekeepingPropertiesDialog(QDialog):
         self.mr_layout.addRow(self.mr_lap_station_check, self.mr_lap_station_edit)
         self.mr_dont_dqs_check = QCheckBox(_("Don't disqualify"))
         self.mr_layout.addRow(self.mr_dont_dqs_check)
-        self.mr_max_penalty_by_cp = QCheckBox(_("Max penalty = quantity of cp"))
+        self.mr_max_penalty_by_cp = QCheckBox(_('Max penalty = quantity of cp'))
         self.mr_layout.addRow(self.mr_max_penalty_by_cp)
         self.marked_route_tab.setLayout(self.mr_layout)
 
@@ -194,7 +211,9 @@ class TimekeepingPropertiesDialog(QDialog):
         self.time_settings_accuracy_edit = QSpinBox()
         self.time_settings_accuracy_edit.setMaximumWidth(50)
         self.time_settings_accuracy_edit.setMaximum(3)
-        self.time_settings_layout.addRow(self.time_settings_accuracy_label, self.time_settings_accuracy_edit)
+        self.time_settings_layout.addRow(
+            self.time_settings_accuracy_label, self.time_settings_accuracy_edit
+        )
 
         self.time_settings_format = QGroupBox()
         self.time_settings_format.setTitle(_('Format of competitions'))
@@ -208,7 +227,9 @@ class TimekeepingPropertiesDialog(QDialog):
 
         self.time_settings_tab.setLayout(self.time_settings_layout)
 
-        self.tab_widget.addTab(self.timekeeping_tab, _('SPORTident (Sportiduino, ...) settings'))
+        self.tab_widget.addTab(
+            self.timekeeping_tab, _('SPORTident (Sportiduino, ...) settings')
+        )
         self.tab_widget.addTab(self.result_proc_tab, _('Result processing'))
         self.tab_widget.addTab(self.scores_tab, _('Scores'))
         self.tab_widget.addTab(self.marked_route_tab, _('Penalty calculation'))
@@ -257,7 +278,9 @@ class TimekeepingPropertiesDialog(QDialog):
         finish_source = cur_race.get_setting('system_finish_source', 'station')
         finish_cp_number = cur_race.get_setting('system_finish_cp_number', 90)
         assign_chip_reading = cur_race.get_setting('system_assign_chip_reading', 'off')
-        duplicate_chip_processing = cur_race.get_setting('system_duplicate_chip_processing', 'several_results')
+        duplicate_chip_processing = cur_race.get_setting(
+            'system_duplicate_chip_processing', 'several_results'
+        )
         assignment_mode = cur_race.get_setting('system_assignment_mode', False)
         si_port = cur_race.get_setting('system_port', '')
 
@@ -309,8 +332,12 @@ class TimekeepingPropertiesDialog(QDialog):
         obj = cur_race
         rp_mode = obj.get_setting('result_processing_mode', 'time')
         rp_score_mode = obj.get_setting('result_processing_score_mode', 'rogain')
-        rp_fixed_scores_value = obj.get_setting('result_processing_fixed_score_value', 1)
-        rp_scores_minute_penalty = obj.get_setting('result_processing_scores_minute_penalty', 1)
+        rp_fixed_scores_value = obj.get_setting(
+            'result_processing_fixed_score_value', 1
+        )
+        rp_scores_minute_penalty = obj.get_setting(
+            'result_processing_scores_minute_penalty', 1
+        )
 
         if rp_mode == 'time':
             self.rp_time_radio.setChecked(True)
@@ -328,12 +355,16 @@ class TimekeepingPropertiesDialog(QDialog):
         # penalty calculation
 
         mr_mode = obj.get_setting('marked_route_mode', 'off')
-        mr_penalty_time = OTime(msec=obj.get_setting('marked_route_penalty_time', 60000))
+        mr_penalty_time = OTime(
+            msec=obj.get_setting('marked_route_penalty_time', 60000)
+        )
         mr_if_counting_lap = obj.get_setting('marked_route_if_counting_lap', True)
         mr_if_station_check = obj.get_setting('marked_route_if_station_check', False)
         mr_station_code = obj.get_setting('marked_route_station_code', 80)
         mr_if_dont_dsq_check = obj.get_setting('marked_route_dont_dsq', False)
-        mr_if_max_penalty_by_cp = obj.get_setting('marked_route_max_penalty_by_cp', False)
+        mr_if_max_penalty_by_cp = obj.get_setting(
+            'marked_route_max_penalty_by_cp', False
+        )
 
         if mr_mode == 'off':
             self.mr_off_radio.setChecked(True)
@@ -352,8 +383,11 @@ class TimekeepingPropertiesDialog(QDialog):
         # score settings
 
         scores_mode = obj.get_setting('scores_mode', 'off')
-        scores_array = obj.get_setting('scores_array', '40,37,35,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,'
-                                                       '16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1')
+        scores_array = obj.get_setting(
+            'scores_array',
+            '40,37,35,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,'
+            '16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1',
+        )
         scores_formula = obj.get_setting('scores_formula', '200 - 100 * time / leader')
 
         if scores_mode == 'off':
@@ -415,7 +449,10 @@ class TimekeepingPropertiesDialog(QDialog):
         old_start_cp_number = obj.get_setting('system_start_cp_number', 31)
         old_finish_cp_number = obj.get_setting('system_finish_cp_number', 90)
 
-        if old_start_cp_number != start_cp_number or old_finish_cp_number != finish_cp_number:
+        if (
+            old_start_cp_number != start_cp_number
+            or old_finish_cp_number != finish_cp_number
+        ):
             race().clear_results()
 
         obj.set_setting('system_port', self.item_si_port.currentText())
@@ -447,7 +484,9 @@ class TimekeepingPropertiesDialog(QDialog):
         obj.set_setting('result_processing_mode', rp_mode)
         obj.set_setting('result_processing_score_mode', rp_score_mode)
         obj.set_setting('result_processing_fixed_score_value', rp_fixed_scores_value)
-        obj.set_setting('result_processing_scores_minute_penalty', rp_scores_minute_penalty)
+        obj.set_setting(
+            'result_processing_scores_minute_penalty', rp_scores_minute_penalty
+        )
 
         # marked route
         mr_mode = 'off'

@@ -2,19 +2,29 @@ import logging
 from datetime import date
 
 from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QFormLayout, QLabel, QLineEdit, QSpinBox, QTimeEdit, QTextEdit, QCheckBox, QDialog, \
-    QDialogButtonBox, QDateEdit
+from PySide2.QtWidgets import (
+    QCheckBox,
+    QDateEdit,
+    QDialog,
+    QDialogButtonBox,
+    QFormLayout,
+    QLabel,
+    QLineEdit,
+    QSpinBox,
+    QTextEdit,
+    QTimeEdit,
+)
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
 from sportorg.models.constant import get_names, get_race_groups, get_race_teams
-from sportorg.models.memory import race, Person, find, Qualification, Limit, Organization
+from sportorg.models.memory import Limit, Organization, Qualification, find, race
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.modules.configs.configs import Config
 from sportorg.modules.teamwork import Teamwork
-from sportorg.utils.time import time_to_qtime, time_to_otime, qdate_to_date
+from sportorg.utils.time import qdate_to_date, time_to_otime, time_to_qtime
 
 
 class PersonEditDialog(QDialog):
@@ -215,7 +225,9 @@ class PersonEditDialog(QDialog):
                     return
                 self.button_ok.setDisabled(True)
                 self.is_ok['card'] = False
-                info = '{}\n{}'.format(_('Card number already exists'), person.full_name)
+                info = '{}\n{}'.format(
+                    _('Card number already exists'), person.full_name
+                )
                 if person.group:
                     info = '{}\n{}: {}'.format(info, _('Group'), person.group.name)
                 if person.bib:
@@ -254,7 +266,9 @@ class PersonEditDialog(QDialog):
         if self.current_object.card_number:
             self.item_card.setValue(self.current_object.card_number)
 
-        self.item_out_of_competition.setChecked(self.current_object.is_out_of_competition)
+        self.item_out_of_competition.setChecked(
+            self.current_object.is_out_of_competition
+        )
         self.item_paid.setChecked(self.current_object.is_paid)
         self.item_paid.setChecked(self.current_object.is_paid)
         self.item_personal.setChecked(self.current_object.is_personal)
@@ -278,11 +292,14 @@ class PersonEditDialog(QDialog):
             person.name = self.item_name.currentText()
         if person.surname != self.item_surname.text():
             person.surname = self.item_surname.text()
-        if (person.group and person.group.name != self.item_group.currentText()) or\
-                (person.group is None and len(self.item_group.currentText()) > 0):
+        if (person.group and person.group.name != self.item_group.currentText()) or (
+            person.group is None and len(self.item_group.currentText()) > 0
+        ):
             person.group = find(race().groups, name=self.item_group.currentText())
-        if (person.organization and person.organization.name != self.item_team.currentText()) or \
-                (person.organization is None and len(self.item_team.currentText()) > 0):
+        if (
+            person.organization
+            and person.organization.name != self.item_team.currentText()
+        ) or (person.organization is None and len(self.item_team.currentText()) > 0):
             organization = find(race().organizations, name=self.item_team.currentText())
             if organization is None:
                 organization = Organization()
@@ -299,11 +316,15 @@ class PersonEditDialog(QDialog):
         if person.start_time != new_time:
             person.start_time = new_time
 
-        if person.start_group != self.item_start_group.value() and self.item_start_group.value():
+        if (
+            person.start_group != self.item_start_group.value()
+            and self.item_start_group.value()
+        ):
             person.start_group = self.item_start_group.value()
 
-        if (not person.card_number or int(person.card_number) != self.item_card.value()) \
-                and self.item_card.value:
+        if (
+            not person.card_number or int(person.card_number) != self.item_card.value()
+        ) and self.item_card.value:
             race().person_card_number(person, self.item_card.value())
 
         if person.is_out_of_competition != self.item_out_of_competition.isChecked():

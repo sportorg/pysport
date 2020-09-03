@@ -1,5 +1,5 @@
 from sportorg.common.otime import OTime
-from sportorg.models.memory import race, Person, find
+from sportorg.models.memory import find, race
 
 
 def get_last_relay_number_protocol():

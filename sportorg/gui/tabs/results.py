@@ -1,8 +1,7 @@
 import logging
 
 from PySide2 import QtCore, QtGui, QtWidgets
-from PySide2.QtCore import QModelIndex
-from PySide2.QtWidgets import QAbstractItemView, QHeaderView, QTextEdit
+from PySide2.QtWidgets import QAbstractItemView, QTextEdit
 
 from sportorg.common.broker import Broker
 from sportorg.gui.dialogs.result_edit import ResultEditDialog
@@ -10,7 +9,7 @@ from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.tabs.memory_model import ResultMemoryModel
 from sportorg.gui.tabs.table import TableView
 from sportorg.language import _
-from sportorg.models.memory import race, Result, Course, CourseControl
+from sportorg.models.memory import race
 from sportorg.utils.time import time_to_hhmmss
 
 
@@ -81,12 +80,18 @@ class Widget(QtWidgets.QWidget):
         self.result_card_start_edit = QtWidgets.QLineEdit(self.result_card_group_box)
         self.result_card_start_label = QtWidgets.QLabel(self.result_card_group_box)
         self.vertical_layout_card = QtWidgets.QVBoxLayout(self.result_card_group_box)
-        self.result_course_details = QtWidgets.QTextBrowser(self.result_course_group_box)
-        self.result_course_length_edit = QtWidgets.QLineEdit(self.result_course_group_box)
+        self.result_course_details = QtWidgets.QTextBrowser(
+            self.result_course_group_box
+        )
+        self.result_course_length_edit = QtWidgets.QLineEdit(
+            self.result_course_group_box
+        )
         self.result_course_length_label = QtWidgets.QLabel(self.result_course_group_box)
         self.result_course_name_edit = QtWidgets.QLineEdit(self.result_course_group_box)
         self.result_course_name_label = QtWidgets.QLabel(self.result_course_group_box)
-        self.vertical_layout_course = QtWidgets.QVBoxLayout(self.result_course_group_box)
+        self.vertical_layout_course = QtWidgets.QVBoxLayout(
+            self.result_course_group_box
+        )
         self.setup_ui()
 
     def setup_ui(self):
@@ -96,12 +101,20 @@ class Widget(QtWidgets.QWidget):
         self.result_detail_part.setFrameShadow(QtWidgets.QFrame.Raised)
         self.vertical_layout_course.setContentsMargins(0, 0, 0, 0)
         self.vertical_layout_course.setSpacing(0)
-        self.result_course_form.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.result_course_name_label)
+        self.result_course_form.setWidget(
+            0, QtWidgets.QFormLayout.LabelRole, self.result_course_name_label
+        )
         self.result_course_name_edit.setReadOnly(True)
-        self.result_course_form.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.result_course_name_edit)
-        self.result_course_form.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.result_course_length_label)
+        self.result_course_form.setWidget(
+            0, QtWidgets.QFormLayout.FieldRole, self.result_course_name_edit
+        )
+        self.result_course_form.setWidget(
+            1, QtWidgets.QFormLayout.LabelRole, self.result_course_length_label
+        )
         self.result_course_length_edit.setReadOnly(True)
-        self.result_course_form.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.result_course_length_edit)
+        self.result_course_form.setWidget(
+            1, QtWidgets.QFormLayout.FieldRole, self.result_course_length_edit
+        )
         self.vertical_layout_course.addLayout(self.result_course_form)
         font = QtGui.QFont()
         font.setFamily('Courier New')
@@ -109,12 +122,20 @@ class Widget(QtWidgets.QWidget):
         self.vertical_layout_course.addWidget(self.result_course_details)
         self.vertical_layout_card.setContentsMargins(0, 0, 0, 0)
         self.vertical_layout_card.setSpacing(0)
-        self.result_card_form.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.result_card_start_label)
+        self.result_card_form.setWidget(
+            0, QtWidgets.QFormLayout.LabelRole, self.result_card_start_label
+        )
         self.result_card_start_edit.setReadOnly(True)
-        self.result_card_form.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.result_card_start_edit)
-        self.result_card_form.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.result_card_finish_label)
+        self.result_card_form.setWidget(
+            0, QtWidgets.QFormLayout.FieldRole, self.result_card_start_edit
+        )
+        self.result_card_form.setWidget(
+            1, QtWidgets.QFormLayout.LabelRole, self.result_card_finish_label
+        )
         self.result_card_finish_edit.setReadOnly(True)
-        self.result_card_form.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.result_card_finish_edit)
+        self.result_card_form.setWidget(
+            1, QtWidgets.QFormLayout.FieldRole, self.result_card_finish_edit
+        )
         self.vertical_layout_card.addLayout(self.result_card_form)
         self.result_card_details.setLineWrapMode(QTextEdit.NoWrap)
         font = QtGui.QFont()
@@ -201,7 +222,8 @@ class Widget(QtWidgets.QWidget):
                 s = '{index:02d} ({code}) {length}'.format(
                     index=index,
                     code=control.code,
-                    length=control.length if control.length else '')
+                    length=control.length if control.length else '',
+                )
                 if is_highlight and str(control.code) not in split_codes:
                     s = '<span style="background: yellow">{}</span>'.format(s)
                 self.result_course_details.append(s)
@@ -211,5 +233,9 @@ class Widget(QtWidgets.QWidget):
             self.result_course_length_edit.setText(str(course.length))
 
     def resize_event(self, *args, **kwargs):
-        self.result_course_group_box.setGeometry(QtCore.QRect(1, 1, 120, self.result_table.height()))
-        self.result_card_group_box.setGeometry(QtCore.QRect(120, 1, 235, self.result_table.height()))
+        self.result_course_group_box.setGeometry(
+            QtCore.QRect(1, 1, 120, self.result_table.height())
+        )
+        self.result_card_group_box.setGeometry(
+            QtCore.QRect(120, 1, 235, self.result_table.height())
+        )

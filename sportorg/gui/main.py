@@ -1,15 +1,21 @@
-from multiprocessing import freeze_support
-import sys
 import glob
+import sys
+from multiprocessing import freeze_support
 
 from PySide2.QtWidgets import QApplication
 
 from sportorg import config
-from sportorg.common.singleton import Singleton
 from sportorg.common.scripts import SCRIPTS, Script
+from sportorg.common.singleton import Singleton
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.main_window import MainWindow
-from sportorg.models.constant import StatusComments, PersonNames, Regions, RankingTable, RentCards
+from sportorg.models.constant import (
+    PersonNames,
+    RankingTable,
+    Regions,
+    RentCards,
+    StatusComments,
+)
 
 
 class Application(metaclass=Singleton):
@@ -93,7 +99,7 @@ class Application(metaclass=Singleton):
                         if script.is_type('live'):
                             script.actions = {
                                 'create': locals()['create'],
-                                'delete': locals()['delete']
+                                'delete': locals()['delete'],
                             }
                         SCRIPTS.append(script)
                 except Exception as e:

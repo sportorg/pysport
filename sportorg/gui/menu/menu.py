@@ -1,4 +1,3 @@
-from sportorg import config
 from sportorg.language import _
 
 
@@ -7,72 +6,47 @@ def menu_list():
         {
             'title': _('File'),
             'actions': [
-                {
-                    'title': _('New'),
-                    'shortcut': 'Ctrl+N',
-                    'action': 'NewAction'
-                },
-                {
-                    'title': _('Save'),
-                    'shortcut': 'Ctrl+S',
-                    'action': 'SaveAction'
-                },
-                {
-                    'title': _('Open'),
-                    'shortcut': 'Ctrl+O',
-                    'action': 'OpenAction'
-                },
+                {'title': _('New'), 'shortcut': 'Ctrl+N', 'action': 'NewAction'},
+                {'title': _('Save'), 'shortcut': 'Ctrl+S', 'action': 'SaveAction'},
+                {'title': _('Open'), 'shortcut': 'Ctrl+O', 'action': 'OpenAction'},
                 {
                     'title': _('Save As'),
                     'shortcut': 'Ctrl+Shift+S',
-                    'action': 'SaveAsAction'
+                    'action': 'SaveAsAction',
                 },
-                {
-                    'type': 'separator',
-                },
+                {'type': 'separator',},
                 {
                     'title': _('Settings'),
                     'shortcut': 'Ctrl+Alt+S',
-                    'action': 'SettingsAction'
+                    'action': 'SettingsAction',
                 },
-                {
-                    'title': _('Event Settings'),
-                    'action': 'EventSettingsAction'
-                },
-                {
-                    'type': 'separator',
-                },
+                {'title': _('Event Settings'), 'action': 'EventSettingsAction'},
+                {'type': 'separator',},
                 {
                     'title': _('Import'),
                     'actions': [
                         {
                             'title': _('Import from SportOrg file'),
-                            'action': 'ImportSportOrgAction'
+                            'action': 'ImportSportOrgAction',
                         },
                         {
                             'title': _('CSV Winorient'),
-                            'action': 'CSVWinorientImportAction'
+                            'action': 'CSVWinorientImportAction',
                         },
                         {
                             'title': _('WDB Winorient'),
-                            'action': 'WDBWinorientImportAction'
+                            'action': 'WDBWinorientImportAction',
                         },
-                        {
-                            'title': _('Ocad txt v8'),
-                            'action': 'OcadTXTv8ImportAction'
-                        },
-                        {
-                            'title': _('IOF xml'),
-                            'action': 'IOFEntryListImportAction'
-                        },
-                    ]
+                        {'title': _('Ocad txt v8'), 'action': 'OcadTXTv8ImportAction'},
+                        {'title': _('IOF xml'), 'action': 'IOFEntryListImportAction'},
+                    ],
                 },
                 {
                     'title': _('Export'),
                     'actions': [
                         {
                             'title': _('WDB Winorient'),
-                            'action': 'WDBWinorientExportAction'
+                            'action': 'WDBWinorientExportAction',
                         },
                         # {
                         #     'title': 'IOF xml',
@@ -83,9 +57,9 @@ def menu_list():
                         #         }
                         #     ]
                         # },
-                    ]
-                }
-            ]
+                    ],
+                },
+            ],
         },
         {
             'title': _('Edit'),
@@ -94,128 +68,87 @@ def menu_list():
                     'title': _('Add object'),
                     'tabs': list(range(5)),
                     'shortcut': ['insert', 'i'],
-                    'action': 'AddObjectAction'
+                    'action': 'AddObjectAction',
                 },
                 {
                     'title': _('Delete'),
                     'shortcut': 'Del',
                     'tabs': list(range(5)),
-                    'action': 'DeleteAction'
+                    'action': 'DeleteAction',
                 },
                 {
                     'title': _('Copy'),
                     'shortcut': 'Ctrl+C',
                     'tabs': list(range(5)),
-                    'action': 'CopyAction'
+                    'action': 'CopyAction',
                 },
                 {
                     'title': _('Duplicate'),
                     'shortcut': 'Ctrl+D',
                     'tabs': list(range(5)),
-                    'action': 'DuplicateAction'
+                    'action': 'DuplicateAction',
                 },
-                {
-                    'title': _('Text exchange'),
-                    'action': 'TextExchangeAction'
-                },
-                {
-                    'title': _('Mass edit'),
-                    'tabs': [0],
-                    'action': 'MassEditAction'
-                }
-            ]
+                {'title': _('Text exchange'), 'action': 'TextExchangeAction'},
+                {'title': _('Mass edit'), 'tabs': [0], 'action': 'MassEditAction'},
+            ],
         },
         {
             'title': _('View'),
             'actions': [
-                {
-                    'title': _('Refresh'),
-                    'shortcut': 'F5',
-                    'action': 'RefreshAction'
-                },
+                {'title': _('Refresh'), 'shortcut': 'F5', 'action': 'RefreshAction'},
                 {
                     'title': _('Filter'),
                     'shortcut': 'F2',
                     'tabs': [0, 1],
-                    'action': 'FilterAction'
+                    'action': 'FilterAction',
                 },
                 {
                     'title': _('Search'),
                     'shortcut': 'Ctrl+F',
                     'tabs': list(range(5)),
-                    'action': 'SearchAction'
+                    'action': 'SearchAction',
                 },
-                {
-                    'type': 'separator',
-                },
+                {'type': 'separator',},
                 {
                     'title': _('Start Preparation'),
                     'shortcut': 'Ctrl+1',
-                    'action': 'ToStartPreparationAction'
+                    'action': 'ToStartPreparationAction',
                 },
                 {
                     'title': _('Race Results'),
                     'shortcut': 'Ctrl+2',
-                    'action': 'ToRaceResultsAction'
+                    'action': 'ToRaceResultsAction',
                 },
                 {
                     'title': _('Groups'),
                     'shortcut': 'Ctrl+3',
-                    'action': 'ToGroupsAction'
+                    'action': 'ToGroupsAction',
                 },
                 {
                     'title': _('Courses'),
                     'shortcut': 'Ctrl+4',
-                    'action': 'ToCoursesAction'
+                    'action': 'ToCoursesAction',
                 },
-                {
-                    'title': _('Teams'),
-                    'shortcut': 'Ctrl+5',
-                    'action': 'ToTeamsAction'
-                }
-            ]
+                {'title': _('Teams'), 'shortcut': 'Ctrl+5', 'action': 'ToTeamsAction'},
+            ],
         },
         {
             'title': _('Start Preparation'),
             'actions': [
-                {
-                    'title': _('Start Preparation'),
-                    'action': 'StartPreparationAction'
-                },
-                {
-                    'title': _('Guess courses'),
-                    'action': 'GuessCoursesAction'
-                },
-                {
-                    'title': _('Guess corridors'),
-                    'action': 'GuessCorridorsAction'
-                },
+                {'title': _('Start Preparation'), 'action': 'StartPreparationAction'},
+                {'title': _('Guess courses'), 'action': 'GuessCoursesAction'},
+                {'title': _('Guess corridors'), 'action': 'GuessCorridorsAction'},
                 {
                     'title': _('Relay number assign mode'),
                     'tabs': [0],
-                    'action': 'RelayNumberAction'
+                    'action': 'RelayNumberAction',
                 },
-                {
-                    'title': _('Start time change'),
-                    'action': 'StartTimeChangeAction'
-                },
-                {
-                    'title': _('Handicap start time'),
-                    'action': 'StartHandicapAction'
-                },
-                {
-                    'title': _('Clone relay legs'),
-                    'action': 'RelayCloneAction'
-                },
-                {
-                    'title': _('Use bib as card number'),
-                    'action': 'CopyBibToCardNumber'
-                },
-                {
-                    'title': _('Use card number as bib'),
-                    'action': 'CopyCardNumberToBib'
-                },
-            ]
+                {'title': _('Start time change'), 'action': 'StartTimeChangeAction'},
+                {'title': _('Handicap start time'), 'action': 'StartHandicapAction'},
+                {'title': _('Clone relay legs'), 'action': 'RelayCloneAction'},
+                {'title': _('Use bib as card number'), 'action': 'CopyBibToCardNumber'},
+                {'title': _('Use card number as bib'), 'action': 'CopyCardNumberToBib'},
+            ],
         },
         {
             'title': _('Race'),
@@ -223,13 +156,13 @@ def menu_list():
                 {
                     'title': _('Manual finish'),
                     'shortcut': 'F3',
-                    'action': 'ManualFinishAction'
+                    'action': 'ManualFinishAction',
                 },
                 {
                     'title': _('Add SPORTident result'),
-                    'action': 'AddSPORTidentResultAction'
+                    'action': 'AddSPORTidentResultAction',
                 },
-            ]
+            ],
         },
         {
             'title': _('Results'),
@@ -237,57 +170,46 @@ def menu_list():
                 {
                     'title': _('Create report'),
                     'shortcut': 'Ctrl+P',
-                    'action': 'CreateReportAction'
+                    'action': 'CreateReportAction',
                 },
                 {
                     'title': _('Split printout'),
                     'shortcut': 'Ctrl+L',
-                    'action': 'SplitPrintoutAction'
+                    'action': 'SplitPrintoutAction',
                 },
-                {
-                    'type': 'separator',
-                },
+                {'type': 'separator',},
                 {
                     'title': _('Rechecking'),
                     'shortcut': 'Ctrl+R',
-                    'action': 'RecheckingAction'
+                    'action': 'RecheckingAction',
                 },
                 {
                     'title': _('Find group by punches'),
                     'tabs': [1],
-                    'action': 'GroupFinderAction'
+                    'action': 'GroupFinderAction',
                 },
                 {
                     'title': _('Penalty calculation'),
-                    'action': 'PenaltyCalculationAction'
+                    'action': 'PenaltyCalculationAction',
                 },
-                {
-                    'title': _('Penalty removing'),
-                    'action': 'PenaltyRemovingAction'
-                },
+                {'title': _('Penalty removing'), 'action': 'PenaltyRemovingAction'},
                 {
                     'title': _('Change status'),
                     'shortcut': 'F4',
                     'tabs': [1],
-                    'action': 'ChangeStatusAction'
+                    'action': 'ChangeStatusAction',
                 },
-                {
-                    'title': _('Set DNS numbers'),
-                    'action': 'SetDNSNumbersAction'
-                },
-                {
-                    'title': _('Delete CP'),
-                    'action': 'CPDeleteAction'
-                },
+                {'title': _('Set DNS numbers'), 'action': 'SetDNSNumbersAction'},
+                {'title': _('Delete CP'), 'action': 'CPDeleteAction'},
                 {
                     'title': _('Assign result by bib'),
-                    'action': 'AssignResultByBibAction'
+                    'action': 'AssignResultByBibAction',
                 },
                 {
                     'title': _('Assign result by card number'),
-                    'action': 'AssignResultByCardNumberAction'
+                    'action': 'AssignResultByCardNumberAction',
                 },
-            ]
+            ],
         },
         {
             'title': _('Service'),
@@ -295,16 +217,13 @@ def menu_list():
                 {
                     'title': _('on/off SPORTident readout'),
                     'shortcut': 'F8',
-                    'action': 'SPORTidentReadoutAction'
+                    'action': 'SPORTidentReadoutAction',
                 },
                 {
                     'title': _('on/off Sportiduino readout'),
-                    'action': 'SportiduinoReadoutAction'
+                    'action': 'SportiduinoReadoutAction',
                 },
-                {
-                    'title': _('on/off SFR readout'),
-                    'action': 'SFRReadoutAction'
-                },
+                {'title': _('on/off SFR readout'), 'action': 'SFRReadoutAction'},
                 {
                     'title': _('Teamwork'),
                     'actions': [
@@ -312,16 +231,11 @@ def menu_list():
                             'title': _('Send selected'),
                             'shortcut': 'Ctrl+K',
                             'tabs': list(range(5)),
-                            'action': 'TeamworkSendAction'
+                            'action': 'TeamworkSendAction',
                         },
-                        {
-                            'type': 'separator',
-                        },
-                        {
-                            'title': _('On/Off'),
-                            'action': 'TeamworkEnableAction'
-                        }
-                    ]
+                        {'type': 'separator',},
+                        {'title': _('On/Off'), 'action': 'TeamworkEnableAction'},
+                    ],
                 },
                 {
                     'title': _('Telegram'),
@@ -329,53 +243,31 @@ def menu_list():
                         {
                             'title': _('Send results'),
                             'tabs': [1],
-                            'action': 'TelegramSendAction'
+                            'action': 'TelegramSendAction',
                         },
-                    ]
+                    ],
                 },
-            ]
+            ],
         },
         {
             'title': _('Options'),
             'actions': [
                 {
                     'title': _('Timekeeping settings'),
-                    'action': 'TimekeepingSettingsAction'
+                    'action': 'TimekeepingSettingsAction',
                 },
-                {
-                    'title': _('Teamwork'),
-                    'action': 'TeamworkSettingsAction'
-                },
-                {
-                    'title': _('Printer settings'),
-                    'action': 'PrinterSettingsAction'
-                },
-                {
-                    'title': _('Live'),
-                    'action': 'LiveSettingsAction'
-                },
-                {
-                    'title': _('Telegram'),
-                    'action': 'TelegramSettingsAction'
-                },
-                {
-                    'title': _('Rent cards'),
-                    'action': 'RentCardsAction'
-                },
-            ]
+                {'title': _('Teamwork'), 'action': 'TeamworkSettingsAction'},
+                {'title': _('Printer settings'), 'action': 'PrinterSettingsAction'},
+                {'title': _('Live'), 'action': 'LiveSettingsAction'},
+                {'title': _('Telegram'), 'action': 'TelegramSettingsAction'},
+                {'title': _('Rent cards'), 'action': 'RentCardsAction'},
+            ],
         },
         {
             'title': _('Help'),
             'actions': [
-                {
-                    'title': _('About'),
-                    'shortcut': 'F1',
-                    'action': 'AboutAction'
-                },
-                {
-                    'title': _('Check updates'),
-                    'action': 'CheckUpdatesAction'
-                },
-            ]
+                {'title': _('About'), 'shortcut': 'F1', 'action': 'AboutAction'},
+                {'title': _('Check updates'), 'action': 'CheckUpdatesAction'},
+            ],
         },
     ]

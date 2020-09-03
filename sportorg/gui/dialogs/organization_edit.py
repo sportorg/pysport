@@ -1,14 +1,14 @@
 import logging
 
 from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, QDialogButtonBox
+from PySide2.QtWidgets import QDialog, QDialogButtonBox, QFormLayout, QLabel, QLineEdit
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
 from sportorg.models.constant import get_countries, get_regions
-from sportorg.models.memory import race, Organization, find
+from sportorg.models.memory import find, race
 from sportorg.modules.teamwork import Teamwork
 
 

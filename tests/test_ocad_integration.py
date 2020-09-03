@@ -1,4 +1,4 @@
-from sportorg.models.memory import race, find, Course
+from sportorg.models.memory import Course, find, race
 from sportorg.modules.ocad import ocad
 
 

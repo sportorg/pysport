@@ -1,8 +1,18 @@
 import logging
 import uuid
 
-from PySide2.QtWidgets import QFormLayout, QLabel, QDialog, QSpinBox, QRadioButton, QDialogButtonBox, QWidget,\
-    QTabWidget, QGroupBox, QLineEdit
+from PySide2.QtWidgets import (
+    QDialog,
+    QDialogButtonBox,
+    QFormLayout,
+    QGroupBox,
+    QLabel,
+    QLineEdit,
+    QRadioButton,
+    QSpinBox,
+    QTabWidget,
+    QWidget,
+)
 
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import _

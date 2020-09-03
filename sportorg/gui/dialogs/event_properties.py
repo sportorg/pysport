@@ -1,14 +1,22 @@
 import logging
 
 from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, QTextEdit, QDateTimeEdit, \
-    QDialogButtonBox, QSpinBox
+from PySide2.QtWidgets import (
+    QDateTimeEdit,
+    QDialog,
+    QDialogButtonBox,
+    QFormLayout,
+    QLabel,
+    QLineEdit,
+    QSpinBox,
+    QTextEdit,
+)
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
-from sportorg.models.memory import race, RaceType
+from sportorg.models.memory import RaceType, race
 from sportorg.models.result.result_calculation import ResultCalculation
 
 
@@ -142,11 +150,7 @@ class EventPropertiesDialog(QDialog):
             obj.data.race_type = t
         obj.data.relay_leg_count = self.item_relay_legs.value()
 
-        obj.set_setting('system_zero_time', (
-            start_date.hour,
-            start_date.minute,
-            0
-        ))
+        obj.set_setting('system_zero_time', (start_date.hour, start_date.minute, 0))
 
         ResultCalculation(race()).process_results()
         GlobalAccess().get_main_window().set_title()

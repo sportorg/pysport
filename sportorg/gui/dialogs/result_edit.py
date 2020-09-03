@@ -1,13 +1,21 @@
 import logging
-
 from abc import abstractmethod
-
 from datetime import datetime
 
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, \
-    QTimeEdit, QSpinBox, QGroupBox, QTextEdit, QDialogButtonBox, QComboBox
+from PySide2.QtWidgets import (
+    QComboBox,
+    QDialog,
+    QDialogButtonBox,
+    QFormLayout,
+    QGroupBox,
+    QLabel,
+    QLineEdit,
+    QSpinBox,
+    QTextEdit,
+    QTimeEdit,
+)
 
 from sportorg import config
 from sportorg.gui.dialogs.person_edit import PersonEditDialog
@@ -15,12 +23,12 @@ from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
 from sportorg.models.constant import StatusComments
-from sportorg.models.memory import race, Result, find, ResultStatus, Person, Limit, Split
+from sportorg.models.memory import Limit, ResultStatus, Split, find, race
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.result_checker import ResultChecker, ResultCheckerException
 from sportorg.models.result.split_calculation import GroupSplits
 from sportorg.modules.teamwork import Teamwork
-from sportorg.utils.time import time_to_qtime, time_to_otime, hhmmss_to_time
+from sportorg.utils.time import hhmmss_to_time, time_to_otime, time_to_qtime
 
 
 class ResultEditDialog(QDialog):
@@ -139,7 +147,9 @@ class ResultEditDialog(QDialog):
         self.button_cancel.clicked.connect(cancel_changes)
 
         if self.current_object.person:
-            button_person = button_box.addButton(_('Entry properties'), QDialogButtonBox.ActionRole)
+            button_person = button_box.addButton(
+                _('Entry properties'), QDialogButtonBox.ActionRole
+            )
             button_person.clicked.connect(self.open_person)
 
         self.layout.addRow(button_box)
@@ -169,7 +179,9 @@ class ResultEditDialog(QDialog):
             self.splits.splits(self.current_object.splits)
             self.splits.show()
         if self.current_object.created_at:
-            self.item_created_at.setTime(time_to_qtime(datetime.fromtimestamp(self.current_object.created_at)))
+            self.item_created_at.setTime(
+                time_to_qtime(datetime.fromtimestamp(self.current_object.created_at))
+            )
         if self.current_object.finish_time:
             self.item_finish.setTime(time_to_qtime(self.current_object.finish_time))
         if self.current_object.start_time:
@@ -337,7 +349,9 @@ class SplitsText(SplitsObject):
         time_accuracy = race().get_setting('time_accuracy', 0)
         for split in splits:
             if self._more24:
-                text += '{} {} {}\n'.format(split.code, split.time.to_str(time_accuracy), split.days)
+                text += '{} {} {}\n'.format(
+                    split.code, split.time.to_str(time_accuracy), split.days
+                )
             else:
                 text += '{} {}\n'.format(split.code, split.time.to_str(time_accuracy))
 

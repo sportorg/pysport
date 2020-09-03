@@ -1,8 +1,17 @@
 import logging
 
 from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QFormLayout, QLabel, QDialog, QDialogButtonBox, QLineEdit, QCheckBox, QGroupBox, \
-    QRadioButton, QTextEdit
+from PySide2.QtWidgets import (
+    QCheckBox,
+    QDialog,
+    QDialogButtonBox,
+    QFormLayout,
+    QGroupBox,
+    QLabel,
+    QLineEdit,
+    QRadioButton,
+    QTextEdit,
+)
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
@@ -81,7 +90,9 @@ class TelegramDialog(QDialog):
         token = obj.get_setting('telegram_token', '')
         url = obj.get_setting('telegram_chat_id', '')
         parse_mode = obj.get_setting('telegram_parse_mode', '')
-        template = obj.get_setting('telegram_template', '{group} {name} {bib} {result} {place}')
+        template = obj.get_setting(
+            'telegram_template', '{group} {name} {bib} {result} {place}'
+        )
         telegram_enabled = obj.get_setting('telegram_enabled', False)
 
         self.item_chat_id.setText(url)

@@ -1,12 +1,18 @@
 import codecs
 import logging
 import os
-
 import webbrowser
 
-from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QFormLayout, QLabel, QDialog, QPushButton, QDialogButtonBox, QCheckBox
 from docxtpl import DocxTemplate
+from PySide2.QtGui import QIcon
+from PySide2.QtWidgets import (
+    QCheckBox,
+    QDialog,
+    QDialogButtonBox,
+    QFormLayout,
+    QLabel,
+    QPushButton,
+)
 
 from sportorg import config
 from sportorg.common.template import get_templates, get_text_from_file
@@ -15,7 +21,7 @@ from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
 from sportorg.models.constant import RentCards
-from sportorg.models.memory import race, races, get_current_race_index
+from sportorg.models.memory import get_current_race_index, race, races
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.score_calculation import ScoreCalculation
 from sportorg.models.result.split_calculation import RaceSplits
@@ -55,7 +61,9 @@ class ReportDialog(QDialog):
         self.item_custom_path = QPushButton(_('Choose template'))
 
         def select_custom_path():
-            file_name = get_open_file_name(_('Open HTML template'), _("HTML file (*.html)"))
+            file_name = get_open_file_name(
+                _('Open HTML template'), _('HTML file (*.html)')
+            )
             self.item_template.setCurrentText(file_name)
 
         self.item_custom_path.clicked.connect(select_custom_path)
@@ -103,7 +111,13 @@ class ReportDialog(QDialog):
     def apply_changes_impl(self):
         obj = race()
         mw = GlobalAccess().get_main_window()
-        map_items = [obj.persons, obj.results, obj.groups, obj.courses, obj.organizations]
+        map_items = [
+            obj.persons,
+            obj.results,
+            obj.groups,
+            obj.courses,
+            obj.organizations,
+        ]
         map_names = ['persons', 'results', 'groups', 'courses', 'organizations']
         selected_items = {
             'persons': [],
@@ -145,8 +159,13 @@ class ReportDialog(QDialog):
             if _settings['save_to_last_file']:
                 file_name = _settings['last_file']
             else:
-                file_name = get_save_file_name(_('Save As MS Word file'), _("MS Word file (*.docx)"),
-                                               '{}_official'.format(obj.data.get_start_datetime().strftime("%Y%m%d")))
+                file_name = get_save_file_name(
+                    _('Save As MS Word file'),
+                    _('MS Word file (*.docx)'),
+                    '{}_official'.format(
+                        obj.data.get_start_datetime().strftime('%Y%m%d')
+                    ),
+                )
             if file_name:
                 doc.save(file_name)
                 os.startfile(file_name)
@@ -158,14 +177,19 @@ class ReportDialog(QDialog):
                 races=races_dict,
                 rent_cards=list(RentCards().get()),
                 current_race=get_current_race_index(),
-                selected=selected_items
+                selected=selected_items,
             )
 
             if _settings['save_to_last_file']:
                 file_name = _settings['last_file']
             else:
-                file_name = get_save_file_name(_('Save As HTML file'), _("HTML file (*.html)"),
-                                               '{}_report'.format(obj.data.get_start_datetime().strftime("%Y%m%d")))
+                file_name = get_save_file_name(
+                    _('Save As HTML file'),
+                    _('HTML file (*.html)'),
+                    '{}_report'.format(
+                        obj.data.get_start_datetime().strftime('%Y%m%d')
+                    ),
+                )
             if len(file_name):
                 _settings['last_file'] = file_name
                 with codecs.open(file_name, 'w', 'utf-8') as file:

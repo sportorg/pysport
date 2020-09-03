@@ -1,5 +1,5 @@
-from threading import Thread
 import logging
+from threading import Thread
 
 import requests
 
@@ -35,8 +35,10 @@ class LiveClient(metaclass=Singleton):
             for s in SCRIPTS:
                 if s.is_type('live') and s.is_enabled():
                     Thread(
-                        target=lambda: s.call('create', requests, url, data, race_data, logging.root),
-                        name='LiveThread'
+                        target=lambda: s.call(
+                            'create', requests, url, data, race_data, logging.root
+                        ),
+                        name='LiveThread',
                     ).start()
                     break
 
@@ -47,7 +49,9 @@ class LiveClient(metaclass=Singleton):
             for s in SCRIPTS:
                 if s.is_type('live') and s.is_enabled():
                     Thread(
-                        target=lambda: s.call('delete', requests, url, data, race_data, logging.root),
-                        name='LiveThread'
+                        target=lambda: s.call(
+                            'delete', requests, url, data, race_data, logging.root
+                        ),
+                        name='LiveThread',
                     ).start()
                     break

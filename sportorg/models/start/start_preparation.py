@@ -5,14 +5,14 @@ import uuid
 from copy import copy
 
 from sportorg.common.otime import OTime
-
-from sportorg.models.memory import race, Group, Person, Result, ResultStatus
+from sportorg.models.memory import Person, race
 from sportorg.models.result.result_calculation import ResultCalculation
 
 
 class ReserveManager(object):
     def __init__(self, r):
         self.race = r
+
     """
         Inserts reserve athletes into each group
         You can specify minimum quantity of person or percentage to add in each group
@@ -20,6 +20,7 @@ class ReserveManager(object):
 
         Now effect on all groups, but in future we'll possible implement working with selected groups only
     """
+
     def process(self, reserve_prefix, reserve_count, reserve_percent):
         current_race = self.race
 
@@ -32,7 +33,9 @@ class ReserveManager(object):
             existing_reserves = 0
             if count > 0:
                 for current_person in persons:
-                    str_name = "" + str(current_person.surname) + str(current_person.name)
+                    str_name = (
+                        '' + str(current_person.surname) + str(current_person.name)
+                    )
                     if str.find(str_name, reserve_prefix) > -1:
                         existing_reserves += 1
 
@@ -50,6 +53,7 @@ class DrawManager(object):
         Execute draw in each group
         Now effect on all groups, but in future we'll possible implement working with filtered persons
     """
+
     def __init__(self, r):
         self.race = r
         self.person_array = []
@@ -74,7 +78,9 @@ class DrawManager(object):
                 team = current_person.organization.name
                 region = current_person.organization.region
 
-            self.person_array.append([index, group, '{:03}'.format(start_group), team, region])
+            self.person_array.append(
+                [index, group, '{:03}'.format(start_group), team, region]
+            )
 
     def get_tossed_array(self, persons):
         index_array = []
@@ -86,10 +92,18 @@ class DrawManager(object):
     def process(self, split_start_groups, split_teams, split_regions, mix_groups=False):
         current_race = self.race
         current_race.update_counters()
-        ret = self.process_array(current_race.persons, split_start_groups, split_teams, split_regions, mix_groups)
+        ret = self.process_array(
+            current_race.persons,
+            split_start_groups,
+            split_teams,
+            split_regions,
+            mix_groups,
+        )
         current_race.persons = ret
 
-    def process_array(self, persons, split_start_groups, split_teams, split_regions, mix_groups=False):
+    def process_array(
+        self, persons, split_start_groups, split_teams, split_regions, mix_groups=False
+    ):
         self.mix_groups = mix_groups
         self.split_start_groups = split_start_groups
         self.split_teams = split_teams
@@ -105,12 +119,18 @@ class DrawManager(object):
         # sort array by group and start_group
         if mix_groups:
             if split_start_groups:
-                self.person_array = sorted(self.person_array, key=lambda item: str(item[2]))
+                self.person_array = sorted(
+                    self.person_array, key=lambda item: str(item[2])
+                )
         else:
             if split_start_groups:
-                self.person_array = sorted(self.person_array, key=lambda item: str(item[1]) + str(item[2]))
+                self.person_array = sorted(
+                    self.person_array, key=lambda item: str(item[1]) + str(item[2])
+                )
             else:
-                self.person_array = sorted(self.person_array, key=lambda item: str(item[1]))
+                self.person_array = sorted(
+                    self.person_array, key=lambda item: str(item[1])
+                )
 
         # process team and region conflicts in each start group
         self.process_conflicts()
@@ -213,18 +233,23 @@ class DrawManager(object):
 
 
 class StartNumberManager(object):
-
     def __init__(self, r):
         self.race = r
+
     """
         Assign new start numbers
 
     """
-    def process(self, mode='interval', first_number=None, interval=None, mix_groups=False):
+
+    def process(
+        self, mode='interval', first_number=None, interval=None, mix_groups=False
+    ):
         if mode == 'interval':
             cur_num = first_number
             for cur_corridor in get_corridors():
-                cur_num = self.process_corridor_by_order(cur_corridor, cur_num, interval)
+                cur_num = self.process_corridor_by_order(
+                    cur_corridor, cur_num, interval
+                )
         else:
             first_number = 1
             cur_num = first_number
@@ -237,7 +262,9 @@ class StartNumberManager(object):
 
     def process_corridor_by_order(self, corridor, first_number=1, interval=1):
         current_race = self.race
-        persons = current_race.get_persons_by_corridor(corridor)  # get persons of current corridor
+        persons = current_race.get_persons_by_corridor(
+            corridor
+        )  # get persons of current corridor
         # persons = sorted(persons, key=lambda item: item.start_time)  # sort by start time
         return self.set_numbers_by_order(persons, first_number, interval)
 
@@ -282,16 +309,24 @@ class StartNumberManager(object):
                 cur_number += interval
         return cur_number
 
-class StartTimeManager(object):
 
+class StartTimeManager(object):
     def __init__(self, r):
         self.race = r
+
     """
         Set new start time for athletes
 
     """
-    def process(self, corridor_first_start, is_group_start_interval, fixed_start_interval=None, one_minute_qty=1,
-                mix_groups=False):
+
+    def process(
+        self,
+        corridor_first_start,
+        is_group_start_interval,
+        fixed_start_interval=None,
+        one_minute_qty=1,
+        mix_groups=False,
+    ):
         current_race = self.race
         current_race.update_counters()
 
@@ -300,7 +335,9 @@ class StartTimeManager(object):
             cur_start = corridor_first_start
 
             if mix_groups:
-                self.process_corridor(cur_corridor, cur_start, fixed_start_interval, one_minute_qty)
+                self.process_corridor(
+                    cur_corridor, cur_start, fixed_start_interval, one_minute_qty
+                )
             else:
                 groups = get_groups_by_corridor(cur_corridor)
                 for cur_group in groups:
@@ -311,7 +348,9 @@ class StartTimeManager(object):
                         if cur_group.start_interval:
                             start_interval = cur_group.start_interval
 
-                    cur_start = self.process_group(cur_group, cur_start, start_interval, one_minute_qty)
+                    cur_start = self.process_group(
+                        cur_group, cur_start, start_interval, one_minute_qty
+                    )
 
     def process_group(self, group, first_start, start_interval, one_minute_qty):
         current_race = self.race
@@ -345,15 +384,15 @@ class StartTimeManager(object):
 
 
 def get_corridors():
-        current_race = race()
-        ret = []
-        for current_group in current_race.groups:
-            cur_corridor = current_group.start_corridor
-            if not cur_corridor:
-                cur_corridor = 0
-            if cur_corridor not in ret:
-                ret.append(cur_corridor)
-        return sorted(ret)
+    current_race = race()
+    ret = []
+    for current_group in current_race.groups:
+        cur_corridor = current_group.start_corridor
+        if not cur_corridor:
+            cur_corridor = 0
+        if cur_corridor not in ret:
+            ret.append(cur_corridor)
+    return sorted(ret)
 
 
 def get_groups_by_corridor(corridor):
@@ -377,7 +416,12 @@ def guess_courses_for_groups():
                 group_name = cur_group.name
                 if str(course_name).find(group_name) > -1:
                     cur_group.course = cur_course
-                    logging.debug('Connecting: group ' + group_name + ' with course ' + course_name)
+                    logging.debug(
+                        'Connecting: group '
+                        + group_name
+                        + ' with course '
+                        + course_name
+                    )
                     break
 
 
@@ -406,10 +450,20 @@ def change_start_time(if_add, time_offset):
 
 def handicap_start_time():
     obj = race()
-    handicap_start = OTime(msec=obj.get_setting('handicap_start', OTime(hour=11).to_msec()))
-    handicap_max_gap = OTime(msec=obj.get_setting('handicap_max_gap', OTime(minute=30).to_msec()))
-    handicap_second_start = OTime(msec=obj.get_setting('handicap_second_start', OTime(hour=11, minute=30).to_msec()))
-    handicap_interval = OTime(msec=obj.get_setting('handicap_interval', OTime(minute=30).to_msec()))
+    handicap_start = OTime(
+        msec=obj.get_setting('handicap_start', OTime(hour=11).to_msec())
+    )
+    handicap_max_gap = OTime(
+        msec=obj.get_setting('handicap_max_gap', OTime(minute=30).to_msec())
+    )
+    handicap_second_start = OTime(
+        msec=obj.get_setting(
+            'handicap_second_start', OTime(hour=11, minute=30).to_msec()
+        )
+    )
+    handicap_interval = OTime(
+        msec=obj.get_setting('handicap_interval', OTime(minute=30).to_msec())
+    )
 
     rc = ResultCalculation(obj)
     for group in obj.groups:
@@ -443,9 +497,15 @@ def handicap_start_time():
 
 def reverse_start_time():
     obj = race()
-    handicap_start = OTime(msec=obj.get_setting('handicap_start', OTime(hour=11).to_msec()))
-    handicap_interval = OTime(msec=obj.get_setting('handicap_interval', OTime(minute=30).to_msec()))
-    handicap_dsg_offset = OTime(msec=obj.get_setting('handicap_dsg_offset', OTime(minute=10).to_msec()))
+    handicap_start = OTime(
+        msec=obj.get_setting('handicap_start', OTime(hour=11).to_msec())
+    )
+    handicap_interval = OTime(
+        msec=obj.get_setting('handicap_interval', OTime(minute=30).to_msec())
+    )
+    handicap_dsg_offset = OTime(
+        msec=obj.get_setting('handicap_dsg_offset', OTime(minute=10).to_msec())
+    )
 
     rc = ResultCalculation(obj)
     for group in obj.groups:

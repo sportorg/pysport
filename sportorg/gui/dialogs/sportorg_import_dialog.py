@@ -1,13 +1,20 @@
 import logging
 
 from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QFormLayout, QDialog, QDialogButtonBox, QLabel, QGroupBox, QRadioButton
+from PySide2.QtWidgets import (
+    QDialog,
+    QDialogButtonBox,
+    QFormLayout,
+    QGroupBox,
+    QLabel,
+    QRadioButton,
+)
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
-from sportorg.models.memory import Race, race, find
+from sportorg.models.memory import find, race
 
 
 class SportOrgImportDialog(QDialog):
@@ -132,7 +139,9 @@ class SportOrgImportDialog(QDialog):
                     if person.group:
                         person.group = find(obj.groups, id=person.group.id)
                     if person.organization:
-                        person.organization = find(obj.organizations, id=person.organization.id)
+                        person.organization = find(
+                            obj.organizations, id=person.organization.id
+                        )
                     persons.append(person)
             obj.persons.extend(persons)
 

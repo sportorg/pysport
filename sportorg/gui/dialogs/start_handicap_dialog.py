@@ -1,14 +1,24 @@
 import logging
 
 from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QFormLayout, QDialog, QDialogButtonBox, QTimeEdit, QLabel, QRadioButton
+from PySide2.QtWidgets import (
+    QDialog,
+    QDialogButtonBox,
+    QFormLayout,
+    QLabel,
+    QRadioButton,
+    QTimeEdit,
+)
 
 from sportorg import config
 from sportorg.common.otime import OTime
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import _
 from sportorg.models.memory import race
-from sportorg.models.start.start_preparation import handicap_start_time, reverse_start_time
+from sportorg.models.start.start_preparation import (
+    handicap_start_time,
+    reverse_start_time,
+)
 from sportorg.utils.time import time_to_otime
 
 
@@ -91,21 +101,52 @@ class StartHandicapDialog(QDialog):
             self.handicap_mode.toggle()
         else:
             self.reverse_mode.toggle()
-        self.zero_time.setTime(OTime(msec=obj.get_setting('handicap_start', OTime(0, 11).to_msec())).to_time())
-        self.max_gap.setTime(OTime(msec=obj.get_setting('handicap_max_gap', OTime(0, 0, 30).to_msec())).to_time())
+        self.zero_time.setTime(
+            OTime(
+                msec=obj.get_setting('handicap_start', OTime(0, 11).to_msec())
+            ).to_time()
+        )
+        self.max_gap.setTime(
+            OTime(
+                msec=obj.get_setting('handicap_max_gap', OTime(0, 0, 30).to_msec())
+            ).to_time()
+        )
         self.second_time.setTime(
-            OTime(msec=obj.get_setting('handicap_second_start', OTime(0, 11, 30).to_msec())).to_time())
-        self.interval_time.setTime(OTime(msec=obj.get_setting('handicap_interval', OTime(0, 0, 1).to_msec())).to_time())
-        self.dsq_offset.setTime(OTime(msec=obj.get_setting('handicap_dsq_offset', OTime(0, 0, 10).to_msec())).to_time())
+            OTime(
+                msec=obj.get_setting(
+                    'handicap_second_start', OTime(0, 11, 30).to_msec()
+                )
+            ).to_time()
+        )
+        self.interval_time.setTime(
+            OTime(
+                msec=obj.get_setting('handicap_interval', OTime(0, 0, 1).to_msec())
+            ).to_time()
+        )
+        self.dsq_offset.setTime(
+            OTime(
+                msec=obj.get_setting('handicap_dsq_offset', OTime(0, 0, 10).to_msec())
+            ).to_time()
+        )
 
     def apply_changes_impl(self):
         obj = race()
         obj.set_setting('handicap_mode', self.handicap_mode.isChecked())
-        obj.set_setting('handicap_start', time_to_otime(self.zero_time.time()).to_msec())
-        obj.set_setting('handicap_max_gap', time_to_otime(self.max_gap.time()).to_msec())
-        obj.set_setting('handicap_second_start', time_to_otime(self.second_time.time()).to_msec())
-        obj.set_setting('handicap_interval', time_to_otime(self.interval_time.time()).to_msec())
-        obj.set_setting('handicap_dsq_offset', time_to_otime(self.dsq_offset.time()).to_msec())
+        obj.set_setting(
+            'handicap_start', time_to_otime(self.zero_time.time()).to_msec()
+        )
+        obj.set_setting(
+            'handicap_max_gap', time_to_otime(self.max_gap.time()).to_msec()
+        )
+        obj.set_setting(
+            'handicap_second_start', time_to_otime(self.second_time.time()).to_msec()
+        )
+        obj.set_setting(
+            'handicap_interval', time_to_otime(self.interval_time.time()).to_msec()
+        )
+        obj.set_setting(
+            'handicap_dsq_offset', time_to_otime(self.dsq_offset.time()).to_msec()
+        )
 
         if obj.get_setting('handicap_mode', True):
             handicap_start_time()

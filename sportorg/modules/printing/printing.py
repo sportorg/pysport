@@ -1,5 +1,5 @@
-import sys
 import logging
+import sys
 from multiprocessing import Process
 
 from PySide2.QtCore import QSizeF
@@ -44,7 +44,7 @@ class PrintProcess(Process):
                 self.margin_top,
                 self.margin_right,
                 self.margin_bottom,
-                QPrinter.Millimeter
+                QPrinter.Millimeter,
             )
 
             page_size = QSizeF()

@@ -1,13 +1,14 @@
 import logging
-from queue import Queue, Empty
+from queue import Empty, Queue
 from threading import Event, main_thread
 
 from PySide2.QtCore import QThread, Signal
 
 from sportorg.common.broker import Broker
 from sportorg.common.singleton import singleton
+
 from .client import ClientThread
-from .server import ServerThread, Command
+from .server import Command, ServerThread
 
 
 class ResultThread(QThread):
@@ -40,10 +41,7 @@ class Teamwork(object):
         self._in_queue = Queue()
         self._out_queue = Queue()
         self._stop_event = Event()
-        self.factory = {
-            'client': ClientThread,
-            'server': ServerThread
-        }
+        self.factory = {'client': ClientThread, 'server': ServerThread}
         self._thread = None
         self._result_thread = None
         self._call_back = None
@@ -74,7 +72,7 @@ class Teamwork(object):
                 self._in_queue,
                 self._out_queue,
                 self._stop_event,
-                self._logger
+                self._logger,
             )
             self._thread.start()
         elif not self._thread.is_alive():
@@ -84,9 +82,7 @@ class Teamwork(object):
     def _start_result_thread(self):
         if self._result_thread is None:
             self._result_thread = ResultThread(
-                self._out_queue,
-                self._stop_event,
-                self._logger
+                self._out_queue, self._stop_event, self._logger
             )
             if self._call_back:
                 self._result_thread.data_sender.connect(self._call_back)
@@ -97,8 +93,12 @@ class Teamwork(object):
             self._start_result_thread()
 
     def is_alive(self):
-        return self._thread and self._thread.is_alive() \
-               and self._result_thread and not self._result_thread.isFinished()
+        return (
+            self._thread
+            and self._thread.is_alive()
+            and self._result_thread
+            and not self._result_thread.isFinished()
+        )
 
     def stop(self):
         self._stop_event.set()

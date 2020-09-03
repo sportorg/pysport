@@ -1,7 +1,7 @@
+import json
 import queue
 import socket
 from threading import Thread, main_thread
-import json
 
 from .server import Command
 
@@ -103,9 +103,13 @@ class ClientThread(Thread):
             try:
                 s.connect(self.addr)
                 self._logger.info('Client start')
-                sender = ClientSenderThread(s, self._in_queue, self._stop_event, self._logger)
+                sender = ClientSenderThread(
+                    s, self._in_queue, self._stop_event, self._logger
+                )
                 sender.start()
-                receiver = ClientReceiverThread(s, self._out_queue, self._stop_event, self._logger)
+                receiver = ClientReceiverThread(
+                    s, self._out_queue, self._stop_event, self._logger
+                )
                 receiver.start()
 
                 sender.join()

@@ -1,6 +1,6 @@
 import logging
 
-from sportorg.models.memory import Course, Group, Qualification, ResultStatus
+from sportorg.models.memory import Course, Qualification, ResultStatus
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.utils.time import get_speed_min_per_km
 
@@ -13,7 +13,10 @@ class PersonSplits(object):
         self._course = None
 
         self.assigned_rank = ''
-        if hasattr(self.result, 'assigned_rank') and self.result.assigned_rank != Qualification.NOT_QUALIFIED:
+        if (
+            hasattr(self.result, 'assigned_rank')
+            and self.result.assigned_rank != Qualification.NOT_QUALIFIED
+        ):
             self.assigned_rank = self.result.assigned_rank.get_title()
 
         self.relay_leg = self.result.person.bib // 1000
@@ -38,7 +41,9 @@ class PersonSplits(object):
         start_time = self.result.get_start_time()
 
         if self.course.length:
-            self.result.speed = get_speed_min_per_km(self.result.get_result_otime(), self.course.length)
+            self.result.speed = get_speed_min_per_km(
+                self.result.get_result_otime(), self.course.length
+            )
 
         if not len(self.course.controls):
             prev_split = start_time
@@ -49,7 +54,9 @@ class PersonSplits(object):
                 split.leg_time = split.time - prev_split
                 prev_split = split.time
 
-        while split_index < len(self.result.splits) and course_index < len(self.course.controls):
+        while split_index < len(self.result.splits) and course_index < len(
+            self.course.controls
+        ):
             cur_split = self.result.splits[split_index]
 
             cur_split.index = split_index
@@ -62,7 +69,9 @@ class PersonSplits(object):
                 cur_split.course_index = course_index
                 cur_split.length_leg = self.course.controls[course_index].length
                 if cur_split.length_leg:
-                    cur_split.speed = get_speed_min_per_km(cur_split.leg_time, cur_split.length_leg)
+                    cur_split.speed = get_speed_min_per_km(
+                        cur_split.leg_time, cur_split.length_leg
+                    )
 
                 cur_split.leg_place = 0
 
@@ -102,7 +111,7 @@ class PersonSplits(object):
         return {
             'person': self.person.to_dict(),
             'result': self.result.to_dict(),
-            'course': self.course.to_dict()
+            'course': self.course.to_dict(),
         }
 
 
@@ -148,12 +157,18 @@ class GroupSplits(object):
         if relative:
             self.person_splits = sorted(
                 self.person_splits,
-                key=lambda item: (item.get_leg_relative_time(index) is None, item.get_leg_relative_time(index))
+                key=lambda item: (
+                    item.get_leg_relative_time(index) is None,
+                    item.get_leg_relative_time(index),
+                ),
             )
         else:
             self.person_splits = sorted(
                 self.person_splits,
-                key=lambda item: (item.get_leg_time(index) is None, item.get_leg_time(index))
+                key=lambda item: (
+                    item.get_leg_time(index) is None,
+                    item.get_leg_time(index),
+                ),
             )
 
     def sort_by_result(self):
@@ -179,8 +194,8 @@ class GroupSplits(object):
             key=lambda item: (
                 item.result.get_place() is None or item.result.get_place() == '',
                 ('0000' + str(item.result.get_place()))[-4:],
-                int(item.relay_leg)
-            )
+                int(item.relay_leg),
+            ),
         )
 
     def set_places_for_leg(self, index, relative=False):
@@ -222,7 +237,10 @@ class GroupSplits(object):
                     prev_split_time = leg.leg_time
 
     def set_leg_leader(self, index, person_split):
-        self.leader[str(index)] = (person_split.person.name, person_split.get_leg_time(index))
+        self.leader[str(index)] = (
+            person_split.person.name,
+            person_split.get_leg_time(index),
+        )
 
     def get_leg_leader(self, index):
         if str(index) in self.leader.keys():

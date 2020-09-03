@@ -2,9 +2,17 @@ import logging
 
 from PySide2 import QtPrintSupport
 from PySide2.QtGui import QIcon
-from PySide2.QtPrintSupport import QPrinter, QPrintDialog, QAbstractPrintDialog
-from PySide2.QtWidgets import QFormLayout, QLabel, QDialog, QPushButton, QCheckBox, QDialogButtonBox, QGroupBox, \
-    QDoubleSpinBox
+from PySide2.QtPrintSupport import QAbstractPrintDialog, QPrintDialog, QPrinter
+from PySide2.QtWidgets import (
+    QCheckBox,
+    QDialog,
+    QDialogButtonBox,
+    QDoubleSpinBox,
+    QFormLayout,
+    QGroupBox,
+    QLabel,
+    QPushButton,
+)
 
 from sportorg import config
 from sportorg.common.template import get_templates
@@ -58,7 +66,9 @@ class PrintPropertiesDialog(QDialog):
         self.item_custom_path = QPushButton(_('Choose template'))
 
         def select_custom_path():
-            file_name = get_open_file_name(_('Open HTML template'), _("HTML file (*.html)"))
+            file_name = get_open_file_name(
+                _('Open HTML template'), _('HTML file (*.html)')
+            )
             self.item_template.setCurrentText(file_name)
 
         self.item_custom_path.clicked.connect(select_custom_path)

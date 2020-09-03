@@ -1,14 +1,14 @@
 import logging
 
 from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QFormLayout, QLabel, QDialog, QDialogButtonBox, QTextEdit
+from PySide2.QtWidgets import QDialog, QDialogButtonBox, QFormLayout, QLabel, QTextEdit
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
 from sportorg.models.constant import StatusComments
-from sportorg.models.memory import race, ResultStatus, find, ResultManual
+from sportorg.models.memory import ResultManual, ResultStatus, find, race
 from sportorg.modules.teamwork import Teamwork
 
 
@@ -61,7 +61,9 @@ class NotStartDialog(QDialog):
         self.show()
 
     def apply_changes_impl(self):
-        status_comment = StatusComments().remove_hint(self.item_status_comment.currentText())
+        status_comment = StatusComments().remove_hint(
+            self.item_status_comment.currentText()
+        )
         text = self.item_numbers.toPlainText()
         numbers = []
         for item in text.split('\n'):

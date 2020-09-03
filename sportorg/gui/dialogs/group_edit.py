@@ -2,8 +2,17 @@ import logging
 from datetime import date
 
 from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, QPushButton, QSpinBox, QTimeEdit, QCheckBox, \
-    QDialogButtonBox
+from PySide2.QtWidgets import (
+    QCheckBox,
+    QDialog,
+    QDialogButtonBox,
+    QFormLayout,
+    QLabel,
+    QLineEdit,
+    QPushButton,
+    QSpinBox,
+    QTimeEdit,
+)
 
 from sportorg import config
 from sportorg.gui.dialogs.group_ranking import GroupRankingDialog
@@ -11,10 +20,10 @@ from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import _
 from sportorg.models.constant import get_race_courses
-from sportorg.models.memory import race, Group, find, Sex, Limit, RaceType
+from sportorg.models.memory import Limit, RaceType, Sex, find, race
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.modules.teamwork import Teamwork
-from sportorg.utils.time import time_to_qtime, time_to_otime
+from sportorg.utils.time import time_to_otime, time_to_qtime
 
 
 class GroupEditDialog(QDialog):
@@ -190,7 +199,9 @@ class GroupEditDialog(QDialog):
         if self.current_object.max_time:
             self.item_max_time.setTime(time_to_qtime(self.current_object.max_time))
         if self.current_object.start_interval:
-            self.item_start_interval.setTime(time_to_qtime(self.current_object.start_interval))
+            self.item_start_interval.setTime(
+                time_to_qtime(self.current_object.start_interval)
+            )
         if self.current_object.start_corridor:
             self.item_corridor.setValue(self.current_object.start_corridor)
         if self.current_object.order_in_corridor:
@@ -219,8 +230,9 @@ class GroupEditDialog(QDialog):
         if group.long_name != self.item_full_name.text():
             group.long_name = self.item_full_name.text()
 
-        if (group.course and group.course.name != self.item_course.currentText()) \
-                or (group.course is None and len(self.item_course.currentText()) > 0):
+        if (group.course and group.course.name != self.item_course.currentText()) or (
+            group.course is None and len(self.item_course.currentText()) > 0
+        ):
             group.course = find(race().courses, name=self.item_course.currentText())
 
         if group.sex.get_title() != self.item_sex.currentText():

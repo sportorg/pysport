@@ -1,15 +1,14 @@
 import platform
 
 from sportorg.common.template import get_text_from_file
-from sportorg.models.memory import race, Organization
+from sportorg.config import template_dir
+from sportorg.language import _
+from sportorg.models.memory import Organization, race
+from sportorg.models.result.split_calculation import GroupSplits
 from sportorg.modules.configs.configs import Config
+from sportorg.modules.printing.printing import print_html
 from sportorg.modules.printing.printout_split import SportorgPrinter
 
-from sportorg.modules.printing.printing import print_html
-from sportorg.config import template_dir
-from sportorg.models.result.split_calculation import GroupSplits
-
-from sportorg.language import _
 
 class NoResultToPrintException(Exception):
     pass
@@ -30,7 +29,9 @@ def split_printout(result):
 
     if person.group and course:
         printer = Config().printer.get('split')
-        template_path = obj.get_setting('split_template', template_dir('split', '1_split_printout.html'))
+        template_path = obj.get_setting(
+            'split_template', template_dir('split', '1_split_printout.html')
+        )
 
         s = GroupSplits(obj, person.group).generate(True)
         result.check_who_can_win()
@@ -46,10 +47,12 @@ def split_printout(result):
                 if scale.isdecimal():
                     size = int(scale) * size // 100
 
-            pr = SportorgPrinter(printer,
-                            size,
-                            int(obj.get_setting('print_margin_left', 5.0)),
-                            int(obj.get_setting('print_margin_top', 5.0)))
+            pr = SportorgPrinter(
+                printer,
+                size,
+                int(obj.get_setting('print_margin_left', 5.0)),
+                int(obj.get_setting('print_margin_top', 5.0)),
+            )
 
             pr.print_split(result)
             pr.end_doc()
@@ -68,7 +71,7 @@ def split_printout(result):
             group=person.group.to_dict(),
             course=course.to_dict(),
             organization=organization.to_dict(),
-            items=s.to_dict()
+            items=s.to_dict(),
         )
         if not printer:
             raise NoPrinterSelectedException('No printer selected')

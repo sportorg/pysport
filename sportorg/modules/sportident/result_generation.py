@@ -1,17 +1,21 @@
 import logging
 
 from sportorg.gui.dialogs.bib_dialog import BibDialog
-from sportorg.models.result.result_checker import ResultChecker, ResultCheckerException
-from sportorg.models.memory import race, Person, Result, ResultSportident, find
 from sportorg.language import _
+from sportorg.models.memory import Person, ResultSportident, find, race
+from sportorg.models.result.result_checker import ResultChecker, ResultCheckerException
 
 
 class ResultSportidentGeneration:
     def __init__(self, result: ResultSportident):
         self._result = result
         self._person = None
-        self.assign_chip_reading = race().get_setting('system_assign_chip_reading', 'off')
-        self.duplicate_chip_processing = race().get_setting('system_duplicate_chip_processing', 'several_results')
+        self.assign_chip_reading = race().get_setting(
+            'system_assign_chip_reading', 'off'
+        )
+        self.duplicate_chip_processing = race().get_setting(
+            'system_duplicate_chip_processing', 'several_results'
+        )
         self.card_read_repeated = self.duplicate_chip_processing == 'bib_request'
 
     def _add_result_to_race(self):
@@ -84,7 +88,11 @@ class ResultSportidentGeneration:
                     if not next_leg_res:
                         self._person = next_leg
                         self._result.person = next_leg
-                        logging.info('Relay: Card {} assigned to bib {}'.format(self._result.card_number, bib))
+                        logging.info(
+                            'Relay: Card {} assigned to bib {}'.format(
+                                self._result.card_number, bib
+                            )
+                        )
                         break
                 else:
                     # All legs of relay team finished
@@ -110,7 +118,6 @@ class ResultSportidentGeneration:
 
             return True
 
-
     def add_result(self):
         if self._has_result():
             logging.info('Result already exist')
@@ -125,7 +132,9 @@ class ResultSportidentGeneration:
         elif self._has_sportident_card():
             if self.duplicate_chip_processing == 'bib_request':
                 self._bib_dialog()
-            elif self.duplicate_chip_processing == 'relay_find_leg' and race().is_relay():
+            elif (
+                self.duplicate_chip_processing == 'relay_find_leg' and race().is_relay()
+            ):
                 self._relay_find_leg()  # assign chip to the next unfinished leg of a relay team
             elif self.duplicate_chip_processing == 'merge':
                 return self._merge_punches()
@@ -154,7 +163,9 @@ class ResultSportidentGeneration:
 
             self._add_result_to_race()
 
-            logging.info('{} {}'.format(self._result.system_type, self._result.card_number))
+            logging.info(
+                '{} {}'.format(self._result.system_type, self._result.card_number)
+            )
         else:
             if self._find_person_by_result():
                 self._result.person = self._person

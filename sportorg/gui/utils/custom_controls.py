@@ -44,7 +44,9 @@ class AdvComboBox(QComboBox):
             self.setCurrentIndex(index)
 
 
-def messageBoxQuestion(parent=None, title='', text='', buttons=(QMessageBox.Yes | QMessageBox.No)):
+def messageBoxQuestion(
+    parent=None, title='', text='', buttons=(QMessageBox.Yes | QMessageBox.No)
+):
     messageBox = QMessageBox(QMessageBox.Question, title, text, buttons, parent)
 
     button_yes = messageBox.button(QMessageBox.Yes)
@@ -64,5 +66,3 @@ def messageBoxQuestion(parent=None, title='', text='', buttons=(QMessageBox.Yes 
         button_cancel.setText(_('Cancel'))
 
     return messageBox.exec_()
-
-
