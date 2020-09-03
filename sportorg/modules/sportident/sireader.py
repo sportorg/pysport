@@ -19,7 +19,7 @@ from sportident import (
 )
 
 from sportorg.common.singleton import singleton
-from sportorg.language import _
+from sportorg.language import translate
 from sportorg.models import memory
 from sportorg.modules.sportident import backup
 from sportorg.utils.time import time_to_otime
@@ -233,13 +233,13 @@ class SIReaderClient(object):
             self._stop_event.clear()
             self._start_si_reader_thread()
             self._start_result_thread()
-            self._logger.info(_('Opening port') + ' ' + self.port)
+            self._logger.info(translate('Opening port') + ' ' + self.port)
         else:
-            self._logger.info(_('Cannot open port'))
+            self._logger.info(translate('Cannot open port'))
 
     def stop(self):
         self._stop_event.set()
-        self._logger.info(_('Closing port'))
+        self._logger.info(translate('Closing port'))
 
     def toggle(self):
         if self.is_alive():
@@ -275,7 +275,7 @@ class SIReaderClient(object):
             return si_port
         ports = self.get_ports()
         if len(ports):
-            self._logger.info(_('Available Ports'))
+            self._logger.info(translate('Available Ports'))
             for i, p in enumerate(ports):
                 self._logger.info('{} - {}'.format(i, p))
             return ports[0]

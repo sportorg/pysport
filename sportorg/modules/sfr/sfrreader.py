@@ -7,7 +7,7 @@ from threading import Event, main_thread
 from PySide2.QtCore import QThread, Signal
 
 from sportorg.common.singleton import singleton
-from sportorg.language import _
+from sportorg.language import translate
 from sportorg.libs.sfr import sfrreader
 from sportorg.libs.sfr.sfrreader import SFRReaderCardChanged, SFRReaderException
 from sportorg.models import memory
@@ -185,7 +185,7 @@ class SFRReaderClient(object):
 
     def stop(self):
         self._stop_event.set()
-        self._logger.info(_('Closing connection'))
+        self._logger.info(translate('Closing connection'))
 
     def toggle(self):
         if self.is_alive():

@@ -14,7 +14,7 @@ from PySide2.QtWidgets import (
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
-from sportorg.language import _
+from sportorg.language import translate
 from sportorg.models.memory import race
 
 
@@ -27,7 +27,7 @@ class ScoresDialog(QDialog):
         return super().exec_()
 
     def init_ui(self):
-        self.setWindowTitle(_('Scores assign'))
+        self.setWindowTitle(translate('Scores assign'))
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(False)
@@ -35,7 +35,7 @@ class ScoresDialog(QDialog):
 
         self.layout = QFormLayout(self)
 
-        self.label_list = QRadioButton(_('Value list'))
+        self.label_list = QRadioButton(translate('Value list'))
         self.label_list.setChecked(True)
         self.item_list = QLineEdit()
         self.item_list.setText(
@@ -43,7 +43,7 @@ class ScoresDialog(QDialog):
         )
         self.layout.addRow(self.label_list, self.item_list)
 
-        self.label_formula = QRadioButton(_('Formula'))
+        self.label_formula = QRadioButton(translate('Formula'))
         self.item_formula = QLineEdit()
         self.layout.addRow(self.label_formula, self.item_formula)
 
@@ -52,7 +52,7 @@ class ScoresDialog(QDialog):
         )
         self.layout.addRow(self.label_formula_hint)
 
-        self.label_limit = QCheckBox(_('Limit per team'))
+        self.label_limit = QCheckBox(translate('Limit per team'))
         self.item_limit = QSpinBox()
         self.item_limit.setMaximumWidth(50)
         self.layout.addRow(self.label_limit, self.item_limit)
@@ -69,10 +69,10 @@ class ScoresDialog(QDialog):
 
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         self.button_ok = button_box.button(QDialogButtonBox.Ok)
-        self.button_ok.setText(_('OK'))
+        self.button_ok.setText(translate('OK'))
         self.button_ok.clicked.connect(apply_changes)
         self.button_cancel = button_box.button(QDialogButtonBox.Cancel)
-        self.button_cancel.setText(_('Cancel'))
+        self.button_cancel.setText(translate('Cancel'))
         self.button_cancel.clicked.connect(cancel_changes)
         self.layout.addRow(button_box)
 

@@ -8,7 +8,7 @@ from sportorg.gui.dialogs.result_edit import ResultEditDialog
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.tabs.memory_model import ResultMemoryModel
 from sportorg.gui.tabs.table import TableView
-from sportorg.language import _
+from sportorg.language import translate
 from sportorg.models.memory import race
 from sportorg.utils.time import time_to_hhmmss
 
@@ -144,12 +144,12 @@ class Widget(QtWidgets.QWidget):
         self.vertical_layout_card.addWidget(self.result_card_details)
 
         self.grid_layout.addWidget(self.result_splitter)
-        self.result_course_group_box.setTitle(_('Course'))
-        self.result_course_name_label.setText(_('Name'))
-        self.result_course_length_label.setText(_('Length'))
-        self.result_card_group_box.setTitle(_('Chip'))
-        self.result_card_start_label.setText(_('Start'))
-        self.result_card_finish_label.setText(_('Finish'))
+        self.result_course_group_box.setTitle(translate('Course'))
+        self.result_course_name_label.setText(translate('Name'))
+        self.result_course_length_label.setText(translate('Length'))
+        self.result_card_group_box.setTitle(translate('Chip'))
+        self.result_card_start_label.setText(translate('Start'))
+        self.result_card_finish_label.setText(translate('Finish'))
 
         self.result_course_group_box.setMinimumHeight(150)
         self.result_card_group_box.setMinimumHeight(150)

@@ -4,7 +4,7 @@ from datetime import datetime
 import dateutil.parser
 
 from sportorg import config
-from sportorg.language import _
+from sportorg.language import translate
 from sportorg.libs.iof.iof import ResultList
 from sportorg.libs.iof.parser import parse
 from sportorg.models.memory import (
@@ -137,7 +137,9 @@ def import_from_entry_list(entries):
     persons_dupl_names = obj.get_duplicate_names()
 
     if len(persons_dupl_cards):
-        logging.info('{}'.format(_('Duplicate card numbers (card numbers are reset)')))
+        logging.info(
+            '{}'.format(translate('Duplicate card numbers (card numbers are reset)'))
+        )
         for person in persons_dupl_cards:
             logging.info(
                 '{} {} {} {}'.format(
@@ -149,7 +151,7 @@ def import_from_entry_list(entries):
             )
             person.card_number = 0
     if len(persons_dupl_names):
-        logging.info('{}'.format(_('Duplicate names')))
+        logging.info('{}'.format(translate('Duplicate names')))
         for person in persons_dupl_names:
             person.card_number = 0
             logging.info(

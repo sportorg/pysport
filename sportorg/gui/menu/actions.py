@@ -36,7 +36,7 @@ from sportorg.gui.dialogs.text_io import TextExchangeDialog
 from sportorg.gui.dialogs.timekeeping_properties import TimekeepingPropertiesDialog
 from sportorg.gui.menu.action import Action
 from sportorg.gui.utils.custom_controls import messageBoxQuestion
-from sportorg.language import _
+from sportorg.language import translate
 from sportorg.libs.winorient.wdb import write_wdb
 from sportorg.models.memory import ResultManual, ResultStatus, find, race
 from sportorg.models.result.result_calculation import ResultCalculation
@@ -82,7 +82,7 @@ class SaveAction(Action, metaclass=ActionFactory):
 class OpenAction(Action, metaclass=ActionFactory):
     def execute(self):
         file_name = get_open_file_name(
-            _('Open SportOrg file'), _('SportOrg file (*.json)')
+            translate('Open SportOrg file'), translate('SportOrg file (*.json)')
         )
         self.app.open_file(file_name)
 
@@ -136,7 +136,7 @@ class EventSettingsAction(Action, metaclass=ActionFactory):
 class CSVWinorientImportAction(Action, metaclass=ActionFactory):
     def execute(self):
         file_name = get_open_file_name(
-            _('Open CSV Winorient file'), _('CSV Winorient (*.csv)')
+            translate('Open CSV Winorient file'), translate('CSV Winorient (*.csv)')
         )
         if file_name is not '':
             try:
@@ -144,7 +144,9 @@ class CSVWinorientImportAction(Action, metaclass=ActionFactory):
             except Exception as e:
                 logging.error(str(e))
                 QMessageBox.warning(
-                    self.app, _('Error'), _('Import error') + ': ' + file_name
+                    self.app,
+                    translate('Error'),
+                    translate('Import error') + ': ' + file_name,
                 )
             self.app.init_model()
 
@@ -152,7 +154,7 @@ class CSVWinorientImportAction(Action, metaclass=ActionFactory):
 class WDBWinorientImportAction(Action, metaclass=ActionFactory):
     def execute(self):
         file_name = get_open_file_name(
-            _('Open WDB Winorient file'), _('WDB Winorient (*.wdb)')
+            translate('Open WDB Winorient file'), translate('WDB Winorient (*.wdb)')
         )
         if file_name is not '':
             try:
@@ -161,7 +163,9 @@ class WDBWinorientImportAction(Action, metaclass=ActionFactory):
                 logging.error(str(e))
                 logging.exception(e)
                 QMessageBox.warning(
-                    self.app, _('Error'), _('Import error') + ': ' + file_name
+                    self.app,
+                    translate('Error'),
+                    translate('Import error') + ': ' + file_name,
                 )
             self.app.init_model()
 
@@ -169,7 +173,7 @@ class WDBWinorientImportAction(Action, metaclass=ActionFactory):
 class OcadTXTv8ImportAction(Action, metaclass=ActionFactory):
     def execute(self):
         file_name = get_open_file_name(
-            _('Open Ocad txt v8 file'), _('Ocad classes v8 (*.txt)')
+            translate('Open Ocad txt v8 file'), translate('Ocad classes v8 (*.txt)')
         )
         if file_name is not '':
             try:
@@ -177,7 +181,9 @@ class OcadTXTv8ImportAction(Action, metaclass=ActionFactory):
             except OcadImportException as e:
                 logging.error(str(e))
                 QMessageBox.warning(
-                    self.app, _('Error'), _('Import error') + ': ' + file_name
+                    self.app,
+                    translate('Error'),
+                    translate('Import error') + ': ' + file_name,
                 )
             self.app.init_model()
 
@@ -185,8 +191,8 @@ class OcadTXTv8ImportAction(Action, metaclass=ActionFactory):
 class WDBWinorientExportAction(Action, metaclass=ActionFactory):
     def execute(self):
         file_name = get_save_file_name(
-            _('Save As WDB file'),
-            _('WDB file (*.wdb)'),
+            translate('Save As WDB file'),
+            translate('WDB file (*.wdb)'),
             '{}_sportorg_export'.format(
                 race().data.get_start_datetime().strftime('%Y%m%d')
             ),
@@ -203,15 +209,17 @@ class WDBWinorientExportAction(Action, metaclass=ActionFactory):
             except Exception as e:
                 logging.exception(str(e))
                 QMessageBox.warning(
-                    self.app, _('Error'), _('Export error') + ': ' + file_name
+                    self.app,
+                    translate('Error'),
+                    translate('Export error') + ': ' + file_name,
                 )
 
 
 class IOFResultListExportAction(Action, metaclass=ActionFactory):
     def execute(self):
         file_name = get_save_file_name(
-            _('Save As IOF xml'),
-            _('IOF xml (*.xml)'),
+            translate('Save As IOF xml'),
+            translate('IOF xml (*.xml)'),
             '{}_resultList'.format(race().data.get_start_datetime().strftime('%Y%m%d')),
         )
         if file_name is not '':
@@ -220,20 +228,26 @@ class IOFResultListExportAction(Action, metaclass=ActionFactory):
             except Exception as e:
                 logging.error(str(e))
                 QMessageBox.warning(
-                    self.app, _('Error'), _('Export error') + ': ' + file_name
+                    self.app,
+                    translate('Error'),
+                    translate('Export error') + ': ' + file_name,
                 )
 
 
 class IOFEntryListImportAction(Action, metaclass=ActionFactory):
     def execute(self):
-        file_name = get_open_file_name(_('Open IOF xml'), _('IOF xml (*.xml)'))
+        file_name = get_open_file_name(
+            translate('Open IOF xml'), translate('IOF xml (*.xml)')
+        )
         if file_name is not '':
             try:
                 iof_xml.import_from_iof(file_name)
             except Exception as e:
                 logging.exception(str(e))
                 QMessageBox.warning(
-                    self.app, _('Error'), _('Import error') + ': ' + file_name
+                    self.app,
+                    translate('Error'),
+                    translate('Import error') + ': ' + file_name,
                 )
             self.app.init_model()
 
@@ -365,9 +379,9 @@ class RelayCloneAction(Action, metaclass=ActionFactory):
 
 class CopyBibToCardNumber(Action, metaclass=ActionFactory):
     def execute(self):
-        msg = _('Use bib as card number') + '?'
+        msg = translate('Use bib as card number') + '?'
         reply = messageBoxQuestion(
-            self.app, _('Question'), msg, QMessageBox.Yes | QMessageBox.No
+            self.app, translate('Question'), msg, QMessageBox.Yes | QMessageBox.No
         )
         if reply == QMessageBox.Yes:
             copy_bib_to_card_number()
@@ -376,9 +390,9 @@ class CopyBibToCardNumber(Action, metaclass=ActionFactory):
 
 class CopyCardNumberToBib(Action, metaclass=ActionFactory):
     def execute(self):
-        msg = _('Use card number as bib') + '?'
+        msg = translate('Use card number as bib') + '?'
         reply = messageBoxQuestion(
-            self.app, _('Question'), msg, QMessageBox.Yes | QMessageBox.No
+            self.app, translate('Question'), msg, QMessageBox.Yes | QMessageBox.No
         )
         if reply == QMessageBox.Yes:
             copy_card_number_to_bib()
@@ -390,7 +404,7 @@ class ManualFinishAction(Action, metaclass=ActionFactory):
         result = race().new_result(ResultManual)
         Teamwork().send(result.to_dict())
         race().add_new_result(result)
-        logging.info(_('Manual finish'))
+        logging.info(translate('Manual finish'))
         self.app.refresh()
 
 
@@ -471,7 +485,7 @@ class PenaltyRemovingAction(Action, metaclass=ActionFactory):
 class ChangeStatusAction(Action, metaclass=ActionFactory):
     def execute(self):
         if self.app.current_tab != 1:
-            logging.warning(_('No result selected'))
+            logging.warning(translate('No result selected'))
             return
         obj = race()
 
@@ -490,7 +504,7 @@ class ChangeStatusAction(Action, metaclass=ActionFactory):
             index = 0
         if index >= len(obj.results):
             mes = QMessageBox()
-            mes.setText(_('No results to change status'))
+            mes.setText(translate('No results to change status'))
             mes.exec_()
             return
         result = obj.results[index]
@@ -592,7 +606,7 @@ class TelegramSendAction(Action, metaclass=ActionFactory):
     def execute(self):
         try:
             if not self.app.current_tab == 1:
-                logging.warning(_('No result selected'))
+                logging.warning(translate('No result selected'))
                 return
             items = race().results
             indexes = self.app.get_selected_rows()
@@ -615,14 +629,14 @@ class CheckUpdatesAction(Action, metaclass=ActionFactory):
     def execute(self):
         try:
             if not checker.check_version(config.VERSION):
-                message = _('Update available') + ' ' + checker.get_version()
+                message = translate('Update available') + ' ' + checker.get_version()
             else:
-                message = _('You are using the latest version')
+                message = translate('You are using the latest version')
 
-            QMessageBox.information(self.app, _('Info'), message)
+            QMessageBox.information(self.app, translate('Info'), message)
         except Exception as e:
             logging.error(str(e))
-            QMessageBox.warning(self.app, _('Error'), str(e))
+            QMessageBox.warning(self.app, translate('Error'), str(e))
 
 
 class AssignResultByBibAction(Action, metaclass=ActionFactory):
@@ -643,7 +657,9 @@ class AssignResultByCardNumberAction(Action, metaclass=ActionFactory):
 
 class ImportSportOrgAction(Action, metaclass=ActionFactory):
     def execute(self):
-        file_name = get_open_file_name(_('Open SportOrg json'), _('SportOrg (*.json)'))
+        file_name = get_open_file_name(
+            translate('Open SportOrg json'), translate('SportOrg (*.json)')
+        )
         if file_name is not '':
             with open(file_name) as f:
                 attr = get_races_from_file(f)

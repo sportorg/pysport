@@ -18,7 +18,7 @@ from PySide2.QtWidgets import (
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
-from sportorg.language import _
+from sportorg.language import translate
 from sportorg.models.constant import get_names, get_race_groups, get_race_teams
 from sportorg.models.memory import Limit, Organization, Qualification, find, race
 from sportorg.models.result.result_calculation import ResultCalculation
@@ -48,54 +48,54 @@ class PersonEditDialog(QDialog):
         return super().exec_()
 
     def init_ui(self):
-        self.setWindowTitle(_('Entry properties'))
+        self.setWindowTitle(translate('Entry properties'))
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(True)
 
         self.layout = QFormLayout(self)
-        self.label_surname = QLabel(_('Last name'))
+        self.label_surname = QLabel(translate('Last name'))
         self.item_surname = QLineEdit()
         self.layout.addRow(self.label_surname, self.item_surname)
 
-        self.label_name = QLabel(_('First name'))
+        self.label_name = QLabel(translate('First name'))
         self.item_name = AdvComboBox()
         self.item_name.addItems(get_names())
         self.layout.addRow(self.label_name, self.item_name)
 
-        self.label_group = QLabel(_('Group'))
+        self.label_group = QLabel(translate('Group'))
         self.item_group = AdvComboBox()
         self.item_group.addItems(get_race_groups())
         self.layout.addRow(self.label_group, self.item_group)
 
-        self.label_team = QLabel(_('Team'))
+        self.label_team = QLabel(translate('Team'))
         self.item_team = AdvComboBox()
         self.item_team.addItems(get_race_teams())
         self.layout.addRow(self.label_team, self.item_team)
 
         use_birthday = Config().configuration.get('use_birthday', False)
         if use_birthday:
-            self.label_birthday = QLabel(_('Birthday'))
+            self.label_birthday = QLabel(translate('Birthday'))
             self.item_birthday = QDateEdit()
             self.item_birthday.setDate(date.today())
             self.item_birthday.setMaximumDate(date.today())
             self.layout.addRow(self.label_birthday, self.item_birthday)
         else:
-            self.label_year = QLabel(_('Year of birth'))
+            self.label_year = QLabel(translate('Year of birth'))
             self.item_year = QSpinBox()
             self.item_year.setMinimum(0)
             self.item_year.setMaximum(date.today().year)
             self.item_year.editingFinished.connect(self.year_change)
             self.layout.addRow(self.label_year, self.item_year)
 
-        self.label_qual = QLabel(_('Qualification'))
+        self.label_qual = QLabel(translate('Qualification'))
         self.item_qual = AdvComboBox()
         for i in list(Qualification):
             self.item_qual.addItem(i.get_title())
         self.layout.addRow(self.label_qual, self.item_qual)
 
         self.is_ok['bib'] = True
-        self.label_bib = QLabel(_('Bib'))
+        self.label_bib = QLabel(translate('Bib'))
         self.item_bib = QSpinBox()
         self.item_bib.setMinimum(0)
         self.item_bib.setMaximum(Limit.BIB)
@@ -105,19 +105,19 @@ class PersonEditDialog(QDialog):
         self.label_bib_info = QLabel('')
         self.layout.addRow(QLabel(''), self.label_bib_info)
 
-        self.label_start = QLabel(_('Start time'))
+        self.label_start = QLabel(translate('Start time'))
         self.item_start = QTimeEdit()
         self.item_start.setDisplayFormat(self.time_format)
         self.layout.addRow(self.label_start, self.item_start)
 
-        self.label_start_group = QLabel(_('Start group'))
+        self.label_start_group = QLabel(translate('Start group'))
         self.item_start_group = QSpinBox()
         self.item_start_group.setMinimum(0)
         self.item_start_group.setMaximum(99)
         self.layout.addRow(self.label_start_group, self.item_start_group)
 
         self.is_ok['card'] = True
-        self.label_card = QLabel(_('Punch card #'))
+        self.label_card = QLabel(translate('Punch card #'))
         self.item_card = QSpinBox()
         self.item_card.setMinimum(0)
         self.item_card.setMaximum(9999999)
@@ -127,14 +127,14 @@ class PersonEditDialog(QDialog):
         self.label_card_info = QLabel('')
         self.layout.addRow(QLabel(''), self.label_card_info)
 
-        self.item_rented = QCheckBox(_('rented card'))
-        self.item_paid = QCheckBox(_('is paid'))
-        self.item_out_of_competition = QCheckBox(_('out of competition'))
-        self.item_personal = QCheckBox(_('personal participation'))
+        self.item_rented = QCheckBox(translate('rented card'))
+        self.item_paid = QCheckBox(translate('is paid'))
+        self.item_out_of_competition = QCheckBox(translate('out of competition'))
+        self.item_personal = QCheckBox(translate('personal participation'))
         self.layout.addRow(self.item_rented, self.item_out_of_competition)
         self.layout.addRow(self.item_paid, self.item_personal)
 
-        self.label_comment = QLabel(_('Comment'))
+        self.label_comment = QLabel(translate('Comment'))
         self.item_comment = QTextEdit()
         self.item_comment.setTabChangesFocus(True)
         self.layout.addRow(self.label_comment, self.item_comment)
@@ -151,10 +151,10 @@ class PersonEditDialog(QDialog):
 
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         self.button_ok = button_box.button(QDialogButtonBox.Ok)
-        self.button_ok.setText(_('OK'))
+        self.button_ok.setText(translate('OK'))
         self.button_ok.clicked.connect(apply_changes)
         self.button_cancel = button_box.button(QDialogButtonBox.Cancel)
-        self.button_cancel.setText(_('Cancel'))
+        self.button_cancel.setText(translate('Cancel'))
         self.button_cancel.clicked.connect(cancel_changes)
         self.layout.addRow(button_box)
 
@@ -198,12 +198,16 @@ class PersonEditDialog(QDialog):
                     return
                 self.button_ok.setDisabled(True)
                 self.is_ok['bib'] = False
-                info = '{}\n{}'.format(_('Number already exists'), person.full_name)
+                info = '{}\n{}'.format(
+                    translate('Number already exists'), person.full_name
+                )
                 if person.group:
-                    info = '{}\n{}: {}'.format(info, _('Group'), person.group.name)
+                    info = '{}\n{}: {}'.format(
+                        info, translate('Group'), person.group.name
+                    )
                 self.label_bib_info.setText(info)
             else:
-                self.label_bib_info.setText(_('Number is unique'))
+                self.label_bib_info.setText(translate('Number is unique'))
                 self.is_ok['bib'] = True
                 if self.items_ok():
                     self.button_ok.setEnabled(True)
@@ -226,15 +230,17 @@ class PersonEditDialog(QDialog):
                 self.button_ok.setDisabled(True)
                 self.is_ok['card'] = False
                 info = '{}\n{}'.format(
-                    _('Card number already exists'), person.full_name
+                    translate('Card number already exists'), person.full_name
                 )
                 if person.group:
-                    info = '{}\n{}: {}'.format(info, _('Group'), person.group.name)
+                    info = '{}\n{}: {}'.format(
+                        info, translate('Group'), person.group.name
+                    )
                 if person.bib:
-                    info = '{}\n{}: {}'.format(info, _('Bib'), person.bib)
+                    info = '{}\n{}: {}'.format(info, translate('Bib'), person.bib)
                 self.label_card_info.setText(info)
             else:
-                self.label_card_info.setText(_('Card number is unique'))
+                self.label_card_info.setText(translate('Card number is unique'))
                 self.is_ok['card'] = True
                 if self.items_ok():
                     self.button_ok.setEnabled(True)

@@ -21,7 +21,7 @@ from sportorg import config
 from sportorg.gui.dialogs.person_edit import PersonEditDialog
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
-from sportorg.language import _
+from sportorg.language import translate
 from sportorg.models.constant import StatusComments
 from sportorg.models.memory import Limit, ResultStatus, Split, find, race
 from sportorg.models.result.result_calculation import ResultCalculation
@@ -48,7 +48,7 @@ class ResultEditDialog(QDialog):
         return super().exec_()
 
     def init_ui(self):
-        self.setWindowTitle(_('Result'))
+        self.setWindowTitle(translate('Result'))
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(True)
@@ -103,21 +103,21 @@ class ResultEditDialog(QDialog):
         more24 = race().get_setting('time_format_24', 'less24') == 'more24'
         self.splits = SplitsText(more24=more24)
 
-        self.layout.addRow(QLabel(_('Created at')), self.item_created_at)
+        self.layout.addRow(QLabel(translate('Created at')), self.item_created_at)
         if self.current_object.is_punch():
-            self.layout.addRow(QLabel(_('Card')), self.item_card_number)
-        self.layout.addRow(QLabel(_('Bib')), self.item_bib)
+            self.layout.addRow(QLabel(translate('Card')), self.item_card_number)
+        self.layout.addRow(QLabel(translate('Bib')), self.item_bib)
         self.layout.addRow(QLabel(''), self.label_person_info)
         if more24:
-            self.layout.addRow(QLabel(_('Days')), self.item_days)
-        self.layout.addRow(QLabel(_('Start')), self.item_start)
-        self.layout.addRow(QLabel(_('Finish')), self.item_finish)
-        self.layout.addRow(QLabel(_('Credit')), self.item_credit)
-        self.layout.addRow(QLabel(_('Penalty')), self.item_penalty)
-        self.layout.addRow(QLabel(_('Penalty legs')), self.item_penalty_laps)
-        self.layout.addRow(QLabel(_('Result')), self.item_result)
-        self.layout.addRow(QLabel(_('Status')), self.item_status)
-        self.layout.addRow(QLabel(_('Comment')), self.item_status_comment)
+            self.layout.addRow(QLabel(translate('Days')), self.item_days)
+        self.layout.addRow(QLabel(translate('Start')), self.item_start)
+        self.layout.addRow(QLabel(translate('Finish')), self.item_finish)
+        self.layout.addRow(QLabel(translate('Credit')), self.item_credit)
+        self.layout.addRow(QLabel(translate('Penalty')), self.item_penalty)
+        self.layout.addRow(QLabel(translate('Penalty legs')), self.item_penalty_laps)
+        self.layout.addRow(QLabel(translate('Result')), self.item_result)
+        self.layout.addRow(QLabel(translate('Status')), self.item_status)
+        self.layout.addRow(QLabel(translate('Comment')), self.item_status_comment)
 
         if self.current_object.is_punch():
             start_source = race().get_setting('system_start_source', 'protocol')
@@ -140,15 +140,15 @@ class ResultEditDialog(QDialog):
 
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         self.button_ok = button_box.button(QDialogButtonBox.Ok)
-        self.button_ok.setText(_('OK'))
+        self.button_ok.setText(translate('OK'))
         self.button_ok.clicked.connect(apply_changes)
         self.button_cancel = button_box.button(QDialogButtonBox.Cancel)
-        self.button_cancel.setText(_('Cancel'))
+        self.button_cancel.setText(translate('Cancel'))
         self.button_cancel.clicked.connect(cancel_changes)
 
         if self.current_object.person:
             button_person = button_box.addButton(
-                _('Entry properties'), QDialogButtonBox.ActionRole
+                translate('Entry properties'), QDialogButtonBox.ActionRole
             )
             button_person.clicked.connect(self.open_person)
 
@@ -165,12 +165,16 @@ class ResultEditDialog(QDialog):
             if person:
                 info = person.full_name
                 if person.group:
-                    info = '{}\n{}: {}'.format(info, _('Group'), person.group.name)
+                    info = '{}\n{}: {}'.format(
+                        info, translate('Group'), person.group.name
+                    )
                 if person.card_number:
-                    info = '{}\n{}: {}'.format(info, _('Card'), person.card_number)
+                    info = '{}\n{}: {}'.format(
+                        info, translate('Card'), person.card_number
+                    )
                 self.label_person_info.setText(info)
             else:
-                self.label_person_info.setText(_('not found'))
+                self.label_person_info.setText(translate('not found'))
 
     def set_values_from_model(self):
         if self.current_object.is_punch():
@@ -309,7 +313,7 @@ class SplitsText(SplitsObject):
     def __init__(self, splits=None, more24=False):
         self._splits = splits
         self._more24 = more24
-        self._box = QGroupBox(_('Splits'))
+        self._box = QGroupBox(translate('Splits'))
         self._layout = QFormLayout()
         self._text = QTextEdit()
         self._text.setTabChangesFocus(True)

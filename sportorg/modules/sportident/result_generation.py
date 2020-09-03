@@ -1,7 +1,7 @@
 import logging
 
 from sportorg.gui.dialogs.bib_dialog import BibDialog
-from sportorg.language import _
+from sportorg.language import translate
 from sportorg.models.memory import Person, ResultSportident, find, race
 from sportorg.models.result.result_checker import ResultChecker, ResultCheckerException
 
@@ -177,7 +177,7 @@ class ResultSportidentGeneration:
     def _create_person(self):
         new_person = Person()
         new_person.bib = self._get_max_bib() + 1
-        new_person.surname = _('Competitor') + ' #' + str(new_person.bib)
+        new_person.surname = translate('Competitor') + ' #' + str(new_person.bib)
         new_person.group = self._find_group_by_punches()
         self._result.person = new_person
 

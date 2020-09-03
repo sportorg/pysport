@@ -11,7 +11,7 @@ import dateutil.parser
 
 from sportorg.common.model import Model
 from sportorg.common.otime import OTime
-from sportorg.language import _
+from sportorg.language import translate
 from sportorg.modules.configs.configs import Config
 from sportorg.utils.time import hhmmss_to_time
 
@@ -47,7 +47,7 @@ class _TitleType(Enum):
         return self.__str__()
 
     def get_title(self):
-        return _(str(self).lower().capitalize().replace('_', ' '))
+        return translate(str(self).lower().capitalize().replace('_', ' '))
 
     @classmethod
     def get_titles(cls):
@@ -585,7 +585,7 @@ class Result:
 
         ret = ''
         if race().get_setting('result_processing_mode', 'time') == 'scores':
-            ret += str(self.scores) + ' ' + _('points') + ' '
+            ret += str(self.scores) + ' ' + translate('points') + ' '
 
         time_accuracy = race().get_setting('time_accuracy', 0)
         ret += self.get_result_otime().to_str(time_accuracy)
@@ -602,7 +602,7 @@ class Result:
 
         ret = ''
         if race().get_setting('result_processing_mode', 'time') == 'scores':
-            ret += str(self.scores) + ' ' + _('points') + ' '
+            ret += str(self.scores) + ' ' + translate('points') + ' '
 
         # time_accuracy = race().get_setting('time_accuracy', 0)
         start = hhmmss_to_time(self.person.comment)
@@ -636,7 +636,7 @@ class Result:
 
         ret = ''
         if race().get_setting('result_processing_mode', 'time') == 'scores':
-            ret += str(self.scores) + ' ' + _('points') + ' '
+            ret += str(self.scores) + ' ' + translate('points') + ' '
 
         time_accuracy = race().get_setting('time_accuracy', 0)
         ret += self.get_result_otime_relay().to_str(time_accuracy)
@@ -711,7 +711,7 @@ class Result:
         if self.place > 0:
             return self.place
         if self.person and self.person.is_out_of_competition:
-            return _('o/c')
+            return translate('o/c')
         return ''
 
     def get_course_splits(self, course=None):

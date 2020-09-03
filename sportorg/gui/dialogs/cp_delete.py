@@ -13,7 +13,7 @@ from PySide2.QtWidgets import (
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
-from sportorg.language import _
+from sportorg.language import translate
 from sportorg.models.memory import race
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.result_checker import ResultChecker
@@ -30,7 +30,7 @@ class CPDeleteDialog(QDialog):
         return super().exec_()
 
     def init_ui(self):
-        self.setWindowTitle(_('Delete CP'))
+        self.setWindowTitle(translate('Delete CP'))
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(True)
@@ -40,14 +40,14 @@ class CPDeleteDialog(QDialog):
         self.item_number = QSpinBox()
         self.item_number.setMaximum(10000)
         self.item_number.valueChanged.connect(self.show_info)
-        self.layout.addRow(QLabel(_('Number CP')), self.item_number)
+        self.layout.addRow(QLabel(translate('Number CP')), self.item_number)
 
-        self.item_is_course = QCheckBox(_('Courses'))
+        self.item_is_course = QCheckBox(translate('Courses'))
         self.item_is_course.setChecked(True)
         self.item_is_course.stateChanged.connect(self.show_info)
         self.layout.addRow(self.item_is_course)
 
-        self.item_is_result = QCheckBox(_('Race Results'))
+        self.item_is_result = QCheckBox(translate('Race Results'))
         self.item_is_result.setChecked(True)
         self.item_is_result.stateChanged.connect(self.show_info)
         self.layout.addRow(self.item_is_result)
@@ -68,10 +68,10 @@ class CPDeleteDialog(QDialog):
 
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         self.button_ok = button_box.button(QDialogButtonBox.Ok)
-        self.button_ok.setText(_('Ok'))
+        self.button_ok.setText(translate('Ok'))
         self.button_ok.clicked.connect(apply_changes)
         self.button_cancel = button_box.button(QDialogButtonBox.Cancel)
-        self.button_cancel.setText(_('Cancel'))
+        self.button_cancel.setText(translate('Cancel'))
         self.button_cancel.clicked.connect(cancel_changes)
         self.layout.addRow(button_box)
 
@@ -95,7 +95,7 @@ class CPDeleteDialog(QDialog):
                             break
                 if len(courses_has_number):
                     text += '{}:\n{}\n'.format(
-                        _('Courses'),
+                        translate('Courses'),
                         '\n'.join([course.name for course in courses_has_number]),
                     )
             is_result = self.item_is_result.isChecked()
@@ -109,7 +109,7 @@ class CPDeleteDialog(QDialog):
                             break
                 if len(results_has_number):
                     text += '{}:\n{}'.format(
-                        _('Results'),
+                        translate('Results'),
                         '\n'.join(
                             [str(result.card_number) for result in results_has_number]
                         ),

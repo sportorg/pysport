@@ -1,6 +1,6 @@
 import platform
 
-from sportorg.language import _
+from sportorg.language import translate
 from sportorg.models.memory import ResultStatus, race
 from sportorg.models.result.result_calculation import ResultCalculation
 
@@ -30,7 +30,7 @@ class SportorgPrinter(object):
         self.y = -1 * y_offset * self.scale_factor
 
     def start_page(self):
-        self.dc.StartDoc(_('SportOrg printing'))
+        self.dc.StartDoc(translate('SportOrg printing'))
         self.dc.StartPage()
 
     def end_page(self):
@@ -86,22 +86,24 @@ class SportorgPrinter(object):
 
         # Athlete info, bib, card number, start time
         self.print_line(person.full_name, fn, fs_large, 700)
-        self.print_line(_('Group') + ': ' + group.name, fn, fs_main)
+        self.print_line(translate('Group') + ': ' + group.name, fn, fs_main)
         if person.organization:
-            self.print_line(_('Team') + ': ' + person.organization.name, fn, fs_main)
+            self.print_line(
+                translate('Team') + ': ' + person.organization.name, fn, fs_main
+            )
         self.print_line(
-            _('Bib')
+            translate('Bib')
             + ': '
             + str(person.bib)
             + ' ' * 5
-            + _('Card')
+            + translate('Card')
             + ': '
             + str(person.card_number),
             fn,
             fs_main,
         )
         self.print_line(
-            _('Start') + ': ' + result.get_start_time().to_str(), fn, fs_main
+            translate('Start') + ': ' + result.get_start_time().to_str(), fn, fs_main
         )
 
         # Splits
@@ -146,7 +148,7 @@ class SportorgPrinter(object):
 
         # Finish
         self.print_line(
-            _('Finish')
+            translate('Finish')
             + ': '
             + result.get_finish_time().to_str()
             + ' ' * 4
@@ -158,34 +160,42 @@ class SportorgPrinter(object):
         # Result
         if is_penalty_used:
             self.print_line(
-                _('Penalty') + ': ' + result.get_penalty_time().to_str(), fn, fs_main
+                translate('Penalty') + ': ' + result.get_penalty_time().to_str(),
+                fn,
+                fs_main,
             )
 
         if result.is_status_ok():
             self.print_line(
-                _('Result') + ': ' + result.get_result() + ' ' * 4 + result.speed,
+                translate('Result')
+                + ': '
+                + result.get_result()
+                + ' ' * 4
+                + result.speed,
                 fn,
                 fs_main,
             )
         else:
-            self.print_line(_('Result') + ': ' + result.get_result(), fn, fs_main)
+            self.print_line(
+                translate('Result') + ': ' + result.get_result(), fn, fs_main
+            )
 
         if is_relay and person.bib > 1000:
             self.print_line(
-                _('Team result') + ': ' + result.get_result_relay(), fn, fs_main
+                translate('Team result') + ': ' + result.get_result_relay(), fn, fs_main
             )
 
         # Place
         if result.place > 0:
-            place = _('Place') + ': ' + str(result.place)
+            place = translate('Place') + ': ' + str(result.place)
             if not is_relay:
                 place += (
                     ' '
-                    + _('from')
+                    + translate('from')
                     + ' '
                     + str(group.count_finished)
                     + ' ('
-                    + _('total')
+                    + translate('total')
                     + ' '
                     + str(group.count_person)
                     + ')'
@@ -198,25 +208,27 @@ class SportorgPrinter(object):
                 if hasattr(result, 'can_win_count'):
                     if result.can_win_count > 0:
                         self.print_line(
-                            _('Who can win you') + ': ' + str(result.can_win_count),
+                            translate('Who can win you')
+                            + ': '
+                            + str(result.can_win_count),
                             fn,
                             fs_main,
                         )
                         self.print_line(
-                            _('Final result will be known')
+                            translate('Final result will be known')
                             + ': '
                             + result.final_result_time.to_str(),
                             fn,
                             fs_main,
                         )
                     else:
-                        self.print_line(_('Result is final'), fn, fs_main)
+                        self.print_line(translate('Result is final'), fn, fs_main)
 
         # Punch checking info
         if result.is_status_ok():
-            self.print_line(_('Status: OK'), fn, fs_large, 700)
+            self.print_line(translate('Status: OK'), fn, fs_large, 700)
         else:
-            self.print_line(_('Status: DSQ'), fn, fs_large, 700)
+            self.print_line(translate('Status: DSQ'), fn, fs_large, 700)
             cp_list = ''
             line_limit = 35
             for cp in course.controls:
@@ -231,7 +243,7 @@ class SportorgPrinter(object):
             pass
         else:
             res = ResultCalculation(obj).get_group_finishes(group)
-            self.print_line(_('Draft results'), fn, fs_main)
+            self.print_line(translate('Draft results'), fn, fs_main)
             for cur_res in res[:10]:
                 self.print_line(
                     ('  ' + str(cur_res.get_place()))[-2:]

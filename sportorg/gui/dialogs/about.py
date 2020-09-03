@@ -4,7 +4,7 @@ from PySide2.QtWidgets import QDialog, QFormLayout, QLabel, QTextEdit
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
-from sportorg.language import _
+from sportorg.language import translate
 
 
 class AboutDialog(QDialog):
@@ -16,7 +16,7 @@ class AboutDialog(QDialog):
         return super().exec_()
 
     def init_ui(self):
-        self.setWindowTitle(_('About'))
+        self.setWindowTitle(translate('About'))
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(True)
@@ -36,7 +36,7 @@ class AboutDialog(QDialog):
         contributors_text = QLabel()
         contributors_text.setText(
             '\n{}:{}'.format(
-                _('Contributors'),
+                translate('Contributors'),
                 '\n\t- Danil Akhtarov,\n\t- Sergei Kobelev,\n\t- Semyon Yakimov,\n\t- Konstantin Bats.',
             )
         )
@@ -45,7 +45,7 @@ class AboutDialog(QDialog):
         home_page_text = QLabel()
         home_page_text.setText(
             '\n{0}: <a href="{1}">{1}</a>'.format(
-                _('Home page'), 'https://sportorg.github.io/pysport/'
+                translate('Home page'), 'https://sportorg.github.io/pysport/'
             )
         )
         home_page_text.setOpenExternalLinks(True)

@@ -13,7 +13,7 @@ from PySide2.QtWidgets import (
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
-from sportorg.language import _
+from sportorg.language import translate
 from sportorg.models.memory import CourseControl, find, race
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.result_checker import ResultChecker
@@ -34,39 +34,41 @@ class CourseEditDialog(QDialog):
         return super().exec_()
 
     def init_ui(self):
-        self.setWindowTitle(_('Course properties'))
+        self.setWindowTitle(translate('Course properties'))
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(True)
 
         self.layout = QFormLayout(self)
 
-        self.label_name = QLabel(_('Name'))
+        self.label_name = QLabel(translate('Name'))
         self.item_name = QLineEdit()
         self.item_name.textChanged.connect(self.check_name)
         self.layout.addRow(self.label_name, self.item_name)
 
-        self.label_length = QLabel(_('Length(m)'))
+        self.label_length = QLabel(translate('Length(m)'))
         self.item_length = QSpinBox()
         self.item_length.setMaximum(100000)
         self.item_length.setSingleStep(100)
         self.item_length.setValue(0)
         self.layout.addRow(self.label_length, self.item_length)
 
-        self.label_climb = QLabel(_('Climb'))
+        self.label_climb = QLabel(translate('Climb'))
         self.item_climb = QSpinBox()
         self.item_climb.setValue(0)
         self.item_climb.setMaximum(10000)
         self.item_climb.setSingleStep(10)
         self.layout.addRow(self.label_climb, self.item_climb)
 
-        self.label_control_qty = QLabel(_('Point count'))
+        self.label_control_qty = QLabel(translate('Point count'))
         self.item_control_qty = QSpinBox()
         self.item_control_qty.setDisabled(True)
         self.layout.addRow(self.label_control_qty, self.item_control_qty)
 
         self.label_controls = QLabel(
-            '{}\n\n31 150\n32 200\n33\n34 500\n...\n90 150'.format(_('Controls'))
+            '{}\n\n31 150\n32 200\n33\n34 500\n...\n90 150'.format(
+                translate('Controls')
+            )
         )
         self.item_controls = QTextEdit()
         self.item_controls.setTabChangesFocus(True)
@@ -84,10 +86,10 @@ class CourseEditDialog(QDialog):
 
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         self.button_ok = button_box.button(QDialogButtonBox.Ok)
-        self.button_ok.setText(_('OK'))
+        self.button_ok.setText(translate('OK'))
         self.button_ok.clicked.connect(apply_changes)
         self.button_cancel = button_box.button(QDialogButtonBox.Cancel)
-        self.button_cancel.setText(_('Cancel'))
+        self.button_cancel.setText(translate('Cancel'))
         self.button_cancel.clicked.connect(cancel_changes)
         self.layout.addRow(button_box)
 

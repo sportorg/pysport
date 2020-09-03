@@ -8,7 +8,7 @@ from PySide2.QtWidgets import QDialog
 from sportorg import config
 from sportorg.common.otime import OTime
 from sportorg.gui.global_access import GlobalAccess
-from sportorg.language import _
+from sportorg.language import translate
 from sportorg.models.memory import Limit, race
 from sportorg.models.start.start_preparation import (
     DrawManager,
@@ -232,33 +232,37 @@ class StartPreparationDialog(QDialog):
         self.recover_state()
 
     def retranslate_ui(self):
-        self.setWindowTitle(_('Start Preparation'))
-        self.reserve_group_box.setTitle(_('Reserves insert'))
-        self.reserve_prefix_label.setText(_('Reserve prefix'))
-        self.reserve_prefix.setText(_('Reserve'))
-        self.reserve_group_count_label.setText(_('Reserves per group, ps'))
-        self.reserve_group_percent_label.setText(_('Reserves per group, %'))
-        self.reserve_check_box.setText(_('Insert reserves'))
-        self.draw_group_box.setTitle(_('Draw'))
-        self.draw_check_box.setText(_('Draw'))
-        self.draw_groups_check_box.setText(_('Split by start groups'))
-        self.draw_teams_check_box.setText(_('Split by teams'))
-        self.draw_regions_check_box.setText(_('Split by regions'))
-        self.draw_mix_groups_check_box.setText(_('Mix groups'))
-        self.start_group_box.setTitle(_('Start time'))
-        self.start_check_box.setText(_('Change start time'))
-        self.start_first_label.setText(_('First start in corridor'))
-        self.start_interval_radio_button.setText(_('Fixed start interval'))
+        self.setWindowTitle(translate('Start Preparation'))
+        self.reserve_group_box.setTitle(translate('Reserves insert'))
+        self.reserve_prefix_label.setText(translate('Reserve prefix'))
+        self.reserve_prefix.setText(translate('Reserve'))
+        self.reserve_group_count_label.setText(translate('Reserves per group, ps'))
+        self.reserve_group_percent_label.setText(translate('Reserves per group, %'))
+        self.reserve_check_box.setText(translate('Insert reserves'))
+        self.draw_group_box.setTitle(translate('Draw'))
+        self.draw_check_box.setText(translate('Draw'))
+        self.draw_groups_check_box.setText(translate('Split by start groups'))
+        self.draw_teams_check_box.setText(translate('Split by teams'))
+        self.draw_regions_check_box.setText(translate('Split by regions'))
+        self.draw_mix_groups_check_box.setText(translate('Mix groups'))
+        self.start_group_box.setTitle(translate('Start time'))
+        self.start_check_box.setText(translate('Change start time'))
+        self.start_first_label.setText(translate('First start in corridor'))
+        self.start_interval_radio_button.setText(translate('Fixed start interval'))
         self.start_group_settings_radio_button.setText(
-            _('Take start interval from group settings')
+            translate('Take start interval from group settings')
         )
-        self.start_one_minute_qty_label.setText(_('Several athletes on one minute'))
-        self.numbers_group_box.setTitle(_('Start numbers'))
-        self.numbers_check_box.setText(_('Change start numbers'))
-        self.numbers_interval_radio_button.setText(_('First number'))
-        self.numbers_interval_label.setText(_('interval'))
-        self.numbers_minute_radio_button.setText(_('Number = corridor + minute'))
-        self.numbers_order_radio_button.setText(_('Number = corridor + order'))
+        self.start_one_minute_qty_label.setText(
+            translate('Several athletes on one minute')
+        )
+        self.numbers_group_box.setTitle(translate('Start numbers'))
+        self.numbers_check_box.setText(translate('Change start numbers'))
+        self.numbers_interval_radio_button.setText(translate('First number'))
+        self.numbers_interval_label.setText(translate('interval'))
+        self.numbers_minute_radio_button.setText(
+            translate('Number = corridor + minute')
+        )
+        self.numbers_order_radio_button.setText(translate('Number = corridor + order'))
 
     def reserve_activate(self):
         status = self.reserve_check_box.isChecked()
@@ -414,7 +418,9 @@ class StartPreparationDialog(QDialog):
         self.reserve_check_box.setChecked(
             obj.get_setting('is_start_preparation_reserve', False)
         )
-        self.reserve_prefix.setText(obj.get_setting('reserve_prefix', _('Reserve')))
+        self.reserve_prefix.setText(
+            obj.get_setting('reserve_prefix', translate('Reserve'))
+        )
         self.reserve_group_count_spin_box.setValue(obj.get_setting('reserve_count', 1))
         self.reserve_group_percent_spin_box.setValue(
             obj.get_setting('reserve_percent', 0)

@@ -17,7 +17,7 @@ from sportorg import config
 from sportorg.common.audio import get_sounds
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
-from sportorg.language import _, get_languages
+from sportorg.language import get_languages, translate
 from sportorg.models.memory import (
     add_race,
     copy_race,
@@ -41,7 +41,7 @@ class MainTab(Tab):
         self.widget = QWidget()
         self.layout = QFormLayout(parent)
 
-        self.label_lang = QLabel(_('Languages'))
+        self.label_lang = QLabel(translate('Languages'))
         self.item_lang = AdvComboBox()
         self.item_lang.addItems(get_languages())
         self.item_lang.setCurrentText(
@@ -52,19 +52,19 @@ class MainTab(Tab):
         self.item_auto_save = QSpinBox()
         self.item_auto_save.setMaximum(3600 * 24)
         self.item_auto_save.setValue(Config().configuration.get('autosave_interval'))
-        self.layout.addRow(_('Auto save') + ' (sec)', self.item_auto_save)
+        self.layout.addRow(translate('Auto save') + ' (sec)', self.item_auto_save)
 
-        self.item_open_recent_file = QCheckBox(_('Open recent file'))
+        self.item_open_recent_file = QCheckBox(translate('Open recent file'))
         self.item_open_recent_file.setChecked(
             Config().configuration.get('open_recent_file')
         )
         self.layout.addRow(self.item_open_recent_file)
 
-        self.item_use_birthday = QCheckBox(_('Use birthday'))
+        self.item_use_birthday = QCheckBox(translate('Use birthday'))
         self.item_use_birthday.setChecked(Config().configuration.get('use_birthday'))
         self.layout.addRow(self.item_use_birthday)
 
-        self.item_check_updates = QCheckBox(_('Check updates'))
+        self.item_check_updates = QCheckBox(translate('Check updates'))
         self.item_check_updates.setChecked(Config().configuration.get('check_updates'))
         # self.layout.addRow(self.item_check_updates)
 
@@ -87,11 +87,11 @@ class SoundTab(Tab):
 
         self.sounds = get_sounds()
 
-        self.item_enabled = QCheckBox(_('Enabled'))
+        self.item_enabled = QCheckBox(translate('Enabled'))
         self.item_enabled.setChecked(Config().sound.get('enabled'))
         self.layout.addRow(self.item_enabled)
 
-        self.label_successful = QLabel(_('Successful result'))
+        self.label_successful = QLabel(translate('Successful result'))
         self.item_successful = AdvComboBox()
         self.item_successful.addItems(self.sounds)
         self.item_successful.setCurrentText(
@@ -99,7 +99,7 @@ class SoundTab(Tab):
         )
         self.layout.addRow(self.label_successful, self.item_successful)
 
-        self.label_unsuccessful = QLabel(_('Unsuccessful result'))
+        self.label_unsuccessful = QLabel(translate('Unsuccessful result'))
         self.item_unsuccessful = AdvComboBox()
         self.item_unsuccessful.addItems(self.sounds)
         self.item_unsuccessful.setCurrentText(
@@ -107,13 +107,13 @@ class SoundTab(Tab):
         )
         self.layout.addRow(self.label_unsuccessful, self.item_unsuccessful)
 
-        self.item_enabled_rented_card = QCheckBox(_('Enable rented card sound'))
+        self.item_enabled_rented_card = QCheckBox(translate('Enable rented card sound'))
         self.item_enabled_rented_card.setChecked(
             Config().sound.get('enabled_rented_card', Config().sound.get('enabled'))
         )
         self.layout.addRow(self.item_enabled_rented_card)
 
-        self.label_rented_card = QLabel(_('Rented card sound'))
+        self.label_rented_card = QLabel(translate('Rented card sound'))
         self.item_rented_card = AdvComboBox()
         self.item_rented_card.addItems(self.sounds)
         self.item_rented_card.setCurrentText(
@@ -156,7 +156,7 @@ class MultidayTab(Tab):
             add_race()
             self.fill_race_list()
 
-        self.item_new = QPushButton(_('New'))
+        self.item_new = QPushButton(translate('New'))
         self.item_new.clicked.connect(add_race_function)
         self.item_new.setMaximumWidth(max_button_width)
         self.layout.addRow(self.item_new)
@@ -165,7 +165,7 @@ class MultidayTab(Tab):
             copy_race()
             self.fill_race_list()
 
-        self.item_copy = QPushButton(_('Copy'))
+        self.item_copy = QPushButton(translate('Copy'))
         self.item_copy.clicked.connect(copy_race_function)
         self.item_copy.setMaximumWidth(max_button_width)
         self.layout.addRow(self.item_copy)
@@ -174,7 +174,7 @@ class MultidayTab(Tab):
             move_up_race()
             self.fill_race_list()
 
-        self.item_move_up = QPushButton(_('Move up'))
+        self.item_move_up = QPushButton(translate('Move up'))
         self.item_move_up.clicked.connect(move_up_race_function)
         self.item_move_up.setMaximumWidth(max_button_width)
         self.layout.addRow(self.item_move_up)
@@ -183,7 +183,7 @@ class MultidayTab(Tab):
             move_down_race()
             self.fill_race_list()
 
-        self.item_move_down = QPushButton(_('Move down'))
+        self.item_move_down = QPushButton(translate('Move down'))
         self.item_move_down.clicked.connect(move_down_race_function)
         self.item_move_down.setMaximumWidth(max_button_width)
         self.layout.addRow(self.item_move_down)
@@ -192,7 +192,7 @@ class MultidayTab(Tab):
             del_race()
             self.fill_race_list()
 
-        self.item_del = QPushButton(_('Delete'))
+        self.item_del = QPushButton(translate('Delete'))
         self.item_del.clicked.connect(del_race_function)
         self.item_del.setMaximumWidth(max_button_width)
         self.layout.addRow(self.item_del)
@@ -218,9 +218,9 @@ class SettingsDialog(QDialog):
     def __init__(self):
         super().__init__(GlobalAccess().get_main_window())
         self.widgets = [
-            (MainTab(self), _('Main settings')),
-            (SoundTab(self), _('Sounds')),
-            (MultidayTab(self), _('Multi day')),
+            (MainTab(self), translate('Main settings')),
+            (SoundTab(self), translate('Sounds')),
+            (MultidayTab(self), translate('Multi day')),
         ]
 
     def exec_(self):
@@ -228,7 +228,7 @@ class SettingsDialog(QDialog):
         return super().exec_()
 
     def init_ui(self):
-        self.setWindowTitle(_('Settings'))
+        self.setWindowTitle(translate('Settings'))
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(True)
@@ -253,10 +253,10 @@ class SettingsDialog(QDialog):
 
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         self.button_ok = button_box.button(QDialogButtonBox.Ok)
-        self.button_ok.setText(_('OK'))
+        self.button_ok.setText(translate('OK'))
         self.button_ok.clicked.connect(apply_changes)
         self.button_cancel = button_box.button(QDialogButtonBox.Cancel)
-        self.button_cancel.setText(_('Cancel'))
+        self.button_cancel.setText(translate('Cancel'))
         self.button_cancel.clicked.connect(cancel_changes)
         self.layout.addRow(button_box)
 

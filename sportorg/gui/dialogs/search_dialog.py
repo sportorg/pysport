@@ -12,7 +12,7 @@ from PySide2.QtWidgets import (
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
-from sportorg.language import _
+from sportorg.language import translate
 
 
 class SearchDialog(QDialog):
@@ -62,7 +62,9 @@ class SearchDialog(QDialog):
                 offset = proxy_model.search_offset
                 if offset == -1 and proxy_model.search:
                     QMessageBox.warning(
-                        self, _('Search'), _('The search has not given any results')
+                        self,
+                        translate('Search'),
+                        translate('The search has not given any results'),
                     )
                 self.table.selectRow(offset)
         except Exception as e:
@@ -72,6 +74,6 @@ class SearchDialog(QDialog):
         self.close()
 
     def retranslate_ui(self):
-        self.setWindowTitle(_('Search'))
-        self.button_ok.setText(_('OK'))
-        self.button_cancel.setText(_('Cancel'))
+        self.setWindowTitle(translate('Search'))
+        self.button_ok.setText(translate('OK'))
+        self.button_cancel.setText(translate('Cancel'))

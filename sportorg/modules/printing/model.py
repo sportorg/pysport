@@ -2,7 +2,7 @@ import platform
 
 from sportorg.common.template import get_text_from_file
 from sportorg.config import template_dir
-from sportorg.language import _
+from sportorg.language import translate
 from sportorg.models.memory import Organization, race
 from sportorg.models.result.split_calculation import GroupSplits
 from sportorg.modules.configs.configs import Config
@@ -41,7 +41,7 @@ def split_printout(result):
 
             size = 60  # base scale factor is 60, used win32con.MM_TWIPS MapMode (unit = 1/20 of dot, 72dpi)
 
-            array = str(template_path).split(_('scale') + '=')
+            array = str(template_path).split(translate('scale') + '=')
             if len(array) > 1:
                 scale = array[1]
                 if scale.isdecimal():

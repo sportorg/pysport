@@ -24,7 +24,7 @@ from sportorg.gui.tabs.memory_model import (
     ResultMemoryModel,
 )
 from sportorg.gui.utils.custom_controls import messageBoxQuestion
-from sportorg.language import _
+from sportorg.language import translate
 from sportorg.models.constant import RentCards
 from sportorg.models.memory import (
     NotEmptyException,
@@ -109,10 +109,10 @@ class MainWindow(QMainWindow):
         Broker().produce('close')
 
     def closeEvent(self, _event):
-        quit_msg = _('Save file before exit?')
+        quit_msg = translate('Save file before exit?')
         reply = messageBoxQuestion(
             self,
-            _('Question'),
+            translate('Question'),
             quit_msg,
             QMessageBox.Save | QMessageBox.No | QMessageBox.Cancel,
         )
@@ -238,11 +238,11 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.tabwidget)
         self.setCentralWidget(self.centralwidget)
 
-        self.tabwidget.addTab(persons.Widget(), _('Competitors'))
-        self.tabwidget.addTab(results.Widget(), _('Race Results'))
-        self.tabwidget.addTab(groups.Widget(), _('Groups'))
-        self.tabwidget.addTab(courses.Widget(), _('Courses'))
-        self.tabwidget.addTab(organizations.Widget(), _('Teams'))
+        self.tabwidget.addTab(persons.Widget(), translate('Competitors'))
+        self.tabwidget.addTab(results.Widget(), translate('Race Results'))
+        self.tabwidget.addTab(groups.Widget(), translate('Groups'))
+        self.tabwidget.addTab(courses.Widget(), translate('Courses'))
+        self.tabwidget.addTab(organizations.Widget(), translate('Teams'))
         self.tabwidget.currentChanged.connect(self._menu_disable)
 
     def _menu_disable(self, tab_index):
@@ -291,7 +291,7 @@ class MainWindow(QMainWindow):
         if index < self.tabwidget.count():
             self.tabwidget.setCurrentIndex(index)
         else:
-            logging.error('{} {}'.format(index, _("Tab doesn't exist")))
+            logging.error('{} {}'.format(index, translate("Tab doesn't exist")))
 
     @staticmethod
     def get_configuration():
@@ -457,8 +457,8 @@ class MainWindow(QMainWindow):
                             if cur_person.card_number:
                                 confirm = messageBoxQuestion(
                                     self,
-                                    _('Question'),
-                                    _(
+                                    translate('Question'),
+                                    translate(
                                         'Are you sure you want to reassign the chip number'
                                     ),
                                     QMessageBox.Yes | QMessageBox.No,
@@ -507,8 +507,8 @@ class MainWindow(QMainWindow):
     # Actions
     def create_file(self, *args, update_data=True):
         file_name = get_save_file_name(
-            _('Create SportOrg file'),
-            _('SportOrg file (*.json)'),
+            translate('Create SportOrg file'),
+            translate('SportOrg file (*.json)'),
             time.strftime('%Y%m%d'),
         )
         if not file_name:
@@ -527,7 +527,9 @@ class MainWindow(QMainWindow):
             except Exception as e:
                 logging.error(str(e))
                 QMessageBox.warning(
-                    self, _('Error'), _('Cannot create file') + ': ' + file_name
+                    self,
+                    translate('Error'),
+                    translate('Cannot create file') + ': ' + file_name,
                 )
             self.refresh()
 
@@ -560,13 +562,13 @@ class MainWindow(QMainWindow):
                 self.delete_from_recent_files(file_name)
                 QMessageBox.warning(
                     self,
-                    _('Error'),
-                    _('Cannot read file, format unknown') + ': ' + file_name,
+                    translate('Error'),
+                    translate('Cannot read file, format unknown') + ': ' + file_name,
                 )
 
     def split_printout_selected(self):
         if self.current_tab != 1:
-            logging.warning(_('No result selected'))
+            logging.warning(translate('No result selected'))
             return
         try:
             indexes = self.get_selected_rows()
@@ -586,12 +588,12 @@ class MainWindow(QMainWindow):
         except NoResultToPrintException as e:
             logging.warning(str(e))
             mes = QMessageBox(self)
-            mes.setText(_('No results to print'))
+            mes.setText(translate('No results to print'))
             mes.exec_()
         except NoPrinterSelectedException as e:
             logging.warning(str(e))
             mes = QMessageBox(self)
-            mes.setText(_('No printer selected'))
+            mes.setText(translate('No printer selected'))
             mes.exec_()
 
     def add_object(self):
@@ -632,7 +634,10 @@ class MainWindow(QMainWindow):
             return
 
         confirm = messageBoxQuestion(
-            self, _('Question'), _('Please confirm'), QMessageBox.Yes | QMessageBox.No
+            self,
+            translate('Question'),
+            translate('Please confirm'),
+            QMessageBox.Yes | QMessageBox.No,
         )
         if confirm == QMessageBox.No:
             return
@@ -652,7 +657,9 @@ class MainWindow(QMainWindow):
             except NotEmptyException as e:
                 logging.warning(str(e))
                 QMessageBox.question(
-                    self.get_group_table(), _('Error'), _('Cannot remove group')
+                    self.get_group_table(),
+                    translate('Error'),
+                    translate('Cannot remove group'),
                 )
             self.refresh()
         elif tab == 3:
@@ -661,7 +668,9 @@ class MainWindow(QMainWindow):
             except NotEmptyException as e:
                 logging.warning(str(e))
                 QMessageBox.question(
-                    self.get_course_table(), _('Error'), _('Cannot remove course')
+                    self.get_course_table(),
+                    translate('Error'),
+                    translate('Cannot remove course'),
                 )
             self.refresh()
         elif tab == 4:
@@ -671,8 +680,8 @@ class MainWindow(QMainWindow):
                 logging.warning(str(e))
                 QMessageBox.question(
                     self.get_organization_table(),
-                    _('Error'),
-                    _('Cannot remove organization'),
+                    translate('Error'),
+                    translate('Cannot remove organization'),
                 )
             self.refresh()
         if len(res):

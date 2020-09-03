@@ -6,7 +6,7 @@ from PySide2.QtWidgets import QDialog, QDialogButtonBox, QFormLayout, QLabel, QL
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
-from sportorg.language import _
+from sportorg.language import translate
 from sportorg.models.constant import get_countries, get_regions
 from sportorg.models.memory import find, race
 from sportorg.modules.teamwork import Teamwork
@@ -24,33 +24,33 @@ class OrganizationEditDialog(QDialog):
         return super().exec_()
 
     def init_ui(self):
-        self.setWindowTitle(_('Team properties'))
+        self.setWindowTitle(translate('Team properties'))
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(True)
 
         self.layout = QFormLayout(self)
 
-        self.label_name = QLabel(_('Name'))
+        self.label_name = QLabel(translate('Name'))
         self.item_name = QLineEdit()
         self.item_name.textChanged.connect(self.check_name)
         self.layout.addRow(self.label_name, self.item_name)
 
-        self.label_code = QLabel(_('Code'))
+        self.label_code = QLabel(translate('Code'))
         self.item_code = QLineEdit()
         self.layout.addRow(self.label_code, self.item_code)
 
-        self.label_country = QLabel(_('Country'))
+        self.label_country = QLabel(translate('Country'))
         self.item_country = AdvComboBox()
         self.item_country.addItems(get_countries())
         self.layout.addRow(self.label_country, self.item_country)
 
-        self.label_region = QLabel(_('Region'))
+        self.label_region = QLabel(translate('Region'))
         self.item_region = AdvComboBox()
         self.item_region.addItems(get_regions())
         self.layout.addRow(self.label_region, self.item_region)
 
-        self.label_contact = QLabel(_('Contact'))
+        self.label_contact = QLabel(translate('Contact'))
         self.item_contact = QLineEdit()
         self.layout.addRow(self.label_contact, self.item_contact)
 
@@ -66,10 +66,10 @@ class OrganizationEditDialog(QDialog):
 
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         self.button_ok = button_box.button(QDialogButtonBox.Ok)
-        self.button_ok.setText(_('OK'))
+        self.button_ok.setText(translate('OK'))
         self.button_ok.clicked.connect(apply_changes)
         self.button_cancel = button_box.button(QDialogButtonBox.Cancel)
-        self.button_cancel.setText(_('Cancel'))
+        self.button_cancel.setText(translate('Cancel'))
         self.button_cancel.clicked.connect(cancel_changes)
         self.layout.addRow(button_box)
 

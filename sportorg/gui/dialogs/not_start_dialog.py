@@ -6,7 +6,7 @@ from PySide2.QtWidgets import QDialog, QDialogButtonBox, QFormLayout, QLabel, QT
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
-from sportorg.language import _
+from sportorg.language import translate
 from sportorg.models.constant import StatusComments
 from sportorg.models.memory import ResultManual, ResultStatus, find, race
 from sportorg.modules.teamwork import Teamwork
@@ -21,7 +21,7 @@ class NotStartDialog(QDialog):
         return super().exec_()
 
     def init_ui(self):
-        self.setWindowTitle(_('Not started numbers'))
+        self.setWindowTitle(translate('Not started numbers'))
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(True)
@@ -51,10 +51,10 @@ class NotStartDialog(QDialog):
 
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         self.button_ok = button_box.button(QDialogButtonBox.Ok)
-        self.button_ok.setText(_('OK'))
+        self.button_ok.setText(translate('OK'))
         self.button_ok.clicked.connect(apply_changes)
         self.button_cancel = button_box.button(QDialogButtonBox.Cancel)
-        self.button_cancel.setText(_('Cancel'))
+        self.button_cancel.setText(translate('Cancel'))
         self.button_cancel.clicked.connect(cancel_changes)
         self.layout.addRow(button_box)
 

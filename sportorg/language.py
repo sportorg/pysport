@@ -54,4 +54,4 @@ def get_languages():
     return dirs
 
 
-_ = locale()
+translate = locale()

@@ -2,7 +2,7 @@ from PySide2 import QtCore
 from PySide2.QtCore import QSortFilterProxyModel
 from PySide2.QtWidgets import QComboBox, QCompleter, QMessageBox
 
-from sportorg.language import _
+from sportorg.language import translate
 
 
 class AdvComboBox(QComboBox):
@@ -51,18 +51,18 @@ def messageBoxQuestion(
 
     button_yes = messageBox.button(QMessageBox.Yes)
     if button_yes:
-        button_yes.setText(_('Yes'))
+        button_yes.setText(translate('Yes'))
 
     button_no = messageBox.button(QMessageBox.No)
     if button_no:
-        button_no.setText(_('No'))
+        button_no.setText(translate('No'))
 
     button_save = messageBox.button(QMessageBox.Save)
     if button_save:
-        button_save.setText(_('Save'))
+        button_save.setText(translate('Save'))
 
     button_cancel = messageBox.button(QMessageBox.Cancel)
     if button_cancel:
-        button_cancel.setText(_('Cancel'))
+        button_cancel.setText(translate('Cancel'))
 
     return messageBox.exec_()
