@@ -3,7 +3,7 @@ import time
 import uuid
 from typing import Any
 
-from PySide2 import QtCore, QtGui
+from PySide2 import QtCore
 
 from PySide2.QtWidgets import QMessageBox, QApplication, QTableView
 
@@ -101,7 +101,7 @@ class CopyAction(Action, metaclass=ActionFactory):
         for index in indexes:
             row = [str(row) for row in sel_model.model().get_data(index.row())]
             data += '\t'.join(row) + '\n'
-        QtGui.qApp.clipboard().setText(data)
+        QApplication.instance().clipboard().setText(data)
 
 
 class DuplicateAction(Action, metaclass=ActionFactory):
