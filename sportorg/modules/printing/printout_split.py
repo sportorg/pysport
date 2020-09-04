@@ -5,9 +5,9 @@ from sportorg.models.memory import ResultStatus, race
 from sportorg.models.result.result_calculation import ResultCalculation
 
 if platform.system() == 'Windows':  # current realisation works on Windows only
+    import win32con
     import win32print
     import win32ui
-    import win32con
 
 
 class SportorgPrinter(object):

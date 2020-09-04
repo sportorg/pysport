@@ -50,8 +50,8 @@ class ReserveManager(object):
 
 class DrawManager(object):
     """
-        Execute draw in each group
-        Now effect on all groups, but in future we'll possible implement working with filtered persons
+    Execute draw in each group
+    Now effect on all groups, but in future we'll possible implement working with filtered persons
     """
 
     def __init__(self, r):

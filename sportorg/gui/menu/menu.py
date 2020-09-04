@@ -26,14 +26,18 @@ def menu_list():
                     'shortcut': 'Ctrl+Shift+S',
                     'action': 'SaveAsAction',
                 },
-                {'type': 'separator',},
+                {
+                    'type': 'separator',
+                },
                 {
                     'title': translate('Settings'),
                     'shortcut': 'Ctrl+Alt+S',
                     'action': 'SettingsAction',
                 },
                 {'title': translate('Event Settings'), 'action': 'EventSettingsAction'},
-                {'type': 'separator',},
+                {
+                    'type': 'separator',
+                },
                 {
                     'title': translate('Import'),
                     'actions': [
@@ -134,7 +138,9 @@ def menu_list():
                     'tabs': list(range(5)),
                     'action': 'SearchAction',
                 },
-                {'type': 'separator',},
+                {
+                    'type': 'separator',
+                },
                 {
                     'title': translate('Start Preparation'),
                     'shortcut': 'Ctrl+1',
@@ -225,7 +231,9 @@ def menu_list():
                     'shortcut': 'Ctrl+L',
                     'action': 'SplitPrintoutAction',
                 },
-                {'type': 'separator',},
+                {
+                    'type': 'separator',
+                },
                 {
                     'title': translate('Rechecking'),
                     'shortcut': 'Ctrl+R',
@@ -290,7 +298,9 @@ def menu_list():
                             'tabs': list(range(5)),
                             'action': 'TeamworkSendAction',
                         },
-                        {'type': 'separator',},
+                        {
+                            'type': 'separator',
+                        },
                         {
                             'title': translate('On/Off'),
                             'action': 'TeamworkEnableAction',

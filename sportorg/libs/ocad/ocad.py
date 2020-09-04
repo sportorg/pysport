@@ -1,4 +1,3 @@
-from abc import ABCMeta
 from typing import IO
 from xml.etree import ElementTree
 
@@ -6,8 +5,6 @@ from chardet.universaldetector import UniversalDetector
 
 
 class Item:
-    __metaclass__ = ABCMeta
-
     def __init__(self, **kwargs):
         self.init(**kwargs)
 

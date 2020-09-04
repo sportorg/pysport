@@ -117,31 +117,31 @@ class ResultChecker:
     @staticmethod
     def penalty_calculation(splits, controls, check_existence=False):
         """:return quantity of incorrect or duplicated punches, order is ignored
-            origin: 31,41,51; athlete: 31,41,51; result:0
-            origin: 31,41,51; athlete: 31; result:0
-            origin: 31,41,51; athlete: 41,31,51; result:0
-            origin: 31,41,51; athlete: 31,42,51; result:1
-            origin: 31,41,51; athlete: 31,41,51,52; result:1
-            origin: 31,41,51; athlete: 31,42,51,52; result:2
-            origin: 31,41,51; athlete: 31,31,41,51; result:1
-            origin: 31,41,51; athlete: 31,41,51,51; result:1
-            origin: 31,41,51; athlete: 32,42,52; result:3
-            origin: 31,41,51; athlete: 31,41,51,61,71,81,91; result:4
-            origin: 31,41,51; athlete: 31,41,52,61,71,81,91; result:5
-            origin: 31,41,51; athlete: 51,61,71,81,91,31,41; result:4
-            origin: 31,41,51; athlete: 51,61,71,81,91,32,41; result:5
-            origin: 31,41,51; athlete: 51,61,71,81,91,32,42; result:6
-            origin: 31,41,51; athlete: 52,61,71,81,91,32,42; result:7
-            origin: 31,41,51; athlete: no punches; result:0
+        origin: 31,41,51; athlete: 31,41,51; result:0
+        origin: 31,41,51; athlete: 31; result:0
+        origin: 31,41,51; athlete: 41,31,51; result:0
+        origin: 31,41,51; athlete: 31,42,51; result:1
+        origin: 31,41,51; athlete: 31,41,51,52; result:1
+        origin: 31,41,51; athlete: 31,42,51,52; result:2
+        origin: 31,41,51; athlete: 31,31,41,51; result:1
+        origin: 31,41,51; athlete: 31,41,51,51; result:1
+        origin: 31,41,51; athlete: 32,42,52; result:3
+        origin: 31,41,51; athlete: 31,41,51,61,71,81,91; result:4
+        origin: 31,41,51; athlete: 31,41,52,61,71,81,91; result:5
+        origin: 31,41,51; athlete: 51,61,71,81,91,31,41; result:4
+        origin: 31,41,51; athlete: 51,61,71,81,91,32,41; result:5
+        origin: 31,41,51; athlete: 51,61,71,81,91,32,42; result:6
+        origin: 31,41,51; athlete: 52,61,71,81,91,32,42; result:7
+        origin: 31,41,51; athlete: no punches; result:0
 
-            with existence checking (if athlete has less punches, each missing add penalty):
-            origin: 31,41,51; athlete: 31; result:2
-            origin: 31,41,51; athlete: no punches; result:3
+        with existence checking (if athlete has less punches, each missing add penalty):
+        origin: 31,41,51; athlete: 31; result:2
+        origin: 31,41,51; athlete: no punches; result:3
 
-            wildcard support for free order
-            origin: *,*,* athlete: 31; result:2
-            origin: *,*,* athlete: 31,31; result:2
-            origin: *,*,* athlete: 31,31,31,31; result:3
+        wildcard support for free order
+        origin: *,*,* athlete: 31; result:2
+        origin: *,*,* athlete: 31,31; result:2
+        origin: *,*,* athlete: 31,31,31,31; result:3
         """
         user_array = [i.code for i in splits]
         origin_array = [i.get_number_code() for i in controls]
@@ -167,23 +167,23 @@ class ResultChecker:
     @staticmethod
     def penalty_calculation_free_order(splits, controls):
         """:return quantity penalty, duplication checked
-            origin: * ,* ,* ; athlete: 31,41,51; result:0
-            origin: * ,* ,* ; athlete: 31,31,51; result:1
-            origin: * ,* ,* ; athlete: 31,31,31; result:2
-            origin: * ,* ,* ; athlete: 31; result:2
+        origin: * ,* ,* ; athlete: 31,41,51; result:0
+        origin: * ,* ,* ; athlete: 31,31,51; result:1
+        origin: * ,* ,* ; athlete: 31,31,31; result:2
+        origin: * ,* ,* ; athlete: 31; result:2
 
-            support of first/last mandatory cp
-            origin: 40,* ,* ,90; athlete: 40,31,32,90; result:0
-            origin: 40,* ,* ,90; athlete: 40,31,40,90; result:1
-            origin: 40,* ,* ,90; athlete: 40,40,40,90; result:2
-            origin: 40,* ,* ,90; athlete: 40,90,90,90; result:2
-            origin: 40,* ,* ,90; athlete: 31,32,33,90; result:4
-            origin: 40,* ,* ,90; athlete: 31,40,31,90; result:1
-            origin: 40,* ,* ,90; athlete: 31,40,90,41; result:1
-            origin: 40,* ,* ,90; athlete: 31,40,31,32; result:1
-            origin: 40,* ,* ,90; athlete: 31,40,31,40; result:2
-            origin: 40,* ,* ,90; athlete: 40,40,90,90; result:2
-            origin: 40,* ,* ,90; athlete: 40,41,90,90; result:0 TODO:1 - only one incorrect case
+        support of first/last mandatory cp
+        origin: 40,* ,* ,90; athlete: 40,31,32,90; result:0
+        origin: 40,* ,* ,90; athlete: 40,31,40,90; result:1
+        origin: 40,* ,* ,90; athlete: 40,40,40,90; result:2
+        origin: 40,* ,* ,90; athlete: 40,90,90,90; result:2
+        origin: 40,* ,* ,90; athlete: 31,32,33,90; result:4
+        origin: 40,* ,* ,90; athlete: 31,40,31,90; result:1
+        origin: 40,* ,* ,90; athlete: 31,40,90,41; result:1
+        origin: 40,* ,* ,90; athlete: 31,40,31,32; result:1
+        origin: 40,* ,* ,90; athlete: 31,40,31,40; result:2
+        origin: 40,* ,* ,90; athlete: 40,40,90,90; result:2
+        origin: 40,* ,* ,90; athlete: 40,41,90,90; result:0 TODO:1 - only one incorrect case
         """
         res = 0
         correct_count = 0

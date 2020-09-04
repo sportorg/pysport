@@ -145,7 +145,9 @@ class SportiduinoClient(object):
     def _start_result_thread(self):
         if self._result_thread is None:
             self._result_thread = ResultThread(
-                self._queue, self._stop_event, self._logger,
+                self._queue,
+                self._stop_event,
+                self._logger,
             )
             if self._call_back:
                 self._result_thread.data_sender.connect(self._call_back)

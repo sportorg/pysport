@@ -5,11 +5,11 @@ from typing import List
 
 def indent(elem, level=0):
     """
-        import xml.etree.ElementTree as ET
+    import xml.etree.ElementTree as ET
 
-        elem = ET.Element('MyElem')
+    elem = ET.Element('MyElem')
 
-        indent(elem)
+    indent(elem)
     """
     i = '\n' + level * '\t'
     if len(elem):
@@ -49,7 +49,7 @@ class BaseElement(object):
 
     def write(self, file, **kwargs):
         """
-            write(elem, file, encoding='utf-8', xml_declaration=True)
+        write(elem, file, encoding='utf-8', xml_declaration=True)
         """
         el = self.to_elem()
         indent(el)
@@ -152,7 +152,13 @@ class Time(BaseElement):
         self.time = TimeStr()
 
     def to_elem(self):
-        return self.get_elem(self._tag_name, childs=[self.date, self.time,])
+        return self.get_elem(
+            self._tag_name,
+            childs=[
+                self.date,
+                self.time,
+            ],
+        )
 
 
 class StartTime(Time):
@@ -223,7 +229,14 @@ class Organisation(BaseElement):
         self.country = Country()
 
     def to_elem(self):
-        return self.get_elem('Organisation', childs=[self.id, self.name, self.country,])
+        return self.get_elem(
+            'Organisation',
+            childs=[
+                self.id,
+                self.name,
+                self.country,
+            ],
+        )
 
 
 class Class(BaseElement):

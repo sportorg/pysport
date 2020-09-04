@@ -3,7 +3,6 @@ from socket import *
 
 from sportorg.utils.time import time_to_hhmmss
 
-
 """
 Format of WDB data package
  - length is 1772 bytes

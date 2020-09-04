@@ -105,6 +105,14 @@ class PersonEditDialog(QDialog):
         self.label_bib_info = QLabel('')
         self.layout.addRow(QLabel(''), self.label_bib_info)
 
+        self.label_world_code = QLabel(translate('World code'))
+        self.item_world_code = QLineEdit()
+        self.layout.addRow(self.label_world_code, self.item_world_code)
+
+        self.label_national_code = QLabel(translate('National code'))
+        self.item_national_code = QLineEdit()
+        self.layout.addRow(self.label_national_code, self.item_national_code)
+
         self.label_start = QLabel(translate('Start time'))
         self.item_start = QTimeEdit()
         self.item_start.setDisplayFormat(self.time_format)
@@ -251,6 +259,8 @@ class PersonEditDialog(QDialog):
         self.item_surname.setText(self.current_object.surname)
         self.item_surname.selectAll()
         self.item_name.setCurrentText(self.current_object.name)
+        self.item_world_code.setText(self.current_object.world_code)
+        self.item_national_code.setText(self.current_object.national_code)
         if self.current_object.group:
             self.item_group.setCurrentText(self.current_object.group.name)
         else:
@@ -294,6 +304,8 @@ class PersonEditDialog(QDialog):
         person = self.current_object
         if self.is_new:
             race().persons.insert(0, person)
+        person.world_code = self.item_world_code.text()
+        person.national_code = self.item_national_code.text()
         if person.name != self.item_name.currentText():
             person.name = self.item_name.currentText()
         if person.surname != self.item_surname.text():

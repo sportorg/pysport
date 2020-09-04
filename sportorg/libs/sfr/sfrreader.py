@@ -26,7 +26,7 @@ from datetime import datetime
 from time import sleep
 
 if platform.system() == 'Windows':
-    from pywinusb.hid import HidDeviceFilter, HidDevice
+    from pywinusb.hid import HidDevice, HidDeviceFilter
 
 
 class SFRReader(object):
@@ -61,7 +61,7 @@ class SFRReader(object):
 
     def __init__(self, debug=False, logfile=None, logger=None):
         """Initializes communication with sfr station via HID interface.
-            We have no information, how to manage 2 connected stations
+        We have no information, how to manage 2 connected stations
         """
         self._device = None  # Type HidDevice
         self._debug = debug
@@ -262,8 +262,7 @@ class SFRReader(object):
             self.ret['punches'].append((code, time))
 
     def _connect_reader(self):
-        """Connect to SFR Reader.
-        """
+        """Connect to SFR Reader."""
         if platform.system() != 'Windows':
             raise SFRReaderException('Unsupported platform: %s' % platform.system())
 

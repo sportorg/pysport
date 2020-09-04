@@ -148,7 +148,7 @@ class CourseControl(Model):
         return self.code == other.code
 
     def get_number_code(self):
-        """ Get int code
+        """Get int code
         31 933 -> 31
         31(31,32,33) 933 -> 31
         * -> 0
@@ -740,7 +740,7 @@ class Result:
 
     def check_who_can_win(self):
         """Generate statistic about unfinished athletes in the group for current person.
-           Calculate, how much people can win and at what time current result will be final (nobody can win).
+        Calculate, how much people can win and at what time current result will be final (nobody can win).
         """
         if self.person and self.person.group:
             who_can_win_count = 0

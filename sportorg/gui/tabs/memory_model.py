@@ -183,8 +183,7 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
         self.search_offset = -1
 
     def sort(self, p_int, order=None):
-        """Sort table by given column number.
-        """
+        """Sort table by given column number."""
 
         def sort_key(x):
             item = self.get_item(x, p_int)

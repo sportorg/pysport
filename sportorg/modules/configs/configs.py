@@ -82,9 +82,18 @@ class Config(metaclass=Singleton):
                 }
             ),
             ConfigFile.SOUND: Configurations(
-                {'enabled': False, 'successful': '', 'unsuccessful': '',}
+                {
+                    'enabled': False,
+                    'successful': '',
+                    'unsuccessful': '',
+                }
             ),
-            ConfigFile.PRINTER: Configurations({'main': '', 'split': '',}),
+            ConfigFile.PRINTER: Configurations(
+                {
+                    'main': '',
+                    'split': '',
+                }
+            ),
             ConfigFile.RANKING: Configurations(
                 {
                     'not_qualified': 0,
