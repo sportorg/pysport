@@ -10,6 +10,7 @@
 ```commandline
 pip install poetry
 poetry install
+poetry install[win]  # for Windows
 ```
 
 Run

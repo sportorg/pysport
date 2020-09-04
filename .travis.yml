@@ -7,9 +7,7 @@ python:
 
 install:
   - pip install poetry codecov
-  - poetry export --dev --without-hashes -f requirements.txt > requirements.txt
-  - sed -i '/win32/d' requirements.txt
-  - pip install -r requirements.txt
+  - poetry install
   - cp .env.example .env
 
 script:
