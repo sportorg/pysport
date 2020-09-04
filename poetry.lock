@@ -774,7 +774,7 @@ version = "228"
 category = "main"
 description = "A package that simplifies USB/HID communications on windows"
 name = "pywinusb"
-optional = true
+optional = false
 python-versions = "*"
 version = "0.4.2"
 
@@ -937,10 +937,10 @@ python-versions = "*"
 version = "1.12.1"
 
 [extras]
-win = ["pywin32", "pywinusb"]
+win = ["pywin32"]
 
 [metadata]
-content-hash = "256dade4e612ebc459f689f1938506381be2518535964d3a09be81a7bf1515d2"
+content-hash = "05b7b729a2d7345792f25b237db36a857b914bc17080cf8b8b93ef3d5fd7a703"
 lock-version = "1.0"
 python-versions = "~3.8"
 
