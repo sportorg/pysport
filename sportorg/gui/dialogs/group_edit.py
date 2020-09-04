@@ -22,7 +22,6 @@ from sportorg.language import translate
 from sportorg.models.constant import get_race_courses
 from sportorg.models.memory import Limit, RaceType, Sex, find, race
 from sportorg.models.result.result_calculation import ResultCalculation
-from sportorg.modules.teamwork import Teamwork
 from sportorg.utils.time import time_to_otime, time_to_qtime
 
 
@@ -279,4 +278,3 @@ class GroupEditDialog(QDialog):
         group.is_any_course = self.item_is_any_course.isChecked()
 
         ResultCalculation(race()).set_rank(group)
-        Teamwork().send(group.to_dict())

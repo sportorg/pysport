@@ -9,7 +9,6 @@ from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import translate
 from sportorg.models.constant import get_countries, get_regions
 from sportorg.models.memory import find, race
-from sportorg.modules.teamwork import Teamwork
 
 
 class OrganizationEditDialog(QDialog):
@@ -103,5 +102,3 @@ class OrganizationEditDialog(QDialog):
         org.country = self.item_country.currentText()
         org.region = self.item_region.currentText()
         org.contact = self.item_contact.text()
-
-        Teamwork().send(org.to_dict())

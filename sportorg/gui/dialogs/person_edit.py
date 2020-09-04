@@ -23,7 +23,6 @@ from sportorg.models.constant import get_names, get_race_groups, get_race_teams
 from sportorg.models.memory import Limit, Organization, Qualification, find, race
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.modules.configs.configs import Config
-from sportorg.modules.teamwork import Teamwork
 from sportorg.utils.time import qdate_to_date, time_to_otime, time_to_qtime
 
 
@@ -323,7 +322,6 @@ class PersonEditDialog(QDialog):
                 organization = Organization()
                 organization.name = self.item_team.currentText()
                 race().organizations.append(organization)
-                Teamwork().send(organization.to_dict())
             person.organization = organization
         if person.qual.get_title() != self.item_qual.currentText():
             person.qual = Qualification.get_qual_by_name(self.item_qual.currentText())
@@ -371,4 +369,3 @@ class PersonEditDialog(QDialog):
                 person.set_year(self.item_year.value())
 
         ResultCalculation(race()).process_results()
-        Teamwork().send(person.to_dict())

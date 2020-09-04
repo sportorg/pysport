@@ -9,7 +9,6 @@ from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import translate
 from sportorg.models.constant import StatusComments
 from sportorg.models.memory import ResultManual, ResultStatus, find, race
-from sportorg.modules.teamwork import Teamwork
 
 
 class NotStartDialog(QDialog):
@@ -82,7 +81,6 @@ class NotStartDialog(QDialog):
                     result.person = person
                     result.status = ResultStatus.DID_NOT_START
                     result.status_comment = status_comment
-                    Teamwork().send(result.to_dict())
                     obj.add_new_result(result)
                 else:
                     logging.info('{} not found'.format(number))
