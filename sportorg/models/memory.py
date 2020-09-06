@@ -297,6 +297,14 @@ class Group(Model):
     def get_count_all(self):
         return self.count_person
 
+    @property
+    def race_type(self):
+        return self.get_type()
+
+    @race_type.setter
+    def race_type(self, value):
+        self.set_type(value)
+
     def get_type(self):
         if self.__type:
             return self.__type
@@ -1079,6 +1087,14 @@ class Person(Model):
 
     def __repr__(self):
         return '{} {} {}'.format(self.full_name, self.bib, self.group)
+
+    @property
+    def year(self):
+        return self.get_year()
+
+    @year.setter
+    def year(self, value: int):
+        self.set_year(value)
 
     def get_year(self):
         """Get year from birth_date. If only year is used in the event, it's stored as 01-01-year"""

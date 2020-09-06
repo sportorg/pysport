@@ -12,9 +12,12 @@ from PySide2.QtWidgets import (
     QGroupBox,
     QLabel,
     QLineEdit,
+    QScrollArea,
     QSpinBox,
     QTextEdit,
     QTimeEdit,
+    QVBoxLayout,
+    QWidget,
 )
 
 from sportorg import config
@@ -51,9 +54,15 @@ class ResultEditDialog(QDialog):
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(True)
-        self.setMaximumWidth(300)
+        self.resize(450, 740)
+        self.setMaximumWidth(self.parent().size().width())
+        self.setMaximumHeight(self.parent().size().height())
 
-        self.layout = QFormLayout(self)
+        vertical_layout = QVBoxLayout(self)
+        scroll_area = QScrollArea()
+        content_widget = QWidget()
+
+        form_layout = QFormLayout(content_widget)
 
         self.item_created_at = QTimeEdit()
         self.item_created_at.setDisplayFormat(self.time_format)
@@ -102,21 +111,21 @@ class ResultEditDialog(QDialog):
         more24 = race().get_setting('time_format_24', 'less24') == 'more24'
         self.splits = SplitsText(more24=more24)
 
-        self.layout.addRow(QLabel(translate('Created at')), self.item_created_at)
+        form_layout.addRow(QLabel(translate('Created at')), self.item_created_at)
         if self.current_object.is_punch():
-            self.layout.addRow(QLabel(translate('Card')), self.item_card_number)
-        self.layout.addRow(QLabel(translate('Bib')), self.item_bib)
-        self.layout.addRow(QLabel(''), self.label_person_info)
+            form_layout.addRow(QLabel(translate('Card')), self.item_card_number)
+        form_layout.addRow(QLabel(translate('Bib')), self.item_bib)
+        form_layout.addRow(QLabel(''), self.label_person_info)
         if more24:
-            self.layout.addRow(QLabel(translate('Days')), self.item_days)
-        self.layout.addRow(QLabel(translate('Start')), self.item_start)
-        self.layout.addRow(QLabel(translate('Finish')), self.item_finish)
-        self.layout.addRow(QLabel(translate('Credit')), self.item_credit)
-        self.layout.addRow(QLabel(translate('Penalty')), self.item_penalty)
-        self.layout.addRow(QLabel(translate('Penalty legs')), self.item_penalty_laps)
-        self.layout.addRow(QLabel(translate('Result')), self.item_result)
-        self.layout.addRow(QLabel(translate('Status')), self.item_status)
-        self.layout.addRow(QLabel(translate('Comment')), self.item_status_comment)
+            form_layout.addRow(QLabel(translate('Days')), self.item_days)
+        form_layout.addRow(QLabel(translate('Start')), self.item_start)
+        form_layout.addRow(QLabel(translate('Finish')), self.item_finish)
+        form_layout.addRow(QLabel(translate('Credit')), self.item_credit)
+        form_layout.addRow(QLabel(translate('Penalty')), self.item_penalty)
+        form_layout.addRow(QLabel(translate('Penalty legs')), self.item_penalty_laps)
+        form_layout.addRow(QLabel(translate('Result')), self.item_result)
+        form_layout.addRow(QLabel(translate('Status')), self.item_status)
+        form_layout.addRow(QLabel(translate('Comment')), self.item_status_comment)
 
         if self.current_object.is_punch():
             start_source = race().get_setting('system_start_source', 'protocol')
@@ -125,7 +134,11 @@ class ResultEditDialog(QDialog):
                 self.item_start.setDisabled(True)
             if finish_source == 'cp':
                 self.item_finish.setDisabled(True)
-            self.layout.addRow(self.splits.widget)
+            form_layout.addRow(self.splits.widget)
+
+        scroll_area.setWidget(content_widget)
+        scroll_area.setWidgetResizable(True)
+        vertical_layout.addWidget(scroll_area)
 
         def cancel_changes():
             self.close()
@@ -151,7 +164,7 @@ class ResultEditDialog(QDialog):
             )
             button_person.clicked.connect(self.open_person)
 
-        self.layout.addRow(button_box)
+        vertical_layout.addWidget(button_box)
 
         self.show()
         self.item_bib.setFocus()
