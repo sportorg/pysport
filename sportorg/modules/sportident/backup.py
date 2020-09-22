@@ -27,8 +27,8 @@ class BackupProcess(Process):
 def backup_data(card_data):
     text = 'start\n{}\n{}\n{}\n'.format(
         card_data['card_number'],
-        time_to_hhmmss(card_data['start']) if card_data['start'] else '',
-        time_to_hhmmss(card_data['finish']) if card_data['finish'] else '',
+        time_to_hhmmss(card_data['start']) if 'start' in card_data else '',
+        time_to_hhmmss(card_data['finish']) if 'finish' in card_data else '',
     )
     text += 'split_start\n'
     for i in range(len(card_data['punches'])):
