@@ -1,5 +1,4 @@
 import logging
-
 import sys
 from threading import Thread
 
@@ -22,11 +21,7 @@ class TelegramSendThread(Thread):
         try:
             sys.stdout = FakeStd()
             sys.stderr = FakeStd()
-            Telegram(self.token).send_message(
-                self.chat_id,
-                self.text,
-                self.parse_mode
-            )
+            Telegram(self.token).send_message(self.chat_id, self.text, self.parse_mode)
         except Exception as e:
             logging.error(str(e))
 
@@ -42,7 +37,6 @@ class BotOption:
 
 @singleton
 class TelegramClient:
-
     @staticmethod
     def get_options():
         obj = race()
@@ -51,20 +45,22 @@ class TelegramClient:
             obj.get_setting('telegram_chat_id', ''),
             obj.get_setting('telegram_template', ''),
             obj.get_setting('telegram_parse_mode', ''),
-            obj.get_setting('telegram_enabled', False)
+            obj.get_setting('telegram_enabled', False),
         )
 
     def send_result(self, result):
         if result.person:
-            self.send({
-                'group': result.person.group.name if result.person.group else '',
-                'name': result.person.full_name,
-                'bib': result.person.bib,
-                'result': result.get_result(),
-                'place': result.place,
-                'penalty_time': result.penalty_time,
-                'penalty_laps': result.penalty_laps,
-            })
+            self.send(
+                {
+                    'group': result.person.group.name if result.person.group else '',
+                    'name': result.person.full_name,
+                    'bib': result.person.bib,
+                    'result': result.get_result(),
+                    'place': result.place,
+                    'penalty_time': result.penalty_time,
+                    'penalty_laps': result.penalty_laps,
+                }
+            )
 
     def send(self, data_dict):
         options = self.get_options()
@@ -78,9 +74,5 @@ class TelegramClient:
             logging.error(str(e))
         logging.info('Telegram {}'.format(text))
         TelegramSendThread(
-            options.token,
-            options.chat_id,
-            text,
-            options.parse_mode
+            options.token, options.chat_id, text, options.parse_mode
         ).start()
-

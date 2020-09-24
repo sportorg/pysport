@@ -1,4 +1,11 @@
-from sportorg.models.memory import race, Person, Group, find, Qualification, Organization
+from sportorg.models.memory import (
+    Group,
+    Organization,
+    Person,
+    Qualification,
+    find,
+    race,
+)
 from sportorg.modules.winorient import winorient
 
 

@@ -1,7 +1,6 @@
 import logging
 
-from PySide2 import QtCore, QtWidgets
-from PySide2.QtWidgets import QAbstractItemView, QHeaderView
+from PySide2 import QtWidgets
 
 from sportorg.gui.dialogs.person_edit import PersonEditDialog
 from sportorg.gui.global_access import GlobalAccess, NumberClicker
@@ -34,7 +33,9 @@ class Widget(QtWidgets.QWidget):
         key = e.key()
         try:
             if key in key_numbers:
-                self.person_table.set_start_group(NumberClicker().click(key_numbers.index(key)))
+                self.person_table.set_start_group(
+                    NumberClicker().click(key_numbers.index(key))
+                )
                 GlobalAccess().get_main_window().refresh()
         except Exception as e:
             print(str(e))

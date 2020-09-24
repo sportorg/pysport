@@ -1,11 +1,10 @@
 from PySide2.QtCore import Qt
+from PySide2.QtGui import QFont, QIcon, QPixmap
+from PySide2.QtWidgets import QDialog, QFormLayout, QLabel, QTextEdit
 
-from PySide2.QtGui import QIcon, QPixmap, QFont
-from PySide2.QtWidgets import QFormLayout, QDialog, QLabel, QTextEdit
-
-from sportorg.gui.global_access import GlobalAccess
-from sportorg.language import _
 from sportorg import config
+from sportorg.gui.global_access import GlobalAccess
+from sportorg.language import translate
 
 
 class AboutDialog(QDialog):
@@ -17,16 +16,16 @@ class AboutDialog(QDialog):
         return super().exec_()
 
     def init_ui(self):
-        self.setWindowTitle(_('About'))
+        self.setWindowTitle(translate('About'))
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(True)
-        self.setStyleSheet("background:white")
+        self.setStyleSheet('background:white')
         self.setMinimumWidth(540)
         self.setMaximumWidth(640)
         self.layout = QFormLayout(self)
 
-        title_font = QFont("Times", 24)
+        title_font = QFont('Times', 24)
         title_text = QLabel()
         title_text.setText('{} {}'.format(config.NAME, config.VERSION))
         title_text.setFont(title_font)
@@ -35,33 +34,36 @@ class AboutDialog(QDialog):
         self.layout.addRow(title_icon, title_text)
 
         contributors_text = QLabel()
-        contributors_text.setText('\n{}:{}'.format(
-            _('Contributors'),
-            '\n\t- Danil Akhtarov,\n\t- Sergei Kobelev,\n\t- Semyon Yakimov,\n\t- Konstantin Bats.'
-        ))
+        contributors_text.setText(
+            '\n{}:{}'.format(
+                translate('Contributors'),
+                '\n\t- Danil Akhtarov,\n\t- Sergei Kobelev,\n\t- Semyon Yakimov,\n\t- Konstantin Bats.',
+            )
+        )
         self.layout.addRow(contributors_text)
 
         home_page_text = QLabel()
         home_page_text.setText(
-            '\n{0}: <a href="{1}">{1}</a>'.format(_('Home page'), 'https://sportorg.github.io/pysport/')
+            '\n{0}: <a href="{1}">{1}</a>'.format(
+                translate('Home page'), 'https://sportorg.github.io/pysport/'
+            )
         )
         home_page_text.setOpenExternalLinks(True)
 
         self.layout.addRow(home_page_text)
 
         licence_title = QLabel()
-        licence_title.setText(
-            '\nGPL v3 License'
-        )
+        licence_title.setText('\nGPL v3 License')
         licence_title.setAlignment(Qt.AlignCenter)
         self.layout.addRow(licence_title)
 
         licence_text = QTextEdit()
-        licence_text.setStyleSheet("QScrollBar:vertical {background: #bfbfbf}")
+        licence_text.setStyleSheet('QScrollBar:vertical {background: #bfbfbf}')
         licence_text.setMinimumHeight(220)
         licence_text.setMaximumHeight(220)
         licence_text.setReadOnly(True)
-        licence_text.setText("""
+        licence_text.setText(
+            """
 
 ### GNU GENERAL PUBLIC LICENSE
 
@@ -738,6 +740,7 @@ library, you may consider it more useful to permit linking proprietary
 applications with the library. If this is what you want to do, use the
 GNU Lesser General Public License instead of this License. But first,
 please read <https://www.gnu.org/licenses/why-not-lgpl.html>.
-""")
+"""
+        )
         self.layout.addRow(licence_text)
         self.show()

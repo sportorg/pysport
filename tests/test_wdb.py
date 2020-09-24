@@ -1,8 +1,18 @@
-import pytest
 import struct
 
-from sportorg.libs.winorient.wdb import WDBPunch, WDBFinish, WDBChip, WDBTeam, WDBDistance, WDBGroup, WDBMan, WDB, \
-    parse_wdb
+import pytest
+
+from sportorg.libs.winorient.wdb import (
+    WDB,
+    WDBChip,
+    WDBDistance,
+    WDBFinish,
+    WDBGroup,
+    WDBMan,
+    WDBPunch,
+    WDBTeam,
+    parse_wdb,
+)
 
 
 def test_WDBPunch_parsing():
@@ -11,7 +21,7 @@ def test_WDBPunch_parsing():
     code = 31
     time = 3600000
 
-    byte_array = struct.pack("<I", code) + struct.pack("<I", time)
+    byte_array = struct.pack('<I', code) + struct.pack('<I', time)
     obj1 = WDBPunch()
     obj1.parse_bytes(byte_array)
     obj2 = WDBPunch(code, time)
@@ -29,7 +39,9 @@ def test_WDBFinish_parsing():
     time = 3600000
     sound = 101
 
-    byte_array = struct.pack("<I", number) + struct.pack("<I", time) + struct.pack("<I", sound)
+    byte_array = (
+        struct.pack('<I', number) + struct.pack('<I', time) + struct.pack('<I', sound)
+    )
     obj1 = WDBFinish()
     obj1.parse_bytes(byte_array)
     obj2 = WDBFinish()

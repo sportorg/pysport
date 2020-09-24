@@ -1,14 +1,16 @@
 import os
-import re
 import platform
+import re
 
 from PySide2.QtWidgets import QFileDialog
 
-from sportorg.modules.configs.configs import ConfigFile, Config
+from sportorg.modules.configs.configs import Config, ConfigFile
 
 
 def get_open_file_name(caption='', filter_text=''):
-    result = QFileDialog.getOpenFileName(None, caption, get_default_dir(), filter_text)[0]
+    result = QFileDialog.getOpenFileName(None, caption, get_default_dir(), filter_text)[
+        0
+    ]
     if result:
         set_default_dir(os.path.dirname(os.path.abspath(result)))
     return result
@@ -21,7 +23,9 @@ def get_save_file_name(caption='', filter_text='', file_name=''):
             suffix = match.group(1)
             if not file_name.endswith(suffix):
                 file_name += suffix
-    result = QFileDialog.getSaveFileName(None, caption, os.path.join(get_default_dir(), file_name), filter_text)[0]
+    result = QFileDialog.getSaveFileName(
+        None, caption, os.path.join(get_default_dir(), file_name), filter_text
+    )[0]
     if result:
         set_default_dir(os.path.dirname(os.path.abspath(result)))
     return result
@@ -35,9 +39,7 @@ def get_default_dir():
 
 def set_default_dir(directory):
     # FIXME
-    get_conf()[ConfigFile.DIRECTORY] = {
-        'dialog_default_dir': directory
-    }
+    get_conf()[ConfigFile.DIRECTORY] = {'dialog_default_dir': directory}
 
 
 def get_conf():

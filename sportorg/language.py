@@ -2,6 +2,7 @@ import configparser
 import gettext
 import logging
 import os
+
 from sportorg import config
 
 
@@ -35,7 +36,9 @@ if config.DEBUG:
 
 
 def locale():
-    cat = gettext.Catalog(config.NAME.lower(), config.LOCALE_DIR, languages=[locale_current])
+    cat = gettext.Catalog(
+        config.NAME.lower(), config.LOCALE_DIR, languages=[locale_current]
+    )
 
     def get_text(message):
         result = cat.gettext(message)
@@ -51,4 +54,4 @@ def get_languages():
     return dirs
 
 
-_ = locale()
+translate = locale()

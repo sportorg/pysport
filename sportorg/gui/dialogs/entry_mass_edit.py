@@ -7,9 +7,9 @@ from PySide2.QtWidgets import QDialog, QDialogButtonBox, QFormLayout
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
-from sportorg.language import _
-from sportorg.models.constant import get_race_teams, get_race_groups
-from sportorg.models.memory import race, find
+from sportorg.language import translate
+from sportorg.models.constant import get_race_groups, get_race_teams
+from sportorg.models.memory import find, race
 
 
 class MassEditDialog(QDialog):
@@ -33,8 +33,8 @@ class MassEditDialog(QDialog):
         self.group_combo = AdvComboBox(self)
 
         empty_value = ''
-        yes = _('Yes')
-        no = _('No')
+        yes = translate('Yes')
+        no = translate('No')
 
         group_list = get_race_groups()
         if empty_value not in group_list:
@@ -84,7 +84,9 @@ class MassEditDialog(QDialog):
         self.out_of_competition_combobox.addItem(no)
         self.out_of_competition_combobox.setEditable(False)
         self.out_of_competition_combobox.setMaximumWidth(50)
-        self.layout.addRow(self.out_of_competition_checkbox, self.out_of_competition_combobox)
+        self.layout.addRow(
+            self.out_of_competition_checkbox, self.out_of_competition_combobox
+        )
 
         self.personal_checkbox = QtWidgets.QCheckBox(self)
         self.personal_combobox = AdvComboBox(self)
@@ -108,7 +110,7 @@ class MassEditDialog(QDialog):
 
     def accept(self, *args, **kwargs):
 
-        yes = _('Yes')
+        yes = translate('Yes')
         try:
             # apply mass edit here
             mv = GlobalAccess().get_main_window()
@@ -117,12 +119,16 @@ class MassEditDialog(QDialog):
                 obj = race()
 
                 change_group = find(obj.groups, name=self.group_combo.currentText())
-                change_team = find(obj.organizations, name=self.team_combo.currentText())
+                change_team = find(
+                    obj.organizations, name=self.team_combo.currentText()
+                )
                 start_group = int(self.start_group_spinbox.value())
                 change_comment = self.comment_text.toPlainText()
                 change_rented = self.rented_combobox.currentText() == yes
                 change_paid = self.paid_combobox.currentText() == yes
-                change_out_of_competition = self.out_of_competition_combobox.currentText() == yes
+                change_out_of_competition = (
+                    self.out_of_competition_combobox.currentText() == yes
+                )
                 change_personal = self.personal_combobox.currentText() == yes
 
                 for i in selection:
@@ -159,15 +165,15 @@ class MassEditDialog(QDialog):
         super().accept(*args, **kwargs)
 
     def retranslate_ui(self):
-        self.setWindowTitle(_("Mass Edit Dialog"))
-        self.group_checkbox.setText(_("Group"))
-        self.team_checkbox.setText(_("Team"))
-        self.start_group_checkbox.setText(_("Start group"))
-        self.comment_checkbox.setText(_("Comment"))
-        self.rented_checkbox.setText(_("rented card"))
-        self.paid_checkbox.setText(_("is paid"))
-        self.out_of_competition_checkbox.setText(_("out of competition"))
-        self.personal_checkbox.setText(_("personal participation"))
+        self.setWindowTitle(translate('Mass Edit Dialog'))
+        self.group_checkbox.setText(translate('Group'))
+        self.team_checkbox.setText(translate('Team'))
+        self.start_group_checkbox.setText(translate('Start group'))
+        self.comment_checkbox.setText(translate('Comment'))
+        self.rented_checkbox.setText(translate('rented card'))
+        self.paid_checkbox.setText(translate('is paid'))
+        self.out_of_competition_checkbox.setText(translate('out of competition'))
+        self.personal_checkbox.setText(translate('personal participation'))
 
-        self.button_ok.setText(_('OK'))
-        self.button_cancel.setText(_('Cancel'))
+        self.button_ok.setText(translate('OK'))
+        self.button_cancel.setText(translate('Cancel'))

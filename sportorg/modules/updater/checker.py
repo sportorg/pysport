@@ -4,12 +4,13 @@ https://developer.github.com/v3/
 
 import requests
 
-
 VERSION = ''
 
 
 def get_last_tag_name():
-    r = requests.get('https://api.github.com/repos/sportorg/pysport/releases/latest', timeout=5)
+    r = requests.get(
+        'https://api.github.com/repos/sportorg/pysport/releases/latest', timeout=5
+    )
     body = r.json()
     return body['tag_name']
 

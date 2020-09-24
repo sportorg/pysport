@@ -1,6 +1,6 @@
 import logging
 
-from sportorg.models.memory import race, Person, Group, Organization
+from sportorg.models.memory import Group, Organization, Person, race
 from sportorg.modules.backup.file import File
 
 

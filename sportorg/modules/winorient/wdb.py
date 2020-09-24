@@ -1,7 +1,27 @@
 from sportorg.common.otime import OTime
-from sportorg.libs.winorient.wdb import WDB, WDBMan, WDBTeam, WDBGroup, WDBDistance, WDBPunch, WDBFinish, WDBChip
-from sportorg.models.memory import Race, Organization, Group, Person, race, find, Course, \
-    CourseControl, ResultStatus, Qualification, ResultSportident, Split
+from sportorg.libs.winorient.wdb import (
+    WDB,
+    WDBChip,
+    WDBDistance,
+    WDBFinish,
+    WDBGroup,
+    WDBMan,
+    WDBPunch,
+    WDBTeam,
+)
+from sportorg.models.memory import (
+    Course,
+    CourseControl,
+    Group,
+    Organization,
+    Person,
+    Qualification,
+    ResultSportident,
+    ResultStatus,
+    Split,
+    find,
+    race,
+)
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.utils.time import int_to_otime, time_to_int
 
@@ -16,7 +36,7 @@ class WinOrientBinary:
         1: ResultStatus.DISQUALIFIED,
         2: ResultStatus.OVERTIME,
         7: ResultStatus.DID_NOT_FINISH,
-        8: ResultStatus.DID_NOT_START
+        8: ResultStatus.DID_NOT_START,
     }
 
     status_reverse = {
@@ -26,7 +46,7 @@ class WinOrientBinary:
         ResultStatus.DISQUALIFIED: 1,
         ResultStatus.OVERTIME: 2,
         ResultStatus.DID_NOT_FINISH: 7,
-        ResultStatus.DID_NOT_START: 8
+        ResultStatus.DID_NOT_START: 8,
     }
 
     def __init__(self, file=None):
@@ -96,8 +116,8 @@ class WinOrientBinary:
 
         for man in self.wdb_object.man:
             new_person = Person()
-            new_person.surname = man.name.strip().split(" ")[0]
-            new_person.name = man.name.strip().split(" ")[-1]
+            new_person.surname = man.name.strip().split(' ')[0]
+            new_person.name = man.name.strip().split(' ')[-1]
             new_person.bib = man.number
             if man.qualification:
                 if man.qualification == 10:
@@ -174,7 +194,7 @@ class WinOrientBinary:
         my_race = race()
 
         title = my_race.data.description
-        wdb_object.info.title = title.replace("<br>", "").split('\n')
+        wdb_object.info.title = title.replace('<br>', '').split('\n')
         wdb_object.info.place = my_race.data.location
         wdb_object.info.referee = my_race.data.chief_referee
         wdb_object.info.secretary = my_race.data.secretary
@@ -232,7 +252,7 @@ class WinOrientBinary:
 
         for man in my_race.persons:
             new_person = WDBMan(wdb_object)
-            new_person.name = str(man.surname) + " " + str(man.name)
+            new_person.name = str(man.surname) + ' ' + str(man.name)
             if man.bib:
                 new_person.number = int(man.bib)
 

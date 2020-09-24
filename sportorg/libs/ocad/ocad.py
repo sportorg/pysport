@@ -1,12 +1,10 @@
 from typing import IO
 from xml.etree import ElementTree
-from abc import ABCMeta
+
 from chardet.universaldetector import UniversalDetector
 
 
 class Item:
-    __metaclass__ = ABCMeta
-
     def __init__(self, **kwargs):
         self.init(**kwargs)
 
@@ -89,14 +87,14 @@ class ClassesV8:
 
     def parse(self, file):
         if not isinstance(file, str) and not isinstance(file, IO):
-            raise TypeError("file is not str or IO")
+            raise TypeError('file is not str or IO')
         if isinstance(file, str):
             try:
                 enc = self.detect_encoding(file)
                 with open(file, encoding=enc) as f:
                     content = f.readlines()
             except FileNotFoundError:
-                raise FileNotFoundError("Not found " + file)
+                raise FileNotFoundError('Not found ' + file)
         else:
             content = file.readlines()
         self._data = [x.strip() for x in content if x]
@@ -131,7 +129,7 @@ class ClassesV8:
     @staticmethod
     def get_courses(item):
         if not isinstance(item, str) and not isinstance(item, list):
-            raise TypeError("item is not string or list")
+            raise TypeError('item is not string or list')
         if isinstance(item, str):
             item = str(item).split(';')
         courses = CourseControlDict()
@@ -142,11 +140,17 @@ class ClassesV8:
         while (2 * i + 1) < limit:
             len_str = str(courses_split[2 * i]).replace(',', '.')
             if len_str and not len_str.replace('.', '').isdecimal():
-                raise OcadImportException('Incorrect length:' + len_str + ' in row ' + str(item))
+                raise OcadImportException(
+                    'Incorrect length:' + len_str + ' in row ' + str(item)
+                )
 
-            courses[i] = CourseControl(**{"order": i, "code": courses_split[2 * i + 1],
-                                          "length": float(len_str) if len(item[4])
-                                          else 0.0})
+            courses[i] = CourseControl(
+                **{
+                    'order': i,
+                    'code': courses_split[2 * i + 1],
+                    'length': float(len_str) if len(item[4]) else 0.0,
+                }
+            )
             i += 1
 
         return courses
@@ -161,7 +165,7 @@ class ClassesV8:
             return None
 
         if not isinstance(item, str) and not isinstance(item, list):
-            raise TypeError("item is not string or list")
+            raise TypeError('item is not string or list')
         if isinstance(item, str):
             item = str(item).split(';')
 
@@ -170,19 +174,23 @@ class ClassesV8:
 
         len_str = str(item[3]).replace(',', '.')
         if len_str and not len_str.replace('.', '').isdecimal():
-            raise OcadImportException('Incorrect length:' + len_str + ' in row ' + str(item))
+            raise OcadImportException(
+                'Incorrect length:' + len_str + ' in row ' + str(item)
+            )
 
         climb_str = str(item[4]).replace(',', '.')
         if climb_str and not climb_str.replace('.', '').isdecimal():
-            raise OcadImportException('Incorrect climb:' + climb_str + ' in row ' + str(item))
+            raise OcadImportException(
+                'Incorrect climb:' + climb_str + ' in row ' + str(item)
+            )
 
         course = {
-            "group": item[0],
-            "course": item[1],
-            "bib": item[2],
-            "length": float(len_str) if len(item[3]) else 0.0,
-            "climb": float(climb_str) if len(item[4]) else 0.0,
-            "controls": ClassesV8.get_courses(item)
+            'group': item[0],
+            'course': item[1],
+            'bib': item[2],
+            'length': float(len_str) if len(item[3]) else 0.0,
+            'climb': float(climb_str) if len(item[4]) else 0.0,
+            'controls': ClassesV8.get_courses(item),
         }
 
         return Course(**course)

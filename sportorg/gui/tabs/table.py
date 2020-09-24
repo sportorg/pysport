@@ -1,6 +1,6 @@
-from PySide2 import QtWidgets, QtCore
-from PySide2.QtWidgets import QMenu, QAbstractItemView, QHeaderView
+from PySide2 import QtCore, QtWidgets
 from PySide2.QtCore import QPoint
+from PySide2.QtWidgets import QAbstractItemView, QHeaderView, QMenu
 
 
 class TableView(QtWidgets.QTableView):

@@ -1,19 +1,25 @@
 import datetime
 import logging
-from queue import Queue, Empty
-from threading import main_thread, Event
-
 import os
 import platform
 import re
 import time
+from queue import Empty, Queue
+from threading import Event, main_thread
 
 import serial
 from PySide2.QtCore import QThread, Signal
+from sportident import (
+    SIReader,
+    SIReaderCardChanged,
+    SIReaderControl,
+    SIReaderException,
+    SIReaderReadout,
+    SIReaderSRR,
+)
 
 from sportorg.common.singleton import singleton
-from sportorg.language import _
-from sportident import SIReader, SIReaderReadout, SIReaderSRR, SIReaderControl, SIReaderException, SIReaderCardChanged
+from sportorg.language import translate
 from sportorg.models import memory
 from sportorg.modules.sportident import backup
 from sportorg.utils.time import time_to_otime
@@ -42,11 +48,14 @@ class SIReaderThread(QThread):
             if si.get_type() == SIReader.M_SRR:
                 si.disconnect()  # release port
                 si = SIReaderSRR(port=self.port, logger=logging.root)
-            elif si.get_type() == SIReader.M_CONTROL or si.get_type() == SIReader.M_BC_CONTROL:
+            elif (
+                si.get_type() == SIReader.M_CONTROL
+                or si.get_type() == SIReader.M_BC_CONTROL
+            ):
                 si.disconnect()  # release port
                 si = SIReaderControl(port=self.port, logger=logging.root)
 
-            si.poll_sicard() # try to poll immediately to catch an exception
+            si.poll_sicard()  # try to poll immediately to catch an exception
         except Exception as e:
             self._logger.debug(str(e))
             return
@@ -114,12 +123,19 @@ class ResultThread(QThread):
             start_time = self.time_to_sec(self.start_time)
             for i in range(len(card_data['punches'])):
                 if self.time_to_sec(card_data['punches'][i][1]) < start_time:
-                    new_datetime = card_data['punches'][i][1].replace(hour=(card_data['punches'][i][1].hour + 12) % 24)
+                    new_datetime = card_data['punches'][i][1].replace(
+                        hour=(card_data['punches'][i][1].hour + 12) % 24
+                    )
                     card_data['punches'][i] = (card_data['punches'][i][0], new_datetime)
 
                 # simple check for morning starts (10:00 a.m. was 22:00 in splits)
-                if self.time_to_sec(card_data['punches'][i][1]) - 12 * 3600 > start_time:
-                    new_datetime = card_data['punches'][i][1].replace(hour=card_data['punches'][i][1].hour - 12)
+                if (
+                    self.time_to_sec(card_data['punches'][i][1]) - 12 * 3600
+                    > start_time
+                ):
+                    new_datetime = card_data['punches'][i][1].replace(
+                        hour=card_data['punches'][i][1].hour - 12
+                    )
                     card_data['punches'][i] = (card_data['punches'][i][0], new_datetime)
 
         return card_data
@@ -148,7 +164,12 @@ class ResultThread(QThread):
     @staticmethod
     def time_to_sec(value, max_val=86400):
         if isinstance(value, datetime.datetime):
-            ret = value.hour * 3600 + value.minute * 60 + value.second + value.microsecond / 1000000
+            ret = (
+                value.hour * 3600
+                + value.minute * 60
+                + value.second
+                + value.microsecond / 1000000
+            )
             if max_val:
                 ret = ret % max_val
             return ret
@@ -175,11 +196,7 @@ class SIReaderClient(object):
     def _start_si_reader_thread(self):
         if self._si_reader_thread is None:
             self._si_reader_thread = SIReaderThread(
-                self.port,
-                self._queue,
-                self._stop_event,
-                self._logger,
-                debug=True
+                self.port, self._queue, self._stop_event, self._logger, debug=True
             )
             self._si_reader_thread.start()
         # elif not self._si_reader_thread.is_alive():
@@ -190,10 +207,7 @@ class SIReaderClient(object):
     def _start_result_thread(self):
         if self._result_thread is None:
             self._result_thread = ResultThread(
-                self._queue,
-                self._stop_event,
-                self._logger,
-                self.get_start_time()
+                self._queue, self._stop_event, self._logger, self.get_start_time()
             )
             if self._call_back:
                 self._result_thread.data_sender.connect(self._call_back)
@@ -206,7 +220,10 @@ class SIReaderClient(object):
     def is_alive(self):
         if self._si_reader_thread and self._result_thread:
             # return self._si_reader_thread.is_alive() and self._result_thread.is_alive()
-            return not self._si_reader_thread.isFinished() and not self._result_thread.isFinished()
+            return (
+                not self._si_reader_thread.isFinished()
+                and not self._result_thread.isFinished()
+            )
 
         return False
 
@@ -216,13 +233,13 @@ class SIReaderClient(object):
             self._stop_event.clear()
             self._start_si_reader_thread()
             self._start_result_thread()
-            self._logger.info(_('Opening port') + ' ' + self.port)
+            self._logger.info(translate('Opening port') + ' ' + self.port)
         else:
-            self._logger.info(_('Cannot open port'))
+            self._logger.info(translate('Cannot open port'))
 
     def stop(self):
         self._stop_event.set()
-        self._logger.info(_('Closing port'))
+        self._logger.info(translate('Closing port'))
 
     def toggle(self):
         if self.is_alive():
@@ -234,8 +251,11 @@ class SIReaderClient(object):
     def get_ports():
         ports = []
         if platform.system() == 'Linux':
-            scan_ports = [os.path.join('/dev', f) for f in os.listdir('/dev') if
-                     re.match('ttyS.*|ttyUSB.*', f)]
+            scan_ports = [
+                os.path.join('/dev', f)
+                for f in os.listdir('/dev')
+                if re.match('ttyS.*|ttyUSB.*', f)
+            ]
         elif platform.system() == 'Windows':
             scan_ports = ['COM' + str(i) for i in range(48)]
 
@@ -255,9 +275,9 @@ class SIReaderClient(object):
             return si_port
         ports = self.get_ports()
         if len(ports):
-            self._logger.info(_('Available Ports'))
+            self._logger.info(translate('Available Ports'))
             for i, p in enumerate(ports):
-                self._logger.info("{} - {}".format(i, p))
+                self._logger.info('{} - {}'.format(i, p))
             return ports[0]
         else:
             self._logger.info('No ports available')
@@ -270,5 +290,5 @@ class SIReaderClient(object):
             hour=start_time[0],
             minute=start_time[1],
             second=start_time[2],
-            microsecond=0
+            microsecond=0,
         )

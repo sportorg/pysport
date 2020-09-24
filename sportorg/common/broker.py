@@ -22,7 +22,6 @@ class Consumer:
 
 @singleton
 class Broker(object):
-
     def __init__(self):
         self._consumers = {}
         self._logger = logging.root
@@ -53,7 +52,11 @@ class Broker(object):
                     method = getattr(cls, method_name)
                     r = method(*args, **kwargs)
                 except AttributeError:
-                    self._logger.error("Class `{}` does not implement `{}`".format(cls.__class__.__name__, method_name))
+                    self._logger.error(
+                        'Class `{}` does not implement `{}`'.format(
+                            cls.__class__.__name__, method_name
+                        )
+                    )
                     r = None
 
             if r:

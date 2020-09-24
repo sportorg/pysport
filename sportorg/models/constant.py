@@ -2,7 +2,7 @@ import logging
 import operator
 
 from sportorg.common.singleton import singleton
-from sportorg.models.memory import race, Qualification
+from sportorg.models.memory import Qualification, race
 
 
 def get_countries():
@@ -179,7 +179,7 @@ def get_countries():
         'Ethiopia',
         'South Africa',
         'Jamaica',
-        'Japan'
+        'Japan',
     ]
 
 
@@ -325,16 +325,18 @@ class RankingTable(object):
     e.g. 850;133;148;166;;
     e.g. 5;;;;;100
     """
+
     RANKING = []
-    column_mapping = {Qualification.I: 1,
-                      Qualification.II: 2,
-                      Qualification.III: 3,
-                      Qualification.I_Y: 4,
-                      Qualification.II_Y: 5,
-                      Qualification.III_Y: 6,
-                      Qualification.KMS: 7,
-                      Qualification.MS: 8
-                      }
+    column_mapping = {
+        Qualification.I: 1,
+        Qualification.II: 2,
+        Qualification.III: 3,
+        Qualification.I_Y: 4,
+        Qualification.II_Y: 5,
+        Qualification.III_Y: 6,
+        Qualification.KMS: 7,
+        Qualification.MS: 8,
+    }
 
     def get_all(self):
         return self.RANKING

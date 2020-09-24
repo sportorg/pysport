@@ -2,16 +2,24 @@ import logging
 
 from PySide2 import QtPrintSupport
 from PySide2.QtGui import QIcon
-from PySide2.QtPrintSupport import QPrinter, QPrintDialog, QAbstractPrintDialog
-from PySide2.QtWidgets import QFormLayout, QLabel, QDialog, QPushButton, QCheckBox, QDialogButtonBox, QGroupBox, \
-    QDoubleSpinBox
+from PySide2.QtPrintSupport import QAbstractPrintDialog, QPrintDialog, QPrinter
+from PySide2.QtWidgets import (
+    QCheckBox,
+    QDialog,
+    QDialogButtonBox,
+    QDoubleSpinBox,
+    QFormLayout,
+    QGroupBox,
+    QLabel,
+    QPushButton,
+)
 
 from sportorg import config
 from sportorg.common.template import get_templates
 from sportorg.gui.dialogs.file_dialog import get_open_file_name
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
-from sportorg.language import _
+from sportorg.language import translate
 from sportorg.models.memory import race
 from sportorg.modules.configs.configs import Config
 
@@ -25,15 +33,15 @@ class PrintPropertiesDialog(QDialog):
         return super().exec_()
 
     def init_ui(self):
-        self.setWindowTitle(_('Printer settings'))
+        self.setWindowTitle(translate('Printer settings'))
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(True)
 
         self.layout = QFormLayout(self)
 
-        self.label_split_printer = QLabel(_('Default split printer'))
-        self.split_printer_selector = QPushButton(_('select'))
+        self.label_split_printer = QLabel(translate('Default split printer'))
+        self.split_printer_selector = QPushButton(translate('select'))
 
         def select_split_printer():
             printer = self.select_printer()
@@ -47,36 +55,40 @@ class PrintPropertiesDialog(QDialog):
         self.layout.addRow(self.label_split_printer, self.split_printer_selector)
         self.layout.addRow(self.selected_split_printer)
 
-        self.label_template = QLabel(_('Template'))
+        self.label_template = QLabel(translate('Template'))
         self.item_template = AdvComboBox()
         self.item_template.setMaximumWidth(200)
-        self.item_template.addItem(_('Internal printing'))
-        self.item_template.addItem(_('Internal printing') + ' ' + _('scale') + '=75')
+        self.item_template.addItem(translate('Internal printing'))
+        self.item_template.addItem(
+            translate('Internal printing') + ' ' + translate('scale') + '=75'
+        )
         self.item_template.addItems(get_templates(config.template_dir('split')))
         self.layout.addRow(self.label_template, self.item_template)
 
-        self.item_custom_path = QPushButton(_('Choose template'))
+        self.item_custom_path = QPushButton(translate('Choose template'))
 
         def select_custom_path():
-            file_name = get_open_file_name(_('Open HTML template'), _("HTML file (*.html)"))
+            file_name = get_open_file_name(
+                translate('Open HTML template'), translate('HTML file (*.html)')
+            )
             self.item_template.setCurrentText(file_name)
 
         self.item_custom_path.clicked.connect(select_custom_path)
         self.layout.addRow(self.item_custom_path)
 
-        self.print_splits_checkbox = QCheckBox(_('Print splits'))
+        self.print_splits_checkbox = QCheckBox(translate('Print splits'))
         self.layout.addRow(self.print_splits_checkbox)
 
-        self.margin_group_box = QGroupBox(_('Margins'))
+        self.margin_group_box = QGroupBox(translate('Margins'))
         self.margin_layout = QFormLayout()
         self.item_margin_left = QDoubleSpinBox()
-        self.margin_layout.addRow(QLabel(_('Left')), self.item_margin_left)
+        self.margin_layout.addRow(QLabel(translate('Left')), self.item_margin_left)
         self.item_margin_top = QDoubleSpinBox()
-        self.margin_layout.addRow(QLabel(_('Top')), self.item_margin_top)
+        self.margin_layout.addRow(QLabel(translate('Top')), self.item_margin_top)
         self.item_margin_right = QDoubleSpinBox()
-        self.margin_layout.addRow(QLabel(_('Right')), self.item_margin_right)
+        self.margin_layout.addRow(QLabel(translate('Right')), self.item_margin_right)
         self.item_margin_bottom = QDoubleSpinBox()
-        self.margin_layout.addRow(QLabel(_('Bottom')), self.item_margin_bottom)
+        self.margin_layout.addRow(QLabel(translate('Bottom')), self.item_margin_bottom)
         self.margin_group_box.setLayout(self.margin_layout)
         self.layout.addRow(self.margin_group_box)
 
@@ -94,10 +106,10 @@ class PrintPropertiesDialog(QDialog):
 
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         self.button_ok = button_box.button(QDialogButtonBox.Ok)
-        self.button_ok.setText(_('OK'))
+        self.button_ok.setText(translate('OK'))
         self.button_ok.clicked.connect(apply_changes)
         self.button_cancel = button_box.button(QDialogButtonBox.Cancel)
-        self.button_cancel.setText(_('Cancel'))
+        self.button_cancel.setText(translate('Cancel'))
         self.button_cancel.clicked.connect(cancel_changes)
         self.layout.addRow(button_box)
 

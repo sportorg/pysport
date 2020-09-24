@@ -3,11 +3,11 @@ import re
 import uuid
 from abc import abstractmethod
 from copy import copy, deepcopy
-
-from PySide2.QtCore import QAbstractTableModel, Qt
 from typing import List
 
-from sportorg.language import _
+from PySide2.QtCore import QAbstractTableModel, Qt
+
+from sportorg.language import translate
 from sportorg.models.constant import RentCards
 from sportorg.models.memory import race
 from sportorg.utils.time import time_to_hhmmss
@@ -17,6 +17,7 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
     """
     Used to specify common table behavior
     """
+
     def __init__(self):
         super().__init__()
         self.race = race()
@@ -76,7 +77,7 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
                 columns = self.get_headers()
                 return columns[index]
             if orientation == Qt.Vertical:
-                return str(index+1)
+                return str(index + 1)
 
     def data(self, index, role=None):
         if role == Qt.DisplayRole:
@@ -182,11 +183,12 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
         self.search_offset = -1
 
     def sort(self, p_int, order=None):
-        """Sort table by given column number.
-        """
+        """Sort table by given column number."""
+
         def sort_key(x):
             item = self.get_item(x, p_int)
             return item is None, str(type(item)), item
+
         try:
             self.layoutAboutToBeChanged.emit()
 
@@ -217,10 +219,25 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
         self.init_cache()
 
     def get_headers(self):
-        return [_('Last name'), _('First name'), _('Sex'), _('Qualification title'), _('Group'), _('Team'),
-                _('Year title'), _('Bib'), _('Start'), _('Start group'), _('Card title'), _('Rented card'),
-                _('Comment'), _('World code title'), _('National code title'), _('Out of competition title'),
-                _('Result count title')]
+        return [
+            translate('Last name'),
+            translate('First name'),
+            translate('Sex'),
+            translate('Qualification title'),
+            translate('Group'),
+            translate('Team'),
+            translate('Year title'),
+            translate('Bib'),
+            translate('Start'),
+            translate('Start group'),
+            translate('Card title'),
+            translate('Rented card'),
+            translate('Comment'),
+            translate('World code title'),
+            translate('National code title'),
+            translate('Out of competition title'),
+            translate('Result count title'),
+        ]
 
     def init_cache(self):
         self.cache.clear()
@@ -267,14 +284,16 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
             ret.append('')
         ret.append(person.start_group)
         ret.append(person.card_number)
-        ret.append(_('Rented card') if is_rented_card else _('Rented stub'))
+        ret.append(
+            translate('Rented card') if is_rented_card else translate('Rented stub')
+        )
         ret.append(person.comment)
         ret.append(str(person.world_code) if person.world_code else '')
         ret.append(str(person.national_code) if person.national_code else '')
 
         out_of_comp_status = ''
         if person.is_out_of_competition:
-            out_of_comp_status = _('o/c')
+            out_of_comp_status = translate('o/c')
         ret.append(out_of_comp_status)
         ret.append(person.result_count)
 
@@ -294,9 +313,24 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
         self.count = None
 
     def get_headers(self):
-        return [_('Last name'), _('First name'), _('Group'), _('Team'), _('Bib'), _('Card title'),
-                _('Start'), _('Finish'), _('Result'), _('Status'), _('Credit'), _('Penalty'), _('Penalty legs title'),
-                _('Place'), _('Type'), _('Rented card')]
+        return [
+            translate('Last name'),
+            translate('First name'),
+            translate('Group'),
+            translate('Team'),
+            translate('Bib'),
+            translate('Card title'),
+            translate('Start'),
+            translate('Finish'),
+            translate('Result'),
+            translate('Status'),
+            translate('Credit'),
+            translate('Penalty'),
+            translate('Penalty legs title'),
+            translate('Place'),
+            translate('Type'),
+            translate('Rented card'),
+        ]
 
     def init_cache(self):
         self.cache.clear()
@@ -335,7 +369,9 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
             if person.organization:
                 team = person.organization.name
 
-            rented_card = _('Rented card') if is_rented_card else _('Rented stub')
+            rented_card = (
+                translate('Rented card') if is_rented_card else translate('Rented stub')
+            )
 
         start = ''
         if i.get_start_time():
@@ -363,7 +399,7 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
             i.penalty_laps,
             i.get_place(),
             str(i.system_type),
-            rented_card
+            rented_card,
         ]
 
     def get_source_array(self):
@@ -378,10 +414,22 @@ class GroupMemoryModel(AbstractSportOrgMemoryModel):
         super().__init__()
 
     def get_headers(self):
-        return [_('Name'), _('Full name'), _('Course name'), _('Start fee title'), _('Type'), _('Length title'),
-                _('Point count title'), _('Climb title'), _('Sex'), _('Min year title'),
-                _('Max year title'), _('Start interval title'), _('Start corridor title'),
-                _('Order in corridor title')]
+        return [
+            translate('Name'),
+            translate('Full name'),
+            translate('Course name'),
+            translate('Start fee title'),
+            translate('Type'),
+            translate('Length title'),
+            translate('Point count title'),
+            translate('Climb title'),
+            translate('Sex'),
+            translate('Min year title'),
+            translate('Max year title'),
+            translate('Start interval title'),
+            translate('Start corridor title'),
+            translate('Order in corridor title'),
+        ]
 
     def init_cache(self):
         self.cache.clear()
@@ -433,7 +481,13 @@ class CourseMemoryModel(AbstractSportOrgMemoryModel):
         super().__init__()
 
     def get_headers(self):
-        return [_('Name'), _('Length title'), _('Point count title'), _('Climb title'), _('Controls')]
+        return [
+            translate('Name'),
+            translate('Length title'),
+            translate('Point count title'),
+            translate('Climb title'),
+            translate('Controls'),
+        ]
 
     def init_cache(self):
         self.cache.clear()
@@ -473,7 +527,13 @@ class OrganizationMemoryModel(AbstractSportOrgMemoryModel):
         super().__init__()
 
     def get_headers(self):
-        return [_('Name'), _('Code'), _('Country'), _('Region'), _('Contact')]
+        return [
+            translate('Name'),
+            translate('Code'),
+            translate('Country'),
+            translate('Region'),
+            translate('Contact'),
+        ]
 
     def init_cache(self):
         self.cache.clear()
@@ -497,7 +557,7 @@ class OrganizationMemoryModel(AbstractSportOrgMemoryModel):
             organization.code,
             organization.country,
             organization.region,
-            organization.contact
+            organization.contact,
         ]
 
     def get_source_array(self):

@@ -2,8 +2,7 @@ import logging
 
 from sportorg.common.otime import OTime
 from sportorg.models.constant import RankingTable
-from sportorg.models.memory import Result, Person, Group, Qualification, RankingItem, \
-    RelayTeam, RaceType, find
+from sportorg.models.memory import Group, Qualification, RaceType, RelayTeam, find
 from sportorg.modules.configs.configs import Config
 
 
@@ -137,7 +136,11 @@ class ResultCalculation(object):
                 if i.person.is_out_of_competition or not i.is_status_ok():
                     continue
 
-                qual_list = sorted(ranking.rank.values(), reverse=True, key=lambda item: item.qual.get_score())
+                qual_list = sorted(
+                    ranking.rank.values(),
+                    reverse=True,
+                    key=lambda item: item.qual.get_score(),
+                )
                 for j in qual_list:
                     if j.is_active:
                         if isinstance(place, int) and j.max_place >= place:

@@ -2,18 +2,17 @@ import logging
 
 from PySide2 import QtCore, QtWidgets
 from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QDialog, QTableView, QDialogButtonBox, QFormLayout
+from PySide2.QtWidgets import QDialog, QDialogButtonBox, QFormLayout
 
 from sportorg import config
 from sportorg.gui.dialogs.person_edit import PersonEditDialog
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
-from sportorg.language import _
-from sportorg.models.constant import get_race_teams, get_race_groups
+from sportorg.language import translate
+from sportorg.models.constant import get_race_groups, get_race_teams
 
 
 class DialogFilter(QDialog):
-
     def __init__(self, table=None):
         super().__init__(GlobalAccess().get_main_window())
         if table:
@@ -80,8 +79,12 @@ class DialogFilter(QDialog):
                     group_column = 2
                     team_column = 3
 
-                proxy_model.set_filter_for_column(group_column, self.group_combo.currentText())
-                proxy_model.set_filter_for_column(team_column, self.team_combo.currentText())
+                proxy_model.set_filter_for_column(
+                    group_column, self.group_combo.currentText()
+                )
+                proxy_model.set_filter_for_column(
+                    team_column, self.team_combo.currentText()
+                )
 
                 proxy_model.apply_filter()
 
@@ -93,9 +96,9 @@ class DialogFilter(QDialog):
         super().accept(*args, **kwargs)
 
     def retranslate_ui(self):
-        self.setWindowTitle(_("Filter Dialog"))
-        self.group_label.setText(_("Group"))
-        self.team_label.setText(_("Team"))
-        self.max_rows_count_label.setText(_("Max rows count"))
-        self.button_ok.setText(_('OK'))
-        self.button_cancel.setText(_('Cancel'))
+        self.setWindowTitle(translate('Filter Dialog'))
+        self.group_label.setText(translate('Group'))
+        self.team_label.setText(translate('Team'))
+        self.max_rows_count_label.setText(translate('Max rows count'))
+        self.button_ok.setText(translate('OK'))
+        self.button_cancel.setText(translate('Cancel'))

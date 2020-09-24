@@ -1,11 +1,8 @@
 import logging
-import time
-import uuid
 from typing import Any
 
-from PySide2 import QtCore, QtGui
-
-from PySide2.QtWidgets import QMessageBox, QApplication, QTableView
+from PySide2 import QtCore
+from PySide2.QtWidgets import QApplication, QMessageBox
 
 from sportorg import config
 from sportorg.common.otime import OTime
@@ -27,19 +24,26 @@ from sportorg.gui.dialogs.search_dialog import SearchDialog
 from sportorg.gui.dialogs.settings import SettingsDialog
 from sportorg.gui.dialogs.sportorg_import_dialog import SportOrgImportDialog
 from sportorg.gui.dialogs.start_handicap_dialog import StartHandicapDialog
-from sportorg.gui.dialogs.start_preparation import StartPreparationDialog, guess_courses_for_groups
+from sportorg.gui.dialogs.start_preparation import (
+    StartPreparationDialog,
+    guess_courses_for_groups,
+)
 from sportorg.gui.dialogs.start_time_change_dialog import StartTimeChangeDialog
-from sportorg.gui.dialogs.teamwork_properties import TeamworkPropertiesDialog
 from sportorg.gui.dialogs.telegram_dialog import TelegramDialog
 from sportorg.gui.dialogs.text_io import TextExchangeDialog
 from sportorg.gui.dialogs.timekeeping_properties import TimekeepingPropertiesDialog
 from sportorg.gui.menu.action import Action
 from sportorg.gui.utils.custom_controls import messageBoxQuestion
+from sportorg.language import translate
 from sportorg.libs.winorient.wdb import write_wdb
-from sportorg.models.memory import race, ResultStatus, ResultManual, find
+from sportorg.models.memory import ResultManual, ResultStatus, find, race
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.result_checker import ResultChecker
-from sportorg.models.start.start_preparation import guess_corridors_for_groups, copy_bib_to_card_number, copy_card_number_to_bib
+from sportorg.models.start.start_preparation import (
+    copy_bib_to_card_number,
+    copy_card_number_to_bib,
+    guess_corridors_for_groups,
+)
 from sportorg.modules.backup.json import get_races_from_file
 from sportorg.modules.iof import iof_xml
 from sportorg.modules.ocad import ocad
@@ -47,12 +51,10 @@ from sportorg.modules.ocad.ocad import OcadImportException
 from sportorg.modules.sfr.sfrreader import SFRReaderClient
 from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.modules.sportiduino.sportiduino import SportiduinoClient
-from sportorg.modules.teamwork import Teamwork
 from sportorg.modules.telegram.telegram import TelegramClient
 from sportorg.modules.updater import checker
 from sportorg.modules.winorient import winorient
 from sportorg.modules.winorient.wdb import WDBImportError, WinOrientBinary
-from sportorg.language import _
 
 
 class ActionFactory(type):
@@ -76,7 +78,9 @@ class SaveAction(Action, metaclass=ActionFactory):
 
 class OpenAction(Action, metaclass=ActionFactory):
     def execute(self):
-        file_name = get_open_file_name(_('Open SportOrg file'), _("SportOrg file (*.json)"))
+        file_name = get_open_file_name(
+            translate('Open SportOrg file'), translate('SportOrg file (*.json)')
+        )
         self.app.open_file(file_name)
 
 
@@ -101,7 +105,7 @@ class CopyAction(Action, metaclass=ActionFactory):
         for index in indexes:
             row = [str(row) for row in sel_model.model().get_data(index.row())]
             data += '\t'.join(row) + '\n'
-        QtGui.qApp.clipboard().setText(data)
+        QApplication.instance().clipboard().setText(data)
 
 
 class DuplicateAction(Action, metaclass=ActionFactory):
@@ -128,45 +132,68 @@ class EventSettingsAction(Action, metaclass=ActionFactory):
 
 class CSVWinorientImportAction(Action, metaclass=ActionFactory):
     def execute(self):
-        file_name = get_open_file_name(_('Open CSV Winorient file'), _("CSV Winorient (*.csv)"))
+        file_name = get_open_file_name(
+            translate('Open CSV Winorient file'), translate('CSV Winorient (*.csv)')
+        )
         if file_name is not '':
             try:
                 winorient.import_csv(file_name)
             except Exception as e:
                 logging.error(str(e))
-                QMessageBox.warning(self.app, _('Error'), _('Import error') + ': ' + file_name)
+                QMessageBox.warning(
+                    self.app,
+                    translate('Error'),
+                    translate('Import error') + ': ' + file_name,
+                )
             self.app.init_model()
 
 
 class WDBWinorientImportAction(Action, metaclass=ActionFactory):
     def execute(self):
-        file_name = get_open_file_name(_('Open WDB Winorient file'), _("WDB Winorient (*.wdb)"))
+        file_name = get_open_file_name(
+            translate('Open WDB Winorient file'), translate('WDB Winorient (*.wdb)')
+        )
         if file_name is not '':
             try:
                 winorient.import_wo_wdb(file_name)
             except WDBImportError as e:
                 logging.error(str(e))
                 logging.exception(e)
-                QMessageBox.warning(self.app, _('Error'), _('Import error') + ': ' + file_name)
+                QMessageBox.warning(
+                    self.app,
+                    translate('Error'),
+                    translate('Import error') + ': ' + file_name,
+                )
             self.app.init_model()
 
 
 class OcadTXTv8ImportAction(Action, metaclass=ActionFactory):
     def execute(self):
-        file_name = get_open_file_name(_('Open Ocad txt v8 file'), _("Ocad classes v8 (*.txt)"))
+        file_name = get_open_file_name(
+            translate('Open Ocad txt v8 file'), translate('Ocad classes v8 (*.txt)')
+        )
         if file_name is not '':
             try:
                 ocad.import_txt_v8(file_name)
             except OcadImportException as e:
                 logging.error(str(e))
-                QMessageBox.warning(self.app, _('Error'), _('Import error') + ': ' + file_name)
+                QMessageBox.warning(
+                    self.app,
+                    translate('Error'),
+                    translate('Import error') + ': ' + file_name,
+                )
             self.app.init_model()
 
 
 class WDBWinorientExportAction(Action, metaclass=ActionFactory):
     def execute(self):
-        file_name = get_save_file_name(_('Save As WDB file'), _("WDB file (*.wdb)"),
-                                       '{}_sportorg_export'.format(race().data.get_start_datetime().strftime("%Y%m%d")))
+        file_name = get_save_file_name(
+            translate('Save As WDB file'),
+            translate('WDB file (*.wdb)'),
+            '{}_sportorg_export'.format(
+                race().data.get_start_datetime().strftime('%Y%m%d')
+            ),
+        )
         if file_name is not '':
             try:
                 wb = WinOrientBinary()
@@ -178,30 +205,47 @@ class WDBWinorientExportAction(Action, metaclass=ActionFactory):
                 write_wdb(wdb_object, file_name)
             except Exception as e:
                 logging.exception(str(e))
-                QMessageBox.warning(self.app, _('Error'), _('Export error') + ': ' + file_name)
+                QMessageBox.warning(
+                    self.app,
+                    translate('Error'),
+                    translate('Export error') + ': ' + file_name,
+                )
 
 
 class IOFResultListExportAction(Action, metaclass=ActionFactory):
     def execute(self):
-        file_name = get_save_file_name(_('Save As IOF xml'), _('IOF xml (*.xml)'),
-                                       '{}_resultList'.format(race().data.get_start_datetime().strftime("%Y%m%d")))
+        file_name = get_save_file_name(
+            translate('Save As IOF xml'),
+            translate('IOF xml (*.xml)'),
+            '{}_resultList'.format(race().data.get_start_datetime().strftime('%Y%m%d')),
+        )
         if file_name is not '':
             try:
                 iof_xml.export_result_list(file_name)
             except Exception as e:
                 logging.error(str(e))
-                QMessageBox.warning(self.app, _('Error'), _('Export error') + ': ' + file_name)
+                QMessageBox.warning(
+                    self.app,
+                    translate('Error'),
+                    translate('Export error') + ': ' + file_name,
+                )
 
 
 class IOFEntryListImportAction(Action, metaclass=ActionFactory):
     def execute(self):
-        file_name = get_open_file_name(_('Open IOF xml'), _('IOF xml (*.xml)'))
+        file_name = get_open_file_name(
+            translate('Open IOF xml'), translate('IOF xml (*.xml)')
+        )
         if file_name is not '':
             try:
                 iof_xml.import_from_iof(file_name)
             except Exception as e:
                 logging.exception(str(e))
-                QMessageBox.warning(self.app, _('Error'), _('Import error') + ': ' + file_name)
+                QMessageBox.warning(
+                    self.app,
+                    translate('Error'),
+                    translate('Import error') + ': ' + file_name,
+                )
             self.app.init_model()
 
 
@@ -332,8 +376,10 @@ class RelayCloneAction(Action, metaclass=ActionFactory):
 
 class CopyBibToCardNumber(Action, metaclass=ActionFactory):
     def execute(self):
-        msg = _('Use bib as card number') + '?'
-        reply = messageBoxQuestion(self.app, _('Question'), msg, QMessageBox.Yes | QMessageBox.No)
+        msg = translate('Use bib as card number') + '?'
+        reply = messageBoxQuestion(
+            self.app, translate('Question'), msg, QMessageBox.Yes | QMessageBox.No
+        )
         if reply == QMessageBox.Yes:
             copy_bib_to_card_number()
             self.app.refresh()
@@ -341,8 +387,10 @@ class CopyBibToCardNumber(Action, metaclass=ActionFactory):
 
 class CopyCardNumberToBib(Action, metaclass=ActionFactory):
     def execute(self):
-        msg = _('Use card number as bib') + '?'
-        reply = messageBoxQuestion(self.app, _('Question'), msg, QMessageBox.Yes | QMessageBox.No)
+        msg = translate('Use card number as bib') + '?'
+        reply = messageBoxQuestion(
+            self.app, translate('Question'), msg, QMessageBox.Yes | QMessageBox.No
+        )
         if reply == QMessageBox.Yes:
             copy_card_number_to_bib()
             self.app.refresh()
@@ -351,9 +399,8 @@ class CopyCardNumberToBib(Action, metaclass=ActionFactory):
 class ManualFinishAction(Action, metaclass=ActionFactory):
     def execute(self):
         result = race().new_result(ResultManual)
-        Teamwork().send(result.to_dict())
         race().add_new_result(result)
-        logging.info(_('Manual finish'))
+        logging.info(translate('Manual finish'))
         self.app.refresh()
 
 
@@ -434,7 +481,7 @@ class PenaltyRemovingAction(Action, metaclass=ActionFactory):
 class ChangeStatusAction(Action, metaclass=ActionFactory):
     def execute(self):
         if self.app.current_tab != 1:
-            logging.warning(_('No result selected'))
+            logging.warning(translate('No result selected'))
             return
         obj = race()
 
@@ -453,7 +500,7 @@ class ChangeStatusAction(Action, metaclass=ActionFactory):
             index = 0
         if index >= len(obj.results):
             mes = QMessageBox()
-            mes.setText(_('No results to change status'))
+            mes.setText(translate('No results to change status'))
             mes.exec_()
             return
         result = obj.results[index]
@@ -461,7 +508,6 @@ class ChangeStatusAction(Action, metaclass=ActionFactory):
             result.status = status_dict[result.status]
         else:
             result.status = ResultStatus.OK
-        Teamwork().send(result.to_dict())
         self.app.refresh()
 
 
@@ -481,7 +527,6 @@ class AddSPORTidentResultAction(Action, metaclass=ActionFactory):
     def execute(self):
         result = race().new_result()
         race().add_new_result(result)
-        Teamwork().send(result.to_dict())
         logging.info('SPORTident result')
         self.app.get_result_table().model().init_cache()
         self.app.refresh()
@@ -491,42 +536,6 @@ class TimekeepingSettingsAction(Action, metaclass=ActionFactory):
     def execute(self):
         TimekeepingPropertiesDialog().exec_()
         self.app.refresh()
-
-
-class TeamworkSettingsAction(Action, metaclass=ActionFactory):
-    def execute(self):
-        TeamworkPropertiesDialog().exec_()
-
-
-class TeamworkEnableAction(Action, metaclass=ActionFactory):
-    def execute(self):
-        host = race().get_setting('teamwork_host', 'localhost')
-        port = race().get_setting('teamwork_port', 50010)
-        token = race().get_setting('teamwork_token', str(uuid.uuid4())[:8])
-        connection_type = race().get_setting('teamwork_type_connection', 'client')
-        Teamwork().set_options(host, port, token, connection_type)
-        Teamwork().toggle()
-
-
-class TeamworkSendAction(Action, metaclass=ActionFactory):
-    def execute(self):
-        try:
-            obj = race()
-            data_list = [obj.persons, obj.results, obj.groups, obj.courses, obj.organizations]
-            if not self.app.current_tab < len(data_list):
-                return
-            items = data_list[self.app.current_tab]
-            indexes = self.app.get_selected_rows()
-            items_dict = []
-            for index in indexes:
-                if index < 0:
-                    continue
-                if index >= len(items):
-                    break
-                items_dict.append(items[index].to_dict())
-            Teamwork().send(items_dict)
-        except Exception as e:
-            logging.error(str(e))
 
 
 class PrinterSettingsAction(Action, metaclass=ActionFactory):
@@ -549,7 +558,7 @@ class TelegramSendAction(Action, metaclass=ActionFactory):
     def execute(self):
         try:
             if not self.app.current_tab == 1:
-                logging.warning(_('No result selected'))
+                logging.warning(translate('No result selected'))
                 return
             items = race().results
             indexes = self.app.get_selected_rows()
@@ -572,14 +581,14 @@ class CheckUpdatesAction(Action, metaclass=ActionFactory):
     def execute(self):
         try:
             if not checker.check_version(config.VERSION):
-                message = _('Update available') + ' ' + checker.get_version()
+                message = translate('Update available') + ' ' + checker.get_version()
             else:
-                message = _('You are using the latest version')
+                message = translate('You are using the latest version')
 
-            QMessageBox.information(self.app, _('Info'), message)
+            QMessageBox.information(self.app, translate('Info'), message)
         except Exception as e:
             logging.error(str(e))
-            QMessageBox.warning(self.app, _('Error'), str(e))
+            QMessageBox.warning(self.app, translate('Error'), str(e))
 
 
 class AssignResultByBibAction(Action, metaclass=ActionFactory):
@@ -600,7 +609,9 @@ class AssignResultByCardNumberAction(Action, metaclass=ActionFactory):
 
 class ImportSportOrgAction(Action, metaclass=ActionFactory):
     def execute(self):
-        file_name = get_open_file_name(_('Open SportOrg json'), _('SportOrg (*.json)'))
+        file_name = get_open_file_name(
+            translate('Open SportOrg json'), translate('SportOrg (*.json)')
+        )
         if file_name is not '':
             with open(file_name) as f:
                 attr = get_races_from_file(f)

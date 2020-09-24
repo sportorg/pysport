@@ -17,9 +17,6 @@ class Telegram:
         }
         if parse_mode in ['Markdown', 'HTML']:
             json_data['parse_mode'] = parse_mode
-        res = requests.post(
-            self._get_api_url('sendMessage'),
-            json=json_data
-        )
+        res = requests.post(self._get_api_url('sendMessage'), json=json_data)
 
         return res

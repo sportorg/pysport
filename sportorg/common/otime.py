@@ -1,5 +1,4 @@
 import datetime
-
 from math import trunc
 
 
@@ -88,17 +87,17 @@ class OTime:
             self.if_none(hour, self.hour),
             self.if_none(minute, self.minute),
             self.if_none(sec, self.sec),
-            self.if_none(msec, self.msec)
+            self.if_none(msec, self.msec),
         )
 
     def copy(self):
         return OTime(msec=self.to_msec())
 
     def to_minute(self):
-        return trunc(self.to_msec()/(1000*60))
+        return trunc(self.to_msec() / (1000 * 60))
 
     def to_sec(self):
-        return trunc(self.to_msec()/1000)
+        return trunc(self.to_msec() / 1000)
 
     def to_msec(self, sub_sec=3):
         if not 0 <= sub_sec <= 3:
@@ -107,18 +106,18 @@ class OTime:
         return self._msec // mlt * mlt
 
     def to_time(self):
-        return datetime.time(self.hour, self.minute, self.sec, self.msec*1000)
+        return datetime.time(self.hour, self.minute, self.sec, self.msec * 1000)
 
     def to_minute_str(self):
-        minute = int(self.to_msec()/(1000*60))
+        minute = int(self.to_msec() / (1000 * 60))
         return '{}:{}'.format(
             minute if minute > 9 else '0' + str(minute),
-            self.sec if self.sec > 9 else '0' + str(self.sec)
+            self.sec if self.sec > 9 else '0' + str(self.sec),
         )
 
     @staticmethod
     def get_msec(day=0, hour=0, minute=0, sec=0, msec=0):
-        ret = day*86400000 + hour*3600000 + minute*60000 + sec*1000 + msec
+        ret = day * 86400000 + hour * 3600000 + minute * 60000 + sec * 1000 + msec
         if ret < 0:
             # emulation of midnight - add 1 day if time < 0. Note, that now we don't support races > 24h
             # TODO: real day difference, support races > 24h
@@ -130,17 +129,17 @@ class OTime:
         return default if val is None else val
 
     def to_str(self, time_accuracy=0):
-        hour = self.hour + self.day*24
+        hour = self.hour + self.day * 24
         if time_accuracy == 0:
             return '{}:{}:{}'.format(
                 hour if hour > 9 else '0' + str(hour),
                 self.minute if self.minute > 9 else '0' + str(self.minute),
-                self.sec if self.sec > 9 else '0' + str(self.sec)
+                self.sec if self.sec > 9 else '0' + str(self.sec),
             )
         else:
             return '{}:{}:{}.{}'.format(
                 ('0' + str(self.hour))[-2:],
                 ('0' + str(self.minute))[-2:],
                 ('0' + str(self.sec))[-2:],
-                ('00' + str(self.msec))[-3:][:time_accuracy]
+                ('00' + str(self.msec))[-3:][:time_accuracy],
             )

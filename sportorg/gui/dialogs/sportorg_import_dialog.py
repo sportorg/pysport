@@ -1,13 +1,20 @@
 import logging
 
 from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QFormLayout, QDialog, QDialogButtonBox, QLabel, QGroupBox, QRadioButton
+from PySide2.QtWidgets import (
+    QDialog,
+    QDialogButtonBox,
+    QFormLayout,
+    QGroupBox,
+    QLabel,
+    QRadioButton,
+)
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
-from sportorg.language import _
-from sportorg.models.memory import Race, race, find
+from sportorg.language import translate
+from sportorg.models.memory import find, race
 
 
 class SportOrgImportDialog(QDialog):
@@ -22,7 +29,7 @@ class SportOrgImportDialog(QDialog):
         return super().exec_()
 
     def init_ui(self):
-        self.setWindowTitle(_('Import'))
+        self.setWindowTitle(translate('Import'))
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(True)
@@ -30,24 +37,24 @@ class SportOrgImportDialog(QDialog):
         self.layout = QFormLayout(self)
 
         self.item_races = AdvComboBox()
-        self.layout.addRow(QLabel(_('Choose race')), self.item_races)
+        self.layout.addRow(QLabel(translate('Choose race')), self.item_races)
 
-        self.unique_id_box = QGroupBox(_('Unique id'))
+        self.unique_id_box = QGroupBox(translate('Unique id'))
         self.unique_id_box_layout = QFormLayout()
-        self.unique_id_item_id = QRadioButton(_('Id'))
+        self.unique_id_item_id = QRadioButton(translate('Id'))
         self.unique_id_item_id.setChecked(True)
         self.unique_id_box_layout.addRow(self.unique_id_item_id)
-        self.unique_id_item_name = QRadioButton(_('Name'))
+        self.unique_id_item_name = QRadioButton(translate('Name'))
         self.unique_id_item_name.setDisabled(True)
         self.unique_id_box_layout.addRow(self.unique_id_item_name)
         self.unique_id_box.setLayout(self.unique_id_box_layout)
         self.layout.addRow(self.unique_id_box)
 
-        self.import_action_box = QGroupBox(_('Action'))
+        self.import_action_box = QGroupBox(translate('Action'))
         self.import_action_box_layout = QFormLayout()
-        self.import_action_item_add = QRadioButton(_('Add'))
+        self.import_action_item_add = QRadioButton(translate('Add'))
         self.import_action_box_layout.addRow(self.import_action_item_add)
-        self.import_action_item_overwrite = QRadioButton(_('Overwrite'))
+        self.import_action_item_overwrite = QRadioButton(translate('Overwrite'))
         self.import_action_item_overwrite.setChecked(True)
         self.import_action_box_layout.addRow(self.import_action_item_overwrite)
         self.import_action_box.setLayout(self.import_action_box_layout)
@@ -65,10 +72,10 @@ class SportOrgImportDialog(QDialog):
 
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         self.button_ok = button_box.button(QDialogButtonBox.Ok)
-        self.button_ok.setText(_('OK'))
+        self.button_ok.setText(translate('OK'))
         self.button_ok.clicked.connect(apply_changes)
         self.button_cancel = button_box.button(QDialogButtonBox.Cancel)
-        self.button_cancel.setText(_('Cancel'))
+        self.button_cancel.setText(translate('Cancel'))
         self.button_cancel.clicked.connect(cancel_changes)
         self.layout.addRow(button_box)
 
@@ -132,7 +139,9 @@ class SportOrgImportDialog(QDialog):
                     if person.group:
                         person.group = find(obj.groups, id=person.group.id)
                     if person.organization:
-                        person.organization = find(obj.organizations, id=person.organization.id)
+                        person.organization = find(
+                            obj.organizations, id=person.organization.id
+                        )
                     persons.append(person)
             obj.persons.extend(persons)
 

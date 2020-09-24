@@ -1,6 +1,6 @@
+import logging.config
 import os
 import sys
-import logging.config
 
 from pydantic import BaseSettings
 
@@ -13,6 +13,7 @@ class Env(BaseSettings):
     class Config:
         env_file = '.env'
 
+
 NAME = 'SportOrg'
 VERSION = Version(1, 5, 0, 0, 'v')
 
@@ -23,9 +24,7 @@ def is_executable():
 
 def module_path():
     if is_executable():
-        return os.path.dirname(
-            sys.executable
-        )
+        return os.path.dirname(sys.executable)
 
     return os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
 
@@ -92,6 +91,7 @@ STYLE_DIR = base_dir('styles')
 def style_dir(*paths):
     return os.path.join(STYLE_DIR, *paths)
 
+
 env = Env(_env_file=base_dir('.env'))
 DEBUG = env.DEBUG
 
@@ -130,43 +130,36 @@ LOG_CONFIG = {
     'formatters': {
         'detailed': {
             'class': 'logging.Formatter',
-            'format': '%(levelname)s %(asctime)-15s %(threadName)s@%(filename)s:%(lineno)d %(message)s'
+            'format': '%(levelname)s %(asctime)-15s %(threadName)s@%(filename)s:%(lineno)d %(message)s',
         },
         'cls': {
             'class': 'logging.Formatter',
-            'format': '%(levelname)s %(threadName)s@%(filename)s:%(lineno)d %(message)s'
-        }
+            'format': '%(levelname)s %(threadName)s@%(filename)s:%(lineno)d %(message)s',
+        },
     },
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
             'level': logging.DEBUG,
             'formatter': 'cls',
-            'stream': sys.stdout
+            'stream': sys.stdout,
         },
         'file': {
             'class': 'logging.FileHandler',
             'filename': log_dir(NAME.lower() + '.log'),
             'mode': 'a',
-            'formatter': 'detailed'
+            'formatter': 'detailed',
         },
         'errors': {
             'class': 'logging.FileHandler',
             'filename': log_dir(NAME.lower() + '-errors.log'),
             'mode': 'a',
             'level': logging.ERROR,
-            'formatter': 'detailed'
+            'formatter': 'detailed',
         },
     },
-    'loggers': {
-        'main': {
-            'handlers': ['file']
-        }
-    },
-    'root': {
-        'level': logging.DEBUG,
-        'handlers': ['console', 'file', 'errors']
-    },
+    'loggers': {'main': {'handlers': ['file']}},
+    'root': {'level': logging.DEBUG, 'handlers': ['console', 'file', 'errors']},
 }
 
 logging.config.dictConfig(LOG_CONFIG)

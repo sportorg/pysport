@@ -1,9 +1,9 @@
 import logging
 
-from sportorg.language import _
+from sportorg.language import translate
 from sportorg.libs.winorient import wo
-from sportorg.models.memory import Qualification
 from sportorg.models import memory
+from sportorg.models.memory import Qualification
 from sportorg.modules.winorient.wdb import WinOrientBinary
 
 
@@ -50,36 +50,42 @@ def import_csv(source):
 
     new_lengths = obj.get_lengths()
 
-    logging.info(_('Import result'))
-    logging.info('{}: {}'.format(_('Persons'), new_lengths[0]-old_lengths[0]))
-    # logging.info('{}: {}'.format(_('Race Results'), new_lengths[1]-old_lengths[1]))
-    logging.info('{}: {}'.format(_('Groups'), new_lengths[2]-old_lengths[2]))
-    # logging.info('{}: {}'.format(_('Courses'), new_lengths[3]-old_lengths[3]))
-    logging.info('{}: {}'.format(_('Teams'), new_lengths[4]-old_lengths[4]))
+    logging.info(translate('Import result'))
+    logging.info('{}: {}'.format(translate('Persons'), new_lengths[0] - old_lengths[0]))
+    # logging.info('{}: {}'.format(translate('Race Results'), new_lengths[1]-old_lengths[1]))
+    logging.info('{}: {}'.format(translate('Groups'), new_lengths[2] - old_lengths[2]))
+    # logging.info('{}: {}'.format(translate('Courses'), new_lengths[3]-old_lengths[3]))
+    logging.info('{}: {}'.format(translate('Teams'), new_lengths[4] - old_lengths[4]))
 
     persons_dupl_cards = obj.get_duplicate_card_numbers()
     persons_dupl_names = obj.get_duplicate_names()
 
     if len(persons_dupl_cards):
-        logging.info('{}'.format(_('Duplicate card numbers (card numbers are reset)')))
+        logging.info(
+            '{}'.format(translate('Duplicate card numbers (card numbers are reset)'))
+        )
         for person in persons_dupl_cards:
-            logging.info('{} {} {} {}'.format(
-                person.full_name,
-                person.group.name if person.group else '',
-                person.organization.name if person.organization else '',
-                person.card_number
-            ))
+            logging.info(
+                '{} {} {} {}'.format(
+                    person.full_name,
+                    person.group.name if person.group else '',
+                    person.organization.name if person.organization else '',
+                    person.card_number,
+                )
+            )
             person.card_number = 0
     if len(persons_dupl_names):
-        logging.info('{}'.format(_('Duplicate names')))
+        logging.info('{}'.format(translate('Duplicate names')))
         for person in persons_dupl_names:
             person.card_number = 0
-            logging.info('{} {} {} {}'.format(
-                person.full_name,
-                person.get_year(),
-                person.group.name if person.group else '',
-                person.organization.name if person.organization else ''
-            ))
+            logging.info(
+                '{} {} {} {}'.format(
+                    person.full_name,
+                    person.get_year(),
+                    person.group.name if person.group else '',
+                    person.organization.name if person.organization else '',
+                )
+            )
 
 
 def import_wo_wdb(file_name):

@@ -2,11 +2,19 @@ import logging
 import re
 
 from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QFormLayout, QLabel, QDialog, QDialogButtonBox, QLineEdit, QCheckBox, QTextEdit
+from PySide2.QtWidgets import (
+    QCheckBox,
+    QDialog,
+    QDialogButtonBox,
+    QFormLayout,
+    QLabel,
+    QLineEdit,
+    QTextEdit,
+)
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
-from sportorg.language import _
+from sportorg.language import translate
 from sportorg.models.memory import race
 
 
@@ -19,7 +27,9 @@ class LiveDialog(QDialog):
             r'localhost|'  # localhost...
             r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'  # ...or ip
             r'(?::\d+)?'  # optional port
-            r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+            r'(?:/?|[/?]\S+)$',
+            re.IGNORECASE,
+        )
 
     def exec_(self):
         self.init_ui()
@@ -27,30 +37,30 @@ class LiveDialog(QDialog):
         return super().exec_()
 
     def init_ui(self):
-        self.setWindowTitle(_('Live'))
+        self.setWindowTitle(translate('Live'))
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(True)
 
         self.layout = QFormLayout(self)
 
-        self.label_url = QLabel(_('URL'))
+        self.label_url = QLabel(translate('URL'))
         self.item_url = QLineEdit()
         self.item_url.textChanged.connect(self.url_validation)
         self.layout.addRow(self.label_url, self.item_url)
 
-        self.label_token = QLabel(_('Token'))
+        self.label_token = QLabel(translate('Token'))
         self.item_token = QLineEdit()
         # self.layout.addRow(self.label_token, self.item_token)
 
         self.label_valid_url = QLabel('')
         self.layout.addRow(QLabel(''), self.label_valid_url)
 
-        self.item_live_enabled = QCheckBox(_('Enabled'))
+        self.item_live_enabled = QCheckBox(translate('Enabled'))
         self.layout.addRow(self.item_live_enabled)
 
-        self.hint = QTextEdit(_('Ctrl+K - send selected'))
-        self.hint.append(_('Ctrl+K on groups - send start list'))
+        self.hint = QTextEdit(translate('Ctrl+K - send selected'))
+        self.hint.append(translate('Ctrl+K on groups - send start list'))
         self.hint.setDisabled(True)
         self.hint.setMaximumHeight(70)
         self.layout.addRow(self.hint)
@@ -67,10 +77,10 @@ class LiveDialog(QDialog):
 
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         self.button_ok = button_box.button(QDialogButtonBox.Ok)
-        self.button_ok.setText(_('OK'))
+        self.button_ok.setText(translate('OK'))
         self.button_ok.clicked.connect(apply_changes)
         self.button_cancel = button_box.button(QDialogButtonBox.Cancel)
-        self.button_cancel.setText(_('Cancel'))
+        self.button_cancel.setText(translate('Cancel'))
         self.button_cancel.clicked.connect(cancel_changes)
         self.layout.addRow(button_box)
 
@@ -82,7 +92,7 @@ class LiveDialog(QDialog):
         if url:
             valid = self.url_regex.match(url)
             if not valid:
-                self.label_valid_url.setText(_('URL not valid'))
+                self.label_valid_url.setText(translate('URL not valid'))
 
     def set_values(self):
         obj = race()
