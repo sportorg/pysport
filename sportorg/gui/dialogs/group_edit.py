@@ -13,7 +13,7 @@ from sportorg.gui.dialogs.group_ranking import GroupRankingDialog
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import translate
 from sportorg.models.constant import get_race_courses
-from sportorg.models.memory import Limit, RaceType, Sex, find, race
+from sportorg.models.memory import Limit, RaceType, find, race
 from sportorg.models.result.result_calculation import ResultCalculation
 
 
@@ -50,13 +50,6 @@ class GroupEditDialog(BaseDialog):
                 object=group,
                 key='is_any_course',
                 id='is_any_course',
-            ),
-            AdvComboBoxField(
-                title=translate('Sex'),
-                object=group,
-                key='sex',
-                id='sex',
-                items=Sex.get_titles(),
             ),
             NumberField(
                 title=translate('Min year'),
@@ -128,19 +121,11 @@ class GroupEditDialog(BaseDialog):
             return ''
         return course.name
 
-    def convert_sex(self, sex) -> str:
-        if not sex:
-            return ''
-        return sex.get_title()
-
     def convert_race_type(self, _) -> str:
         return race().get_type(self.current_object).get_title()
 
     def parse_course(self, text: str):
         return find(race().courses, name=text)
-
-    def parse_sex(self, text: str):
-        return Sex.get_by_name(text) or Sex.MF
 
     def parse_race_type(self, text: str):
         selected = RaceType.get_by_name(text)

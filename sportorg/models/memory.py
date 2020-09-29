@@ -61,12 +61,6 @@ class _TitleType(Enum):
                 return obj
 
 
-class Sex(_TitleType):
-    MF = 0
-    M = 1
-    F = 2
-
-
 class RaceType(_TitleType):
     INDIVIDUAL_RACE = 0
     # MASS_START = 1
@@ -267,7 +261,6 @@ class Group(Model):
         self.is_any_course = False
         self.price = 0
         self.long_name = ''
-        self.sex = Sex.MF
 
         self.min_year = 0
         self.max_year = 0
@@ -324,7 +317,6 @@ class Group(Model):
             'is_any_course': self.is_any_course,
             'long_name': self.long_name,
             'price': self.price,
-            'sex': self.sex.value,
             'min_year': self.min_year,
             'max_year': self.max_year,
             'min_age': self.min_age,
@@ -345,7 +337,6 @@ class Group(Model):
         self.name = str(data['name'])
         self.long_name = str(data['long_name'])
         self.price = int(data['price'])
-        self.sex = Sex(int(data['sex']))
         self.min_year = int(data['min_year'])
         self.max_year = int(data['max_year'])
         self.min_age = int(data['min_age'])
@@ -1062,7 +1053,6 @@ class Person(Model):
         self.id = uuid.uuid4()
         self.name = ''
         self.surname = ''
-        self.sex = Sex.MF
 
         self.card_number = 0
         self.bib = 0
@@ -1126,7 +1116,6 @@ class Person(Model):
             'id': str(self.id),
             'name': self.name,
             'surname': self.surname,
-            'sex': self.sex.value,
             'card_number': self.card_number,
             'bib': self.bib,
             'birth_date': str(self.birth_date) if self.birth_date else None,
@@ -1150,7 +1139,6 @@ class Person(Model):
     def update_data(self, data):
         self.name = str(data['name'])
         self.surname = str(data['surname'])
-        self.sex = Sex(int(data['sex']))
         self.card_number = int(data['card_number'])
         self.bib = int(data['bib'])
         self.contact = []
