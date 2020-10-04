@@ -105,7 +105,6 @@ class MainWindow(QMainWindow):
 
     def close(self):
         self.conf_write()
-        Broker().produce('close')
 
     def closeEvent(self, _event):
         quit_msg = translate('Save file before exit?')
@@ -158,7 +157,6 @@ class MainWindow(QMainWindow):
         SportiduinoClient().set_call(self.add_sportiduino_result_from_reader)
         SFRReaderClient().set_call(self.add_sfr_result_from_reader)
 
-        LiveClient().init()
         self._menu_disable(self.current_tab)
 
     def _setup_ui(self):
@@ -479,22 +477,6 @@ class MainWindow(QMainWindow):
 
     def add_sportiduino_result_from_reader(self, result):
         self.add_sportident_result_from_sireader(result)
-
-    def teamwork(self, command):
-        try:
-            race().update_data(command.data)
-            logging.info(repr(command.data))
-            if 'object' in command.data and command.data['object'] in [
-                'ResultManual',
-                'ResultSportident',
-                'ResultSFR',
-                'ResultSportiduino',
-            ]:
-                ResultCalculation(race()).process_results()
-            Broker().produce('teamwork_recieving', command.data)
-            self.refresh()
-        except Exception as e:
-            logging.error(str(e))
 
     # Actions
     def create_file(self, *args, update_data=True):

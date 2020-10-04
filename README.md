@@ -30,3 +30,10 @@ python SportOrg.pyw
 ### cx_Freeze
 
 `python setup_.py build`
+
+
+## Roadmap
+
+* Fix live results (sportorg doesn't send data to server)
+* Fix teamwork
+* Publish to pypi
