@@ -194,6 +194,18 @@ class IOFResultListExportAction(Action, metaclass=ActionFactory):
                 QMessageBox.warning(self.app, _('Error'), _('Export error') + ': ' + file_name)
 
 
+class IOFEntryListExportAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        file_name = get_save_file_name(_('Save As IOF xml'), _('IOF xml (*.xml)'),
+                                       '{}_entryList'.format(race().data.get_start_datetime().strftime("%Y%m%d")))
+        if file_name is not '':
+            try:
+                iof_xml.export_entry_list(file_name)
+            except Exception as e:
+                logging.exception(str(e))
+                QMessageBox.warning(self.app, _('Error'), _('Export error') + ': ' + file_name)
+
+
 class IOFEntryListImportAction(Action, metaclass=ActionFactory):
     def execute(self):
         file_name = get_open_file_name(_('Open IOF xml'), _('IOF xml (*.xml)'))

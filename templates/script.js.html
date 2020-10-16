@@ -385,7 +385,7 @@
         };
         SettingsGenerator.prototype.getHiddenButton = function () {
             var el = document.createElement('button');
-            el.appendChild(document.createTextNode('Свернуть/Развернуть'));
+            el.appendChild(document.createTextNode('SETTINGS'));
             var _this = this;
             el.onclick = function (ev) { _this.toggleHidden() };
             return el;

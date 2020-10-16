@@ -116,9 +116,7 @@ class PersonEditDialog(QDialog):
         self.layout.addRow(self.label_card, self.item_card)
 
         self.label_iof_id = QLabel(_('IOF id'))
-        self.item_iof_id = QSpinBox()
-        self.item_iof_id.setMinimum(0)
-        self.item_iof_id.setMaximum(99999999)
+        self.item_iof_id = QLineEdit()
         self.layout.addRow(self.label_iof_id, self.item_iof_id)
 
 
@@ -263,10 +261,7 @@ class PersonEditDialog(QDialog):
         if self.current_object.card_number:
             self.item_card.setValue(self.current_object.card_number)
 
-        if self.current_object.world_code:
-            self.item_iof_id.setValue(self.current_object.world_code)
-        else:
-            self.item_iof_id.setValue(0)
+        self.item_iof_id.setText(self.current_object.world_code)
 
         self.item_out_of_competition.setChecked(self.current_object.is_out_of_competition)
         self.item_paid.setChecked(self.current_object.is_paid)
@@ -321,7 +316,7 @@ class PersonEditDialog(QDialog):
                 and self.item_card.value:
             race().person_card_number(person, self.item_card.value())
 
-        person.world_code = self.item_iof_id.value()
+        person.world_code = self.item_iof_id.text()
 
         if person.is_out_of_competition != self.item_out_of_competition.isChecked():
             person.is_out_of_competition = self.item_out_of_competition.isChecked()

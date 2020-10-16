@@ -87,6 +87,10 @@ def menu_list():
                                 {
                                     'title': _('ResultList'),
                                     'action': 'IOFResultListExportAction'
+                                },
+                                {
+                                    'title': _('EntrytList'),
+                                    'action': 'IOFEntryListExportAction'
                                 }
                             ]
                         },

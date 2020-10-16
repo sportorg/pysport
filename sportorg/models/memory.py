@@ -1033,7 +1033,7 @@ class Person(Model):
         self.birth_date = None  # type: date
         self.organization = None  # type: Organization
         self.group = None  # type: Group
-        self.world_code = 0  # WRE ID for orienteering and the same
+        self.world_code = ''  # WRE ID for orienteering and the same
         self.national_code = 0
         self.qual = Qualification.NOT_QUALIFIED  # type: Qualification # 'qualification, used in Russia only'
         self.is_out_of_competition = False  # e.g. 20-years old person, running in M12
@@ -1106,7 +1106,7 @@ class Person(Model):
         self.bib = int(data['bib'])
         self.contact = []
         if data['world_code']:
-            self.world_code = int(data['world_code'])
+            self.world_code = str(data['world_code'])
         if data['national_code']:
             self.national_code = data['national_code']
         self.qual = Qualification.get_qual_by_code(data['qual'])
