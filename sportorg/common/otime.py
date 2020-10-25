@@ -132,9 +132,9 @@ class OTime:
         hour = self.hour + self.day * 24
         if time_accuracy == 0:
             return '{}:{}:{}'.format(
-                hour if hour > 9 else '0' + str(hour),
-                self.minute if self.minute > 9 else '0' + str(self.minute),
-                self.sec if self.sec > 9 else '0' + str(self.sec),
+                ('0' + str(self.hour))[-2:],
+                ('0' + str(self.minute))[-2:],
+                ('0' + str(self.sec))[-2:]
             )
         else:
             return '{}:{}:{}.{}'.format(
@@ -143,3 +143,15 @@ class OTime:
                 ('0' + str(self.sec))[-2:],
                 ('00' + str(self.msec))[-3:][:time_accuracy],
             )
+
+    def round(self, time_accuracy=0, time_rounding='math'):
+        ms = self.to_msec()
+        multiplier = 10 ** (3 - time_accuracy)
+        if time_rounding == 'math':
+            new_ms = int(round(ms / multiplier)) * multiplier
+        elif time_rounding == 'down':
+            new_ms = ms // multiplier * multiplier
+        else:
+            new_ms = -(-ms // multiplier) * multiplier  # math.ceil is slower
+
+        return OTime(msec=new_ms)

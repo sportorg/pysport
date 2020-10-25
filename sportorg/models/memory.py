@@ -656,21 +656,19 @@ class Result:
 
     def get_result_otime(self):
         time_accuracy = race().get_setting('time_accuracy', 0)
-        ret_ms = self.get_finish_time().to_msec(
-            time_accuracy
-        ) - self.get_start_time().to_msec(time_accuracy)
-        ret_ms += self.get_penalty_time().to_msec(time_accuracy)
-        ret_ms -= self.get_credit_time().to_msec(time_accuracy)
-        return OTime(msec=ret_ms)
+        time_rounding = race().get_setting('time_rounding', 'math')
+        ret_ms = self.get_finish_time().to_msec() - self.get_start_time().to_msec()
+        ret_ms += self.get_penalty_time().to_msec()
+        ret_ms -= self.get_credit_time().to_msec()
+        return OTime(msec=ret_ms).round(time_accuracy, time_rounding)
 
     def get_result_otime_relay(self):
         time_accuracy = race().get_setting('time_accuracy', 0)
-        ret_ms = self.get_finish_time().to_msec(
-            time_accuracy
-        ) - self.get_start_time_relay().to_msec(time_accuracy)
-        ret_ms += self.get_penalty_time().to_msec(time_accuracy)
-        ret_ms -= self.get_credit_time().to_msec(time_accuracy)
-        return OTime(msec=ret_ms)
+        time_rounding = race().get_setting('time_rounding', 'math')
+        ret_ms = self.get_finish_time().to_msec() - self.get_start_time_relay().to_msec()
+        ret_ms += self.get_penalty_time().to_msec()
+        ret_ms -= self.get_credit_time().to_msec()
+        return OTime(msec=ret_ms).round(time_accuracy, time_rounding)
 
     def get_start_time(self):
         if self.start_time and self.start_time.to_msec():
