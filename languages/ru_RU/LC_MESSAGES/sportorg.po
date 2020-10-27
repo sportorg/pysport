@@ -1383,3 +1383,12 @@ msgstr "Несколько участников на 1 минуте"
 
 msgid "Group not found"
 msgstr "Такой группы нет"
+
+msgid "Missed finish"
+msgstr "Нет отметки на финише"
+
+msgid "Readout time"
+msgstr "Время считывания"
+
+msgid "Last control + penalty"
+msgstr "Время последнего КП + штраф"

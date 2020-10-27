@@ -1,8 +1,9 @@
 import logging
 
+from sportorg.common.otime import OTime
 from sportorg.gui.dialogs.bib_dialog import BibDialog
 from sportorg.language import translate
-from sportorg.models.memory import Person, ResultSportident, find, race
+from sportorg.models.memory import Person, ResultSportident, find, race, ResultStatus
 from sportorg.models.result.result_checker import ResultChecker, ResultCheckerException
 
 
@@ -17,6 +18,33 @@ class ResultSportidentGeneration:
             'system_duplicate_chip_processing', 'several_results'
         )
         self.card_read_repeated = self.duplicate_chip_processing == 'bib_request'
+        self.missed_finish = race().get_setting(
+            'system_missed_finish', 'zero'
+        )
+        self.finish_source = race().get_setting(
+            'system_finish_source', 'station'
+        )
+        self._process_missed_finish()
+
+    def _process_missed_finish(self):
+        if self._result is not None and self._result.finish_time is None:
+            if self.finish_source == 'station':
+                if self.missed_finish == 'readout':
+                    self._result.finish_time = OTime.now()
+                elif self.missed_finish == 'zero':
+                    self._result.finish_time = OTime(msec=0)
+                elif self.missed_finish == 'dsq':
+                    self._result.finish_time = OTime(msec=0)
+                    self._result.status = ResultStatus.DISQUALIFIED
+                elif self.missed_finish == 'penalty':
+                    if len(self._result.splits) > 0:
+                        last_cp_time = self._result.splits[-1].time
+                        penalty_time = OTime(
+                            msec=race().get_setting('marked_route_penalty_time', 60000)
+                        )
+                        self._result.finish_time = last_cp_time + penalty_time
+                    else:
+                        self._result.finish_time = OTime(msec=0)
 
     def _add_result_to_race(self):
         race().add_result(self._result)

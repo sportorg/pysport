@@ -470,7 +470,7 @@ class MainWindow(QMainWindow):
                             break
             self.refresh()
         except Exception as e:
-            logging.error(str(e))
+            logging.exception(e)
 
     def add_sfr_result_from_reader(self, result):
         self.add_sportident_result_from_sireader(result)
