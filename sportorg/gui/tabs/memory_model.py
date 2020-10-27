@@ -222,7 +222,6 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
         return [
             translate('Last name'),
             translate('First name'),
-            translate('Sex'),
             translate('Qualification title'),
             translate('Group'),
             translate('Team'),
@@ -263,7 +262,6 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
 
         ret.append(person.surname)
         ret.append(person.name)
-        ret.append(person.sex.get_title())
         if person.qual:
             ret.append(person.qual.get_title())
         else:
@@ -423,7 +421,6 @@ class GroupMemoryModel(AbstractSportOrgMemoryModel):
             translate('Length title'),
             translate('Point count title'),
             translate('Climb title'),
-            translate('Sex'),
             translate('Min year title'),
             translate('Max year title'),
             translate('Start interval title'),
@@ -461,7 +458,6 @@ class GroupMemoryModel(AbstractSportOrgMemoryModel):
             course.length if course else 0,
             control_count,
             course.climb if course else 0,
-            group.sex.get_title(),
             group.min_year,
             group.max_year,
             group.start_interval,

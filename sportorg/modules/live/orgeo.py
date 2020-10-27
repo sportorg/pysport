@@ -1,5 +1,3 @@
-"""Orgeo.ru"""
-
 RESULT_STATUS = ['NONE', 'OK', 'FINISHED', 'DISQUALIFIED', 'MISSING_PUNCH',
                  'DID_NOT_FINISH', 'ACTIVE', 'INACTIVE', 'OVERTIME', 'SPORTING_WITHDRAWAL',
                  'NOT_COMPETING', 'MOVED', 'MOVED_UP', 'DID_NOT_START', 'DID_NOT_ENTER',
@@ -26,12 +24,6 @@ class Orgeo:
             json=data
         )
         return response
-
-
-CONFIG = {
-    'type': 'live',
-    'enabled': True,
-}
 
 
 def _get_obj(data, race_data, key, key_id):
@@ -129,8 +121,6 @@ def create(requests, url, data, race_data, logger=None):
     data is Dict: Person, Result, Group, Course, Organization
     race_data is Dict: Race
     """
-    global Orgeo, RESULT_STATUS, _get_group, _get_organization, _get_obj, _get_person_obj
-    global _get_person, _get_result_by_person
     o = Orgeo(requests, url)
     if not isinstance(data, list):
         data = [data]
@@ -172,7 +162,6 @@ def create(requests, url, data, race_data, logger=None):
 
 
 def delete(requests, url, data, race_data, logger=None):
-    global Orgeo, _get_obj, _get_person_obj, _get_person
     o = Orgeo(requests, url)
     if not isinstance(data, list):
         data = [data]

@@ -10,6 +10,7 @@ from PySide2.QtCore import QThread, Signal
 from sportorg.common.singleton import singleton
 from sportorg.libs.sportiduino import sportiduino
 from sportorg.models import memory
+from sportorg.modules.sportident import backup
 from sportorg.utils.time import time_to_otime
 
 
@@ -74,11 +75,13 @@ class ResultThread(QThread):
                 if cmd.command == 'card_data':
                     result = self._get_result(cmd.data)
                     self.data_sender.emit(result)
+                    backup.backup_data(cmd.data)
             except Empty:
                 if not main_thread().is_alive() or self._stop_event.is_set():
                     break
             except Exception as e:
                 self._logger.error(str(e))
+                raise e
         self._logger.debug('Stop adder result')
 
     @staticmethod
@@ -95,9 +98,9 @@ class ResultThread(QThread):
                 split.days = memory.race().get_days(t)
                 result.splits.append(split)
 
-        if card_data['start']:
+        if 'start' in card_data and card_data['start']:
             result.start_time = time_to_otime(card_data['start'])
-        if card_data['finish']:
+        if 'finish' in card_data and card_data['finish']:
             result.finish_time = time_to_otime(card_data['finish'])
 
         return result
