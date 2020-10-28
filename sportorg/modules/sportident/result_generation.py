@@ -161,7 +161,7 @@ class ResultSportidentGeneration:
             if self.duplicate_chip_processing == 'bib_request':
                 self._bib_dialog()
             elif (
-                self.duplicate_chip_processing == 'relay_find_leg' and race().is_relay()
+                    self.duplicate_chip_processing == 'relay_find_leg' and race().is_relay()
             ):
                 self._relay_find_leg()  # assign chip to the next unfinished leg of a relay team
             elif self.duplicate_chip_processing == 'merge':

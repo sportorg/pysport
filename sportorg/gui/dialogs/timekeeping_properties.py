@@ -487,8 +487,8 @@ class TimekeepingPropertiesDialog(QDialog):
         old_finish_cp_number = obj.get_setting('system_finish_cp_number', 90)
 
         if (
-            old_start_cp_number != start_cp_number
-            or old_finish_cp_number != finish_cp_number
+                old_start_cp_number != start_cp_number
+                or old_finish_cp_number != finish_cp_number
         ):
             race().clear_results()
 
