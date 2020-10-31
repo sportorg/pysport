@@ -749,15 +749,18 @@ class Result:
 
                 if cur_person.result_count == 0:
                     if not cur_person.is_out_of_competition:
-                        if cur_person.start_time > self.person.start_time:
-                            if (
-                                self.get_result_otime()
-                                > OTime.now() - cur_person.start_time
-                            ):
-                                who_can_win_count += 1
-                                max_unfinished_start_time = max(
-                                    cur_person.start_time, max_unfinished_start_time
-                                )
+                        if cur_person.start_time and self.person.start_time:
+                            if cur_person.start_time > self.person.start_time:
+                                if (
+                                    self.get_result_otime()
+                                    > OTime.now() - cur_person.start_time
+                                ):
+                                    who_can_win_count += 1
+                                    max_unfinished_start_time = max(
+                                        cur_person.start_time, max_unfinished_start_time
+                                    )
+                        else:
+                            who_can_win_count += 1
 
             self.can_win_count = who_can_win_count
             self.final_result_time = max_unfinished_start_time + self.get_result_otime()
@@ -896,7 +899,7 @@ class ResultSportident(Result):
                 if ind_begin > 0 and ind_end > 0:
                     list_exists = True
                     # any control from the list e.g. '%(31,32,35-45)'
-                    arr = re.split(r'\s*,\s*', template[ind_begin + 1 : ind_end])
+                    arr = re.split(r'\s*,\s*', template[ind_begin + 1: ind_end])
                     for cp in arr:
                         cp_range = re.split(r'\s*-\s*', cp)
                         if int(cur_code) == int(cp_range[0]):
