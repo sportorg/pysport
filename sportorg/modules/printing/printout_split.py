@@ -107,8 +107,22 @@ class SportorgPrinter(object):
         )
 
         # Splits
+        index = 1
         for split in result.splits:
-            if split.is_correct:
+            if not course:
+                line = (
+                    ('  ' + str(index))[-3:]
+                    + ' '
+                    + ('  ' + split.code)[-3:]
+                    + ' '
+                    + split.relative_time.to_str()[-7:]
+                    + ' '
+                    + split.leg_time.to_str()[-5:]
+                    + ' '
+                )
+                index += 1
+                self.print_line(line, fn, fs_main)
+            elif split.is_correct:
                 line = (
                     ('  ' + str(split.course_index + 1))[-3:]
                     + ' '
@@ -126,7 +140,7 @@ class SportorgPrinter(object):
                     line += ('  ' + str(split.leg_place))[-3:]
 
                 # Highlight correct controls of marked route ( '31' and '31(31,32,33)' => + )
-                if is_penalty_used:
+                if is_penalty_used and course:
                     for course_cp in course.controls:
                         if str(course_cp).startswith(split.code):
                             line += ' +'
@@ -231,12 +245,13 @@ class SportorgPrinter(object):
             self.print_line(translate('Status: DSQ'), fn, fs_large, 700)
             cp_list = ''
             line_limit = 35
-            for cp in course.controls:
-                if len(cp_list) > line_limit:
-                    self.print_line(cp_list, fn, fs_main)
-                    cp_list = ''
-                cp_list += cp.code.split('(')[0] + ' '
-            self.print_line(cp_list, fn, fs_main)
+            if course and course.controls:
+                for cp in course.controls:
+                    if len(cp_list) > line_limit:
+                        self.print_line(cp_list, fn, fs_main)
+                        cp_list = ''
+                    cp_list += cp.code.split('(')[0] + ' '
+                self.print_line(cp_list, fn, fs_main)
 
         # Short result list
         if is_relay:
