@@ -10,7 +10,7 @@ from typing import Any, Dict, List
 import dateutil.parser
 
 from sportorg.common.model import Model
-from sportorg.common.otime import OTime
+from sportorg.common.otime import OTime, TimeRounding
 from sportorg.language import translate
 from sportorg.modules.configs.configs import Config
 from sportorg.utils.time import hhmmss_to_time
@@ -660,7 +660,7 @@ class Result:
         ret_ms = self.get_finish_time().to_msec() - self.get_start_time().to_msec()
         ret_ms += self.get_penalty_time().to_msec()
         ret_ms -= self.get_credit_time().to_msec()
-        return OTime(msec=ret_ms).round(time_accuracy, time_rounding)
+        return OTime(msec=ret_ms).round(time_accuracy, TimeRounding[time_rounding])
 
     def get_result_otime_relay(self):
         time_accuracy = race().get_setting('time_accuracy', 0)
@@ -668,7 +668,7 @@ class Result:
         ret_ms = self.get_finish_time().to_msec() - self.get_start_time_relay().to_msec()
         ret_ms += self.get_penalty_time().to_msec()
         ret_ms -= self.get_credit_time().to_msec()
-        return OTime(msec=ret_ms).round(time_accuracy, time_rounding)
+        return OTime(msec=ret_ms).round(time_accuracy, TimeRounding[time_rounding])
 
     def get_start_time(self):
         if self.start_time and self.start_time.to_msec():

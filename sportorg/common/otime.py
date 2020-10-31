@@ -1,5 +1,12 @@
 import datetime
+from enum import Enum
 from math import trunc
+
+
+class TimeRounding(Enum):
+    math = 0
+    down = 1
+    up = 2
 
 
 class OTime:
@@ -131,25 +138,20 @@ class OTime:
     def to_str(self, time_accuracy=0):
         hour = self.hour + self.day * 24
         if time_accuracy == 0:
-            return '{}:{}:{}'.format(
-                ('0' + str(self.hour))[-2:],
-                ('0' + str(self.minute))[-2:],
-                ('0' + str(self.sec))[-2:]
-            )
-        else:
-            return '{}:{}:{}.{}'.format(
-                ('0' + str(self.hour))[-2:],
-                ('0' + str(self.minute))[-2:],
-                ('0' + str(self.sec))[-2:],
-                ('00' + str(self.msec))[-3:][:time_accuracy],
-            )
+            return f'{hour:02}:{self.minute:02}:{self.sec:02}'
+        elif time_accuracy == 3:
+            return f'{hour:02}:{self.minute:02}:{self.sec:02}.{self.msec:003}'
+        elif time_accuracy == 2:
+            return f'{hour:02}:{self.minute:02}:{self.sec:02}.{self.msec // 10:02}'
+        elif time_accuracy == 1:
+            return f'{hour:02}:{self.minute:02}:{self.sec:02}.{self.msec // 100}'
 
-    def round(self, time_accuracy=0, time_rounding='math'):
+    def round(self, time_accuracy: int = 0, time_rounding: Enum = TimeRounding.math):
         ms = self.to_msec()
         multiplier = 10 ** (3 - time_accuracy)
-        if time_rounding == 'math':
+        if time_rounding == TimeRounding.math:
             new_ms = int(round(ms / multiplier)) * multiplier
-        elif time_rounding == 'down':
+        elif time_rounding == TimeRounding.down:
             new_ms = ms // multiplier * multiplier
         else:
             new_ms = -(-ms // multiplier) * multiplier  # math.ceil is slower
