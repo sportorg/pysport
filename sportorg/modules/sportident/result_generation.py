@@ -1,10 +1,19 @@
 import logging
+from enum import Enum
 
 from sportorg.common.otime import OTime
 from sportorg.gui.dialogs.bib_dialog import BibDialog
 from sportorg.language import translate
 from sportorg.models.memory import Person, ResultSportident, find, race, ResultStatus
 from sportorg.models.result.result_checker import ResultChecker, ResultCheckerException
+
+
+class FinishSource(Enum):
+    station = 0
+    zero = 1
+    readout = 2
+    dsq = 3
+    penalty = 4
 
 
 class ResultSportidentGeneration:
@@ -21,22 +30,22 @@ class ResultSportidentGeneration:
         self.missed_finish = race().get_setting(
             'system_missed_finish', 'zero'
         )
-        self.finish_source = race().get_setting(
+        self.finish_source = FinishSource[race().get_setting(
             'system_finish_source', 'station'
-        )
+        )]
         self._process_missed_finish()
 
     def _process_missed_finish(self):
-        if self._result is not None and self._result.finish_time is None:
-            if self.finish_source == 'station':
-                if self.missed_finish == 'readout':
+        if self._result and self._result.finish_time is None:
+            if self.finish_source == FinishSource.station:
+                if self.missed_finish == FinishSource.readout:
                     self._result.finish_time = OTime.now()
-                elif self.missed_finish == 'zero':
+                elif self.missed_finish == FinishSource.zero:
                     self._result.finish_time = OTime(msec=0)
-                elif self.missed_finish == 'dsq':
+                elif self.missed_finish == FinishSource.dsq:
                     self._result.finish_time = OTime(msec=0)
                     self._result.status = ResultStatus.DISQUALIFIED
-                elif self.missed_finish == 'penalty':
+                elif self.missed_finish == FinishSource.penalty:
                     if len(self._result.splits) > 0:
                         last_cp_time = self._result.splits[-1].time
                         penalty_time = OTime(
@@ -161,7 +170,7 @@ class ResultSportidentGeneration:
             if self.duplicate_chip_processing == 'bib_request':
                 self._bib_dialog()
             elif (
-                    self.duplicate_chip_processing == 'relay_find_leg' and race().is_relay()
+                self.duplicate_chip_processing == 'relay_find_leg' and race().is_relay()
             ):
                 self._relay_find_leg()  # assign chip to the next unfinished leg of a relay team
             elif self.duplicate_chip_processing == 'merge':
