@@ -234,6 +234,18 @@ class TimekeepingPropertiesDialog(QDialog):
             self.time_settings_accuracy_label, self.time_settings_accuracy_edit
         )
 
+        self.time_rounding = QGroupBox()
+        self.time_rounding.setTitle(translate('Time rounding'))
+        self.time_rounding_math = QRadioButton(translate('Math rounding'))
+        self.time_rounding_down = QRadioButton(translate('Rounding down'))
+        self.time_rounding_up = QRadioButton(translate('Rounding up'))
+        self.time_rounding_layout = QFormLayout()
+        self.time_rounding_layout.addRow(self.time_rounding_math)
+        self.time_rounding_layout.addRow(self.time_rounding_down)
+        self.time_rounding_layout.addRow(self.time_rounding_up)
+        self.time_rounding.setLayout(self.time_rounding_layout)
+        self.time_settings_layout.addRow(self.time_rounding)
+
         self.time_settings_format = QGroupBox()
         self.time_settings_format.setTitle(translate('Format of competitions'))
         self.time_settings_format_less = QRadioButton(translate('< 24'))
@@ -431,9 +443,18 @@ class TimekeepingPropertiesDialog(QDialog):
 
         # time settings
         time_accuracy = obj.get_setting('time_accuracy', 0)
+        time_rounding = obj.get_setting('time_rounding', 'math')
         time_format_24 = obj.get_setting('time_format_24', 'less24')
 
         self.time_settings_accuracy_edit.setValue(time_accuracy)
+
+        if time_rounding == 'math':
+            self.time_rounding_math.setChecked(True)
+        elif time_rounding == 'down':
+            self.time_rounding_down.setChecked(True)
+        elif time_rounding == 'up':
+            self.time_rounding_up.setChecked(True)
+
         if time_format_24 == 'less24':
             self.time_settings_format_less.setChecked(True)
         elif time_format_24 == 'more24':
@@ -570,7 +591,14 @@ class TimekeepingPropertiesDialog(QDialog):
         if self.time_settings_format_more.isChecked():
             time_format_24 = 'more24'
 
+        time_rounding = 'math'
+        if self.time_rounding_down.isChecked():
+            time_rounding = 'down'
+        elif self.time_rounding_up.isChecked():
+            time_rounding = 'up'
+
         obj.set_setting('time_accuracy', time_accuracy)
+        obj.set_setting('time_rounding', time_rounding)
         obj.set_setting('time_format_24', time_format_24)
 
         ResultCalculation(race()).process_results()

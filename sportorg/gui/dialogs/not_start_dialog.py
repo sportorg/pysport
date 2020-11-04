@@ -9,6 +9,7 @@ from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import translate
 from sportorg.models.constant import StatusComments
 from sportorg.models.memory import ResultManual, ResultStatus, find, race
+from sportorg.models.result.result_calculation import ResultCalculation
 
 
 class NotStartDialog(QDialog):
@@ -85,3 +86,4 @@ class NotStartDialog(QDialog):
                 else:
                     logging.info('{} not found'.format(number))
                 old_numbers.append(number)
+        ResultCalculation(race()).process_results()

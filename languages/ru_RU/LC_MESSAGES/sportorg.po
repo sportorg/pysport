@@ -1392,3 +1392,15 @@ msgstr "Время считывания"
 
 msgid "Last control + penalty"
 msgstr "Время последнего КП + штраф"
+
+msgid "Time rounding"
+msgstr "Округление времени"
+
+msgid "Math rounding"
+msgstr "Математическое округление"
+
+msgid "Rounding down"
+msgstr "Округление вниз"
+
+msgid "Rounding up"
+msgstr "Округление вверх"
