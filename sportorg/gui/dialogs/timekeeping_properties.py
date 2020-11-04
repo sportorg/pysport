@@ -60,39 +60,6 @@ class TimekeepingPropertiesDialog(QDialog):
         self.item_si_port.addItems(SIReaderClient().get_ports())
         self.tk_layout.addRow(self.label_si_port, self.item_si_port)
 
-        self.start_group_box = QGroupBox(translate('Start time'))
-        self.start_layout = QFormLayout()
-        self.item_start_protocol = QRadioButton(translate('From protocol'))
-        self.start_layout.addRow(self.item_start_protocol)
-        self.item_start_station = QRadioButton(translate('Start station'))
-        self.start_layout.addRow(self.item_start_station)
-        self.item_start_cp = QRadioButton(translate('Control point'))
-        self.item_start_cp_value = QSpinBox()
-        self.item_start_cp_value.setMaximum(999)
-        self.item_start_cp_value.setMaximumSize(60, 20)
-        self.start_layout.addRow(self.item_start_cp, self.item_start_cp_value)
-        self.item_start_gate = QRadioButton(translate('Start gate'))
-        self.item_start_gate.setDisabled(True)
-        self.start_layout.addRow(self.item_start_gate)
-        self.start_group_box.setLayout(self.start_layout)
-        self.tk_layout.addRow(self.start_group_box)
-
-        self.finish_group_box = QGroupBox(translate('Finish time'))
-        self.finish_layout = QFormLayout()
-        self.item_finish_station = QRadioButton(translate('Finish station'))
-        self.finish_layout.addRow(self.item_finish_station)
-        self.item_finish_cp = QRadioButton(translate('Control point'))
-        self.item_finish_cp_value = QSpinBox()
-        self.item_finish_cp_value.setMaximum(999)
-        self.item_finish_cp_value.setMinimum(-1)
-        self.item_finish_cp_value.setMaximumSize(60, 20)
-        self.finish_layout.addRow(self.item_finish_cp, self.item_finish_cp_value)
-        self.item_finish_beam = QRadioButton(translate('Light beam'))
-        self.item_finish_beam.setDisabled(True)
-        self.finish_layout.addRow(self.item_finish_beam)
-        self.finish_group_box.setLayout(self.finish_layout)
-        self.tk_layout.addRow(self.finish_group_box)
-
         self.chip_reading_box = QGroupBox(translate('Assigning a chip when reading'))
         self.chip_reading_layout = QFormLayout()
         self.chip_reading_off = QRadioButton(translate('Off'))
@@ -156,6 +123,54 @@ class TimekeepingPropertiesDialog(QDialog):
             self.rp_scores_minute_penalty_label, self.rp_scores_minute_penalty_edit
         )
         self.result_proc_layout.addRow(self.rp_scores_group)
+
+        self.start_group_box = QGroupBox(translate('Start time'))
+        self.start_layout = QFormLayout()
+        self.item_start_protocol = QRadioButton(translate('From protocol'))
+        self.start_layout.addRow(self.item_start_protocol)
+        self.item_start_station = QRadioButton(translate('Start station'))
+        self.start_layout.addRow(self.item_start_station)
+        self.item_start_cp = QRadioButton(translate('Control point'))
+        self.item_start_cp_value = QSpinBox()
+        self.item_start_cp_value.setMaximum(999)
+        self.item_start_cp_value.setMaximumSize(60, 20)
+        self.start_layout.addRow(self.item_start_cp, self.item_start_cp_value)
+        self.item_start_gate = QRadioButton(translate('Start gate'))
+        self.item_start_gate.setDisabled(True)
+        self.start_layout.addRow(self.item_start_gate)
+        self.start_group_box.setLayout(self.start_layout)
+        self.result_proc_layout.addRow(self.start_group_box)
+
+        self.finish_group_box = QGroupBox(translate('Finish time'))
+        self.finish_layout = QFormLayout()
+        self.item_finish_station = QRadioButton(translate('Finish station'))
+        self.finish_layout.addRow(self.item_finish_station)
+
+        self.missed_finish_group_box = QGroupBox(translate('Missed finish'))
+        self.missed_finish_layout = QFormLayout()
+        self.missed_finish_zero = QRadioButton(translate('00:00:00'))
+        self.missed_finish_layout.addRow(self.missed_finish_zero)
+        self.missed_finish_dsq = QRadioButton(translate('DSQ'))
+        self.missed_finish_layout.addRow(self.missed_finish_dsq)
+        self.missed_finish_readout = QRadioButton(translate('Readout time'))
+        self.missed_finish_layout.addRow(self.missed_finish_readout)
+        self.missed_finish_penalty = QRadioButton(translate('Last control + penalty'))
+        self.missed_finish_layout.addRow(self.missed_finish_penalty)
+        self.missed_finish_group_box.setLayout(self.missed_finish_layout)
+        self.finish_layout.addRow(self.missed_finish_group_box)
+
+        self.item_finish_cp = QRadioButton(translate('Control point'))
+        self.item_finish_cp_value = QSpinBox()
+        self.item_finish_cp_value.setMaximum(999)
+        self.item_finish_cp_value.setMinimum(-1)
+        self.item_finish_cp_value.setMaximumSize(60, 20)
+        self.finish_layout.addRow(self.item_finish_cp, self.item_finish_cp_value)
+        self.item_finish_beam = QRadioButton(translate('Light beam'))
+        self.item_finish_beam.setDisabled(True)
+        self.finish_layout.addRow(self.item_finish_beam)
+        self.finish_group_box.setLayout(self.finish_layout)
+        self.result_proc_layout.addRow(self.finish_group_box)
+
         self.result_proc_tab.setLayout(self.result_proc_layout)
 
         # marked route settings
@@ -292,6 +307,7 @@ class TimekeepingPropertiesDialog(QDialog):
         start_source = cur_race.get_setting('system_start_source', 'protocol')
         start_cp_number = cur_race.get_setting('system_start_cp_number', 31)
         finish_source = cur_race.get_setting('system_finish_source', 'station')
+        missed_finish = cur_race.get_setting('system_missed_finish', 'zero')
         finish_cp_number = cur_race.get_setting('system_finish_cp_number', 90)
         assign_chip_reading = cur_race.get_setting('system_assign_chip_reading', 'off')
         duplicate_chip_processing = cur_race.get_setting(
@@ -321,6 +337,15 @@ class TimekeepingPropertiesDialog(QDialog):
             self.item_finish_cp.setChecked(True)
         elif finish_source == 'beam':
             self.item_finish_beam.setChecked(True)
+
+        if missed_finish == 'zero':
+            self.missed_finish_zero.setChecked(True)
+        elif missed_finish == 'dsq':
+            self.missed_finish_dsq.setChecked(True)
+        elif missed_finish == 'readout':
+            self.missed_finish_readout.setChecked(True)
+        elif missed_finish == 'penalty':
+            self.missed_finish_penalty.setChecked(True)
 
         self.item_finish_cp_value.setValue(finish_cp_number)
 
@@ -452,6 +477,14 @@ class TimekeepingPropertiesDialog(QDialog):
         elif self.item_finish_beam.isChecked():
             finish_source = 'beam'
 
+        missed_finish = 'penalty'
+        if self.missed_finish_zero.isChecked():
+            missed_finish = 'zero'
+        elif self.missed_finish_dsq.isChecked():
+            missed_finish = 'dsq'
+        elif self.missed_finish_readout.isChecked():
+            missed_finish = 'readout'
+
         assign_chip_reading = 'off'
         if self.chip_reading_unknown.isChecked():
             assign_chip_reading = 'only_unknown_members'
@@ -475,8 +508,8 @@ class TimekeepingPropertiesDialog(QDialog):
         old_finish_cp_number = obj.get_setting('system_finish_cp_number', 90)
 
         if (
-            old_start_cp_number != start_cp_number
-            or old_finish_cp_number != finish_cp_number
+                old_start_cp_number != start_cp_number
+                or old_finish_cp_number != finish_cp_number
         ):
             race().clear_results()
 
@@ -484,6 +517,7 @@ class TimekeepingPropertiesDialog(QDialog):
 
         obj.set_setting('system_start_source', start_source)
         obj.set_setting('system_finish_source', finish_source)
+        obj.set_setting('system_missed_finish', missed_finish)
 
         obj.set_setting('system_start_cp_number', start_cp_number)
         obj.set_setting('system_finish_cp_number', finish_cp_number)
