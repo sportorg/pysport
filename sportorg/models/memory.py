@@ -116,6 +116,7 @@ class Organization(Model):
             'contact': self.contact,
             'code': self.code,
             'count_person': self.count_person,  # readonly
+            'sex': 0,
         }
 
     def update_data(self, data):
@@ -331,6 +332,7 @@ class Group(Model):
             'ranking': self.ranking.to_dict() if self.ranking else None,
             '__type': self.__type.value if self.__type else None,
             'relay_legs': self.relay_legs,
+            'sex': 0,
         }
 
     def update_data(self, data):
@@ -1132,6 +1134,7 @@ class Person(Model):
             'comment': self.comment,
             'start_time': self.start_time.to_msec() if self.start_time else None,
             'start_group': self.start_group,
+            'sex': 0,  # back compatibility with 1.5
         }
 
     def update_data(self, data):
