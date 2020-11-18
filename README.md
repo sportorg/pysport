@@ -15,8 +15,10 @@ poetry install[win]  # for Windows
 
 Run
 
+Add `DEBUG=True` to `.env` file or `cp .env.example .env`
+
 ```commandline
-python SportOrg.pyw
+poetry run python SportOrg.pyw
 ```
 
 ![Mainwindow sportorg](img/mainwindow.png)
