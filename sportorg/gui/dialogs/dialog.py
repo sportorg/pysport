@@ -58,12 +58,12 @@ class NumberField(Field):
 class LabelField(Field):
     def set_text(self, text: str = '') -> None:
         if text:
-            self.q_label.show()
-            self.q_item.show()
+            self.q_label.show()  # type:ignore
+            self.q_item.show()  # type:ignore
         else:
-            self.q_label.hide()
-            self.q_item.hide()
-        self.q_item.setText(text)
+            self.q_label.hide()  # type:ignore
+            self.q_item.hide()  # type:ignore
+        self.q_item.setText(text)  # type:ignore
 
 
 @dataclass
@@ -122,13 +122,14 @@ class BaseDialog(QDialog):
         return super().exec_()
 
     def _init_ui(self) -> None:
+        # type:ignore
         parent = self.parent()
 
         self.setWindowTitle(self.title)
         self.setWindowIcon(QIcon(config.ICON))
         self.setModal(self.is_modal)
-        self.resize(*self.size)
-        if self.is_modal and parent:
+        self.resize(*self.size)  # type:ignore
+        if self.is_modal and parent:  # type:ignore
             self.setMaximumWidth(parent.size().width())
             self.setMaximumHeight(parent.size().height())
 
@@ -151,8 +152,8 @@ class BaseDialog(QDialog):
             if isinstance(field, LineField):
                 item = QLineEdit()
                 if value is not Empty:
-                    item.setText(value)
-                callback = getattr(self, f'on_{field.id}_changed', None)
+                    item.setText(value)  # type:ignore
+                callback = getattr(self, f'on_{field.id}_changed', None)  # type:ignore
                 if callback:
                     item.textChanged.connect(callback)
             if isinstance(field, NumberField):
@@ -166,8 +167,8 @@ class BaseDialog(QDialog):
                 if field.is_disabled is not None:
                     item.setDisabled(field.is_disabled)
                 if value is not Empty:
-                    item.setValue(value)
-                callback = getattr(self, f'on_{field.id}_finished', None)
+                    item.setValue(value)  # type:ignore
+                callback = getattr(self, f'on_{field.id}_finished', None)  # type:ignore
                 if callback:
                     item.editingFinished.connect(callback)
                 callback = getattr(self, f'on_{field.id}_changed', None)
@@ -180,7 +181,7 @@ class BaseDialog(QDialog):
             if isinstance(field, CheckBoxField):
                 item = QCheckBox(field.label)
                 if value is not Empty:
-                    item.setChecked(value)
+                    item.setChecked(value)  # type:ignore
                 callback = getattr(self, f'on_{field.id}_changed', None)
                 if callback:
                     item.stateChanged.connect(callback)
@@ -188,7 +189,7 @@ class BaseDialog(QDialog):
                 item = AdvComboBox()
                 item.addItems(field.items)
                 if value is not Empty:
-                    item.setCurrentText(value)
+                    item.setCurrentText(value)  # type:ignore
                 callback = getattr(self, f'on_{field.id}_changed', None)
                 if callback:
                     item.currentTextChanged.connect(callback)
@@ -198,7 +199,7 @@ class BaseDialog(QDialog):
                 if isinstance(value, str):
                     item.setText(value)
                 elif value is not Empty:
-                    for row in value:
+                    for row in value:  # type:ignore
                         item.append(row)
                 callback = getattr(self, f'on_{field.id}_changed', None)
                 if callback:
@@ -210,16 +211,16 @@ class BaseDialog(QDialog):
             if isinstance(field, DateField):
                 item = QDateEdit()
                 if field.maximum:
-                    item.setMaximumDate(field.maximum)
+                    item.setMaximumDate(field.maximum)  # type:ignore
                 if value and value is not Empty:
-                    item.setDate(value)
+                    item.setDate(value)  # type:ignore
             if isinstance(field, ButtonField):
                 item = QPushButton(field.text)
                 callback = getattr(self, f'on_{field.id}_clicked', None)
                 if callback:
                     item.clicked.connect(callback)
 
-            form_layout.addRow(label, item)
+            form_layout.addRow(label, item)  # type:ignore
             field.q_label = label
             field.q_item = item
             if field.id:
@@ -248,8 +249,8 @@ class BaseDialog(QDialog):
         for field in self.form:
             if isinstance(field, LineField):
                 if field.select_all:
-                    field.q_item.setFocus()
-                    field.q_item.selectAll()
+                    field.q_item.setFocus()  # type:ignore
+                    field.q_item.selectAll()  # type:ignore
         self.after_showing()
 
     def _apply(self) -> None:
@@ -257,21 +258,21 @@ class BaseDialog(QDialog):
             value = Empty
 
             if isinstance(field, LineField):
-                value = field.q_item.text()
+                value = field.q_item.text()  # type:ignore
             if isinstance(field, NumberField):
-                value = field.q_item.value()
+                value = field.q_item.value()  # type:ignore
             if isinstance(field, LabelField):
                 pass
             if isinstance(field, CheckBoxField):
-                value = field.q_item.isChecked()
+                value = field.q_item.isChecked()  # type:ignore
             if isinstance(field, AdvComboBoxField):
-                value = field.q_item.currentText()
+                value = field.q_item.currentText()  # type:ignore
             if isinstance(field, TextField):
-                value = field.q_item.toPlainText()
+                value = field.q_item.toPlainText()  # type:ignore
             if isinstance(field, TimeField):
-                value = time_to_otime(field.q_item.time())
+                value = time_to_otime(field.q_item.time())  # type:ignore
             if isinstance(field, DateField):
-                value = qdate_to_date(field.q_item.date())
+                value = qdate_to_date(field.q_item.date())  # type:ignore
 
             if value is Empty:
                 continue

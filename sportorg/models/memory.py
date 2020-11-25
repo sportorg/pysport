@@ -5,7 +5,7 @@ import uuid
 from abc import abstractmethod
 from datetime import date
 from enum import Enum, IntEnum
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import dateutil.parser
 
@@ -437,12 +437,12 @@ class Result:
         self.place = 0
         self.scores = 0
         self.assigned_rank = Qualification.NOT_QUALIFIED
-        self.diff = None  # type: OTime  # readonly
+        self.diff: Optional[OTime] = None  # readonly
         self.diff_scores = 0  # readonly
         self.created_at = time.time()
         self.speed = ''
         self.can_win_count = 0  # quantity of athletes who can win at current time
-        self.final_result_time = None  # type: OTime real time, when nobody can win
+        self.final_result_time: Optional[OTime] = None  # real time, when nobody can win
 
         self.card_number = 0
         self.splits = []  # type: List[Split]
@@ -658,7 +658,9 @@ class Result:
     def get_result_otime_relay(self):
         time_accuracy = race().get_setting('time_accuracy', 0)
         time_rounding = race().get_setting('time_rounding', 'math')
-        ret_ms = self.get_finish_time().to_msec() - self.get_start_time_relay().to_msec()
+        ret_ms = (
+            self.get_finish_time().to_msec() - self.get_start_time_relay().to_msec()
+        )
         ret_ms += self.get_penalty_time().to_msec()
         ret_ms -= self.get_credit_time().to_msec()
         return OTime(msec=ret_ms).round(time_accuracy, TimeRounding[time_rounding])

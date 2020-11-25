@@ -4,7 +4,7 @@ from enum import Enum
 from sportorg.common.otime import OTime
 from sportorg.gui.dialogs.bib_dialog import BibDialog
 from sportorg.language import translate
-from sportorg.models.memory import Person, ResultSportident, find, race, ResultStatus
+from sportorg.models.memory import Person, ResultSportident, ResultStatus, find, race
 from sportorg.models.result.result_checker import ResultChecker, ResultCheckerException
 
 
@@ -27,12 +27,10 @@ class ResultSportidentGeneration:
             'system_duplicate_chip_processing', 'several_results'
         )
         self.card_read_repeated = self.duplicate_chip_processing == 'bib_request'
-        self.missed_finish = race().get_setting(
-            'system_missed_finish', 'zero'
-        )
-        self.finish_source = FinishSource[race().get_setting(
-            'system_finish_source', 'station'
-        )]
+        self.missed_finish = race().get_setting('system_missed_finish', 'zero')
+        self.finish_source = FinishSource[
+            race().get_setting('system_finish_source', 'station')
+        ]
         self._process_missed_finish()
 
     def _process_missed_finish(self):

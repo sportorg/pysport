@@ -205,7 +205,7 @@ class MainWindow(QMainWindow):
                 if 'property' in action_item:
                     self.menu_property[action_item['property']] = action
                 if (
-                        'debug' in action_item and action_item['debug']
+                    'debug' in action_item and action_item['debug']
                 ) or 'debug' not in action_item:
                     parent.addAction(action)
             else:
@@ -438,7 +438,7 @@ class MainWindow(QMainWindow):
                         else:
                             Sound().fail()
                         if result.person.is_rented_card or RentCards().exists(
-                                result.person.card_number
+                            result.person.card_number
                         ):
                             Sound().rented_card()
             else:

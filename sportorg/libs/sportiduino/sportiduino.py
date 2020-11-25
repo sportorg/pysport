@@ -32,7 +32,7 @@ from six import PY3, byte2int, int2byte, iterbytes, print_
 
 if PY3:
 
-    def byte2int(x):
+    def byte2int(x):  # type:ignore
         try:
             return x[0]
         except TypeError:
@@ -203,7 +203,7 @@ class Sportiduino(object):
                     byte = serial.read()
                     if byte == b'':
                         raise SportiduinoTimeout(
-                            Sportiduino._translate('sportiduino', "No response")
+                            Sportiduino._translate('sportiduino', 'No response')
                         )
                     elif byte == self._start_byte:
                         break
@@ -240,13 +240,13 @@ class Sportiduino(object):
 
                 if not self._cs_check(code + length_byte + data, checksum):
                     raise SportiduinoException(
-                        Sportiduino._translate('sportiduino', "Checksum mismatch")
+                        Sportiduino._translate('sportiduino', 'Checksum mismatch')
                     )
 
             except (SerialException, OSError) as msg:
                 raise SportiduinoException(
                     Sportiduino._translate(
-                        'sportiduino', "Error reading response: {}"
+                        'sportiduino', 'Error reading response: {}'
                     ).format(msg)
                 )
 
@@ -336,7 +336,7 @@ class Sportiduino(object):
         raise SportiduinoException(
             Sportiduino._translate(
                 'sportiduino',
-                "No Sportiduino master station found. Possible reasons: {}",
+                'No Sportiduino master station found. Possible reasons: {}',
             ).format(errors)
         )
 
@@ -387,7 +387,7 @@ class Sportiduino(object):
         else:
             raise SportiduinoException(
                 Sportiduino._translate(
-                    'sportiduino', "Unknown error during card reading"
+                    'sportiduino', 'Unknown error during card reading'
                 )
             )
 
@@ -496,7 +496,7 @@ class Sportiduino(object):
             Sportiduino.MASTER_CARD_GET_STATE
         ):
             raise SportiduinoException(
-                Sportiduino._translate('sportiduino', "The state-card not found")
+                Sportiduino._translate('sportiduino', 'The state-card not found')
             )
 
         state = {}
@@ -526,7 +526,7 @@ class Sportiduino(object):
         if code == Sportiduino.RESP_SETTINGS:
             return Sportiduino.Config.unpack(data)
         else:
-            raise SportiduinoException("Read settings failed")
+            raise SportiduinoException('Read settings failed')
 
     def write_settings(self, antenna_gain, timezone):
         params = Sportiduino.Config(antenna_gain, timezone).pack()
@@ -551,38 +551,38 @@ class Sportiduino(object):
     def card_name(card_type):
         if card_type == 1:
             return Sportiduino._translate(
-                'sportiduino', "Compliant with ISO/IEC 14443-4"
+                'sportiduino', 'Compliant with ISO/IEC 14443-4'
             )
         elif card_type == 2:
             return Sportiduino._translate(
-                'sportiduino', "Compliant with ISO/IEC 18092 (NFC)"
+                'sportiduino', 'Compliant with ISO/IEC 18092 (NFC)'
             )
         elif card_type == 3:
-            return "MIFARE Classic Mini"
+            return 'MIFARE Classic Mini'
         elif card_type == 4:
-            return "MIFARE Classic 1K"
+            return 'MIFARE Classic 1K'
         elif card_type == 5:
-            return "MIFARE Classic 4K"
+            return 'MIFARE Classic 4K'
         elif card_type == 6:
-            return "MIFARE Ultralight"
+            return 'MIFARE Ultralight'
         elif card_type == 7:
-            return "MIFARE Plus"
+            return 'MIFARE Plus'
         elif card_type == 8:
-            return "TNP3XXX"
+            return 'TNP3XXX'
         elif card_type == 9:
-            return "NTAG213"
+            return 'NTAG213'
         elif card_type == 10:
-            return "NTAG215"
+            return 'NTAG215'
         elif card_type == 11:
-            return "NTAG216"
+            return 'NTAG216'
         elif card_type is None or card_type == 0 or card_type == 0xFF:
-            return Sportiduino._translate('sportiduino', "Not detected")
+            return Sportiduino._translate('sportiduino', 'Not detected')
         else:
             return Sportiduino._translate(
-                'sportiduino', "Unknown card type: {}"
+                'sportiduino', 'Unknown card type: {}'
             ).format(card_type)
 
-        return Sportiduino._translate('sportiduino', "Unknown type")
+        return Sportiduino._translate('sportiduino', 'Unknown type')
 
     def _set_mode(self, mode):
         """Set master station read mode. Deprecated."""
@@ -593,7 +593,7 @@ class Sportiduino(object):
             self._serial = Serial(port, baudrate=38400, timeout=3)
         except (SerialException, OSError):
             raise SportiduinoException(
-                Sportiduino._translate('sportiduino', "Could not open port {}").format(
+                Sportiduino._translate('sportiduino', 'Could not open port {}').format(
                     port
                 )
             )
@@ -602,7 +602,7 @@ class Sportiduino(object):
             self._serial.reset_input_buffer()
         except (SerialException, OSError):
             raise SportiduinoException(
-                Sportiduino._translate('sportiduino', "Could not flush port {}").format(
+                Sportiduino._translate('sportiduino', 'Could not flush port {}').format(
                     port
                 )
             )
@@ -618,12 +618,12 @@ class Sportiduino(object):
                 )
                 self.version = self.read_version(timeout=2)
             except SportiduinoTimeout:
-                self._log_debug("No response")
+                self._log_debug('No response')
             else:
                 break
 
         if self.version is None:
-            raise SportiduinoTimeout("No response")
+            raise SportiduinoTimeout('No response')
 
         self.port = port
         self.baudrate = self._serial.baudrate
@@ -640,7 +640,7 @@ class Sportiduino(object):
 
     def __del__(self):
         if self._serial is not None:
-            self._log_info("Disconnect master station")
+            self._log_info('Disconnect master station')
             self._serial.close()
 
     @staticmethod

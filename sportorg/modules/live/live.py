@@ -1,13 +1,12 @@
 import logging
-from threading import Thread
 from functools import partial
+from threading import Thread
 
 import requests
 
 from sportorg.common.singleton import Singleton
 from sportorg.models.memory import race
 from sportorg.modules.live import orgeo
-
 
 
 class LiveClient(metaclass=Singleton):

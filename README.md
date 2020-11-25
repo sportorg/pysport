@@ -10,7 +10,7 @@
 ```commandline
 pip install poetry
 poetry install
-poetry install[win]  # for Windows
+poetry install -E win  # for Windows
 ```
 
 Run
@@ -36,6 +36,6 @@ poetry run python SportOrg.pyw
 
 ## Roadmap
 
-* Fix live results (sportorg doesn't send data to server)
-* Fix teamwork
-* Publish to pypi
+- [ ] Fix live results (sportorg doesn't send data to server)
+- [ ] Fix teamwork
+- [ ] Publish to pypi

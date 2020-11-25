@@ -3,7 +3,7 @@ import platform
 from sportorg.common.template import get_text_from_file
 from sportorg.config import template_dir
 from sportorg.language import translate
-from sportorg.models.memory import Organization, race, Group, Course
+from sportorg.models.memory import Course, Group, Organization, race
 from sportorg.models.result.split_calculation import GroupSplits
 from sportorg.modules.configs.configs import Config
 from sportorg.modules.printing.printing import print_html

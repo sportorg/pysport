@@ -49,8 +49,8 @@ class SIReaderThread(QThread):
                 si.disconnect()  # release port
                 si = SIReaderSRR(port=self.port, logger=logging.root)
             elif (
-                    si.get_type() == SIReader.M_CONTROL
-                    or si.get_type() == SIReader.M_BC_CONTROL
+                si.get_type() == SIReader.M_CONTROL
+                or si.get_type() == SIReader.M_BC_CONTROL
             ):
                 si.disconnect()  # release port
                 si = SIReaderControl(port=self.port, logger=logging.root)
@@ -130,8 +130,8 @@ class ResultThread(QThread):
 
                 # simple check for morning starts (10:00 a.m. was 22:00 in splits)
                 if (
-                        self.time_to_sec(card_data['punches'][i][1]) - 12 * 3600
-                        > start_time
+                    self.time_to_sec(card_data['punches'][i][1]) - 12 * 3600
+                    > start_time
                 ):
                     new_datetime = card_data['punches'][i][1].replace(
                         hour=card_data['punches'][i][1].hour - 12
@@ -168,10 +168,10 @@ class ResultThread(QThread):
     def time_to_sec(value, max_val=86400):
         if isinstance(value, datetime.datetime):
             ret = (
-                    value.hour * 3600
-                    + value.minute * 60
-                    + value.second
-                    + value.microsecond / 1000000
+                value.hour * 3600
+                + value.minute * 60
+                + value.second
+                + value.microsecond / 1000000
             )
             if max_val:
                 ret = ret % max_val
@@ -224,8 +224,8 @@ class SIReaderClient(object):
         if self._si_reader_thread and self._result_thread:
             # return self._si_reader_thread.is_alive() and self._result_thread.is_alive()
             return (
-                    not self._si_reader_thread.isFinished()
-                    and not self._result_thread.isFinished()
+                not self._si_reader_thread.isFinished()
+                and not self._result_thread.isFinished()
             )
 
         return False

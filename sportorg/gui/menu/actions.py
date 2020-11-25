@@ -1,5 +1,5 @@
 import logging
-from typing import Any
+from typing import Any, Dict, Type
 
 from PySide2 import QtCore
 from PySide2.QtWidgets import QApplication, QMessageBox
@@ -58,7 +58,7 @@ from sportorg.modules.winorient.wdb import WDBImportError, WinOrientBinary
 
 
 class ActionFactory(type):
-    actions = {}
+    actions: Dict[str, Type[Action]] = {}
 
     def __new__(mcs, name, *args, **kwargs) -> Any:
         cls = super().__new__(mcs, name, *args, **kwargs)

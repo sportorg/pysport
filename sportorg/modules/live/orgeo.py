@@ -1,7 +1,21 @@
-RESULT_STATUS = ['NONE', 'OK', 'FINISHED', 'DISQUALIFIED', 'MISSING_PUNCH',
-                 'DID_NOT_FINISH', 'ACTIVE', 'INACTIVE', 'OVERTIME', 'SPORTING_WITHDRAWAL',
-                 'NOT_COMPETING', 'MOVED', 'MOVED_UP', 'DID_NOT_START', 'DID_NOT_ENTER',
-                 'CANCELLED']  # 'RESTORED' is 'OK'
+RESULT_STATUS = [
+    'NONE',
+    'OK',
+    'FINISHED',
+    'DISQUALIFIED',
+    'MISSING_PUNCH',
+    'DID_NOT_FINISH',
+    'ACTIVE',
+    'INACTIVE',
+    'OVERTIME',
+    'SPORTING_WITHDRAWAL',
+    'NOT_COMPETING',
+    'MOVED',
+    'MOVED_UP',
+    'DID_NOT_START',
+    'DID_NOT_ENTER',
+    'CANCELLED',
+]  # 'RESTORED' is 'OK'
 
 
 class Orgeo:
@@ -10,19 +24,13 @@ class Orgeo:
             user_agent = 'SportOrg'
         self.requests = requests
         self._url = url
-        self._headers = {
-            'User-Agent': user_agent
-        }
+        self._headers = {'User-Agent': user_agent}
 
     def _get_url(self, text=''):
         return '{}{}'.format(self._url, text)
 
     def send(self, data):
-        response = self.requests.post(
-            self._get_url(),
-            headers=self._headers,
-            json=data
-        )
+        response = self.requests.post(self._get_url(), headers=self._headers, json=data)
         return response
 
 
@@ -73,7 +81,7 @@ def _get_person_obj(data, race_data, result=None):
         'national_code': None,
         'world_code': None,
         'out_of_competition': data['is_out_of_competition'],
-        'start': round(data['start_time'] / 1000) if data['start_time'] else 0
+        'start': round(data['start_time'] / 1000) if data['start_time'] else 0,
     }
     is_relay = group and group['__type'] == 3 or race_data['data']['race_type'] == 3
     if is_relay:
@@ -84,12 +92,19 @@ def _get_person_obj(data, race_data, result=None):
         obj['start'] = round(result['start_msec'] / 1000)
 
         if is_relay:
-            obj['result_ms'] = round(result['result_relay_msec'] / 10)  # 1/100 sec - proprietary format
+            obj['result_ms'] = round(
+                result['result_relay_msec'] / 10
+            )  # 1/100 sec - proprietary format
         else:
-            obj['result_ms'] = round(result['result_msec'] / 10)  # 1/100 sec - proprietary format
+            obj['result_ms'] = round(
+                result['result_msec'] / 10
+            )  # 1/100 sec - proprietary format
 
-        obj['result_status'] = RESULT_STATUS[int(result['status'])] \
-            if -1 < int(result['status']) < len(RESULT_STATUS) else 'OK'
+        obj['result_status'] = (
+            RESULT_STATUS[int(result['status'])]
+            if -1 < int(result['status']) < len(RESULT_STATUS)
+            else 'OK'
+        )
 
         if len(result['splits']):
             obj['splits'] = []
@@ -98,12 +113,14 @@ def _get_person_obj(data, race_data, result=None):
                 if split['is_correct']:
                     splits.append(split)
             for i in range(len(splits)):
+                # fmt: off
                 """
                 Orgeo Splits format:
                 Option 	Type 	Description
                 code 	string 	CP code
                 time 	int 	seconds of current split - time from previous CP to this CP
                 """
+                # fmt: on
                 current_split = {}
                 current_split['code'] = splits[i]['code']
                 end_time = splits[i]['time'] or 0
@@ -138,27 +155,34 @@ def create(requests, url, data, race_data, logger=None):
                     persons.append(_get_person_obj(person_data, race_data, result_data))
         if item['object'] == 'Organization':
             for person_data in race_data['persons']:
-                if person_data['organization_id'] and person_data['organization_id'] == item['id']:
+                if (
+                    person_data['organization_id']
+                    and person_data['organization_id'] == item['id']
+                ):
                     result_data = _get_result_by_person(person_data, race_data)
                     persons.append(_get_person_obj(person_data, race_data, result_data))
-        elif item['object'] in ['Result', 'ResultSportident', 'ResultSportiduino', 'ResultSFR', 'ResultManual']:
+        elif item['object'] in [
+            'Result',
+            'ResultSportident',
+            'ResultSportiduino',
+            'ResultSFR',
+            'ResultManual',
+        ]:
             person_data = _get_person(item, race_data)
             if person_data:
                 persons.append(_get_person_obj(person_data, race_data, item))
     if group_i == len(race_data['groups']):
         is_start = True
     if len(persons):
-        obj_for_send = {
-            'persons': persons
-        }
+        obj_for_send = {'persons': persons}
         if is_start:
-            obj_for_send['params'] = {
-                'start_list': True
-            }
+            obj_for_send['params'] = {'start_list': True}
         response = o.send(obj_for_send)
         json_response = response.json()
         if 'response' in json_response:
-            logger.info('Code: {}. {}'.format(response.status_code, json_response['response']))
+            logger.info(
+                'Code: {}. {}'.format(response.status_code, json_response['response'])
+            )
 
 
 def delete(requests, url, data, race_data, logger=None):
@@ -168,19 +192,21 @@ def delete(requests, url, data, race_data, logger=None):
     persons = []
     for item in data:
         if item['object'] == 'Person':
-            persons.append({
-                'ref_id': item['id']
-            })
-        elif item['object'] in ['Result', 'ResultSportident', 'ResultSportiduino', 'ResultSFR', 'ResultManual']:
+            persons.append({'ref_id': item['id']})
+        elif item['object'] in [
+            'Result',
+            'ResultSportident',
+            'ResultSportiduino',
+            'ResultSFR',
+            'ResultManual',
+        ]:
             person_data = _get_person(item, race_data)
             if person_data:
-                persons.append({
-                    'ref_id': person_data['id']
-                })
+                persons.append({'ref_id': person_data['id']})
     if len(persons):
-        response = o.send({
-            'persons': persons
-        })
+        response = o.send({'persons': persons})
         json_response = response.json()
         if 'response' in json_response:
-            logger.info('Code: {}. {}'.format(response.status_code, json_response['response']))
+            logger.info(
+                'Code: {}. {}'.format(response.status_code, json_response['response'])
+            )

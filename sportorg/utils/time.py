@@ -165,10 +165,6 @@ def date_to_qdate(value):
     return QDate(value.year, value.month, value.day)
 
 
-def date_to_str(value, separator='-'):
-    return '{:%m' + separator + '%d' + separator + '%Y}'.format(value)
-
-
 def str_to_date(value, separator='-'):
     day, month, year = str(value).split(separator)
     return date(int(year), int(month), int(day))

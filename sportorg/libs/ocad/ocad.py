@@ -1,51 +1,45 @@
+from dataclasses import dataclass, field
 from typing import IO
 from xml.etree import ElementTree
 
 from chardet.universaldetector import UniversalDetector
 
 
-class Item:
-    def __init__(self, **kwargs):
-        self.init(**kwargs)
-
-    def init(self, **kwargs):
-        for key, value in kwargs.items():
-            if hasattr(self, key):
-                setattr(self, key, value)
-
-
-class CourseControl(Item):
-    def __init__(self, **kwargs):
-        self.order = ''
-        self.code = ''
-        self.length = ''
-        super().__init__(**kwargs)
+class OcadImportException(Exception):
+    pass
 
 
 class CourseControlDict(dict):
     def __len__(self) -> int:
-        return len(self.keys()) - 1 if len(self.keys()) - 1 >= 0 else len(self.keys())
+        if len(self.keys()) - 1 >= 0:
+            return len(self.keys()) - 1
+
+        return len(self.keys())
 
 
-class Course(Item):
-    def __init__(self, **kwargs):
-        self.group = ''
-        self.course = ''
-        self.bib = ''
-        self.climb = 0
-        self.length = 0
-        self.controls = CourseControlDict()
-        super().__init__(**kwargs)
+@dataclass
+class CourseControl:
+    order: str = ''
+    code: str = ''
+    length: str = ''
+
+
+@dataclass
+class Course:
+    group: str = ''
+    course: str = ''
+    bib: str = ''
+    climb: int = 0
+    length: int = 0
+    controls: CourseControlDict = field(default_factory=CourseControlDict)
 
 
 class CourseList(list):
     def append(self, course: Course) -> None:
         super().append(course)
 
-    def __getitem__(self, i: int) -> Course:
-        return super().__getitem__(i)
 
-
+# fmt: off
 class ClassesV8:
     """
     Example:
@@ -55,6 +49,7 @@ class ClassesV8:
     Relay;Relay;1.2;3.400;205;S1;0.219;117;0.246;64;0.733;70;0.207;52;0.198;87;0.341;56;0.281;95;0.098;116;0.152;90;0.179;47;0.216;120;0.280;115;0.229;F1
     Relay;Relay;1.3;3.400;205;S1;0.287;118;0.360;64;0.596;78;0.303;52;0.225;106;0.229;56;0.281;95;0.098;116;0.152;90;0.179;47;0.216;120;0.280;115;0.229;F1
     """
+    # fmt: on
 
     def __init__(self, data=None):
         if data is None:
@@ -228,7 +223,3 @@ def parse_xml_v3(source):
     iof_xml_v3 = IofXMLv3()
 
     return iof_xml_v3.parse(source)
-
-
-class OcadImportException(Exception):
-    pass

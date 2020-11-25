@@ -1,4 +1,5 @@
 import logging
+from typing import List
 
 from sportorg.gui.dialogs.dialog import BaseDialog, LineField, NumberField, TextField
 from sportorg.gui.global_access import GlobalAccess
@@ -59,8 +60,8 @@ class CourseEditDialog(BaseDialog):
     def before_showing(self) -> None:
         self.on_controls_changed()
 
-    def convert_controls(self, controls) -> str:
-        result = []
+    def convert_controls(self, controls) -> List[str]:
+        result: List[str] = []
         for i in controls:
             result.append('{} {}'.format(i.code, i.length if i.length else ''))
         return result
