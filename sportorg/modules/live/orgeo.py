@@ -133,7 +133,7 @@ def _get_person_obj(data, race_data, result=None):
     return obj
 
 
-def create(requests, url, data, race_data, logger=None):
+def create(requests, url, data, race_data):
     """
     data is Dict: Person, Result, Group, Course, Organization
     race_data is Dict: Race
@@ -173,19 +173,14 @@ def create(requests, url, data, race_data, logger=None):
                 persons.append(_get_person_obj(person_data, race_data, item))
     if group_i == len(race_data['groups']):
         is_start = True
-    if len(persons):
+    if persons:
         obj_for_send = {'persons': persons}
         if is_start:
             obj_for_send['params'] = {'start_list': True}
-        response = o.send(obj_for_send)
-        json_response = response.json()
-        if 'response' in json_response:
-            logger.info(
-                'Code: {}. {}'.format(response.status_code, json_response['response'])
-            )
+        o.send(obj_for_send)
 
 
-def delete(requests, url, data, race_data, logger=None):
+def delete(requests, url, data, race_data):
     o = Orgeo(requests, url)
     if not isinstance(data, list):
         data = [data]
@@ -203,10 +198,5 @@ def delete(requests, url, data, race_data, logger=None):
             person_data = _get_person(item, race_data)
             if person_data:
                 persons.append({'ref_id': person_data['id']})
-    if len(persons):
-        response = o.send({'persons': persons})
-        json_response = response.json()
-        if 'response' in json_response:
-            logger.info(
-                'Code: {}. {}'.format(response.status_code, json_response['response'])
-            )
+    if persons:
+        o.send({'persons': persons})

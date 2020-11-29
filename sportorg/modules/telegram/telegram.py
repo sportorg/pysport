@@ -3,7 +3,6 @@ import sys
 from threading import Thread
 
 from sportorg.common.fake_std import FakeStd
-from sportorg.common.singleton import singleton
 from sportorg.libs.telegram.telegram import Telegram
 from sportorg.models.memory import race
 
@@ -35,7 +34,6 @@ class BotOption:
         self.enabled = enabled
 
 
-@singleton
 class TelegramClient:
     @staticmethod
     def get_options():
@@ -76,3 +74,6 @@ class TelegramClient:
         TelegramSendThread(
             options.token, options.chat_id, text, options.parse_mode
         ).start()
+
+
+telegram_client = TelegramClient()

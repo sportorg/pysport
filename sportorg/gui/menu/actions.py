@@ -51,7 +51,7 @@ from sportorg.modules.ocad.ocad import OcadImportException
 from sportorg.modules.sfr.sfrreader import SFRReaderClient
 from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.modules.sportiduino.sportiduino import SportiduinoClient
-from sportorg.modules.telegram.telegram import TelegramClient
+from sportorg.modules.telegram.telegram import telegram_client
 from sportorg.modules.updater import checker
 from sportorg.modules.winorient import winorient
 from sportorg.modules.winorient.wdb import WDBImportError, WinOrientBinary
@@ -567,7 +567,7 @@ class TelegramSendAction(Action, metaclass=ActionFactory):
                     continue
                 if index >= len(items):
                     pass
-                TelegramClient().send_result(items[index])
+                telegram_client().send_result(items[index])
         except Exception as e:
             logging.error(str(e))
 

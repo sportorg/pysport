@@ -1,15 +1,13 @@
-import logging
 from functools import partial
 from threading import Thread
 
 import requests
 
-from sportorg.common.singleton import Singleton
 from sportorg.models.memory import race
 from sportorg.modules.live import orgeo
 
 
-class LiveClient(metaclass=Singleton):
+class LiveClient:
     @staticmethod
     def is_enabled():
         obj = race()
@@ -30,7 +28,7 @@ class LiveClient(metaclass=Singleton):
         urls = self.get_urls()
         race_data = race().to_dict()
         for url in urls:
-            func = partial(orgeo.create, requests, url, data, race_data, logging.root)
+            func = partial(orgeo.create, requests, url, data, race_data)
             Thread(target=func, name='LiveThread').start()
 
     def delete(self, data):
@@ -40,5 +38,8 @@ class LiveClient(metaclass=Singleton):
         urls = self.get_urls()
         race_data = race().to_dict()
         for url in urls:
-            func = partial(orgeo.create, requests, url, data, race_data, logging.root)
+            func = partial(orgeo.delete, requests, url, data, race_data)
             Thread(target=func, name='LiveThread').start()
+
+
+live_client = LiveClient()

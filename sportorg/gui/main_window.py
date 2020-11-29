@@ -48,7 +48,7 @@ from sportorg.modules.sound import Sound
 from sportorg.modules.sportident.result_generation import ResultSportidentGeneration
 from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.modules.sportiduino.sportiduino import SportiduinoClient
-from sportorg.modules.telegram.telegram import TelegramClient
+from sportorg.modules.telegram.telegram import telegram_client
 
 
 class ConsolePanelHandler(logging.Handler):
@@ -431,7 +431,7 @@ class MainWindow(QMainWindow):
                             logging.error(str(e))
                     elif result.person and result.person.group:
                         GroupSplits(race(), result.person.group).generate(True)
-                    TelegramClient().send_result(result)
+                    telegram_client.send_result(result)
                     if result.person:
                         if result.is_status_ok():
                             Sound().ok()
