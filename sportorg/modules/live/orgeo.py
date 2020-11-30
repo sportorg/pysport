@@ -139,8 +139,6 @@ def create(requests, url, data, race_data):
     race_data is Dict: Race
     """
     o = Orgeo(requests, url)
-    if not isinstance(data, list):
-        data = [data]
     is_start = False
     group_i = 0
     persons = []
@@ -182,8 +180,6 @@ def create(requests, url, data, race_data):
 
 def delete(requests, url, data, race_data):
     o = Orgeo(requests, url)
-    if not isinstance(data, list):
-        data = [data]
     persons = []
     for item in data:
         if item['object'] == 'Person':

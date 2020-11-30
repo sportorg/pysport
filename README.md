@@ -38,4 +38,4 @@ poetry run python SportOrg.pyw
 
 - [ ] Fix live results (sportorg doesn't send data to server)
 - [ ] Publish to pypi
-- [ ] Deploy to relegram
+- [ ] Deploy to telegram

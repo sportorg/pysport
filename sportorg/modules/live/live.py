@@ -25,20 +25,28 @@ class LiveClient:
         if not self.is_enabled():
             return
 
+        if not isinstance(data, list):
+            data = [data]
+        items = [item.to_dict() for item in data]
+
         urls = self.get_urls()
         race_data = race().to_dict()
         for url in urls:
-            func = partial(orgeo.create, requests, url, data, race_data)
+            func = partial(orgeo.create, requests, url, items, race_data)
             Thread(target=func, name='LiveThread').start()
 
     def delete(self, data):
         if not self.is_enabled():
             return
 
+        if not isinstance(data, list):
+            data = [data]
+        items = [item.to_dict() for item in data]
+
         urls = self.get_urls()
         race_data = race().to_dict()
         for url in urls:
-            func = partial(orgeo.delete, requests, url, data, race_data)
+            func = partial(orgeo.delete, requests, url, items, race_data)
             Thread(target=func, name='LiveThread').start()
 
 
