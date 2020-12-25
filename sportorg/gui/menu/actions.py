@@ -25,6 +25,7 @@ from sportorg.gui.dialogs.rent_cards_dialog import RentCardsDialog
 from sportorg.gui.dialogs.report_dialog import ReportDialog
 from sportorg.gui.dialogs.search_dialog import SearchDialog
 from sportorg.gui.dialogs.settings import SettingsDialog
+from sportorg.gui.dialogs.split_delete import SplitDeleteDialog
 from sportorg.gui.dialogs.sportorg_import_dialog import SportOrgImportDialog
 from sportorg.gui.dialogs.start_handicap_dialog import StartHandicapDialog
 from sportorg.gui.dialogs.start_preparation import StartPreparationDialog, guess_courses_for_groups
@@ -519,6 +520,12 @@ class SetDNSNumbersAction(Action, metaclass=ActionFactory):
 class CPDeleteAction(Action, metaclass=ActionFactory):
     def execute(self):
         CPDeleteDialog().exec_()
+        self.app.refresh()
+
+
+class SplitDeleteAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        SplitDeleteDialog().exec_()
         self.app.refresh()
 
 

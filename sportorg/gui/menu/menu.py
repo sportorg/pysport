@@ -305,6 +305,10 @@ def menu_list():
                     'action': 'CPDeleteAction'
                 },
                 {
+                    'title': _('Delete Split'),
+                    'action': 'SplitDeleteAction'
+                },
+                {
                     'title': _('Assign result by bib'),
                     'action': 'AssignResultByBibAction'
                 },
