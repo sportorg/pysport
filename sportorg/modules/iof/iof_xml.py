@@ -6,7 +6,8 @@ import dateutil.parser
 
 from sportorg.common.otime import OTime
 from sportorg.language import _
-from sportorg.libs.iof.generator import generate_result_list, generate_entry_list
+from sportorg.libs.iof.generator import generate_result_list, generate_entry_list, generate_start_list, \
+    generate_competitor_list
 
 from sportorg.libs.iof.parser import parse
 
@@ -31,6 +32,22 @@ def export_entry_list(file):
     entry_list.write(open(file, 'wb'), xml_declaration=True, encoding='UTF-8')
 
 
+def export_start_list(file):
+    obj = race()
+
+    start_list = generate_start_list(obj)
+
+    start_list.write(open(file, 'wb'), xml_declaration=True, encoding='UTF-8')
+
+
+def export_competitor_list(file):
+    obj = race()
+
+    start_list = generate_competitor_list(obj)
+
+    start_list.write(open(file, 'wb'), xml_declaration=True, encoding='UTF-8')
+
+
 def import_from_iof(file):
     results = parse(file)
     if not len(results):
@@ -42,6 +59,8 @@ def import_from_iof(file):
         elif result.name == 'CourseData':
             import_from_course_data(result.data)
         elif result.name == 'ResultList':
+            import_from_result_list(result.data)
+        elif result.name == 'StartList':
             import_from_result_list(result.data)
         elif result.name == 'Event':
             import_from_event_data(result.data)

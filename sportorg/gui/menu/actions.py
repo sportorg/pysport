@@ -218,6 +218,31 @@ class IOFEntryListImportAction(Action, metaclass=ActionFactory):
             self.app.init_model()
 
 
+class IOFStartListExportAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        file_name = get_save_file_name(_('Save As IOF xml'), _('IOF xml (*.xml)'),
+                                       '{}_startList'.format(race().data.get_start_datetime().strftime("%Y%m%d")))
+        if file_name is not '':
+            try:
+                iof_xml.export_start_list(file_name)
+            except Exception as e:
+                logging.exception(str(e))
+                QMessageBox.warning(self.app, _('Error'), _('Export error') + ': ' + file_name)
+
+
+class IOFCompetitorListExportAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        file_name = get_save_file_name(_('Save As IOF xml'), _('IOF xml (*.xml)'),
+                                       '{}_competitorList'.format(
+                                           race().data.get_start_datetime().strftime("%Y%m%d")))
+        if file_name is not '':
+            try:
+                iof_xml.export_competitor_list(file_name)
+            except Exception as e:
+                logging.exception(str(e))
+                QMessageBox.warning(self.app, _('Error'), _('Export error') + ': ' + file_name)
+
+
 class AddObjectAction(Action, metaclass=ActionFactory):
     def execute(self):
         self.app.add_object()

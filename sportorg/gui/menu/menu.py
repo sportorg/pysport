@@ -91,7 +91,15 @@ def menu_list():
                                 {
                                     'title': _('EntrytList'),
                                     'action': 'IOFEntryListExportAction'
-                                }
+                                },
+                                {
+                                    'title': _('CompetitorList'),
+                                    'action': 'IOFCompetitorListExportAction'
+                                },
+                                {
+                                    'title': _('StartList'),
+                                    'action': 'IOFStartListExportAction'
+                                },
                             ]
                         },
                     ]

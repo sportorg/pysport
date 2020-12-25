@@ -34,7 +34,7 @@ def generate_result_list(obj):
     xml_rl = Element('{' + xmlns + '}ResultList',
                      nsmap={'xsi': xsi, None: xmlns},
                      iofVersion='3.0',
-                     creator=config.NAME + ' ' + config.VERSION,
+                     creator=config.NAME + ' ' + str(config.VERSION),
                      createTime=datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
                      )
     xml_rl.append(generate_evant(obj))
@@ -126,7 +126,7 @@ def generate_entry_list(obj):
     xml_el = Element('{' + xmlns + '}EntryList',
                      nsmap={'xsi': xsi, None: xmlns},
                      iofVersion='3.0',
-                     creator=config.NAME + ' ' + config.VERSION,
+                     creator=config.NAME + ' ' + str(config.VERSION),
                      createTime=datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
                      )
     xml_el.append(generate_evant(obj))
@@ -152,21 +152,19 @@ def generate_start_list(obj):
 
     if isinstance(obj, Race):
 
-
         xmlns = "http://www.orienteering.org/datastandard/3.0"
         xsi = "http://www.w3.org/2001/XMLSchema-instance"
 
         xml_sl = Element('{' + xmlns + '}StartList',
                          nsmap={'xsi': xsi, None: xmlns},
                          iofVersion='3.0',
-                         creator=config.NAME + ' ' + config.VERSION,
+                         creator=config.NAME + ' ' + str(config.VERSION),
                          createTime=datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
                          )
         xml_sl.append(generate_evant(obj))
 
         for group in obj.groups:
             # Generate ClassStart and Class objects for each group
-
             xml_cs = E.ClassStart(
                 generate_class(group)
             )
@@ -177,9 +175,9 @@ def generate_start_list(obj):
                 for person in obj.get_persons_by_group(group):
                     # generate Start
                     xml_start = E.Start(
-                        E.StartTime(otime_to_str(obj, result.get_start_time())),
-                        E.BibNumber(str(result.get_bib()) if result.get_bib() else ''),
-                        E.ControlCard(str(result.card_number)),
+                        E.StartTime(otime_to_str(obj, person.start_time)),
+                        E.BibNumber(str(person.bib) if person.bib else ''),
+                        E.ControlCard(str(person.card_number)),
                     )
                     # compose PersonStart from organization, person and result
                     xml_person_start = E.PersonStart(
@@ -190,53 +188,44 @@ def generate_start_list(obj):
                     xml_cs.append(xml_person_start)
 
             else:
-                # process relay race data - TeamResult-TeamMemberResult-Result
-                for relay_team in ResultCalculation(obj).process_relay_results(group):
-                    organization = relay_team.legs[0].person.organization
-                    xml_team_result = E.TeamResult(
-                        E.Name(organization.name if organization else ''),
-                        generate_organization(organization),
-                        E.BibNumber(str(relay_team.bib_number))
-                    )
-                    xml_cs.append(xml_team_result)
+                pass
 
-                    for team_member in relay_team.legs:
-                        # relay team loop
-                        person = team_member.person
-                        result = team_member.result
-                        organization = person.organization
-                        course = obj.find_course(result)
+    return ElementTree(xml_sl)
 
-                        # generate Result object
-                        xml_result = E.Result(
-                            E.Leg(str(team_member.leg)),
-                            E.StartTime(otime_to_str(obj, result.get_start_time())),
-                            E.FinishTime(otime_to_str(obj, result.get_finish_time())),
-                            E.Time(str(result.get_result_otime().to_sec()) + ".0"),
-                            E.Status(get_iof_status(result.status)),
-                            E.OverallResult(
-                                E.Time(str(result.get_result_otime_relay().to_sec()) + ".0"),
-                                E.Position(str(relay_team.place)),
-                                E.Status(get_iof_status(ResultStatus.DISQUALIFIED)
-                                         if relay_team.get_correct_lap_count() < team_member.leg
-                                         else get_iof_status(ResultStatus.OK)
-                                         ),
-                            ),
-                            generate_course(course)
-                        )
-                        # append splits to Result object
-                        for split in result.splits:
-                            xml_result.append(generate_split(split))
 
-                        # compose TeamMemberResult
-                        xml_team_member_result = E.TeamMemberResult(
-                            generate_person(person),
-                            generate_organization(organization),
-                            xml_result,
-                        )
-                        xml_team_result.append(xml_team_member_result)
+def generate_competitor_list(obj):
+    """Generate the IOF XML CompetitorList string from the race data"""
 
-    return ElementTree(xml_rl)
+    if isinstance(obj, Race):
+
+        xmlns = "http://www.orienteering.org/datastandard/3.0"
+        xsi = "http://www.w3.org/2001/XMLSchema-instance"
+
+        xml_cl = Element('{' + xmlns + '}CompetitorList',
+                         nsmap={'xsi': xsi, None: xmlns},
+                         iofVersion='3.0',
+                         creator=config.NAME + ' ' + str(config.VERSION),
+                         createTime=datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
+                         )
+        xml_cl.append(generate_evant(obj))
+
+        for person in obj.persons:
+            # Generate Competitor object for each person
+
+            xml_competitor = E.Competitor(generate_person(person))
+
+
+            if person.organization:
+                xml_competitor.append(generate_organization(person.organization))
+
+            if person.group:
+                xml_competitor.append(generate_class(person.group))
+
+            xml_competitor.append(E.ControlCard(str(person.card_number)))
+
+            xml_cl.append(xml_competitor)
+
+    return ElementTree(xml_cl)
 
 
 def generate_evant(obj):
@@ -256,11 +245,17 @@ def generate_organization(organization):
 
 
 def generate_person(person):
+
+    person_name = person.name
+    if not person_name or len (person_name) < 1:
+        # mandatory first name (SPORTident Center doesn't work without it)
+        person_name = '_'
+
     ret = E.Person(
         E.Id(str(person.world_code)),
         E.Name(
             E.Family(person.surname),
-            E.Given(person.name),
+            E.Given(person_name),
         ),
         E.BirthDate(str(person.birth_date) if person.birth_date else ''),
     )
