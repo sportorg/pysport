@@ -370,7 +370,7 @@ def set_property(person, key, value, **options):
             person.organization = team
     elif key == translate('Qualification'):
         qual = Qualification.get_qual_by_name(value)
-        if qual:
+        if qual is not None:
             person.qual = qual
     elif key == translate('Bib'):
         if value.isdigit():
