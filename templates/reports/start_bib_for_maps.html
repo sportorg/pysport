@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Bib on maps</title>
-   {% raw %} 
+    <title>Bib</title>
+    {% raw %}
     <style>
         table {
             border-collapse: collapse;
@@ -101,10 +101,10 @@
             text-overflow: ellipsis;
         }
         .bib-number {
-            text-align: left;
-            font-size: 5cm;
-            height: 5cm;
-            font-weight: normal;
+            text-align: center;
+            font-size: 9cm;
+            height: 9cm;
+            font-weight: bold;
         }
         .bib-info {
             font-size: 0.8cm;
@@ -138,11 +138,11 @@
 
         @media print {
             @page {
-                margin: 0.0cm;
+                margin: 0.5cm;
             }
             body {
                 margin: 0;
-                zoom: 100%;
+                zoom: 50%;
             }
             table {
                 display: table;
@@ -161,17 +161,14 @@
             h3,
             h4,
             h5,
-         	h6 {
+            h6 {
                 margin: 1px 0;
-				
             }
-			
             section {
                 page-break-before: always;
             }
             .new-page:nth-child(4n) {
                 page-break-after: always;
-				page-break-before: always;
             }
             ul {
                 page-break-inside: avoid;
@@ -204,7 +201,7 @@
     var race = {% endraw %}{{race|tojson}}{% raw %};
     racePreparation(race);
     var store = {
-        bibDetailedRotatableText: false,
+        bibDetailedRotatableText: true,
         isRelayView: false
     };
     function render (options) {
