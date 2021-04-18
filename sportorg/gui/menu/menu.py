@@ -299,6 +299,17 @@ def menu_list():
                         },
                     ],
                 },
+                {
+                    'title': translate('Online'),
+                    'actions': [
+                        {
+                            'title': translate('Send selected'),
+                            'shortcut': 'Ctrl+K',
+                            'tabs': [0, 1, 3, 4],
+                            'action': 'OnlineSendAction',
+                        },
+                    ],
+                },
             ],
         },
         {

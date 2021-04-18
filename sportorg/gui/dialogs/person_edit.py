@@ -17,6 +17,7 @@ from sportorg.models.constant import get_names, get_race_groups, get_race_teams
 from sportorg.models.memory import Limit, Organization, Qualification, find, race
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.modules.configs.configs import Config
+from sportorg.modules.live.live import live_client
 
 
 class PersonEditDialog(BaseDialog):
@@ -264,3 +265,4 @@ class PersonEditDialog(BaseDialog):
             race().persons.insert(0, person)
 
         ResultCalculation(race()).process_results()
+        live_client.send(person)

@@ -23,6 +23,7 @@ from sportorg.gui.tabs.memory_model import (
     PersonMemoryModel,
     ResultMemoryModel,
 )
+from sportorg.gui.toolbar import toolbar_list
 from sportorg.gui.utils.custom_controls import messageBoxQuestion
 from sportorg.language import translate
 from sportorg.models.constant import RentCards
@@ -38,6 +39,7 @@ from sportorg.models.result.split_calculation import GroupSplits
 from sportorg.modules.backup.file import File
 from sportorg.modules.configs.configs import Config as Configuration
 from sportorg.modules.configs.configs import ConfigFile
+from sportorg.modules.live.live import live_client
 from sportorg.modules.printing.model import (
     NoPrinterSelectedException,
     NoResultToPrintException,
@@ -97,6 +99,7 @@ class MainWindow(QMainWindow):
         self._set_style()
         self._setup_ui()
         self._setup_menu()
+        self._setup_toolbar()
         self._setup_tab()
         self._setup_statusbar()
         self.show()
@@ -221,6 +224,15 @@ class MainWindow(QMainWindow):
         self.menubar.setGeometry(QtCore.QRect(0, 0, 880, 21))
         self.setMenuBar(self.menubar)
         self._create_menu(self.menubar, menu_list())
+
+    def _setup_toolbar(self):
+        self.toolbar = self.addToolBar(translate('Toolbar'))
+        for tb in toolbar_list():
+            tb_action = QtWidgets.QAction(QtGui.QIcon(tb[0]), tb[1], self)
+            tb_action.triggered.connect(self.menu_factory.get_action(tb[2]))
+            if len(tb) == 4:
+                self.toolbar_property[tb[3]] = tb_action
+            self.toolbar.addAction(tb_action)
 
     def _setup_statusbar(self):
         self.statusbar = QtWidgets.QStatusBar()
@@ -431,6 +443,7 @@ class MainWindow(QMainWindow):
                             logging.error(str(e))
                     elif result.person and result.person.group:
                         GroupSplits(race(), result.person.group).generate(True)
+                    live_client.send(result)
                     telegram_client.send_result(result)
                     if result.person:
                         if result.is_status_ok():
@@ -619,10 +632,12 @@ class MainWindow(QMainWindow):
         if tab == 0:
             res = race().delete_persons(indexes)
             ResultCalculation(race()).process_results()
+            live_client.delete(res)
             self.refresh()
         elif tab == 1:
             res = race().delete_results(indexes)
             ResultCalculation(race()).process_results()
+            live_client.delete(res)
             self.refresh()
         elif tab == 2:
             try:

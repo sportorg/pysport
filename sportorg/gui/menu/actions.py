@@ -46,6 +46,7 @@ from sportorg.models.start.start_preparation import (
 )
 from sportorg.modules.backup.json import get_races_from_file
 from sportorg.modules.iof import iof_xml
+from sportorg.modules.live.live import live_client
 from sportorg.modules.ocad import ocad
 from sportorg.modules.ocad.ocad import OcadImportException
 from sportorg.modules.sfr.sfrreader import SFRReaderClient
@@ -135,7 +136,7 @@ class CSVWinorientImportAction(Action, metaclass=ActionFactory):
         file_name = get_open_file_name(
             translate('Open CSV Winorient file'), translate('CSV Winorient (*.csv)')
         )
-        if file_name is not '':
+        if file_name != '':
             try:
                 winorient.import_csv(file_name)
             except Exception as e:
@@ -153,7 +154,7 @@ class WDBWinorientImportAction(Action, metaclass=ActionFactory):
         file_name = get_open_file_name(
             translate('Open WDB Winorient file'), translate('WDB Winorient (*.wdb)')
         )
-        if file_name is not '':
+        if file_name != '':
             try:
                 winorient.import_wo_wdb(file_name)
             except WDBImportError as e:
@@ -172,7 +173,7 @@ class OcadTXTv8ImportAction(Action, metaclass=ActionFactory):
         file_name = get_open_file_name(
             translate('Open Ocad txt v8 file'), translate('Ocad classes v8 (*.txt)')
         )
-        if file_name is not '':
+        if file_name != '':
             try:
                 ocad.import_txt_v8(file_name)
             except OcadImportException as e:
@@ -194,7 +195,7 @@ class WDBWinorientExportAction(Action, metaclass=ActionFactory):
                 race().data.get_start_datetime().strftime('%Y%m%d')
             ),
         )
-        if file_name is not '':
+        if file_name != '':
             try:
                 wb = WinOrientBinary()
 
@@ -219,7 +220,7 @@ class IOFResultListExportAction(Action, metaclass=ActionFactory):
             translate('IOF xml (*.xml)'),
             '{}_resultList'.format(race().data.get_start_datetime().strftime('%Y%m%d')),
         )
-        if file_name is not '':
+        if file_name != '':
             try:
                 iof_xml.export_result_list(file_name)
             except Exception as e:
@@ -236,7 +237,7 @@ class IOFEntryListImportAction(Action, metaclass=ActionFactory):
         file_name = get_open_file_name(
             translate('Open IOF xml'), translate('IOF xml (*.xml)')
         )
-        if file_name is not '':
+        if file_name != '':
             try:
                 iof_xml.import_from_iof(file_name)
             except Exception as e:
@@ -567,7 +568,34 @@ class TelegramSendAction(Action, metaclass=ActionFactory):
                     continue
                 if index >= len(items):
                     pass
-                telegram_client().send_result(items[index])
+                telegram_client.send_result(items[index])
+        except Exception as e:
+            logging.error(str(e))
+
+
+class OnlineSendAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        try:
+            items = []
+            if self.app.current_tab == 0:
+                items = race().persons
+            if self.app.current_tab == 1:
+                items = race().results
+            if self.app.current_tab == 3:
+                items = race().courses
+            if self.app.current_tab == 4:
+                items = race().organizations
+            indexes = self.app.get_selected_rows()
+            if not indexes:
+                return
+            selected_items = []
+            for index in indexes:
+                if index < 0:
+                    continue
+                if index >= len(items):
+                    pass
+                selected_items.append(items[index])
+            live_client.send(selected_items)
         except Exception as e:
             logging.error(str(e))
 
@@ -612,7 +640,7 @@ class ImportSportOrgAction(Action, metaclass=ActionFactory):
         file_name = get_open_file_name(
             translate('Open SportOrg json'), translate('SportOrg (*.json)')
         )
-        if file_name is not '':
+        if file_name != '':
             with open(file_name) as f:
                 attr = get_races_from_file(f)
             SportOrgImportDialog(*attr).exec_()
