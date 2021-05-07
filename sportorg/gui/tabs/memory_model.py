@@ -114,7 +114,7 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
             i = 0
             while i < len(current_array):
                 value = self.get_item(current_array[i], column)
-                if not check.match(value):
+                if not  check.match(str(value)):
                     self.filter_backup.append(current_array.pop(i))
                     i -= 1
                 i += 1
