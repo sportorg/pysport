@@ -7,19 +7,18 @@ from PySide2.QtWidgets import (
     QFormLayout,
     QLabel,
     QRadioButton,
-    QTimeEdit,
 )
 
 from sportorg import config
 from sportorg.common.otime import OTime
 from sportorg.gui.global_access import GlobalAccess
+from sportorg.gui.utils.custom_controls import AdvTimeEdit
 from sportorg.language import translate
 from sportorg.models.memory import race
 from sportorg.models.start.start_preparation import (
     handicap_start_time,
     reverse_start_time,
 )
-from sportorg.utils.time import time_to_otime
 
 
 class StartHandicapDialog(QDialog):
@@ -39,28 +38,23 @@ class StartHandicapDialog(QDialog):
         self.layout.addRow(self.reverse_mode)
 
         self.zero_time_label = QLabel(translate('Start time'))
-        self.zero_time = QTimeEdit()
-        self.zero_time.setDisplayFormat(self.time_format)
+        self.zero_time = AdvTimeEdit(display_format=self.time_format)
         self.layout.addRow(self.zero_time_label, self.zero_time)
 
         self.max_gap_label = QLabel(translate('Max gap from leader'))
-        self.max_gap = QTimeEdit()
-        self.max_gap.setDisplayFormat(self.time_format)
+        self.max_gap = AdvTimeEdit(display_format=self.time_format)
         self.layout.addRow(self.max_gap_label, self.max_gap)
 
         self.second_start_time_label = QLabel(translate('Start time for 2 group'))
-        self.second_time = QTimeEdit()
-        self.second_time.setDisplayFormat(self.time_format)
+        self.second_time = AdvTimeEdit(display_format=self.time_format)
         self.layout.addRow(self.second_start_time_label, self.second_time)
 
         self.interval_time_label = QLabel(translate('Start interval'))
-        self.interval_time = QTimeEdit()
-        self.interval_time.setDisplayFormat(self.time_format)
+        self.interval_time = AdvTimeEdit(display_format=self.time_format)
         self.layout.addRow(self.interval_time_label, self.interval_time)
 
         self.dsq_offset_label = QLabel(translate('Offset after DSQ'))
-        self.dsq_offset = QTimeEdit()
-        self.dsq_offset.setDisplayFormat(self.time_format)
+        self.dsq_offset = AdvTimeEdit(display_format=self.time_format)
         self.layout.addRow(self.dsq_offset_label, self.dsq_offset)
 
         def mode_changed():
@@ -133,19 +127,19 @@ class StartHandicapDialog(QDialog):
         obj = race()
         obj.set_setting('handicap_mode', self.handicap_mode.isChecked())
         obj.set_setting(
-            'handicap_start', time_to_otime(self.zero_time.time()).to_msec()
+            'handicap_start', self.zero_time.getOTime().to_msec()
         )
         obj.set_setting(
-            'handicap_max_gap', time_to_otime(self.max_gap.time()).to_msec()
+            'handicap_max_gap', self.max_gap.getOTime().to_msec()
         )
         obj.set_setting(
-            'handicap_second_start', time_to_otime(self.second_time.time()).to_msec()
+            'handicap_second_start', self.second_time.getOTime().to_msec()
         )
         obj.set_setting(
-            'handicap_interval', time_to_otime(self.interval_time.time()).to_msec()
+            'handicap_interval', self.interval_time.getOTime().to_msec()
         )
         obj.set_setting(
-            'handicap_dsq_offset', time_to_otime(self.dsq_offset.time()).to_msec()
+            'handicap_dsq_offset', self.dsq_offset.getOTime().to_msec()
         )
 
         if obj.get_setting('handicap_mode', True):

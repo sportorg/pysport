@@ -6,7 +6,7 @@ from PySide2.QtWidgets import QDialog, QDialogButtonBox, QFormLayout
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
-from sportorg.gui.utils.custom_controls import AdvComboBox
+from sportorg.gui.utils.custom_controls import AdvComboBox, AdvSpinBox
 from sportorg.language import translate
 from sportorg.models.constant import get_race_groups, get_race_teams
 from sportorg.models.memory import find, race
@@ -51,9 +51,7 @@ class MassEditDialog(QDialog):
         self.layout.addRow(self.team_checkbox, self.team_combo)
 
         self.start_group_checkbox = QtWidgets.QCheckBox(self)
-        self.start_group_spinbox = QtWidgets.QSpinBox()
-        self.start_group_spinbox.setMinimum(0)
-        self.start_group_spinbox.setMaximum(99)
+        self.start_group_spinbox = AdvSpinBox(minimum=0, maximum=99)
         self.layout.addRow(self.start_group_checkbox, self.start_group_spinbox)
 
         self.comment_checkbox = QtWidgets.QCheckBox(self)

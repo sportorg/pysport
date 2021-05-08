@@ -1,8 +1,10 @@
 from PySide2 import QtCore
-from PySide2.QtCore import QSortFilterProxyModel
-from PySide2.QtWidgets import QComboBox, QCompleter, QMessageBox
+from PySide2.QtCore import QSortFilterProxyModel, QTime
+from PySide2.QtWidgets import QComboBox, QCompleter, QMessageBox, QSpinBox, QTimeEdit
 
+from sportorg.common.otime import OTime
 from sportorg.language import translate
+from sportorg.utils.time import time_to_qtime, time_to_otime
 
 
 class AdvComboBox(QComboBox):
@@ -48,6 +50,45 @@ class AdvComboBox(QComboBox):
             index = self.findText(str(text))
             self.setCurrentIndex(index)
 
+
+class AdvSpinBox(QSpinBox):
+    def __init__(self, minimum=0, maximum=99999999, value=0, max_width=0, parent=None):
+        super(AdvSpinBox, self).__init__(parent)
+        self.setMinimum(minimum)
+        self.setMaximum(maximum)
+        self.setValue(max(value, minimum))
+        if max_width > 0:
+            self.setMaximumWidth(max_width)
+
+    def wheelEvent(self, ev):
+        if ev.type() == QtCore.QEvent.Wheel:
+            ev.ignore()
+
+
+class AdvTimeEdit(QTimeEdit):
+    def __init__(self, time=OTime(), max_width=0, display_format=None, parent=None):
+        super(AdvTimeEdit, self).__init__(parent)
+
+        if isinstance(time, OTime):
+            self.setOTime(time)
+        elif isinstance(time, QTime):
+            self.setTime(time)
+
+        if max_width > 10:
+            self.setMaximumWidth(max_width)
+
+        if display_format:
+            self.setDisplayFormat(display_format)
+
+    def setOTime(self, new_time):
+        self.setTime(time_to_qtime(new_time))
+
+    def getOTime(self):
+        return time_to_otime(self.time())
+
+    def wheelEvent(self, ev):
+        if ev.type() == QtCore.QEvent.Wheel:
+            ev.ignore()
 
 def messageBoxQuestion(
     parent=None, title='', text='', buttons=(QMessageBox.Yes | QMessageBox.No)

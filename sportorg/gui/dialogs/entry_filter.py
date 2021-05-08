@@ -7,7 +7,7 @@ from PySide2.QtWidgets import QDialog, QDialogButtonBox, QFormLayout
 from sportorg import config
 from sportorg.gui.dialogs.person_edit import PersonEditDialog
 from sportorg.gui.global_access import GlobalAccess
-from sportorg.gui.utils.custom_controls import AdvComboBox
+from sportorg.gui.utils.custom_controls import AdvComboBox, AdvSpinBox
 from sportorg.language import translate
 from sportorg.models.constant import get_race_groups, get_race_teams
 
@@ -46,9 +46,7 @@ class DialogFilter(QDialog):
 
         self.max_rows_count_label = QtWidgets.QLabel(self)
 
-        self.max_rows_count_spin_box = QtWidgets.QSpinBox(self)
-        self.max_rows_count_spin_box.setMaximum(100000)
-        self.max_rows_count_spin_box.setValue(5000)
+        self.max_rows_count_spin_box = AdvSpinBox(5000, 100000)
         self.layout.addRow(self.max_rows_count_label, self.max_rows_count_spin_box)
 
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)

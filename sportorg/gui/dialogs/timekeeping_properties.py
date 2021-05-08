@@ -10,20 +10,17 @@ from PySide2.QtWidgets import (
     QLabel,
     QLineEdit,
     QRadioButton,
-    QSpinBox,
     QTabWidget,
-    QTimeEdit,
     QWidget,
 )
 
 from sportorg.common.otime import OTime
 from sportorg.gui.global_access import GlobalAccess
-from sportorg.gui.utils.custom_controls import AdvComboBox
+from sportorg.gui.utils.custom_controls import AdvComboBox, AdvSpinBox, AdvTimeEdit
 from sportorg.language import translate
 from sportorg.models.memory import race
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.modules.sportident.sireader import SIReaderClient
-from sportorg.utils.time import time_to_otime
 
 
 class TimekeepingPropertiesDialog(QDialog):
@@ -49,9 +46,7 @@ class TimekeepingPropertiesDialog(QDialog):
         self.tk_layout = QFormLayout()
 
         self.label_zero_time = QLabel(translate('Zero time'))
-        self.item_zero_time = QTimeEdit()
-        self.item_zero_time.setDisplayFormat('HH:mm')
-        self.item_zero_time.setMaximumSize(60, 20)
+        self.item_zero_time = AdvTimeEdit(max_width=60, display_format='HH:mm')
         self.item_zero_time.setDisabled(True)
         self.tk_layout.addRow(self.label_zero_time, self.item_zero_time)
 
@@ -111,14 +106,12 @@ class TimekeepingPropertiesDialog(QDialog):
         self.rp_rogain_scores_radio = QRadioButton(translate('rogain scores'))
         self.rp_scores_layout.addRow(self.rp_rogain_scores_radio)
         self.rp_fixed_scores_radio = QRadioButton(translate('fixed scores'))
-        self.rp_fixed_scores_edit = QSpinBox()
-        self.rp_fixed_scores_edit.setMaximumWidth(50)
+        self.rp_fixed_scores_edit = AdvSpinBox(max_width=50)
         self.rp_scores_layout.addRow(
             self.rp_fixed_scores_radio, self.rp_fixed_scores_edit
         )
         self.rp_scores_minute_penalty_label = QLabel(translate('minute penalty'))
-        self.rp_scores_minute_penalty_edit = QSpinBox()
-        self.rp_scores_minute_penalty_edit.setMaximumWidth(50)
+        self.rp_scores_minute_penalty_edit = AdvSpinBox(max_width=50)
         self.rp_scores_layout.addRow(
             self.rp_scores_minute_penalty_label, self.rp_scores_minute_penalty_edit
         )
@@ -131,9 +124,7 @@ class TimekeepingPropertiesDialog(QDialog):
         self.item_start_station = QRadioButton(translate('Start station'))
         self.start_layout.addRow(self.item_start_station)
         self.item_start_cp = QRadioButton(translate('Control point'))
-        self.item_start_cp_value = QSpinBox()
-        self.item_start_cp_value.setMaximum(999)
-        self.item_start_cp_value.setMaximumSize(60, 20)
+        self.item_start_cp_value = AdvSpinBox(maximum=999, max_width=60)
         self.start_layout.addRow(self.item_start_cp, self.item_start_cp_value)
         self.item_start_gate = QRadioButton(translate('Start gate'))
         self.item_start_gate.setDisabled(True)
@@ -160,10 +151,7 @@ class TimekeepingPropertiesDialog(QDialog):
         self.finish_layout.addRow(self.missed_finish_group_box)
 
         self.item_finish_cp = QRadioButton(translate('Control point'))
-        self.item_finish_cp_value = QSpinBox()
-        self.item_finish_cp_value.setMaximum(999)
-        self.item_finish_cp_value.setMinimum(-1)
-        self.item_finish_cp_value.setMaximumSize(60, 20)
+        self.item_finish_cp_value = AdvSpinBox(-1, 999, max_width=60)
         self.finish_layout.addRow(self.item_finish_cp, self.item_finish_cp_value)
         self.item_finish_beam = QRadioButton(translate('Light beam'))
         self.item_finish_beam.setDisabled(True)
@@ -179,8 +167,7 @@ class TimekeepingPropertiesDialog(QDialog):
         self.mr_off_radio = QRadioButton(translate('no penalty'))
         self.mr_layout.addRow(self.mr_off_radio)
         self.mr_time_radio = QRadioButton(translate('penalty time'))
-        self.mr_time_edit = QTimeEdit()
-        self.mr_time_edit.setDisplayFormat(self.time_format)
+        self.mr_time_edit = AdvTimeEdit(display_format=self.time_format)
         self.mr_layout.addRow(self.mr_time_radio, self.mr_time_edit)
         self.mr_laps_radio = QRadioButton(translate('penalty laps'))
         self.mr_layout.addRow(self.mr_laps_radio)
@@ -189,8 +176,7 @@ class TimekeepingPropertiesDialog(QDialog):
         self.mr_layout.addRow(self.mr_counting_lap_check)
         self.mr_lap_station_check = QCheckBox(translate('lap station'))
         self.mr_lap_station_check.setDisabled(True)  # TODO
-        self.mr_lap_station_edit = QSpinBox()
-        self.mr_lap_station_edit.setMaximumWidth(50)
+        self.mr_lap_station_edit = AdvSpinBox(max_width=50)
         self.mr_layout.addRow(self.mr_lap_station_check, self.mr_lap_station_edit)
         self.mr_dont_dqs_check = QCheckBox(translate("Don't disqualify"))
         self.mr_layout.addRow(self.mr_dont_dqs_check)
@@ -227,9 +213,7 @@ class TimekeepingPropertiesDialog(QDialog):
         self.time_settings_tab = QWidget()
         self.time_settings_layout = QFormLayout()
         self.time_settings_accuracy_label = QLabel(translate('Accuracy'))
-        self.time_settings_accuracy_edit = QSpinBox()
-        self.time_settings_accuracy_edit.setMaximumWidth(50)
-        self.time_settings_accuracy_edit.setMaximum(3)
+        self.time_settings_accuracy_edit = AdvSpinBox(maximum=3, max_width=50)
         self.time_settings_layout.addRow(
             self.time_settings_accuracy_label, self.time_settings_accuracy_edit
         )
@@ -555,7 +539,7 @@ class TimekeepingPropertiesDialog(QDialog):
             mr_mode = 'time'
 
         obj.set_setting('marked_route_mode', mr_mode)
-        mr_penalty_time = time_to_otime(self.mr_time_edit.time()).to_msec()
+        mr_penalty_time = self.mr_time_edit.getOTime().to_msec()
         mr_if_counting_lap = self.mr_counting_lap_check.isChecked()
         mr_if_station_check = self.mr_lap_station_check.isChecked()
         mr_station_code = self.mr_lap_station_edit.value()
