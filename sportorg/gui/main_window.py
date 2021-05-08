@@ -101,6 +101,40 @@ class MainWindow(QMainWindow):
         self.show()
         self.post_show()
 
+    sportident_status = False
+    sportident_icon = {
+        True: 'sportident-on.png',
+        False: 'sportident.png',
+    }
+
+    def interval(self):
+        if SIReaderClient().is_alive() != self.sportident_status:
+            self.toolbar_property['sportident'].setIcon(
+                QtGui.QIcon(config.icon_dir(self.sportident_icon[SIReaderClient().is_alive()])))
+            self.sportident_status = SIReaderClient().is_alive()
+        """
+        if Teamwork().is_alive() != self.teamwork_status:
+            self.toolbar_property['teamwork'].setIcon(
+                QtGui.QIcon(config.icon_dir(self.teamwork_icon[Teamwork().is_alive()])))
+            self.teamwork_status = Teamwork().is_alive()
+        """
+        try:
+            if self.get_configuration().get('autosave_interval'):
+                if self.file:
+                    if time.time() - self.last_update > int(self.get_configuration().get('autosave_interval')):
+                        self.save_file()
+                        logging.info(_('Auto save'))
+                else:
+                    logging.debug(translate('No file to auto save'))
+        except Exception as e:
+            logging.error(str(e))
+
+        while not self.log_queue.empty():
+            text = self.log_queue.get()
+            self.statusbar_message(text)
+            if hasattr(self, 'logging_tab'):
+                self.logging_tab.write(text)
+
     def close(self):
         self.conf_write()
 
@@ -249,7 +283,7 @@ class MainWindow(QMainWindow):
         self.tabwidget.addTab(results.Widget(), translate('Race Results'))
         self.tabwidget.addTab(groups.Widget(), translate('Groups'))
         self.tabwidget.addTab(courses.Widget(), translate('Courses'))
-#        self.tabwidget.addTab(organizations.Widget(), translate('Teams'))
+        self.tabwidget.addTab(organizations.Widget(), translate('Teams'))
         self.logging_tab = log.Widget()
         self.tabwidget.addTab(self.logging_tab, translate('Logs'))
         self.tabwidget.currentChanged.connect(self._menu_disable)
