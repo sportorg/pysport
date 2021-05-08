@@ -7,25 +7,11 @@ from PySide2 import QtCore, QtGui, QtWidgets
 from PySide2.QtWidgets import QMainWindow, QMessageBox
 
 from sportorg import config
-from sportorg.common.broker import Broker
 from sportorg.gui.dialogs.course_edit import CourseEditDialog
-from sportorg.gui.dialogs.file_dialog import get_save_file_name
 from sportorg.gui.dialogs.group_edit import GroupEditDialog
 from sportorg.gui.dialogs.organization_edit import OrganizationEditDialog
 from sportorg.gui.dialogs.person_edit import PersonEditDialog
 from sportorg.gui.global_access import GlobalAccess
-from sportorg.gui.menu import Factory, menu_list
-from sportorg.gui.tabs import courses, groups, organizations, persons, results
-from sportorg.gui.tabs.memory_model import (
-    CourseMemoryModel,
-    GroupMemoryModel,
-    OrganizationMemoryModel,
-    PersonMemoryModel,
-    ResultMemoryModel,
-)
-from sportorg.gui.toolbar import toolbar_list
-from sportorg.gui.utils.custom_controls import messageBoxQuestion
-from sportorg.language import translate
 from sportorg.models.constant import RentCards
 from sportorg.models.memory import (
     NotEmptyException,
@@ -56,7 +42,7 @@ from sportorg.gui.tabs.memory_model import PersonMemoryModel, ResultMemoryModel,
     CourseMemoryModel, OrganizationMemoryModel
 from sportorg.gui.toolbar import toolbar_list
 from sportorg.gui.utils.custom_controls import messageBoxQuestion
-from sportorg.language import _
+from sportorg.language import translate
 from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.modules.sportiduino.sportiduino import SportiduinoClient
 from sportorg.modules.telegram.telegram import telegram_client
