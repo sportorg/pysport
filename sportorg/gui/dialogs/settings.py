@@ -54,6 +54,10 @@ class MainTab(Tab):
         self.item_auto_save.setValue(Config().configuration.get('autosave_interval'))
         self.layout.addRow(translate('Auto save') + ' (sec)', self.item_auto_save)
 
+        self.item_show_toolbar = QCheckBox(_('Show toolbar'))
+        self.item_show_toolbar.setChecked(Config().configuration.get('show_toolbar'))
+        self.layout.addRow(self.item_show_toolbar)
+
         self.item_open_recent_file = QCheckBox(translate('Open recent file'))
         self.item_open_recent_file.setChecked(
             Config().configuration.get('open_recent_file')
@@ -76,6 +80,8 @@ class MainTab(Tab):
         Config().configuration.set(
             'open_recent_file', self.item_open_recent_file.isChecked()
         )
+        Config().configuration.set('show_toolbar', self.item_show_toolbar.isChecked())
+        Config().configuration.set('open_recent_file', self.item_open_recent_file.isChecked())
         Config().configuration.set('use_birthday', self.item_use_birthday.isChecked())
         Config().configuration.set('check_updates', self.item_check_updates.isChecked())
 

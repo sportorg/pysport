@@ -48,6 +48,15 @@ from sportorg.modules.printing.model import (
 from sportorg.modules.sfr.sfrreader import SFRReaderClient
 from sportorg.modules.sound import Sound
 from sportorg.modules.sportident.result_generation import ResultSportidentGeneration
+from sportorg.common.broker import Broker
+from sportorg.gui.dialogs.file_dialog import get_save_file_name
+from sportorg.gui.menu import menu_list, Factory
+from sportorg.gui.tabs import persons, groups, organizations, results, courses, log
+from sportorg.gui.tabs.memory_model import PersonMemoryModel, ResultMemoryModel, GroupMemoryModel, \
+    CourseMemoryModel, OrganizationMemoryModel
+from sportorg.gui.toolbar import toolbar_list
+from sportorg.gui.utils.custom_controls import messageBoxQuestion
+from sportorg.language import _
 from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.modules.sportiduino.sportiduino import SportiduinoClient
 from sportorg.modules.telegram.telegram import telegram_client
@@ -99,7 +108,8 @@ class MainWindow(QMainWindow):
         self._set_style()
         self._setup_ui()
         self._setup_menu()
-        self._setup_toolbar()
+        if Configuration().configuration.get('show_toolbar'):
+            self._setup_toolbar()
         self._setup_tab()
         self._setup_statusbar()
         self.show()
@@ -201,6 +211,8 @@ class MainWindow(QMainWindow):
                         else action_item['shortcut']
                     )
                     action.setShortcuts(shortcuts)
+                if 'icon' in action_item:
+                    action.setIcon(QtGui.QIcon(action_item['icon']))
                 if 'status_tip' in action_item:
                     action.setStatusTip(action_item['status_tip'])
                 if 'tabs' in action_item:
@@ -214,6 +226,8 @@ class MainWindow(QMainWindow):
             else:
                 menu = QtWidgets.QMenu(parent)
                 menu.setTitle(action_item['title'])
+                if 'icon' in action_item:
+                    menu.setIcon(QtGui.QIcon(action_item['icon']))
                 if 'tabs' in action_item:
                     self.menu_list_for_disabled.append((menu, action_item['tabs']))
                 self._create_menu(menu, action_item['actions'])
@@ -249,7 +263,9 @@ class MainWindow(QMainWindow):
         self.tabwidget.addTab(results.Widget(), translate('Race Results'))
         self.tabwidget.addTab(groups.Widget(), translate('Groups'))
         self.tabwidget.addTab(courses.Widget(), translate('Courses'))
-        self.tabwidget.addTab(organizations.Widget(), translate('Teams'))
+#        self.tabwidget.addTab(organizations.Widget(), translate('Teams'))
+        self.logging_tab = log.Widget()
+        self.tabwidget.addTab(self.logging_tab, translate('Logs'))
         self.tabwidget.currentChanged.connect(self._menu_disable)
 
     def _menu_disable(self, tab_index):
