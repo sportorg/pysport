@@ -37,6 +37,11 @@ class AdvComboBox(QComboBox):
         self.lineEdit().textEdited.connect(filter_function)
         self.completer.activated.connect(self.on_completer_activated)
 
+    def wheelEvent(self, ev):
+        if ev.type() == QtCore.QEvent.Wheel:
+            ev.ignore()
+
+
     # on selection of an item from the completer, select the corresponding item from combobox
     def on_completer_activated(self, text):
         if text:
