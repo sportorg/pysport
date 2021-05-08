@@ -476,13 +476,13 @@ class MainWindow(QMainWindow):
                     ResultCalculation(race()).process_results()
                     if race().get_setting('split_printout', False):
                         try:
-                            split_printout([].append(result))
+                            split_printout([result])
                         except NoResultToPrintException as e:
-                            logging.error(str(e))
+                            logging.exception(e)
                         except NoPrinterSelectedException as e:
-                            logging.error(str(e))
+                            logging.exception(e)
                         except Exception as e:
-                            logging.error(str(e))
+                            logging.exception(e)
                     elif result.person and result.person.group:
                         GroupSplits(race(), result.person.group).generate(True)
                     live_client.send(result)
@@ -608,14 +608,14 @@ class MainWindow(QMainWindow):
                 if index >= len(obj.results):
                     pass
                 # self.split_printout(obj.results[index])
-                results.append(obj.results[index])
-            split_printout(results)
+                print_results.append(obj.results[index])
+            split_printout(print_results)
         except Exception as e:
             logging.exception(str(e))
 
-    def split_printout(self, result):
+    def split_printout(self, results):
         try:
-            split_printout(result)
+            split_printout(results)
         except NoResultToPrintException as e:
             logging.warning(str(e))
             mes = QMessageBox(self)
