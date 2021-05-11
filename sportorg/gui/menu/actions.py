@@ -586,6 +586,8 @@ class OnlineSendAction(Action, metaclass=ActionFactory):
                 items = race().persons
             if self.app.current_tab == 1:
                 items = race().results
+            if self.app.current_tab == 2:
+                items = race().results
             if self.app.current_tab == 3:
                 items = race().courses
             if self.app.current_tab == 4:
@@ -602,7 +604,7 @@ class OnlineSendAction(Action, metaclass=ActionFactory):
                 selected_items.append(items[index])
             live_client.send(selected_items)
         except Exception as e:
-            logging.error(str(e))
+            logging.exception(e)
 
 
 class AboutAction(Action, metaclass=ActionFactory):

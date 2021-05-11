@@ -4,6 +4,7 @@ import time
 from queue import Queue
 
 from PySide2 import QtCore, QtGui, QtWidgets
+from PySide2.QtCore import QModelIndex, QItemSelectionModel, QTimer, Signal
 from PySide2.QtWidgets import QMainWindow, QMessageBox
 
 from sportorg import config
@@ -108,7 +109,7 @@ class MainWindow(QMainWindow):
     }
 
     def interval(self):
-        if SIReaderClient().is_alive() != self.sportident_status:
+        if SIReaderClient().is_alive() != self.sportident_status and hasattr(self, 'toolbar'):
             self.toolbar_property['sportident'].setIcon(
                 QtGui.QIcon(config.icon_dir(self.sportident_icon[SIReaderClient().is_alive()])))
             self.sportident_status = SIReaderClient().is_alive()
@@ -123,7 +124,7 @@ class MainWindow(QMainWindow):
                 if self.file:
                     if time.time() - self.last_update > int(self.get_configuration().get('autosave_interval')):
                         self.save_file()
-                        logging.info(_('Auto save'))
+                        logging.info(translate('Auto save'))
                 else:
                     logging.debug(translate('No file to auto save'))
         except Exception as e:
@@ -189,6 +190,11 @@ class MainWindow(QMainWindow):
         SportiduinoClient().set_call(self.add_sportiduino_result_from_reader)
         SFRReaderClient().set_call(self.add_sfr_result_from_reader)
 
+        self.service_timer = QTimer(self)
+        self.service_timer.timeout.connect(self.interval)
+        self.service_timer.start(1000) # msec
+
+        #LiveClient().init()
         self._menu_disable(self.current_tab)
 
     def _setup_ui(self):

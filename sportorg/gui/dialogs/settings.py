@@ -30,7 +30,6 @@ from sportorg.models.memory import (
 )
 from sportorg.modules.configs.configs import Config
 
-
 class Tab:
     def save(self):
         pass
@@ -54,7 +53,7 @@ class MainTab(Tab):
         self.item_auto_save.setValue(Config().configuration.get('autosave_interval'))
         self.layout.addRow(translate('Auto save') + ' (sec)', self.item_auto_save)
 
-        self.item_show_toolbar = QCheckBox(_('Show toolbar'))
+        self.item_show_toolbar = QCheckBox(translate('Show toolbar'))
         self.item_show_toolbar.setChecked(Config().configuration.get('show_toolbar'))
         self.layout.addRow(self.item_show_toolbar)
 
@@ -80,8 +79,18 @@ class MainTab(Tab):
         Config().configuration.set(
             'open_recent_file', self.item_open_recent_file.isChecked()
         )
+
+        if(bool(Config().configuration.get('show_toolbar')) != self.item_show_toolbar.isChecked()):
+            if( self.item_show_toolbar.isChecked()):
+                mw = GlobalAccess().get_main_window()
+                if(hasattr(mw, 'toolbar')):
+                  mw.toolbar.show();
+                else:
+                    mw._setup_toolbar()
+            else:
+                mw = GlobalAccess().get_main_window()
+                mw.toolbar.hide();
         Config().configuration.set('show_toolbar', self.item_show_toolbar.isChecked())
-        Config().configuration.set('open_recent_file', self.item_open_recent_file.isChecked())
         Config().configuration.set('use_birthday', self.item_use_birthday.isChecked())
         Config().configuration.set('check_updates', self.item_check_updates.isChecked())
 

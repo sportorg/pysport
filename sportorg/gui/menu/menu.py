@@ -351,7 +351,7 @@ def menu_list():
                         {
                             'title': translate('Send selected'),
                             'shortcut': 'Ctrl+K',
-                            'tabs': [0, 1, 3, 4],
+                            'tabs': [0, 1, 2, 3, 4],
                             'action': 'OnlineSendAction',
                         },
                     ],

@@ -72,12 +72,12 @@ class DialogFilter(QDialog):
                 proxy_model.clear_filter()
                 proxy_model.max_rows_count = self.max_rows_count_spin_box.value()
 
-                group_column = 4
-                team_column = 5
+                group_column = 2
+                team_column = 3
 
-                if GlobalAccess().get_main_window().current_tab == 1:
-                    group_column = 2
-                    team_column = 3
+                if GlobalAccess().get_main_window().current_tab == 0:
+                    group_column = 3
+                    team_column = 4
 
                 proxy_model.set_filter_for_column(
                     group_column, self.group_combo.currentText()
@@ -91,7 +91,7 @@ class DialogFilter(QDialog):
                 PersonEditDialog.GROUP_NAME = self.group_combo.currentText()
                 PersonEditDialog.ORGANIZATION_NAME = self.team_combo.currentText()
         except Exception as e:
-            logging.error(str(e))
+            logging.exception(e)
 
         super().accept(*args, **kwargs)
 
