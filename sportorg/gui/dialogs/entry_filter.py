@@ -33,14 +33,14 @@ class DialogFilter(QDialog):
         self.group_label = QtWidgets.QLabel(self)
 
         self.group_combo = AdvComboBox(self)
-        self.group_combo.addItem('')
+#        self.group_combo.addItem('')
         self.group_combo.addItems(get_race_groups())
         self.layout.addRow(self.group_label, self.group_combo)
 
         self.team_label = QtWidgets.QLabel(self)
 
         self.team_combo = AdvComboBox(self)
-        self.team_combo.addItem('')
+#        self.team_combo.addItem('')
         self.team_combo.addItems(get_race_teams())
         self.layout.addRow(self.team_label, self.team_combo)
 

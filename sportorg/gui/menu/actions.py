@@ -587,7 +587,7 @@ class OnlineSendAction(Action, metaclass=ActionFactory):
             if self.app.current_tab == 1:
                 items = race().results
             if self.app.current_tab == 2:
-                items = race().results
+                items = race().groups
             if self.app.current_tab == 3:
                 items = race().courses
             if self.app.current_tab == 4:
