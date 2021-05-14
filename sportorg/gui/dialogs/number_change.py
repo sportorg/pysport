@@ -3,6 +3,7 @@ from PySide2.QtGui import QIcon
 from PySide2.QtWidgets import QDialog
 
 from sportorg import config
+from sportorg.gui.utils.custom_controls import AdvSpinBox
 from sportorg.language import translate
 
 
@@ -28,15 +29,13 @@ class NumberChangeDialog(QDialog):
         self.number_grid_layout.setContentsMargins(0, 0, 0, 0)
         self.source_num_label = QtWidgets.QLabel(self.layoutWidget)
         self.number_grid_layout.addWidget(self.source_num_label, 0, 0, 1, 1)
-        self.source_num_spin_box = QtWidgets.QSpinBox(self.layoutWidget)
-        self.source_num_spin_box.setMaximum(100000)
+        self.source_num_spin_box = AdvSpinBox(maximum=100000, parent=self.layoutWidget)
         self.number_grid_layout.addWidget(self.source_num_spin_box, 0, 1, 1, 1)
         self.source_info_label = QtWidgets.QLabel(self.layoutWidget)
         self.number_grid_layout.addWidget(self.source_info_label, 0, 2, 1, 1)
         self.target_num_label = QtWidgets.QLabel(self.layoutWidget)
         self.number_grid_layout.addWidget(self.target_num_label, 1, 0, 1, 1)
-        self.target_num_spin_box = QtWidgets.QSpinBox(self.layoutWidget)
-        self.target_num_spin_box.setMaximum(100000)
+        self.target_num_spin_box = AdvSpinBox(maximum=100000, parent=self.layoutWidget)
         self.number_grid_layout.addWidget(self.target_num_spin_box, 1, 1, 1, 1)
         self.target_info_label = QtWidgets.QLabel(self.layoutWidget)
         self.number_grid_layout.addWidget(self.target_info_label, 1, 2, 1, 1)

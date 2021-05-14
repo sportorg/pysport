@@ -7,17 +7,14 @@ from PySide2.QtWidgets import (
     QDialogButtonBox,
     QFormLayout,
     QHBoxLayout,
-    QSpinBox,
-    QTimeEdit,
 )
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
-from sportorg.gui.utils.custom_controls import AdvComboBox
+from sportorg.gui.utils.custom_controls import AdvComboBox, AdvSpinBox, AdvTimeEdit
 from sportorg.language import translate
 from sportorg.models.memory import Qualification, race
 from sportorg.models.result.result_calculation import ResultCalculation
-from sportorg.utils.time import time_to_otime, time_to_qtime
 
 
 class GroupRankingDialog(QDialog):
@@ -74,10 +71,9 @@ class GroupRankingDialog(QDialog):
                 rank.is_active = self.findChild(
                     QCheckBox, name + '_checkbox'
                 ).isChecked()
-                rank.max_place = self.findChild(QSpinBox, name + '_place').value()
-                rank.max_time = time_to_otime(
-                    self.findChild(QTimeEdit, name + '_time').time()
-                )
+                rank.max_place = self.findChild(AdvSpinBox, name + '_place').value()
+                rank.max_time = self.findChild(AdvTimeEdit, name + '_time').getOTime()
+
                 rank.use_scores = self.findChild(
                     AdvComboBox, name + '_combo'
                 ).currentText() == translate('Rank')
@@ -97,14 +93,11 @@ def get_widget_from_ranking(ranking):
     type_combo.setFixedWidth(150)
     type_combo.setObjectName(qual + '_combo')
 
-    max_place = QSpinBox()
-    max_place.setValue(0)
+    max_place = AdvSpinBox(value=0)
     max_place.setFixedWidth(70)
     max_place.setObjectName(qual + '_place')
 
-    max_time = QTimeEdit()
-    max_time.setFixedWidth(70)
-    max_time.setDisplayFormat('hh:mm:ss')
+    max_time = AdvTimeEdit(display_format='hh:mm:ss', max_width=70)
     max_time.setObjectName(qual + '_time')
 
     def select_type():
@@ -128,7 +121,7 @@ def get_widget_from_ranking(ranking):
         max_place.setValue(ranking.max_place)
     else:
         type_combo.setCurrentText(translate('Result time'))
-        max_time.setTime(time_to_qtime(ranking.max_time))
+        max_time.setOTime(ranking.max_time)
 
     qual_checkbox.setChecked(ranking.is_active)
     select_type()

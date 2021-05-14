@@ -1620,6 +1620,9 @@ class Qualification(IntEnum):
             'МСМК': 9,
             'ЗМС': 9,
         }
+        if name not in qual_reverse:
+            return cls(0)
+
         return cls(qual_reverse[name])
 
     def get_title(self):

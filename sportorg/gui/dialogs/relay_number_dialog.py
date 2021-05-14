@@ -1,10 +1,11 @@
 import logging
 
 from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QDialog, QDialogButtonBox, QFormLayout, QLabel, QSpinBox
+from PySide2.QtWidgets import QDialog, QDialogButtonBox, QFormLayout, QLabel
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
+from sportorg.gui.utils.custom_controls import AdvSpinBox
 from sportorg.language import translate
 from sportorg.models.start.relay import (
     get_next_relay_number_protocol,
@@ -28,9 +29,7 @@ class RelayNumberDialog(QDialog):
         self.layout = QFormLayout(self)
 
         self.number_label = QLabel(translate('First relay number'))
-        self.number_item = QSpinBox()
-        self.number_item.setMinimum(1001)
-        self.number_item.setMaximum(9999)
+        self.number_item = AdvSpinBox(1001, 9999)
 
         next_number = get_next_relay_number_protocol()
         self.number_item.setValue(next_number)

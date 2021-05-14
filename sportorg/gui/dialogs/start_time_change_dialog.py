@@ -6,14 +6,13 @@ from PySide2.QtWidgets import (
     QDialogButtonBox,
     QFormLayout,
     QRadioButton,
-    QTimeEdit,
 )
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
+from sportorg.gui.utils.custom_controls import AdvTimeEdit
 from sportorg.language import translate
 from sportorg.models.start.start_preparation import change_start_time
-from sportorg.utils.time import time_to_otime
 
 
 class StartTimeChangeDialog(QDialog):
@@ -35,8 +34,7 @@ class StartTimeChangeDialog(QDialog):
         self.time_add = QRadioButton(translate('Add'))
         self.time_add.setChecked(True)
         self.time_reduce = QRadioButton(translate('Reduce'))
-        self.time_value = QTimeEdit()
-        self.time_value.setDisplayFormat(self.time_format)
+        self.time_value = AdvTimeEdit(display_format=self.time_format)
 
         self.layout.addRow(self.time_add)
         self.layout.addRow(self.time_reduce)
@@ -65,5 +63,5 @@ class StartTimeChangeDialog(QDialog):
 
     def apply_changes_impl(self):
         change_start_time(
-            self.time_add.isChecked(), time_to_otime(self.time_value.time())
+            self.time_add.isChecked(), self.time_value.getOTime()
         )

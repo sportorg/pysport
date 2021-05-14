@@ -7,12 +7,12 @@ from PySide2.QtWidgets import (
     QDialogButtonBox,
     QFormLayout,
     QLabel,
-    QSpinBox,
     QTextEdit,
 )
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
+from sportorg.gui.utils.custom_controls import AdvSpinBox
 from sportorg.language import translate
 from sportorg.models.memory import race
 from sportorg.models.result.result_calculation import ResultCalculation
@@ -37,8 +37,7 @@ class CPDeleteDialog(QDialog):
 
         self.layout = QFormLayout(self)
 
-        self.item_number = QSpinBox()
-        self.item_number.setMaximum(10000)
+        self.item_number = AdvSpinBox(maximum=10000)
         self.item_number.valueChanged.connect(self.show_info)
         self.layout.addRow(QLabel(translate('Number CP')), self.item_number)
 

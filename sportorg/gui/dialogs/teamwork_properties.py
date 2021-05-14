@@ -9,12 +9,12 @@ from PySide2.QtWidgets import (
     QLabel,
     QLineEdit,
     QRadioButton,
-    QSpinBox,
     QTabWidget,
     QWidget,
 )
 
 from sportorg.gui.global_access import GlobalAccess
+from sportorg.gui.utils.custom_controls import AdvSpinBox
 from sportorg.language import translate
 from sportorg.models.memory import race
 
@@ -41,9 +41,7 @@ class TeamworkPropertiesDialog(QDialog):
         self.teamwork_tab = QWidget()
         self.teamwork_layout = QFormLayout()
         self.teamwork_item_host = QLineEdit()
-        self.teamwork_item_port = QSpinBox()
-        self.teamwork_item_port.setMinimum(0)
-        self.teamwork_item_port.setMaximum(65535)
+        self.teamwork_item_port = AdvSpinBox(0, 65535)
         self.teamwork_item_token = QLineEdit()
         self.teamwork_groupbox = QGroupBox()
         self.teamwork_groupbox.setTitle(translate('Type connection'))

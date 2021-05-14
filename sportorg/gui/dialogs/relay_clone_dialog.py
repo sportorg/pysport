@@ -1,10 +1,11 @@
 import logging
 
 from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QDialog, QDialogButtonBox, QFormLayout, QLabel, QSpinBox
+from PySide2.QtWidgets import QDialog, QDialogButtonBox, QFormLayout, QLabel
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
+from sportorg.gui.utils.custom_controls import AdvSpinBox
 from sportorg.language import translate
 from sportorg.models.start.start_preparation import clone_relay_legs
 
@@ -19,19 +20,13 @@ class RelayCloneDialog(QDialog):
         self.setModal(True)
         self.layout = QFormLayout(self)
 
-        self.min_bib = QSpinBox()
-        self.min_bib.setMaximum(10000000)
-        self.min_bib.setValue(1001)
+        self.min_bib = AdvSpinBox(maximum=10000000, value=1001)
         self.layout.addRow(QLabel(translate('Minimal bib')), self.min_bib)
 
-        self.max_bib = QSpinBox()
-        self.max_bib.setMaximum(10000000)
-        self.max_bib.setValue(2999)
+        self.max_bib = AdvSpinBox(maximum=10000000, value=2999)
         self.layout.addRow(QLabel(translate('Maximal bib')), self.max_bib)
 
-        self.increment = QSpinBox()
-        self.increment.setMaximum(10000000)
-        self.increment.setValue(2000)
+        self.increment = AdvSpinBox(maximum=10000000, value=2000)
         self.layout.addRow(QLabel(translate('Increment')), self.increment)
 
         def cancel_changes():

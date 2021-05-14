@@ -9,11 +9,11 @@ from PySide2.QtWidgets import (
     QLabel,
     QLineEdit,
     QRadioButton,
-    QSpinBox,
 )
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
+from sportorg.gui.utils.custom_controls import AdvSpinBox
 from sportorg.language import translate
 from sportorg.models.memory import race
 
@@ -53,8 +53,7 @@ class ScoresDialog(QDialog):
         self.layout.addRow(self.label_formula_hint)
 
         self.label_limit = QCheckBox(translate('Limit per team'))
-        self.item_limit = QSpinBox()
-        self.item_limit.setMaximumWidth(50)
+        self.item_limit = AdvSpinBox(max_width=50)
         self.layout.addRow(self.label_limit, self.item_limit)
 
         def cancel_changes():
