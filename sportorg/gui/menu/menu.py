@@ -70,18 +70,30 @@ def menu_list():
                             'title': translate('WDB Winorient'),
                             'action': 'WDBWinorientExportAction',
                         },
-                        # {
-                        #     'title': 'IOF xml',
-                        #     'actions': [
-                        #         {
-                        #             'title': translate('ResultList'),
-                        #             'action': 'IOFResultListExportAction'
-                        #         }
-                        #     ]
-                        # },
-                    ],
-                },
-            ],
+                        {
+                            'title': 'IOF xml',
+                            'actions': [
+                                {
+                                    'title': translate('ResultList'),
+                                    'action': 'IOFResultListExportAction'
+                                },
+                                {
+                                    'title': translate('EntrytList'),
+                                    'action': 'IOFEntryListExportAction'
+                                },
+                                {
+                                    'title': translate('CompetitorList'),
+                                    'action': 'IOFCompetitorListExportAction'
+                                },
+                                {
+                                    'title': translate('StartList'),
+                                    'action': 'IOFStartListExportAction'
+                                },
+                            ]
+                        },
+                    ]
+                }
+            ]
         },
         {
             'title': translate('Edit'),
@@ -264,8 +276,12 @@ def menu_list():
                 },
                 {'title': translate('Delete CP'), 'action': 'CPDeleteAction'},
                 {
+                    'title': translate('Delete Split'),
+                    'action': 'SplitDeleteAction'
+                },
+                {
                     'title': translate('Assign result by bib'),
-                    'action': 'AssignResultByBibAction',
+                    'action': 'AssignResultByBibAction'
                 },
                 {
                     'title': translate('Assign result by card number'),

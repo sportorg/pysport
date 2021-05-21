@@ -1062,8 +1062,8 @@ class Person(Model):
         self.birth_date = None  # type: date
         self.organization = None  # type: Organization
         self.group = None  # type: Group
-        self.world_code = None  # WRE ID for orienteering and the same
-        self.national_code = None
+        self.world_code = ''  # WRE ID for orienteering and the same
+        self.national_code = 0
         self.qual = (
             Qualification.NOT_QUALIFIED
         )  # type: Qualification # 'qualification, used in Russia only'
@@ -1145,8 +1145,10 @@ class Person(Model):
         self.card_number = int(data['card_number'])
         self.bib = int(data['bib'])
         self.contact = []
-        self.world_code = data['world_code']
-        self.national_code = data['national_code']
+        if data['world_code']:
+            self.world_code = str(data['world_code'])
+        if data['national_code']:
+            self.national_code = data['national_code']
         self.qual = Qualification.get_qual_by_code(data['qual'])
         self.is_out_of_competition = bool(data['is_out_of_competition'])
         self.is_paid = bool(data['is_paid'])

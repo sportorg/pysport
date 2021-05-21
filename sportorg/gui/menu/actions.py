@@ -22,6 +22,7 @@ from sportorg.gui.dialogs.rent_cards_dialog import RentCardsDialog
 from sportorg.gui.dialogs.report_dialog import ReportDialog
 from sportorg.gui.dialogs.search_dialog import SearchDialog
 from sportorg.gui.dialogs.settings import SettingsDialog
+from sportorg.gui.dialogs.split_delete import SplitDeleteDialog
 from sportorg.gui.dialogs.sportorg_import_dialog import SportOrgImportDialog
 from sportorg.gui.dialogs.start_handicap_dialog import StartHandicapDialog
 from sportorg.gui.dialogs.start_preparation import (
@@ -231,6 +232,24 @@ class IOFResultListExportAction(Action, metaclass=ActionFactory):
                     translate('Export error') + ': ' + file_name,
                 )
 
+class IOFEntryListExportAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        file_name = get_save_file_name(
+            translate('Save As IOF xml'),
+            translate('IOF xml (*.xml)'),
+            '{}_entryList'.format(race().data.get_start_datetime().strftime('%Y%m%d')),
+        )
+        if file_name != '':
+            try:
+                iof_xml.export_entry_list(file_name)
+            except Exception as e:
+                logging.error(str(e))
+                QMessageBox.warning(
+                    self.app,
+                    translate('Error'),
+                    translate('Export error') + ': ' + file_name,
+                )
+
 
 class IOFEntryListImportAction(Action, metaclass=ActionFactory):
     def execute(self):
@@ -248,6 +267,31 @@ class IOFEntryListImportAction(Action, metaclass=ActionFactory):
                     translate('Import error') + ': ' + file_name,
                 )
             self.app.init_model()
+
+
+class IOFStartListExportAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        file_name = get_save_file_name(_('Save As IOF xml'), _('IOF xml (*.xml)'),
+                                       '{}_startList'.format(race().data.get_start_datetime().strftime("%Y%m%d")))
+        if file_name is not '':
+            try:
+                iof_xml.export_start_list(file_name)
+            except Exception as e:
+                logging.exception(str(e))
+                QMessageBox.warning(self.app, _('Error'), _('Export error') + ': ' + file_name)
+
+
+class IOFCompetitorListExportAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        file_name = get_save_file_name(_('Save As IOF xml'), _('IOF xml (*.xml)'),
+                                       '{}_competitorList'.format(
+                                           race().data.get_start_datetime().strftime("%Y%m%d")))
+        if file_name is not '':
+            try:
+                iof_xml.export_competitor_list(file_name)
+            except Exception as e:
+                logging.exception(str(e))
+                QMessageBox.warning(self.app, _('Error'), _('Export error') + ': ' + file_name)
 
 
 class AddObjectAction(Action, metaclass=ActionFactory):
@@ -521,6 +565,12 @@ class SetDNSNumbersAction(Action, metaclass=ActionFactory):
 class CPDeleteAction(Action, metaclass=ActionFactory):
     def execute(self):
         CPDeleteDialog().exec_()
+        self.app.refresh()
+
+
+class SplitDeleteAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        SplitDeleteDialog().exec_()
         self.app.refresh()
 
 

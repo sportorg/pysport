@@ -434,7 +434,7 @@ class MainWindow(QMainWindow):
                     ResultCalculation(race()).process_results()
                     if race().get_setting('split_printout', False):
                         try:
-                            split_printout(result)
+                            split_printout([].append(result))
                         except NoResultToPrintException as e:
                             logging.error(str(e))
                         except NoPrinterSelectedException as e:
@@ -559,12 +559,15 @@ class MainWindow(QMainWindow):
         try:
             indexes = self.get_selected_rows()
             obj = race()
+            results = []
             for index in indexes:
                 if index < 0:
                     continue
                 if index >= len(obj.results):
                     pass
-                self.split_printout(obj.results[index])
+                # self.split_printout(obj.results[index])
+                results.append(obj.results[index])
+            split_printout(results)
         except Exception as e:
             logging.exception(str(e))
 

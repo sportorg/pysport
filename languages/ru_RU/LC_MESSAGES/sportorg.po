@@ -1404,3 +1404,9 @@ msgstr "Округление вниз"
 
 msgid "Rounding up"
 msgstr "Округление вверх"
+
+msgid "IOF id"
+msgstr "Код IOF Id"
+
+msgid "National id"
+msgstr "Национальный Id"
