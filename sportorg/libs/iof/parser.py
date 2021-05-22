@@ -71,7 +71,7 @@ def entry_list(tree, ns):
             'given': person_el.find('iof:Name', ns).find('iof:Given', ns).text,
             'extensions': {},
         }
-        if birth_date_el:
+        if birth_date_el is not None and birth_date_el.text:
             person['birth_date'] = birth_date_el.text
         extensions_el = person_el.find('iof:Extensions', ns)
         if extensions_el:
@@ -103,7 +103,7 @@ def entry_list(tree, ns):
 
         control_card_el = person_entry_el.find('iof:ControlCard', ns)
         control_card = ''
-        if control_card_el:
+        if control_card_el is not None and control_card_el.text:
             control_card = control_card_el.text
 
         race_numbers = []

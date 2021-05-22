@@ -117,8 +117,13 @@ def import_from_entry_list(entries):
             ).date()
         if len(person_entry['race_numbers']):
             person.comment = 'C:' + ''.join(person_entry['race_numbers'])
+
+
         if person_entry['control_card']:
             person.card_number = int(person_entry['control_card'])
+            person.is_rented_card = False
+        else:
+            person.is_rented_card = True
         if (
             'bib' in person_entry['person']['extensions']
             and person_entry['person']['extensions']['bib']
