@@ -53,7 +53,7 @@ def generate_result_list(obj):
                 organization = person.organization
 
                 # generate Result
-                xml_result = generate_result(result)
+                xml_result = generate_result(obj, result)
 
                 # add splits to Result object
                 for split in result.splits:

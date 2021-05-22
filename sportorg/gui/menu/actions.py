@@ -225,7 +225,7 @@ class IOFResultListExportAction(Action, metaclass=ActionFactory):
             try:
                 iof_xml.export_result_list(file_name)
             except Exception as e:
-                logging.error(str(e))
+                logging.exception(e)
                 QMessageBox.warning(
                     self.app,
                     translate('Error'),
@@ -271,27 +271,27 @@ class IOFEntryListImportAction(Action, metaclass=ActionFactory):
 
 class IOFStartListExportAction(Action, metaclass=ActionFactory):
     def execute(self):
-        file_name = get_save_file_name(_('Save As IOF xml'), _('IOF xml (*.xml)'),
+        file_name = get_save_file_name(translate('Save As IOF xml'), translate('IOF xml (*.xml)'),
                                        '{}_startList'.format(race().data.get_start_datetime().strftime("%Y%m%d")))
-        if file_name is not '':
+        if file_name != '':
             try:
                 iof_xml.export_start_list(file_name)
             except Exception as e:
                 logging.exception(str(e))
-                QMessageBox.warning(self.app, _('Error'), _('Export error') + ': ' + file_name)
+                QMessageBox.warning(self.app, translate('Error'), translate('Export error') + ': ' + file_name)
 
 
 class IOFCompetitorListExportAction(Action, metaclass=ActionFactory):
     def execute(self):
-        file_name = get_save_file_name(_('Save As IOF xml'), _('IOF xml (*.xml)'),
+        file_name = get_save_file_name(translate('Save As IOF xml'), translate('IOF xml (*.xml)'),
                                        '{}_competitorList'.format(
                                            race().data.get_start_datetime().strftime("%Y%m%d")))
-        if file_name is not '':
+        if file_name != '':
             try:
                 iof_xml.export_competitor_list(file_name)
             except Exception as e:
                 logging.exception(str(e))
-                QMessageBox.warning(self.app, _('Error'), _('Export error') + ': ' + file_name)
+                QMessageBox.warning(self.app, translate('Error'), translate('Export error') + ': ' + file_name)
 
 
 class AddObjectAction(Action, metaclass=ActionFactory):

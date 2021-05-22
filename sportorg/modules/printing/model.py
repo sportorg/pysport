@@ -48,6 +48,8 @@ def split_printout(results):
         person = result.person
 
         if not person or not person.group:
+            if isDirectMode:
+                pr.end_doc()
             raise NoResultToPrintException('No results to print')
 
         course = obj.find_course(result)

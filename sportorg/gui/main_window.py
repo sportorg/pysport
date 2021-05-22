@@ -607,7 +607,7 @@ class MainWindow(QMainWindow):
                 OrganizationEditDialog(o, True).exec_()
                 self.refresh()
         except Exception as e:
-            logging.error(str(e))
+            logging.exception(e)
 
     def delete_object(self):
         try:

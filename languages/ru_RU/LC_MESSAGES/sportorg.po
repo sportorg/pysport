@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: SportOrg\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-04-12 11:13+0300\n"
-"PO-Revision-Date: 2019-08-03 09:39+0500\n"
+"PO-Revision-Date: 2021-05-22 13:45+0500\n"
 "Last-Translator: SportOrg\n"
 "Language-Team: SportOrg\n"
 "Language: ru_RU\n"
@@ -1410,3 +1410,51 @@ msgstr "Код IOF Id"
 
 msgid "National id"
 msgstr "Национальный Id"
+
+msgid "Id"
+msgstr "Код"
+
+msgid "Code"
+msgstr "Код"
+
+msgid "Delete split"
+msgstr "Удаление перегона"
+
+msgid "Delete Split"
+msgstr "Удаление перегона"
+
+msgid "Start CP"
+msgstr "Начальный КП"
+
+msgid "End CP"
+msgstr "Конечный КП"
+
+msgid "Max intermediate CP"
+msgstr "Максимум промежуточных КП"
+
+msgid "IOF xml"
+msgstr "Файл IOF xml"
+
+msgid "EntrytList"
+msgstr "EntrytList (заявки"
+
+msgid "ResultList"
+msgstr "ResultList (результаты)"
+
+msgid "StartList"
+msgstr "StartList (протокол старта)"
+
+msgid "CompetitorList"
+msgstr "CompetitorList (список участников)"
+
+msgid "Online"
+msgstr "Онлайн"
+
+msgid "Save As MS Word file"
+msgstr "Сохранить в файл Word"
+
+msgid "SportOrg (*.json)"
+msgstr "Файл SportOrg (*.json)"
+
+msgid " MS Word file (*.docx)"
+msgstr "Файл MS Word (*.docx)"

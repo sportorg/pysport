@@ -35,7 +35,7 @@ class SportorgPrinter(object):
 
     def end_page(self):
         self.dc.EndPage()
-        self.y = self.y_offset * self.scale_factor
+        self.y = -1 * self.y_offset * self.scale_factor
 
     def end_doc(self):
         self.dc.EndDoc()

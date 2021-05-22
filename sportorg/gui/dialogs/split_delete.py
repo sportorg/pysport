@@ -5,7 +5,7 @@ from PySide2.QtWidgets import QFormLayout, QDialog, QDialogButtonBox, QSpinBox, 
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
-from sportorg.language import _
+from sportorg.language import translate
 from sportorg.models.memory import race
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.result_checker import ResultChecker
@@ -22,7 +22,7 @@ class SplitDeleteDialog(QDialog):
         return super().exec_()
 
     def init_ui(self):
-        self.setWindowTitle(_('Delete split'))
+        self.setWindowTitle(translate('Delete split'))
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(True)
@@ -31,17 +31,16 @@ class SplitDeleteDialog(QDialog):
 
         self.item_start_cp = QSpinBox()
         self.item_start_cp.setMaximum(999)
-        self.layout.addRow(QLabel(_('Start CP')), self.item_start_cp)
+        self.layout.addRow(QLabel(translate('Start CP')), self.item_start_cp)
 
         self.item_end_cp = QSpinBox()
         self.item_end_cp.setMaximum(999)
-        self.layout.addRow(QLabel(_('End CP')), self.item_end_cp)
+        self.layout.addRow(QLabel(translate('End CP')), self.item_end_cp)
 
         self.item_max_intermediate = QSpinBox()
         self.item_max_intermediate.setValue(5)
         self.item_max_intermediate.setMaximum(999)
-        self.layout.addRow(QLabel(_('Max intermediate CP')), self.item_max_intermediate)
-
+        self.layout.addRow(QLabel(translate('Max intermediate CP')), self.item_max_intermediate)
 
         def cancel_changes():
             self.close()
@@ -55,10 +54,10 @@ class SplitDeleteDialog(QDialog):
 
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         self.button_ok = button_box.button(QDialogButtonBox.Ok)
-        self.button_ok.setText(_('Ok'))
+        self.button_ok.setText(translate('Ok'))
         self.button_ok.clicked.connect(apply_changes)
         self.button_cancel = button_box.button(QDialogButtonBox.Cancel)
-        self.button_cancel.setText(_('Cancel'))
+        self.button_cancel.setText(translate('Cancel'))
         self.button_cancel.clicked.connect(cancel_changes)
         self.layout.addRow(button_box)
 
@@ -85,6 +84,10 @@ class SplitDeleteDialog(QDialog):
 
             if from_index > -1 and 0 < to_index - from_index <= max_offset:
                 delta = cur_res.splits[to_index].time - cur_res.splits[from_index].time
+
+                for i in range(from_index + 1, to_index):
+                    cur_res.splits[i].time = cur_res.splits[from_index].time
+
                 for i in range(to_index, len(cur_res.splits)):
                     cur_res.splits[i].time = cur_res.splits[i].time - delta
                 cur_res.finish_time = cur_res.finish_time - delta
