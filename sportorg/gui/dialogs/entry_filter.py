@@ -22,7 +22,7 @@ class DialogFilter(QDialog):
         self.init_ui()
         return super().exec_()
 
-    def init_ui(self):
+    def init_ui(self, flt=None):
         self.setWindowModality(QtCore.Qt.WindowModal)
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
