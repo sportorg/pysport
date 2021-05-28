@@ -4,28 +4,15 @@ import time
 from queue import Queue
 
 from PySide2 import QtCore, QtGui, QtWidgets
+from PySide2.QtCore import QModelIndex, QItemSelectionModel, QTimer, Signal
 from PySide2.QtWidgets import QMainWindow, QMessageBox
 
 from sportorg import config
-from sportorg.common.broker import Broker
 from sportorg.gui.dialogs.course_edit import CourseEditDialog
-from sportorg.gui.dialogs.file_dialog import get_save_file_name
 from sportorg.gui.dialogs.group_edit import GroupEditDialog
 from sportorg.gui.dialogs.organization_edit import OrganizationEditDialog
 from sportorg.gui.dialogs.person_edit import PersonEditDialog
 from sportorg.gui.global_access import GlobalAccess
-from sportorg.gui.menu import Factory, menu_list
-from sportorg.gui.tabs import courses, groups, organizations, persons, results
-from sportorg.gui.tabs.memory_model import (
-    CourseMemoryModel,
-    GroupMemoryModel,
-    OrganizationMemoryModel,
-    PersonMemoryModel,
-    ResultMemoryModel,
-)
-from sportorg.gui.toolbar import toolbar_list
-from sportorg.gui.utils.custom_controls import messageBoxQuestion
-from sportorg.language import translate
 from sportorg.models.constant import RentCards
 from sportorg.models.memory import (
     NotEmptyException,
@@ -48,6 +35,15 @@ from sportorg.modules.printing.model import (
 from sportorg.modules.sfr.sfrreader import SFRReaderClient
 from sportorg.modules.sound import Sound
 from sportorg.modules.sportident.result_generation import ResultSportidentGeneration
+from sportorg.common.broker import Broker
+from sportorg.gui.dialogs.file_dialog import get_save_file_name
+from sportorg.gui.menu import menu_list, Factory
+from sportorg.gui.tabs import persons, groups, organizations, results, courses, log
+from sportorg.gui.tabs.memory_model import PersonMemoryModel, ResultMemoryModel, GroupMemoryModel, \
+    CourseMemoryModel, OrganizationMemoryModel
+from sportorg.gui.toolbar import toolbar_list
+from sportorg.gui.utils.custom_controls import messageBoxQuestion
+from sportorg.language import translate
 from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.modules.sportiduino.sportiduino import SportiduinoClient
 from sportorg.modules.telegram.telegram import telegram_client
@@ -99,11 +95,46 @@ class MainWindow(QMainWindow):
         self._set_style()
         self._setup_ui()
         self._setup_menu()
-        self._setup_toolbar()
+        if Configuration().configuration.get('show_toolbar'):
+            self._setup_toolbar()
         self._setup_tab()
         self._setup_statusbar()
         self.show()
         self.post_show()
+
+    sportident_status = False
+    sportident_icon = {
+        True: 'sportident-on.png',
+        False: 'sportident.png',
+    }
+
+    def interval(self):
+        if SIReaderClient().is_alive() != self.sportident_status and hasattr(self, 'toolbar'):
+            self.toolbar_property['sportident'].setIcon(
+                QtGui.QIcon(config.icon_dir(self.sportident_icon[SIReaderClient().is_alive()])))
+            self.sportident_status = SIReaderClient().is_alive()
+        """
+        if Teamwork().is_alive() != self.teamwork_status:
+            self.toolbar_property['teamwork'].setIcon(
+                QtGui.QIcon(config.icon_dir(self.teamwork_icon[Teamwork().is_alive()])))
+            self.teamwork_status = Teamwork().is_alive()
+        """
+        try:
+            if self.get_configuration().get('autosave_interval'):
+                if self.file:
+                    if time.time() - self.last_update > int(self.get_configuration().get('autosave_interval')):
+                        self.save_file()
+                        logging.info(translate('Auto save'))
+                else:
+                    logging.debug(translate('No file to auto save'))
+        except Exception as e:
+            logging.error(str(e))
+
+        while not self.log_queue.empty():
+            text = self.log_queue.get()
+            self.statusbar_message(text)
+            if hasattr(self, 'logging_tab'):
+                self.logging_tab.write(text)
 
     def close(self):
         self.conf_write()
@@ -159,6 +190,11 @@ class MainWindow(QMainWindow):
         SportiduinoClient().set_call(self.add_sportiduino_result_from_reader)
         SFRReaderClient().set_call(self.add_sfr_result_from_reader)
 
+        self.service_timer = QTimer(self)
+        self.service_timer.timeout.connect(self.interval)
+        self.service_timer.start(1000) # msec
+
+        #LiveClient().init()
         self._menu_disable(self.current_tab)
 
     def _setup_ui(self):
@@ -201,6 +237,8 @@ class MainWindow(QMainWindow):
                         else action_item['shortcut']
                     )
                     action.setShortcuts(shortcuts)
+                if 'icon' in action_item:
+                    action.setIcon(QtGui.QIcon(action_item['icon']))
                 if 'status_tip' in action_item:
                     action.setStatusTip(action_item['status_tip'])
                 if 'tabs' in action_item:
@@ -214,6 +252,8 @@ class MainWindow(QMainWindow):
             else:
                 menu = QtWidgets.QMenu(parent)
                 menu.setTitle(action_item['title'])
+                if 'icon' in action_item:
+                    menu.setIcon(QtGui.QIcon(action_item['icon']))
                 if 'tabs' in action_item:
                     self.menu_list_for_disabled.append((menu, action_item['tabs']))
                 self._create_menu(menu, action_item['actions'])
@@ -250,6 +290,8 @@ class MainWindow(QMainWindow):
         self.tabwidget.addTab(groups.Widget(), translate('Groups'))
         self.tabwidget.addTab(courses.Widget(), translate('Courses'))
         self.tabwidget.addTab(organizations.Widget(), translate('Teams'))
+        self.logging_tab = log.Widget()
+        self.tabwidget.addTab(self.logging_tab, translate('Logs'))
         self.tabwidget.currentChanged.connect(self._menu_disable)
 
     def _menu_disable(self, tab_index):

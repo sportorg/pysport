@@ -1,4 +1,5 @@
 import logging
+import time
 from typing import Any, Dict, Type
 
 from PySide2 import QtCore
@@ -452,17 +453,21 @@ class ManualFinishAction(Action, metaclass=ActionFactory):
 class SPORTidentReadoutAction(Action, metaclass=ActionFactory):
     def execute(self):
         SIReaderClient().toggle()
+        time.sleep(0.5)
+        self.app.interval()
 
 
 class SportiduinoReadoutAction(Action, metaclass=ActionFactory):
     def execute(self):
         SportiduinoClient().toggle()
-
+        time.sleep(0.5)
+        self.app.interval()
 
 class SFRReadoutAction(Action, metaclass=ActionFactory):
     def execute(self):
         SFRReaderClient().toggle()
-
+        time.sleep(0.5)
+        self.app.interval()
 
 class CreateReportAction(Action, metaclass=ActionFactory):
     def execute(self):
