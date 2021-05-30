@@ -75,8 +75,10 @@ class MainWindow(QMainWindow):
             self.file = None
 
         self.log_queue = Queue()
-        handler = ConsolePanelHandler(self)
-        logging.root.addHandler(handler)
+        self._handler = ConsolePanelHandler(self)
+
+        logging.root.addHandler(self._handler)
+
         self.last_update = time.time()
         self.relay_number_assign = False
 
@@ -174,6 +176,20 @@ class MainWindow(QMainWindow):
                     self.recent_files = recent_files
             except Exception as e:
                 logging.error(str(e))
+
+        logging_levels_dict = {
+            'INFO': logging.INFO,
+            'DEBUG': logging.DEBUG,
+            'WARN': logging.WARNING,
+            'ERROR': logging.ERROR
+        }
+
+        logging.info('logging_level: {}'.format(Configuration().configuration.get('logging_level')));
+        #self.tabwidget.setTabText(5, translate('Logs') + '(' + Configuration().configuration.get('logging_level') + ')')
+        if Configuration().configuration.get('logging_level') in (logging_levels_dict.keys()):
+            self._handler.setLevel(logging_levels_dict[Configuration().configuration.get('logging_level')])
+        else:
+            self._handler.setLevel(logging.DEBUG)
 
     def conf_write(self):
         Configuration().parser[ConfigFile.GEOMETRY] = self.get_size()

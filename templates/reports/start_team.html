@@ -164,7 +164,7 @@
                 }
                 var titleBlock = document.createElement('h2');
                 titleBlock.id = org.name;
-                titleBlock.appendChild(document.createTextNode(dateFormat(race.data.start_datetime) + ' / ' + org.name));
+                titleBlock.appendChild(document.createTextNode(dateFormat(race.data.start_datetime) + ' / ' + org.name + ' / ' + org.contact)); 
                 resultBlock.appendChild(titleBlock);
                 if (store.tableView) {
                     resultBlock.appendChild(new TableGenerator(rows, Fields.fields).getTable({className: 'sportorg-table'}));
