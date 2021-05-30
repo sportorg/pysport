@@ -64,7 +64,7 @@ def import_csv(source):
         logging.info(
             '{}'.format(translate('Duplicate card numbers (card numbers are reset)'))
         )
-        for person in persons_dupl_cards:
+        for person in sorted(persons_dupl_cards, key=lambda x: x.card_number):
             logging.info(
                 '{} {} {} {}'.format(
                     person.full_name,
@@ -76,8 +76,7 @@ def import_csv(source):
             person.card_number = 0
     if len(persons_dupl_names):
         logging.info('{}'.format(translate('Duplicate names')))
-        for person in persons_dupl_names:
-            person.card_number = 0
+        for person in sorted(persons_dupl_names, key=lambda x: x.full_name):
             logging.info(
                 '{} {} {} {}'.format(
                     person.full_name,
@@ -90,5 +89,4 @@ def import_csv(source):
 
 def import_wo_wdb(file_name):
     wb = WinOrientBinary(file=file_name)
-    # wb.run()
     wb.create_objects()
