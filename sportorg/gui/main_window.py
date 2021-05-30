@@ -177,19 +177,9 @@ class MainWindow(QMainWindow):
             except Exception as e:
                 logging.error(str(e))
 
-        logging_levels_dict = {
-            'INFO': logging.INFO,
-            'DEBUG': logging.DEBUG,
-            'WARN': logging.WARNING,
-            'ERROR': logging.ERROR
-        }
+        self._handler.setLevel(Configuration().configuration.get('logging_level'))
 
-        logging.info('logging_level: {}'.format(Configuration().configuration.get('logging_level')));
-        #self.tabwidget.setTabText(5, translate('Logs') + '(' + Configuration().configuration.get('logging_level') + ')')
-        if Configuration().configuration.get('logging_level') in (logging_levels_dict.keys()):
-            self._handler.setLevel(logging_levels_dict[Configuration().configuration.get('logging_level')])
-        else:
-            self._handler.setLevel(logging.DEBUG)
+
 
     def conf_write(self):
         Configuration().parser[ConfigFile.GEOMETRY] = self.get_size()
