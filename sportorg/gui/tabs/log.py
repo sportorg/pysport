@@ -1,5 +1,5 @@
 from PySide2 import QtCore, QtWidgets, QtGui
-
+from sportorg.modules.configs.configs import Config as Configuration
 
 class Widget(QtWidgets.QWidget):
     def __init__(self):
@@ -13,11 +13,13 @@ class Widget(QtWidgets.QWidget):
         self.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.setAutoFillBackground(False)
         self.layout = QtWidgets.QGridLayout(self)
-        self.textEdit = QtWidgets.QTextEdit(self)
-        self.textEdit.setLineWrapMode(QtWidgets.QTextEdit.NoWrap)
+        self.textEdit = QtWidgets.QPlainTextEdit(self)
+        self.textEdit.setLineWrapMode(QtWidgets.QPlainTextEdit.NoWrap)
         self.textEdit.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+        self.textEdit.setMaximumBlockCount(Configuration().configuration.get('log_window_row_count'))
         self.layout.addWidget(self.textEdit)
 
+
     def write(self, s):
-        self.textEdit.setFontWeight(QtGui.QFont.Normal)
-        self.textEdit.append(s)
+        self.textEdit.appendPlainText(s)
+
