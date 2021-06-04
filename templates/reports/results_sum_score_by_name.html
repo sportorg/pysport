@@ -83,7 +83,7 @@
         }
         for (var _i = 0, _a = personList; _i < _a.length; _i++) {
             var person = _a[_i];
-            if (person.sumMsec && person.group.name === group.name) {
+            if (person.group.name === group.name) {
                 var r = {
                     index: 0,
                     name: (person.surname + ' ' + person.name).slice(0, MAX_PERSON_NAME),
@@ -92,14 +92,14 @@
                     bib: person.bib,
                     year: person.birth_date ? (new Date(person.birth_date)).getFullYear() : '',
                     resultMsec: person.sumMsec,
-                    result: person.sumMsec,
+                    result: person.sumMsec.toFixed(1),
                     place: '',
                     person: person
                 };
                 for (var _b = 0, races_1 = races; _b < races_1.length; _b++) {
                     var race_ = races_1[_b];
                     if (person.results[race_.id]) {
-                        r[race_.id] = person.results[race_.id].scores + '(' + person.results[race_.id].result + ')';
+                        r[race_.id] = person.results[race_.id].scores.toFixed(1) + '(' + person.results[race_.id].result + ')';
                     }
                 }
                 results.push(r);
@@ -210,7 +210,7 @@
                 this.fields.push({
                     key: race_.id,
                     title: day,
-                    size: 14
+                    size: 18
                 });
                 day++;
             }
