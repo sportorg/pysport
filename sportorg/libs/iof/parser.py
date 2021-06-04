@@ -29,26 +29,59 @@ def course_data(tree, ns):
     if 'CourseData' not in root.tag:
         return
     courses = []
-    for course_el in root.find('iof:RaceCourseData', ns).findall('iof:Course', ns):
-        course = {
-            'name': course_el.find('iof:Name', ns).text,
-            'length': int(course_el.find('iof:Length', ns).text),
-            'climb': int(course_el.find('iof:Climb', ns).text),
-            'controls': [],
-        }
 
-        for course_control_el in course_el.findall('iof:CourseControl', ns):
-            leg_length = 0
-            if course_control_el.find('iof:LegLength', ns) is not None:
-                leg_length = int(course_control_el.find('iof:LegLength', ns).text)
-            course['controls'].append(
-                {
-                    'type': course_control_el.attrib['type'],  # Start, Control, Finish
-                    'control': course_control_el.find('iof:Control', ns).text,
-                    'leg_length': leg_length,
-                }
-            )
-        courses.append(course)
+    version = '0'
+    if 'iofVersion' in root.attrib:
+        version = root.attrib['iofVersion'][0]
+    elif root.find('IOFVersion') is not None:
+        version = root.find('IOFVersion').attrib['version'][0]
+
+    if version == '3':
+        for course_el in root.find('iof:RaceCourseData', ns).findall('iof:Course', ns):
+            course = {
+                'name': course_el.find('iof:Name', ns).text,
+                'length': int(course_el.find('iof:Length', ns).text),
+                'climb': int(course_el.find('iof:Climb', ns).text),
+                'controls': [],
+            }
+
+            for course_control_el in course_el.findall('iof:CourseControl', ns):
+                leg_length = 0
+                if course_control_el.find('iof:LegLength', ns) is not None:
+                    leg_length = int(course_control_el.find('iof:LegLength', ns).text)
+                course['controls'].append(
+                    {
+                        'type': course_control_el.attrib['type'],  # Start, Control, Finish
+                        'control': course_control_el.find('iof:Control', ns).text,
+                        'leg_length': leg_length,
+                    }
+                )
+            courses.append(course)
+
+    elif version == '2':
+        for course_el in root.findall('Course'):
+            course_variation_el = course_el.find('CourseVariation')
+            course = {
+                'name': course_el.find('CourseName').text.strip(),
+                'length': int(course_variation_el.find('CourseLength').text),
+                'climb': int(course_variation_el.find('CourseClimb').text.strip()) if course_variation_el.find(
+                    'CourseClimb').text.strip().isdigit() else 0,
+                'controls': [],
+            }
+
+            for course_control_el in course_variation_el.findall('CourseControl'):
+                leg_length = 0
+                if course_control_el.find('LegLength') is not None:
+                    leg_length = int(course_control_el.find('LegLength').text)
+                course['controls'].append(
+                    {
+                        'type': 'Control',
+                        'control': course_control_el.find('ControlCode').text.strip(),
+                        'leg_length': leg_length,
+                    }
+                )
+            courses.append(course)
+
     return courses
 
 
