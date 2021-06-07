@@ -1,5 +1,5 @@
 import xml.etree.ElementTree as ET
-
+import logging
 
 class IOFParseResult(object):
     def __init__(self, name, data):
@@ -76,10 +76,10 @@ def entry_list(tree, ns):
         extensions_el = person_el.find('iof:Extensions', ns)
         if extensions_el:
             qual_el = extensions_el.find('orgeo:Qual', ns)
-            if qual_el:
+            if qual_el.text:
                 person['extensions']['qual'] = qual_el.text
             bib_el = extensions_el.find('orgeo:BibNumber', ns)
-            if bib_el:
+            if bib_el.text:
                 person['extensions']['bib'] = bib_el.text
 
         org_el = person_entry_el.find('iof:Organisation', ns)
