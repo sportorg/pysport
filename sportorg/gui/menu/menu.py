@@ -61,6 +61,10 @@ def menu_list():
                             'title': translate('IOF xml'),
                             'action': 'IOFEntryListImportAction',
                         },
+                        {
+                            'title': translate('SportOrg results reading log'),
+                            'action': 'SportOrgResultsReadingLog',
+                        },
                     ],
                 },
                 {

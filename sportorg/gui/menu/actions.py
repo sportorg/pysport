@@ -46,6 +46,7 @@ from sportorg.models.start.start_preparation import (
 )
 from sportorg.modules.backup.json import get_races_from_file
 from sportorg.modules.iof import iof_xml
+from sportorg.modules.sportident.backup import load_backup
 from sportorg.modules.live.live import live_client
 from sportorg.modules.ocad import ocad
 from sportorg.modules.ocad.ocad import OcadImportException
@@ -240,6 +241,24 @@ class IOFEntryListImportAction(Action, metaclass=ActionFactory):
         if file_name != '':
             try:
                 iof_xml.import_from_iof(file_name)
+            except Exception as e:
+                logging.exception(str(e))
+                QMessageBox.warning(
+                    self.app,
+                    translate('Error'),
+                    translate('Import error') + ': ' + file_name,
+                )
+            self.app.init_model()
+
+
+class SportOrgResultsReadingLog(Action, metaclass=ActionFactory):
+    def execute(self):
+        file_name = get_open_file_name(
+            translate('Open SportOrg backup file'), translate('Backup file (*.log)')
+        )
+        if file_name != '':
+            try:
+                load_backup(file_name)
             except Exception as e:
                 logging.exception(str(e))
                 QMessageBox.warning(
