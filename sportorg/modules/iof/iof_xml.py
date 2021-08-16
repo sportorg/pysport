@@ -155,7 +155,7 @@ def import_from_entry_list(entries):
         logging.info(
             '{}'.format(translate('Duplicate card numbers (card numbers are reset)'))
         )
-        for person in persons_dupl_cards:
+        for person in sorted(persons_dupl_cards, key=lambda x: x.card_number):
             logging.info(
                 '{} {} {} {}'.format(
                     person.full_name,
@@ -167,7 +167,7 @@ def import_from_entry_list(entries):
             person.card_number = 0
     if len(persons_dupl_names):
         logging.info('{}'.format(translate('Duplicate names')))
-        for person in persons_dupl_names:
+        for person in sorted(persons_dupl_names, key=lambda x: x.full_name):
             person.card_number = 0
             logging.info(
                 '{} {} {} {}'.format(

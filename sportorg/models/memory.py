@@ -1569,26 +1569,32 @@ class Race(Model):
 
     def get_duplicate_card_numbers(self):
         ret = []
-        for person in self.persons:
-            for p in self.persons:
-                if (
-                    person.id != p.id
-                    and person.card_number
-                    and person.card_number == p.card_number
-                ):
-                    ret.append(person)
+        current_card = -1
+        previous_person = None
+        for person in sorted(self.persons, key=lambda x: x.card_number):
+            if person.card_number > 0 and person.card_number == current_card:
+                if previous_person:
+                    ret.append(previous_person)
+                    previous_person = None
+                ret.append(person)
+            else:
+                previous_person = person
+                current_card = person.card_number
         return ret
 
     def get_duplicate_names(self):
         ret = []
-        for person in self.persons:
-            for p in self.persons:
-                if (
-                    person.id != p.id
-                    and person.full_name
-                    and person.full_name == p.full_name
-                ):
-                    ret.append(person)
+        current_name = ''
+        previous_person = None
+        for person in sorted(self.persons, key=lambda x: x.full_name):
+            if person.full_name and person.full_name == current_name:
+                if previous_person:
+                    ret.append(previous_person)
+                    previous_person = None
+                ret.append(person)
+            else:
+                previous_person = person
+                current_name = person.full_name
         return ret
 
 
