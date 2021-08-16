@@ -1,5 +1,6 @@
 import json
 import uuid
+import os
 
 from sportorg import config
 from sportorg.models.memory import (
@@ -23,6 +24,8 @@ def dump(file):
         'races': [race_downgrade(r.to_dict()) for r in races()],
     }
     json.dump(data, file, sort_keys=True, indent=2, ensure_ascii=False)
+    file.flush()
+    os.fsync(file.fileno())
 
 
 def load(file):

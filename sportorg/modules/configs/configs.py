@@ -79,6 +79,8 @@ class Config(metaclass=Singleton):
                 'use_birthday': False,
                 'check_updates': True,
                 'autosave_interval': 0,
+                'logging_level': 'INFO',
+                'log_window_row_count': 1000
             }),
             ConfigFile.SOUND: Configurations({
                 'enabled': False,
