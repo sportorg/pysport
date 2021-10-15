@@ -4,23 +4,25 @@
 {% block content %}
 <div class="text-center">
     <h3>{{ race.data.description }} <br>{{ race.data.start_datetime|date }} {{ race.data.location }}</h3>
-    <h2>ПРОТОКОЛ РЕЗУЛЬТАТОВ</h2>
+    <h2>RESULT LIST</h2>
 </div>
 <div id="results-tables"></div>
+<!--
 <div>
     <table class="empty-table">
         <tr>
-            <td><b>Главный судья:</b></td>
+            <td><b>Chief referee:</b></td>
             <td width="150px"></td>
             <td><b>{{ race.data.chief_referee }}</b></td>
         </tr>
         <tr>
-            <td><b>Главный секретарь:</b></td>
+            <td><b>Secretary:</b></td>
             <td width="150px"></td>
             <td><b>{{ race.data.secretary }}</b></td>
         </tr>
     </table>
 </div>
+-->
 {% raw %}
 <style>
     table.table-split {
@@ -59,18 +61,15 @@
                     place: result.place,
                     status: result.status,
                     scores: result.scores,
-                    place_show: result.person.is_out_of_competition ? 'в/к' : result.place === 0 ? '' : result.place === -1 ? '' : result.place,
+                    place_show: result.person.is_out_of_competition ? 'o/c' : result.place === 0 ? '' : result.place === -1 ? '' : result.place,
                     is_out_of_competition: result.person.is_out_of_competition,
                     speed: result.speed,
-                    speed_kmh:  group.course ? (group.course.length * 3600 / result.result_msec).toFixed(1) + 'км/ч' : '',
-                    data: result,
-                    order: result.order
+                    data: result
                 };
                 if (result.status !== 1) {
                     r.diff = '';
                     r.place_show = '';
                     r.speed = '';
-                    r.speed_kmh = '';
                     r.scores = '';
                     r.penalty_time = '';
                     r.penalty_laps = '';
@@ -147,11 +146,16 @@
         }
         results.sort(function (a, b) {
             if (isRelay) {
-
-                if (a.order === b.order) {
+                if (a.place < 1) {
+                    return 1
+                }
+                if (b.place < 1) {
+                    return -1
+                }
+                if (a.place === b.place) {
                     return ~~(a.bib / 1000) - ~~(b.bib / 1000)
                 }
-                return a.order - b.order
+                return a.place - b.place
 
             } else {
                 if (a.status !== 1 && b.status !== 1) {
@@ -229,10 +233,9 @@
                     place: result.place,
                     status: result.status,
                     scores: result.scores,
-                    place_show: result.person.is_out_of_competition ? 'в/к' : result.place === 0 ? '' : result.place === -1 ? '' : result.place,
+                    place_show: result.person.is_out_of_competition ? 'o/c' : result.place === 0 ? '' : result.place === -1 ? '' : result.place,
                     is_out_of_competition: result.person.is_out_of_competition,
                     speed: result.speed,
-                    speed_kmh:  (result.person.group.course.length * 3600 / result.result_msec).toFixed(1) + 'км/ч',
 					group: result.person.group.name,
                     data: result
                 };
@@ -240,7 +243,6 @@
                     r.diff = '';
                     r.place_show = '';
                     r.speed = '';
-                    r.speed_kmh = '';
                     r.scores = '';
                     r.penalty_time = '';
                     r.penalty_laps = '';
@@ -295,10 +297,16 @@
         }
         results.sort(function (a, b) {
             if (isRelay) {
-                if (a.order === b.order) {
+                if (a.place < 1) {
+                    return 1
+                }
+                if (b.place < 1) {
+                    return -1
+                }
+                if (a.place === b.place) {
                     return ~~(a.bib / 1000) - ~~(b.bib / 1000)
                 }
-                return a.order - b.order
+                return a.place - b.place
             } else {
                 if (a.status !== 1 && b.status !== 1) {
                     return STATUS_PRIORITY.indexOf(a.status) - STATUS_PRIORITY.indexOf(b.status);
@@ -432,14 +440,14 @@
         var rankingBlock = document.createElement('span');
         var ranking = group.ranking;
         if (ranking && ranking.is_active && ranking.rank_scores > 0) {
-            var text = 'Квалификационный уровень (баллы): ' + ranking.rank_scores.toFixed(0);
+            var text = 'Ranking, scores: ' + ranking.rank_scores.toFixed(0);
             rankingBlock.appendChild(document.createTextNode(text));
 
             for (var _i = 0; _i < ranking.rank.length; _i++) {
                 var rank = ranking.rank[_i];
                 if (rank.is_active) {
                     if (rank.max_place > 0) {
-                        var text = Qualification[rank.qual] + ' - до ' + rank.max_place + ' места';
+                        var text = Qualification[rank.qual] + ' - up to ' + rank.max_place + ' place';
                         rankingBlock.appendChild(document.createElement("br"));
                         rankingBlock.appendChild(document.createTextNode(text));
                     }
@@ -467,22 +475,21 @@
     var Fields = {
         fields: [
             {key: 'index', title: '№', size: 4},
-            {key: 'group', title: 'Группа', size: 10, active: false},
-            {key: 'name', title: 'Фамилия, имя', size: 30},
-            {key: 'org', title: 'Коллектив', size: 20},
-            {key: 'year', title: 'ГР', size: 5},
-            {key: 'qual', title: 'Разряд', size: 7},
-            {key: 'bib', title: 'Номер', size: 6},
-            {key: 'penalty_time', title: 'Штраф', size: 9, active: false},
-            {key: 'penalty_laps', title: 'Штраф', size: 9, active: false},
-            {key: 'result', title: 'Результат', size: 14},
-            {key: 'result_relay', title: 'Ком. рез-т', size: 14},
-            {key: 'diff', title: 'Отставание', size: 11},
-            {key: 'speed', title: 'Темп', size: 8, active: false},
-            {key: 'speed_kmh', title: 'Скорость', size: 8, active: false},
-            {key: 'place_show', title: 'Место', size: 6},
-            {key: 'scores', title: 'Очки', size: 5, active: false},
-            {key: 'all_splits', title: 'Сплиты', active: false}
+            {key: 'group', title: 'Class', size: 10, active: false},
+            {key: 'name', title: 'Name', size: 30},
+            {key: 'org', title: 'Orgznization', size: 20},
+            {key: 'year', title: 'Year', size: 5},
+            //{key: 'qual', title: 'Qual', size: 7},
+            {key: 'bib', title: 'Bib', size: 6},
+            {key: 'penalty_time', title: 'Penalty', size: 9, active: false},
+            {key: 'penalty_laps', title: 'Penalty,l', size: 9, active: false},
+            {key: 'result', title: 'Result', size: 14},
+            {key: 'result_relay', title: 'Team result', size: 14},
+            {key: 'diff', title: 'Diff', size: 11},
+            {key: 'speed', title: 'Pace', size: 12, active: false},
+            {key: 'place_show', title: 'Place', size: 6},
+            {key: 'scores', title: 'Scores', size: 5, active: false},
+            {key: 'all_splits', title: 'Splits', active: false}
         ],
         active: function (key, val) {
             for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
@@ -535,11 +542,7 @@
     };
 
     try {
-        store.splitsShow = (
-            location.href.indexOf('s_splits=1') > -1 ||
-            location.href.indexOf('&splits=1') > -1 ||
-            location.href.indexOf('?splits=1') > -1
-        );
+        store.splitsShow = location.href.indexOf('s_splits=1') > -1;
         store.rankingShow = location.href.indexOf('ranking=1') > -1;
         store.showProtocolByCourse = location.href.indexOf('by_course=1') > -1;
     } catch (e) {}
@@ -571,10 +574,10 @@
             titleBlock.id = groupName;
             var groupTitle = groupName;
             if (course && course.controls && course.controls.length){
-                groupTitle += ', ' + course.controls.length + ' КП';
+                groupTitle += ', ' + course.controls.length + ' controls';
             }
             if (course && course.length){
-                groupTitle += ', ' + course.length / 1000 + ' км';
+                groupTitle += ', ' + course.length / 1000 + ' km';
             }
             titleBlock.appendChild(document.createTextNode(groupTitle));
             resultBlock.appendChild(titleBlock);
@@ -668,7 +671,7 @@
 
     new SettingsGenerator([
         {
-            title: 'Ссылки на группы',
+            title: 'Classes links',
             value: !!store.showLinkForGroups,
             change: function (checked) {
                 store.showLinkForGroups = checked;
@@ -676,7 +679,7 @@
             }
         },
         {
-            title: 'Протокол по дистанциям',
+            title: 'Results by courses',
             value: !!store.showProtocolByCourse,
             change: function (checked) {
                 store.showProtocolByCourse = checked;
@@ -684,7 +687,7 @@
             }
         },
         {
-            title: 'Табличный вид',
+            title: 'Table view',
             value: !!store.tableView,
             change: function (checked) {
                 store.tableView = checked;
@@ -692,7 +695,7 @@
             }
         },
         {
-            title: 'Номер',
+            title: 'Bib',
             value: Fields.isActive('bib'),
             change: function (checked) {
                 Fields.active('bib', checked);
@@ -700,7 +703,7 @@
             }
         },
         {
-            title: 'Штрафное время',
+            title: 'Penalty time',
             value: Fields.isActive('penalty_time'),
             change: function (checked) {
                 Fields.active('penalty_time', checked);
@@ -708,7 +711,7 @@
             }
         },
         {
-            title: 'Кол-во штрафных кругов',
+            title: 'Penalty laps',
             value: Fields.isActive('penalty_laps'),
             change: function (checked) {
                 Fields.active('penalty_laps', checked);
@@ -716,7 +719,7 @@
             }
         },
         {
-            title: 'Отставание',
+            title: 'Diff',
             value: Fields.isActive('diff'),
             change: function (checked) {
                 Fields.active('diff', checked);
@@ -724,7 +727,7 @@
             }
         },
         {
-            title: 'Темп',
+            title: 'Pace',
             value: Fields.isActive('speed'),
             change: function (checked) {
                 Fields.active('speed', checked);
@@ -732,15 +735,7 @@
             }
         },
         {
-            title: 'Скорость км/ч',
-            value: Fields.isActive('speed_kmh'),
-            change: function (checked) {
-                Fields.active('speed_kmh', checked);
-                render()
-            }
-        },
-        {
-            title: 'Сплиты (заданное направление)',
+            title: 'Splits (no forking)',
             value: !!store.splitsShow,
             change: function (checked) {
                 store.splitsShow = checked;
@@ -748,7 +743,7 @@
             }
         },
         {
-            title: 'Сплиты (все отметки)',
+            title: 'Splits (all)',
             value: Fields.isActive('all_splits'),
             change: function (checked) {
                 Fields.active('all_splits', checked);
@@ -756,7 +751,7 @@
             }
         },
         {
-            title: 'Очки',
+            title: 'Scores',
             value: Fields.isActive('scores'),
             change: function (checked) {
                 Fields.active('scores', checked);
@@ -764,7 +759,7 @@
             }
         },
         {
-            title: 'Выполнение',
+            title: 'Ranking (Russian)',
             value: store.rankingShow,
             change: function (checked) {
                 store.rankingShow = checked;
@@ -772,9 +767,9 @@
             }
         },
         {
-            title: 'Показать первые: ',
+            title: 'Show first: ',
             value: [
-                {text: 'Все результаты', value: 0},
+                {text: 'All', value: 0},
                 {text: '1', value: 1},
                 {text: '3', value: 3},
                 {text: '4', value: 4},
@@ -788,7 +783,7 @@
             }
         },
         {
-            title: 'Печатать на отдельной странице',
+            title: 'Each class from new page',
             value: false,
             change: function (checked) {
                 store.newPage = checked;
@@ -796,7 +791,7 @@
             }
         },
         {
-            title: 'Автоскролл',
+            title: 'Autoscroll',
             value: Scrolling.enabled,
             change: function (checked) {
                 Scrolling.enabled = checked;

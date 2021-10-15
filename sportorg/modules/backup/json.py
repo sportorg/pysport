@@ -37,6 +37,7 @@ def load(file):
     ResultCalculation(obj).process_results()
     RaceSplits(obj).generate()
     ScoreCalculation(obj).calculate_scores()
+    obj.set_setting('live_enabled', False)  # force user to activate Live broadcast manually (not to loose live results)
 
 
 def get_races_from_file(file):

@@ -77,7 +77,9 @@
             sum += s
         }
 
-        persons[p_index].sumMsec = sum;
+        //persons[p_index].sumMsec = sum;
+        persons[p_index].sumMsec = sum_time_ms;
+        persons[p_index].ok_count = ok_count;
         personList.push(persons[p_index]);
     }
 
@@ -99,14 +101,15 @@
                     bib: person.bib,
                     year: person.birth_date ? (new Date(person.birth_date)).getFullYear() : '',
                     resultMsec: person.sumMsec,
-                    result: person.sumMsec.toFixed(1),
+                    result: toHHMMSS(person.sumMsec) + ' (' + person.ok_count + ')',
+                    ok_count: person.ok_count,
                     place: '',
                     person: person
                 };
                 for (var _b = 0, races_1 = races; _b < races_1.length; _b++) {
                     var race_ = races_1[_b];
                     if (person.results[race_.id]) {
-                        r[race_.id] = person.results[race_.id].scores.toFixed(1) + '(' + person.results[race_.id].result + ')';
+                        r[race_.id] = person.results[race_.id].result;
                     }
                 }
                 results.push(r);
@@ -119,16 +122,16 @@
             if (!b.resultMsec) {
                 return -1;
             }
-            if (a.person.dsq && b.person.dsq) {
-                return b.resultMsec - a.resultMsec;
-            }
             if (a.person.dsq) {
                 return 1;
             }
             if (b.person.dsq) {
                 return -1;
             }
-            return b.resultMsec - a.resultMsec;
+            if (a.person.ok_count != b.person.ok_count) {
+                return b.person.ok_count - a.person.ok_count;
+            }
+            return a.resultMsec - b.resultMsec;
         });
         var prevRes = results[0];
         var place = 0;

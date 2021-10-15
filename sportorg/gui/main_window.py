@@ -472,6 +472,11 @@ class MainWindow(QMainWindow):
             ret.append(orig_index_int)
         return ret
 
+    def clear_selection(self, table=None):
+        if table is None:
+            table = self.get_current_table()
+        table.clearSelection()
+
     def add_sportident_result_from_sireader(self, result):
         try:
             assignment_mode = race().get_setting('system_assignment_mode', False)
@@ -579,7 +584,7 @@ class MainWindow(QMainWindow):
                 self.apply_filters()
                 self.last_update = time.time()
             except Exception as e:
-                logging.error(str(e))
+                logging.exception(e)
         else:
             self.save_file_as()
 
@@ -685,12 +690,10 @@ class MainWindow(QMainWindow):
             res = race().delete_persons(indexes)
             ResultCalculation(race()).process_results()
             live_client.delete(res)
-            self.refresh()
         elif tab == 1:
             res = race().delete_results(indexes)
             ResultCalculation(race()).process_results()
             live_client.delete(res)
-            self.refresh()
         elif tab == 2:
             try:
                 res = race().delete_groups(indexes)
@@ -701,7 +704,6 @@ class MainWindow(QMainWindow):
                     translate('Error'),
                     translate('Cannot remove group'),
                 )
-            self.refresh()
         elif tab == 3:
             try:
                 res = race().delete_courses(indexes)
@@ -712,7 +714,6 @@ class MainWindow(QMainWindow):
                     translate('Error'),
                     translate('Cannot remove course'),
                 )
-            self.refresh()
         elif tab == 4:
             try:
                 res = race().delete_organizations(indexes)
@@ -723,4 +724,6 @@ class MainWindow(QMainWindow):
                     translate('Error'),
                     translate('Cannot remove organization'),
                 )
-            self.refresh()
+
+        self.clear_selection()
+        self.refresh()

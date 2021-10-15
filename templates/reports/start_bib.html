@@ -92,6 +92,9 @@
             float: left;
             padding: 1cm;
             border: 1px solid #e7e7e7;
+            background-image: url(bg.jpg);
+            background-repeat: no-repeat;
+            background-size: 100% 100%;
         }
         .bib-title {
             text-align: center;
@@ -198,12 +201,46 @@
 </div>
 {% raw %}
 <script>
-    var race = {% endraw %}{{race|tojson}}{% raw %};
-    racePreparation(race);
+    var current_race =  Number({% endraw %}{{current_race}}{%raw %});
+    var races = {% endraw %}{{races|tojson}}{%raw %};
+    races.forEach(function (race) {
+        racePreparation(race);
+    });
+    var race = races[current_race];
     var store = {
         bibDetailedRotatableText: true,
-        isRelayView: false
+        isRelayView: false,
+        allDays: races.length > 1,
     };
+    var data = {};
+    races.forEach(function (race, raceIndex) {
+        for (var _i = 0, _a = race.persons; _i < _a.length; _i++) {
+            var person = _a[_i];
+            if (person.bib) {
+                if (!data[person.bib]) {
+                    data[person.bib] = {};
+                }
+                data[person.bib][raceIndex] = person;
+            }
+        }
+    });
+    var persons = [];
+    Object.keys(data).forEach(function (bib) {
+        var person;
+        Object.keys(data[bib]).forEach(function (raceIndex) {
+            var _person = data[bib][raceIndex];
+            if (!_person) {
+                return;
+            }
+            if (!person) {
+                person = _person;
+                person.startTimeByRaceIndex = {};
+            }
+            person.startTimeByRaceIndex[raceIndex] = _person.start_time;
+        });
+        persons.push(person);
+    });
+
     function render (options) {
         var sort = options && options.sort;
         var sortFunc = function (a, b) {
@@ -240,11 +277,14 @@
                 return 0;
             };
         }
-        race.persons.sort(sortFunc);
+        persons.sort(sortFunc);
         var bibListBlock = document.getElementById('bib-list');
         bibListBlock.innerHTML = '';
-        for (var _i = 0, _a = race.persons; _i < _a.length; _i++) {
+        for (var _i = 0, _a = persons; _i < _a.length; _i++) {
             var person = _a[_i];
+            if (!options.allDays && !toHHMMSS(person.startTimeByRaceIndex[current_race])) {
+                continue;
+            }
             var bibItemBlock = document.createElement('div');
             bibItemBlock.className = 'bib-item';
             var bibTitleBlock = document.createElement('div');
@@ -256,8 +296,12 @@
             var bibDetailedBlock = document.createElement('div');
             var detildData = [
                 { title: '', value: person.surname + ' ' + person.name },
+                { title: '', value: options.allDays
+                            ? races.map(function (_, raceIndex) {
+                                return toHHMMSS(person.startTimeByRaceIndex[raceIndex]) || '-';
+                            }).join(' / ')
+                            : toHHMMSS(person.startTimeByRaceIndex[current_race])},
                 { title: 'Номер чипа: ', value: person.card_number || '' },
-                { title: 'Время старта: ', value: toHHMMSS(person.start_time) },
                 { title: 'Группа: ', value: person.group && person.group.name },
                 { title: 'Коллектив: ', value: person.organization && person.organization.name || '' }
             ];
@@ -320,6 +364,14 @@
             value: store.isRelayView,
             change: function (checked) {
                 store.isRelayView = checked;
+                render(store);
+            }
+        },
+        {
+            title: 'Все дни',
+            value: store.allDays,
+            change: function (checked) {
+                store.allDays = checked;
                 render(store);
             }
         }

@@ -97,10 +97,18 @@ class ResultCalculation(object):
                 team = relay_teams[str(team_number)]
                 team.add_result(res)
             teams_sorted = sorted(relay_teams.values())
-            place = 1
+            place = 1  # place to show
+            order = 1  # order for templates
             for cur_team in teams_sorted:
-                cur_team.set_place(place)
-                place += 1
+                if not cur_team.get_is_status_ok() or cur_team.get_is_out_of_competition():
+                    cur_team.set_place(-1)
+                else:
+                    cur_team.set_place(place)
+                    place += 1
+
+                cur_team.set_order(order)
+                order += 1
+
                 cur_team.set_start_times()
             return relay_teams.values()
 

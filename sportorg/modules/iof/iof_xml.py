@@ -146,7 +146,7 @@ def create_person(person_entry):
 def import_from_entry_list(entries):
     obj = race()
     for person_entry in entries:
-        person = create_person(person_entry)
+        create_person(person_entry)
 
     persons_dupl_cards = obj.get_duplicate_card_numbers()
     persons_dupl_names = obj.get_duplicate_names()
@@ -252,8 +252,9 @@ def import_from_event_data(data):
     obj = race()
 
     if 'name' in data:
-        obj.data.title = data['name']
-        obj.data.description = data['name']
+        if len(data['name']) > 0 and data['name'] != 'Event':
+            obj.data.title = data['name']
+
     if 'start_date' in data:
         date_val = yyyymmdd_to_date(data['start_date'], '-')
         obj.data.start_datetime = datetime.datetime.combine(date_val, time())

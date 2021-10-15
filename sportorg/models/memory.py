@@ -302,6 +302,7 @@ class Group(Model):
     def get_type(self):
         if self.__type:
             return self.__type
+        return race().data.race_type
 
     def set_type(self, new_type):
         self.__type = new_type
@@ -449,6 +450,8 @@ class Result:
         self.__start_time = None
         self.__finish_time = None
 
+        self.order = 0  # Order number, introduced in 1.6, needed for result templates to sort results correctly
+
     def __str__(self):
         return str(self.system_type)
 
@@ -529,6 +532,7 @@ class Result:
             'final_result_time': self.final_result_time.to_str()
             if self.final_result_time
             else None,
+            'order': self.order
         }
 
     def update_data(self, data):
@@ -1076,7 +1080,7 @@ class Person(Model):
         self.is_personal = False
         self.comment = ''
 
-        self.start_time = None  # type: OTime
+        self.start_time = OTime(0)  # type: OTime
         self.start_group = 0
         self.result_count = 0
 
@@ -1926,6 +1930,11 @@ class RelayLeg(object):
         if res and isinstance(res, Result):
             res.place = place
 
+    def set_order(self, order):
+        res = self.get_result()
+        if res and isinstance(res, Result):
+            res.order = order
+
 
 class RelayTeam(object):
     def __init__(self, r):
@@ -1937,6 +1946,7 @@ class RelayTeam(object):
         self.last_finished_leg = 0
         self.last_correct_leg = 0
         self.place = 0
+        self.order = 0
 
     def __eq__(self, other):
         if self.get_is_status_ok() == other.get_is_status_ok():
@@ -1950,6 +1960,12 @@ class RelayTeam(object):
             return False
 
         if not self.get_is_status_ok() and other.get_is_status_ok():
+            return True
+
+        if not self.get_is_out_of_competition() and other.get_is_out_of_competition():
+            return False
+
+        if self.get_is_out_of_competition() and not other.get_is_out_of_competition():
             return True
 
         if self.get_correct_lap_count() != other.get_correct_lap_count():
@@ -2038,6 +2054,11 @@ class RelayTeam(object):
         self.place = place
         for i in self.legs:
             i.set_place(place)
+
+    def set_order(self, order):
+        self.order = order
+        for i in self.legs:
+            i.set_order(order)
 
 
 def create(obj, **kwargs):
