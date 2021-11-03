@@ -4,7 +4,7 @@ import time
 from queue import Queue
 
 from PySide2 import QtCore, QtGui, QtWidgets
-from PySide2.QtCore import QModelIndex, QItemSelectionModel, QTimer, Signal
+from PySide2.QtCore import QTimer
 from PySide2.QtWidgets import QMainWindow, QMessageBox
 
 from sportorg import config
@@ -104,40 +104,6 @@ class MainWindow(QMainWindow):
         self.show()
         self.post_show()
 
-    sportident_status = False
-    sportident_icon = {
-        True: 'sportident-on.png',
-        False: 'sportident.png',
-    }
-
-    def interval(self):
-        if SIReaderClient().is_alive() != self.sportident_status and hasattr(self, 'toolbar'):
-            self.toolbar_property['sportident'].setIcon(
-                QtGui.QIcon(config.icon_dir(self.sportident_icon[SIReaderClient().is_alive()])))
-            self.sportident_status = SIReaderClient().is_alive()
-        """
-        if Teamwork().is_alive() != self.teamwork_status:
-            self.toolbar_property['teamwork'].setIcon(
-                QtGui.QIcon(config.icon_dir(self.teamwork_icon[Teamwork().is_alive()])))
-            self.teamwork_status = Teamwork().is_alive()
-        """
-        try:
-            if self.get_configuration().get('autosave_interval'):
-                if self.file:
-                    if time.time() - self.last_update > int(self.get_configuration().get('autosave_interval')):
-                        self.save_file()
-                        logging.info(translate('Auto save'))
-                else:
-                    logging.debug(translate('No file to auto save'))
-        except Exception as e:
-            logging.error(str(e))
-
-        while not self.log_queue.empty():
-            text = self.log_queue.get()
-            self.statusbar_message(text)
-            if hasattr(self, 'logging_tab'):
-                self.logging_tab.write(text)
-
     def close(self):
         self.conf_write()
 
@@ -198,7 +164,7 @@ class MainWindow(QMainWindow):
 
         self.service_timer = QTimer(self)
         self.service_timer.timeout.connect(self.interval)
-        self.service_timer.start(1000) # msec
+        self.service_timer.start(1000) #msec
 
         #LiveClient().init()
         self._menu_disable(self.current_tab)
@@ -544,6 +510,55 @@ class MainWindow(QMainWindow):
     def add_sportiduino_result_from_reader(self, result):
         self.add_sportident_result_from_sireader(result)
 
+    def teamwork(self, command):
+        try:
+            race().update_data(command.data)
+            logging.info(repr(command.data))
+            if 'object' in command.data and command.data['object'] in ['ResultManual', 'ResultSportident', 'ResultSFR',
+                                                                       'ResultSportiduino', 'ResultRfidImpinj']:
+                ResultCalculation(race()).process_results()
+            Broker().produce('teamwork_recieving', command.data)
+            self.refresh()
+        except Exception as e:
+            logging.error(str(e))
+
+    sportident_status = False
+    sportident_icon = {
+        True: 'sportident-on.png',
+        False: 'sportident.png',
+    }
+    teamwork_status = False
+    teamwork_icon = {
+        True: 'network.svg',
+        False: 'network-off.svg',
+    }
+
+    def interval(self):
+        is_alive = SIReaderClient().is_alive() \
+                   or SFRReaderClient().is_alive() \
+                   or SportiduinoClient().is_alive()
+
+        if is_alive != self.sportident_status:
+            self.toolbar_property['sportident'].setIcon(
+                QtGui.QIcon(config.icon_dir(self.sportident_icon[is_alive])))
+            self.sportident_status = is_alive
+
+        try:
+            if self.get_configuration().get('autosave_interval'):
+                if self.file:
+                    if time.time() - self.last_update > int(self.get_configuration().get('autosave_interval')):
+                        self.save_file()
+                        logging.info(translate('Auto save'))
+
+        except Exception as e:
+            logging.error(str(e))
+
+        while not self.log_queue.empty():
+            text = self.log_queue.get()
+            self.statusbar_message(text)
+            if hasattr(self, 'logging_tab'):
+                self.logging_tab.write(text)
+
     # Actions
     def create_file(self, *args, update_data=True):
         file_name = get_save_file_name(
@@ -613,7 +628,7 @@ class MainWindow(QMainWindow):
         try:
             indexes = self.get_selected_rows()
             obj = race()
-            results = []
+            print_results = []
             for index in indexes:
                 if index < 0:
                     continue
@@ -621,7 +636,19 @@ class MainWindow(QMainWindow):
                     pass
                 # self.split_printout(obj.results[index])
                 print_results.append(obj.results[index])
-            split_printout(print_results)
+
+            confirm_printing = True
+            if len(print_results) > 1:
+                confirm = messageBoxQuestion(
+                    self,
+                    translate('Question'),
+                    translate('Please confirm'),
+                    QMessageBox.Yes | QMessageBox.No,
+                )
+                confirm_printing = confirm == QMessageBox.Yes
+            if confirm_printing:
+                split_printout(print_results)
+
         except Exception as e:
             logging.exception(str(e))
 

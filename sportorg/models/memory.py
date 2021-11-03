@@ -923,6 +923,7 @@ class ResultSportident(Result):
                         split.is_correct = True
                         split.has_penalty = False
                         recognized_indexes.append(i)
+                        split.course_index = course_index
                         course_index += 1
 
                 elif template.find('*') > -1:
@@ -955,6 +956,7 @@ class ResultSportident(Result):
                         split.is_correct = True
                         split.has_penalty = False
                         recognized_indexes.append(i)
+                        split.course_index = course_index
                         course_index += 1
 
                 else:
@@ -971,6 +973,7 @@ class ResultSportident(Result):
                             if split.code == correct_code:
                                 split.has_penalty = False
 
+                            split.course_index = course_index
                             course_index += 1
                     else:
                         # just cp '31 989'
@@ -979,6 +982,7 @@ class ResultSportident(Result):
                             split.is_correct = True
                             split.has_penalty = False
                             recognized_indexes.append(i)
+                            split.course_index = course_index
                             course_index += 1
 
                 if course_index == count_controls:

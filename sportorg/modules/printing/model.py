@@ -47,10 +47,8 @@ def split_printout(results):
 
         person = result.person
 
-        if not person or not person.group:
-            if isDirectMode:
-                pr.end_doc()
-            raise NoResultToPrintException('No results to print')
+        if not person:
+            continue
 
         course = obj.find_course(result)
 
@@ -88,5 +86,9 @@ def split_printout(results):
                     obj.get_setting('print_margin_right', 5.0),
                     obj.get_setting('print_margin_bottom', 5.0),
                 )
+        else:
+            # no group or course - just print all splits
+            pr.print_split(result)
+
     if isDirectMode:
         pr.end_doc()

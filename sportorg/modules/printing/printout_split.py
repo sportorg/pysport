@@ -1,7 +1,7 @@
 import platform
 
 from sportorg.language import translate
-from sportorg.models.memory import ResultStatus, race
+from sportorg.models.memory import ResultStatus, race, Group
 from sportorg.models.result.result_calculation import ResultCalculation
 
 if platform.system() == 'Windows':  # current realisation works on Windows only
@@ -39,6 +39,7 @@ class SportorgPrinter(object):
 
     def end_doc(self):
         self.dc.EndDoc()
+        self.dc.DeleteDC()
 
     def move_cursor(self, offset):
         self.y -= int(self.scale_factor * offset)
@@ -66,8 +67,11 @@ class SportorgPrinter(object):
             return
 
         group = person.group
+        is_group_existed = True
         if group is None:
-            return
+            group = Group()
+            group.name = "-"
+            is_group_existed = False
 
         course = obj.find_course(result)
 
@@ -109,7 +113,17 @@ class SportorgPrinter(object):
         # Splits
         index = 1
         for split in result.splits:
-            if not course:
+            if not is_group_existed:
+                line = (
+                        ('  ' + str(index))[-3:]
+                        + ' '
+                        + ('  ' + split.code)[-3:]
+                        + ' '
+                        + split.time.to_str()[-7:]
+                )
+                index += 1
+                self.print_line(line, fn, fs_main)
+            elif not course:
                 line = (
                     ('  ' + str(index))[-3:]
                     + ' '
@@ -118,7 +132,6 @@ class SportorgPrinter(object):
                     + split.relative_time.to_str()[-7:]
                     + ' '
                     + split.leg_time.to_str()[-5:]
-                    + ' '
                 )
                 index += 1
                 self.print_line(line, fn, fs_main)
@@ -200,7 +213,7 @@ class SportorgPrinter(object):
             )
 
         # Place
-        if result.place > 0:
+        if result.place > 0 and is_group_existed:
             place = translate('Place') + ': ' + str(result.place)
             if not is_relay:
                 place += (
@@ -215,9 +228,12 @@ class SportorgPrinter(object):
                     + ')'
                 )
             self.print_line(place, fn, fs_main)
+        elif result.person.is_out_of_competition:
+            place = translate('Place') + ': ' + translate('o/c').upper()
+            self.print_line(place, fn, fs_main)
 
         # Info about competitors, who can win current person
-        if result.is_status_ok() and not is_relay:
+        if result.is_status_ok() and not is_relay and is_group_existed:
             if obj.get_setting('system_start_source', 'protocol') == 'protocol':
                 if hasattr(result, 'can_win_count'):
                     if result.can_win_count > 0:
@@ -239,36 +255,37 @@ class SportorgPrinter(object):
                         self.print_line(translate('Result is final'), fn, fs_main)
 
         # Punch checking info
-        if result.is_status_ok():
-            self.print_line(translate('Status: OK'), fn, fs_large, 700)
-        else:
-            self.print_line(translate('Status: DSQ'), fn, fs_large, 700)
-            cp_list = ''
-            line_limit = 35
-            if course and course.controls:
-                for cp in course.controls:
-                    if len(cp_list) > line_limit:
-                        self.print_line(cp_list, fn, fs_main)
-                        cp_list = ''
-                    cp_list += cp.code.split('(')[0] + ' '
-                self.print_line(cp_list, fn, fs_main)
+        if is_group_existed:
+            if result.is_status_ok():
+                self.print_line(translate('Status: OK'), fn, fs_large, 700)
+            else:
+                self.print_line(translate('Status: DSQ'), fn, fs_large, 700)
+                cp_list = ''
+                line_limit = 35
+                if course and course.controls:
+                    for cp in course.controls:
+                        if len(cp_list) > line_limit:
+                            self.print_line(cp_list, fn, fs_main)
+                            cp_list = ''
+                        cp_list += cp.code.split('(')[0] + ' '
+                    self.print_line(cp_list, fn, fs_main)
 
-        # Short result list
-        if is_relay:
-            pass
-        else:
-            res = ResultCalculation(obj).get_group_finishes(group)
-            self.print_line(translate('Draft results'), fn, fs_main)
-            for cur_res in res[:10]:
-                self.print_line(
-                    ('  ' + str(cur_res.get_place()))[-2:]
-                    + ' '
-                    + (cur_res.person.full_name + ' ' * 22)[:22]
-                    + ' '
-                    + cur_res.get_result(),
-                    fn,
-                    fs_main,
-                )
+            # Short result list
+            if is_relay:
+                pass
+            else:
+                res = ResultCalculation(obj).get_group_finishes(group)
+                self.print_line(translate('Draft results'), fn, fs_main)
+                for cur_res in res[:10]:
+                    self.print_line(
+                        ('   ' + str(cur_res.get_place()))[-3:]
+                        + ' '
+                        + (cur_res.person.full_name + ' ' * 22)[:22]
+                        + ' '
+                        + cur_res.get_result(),
+                        fn,
+                        fs_main,
+                    )
 
         self.print_line(obj.data.url, fn, fs_main)
 
