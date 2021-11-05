@@ -109,7 +109,8 @@ class Config(metaclass=Singleton):
                 'finish_limit_relay': 4,
                 'sum_count': 10,
                 'sum_count_relay': 10,
-                'relay_ranking_method': 'personal'  # also use 'average' to get average
+                'individual_ranking_method': 'best',  # 'best' or 'first'
+                'relay_ranking_method': 'personal'  # 'personal', 'average', 'first'
             })
         }
 

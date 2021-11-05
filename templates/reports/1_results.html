@@ -444,13 +444,23 @@
                         rankingBlock.appendChild(document.createTextNode(text));
                     }
                     else {
-                        if (rank.max_time > 0) {
-                            var text = Qualification[rank.qual] + ' - ' + toHHMMSS(rank.max_time);
+                        if (rank.min_scores && rank.min_scores > 0) {
+                            var text = Qualification[rank.qual] + ' - ' + rank.min_scores + ' очк.';
                             if (rank.percent > 0) {
                                 text += ' (' + rank.percent + '%)';
                             }
                             rankingBlock.appendChild(document.createElement("br"));
                             rankingBlock.appendChild(document.createTextNode(text));
+                        }
+                        else {
+                            if (rank.max_time > 0) {
+                                var text = Qualification[rank.qual] + ' - ' + toHHMMSS(rank.max_time);
+                                if (rank.percent > 0) {
+                                    text += ' (' + rank.percent + '%)';
+                                }
+                                rankingBlock.appendChild(document.createElement("br"));
+                                rankingBlock.appendChild(document.createTextNode(text));
+                            }
                         }
                     }
                 }
@@ -475,7 +485,7 @@
             {key: 'bib', title: 'Номер', size: 6},
             {key: 'penalty_time', title: 'Штраф', size: 9, active: false},
             {key: 'penalty_laps', title: 'Штраф', size: 9, active: false},
-            {key: 'result', title: 'Результат', size: 14},
+            {key: 'result', title: 'Результат', size: 17},
             {key: 'result_relay', title: 'Ком. рез-т', size: 14},
             {key: 'diff', title: 'Отставание', size: 11},
             {key: 'speed', title: 'Темп', size: 8, active: false},

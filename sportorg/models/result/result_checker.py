@@ -21,7 +21,7 @@ class ResultChecker:
 
         if race().get_setting('result_processing_mode', 'time') == 'scores':
             # process by score (rogain)
-            result.scores = self.calculate_scores_rogain(result)
+            result.scores_rogain = self.calculate_scores_rogain(result)
             return True
 
         course = race().find_course(result)

@@ -2,7 +2,7 @@ import logging
 
 from sportorg.common.otime import OTime
 from sportorg.models.constant import RankingTable
-from sportorg.models.memory import Group, Qualification, RaceType, RelayTeam, find
+from sportorg.models.memory import Group, Qualification, RaceType, RelayTeam, find, ResultStatus
 from sportorg.modules.configs.configs import Config
 
 
@@ -127,18 +127,33 @@ class ResultCalculation(object):
                 rank = self.get_group_rank(group)
             ranking.rank_scores = rank
             if rank > 0:
-                leader_time = self.get_group_leader_time(group)
+
+                is_score_processing_mode = self.race.get_setting('result_processing_mode', 'time') == 'scores'
+                leader_time = OTime(0)
+                leader_scores = 0
+                if is_score_processing_mode:
+                    results = self.get_group_finishes(group)
+                    if len(results) > 0:
+                        leader_result = results[0]
+                        leader_scores = leader_result.scores
+                else:
+                    leader_time = self.get_group_leader_time(group)
+
                 for i in ranking.rank.values():
                     if i.is_active and i.use_scores:
-                        i.max_time = self.get_time_for_rank(leader_time, i.qual, rank)
                         i.percent = self.get_percent_for_rank(i.qual, rank)
                         i.max_place = 0
+                        if is_score_processing_mode:
+                            i.min_scores = self.get_scores_for_rank(leader_scores, i.qual, rank)
+                        else:
+                            i.max_time = self.get_time_for_rank(leader_time, i.qual, rank)
                     else:
                         i.percent = 0
 
             # Rank assigning for all athletes
             for i in results:
                 result_time = i.get_result_otime()
+                result_scores = i.scores
                 place = i.place
 
                 if i.person.is_out_of_competition or not i.is_status_ok():
@@ -157,6 +172,10 @@ class ResultCalculation(object):
                         if j.max_time and j.max_time >= result_time:
                             i.assigned_rank = j.qual
                             break
+                        if  result_scores >= j.min_scores > 0:
+                            i.assigned_rank = j.qual
+                            break
+
 
     def get_group_leader_time(self, group):
         if self.race.get_type(group) == RaceType.RELAY:
@@ -187,17 +206,20 @@ class ResultCalculation(object):
         start_limit = Config().ranking.get('start_limit', 10)
         finish_limit = Config().ranking.get('finish_limit', 5)
         sum_count = Config().ranking.get('sum_count', 10)
+        individual_ranking_method = Config().ranking.get('individual_ranking_method', 'best')
 
-        if len(array) < start_limit:
-            # less than X (default=10) started
-            return -1
-
+        started_count = 0
         for i in array:
-            if i.is_status_ok():
-                person = i.person
-                if not person.is_out_of_competition:
+            person = i.person
+            if not person.is_out_of_competition and i.status not in [ResultStatus.DID_NOT_START]:
+                started_count += 1
+                if i.is_status_ok():
                     qual = person.qual
                     scores.append(qual.get_score())
+
+        if started_count < start_limit:
+            # less than X (default=10) started
+            return -1
 
         if len(scores) < finish_limit:
             # less than X (default=5) finished and not disqualified
@@ -207,7 +229,11 @@ class ResultCalculation(object):
             # get rank sum of X (default=10) best finished
             return sum(scores)
 
-        scores = sorted(scores)
+        if individual_ranking_method == 'best':
+            scores = sorted(scores)
+        else:
+            # Use points of first N in protocol, reverse list and get last values (1st place in the end)
+            scores.reverse()
         return sum(scores[-sum_count:])
 
     def get_group_rank_relay(self, group):
@@ -244,7 +270,7 @@ class ResultCalculation(object):
             # less than X (default=4) teams successfully finished in relay
             return -1
 
-        if relay_ranking_method == 'personal':
+        if relay_ranking_method in ['personal', 'first']:
             scores = []
             for cur_team in success_teams:
                 for cur_leg in cur_team.legs:
@@ -254,10 +280,15 @@ class ResultCalculation(object):
                     scores.append(qual.get_score())
 
             if len(scores) <= sum_count:
-                # get rank sum of X (default=10) best finished
+                # get rank sum of X (default=10) best (by qualification, ignoring places) finished
                 return sum(scores)
 
-            scores = sorted(scores)
+            if relay_ranking_method == 'personal':
+                scores = sorted(scores)
+            else:
+                # get rank sum of X (default=10), taken from first in protocol teams
+                scores.reverse()
+
             return sum(scores[-sum_count:])
         else:
             # calculate average team score and get sum of first X teams
@@ -287,5 +318,12 @@ class ResultCalculation(object):
         if leader_time:
             msec_new = round(leader_time.to_msec() * percent / 100)
             ret = OTime(msec=msec_new)
+            return ret
+        return None
+
+    def get_scores_for_rank(self, leader_scores, qual, rank):
+        percent = self.get_percent_for_rank(qual, rank)
+        if leader_scores:
+            ret = round(int(leader_scores) * percent / 100)
             return ret
         return None

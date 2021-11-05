@@ -437,6 +437,7 @@ class Result:
         self.penalty_laps = 0  # count of penalty legs (marked route)
         self.place = 0
         self.scores = 0
+        self.scores_rogain = 0
         self.assigned_rank = Qualification.NOT_QUALIFIED
         self.diff: Optional[OTime] = None  # readonly
         self.diff_scores = 0  # readonly
@@ -469,7 +470,7 @@ class Result:
             else:
                 return False
         else:  # process by score (rogain)
-            eq = eq and self.scores == other.scores
+            eq = eq and self.scores_rogain == other.scores_rogain
             if eq and self.get_start_time() and other.get_start_time():
                 eq = eq and self.get_start_time() == other.get_start_time()
             if eq and self.get_finish_time() and other.get_finish_time():
@@ -488,10 +489,10 @@ class Result:
         if race().get_setting('result_processing_mode', 'time') == 'time':
             return self.get_result_otime() > other.get_result_otime()
         else:  # process by score (rogain)
-            if self.scores == other.scores:
+            if self.scores_rogain == other.scores_rogain:
                 return self.get_result_otime() > other.get_result_otime()
             else:
-                return self.scores < other.scores
+                return self.scores_rogain < other.scores_rogain
 
     @property
     @abstractmethod
@@ -521,6 +522,7 @@ class Result:
             'card_number': self.card_number,
             'speed': self.speed,  # readonly
             'scores': self.scores,  # readonly
+            'scores_rogain': self.scores_rogain,  # readonly
             'created_at': self.created_at,  # readonly
             'result': self.get_result(),  # readonly
             'result_relay': self.get_result_relay(),
@@ -539,6 +541,8 @@ class Result:
         self.status = ResultStatus(int(data['status']))
         self.penalty_laps = int(data['penalty_laps'])
         self.scores = data['scores']
+        if 'scores_rogain' in data and data['scores_rogain']:
+            self.scores_rogain = data['scores_rogain']
         if str(data['place']).isdigit():
             self.place = int(data['place'])
         self.assigned_rank = Qualification.get_qual_by_code(data['assigned_rank'])
@@ -590,7 +594,7 @@ class Result:
 
         ret = ''
         if race().get_setting('result_processing_mode', 'time') == 'scores':
-            ret += str(self.scores) + ' ' + translate('points') + ' '
+            ret += str(self.scores_rogain) + ' ' + translate('points') + ' '
 
         time_accuracy = race().get_setting('time_accuracy', 0)
         ret += self.get_result_otime().to_str(time_accuracy)
@@ -607,7 +611,7 @@ class Result:
 
         ret = ''
         if race().get_setting('result_processing_mode', 'time') == 'scores':
-            ret += str(self.scores) + ' ' + translate('points') + ' '
+            ret += str(self.scores_rogain) + ' ' + translate('points') + ' '
 
         # time_accuracy = race().get_setting('time_accuracy', 0)
         start = hhmmss_to_time(self.person.comment)
@@ -641,7 +645,7 @@ class Result:
 
         ret = ''
         if race().get_setting('result_processing_mode', 'time') == 'scores':
-            ret += str(self.scores) + ' ' + translate('points') + ' '
+            ret += str(self.scores_rogain) + ' ' + translate('points') + ' '
 
         time_accuracy = race().get_setting('time_accuracy', 0)
         ret += self.get_result_otime_relay().to_str(time_accuracy)
@@ -1682,12 +1686,14 @@ class RankingItem(object):
         self.max_time = max_time
         self.is_active = is_active
         self.percent = 0
+        self.min_scores = 0
 
     def get_dict_data(self):
         ret = {}
         ret['qual'] = self.qual.get_title()
         ret['max_place'] = self.max_place
         ret['max_time'] = str(self.max_time)
+        ret['min_scores'] = str(self.min_scores) if self.min_scores else None
         ret['percent'] = self.percent
         return ret
 
@@ -1697,6 +1703,7 @@ class RankingItem(object):
         ret['use_scores'] = self.use_scores
         ret['max_place'] = str(self.max_place)
         ret['max_time'] = self.max_time.to_msec() if self.max_time else None
+        ret['min_scores'] = str(self.min_scores) if self.min_scores else None
         ret['is_active'] = self.is_active
         ret['percent'] = self.percent
         return ret
@@ -1707,6 +1714,8 @@ class RankingItem(object):
         self.max_place = int(data['max_place'])
         if data['max_time']:
             self.max_time = OTime(msec=int(data['max_time']))
+        if 'min_scores' in data and data['min_scores']:
+            self.min_scores = (data['max_time'])
         self.is_active = bool(data['is_active'])
         self.percent = int(data['percent'])
 
