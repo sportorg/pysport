@@ -81,6 +81,8 @@ class MainWindow(QMainWindow):
 
         self.last_update = time.time()
         self.relay_number_assign = False
+        self.split_printer_thread = None
+        self.split_printer_queue = None
 
     def _set_style(self):
         try:
@@ -141,6 +143,12 @@ class MainWindow(QMainWindow):
     def close(self):
         self.conf_write()
 
+    def closeSplitPrinter(self):
+        if self.split_printer_thread:
+            self.split_printer_thread.terminate()
+        if self.split_printer_queue:
+            self.split_printer_queue.close()
+
     def closeEvent(self, _event):
         quit_msg = translate('Save file before exit?')
         reply = messageBoxQuestion(
@@ -150,6 +158,7 @@ class MainWindow(QMainWindow):
             QMessageBox.Save | QMessageBox.No | QMessageBox.Cancel,
         )
 
+        self.closeSplitPrinter()
         if reply == QMessageBox.Save:
             self.save_file()
             self.close()
@@ -721,3 +730,15 @@ class MainWindow(QMainWindow):
                     translate('Cannot remove organization'),
                 )
             self.refresh()
+
+    def get_split_printer_thread(self):
+        return self.split_printer_thread
+
+    def set_split_printer_thread(self, split_printer):
+        self.split_printer_thread = split_printer
+
+    def get_split_printer_queue(self):
+        return self.split_printer_queue
+
+    def set_split_printer_queue(self, split_printer_app):
+        self.split_printer_queue = split_printer_app
