@@ -1,6 +1,8 @@
 import logging
 import sys
-from multiprocessing import Process
+from multiprocessing import Process, Queue
+
+from sportorg.gui.global_access import GlobalAccess
 
 from PySide2.QtCore import QSizeF
 from PySide2.QtGui import QTextDocument
@@ -11,7 +13,7 @@ from sportorg.common.fake_std import FakeStd
 
 
 class PrintProcess(Process):
-    def __init__(self, printer_name, html, left=5.0, top=5.0, right=5.0, bottom=5.0):
+    def __init__(self, queue, printer_name, html, left=5.0, top=5.0, right=5.0, bottom=5.0):
         super().__init__()
         self.printer_name = printer_name
         self.html = html
@@ -59,7 +61,19 @@ class PrintProcess(Process):
             logging.error(str(e))
 
 
-def print_html(printer_name, html, left=5.0, top=5.0, right=5.0, bottom=5.0):
-    thread = PrintProcess(printer_name, html, left, top, right, bottom)
-    thread.start()
-    logging.info('printing poccess started')
+def print_html(printer_name, html, left=5.0, top=5.0, right=5.0, bottom=5.0, scale=100.0):
+    logging.info('print_html: Startin printing poccess')
+    thread = GlobalAccess().get_main_window().get_split_printer_thread()
+    queue = GlobalAccess().get_main_window().get_split_printer_queue()
+    if not queue:
+        queue = Queue()
+        GlobalAccess().get_main_window().set_split_printer_queue(queue)
+        logging.info('print_html:  Queue has been created')
+    if not thread:
+        thread = PrintProcess(queue, printer_name, html, left, top, right, bottom)
+        thread.start()
+        GlobalAccess().get_main_window().set_split_printer_thread(thread)
+        logging.info('print_html:  Process has been initialized and started has been created')
+
+    queue.put(html)
+    logging.info('print_html: Task has been put to queue')
