@@ -8,6 +8,7 @@ from PySide2.QtWidgets import QDialog
 from sportorg import config
 from sportorg.common.otime import OTime
 from sportorg.gui.global_access import GlobalAccess
+from sportorg.gui.utils.custom_controls import AdvSpinBox, AdvTimeEdit
 from sportorg.language import translate
 from sportorg.models.memory import Limit, race
 from sportorg.models.start.start_preparation import (
@@ -16,7 +17,6 @@ from sportorg.models.start.start_preparation import (
     StartNumberManager,
     StartTimeManager,
 )
-from sportorg.utils.time import time_to_otime
 
 
 class StartPreparationDialog(QDialog):
@@ -61,7 +61,7 @@ class StartPreparationDialog(QDialog):
         self.reserve_layout.setWidget(
             2, QtWidgets.QFormLayout.LabelRole, self.reserve_group_count_label
         )
-        self.reserve_group_count_spin_box = QtWidgets.QSpinBox(self.widget_reserve)
+        self.reserve_group_count_spin_box = AdvSpinBox(parent=self.widget_reserve)
         self.reserve_group_count_spin_box.setEnabled(False)
         self.reserve_layout.setWidget(
             2, QtWidgets.QFormLayout.FieldRole, self.reserve_group_count_spin_box
@@ -70,9 +70,8 @@ class StartPreparationDialog(QDialog):
         self.reserve_layout.setWidget(
             3, QtWidgets.QFormLayout.LabelRole, self.reserve_group_percent_label
         )
-        self.reserve_group_percent_spin_box = QtWidgets.QSpinBox(self.widget_reserve)
+        self.reserve_group_percent_spin_box = AdvSpinBox(parent=self.widget_reserve, maximum=100)
         self.reserve_group_percent_spin_box.setEnabled(False)
-        self.reserve_group_percent_spin_box.setMaximum(100)
         self.reserve_group_percent_spin_box.setSingleStep(5)
         self.reserve_layout.setWidget(
             3, QtWidgets.QFormLayout.FieldRole, self.reserve_group_percent_spin_box
@@ -132,9 +131,8 @@ class StartPreparationDialog(QDialog):
         self.start_layout.setWidget(
             1, QtWidgets.QFormLayout.LabelRole, self.start_first_label
         )
-        self.start_first_time_edit = QtWidgets.QTimeEdit(self.widget_start)
+        self.start_first_time_edit = AdvTimeEdit(display_format=self.time_format, parent=self.widget_start)
         self.start_first_time_edit.setEnabled(False)
-        self.start_first_time_edit.setDisplayFormat(self.time_format)
         self.start_layout.setWidget(
             1, QtWidgets.QFormLayout.FieldRole, self.start_first_time_edit
         )
@@ -143,9 +141,8 @@ class StartPreparationDialog(QDialog):
         self.start_layout.setWidget(
             2, QtWidgets.QFormLayout.LabelRole, self.start_interval_radio_button
         )
-        self.start_interval_time_edit = QtWidgets.QTimeEdit(self.widget_start)
+        self.start_interval_time_edit = AdvTimeEdit(display_format=self.time_format, parent=self.widget_start)
         self.start_interval_time_edit.setEnabled(False)
-        self.start_interval_time_edit.setDisplayFormat(self.time_format)
         self.start_layout.setWidget(
             2, QtWidgets.QFormLayout.FieldRole, self.start_interval_time_edit
         )
@@ -163,9 +160,8 @@ class StartPreparationDialog(QDialog):
         self.start_layout.setWidget(
             4, QtWidgets.QFormLayout.LabelRole, self.start_one_minute_qty_label
         )
-        self.start_one_minute_qty = QtWidgets.QSpinBox(self.widget_start)
+        self.start_one_minute_qty = AdvSpinBox(parent=self.widget_start, maximum=100)
         self.start_one_minute_qty.setValue(1)
-        self.start_one_minute_qty.setMaximum(100)
         self.start_layout.setWidget(
             4, QtWidgets.QFormLayout.FieldRole, self.start_one_minute_qty
         )
@@ -184,15 +180,14 @@ class StartPreparationDialog(QDialog):
         self.numbers_interval_radio_button.setChecked(True)
         self.numbers_interval_radio_button.setMinimumWidth(70)
         self.numbers_interval_hor_layout.addWidget(self.numbers_interval_radio_button)
-        self.numbers_first_spin_box = QtWidgets.QSpinBox(self.widget_numbers)
+        self.numbers_first_spin_box = AdvSpinBox(parent=self.widget_numbers, maximum=Limit.BIB)
         self.numbers_first_spin_box.setEnabled(False)
         self.numbers_first_spin_box.setMinimumWidth(47)
-        self.numbers_first_spin_box.setMaximum(Limit.BIB)
         self.numbers_first_spin_box.setMinimumHeight(20)
         self.numbers_interval_hor_layout.addWidget(self.numbers_first_spin_box)
         self.numbers_interval_label = QtWidgets.QLabel(self.widget_numbers)
         self.numbers_interval_hor_layout.addWidget(self.numbers_interval_label)
-        self.numbers_interval_spin_box = QtWidgets.QSpinBox(self.widget_numbers)
+        self.numbers_interval_spin_box = AdvSpinBox(parent=self.widget_numbers)
         self.numbers_interval_spin_box.setMinimumHeight(20)
         self.numbers_interval_spin_box.setEnabled(False)
         self.numbers_interval_hor_layout.addWidget(self.numbers_interval_spin_box)
@@ -327,10 +322,9 @@ class StartPreparationDialog(QDialog):
 
             if self.start_check_box.isChecked():
 
-                corridor_first_start = time_to_otime(self.start_first_time_edit.time())
-                fixed_start_interval = time_to_otime(
-                    self.start_interval_time_edit.time()
-                )
+                corridor_first_start = self.start_first_time_edit.getOTime()
+                fixed_start_interval = self.start_interval_time_edit.getOTime()
+
                 one_minute_qty = self.start_one_minute_qty.value()
                 if self.start_interval_radio_button.isChecked():
                     StartTimeManager(obj).process(
@@ -389,11 +383,11 @@ class StartPreparationDialog(QDialog):
         )
         obj.set_setting(
             'start_interval',
-            time_to_otime(self.start_interval_time_edit.time()).to_msec(),
+            self.start_interval_time_edit.getOTime().to_msec(),
         )
         obj.set_setting(
             'start_first_time',
-            time_to_otime(self.start_first_time_edit.time()).to_msec(),
+            self.start_first_time_edit.getOTime().to_msec(),
         )
         obj.set_setting('start_one_minute_qty', self.start_one_minute_qty.value())
 

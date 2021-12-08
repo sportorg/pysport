@@ -15,6 +15,7 @@ from sportorg.language import translate
 from sportorg.models.constant import get_race_courses
 from sportorg.models.memory import Limit, RaceType, find, race
 from sportorg.models.result.result_calculation import ResultCalculation
+from sportorg.modules.live.live import live_client
 
 
 class GroupEditDialog(BaseDialog):
@@ -187,3 +188,4 @@ class GroupEditDialog(BaseDialog):
             race().groups.insert(0, group)
 
         ResultCalculation(race()).set_rank(group)
+        live_client.send(group)

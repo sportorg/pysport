@@ -3,6 +3,7 @@ from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import translate
 from sportorg.models.constant import get_countries, get_regions
 from sportorg.models.memory import find, race
+from sportorg.modules.live.live import live_client
 
 
 class OrganizationEditDialog(BaseDialog):
@@ -56,3 +57,4 @@ class OrganizationEditDialog(BaseDialog):
         org = self.current_object
         if self.is_new:
             race().organizations.insert(0, org)
+        live_client.send(org)

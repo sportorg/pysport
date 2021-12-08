@@ -8,7 +8,6 @@ from PySide2.QtWidgets import (
     QFormLayout,
     QLabel,
     QPushButton,
-    QSpinBox,
     QTabWidget,
     QWidget,
 )
@@ -16,7 +15,7 @@ from PySide2.QtWidgets import (
 from sportorg import config
 from sportorg.common.audio import get_sounds
 from sportorg.gui.global_access import GlobalAccess
-from sportorg.gui.utils.custom_controls import AdvComboBox
+from sportorg.gui.utils.custom_controls import AdvComboBox, AdvSpinBox
 from sportorg.language import get_languages, translate
 from sportorg.models.memory import (
     add_race,
@@ -49,9 +48,7 @@ class MainTab(Tab):
         )
         self.layout.addRow(self.label_lang, self.item_lang)
 
-        self.item_auto_save = QSpinBox()
-        self.item_auto_save.setMaximum(3600 * 24)
-        self.item_auto_save.setValue(Config().configuration.get('autosave_interval'))
+        self.item_auto_save = AdvSpinBox(maximum=3600 * 24, value=Config().configuration.get('autosave_interval'))
         self.layout.addRow(translate('Auto save') + ' (sec)', self.item_auto_save)
 
         self.item_open_recent_file = QCheckBox(translate('Open recent file'))

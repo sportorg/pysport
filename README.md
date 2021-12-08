@@ -36,6 +36,5 @@ poetry run python SportOrg.pyw
 
 ## Roadmap
 
-- [ ] Fix live results (sportorg doesn't send data to server)
 - [ ] Publish to pypi
 - [ ] Deploy to telegram

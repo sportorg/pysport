@@ -146,6 +146,15 @@ class ReportDialog(QDialog):
 
         races_dict = [r.to_dict() for r in races()]
 
+        template_path_items = template_path.split('/')[-1]
+        template_path_items = '.'.join(template_path_items.split('.')[:-1]).split('_')
+
+        # remove tokens, containing only digits
+        for i in template_path_items:
+            if str(i).isdigit():
+                template_path_items.remove(i)
+        report_suffix = '_'.join(template_path_items)
+
         if template_path.endswith('.docx'):
             # DOCX template processing
             full_path = config.template_dir() + template_path
@@ -162,8 +171,8 @@ class ReportDialog(QDialog):
                 file_name = get_save_file_name(
                     translate('Save As MS Word file'),
                     translate('MS Word file (*.docx)'),
-                    '{}_official'.format(
-                        obj.data.get_start_datetime().strftime('%Y%m%d')
+                    '{}_{}'.format(
+                        obj.data.get_start_datetime().strftime('%Y%m%d'), report_suffix
                     ),
                 )
             if file_name:
@@ -186,8 +195,8 @@ class ReportDialog(QDialog):
                 file_name = get_save_file_name(
                     translate('Save As HTML file'),
                     translate('HTML file (*.html)'),
-                    '{}_report'.format(
-                        obj.data.get_start_datetime().strftime('%Y%m%d')
+                    '{}_{}'.format(
+                        obj.data.get_start_datetime().strftime('%Y%m%d'), report_suffix
                     ),
                 )
             if len(file_name):

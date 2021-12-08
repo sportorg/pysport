@@ -7,7 +7,7 @@ from PySide2.QtWidgets import QDialog, QDialogButtonBox, QFormLayout
 from sportorg import config
 from sportorg.gui.dialogs.person_edit import PersonEditDialog
 from sportorg.gui.global_access import GlobalAccess
-from sportorg.gui.utils.custom_controls import AdvComboBox
+from sportorg.gui.utils.custom_controls import AdvComboBox, AdvSpinBox
 from sportorg.language import translate
 from sportorg.models.constant import get_race_groups, get_race_teams
 
@@ -46,9 +46,7 @@ class DialogFilter(QDialog):
 
         self.max_rows_count_label = QtWidgets.QLabel(self)
 
-        self.max_rows_count_spin_box = QtWidgets.QSpinBox(self)
-        self.max_rows_count_spin_box.setMaximum(100000)
-        self.max_rows_count_spin_box.setValue(5000)
+        self.max_rows_count_spin_box = AdvSpinBox(5000, 100000)
         self.layout.addRow(self.max_rows_count_label, self.max_rows_count_spin_box)
 
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
@@ -72,12 +70,12 @@ class DialogFilter(QDialog):
                 proxy_model.clear_filter()
                 proxy_model.max_rows_count = self.max_rows_count_spin_box.value()
 
-                group_column = 4
-                team_column = 5
+                group_column = 2
+                team_column = 3
 
-                if GlobalAccess().get_main_window().current_tab == 1:
-                    group_column = 2
-                    team_column = 3
+                if GlobalAccess().get_main_window().current_tab == 0:
+                    group_column = 3
+                    team_column = 4
 
                 proxy_model.set_filter_for_column(
                     group_column, self.group_combo.currentText()
@@ -91,7 +89,7 @@ class DialogFilter(QDialog):
                 PersonEditDialog.GROUP_NAME = self.group_combo.currentText()
                 PersonEditDialog.ORGANIZATION_NAME = self.team_combo.currentText()
         except Exception as e:
-            logging.error(str(e))
+            logging.exception(e)
 
         super().accept(*args, **kwargs)
 

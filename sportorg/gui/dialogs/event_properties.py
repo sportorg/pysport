@@ -8,13 +8,12 @@ from PySide2.QtWidgets import (
     QFormLayout,
     QLabel,
     QLineEdit,
-    QSpinBox,
     QTextEdit,
 )
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
-from sportorg.gui.utils.custom_controls import AdvComboBox
+from sportorg.gui.utils.custom_controls import AdvComboBox, AdvSpinBox
 from sportorg.language import translate
 from sportorg.models.memory import RaceType, race
 from sportorg.models.result.result_calculation import ResultCalculation
@@ -67,10 +66,7 @@ class EventPropertiesDialog(QDialog):
         self.layout.addRow(self.label_type, self.item_type)
 
         self.label_relay_legs = QLabel(translate('Relay legs'))
-        self.item_relay_legs = QSpinBox()
-        self.item_relay_legs.setMinimum(1)
-        self.item_relay_legs.setMaximum(20)
-        self.item_relay_legs.setValue(3)
+        self.item_relay_legs = AdvSpinBox(minimum=1, maximum=20, value=3)
         self.layout.addRow(self.label_relay_legs, self.item_relay_legs)
 
         self.item_type.currentTextChanged.connect(self.change_type)

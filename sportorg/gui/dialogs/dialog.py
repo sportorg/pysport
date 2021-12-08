@@ -13,17 +13,15 @@ from PySide2.QtWidgets import (
     QLineEdit,
     QPushButton,
     QScrollArea,
-    QSpinBox,
     QTextEdit,
-    QTimeEdit,
     QVBoxLayout,
     QWidget,
 )
 
 from sportorg import config
-from sportorg.gui.utils.custom_controls import AdvComboBox
+from sportorg.gui.utils.custom_controls import AdvComboBox, AdvSpinBox, AdvTimeEdit
 from sportorg.language import translate
-from sportorg.utils.time import qdate_to_date, time_to_otime, time_to_qtime
+from sportorg.utils.time import qdate_to_date, time_to_otime
 
 
 @dataclass
@@ -157,7 +155,7 @@ class BaseDialog(QDialog):
                 if callback:
                     item.textChanged.connect(callback)
             if isinstance(field, NumberField):
-                item = QSpinBox()
+                item = AdvSpinBox()
                 if field.maximum is not None:
                     item.setMaximum(field.maximum)
                 if field.minimum is not None:
@@ -205,9 +203,7 @@ class BaseDialog(QDialog):
                 if callback:
                     item.textChanged.connect(callback)
             if isinstance(field, TimeField):
-                item = QTimeEdit()
-                item.setDisplayFormat(field.format)
-                item.setTime(time_to_qtime(value))
+                item = AdvTimeEdit(display_format=field.format, time=value)
             if isinstance(field, DateField):
                 item = QDateEdit()
                 if field.maximum:

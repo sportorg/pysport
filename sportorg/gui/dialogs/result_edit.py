@@ -13,9 +13,7 @@ from PySide2.QtWidgets import (
     QLabel,
     QLineEdit,
     QScrollArea,
-    QSpinBox,
     QTextEdit,
-    QTimeEdit,
     QVBoxLayout,
     QWidget,
 )
@@ -23,14 +21,15 @@ from PySide2.QtWidgets import (
 from sportorg import config
 from sportorg.gui.dialogs.person_edit import PersonEditDialog
 from sportorg.gui.global_access import GlobalAccess
-from sportorg.gui.utils.custom_controls import AdvComboBox
+from sportorg.gui.utils.custom_controls import AdvComboBox, AdvSpinBox, AdvTimeEdit
 from sportorg.language import translate
 from sportorg.models.constant import StatusComments
 from sportorg.models.memory import Limit, ResultStatus, Split, find, race
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.result_checker import ResultChecker, ResultCheckerException
 from sportorg.models.result.split_calculation import GroupSplits
-from sportorg.utils.time import hhmmss_to_time, time_to_otime, time_to_qtime
+from sportorg.modules.live.live import live_client
+from sportorg.utils.time import hhmmss_to_time
 
 
 class ResultEditDialog(QDialog):
@@ -64,39 +63,30 @@ class ResultEditDialog(QDialog):
 
         form_layout = QFormLayout(content_widget)
 
-        self.item_created_at = QTimeEdit()
-        self.item_created_at.setDisplayFormat(self.time_format)
+        self.item_created_at = AdvTimeEdit(display_format=self.time_format)
         self.item_created_at.setReadOnly(True)
 
-        self.item_card_number = QSpinBox()
-        self.item_card_number.setMaximum(9999999)
+        self.item_card_number = AdvSpinBox(maximum=9999999)
 
-        self.item_bib = QSpinBox()
-        self.item_bib.setMaximum(Limit.BIB)
+        self.item_bib = AdvSpinBox(maximum=Limit.BIB)
         self.item_bib.valueChanged.connect(self.show_person_info)
 
         self.label_person_info = QLabel('')
 
-        self.item_days = QSpinBox()
-        self.item_days.setMaximum(365)
+        self.item_days = AdvSpinBox(maximum=365)
 
-        self.item_finish = QTimeEdit()
-        self.item_finish.setDisplayFormat(self.time_format)
+        self.item_finish = AdvTimeEdit(display_format=self.time_format)
 
-        self.item_start = QTimeEdit()
-        self.item_start.setDisplayFormat(self.time_format)
+        self.item_start = AdvTimeEdit(display_format=self.time_format)
 
         self.item_result = QLineEdit()
         self.item_result.setEnabled(False)
 
-        self.item_credit = QTimeEdit()
-        self.item_credit.setDisplayFormat(self.time_format)
+        self.item_credit = AdvTimeEdit(display_format=self.time_format)
 
-        self.item_penalty = QTimeEdit()
-        self.item_penalty.setDisplayFormat(self.time_format)
+        self.item_penalty = AdvTimeEdit(display_format=self.time_format)
 
-        self.item_penalty_laps = QSpinBox()
-        self.item_penalty_laps.setMaximum(1000000)
+        self.item_penalty_laps = AdvSpinBox(maximum=1000000)
 
         self.item_status = QComboBox()
         self.item_status.addItems(ResultStatus.get_titles())
@@ -195,19 +185,17 @@ class ResultEditDialog(QDialog):
             self.splits.splits(self.current_object.splits)
             self.splits.show()
         if self.current_object.created_at:
-            self.item_created_at.setTime(
-                time_to_qtime(datetime.fromtimestamp(self.current_object.created_at))
-            )
+            self.item_created_at.setOTime(datetime.fromtimestamp(self.current_object.created_at))
         if self.current_object.finish_time:
-            self.item_finish.setTime(time_to_qtime(self.current_object.finish_time))
+            self.item_finish.setOTime(self.current_object.finish_time)
         if self.current_object.start_time:
-            self.item_start.setTime(time_to_qtime(self.current_object.start_time))
+            self.item_start.setOTime(self.current_object.start_time)
         if self.current_object.finish_time:
             self.item_result.setText(str(self.current_object.get_result()))
         if self.current_object.credit_time:
-            self.item_credit.setTime(time_to_qtime(self.current_object.credit_time))
+            self.item_credit.setOTime(self.current_object.credit_time)
         if self.current_object.penalty_time:
-            self.item_penalty.setTime(time_to_qtime(self.current_object.penalty_time))
+            self.item_penalty.setOTime(self.current_object.penalty_time)
         if self.current_object.penalty_laps:
             self.item_penalty_laps.setValue(self.current_object.penalty_laps)
         self.item_bib.setValue(self.current_object.get_bib())
@@ -242,19 +230,19 @@ class ResultEditDialog(QDialog):
                         break
             result.splits = new_splits
 
-        time_ = time_to_otime(self.item_finish.time())
+        time_ = self.item_finish.getOTime()
         if result.finish_time != time_:
             result.finish_time = time_
 
-        time_ = time_to_otime(self.item_start.time())
+        time_ = self.item_start.getOTime()
         if result.start_time != time_:
             result.start_time = time_
 
-        time_ = time_to_otime(self.item_credit.time())
+        time_ = self.item_credit.getOTime()
         if result.credit_time != time_:
             result.credit_time = time_
 
-        time_ = time_to_otime(self.item_penalty.time())
+        time_ = self.item_penalty.getOTime()
         if result.penalty_time != time_:
             result.penalty_time = time_
 
@@ -303,6 +291,7 @@ class ResultEditDialog(QDialog):
             except ResultCheckerException as e:
                 logging.error(str(e))
         ResultCalculation(race()).process_results()
+        live_client.send(result)
 
 
 class SplitsObject:
