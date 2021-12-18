@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+{% block title %}Results{% endblock %}
+{% block head %}{{ super() }}{% endblock %}
+{% block content %}
+<div class="text-center">
+    <h3>{{ race.data.description }} <br>{{ race.data.start_datetime|date }} {{ race.data.location }}</h3>
+    <h2>ПРОТОКОЛ РЕЗУЛЬТАТОВ</h2>
+</div>
+<div id="results-tables"></div>
+<div>
+    <table class="empty-table">
+        <tr>
+            <td><b>Главный судья:</b></td>
+            <td width="150px"></td>
+            <td><b>{{ race.data.chief_referee }}</b></td>
+        </tr>
+        <tr>
+            <td><b>Главный секретарь:</b></td>
+            <td width="150px"></td>
+            <td><b>{{ race.data.secretary }}</b></td>
+        </tr>
+    </table>
+</div>
+{% raw %}
+<script>
+    var race = {% endraw %}{{race|tojson}}{%raw %};
+    var selected = {% endraw %}{{selected|tojson}}{%raw %};
+    racePreparation(race);
+
+    var Scores = {
+        race: race,
+        selected: selected,
+        store: {
+            hideNull: true,
+            sort: 'places',
+            grouping: 'organizations',
+            sum: 'n_all',
+            nsum: 0
+        },
+        fields: [
+            {key: 'index', title: '№'},
+            {key: 'name', title: 'Коллектив'},
+            {key: 'places', title: 'Сумма мест'},
+            {key: 'count', title: 'Участников'},
+            {key: 'people', title: 'Участники'}
+        ],
+        init: function () {
+            this.showSettings();
+            this.render();
+            return this;
+        },
+        getScores: function (org) {
+            // org is organization or region, interface {id: string, name: string}
+            var _this = this;
+            var places = 0;
+            var count = 0;
+            var people = "";
+            var equal = function (organization) {
+                if (_this.store.grouping === 'organizations') {
+                    return organization.id === org.id;
+                } else if (_this.store.grouping === 'regions') {
+                    return organization.address.state === org.name;
+                }
+            };
+            var results = this.race.results.filter(function (result) {
+                if (result.status === 1 && result.person && !result.person.is_out_of_competition && result.person.group && result.person.organization && equal(result.person.organization, result.person.group)) {
+                    return !_this.selected.groups.length || _this.selected.groups.some(function (elem) {
+                        return elem.id === result.person.group.id;
+                    })
+                }
+                return false;
+            });
+
+            results.sort(function (a, b) {
+                return a.place - b.place;
+            });
+            if (+_this.store.nsum) {
+                results = results.slice(0, +_this.store.nsum);
+            }
+
+            results.forEach(function (elem) {
+                count++;
+                places += elem.place;
+                for (var _i = 0, _a = this.race.persons; _i < _a.length; _i++) {
+                    var person = _a[_i];
+                    if (person.id === elem.person_id){
+                        people += elem.place + ": " + person.surname + " " + person.name + " " + elem.result + "; "
+                        break;
+                    }
+                }
+            });
+
+            return {places: places, count: count, people: people};
+        },
+        getScoresTable: function () {
+            var ret = [];
+            var data = [];
+            if (this.store.grouping === 'organizations') {
+                data = this.race.organizations;
+            } else if (this.store.grouping === 'regions') {
+                var regions = {};
+                this.race.organizations.forEach(function (elem) {
+                    regions[elem.address.state] = true;
+                });
+                Object.keys(regions).forEach(function (value) {
+                    data.push({
+                        id: guid(),
+                        name: value
+                    });
+                });
+            }
+            for (var _i = 0, _a = data; _i < _a.length; _i++) {
+                var obj = _a[_i];
+                var s = this.getScores(obj);
+                ret.push({
+                    index: 0,
+                    name: obj.name,
+                    places: s.places,
+                    count: s.count,
+                    places_int : s.places,
+                    people: s.people
+                })
+            }
+            if (this.store.hideNull) {
+                ret = ret.filter(function (elem) {
+                    return !!elem.places_int;
+                });
+            }
+            var sortByName = function (a, b) {
+                var nameA = a.name && a.name.toLowerCase() || '';
+                var nameB = b.name && b.name.toLowerCase() || '';
+                if (nameA < nameB)
+                    return -1;
+                if (nameA > nameB)
+                    return 1;
+                return 0;
+            };
+            var sortFunc = function (a, b) {
+                if (a.count === b.count){
+                    if (a.places_int === b.places_int) {
+                        return sortByName(a, b);
+                    }
+                    return a.places_int - b.places_int;
+                }
+                return b.count - a.count;
+            };
+            if (this.store.sort === 'name') {
+                sortFunc = sortByName;
+            }
+            ret.sort(sortFunc);
+            var index = 0;
+            ret.forEach(function (elem) {
+                elem.index = ++index;
+            });
+            return ret;
+        },
+        render: function () {
+            var resultBlock = document.getElementById('results-tables');
+            resultBlock.innerHTML = '';
+            resultBlock.appendChild(new TableGenerator(this.getScoresTable(), this.fields).getTable({className: 'sportorg-table'}));
+        },
+        showSettings: function () {
+            var _this = this;
+            new SettingsGenerator([
+                {
+                    title: 'Объеденить по: ',
+                    value: [
+                        {text: 'коллективам', value: 'organizations'},
+                        {text: 'регионам', value: 'regions'}
+                    ],
+                    change: function (arr) {
+                        _this.store.grouping = arr[0];
+                        _this.render();
+                    }
+                },
+                {
+                    title: 'Сумма: ',
+                    value: [
+                        {text: 'лучшие n среди всех групп', value: 'n_all'},
+                        {text: 'лучшие n в группе', value: 'n_group'}
+                    ],
+                    change: function (arr) {
+                        _this.store.sum = arr[0];
+                        _this.render();
+                    }
+                },
+                {
+                    title: 'n: ',
+                    value: [
+                        {text: 'все участники', value: 0},
+                        {text: '3', value: 3},
+                        {text: '4', value: 4},
+                        {text: '6', value: 6},
+                        {text: '8', value: 8},
+                        {text: '9', value: 9},
+                        {text: '10', value: 10},
+                        {text: '101', value: 101}
+                    ],
+                    change: function (arr) {
+                        _this.store.nsum = arr[0];
+                        _this.render();
+                    }
+                },
+                {
+                    title: 'Сортировать по: ',
+                    value: [
+                        {text: 'сумме мест', value: 'places'},
+                        {text: 'названию', value: 'name'}
+                    ],
+                    change: function (arr) {
+                        _this.store.sort = arr[0];
+                        _this.render();
+                    }
+                },
+                {
+                    title: 'Скрыть нулевые очки',
+                    value: this.store.hideNull,
+                    change: function (checked) {
+                        _this.store.hideNull = checked;
+                        _this.render()
+                    }
+                }
+            ]).show();
+        }
+    }.init()
+</script>
+{% endraw %}
+{% endblock %}
