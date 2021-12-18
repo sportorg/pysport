@@ -154,8 +154,6 @@ class MainWindow(QMainWindow):
 
         self._handler.setLevel(Configuration().configuration.get('logging_level'))
 
-
-
     def conf_write(self):
         Configuration().parser[ConfigFile.GEOMETRY]['main'] = bytes(self.saveGeometry().toHex()).decode()
         Configuration().save()
