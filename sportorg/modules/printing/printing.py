@@ -21,15 +21,23 @@ class PrintProcess(Process):
         self.margin_top = top
         self.margin_right = right
         self.margin_bottom = bottom
+        self.queue = queue
+
+    def set_app_printer(self, app, printer):
+        self.app = app
+        self.printer_name = printer
+        self.mw.set_split_printer_app(app)
+        self.mw.set_split_printer(printer)
 
     def run(self):
+        #t = time.process_time()
         try:
             sys.stdout = FakeStd()
             sys.stderr = FakeStd()
             app = QApplication.instance()
             if app is None:
                 app = QApplication(['--platform', 'minimal'])
-            # we need this call to correctly render images...
+                # we need this call to correctly render images...
             app.processEvents()
 
             printer = QPrinter()
@@ -55,8 +63,14 @@ class PrintProcess(Process):
             text_document.setPageSize(page_size)
             text_document.setDocumentMargin(0.0)
 
-            text_document.setHtml(self.html)
-            text_document.print_(printer)
+            while True:
+                #t = time.process_time()
+                html = self.queue.get()
+                #logging.debug("print_html: New task recived: {}".format(time.process_time() - t))
+                text_document.setHtml(html)
+                #logging.debug("print_html: text_document setHtml: {}".format(time.process_time() - t))
+                text_document.print_(printer)
+                #logging.debug("print_html: text_document printing done: {}".format(time.process_time() - t))
         except Exception as e:
             logging.error(str(e))
 
