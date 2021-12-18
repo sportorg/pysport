@@ -1,6 +1,7 @@
 from boltons.fileutils import atomic_rename
 
 from . import binary, json
+from ..configs.configs import Config
 
 
 class File:
@@ -26,8 +27,25 @@ class File:
 
     @staticmethod
     def backup(file_name, func, mode='wb'):
-        with open(file_name, mode) as f:
-            func(f)
+        use_utf8 = Config().configuration.get('save_in_utf8', False)
+        # if user set UTF-8 usage, first try to open file in UTF-8, then in system locale (1251 for RU Windows)
+        try:
+            def_encoding = None
+            if use_utf8:
+                def_encoding = 'utf-8'
+
+            with open(file_name, mode, encoding=def_encoding) as f:
+                func(f)
+
+        except UnicodeDecodeError:
+            f.close()
+
+            alt_encoding = 'utf-8'
+            if use_utf8:
+                alt_encoding = None
+
+            with open(file_name, mode, encoding=alt_encoding) as f:
+                func(f)
 
     def create(self):
         self._logger.info('Create ' + self._file_name)

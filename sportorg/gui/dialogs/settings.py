@@ -48,6 +48,7 @@ class MainTab(Tab):
         self.layout.addRow(self.label_lang, self.item_lang)
 
         self.item_auto_save = AdvSpinBox(maximum=3600 * 24, value=Config().configuration.get('autosave_interval'))
+        self.item_auto_save.setMinimum(5)
         self.layout.addRow(translate('Auto save') + ' (sec)', self.item_auto_save)
 
         self.item_show_toolbar = QCheckBox(translate('Show toolbar'))
@@ -67,6 +68,10 @@ class MainTab(Tab):
         self.item_check_updates = QCheckBox(translate('Check updates'))
         self.item_check_updates.setChecked(Config().configuration.get('check_updates'))
         # self.layout.addRow(self.item_check_updates)
+
+        self.item_save_in_utf8 = QCheckBox(translate('Save in UTF-8 encoding'))
+        self.item_save_in_utf8.setChecked(Config().configuration.get('save_in_utf8', False))
+        self.layout.addRow(self.item_save_in_utf8)
 
         self.widget.setLayout(self.layout)
 
@@ -90,6 +95,7 @@ class MainTab(Tab):
         Config().configuration.set('show_toolbar', self.item_show_toolbar.isChecked())
         Config().configuration.set('use_birthday', self.item_use_birthday.isChecked())
         Config().configuration.set('check_updates', self.item_check_updates.isChecked())
+        Config().configuration.set('save_in_utf8', self.item_save_in_utf8.isChecked())
 
 
 class SoundTab(Tab):
