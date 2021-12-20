@@ -550,6 +550,11 @@ class MainWindow(QMainWindow):
                 QtGui.QIcon(config.icon_dir(self.sportident_icon[is_alive])))
             self.sportident_status = is_alive
 
+        if Teamwork().is_alive() != self.teamwork_status:
+            self.toolbar_property['teamwork'].setIcon(
+                QtGui.QIcon(config.icon_dir(self.teamwork_icon[Teamwork().is_alive()])))
+            self.teamwork_status = is_alive
+
         try:
             if self.get_configuration().get('autosave_interval'):
                 if self.file:
