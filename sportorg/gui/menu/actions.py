@@ -1,5 +1,6 @@
 import logging
 import time
+import uuid
 from typing import Any, Dict, Type
 
 from PySide2 import QtCore
@@ -31,6 +32,7 @@ from sportorg.gui.dialogs.start_preparation import (
     guess_courses_for_groups,
 )
 from sportorg.gui.dialogs.start_time_change_dialog import StartTimeChangeDialog
+from sportorg.gui.dialogs.teamwork_properties import TeamworkPropertiesDialog
 from sportorg.gui.dialogs.telegram_dialog import TelegramDialog
 from sportorg.gui.dialogs.text_io import TextExchangeDialog
 from sportorg.gui.dialogs.timekeeping_properties import TimekeepingPropertiesDialog
@@ -54,6 +56,7 @@ from sportorg.modules.ocad.ocad import OcadImportException
 from sportorg.modules.sfr.sfrreader import SFRReaderClient
 from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.modules.sportiduino.sportiduino import SportiduinoClient
+from sportorg.modules.teamwork import Teamwork
 from sportorg.modules.telegram.telegram import telegram_client
 from sportorg.modules.updater import checker
 from sportorg.modules.winorient import winorient
@@ -445,6 +448,7 @@ class CopyCardNumberToBib(Action, metaclass=ActionFactory):
 class ManualFinishAction(Action, metaclass=ActionFactory):
     def execute(self):
         result = race().new_result(ResultManual)
+        Teamwork().send(result.to_dict())
         race().add_new_result(result)
         logging.info(translate('Manual finish'))
         self.app.refresh()
@@ -558,6 +562,7 @@ class ChangeStatusAction(Action, metaclass=ActionFactory):
             result.status = status_dict[result.status]
         else:
             result.status = ResultStatus.OK
+        Teamwork().send(result.to_dict())
         self.app.refresh()
 
 
@@ -583,6 +588,7 @@ class AddSPORTidentResultAction(Action, metaclass=ActionFactory):
     def execute(self):
         result = race().new_result()
         race().add_new_result(result)
+        Teamwork().send(result.to_dict())
         logging.info('SPORTident result')
         self.app.get_result_table().model().init_cache()
         self.app.refresh()
@@ -592,6 +598,48 @@ class TimekeepingSettingsAction(Action, metaclass=ActionFactory):
     def execute(self):
         TimekeepingPropertiesDialog().exec_()
         self.app.refresh()
+
+
+class TeamworkSettingsAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        TeamworkPropertiesDialog().exec_()
+
+
+class TeamworkEnableAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        host = race().get_setting('teamwork_host', 'localhost')
+        port = race().get_setting('teamwork_port', 50010)
+        token = race().get_setting('teamwork_token', str(uuid.uuid4())[:8])
+        connection_type = race().get_setting('teamwork_type_connection', 'client')
+        Teamwork().set_options(host, port, token, connection_type)
+        Teamwork().toggle()
+
+
+class TeamworkSendAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        try:
+            obj = race()
+            data_list = [
+                obj.persons,
+                obj.results,
+                obj.groups,
+                obj.courses,
+                obj.organizations,
+            ]
+            if not self.app.current_tab < len(data_list):
+                return
+            items = data_list[self.app.current_tab]
+            indexes = self.app.get_selected_rows()
+            items_dict = []
+            for index in indexes:
+                if index < 0:
+                    continue
+                if index >= len(items):
+                    break
+                items_dict.append(items[index].to_dict())
+            Teamwork().send(items_dict)
+        except Exception as e:
+            logging.error(str(e))
 
 
 class PrinterSettingsAction(Action, metaclass=ActionFactory):

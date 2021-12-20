@@ -18,6 +18,8 @@ from sportorg.models.memory import Limit, Organization, Qualification, find, rac
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.modules.configs.configs import Config
 from sportorg.modules.live.live import live_client
+from sportorg.modules.teamwork import Teamwork
+from sportorg.utils.time import qdate_to_date, time_to_otime, time_to_qtime
 
 
 class PersonEditDialog(BaseDialog):
@@ -266,3 +268,4 @@ class PersonEditDialog(BaseDialog):
 
         ResultCalculation(race()).process_results()
         live_client.send(person)
+        Teamwork().send(person.to_dict())

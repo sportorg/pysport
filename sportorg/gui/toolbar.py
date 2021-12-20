@@ -18,5 +18,11 @@ def toolbar_list():
             'SPORTidentReadoutAction',
             'sportident',
         ),
+        (
+            config.icon_dir('network-off.svg'),
+            translate('Teamwork'),
+            'TeamworkEnableAction',
+            'teamwork',
+        ),
         (config.icon_dir('flag.svg'), translate('Manual finish'), 'ManualFinishAction'),
     ]

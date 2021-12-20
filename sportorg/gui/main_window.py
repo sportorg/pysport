@@ -46,7 +46,8 @@ from sportorg.gui.utils.custom_controls import messageBoxQuestion
 from sportorg.language import translate
 from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.modules.sportiduino.sportiduino import SportiduinoClient
-from sportorg.modules.telegram.telegram import telegram_client
+from sportorg.modules.teamwork import Teamwork
+from sportorg.modules.telegram.telegram import TelegramClient
 
 
 class ConsolePanelHandler(logging.Handler):
@@ -165,6 +166,7 @@ class MainWindow(QMainWindow):
             if len(self.recent_files):
                 self.open_file(self.recent_files[0])
 
+        Teamwork().set_call(self.teamwork)
         SIReaderClient().set_call(self.add_sportident_result_from_sireader)
         SportiduinoClient().set_call(self.add_sportiduino_result_from_reader)
         SFRReaderClient().set_call(self.add_sfr_result_from_reader)
@@ -471,7 +473,8 @@ class MainWindow(QMainWindow):
                     elif result.person and result.person.group:
                         GroupSplits(race(), result.person.group).generate(True)
                     live_client.send(result)
-                    telegram_client.send_result(result)
+                    Teamwork().send(result.to_dict())
+                    TelegramClient().send_result(result)
                     if result.person:
                         if result.is_status_ok():
                             Sound().ok()
@@ -504,8 +507,13 @@ class MainWindow(QMainWindow):
                 else:
                     for person in race().persons:
                         if not person.card_number:
-                            _ = race().person_card_number(person, result.card_number)
+                            old_person = race().person_card_number(
+                                person, result.card_number
+                            )
+                            if old_person:
+                                Teamwork().send(old_person.to_dict())
                             person.is_rented_card = True
+                            Teamwork().send(person.to_dict())
                             break
             self.refresh()
         except Exception as e:
@@ -766,6 +774,8 @@ class MainWindow(QMainWindow):
 
         self.clear_selection()
         self.refresh()
+        if len(res):
+            Teamwork().delete([r.to_dict() for r in res])
 
     def get_split_printer_thread(self):
         return self.split_printer_thread

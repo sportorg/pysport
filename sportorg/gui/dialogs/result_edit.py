@@ -30,6 +30,8 @@ from sportorg.models.result.result_checker import ResultChecker, ResultCheckerEx
 from sportorg.models.result.split_calculation import GroupSplits
 from sportorg.modules.live.live import live_client
 from sportorg.utils.time import hhmmss_to_time
+from sportorg.modules.teamwork import Teamwork
+from sportorg.utils.time import hhmmss_to_time, time_to_otime, time_to_qtime
 
 
 class ResultEditDialog(QDialog):
@@ -292,6 +294,7 @@ class ResultEditDialog(QDialog):
                 logging.error(str(e))
         ResultCalculation(race()).process_results()
         live_client.send(result)
+        Teamwork().send(result.to_dict())
 
 
 class SplitsObject:
