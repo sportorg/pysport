@@ -47,6 +47,7 @@ from sportorg.language import translate
 from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.modules.sportiduino.sportiduino import SportiduinoClient
 from sportorg.modules.telegram.telegram import telegram_client
+from sportorg.modules.teamwork import Teamwork
 
 
 class ConsolePanelHandler(logging.Handler):
@@ -112,17 +113,34 @@ class MainWindow(QMainWindow):
         False: 'sportident.png',
     }
 
+    def teamwork(self, command):
+        try:
+            race().update_data(command.data)
+            logging.info(repr(command.data))
+            if 'object' in command.data and command.data['object'] in ['ResultManual', 'ResultSportident', 'ResultSFR', 'ResultSportiduino']:
+                ResultCalculation(race()).process_results()
+            Broker().produce('teamwork_recieving', command.data)
+            self.refresh()
+        except Exception as e:
+            logging.error(str(e))
+
+    teamwork_status = False
+    teamwork_icon = {
+        True: 'network.svg',
+        False: 'network-off.svg',
+    }
+
     def interval(self):
         if SIReaderClient().is_alive() != self.sportident_status and hasattr(self, 'toolbar'):
             self.toolbar_property['sportident'].setIcon(
                 QtGui.QIcon(config.icon_dir(self.sportident_icon[SIReaderClient().is_alive()])))
             self.sportident_status = SIReaderClient().is_alive()
-        """
+
         if Teamwork().is_alive() != self.teamwork_status:
             self.toolbar_property['teamwork'].setIcon(
                 QtGui.QIcon(config.icon_dir(self.teamwork_icon[Teamwork().is_alive()])))
             self.teamwork_status = Teamwork().is_alive()
-        """
+
         try:
             if self.get_configuration().get('autosave_interval'):
                 if self.file:
@@ -139,6 +157,7 @@ class MainWindow(QMainWindow):
             self.statusbar_message(text)
             if hasattr(self, 'logging_tab'):
                 self.logging_tab.write(text)
+                self.logging_tab.setStyleSheet("QTabBar::tab:selected { color: #ffffff; }")
 
     def close(self):
         self.conf_write()
@@ -168,6 +187,8 @@ class MainWindow(QMainWindow):
             _event.accept()
         else:
             _event.ignore()
+
+
 
     def resizeEvent(self, e):
         Broker().produce('resize', self.get_size())
@@ -201,6 +222,7 @@ class MainWindow(QMainWindow):
             if len(self.recent_files):
                 self.open_file(self.recent_files[0])
 
+        Teamwork().set_call(self.teamwork)
         SIReaderClient().set_call(self.add_sportident_result_from_sireader)
         SportiduinoClient().set_call(self.add_sportiduino_result_from_reader)
         SFRReaderClient().set_call(self.add_sfr_result_from_reader)
@@ -304,6 +326,10 @@ class MainWindow(QMainWindow):
         self.tabwidget.addTab(organizations.Widget(), translate('Teams'))
         self.logging_tab = log.Widget()
         self.tabwidget.addTab(self.logging_tab, translate('Logs'))
+        self.tabwidget.setStyleSheet("QTabBar::tab:selected {\
+                                   color: #00ff00;\
+                                   background-color: rgb(0,0,255);\
+                               }"  ) #"color: rgb(119, 133, 255);")
         self.tabwidget.currentChanged.connect(self._menu_disable)
 
     def _menu_disable(self, tab_index):
@@ -502,6 +528,7 @@ class MainWindow(QMainWindow):
                     elif result.person and result.person.group:
                         GroupSplits(race(), result.person.group).generate(True)
                     live_client.send(result)
+                    Teamwork().send(result.to_dict())
                     telegram_client.send_result(result)
                     if result.person:
                         if result.is_status_ok():
@@ -536,7 +563,11 @@ class MainWindow(QMainWindow):
                     for person in race().persons:
                         if not person.card_number:
                             _ = race().person_card_number(person, result.card_number)
+                            #old_person = race().person_card_number(person, result.card_number)
+                            #if old_person is not None:
+                            #    Teamwork().send(old_person.to_dict())
                             person.is_rented_card = True
+                            Teamwork().send(person.to_dict())
                             break
             self.refresh()
         except Exception as e:
@@ -588,7 +619,8 @@ class MainWindow(QMainWindow):
                 self.apply_filters()
                 self.last_update = time.time()
             except Exception as e:
-                logging.error(str(e))
+                logging.exception("message")
+                #logging.error(str(e))
         else:
             self.save_file_as()
 
@@ -730,6 +762,8 @@ class MainWindow(QMainWindow):
                     translate('Cannot remove organization'),
                 )
             self.refresh()
+        if len(res):
+            Teamwork().delete([r.to_dict() for r in res])
 
     def get_split_printer_thread(self):
         return self.split_printer_thread
