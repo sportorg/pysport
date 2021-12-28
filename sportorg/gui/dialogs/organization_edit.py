@@ -59,5 +59,4 @@ class OrganizationEditDialog(BaseDialog):
         if self.is_new:
             race().organizations.insert(0, org)
         live_client.send(org)
-
         Teamwork().send(org.to_dict())

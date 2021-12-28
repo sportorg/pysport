@@ -1,4 +1,5 @@
 import logging
+import socket
 import time
 import uuid
 from typing import Any, Dict, Type
@@ -449,6 +450,7 @@ class ManualFinishAction(Action, metaclass=ActionFactory):
     def execute(self):
         result = race().new_result(ResultManual)
         Teamwork().send(result.to_dict())
+        live_client.send(result)
         race().add_new_result(result)
         logging.info(translate('Manual finish'))
         self.app.refresh()
@@ -563,6 +565,7 @@ class ChangeStatusAction(Action, metaclass=ActionFactory):
         else:
             result.status = ResultStatus.OK
         Teamwork().send(result.to_dict())
+        live_client.send(result)
         self.app.refresh()
 
 
@@ -611,6 +614,9 @@ class TeamworkEnableAction(Action, metaclass=ActionFactory):
         port = race().get_setting('teamwork_port', 50010)
         token = race().get_setting('teamwork_token', str(uuid.uuid4())[:8])
         connection_type = race().get_setting('teamwork_type_connection', 'client')
+        if connection_type == 'server' and host in {'localhost', '127.0.0.1'}:
+            host = socket.gethostbyname(socket.gethostname())
+            logging.debug('Server socket address = ' + str(host))
         Teamwork().set_options(host, port, token, connection_type)
         Teamwork().toggle()
 
@@ -639,7 +645,7 @@ class TeamworkSendAction(Action, metaclass=ActionFactory):
                 items_dict.append(items[index].to_dict())
             Teamwork().send(items_dict)
         except Exception as e:
-            logging.error(str(e))
+            logging.exception(e)
 
 
 class PrinterSettingsAction(Action, metaclass=ActionFactory):

@@ -190,4 +190,5 @@ class GroupEditDialog(BaseDialog):
             race().groups.insert(0, group)
 
         ResultCalculation(race()).set_rank(group)
+        live_client.send(group)
         Teamwork().send(group.to_dict())

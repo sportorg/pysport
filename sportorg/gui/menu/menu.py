@@ -331,43 +331,24 @@ def menu_list():
                     'icon': config.icon_dir('sfr.png'),
                     'action': 'SFRReadoutAction',
                 },
-#                {
-#                    'title': translate('Teamwork'),
-#                    'icon': config.icon_dir('network.svg'),
-#                    'actions': [
-#                        {
-#                            'title': translate('Send selected'),
-#                            'shortcut': 'Ctrl+K',
-#                            'tabs': list(range(5)),
-#                            'action': 'TeamworkSendAction'
-#                        },
-#                        {
-#                            'type': 'separator',
-#                        },
-#                        {
-#                            'title': translate('On/Off'),
-#                            'action': 'TeamworkEnableAction'
-#                        }
-#                    ]
-#                },
-
                 {
-                    'title': translate('Teamwork'),
-                    'actions': [
-                        {
-                            'title': translate('Send selected'),
-                            'shortcut': 'Ctrl+K',
-                            'tabs': list(range(5)),
-                            'action': 'TeamworkSendAction',
-                        },
-                        {
-                            'type': 'separator',
-                        },
-                        {
-                            'title': translate('On/Off'),
-                            'action': 'TeamworkEnableAction',
-                        },
-                    ],
+                   'title': translate('Teamwork'),
+                   'icon': config.icon_dir('network.svg'),
+                   'actions': [
+                       {
+                           'title': translate('Send selected'),
+                           'shortcut': 'Ctrl+Shift+K',
+                           'tabs': list(range(5)),
+                           'action': 'TeamworkSendAction'
+                       },
+                       {
+                           'type': 'separator',
+                       },
+                       {
+                           'title': translate('On/Off'),
+                           'action': 'TeamworkEnableAction'
+                       }
+                   ]
                 },
                 {
                     'title': translate('Telegram'),

@@ -472,8 +472,8 @@ class MainWindow(QMainWindow):
                             logging.exception(e)
                     elif result.person and result.person.group:
                         GroupSplits(race(), result.person.group).generate(True)
-                    live_client.send(result)
                     Teamwork().send(result.to_dict())
+                    live_client.send(result)
                     TelegramClient().send_result(result)
                     if result.person:
                         if result.is_status_ok():
@@ -514,6 +514,7 @@ class MainWindow(QMainWindow):
                                 Teamwork().send(old_person.to_dict())
                             person.is_rented_card = True
                             Teamwork().send(person.to_dict())
+                            live_client.send(person)
                             break
             self.refresh()
         except Exception as e:
@@ -558,9 +559,10 @@ class MainWindow(QMainWindow):
                 QtGui.QIcon(config.icon_dir(self.sportident_icon[is_alive])))
             self.sportident_status = is_alive
 
-        if Teamwork().is_alive() != self.teamwork_status:
+        is_alive = Teamwork().is_alive()
+        if is_alive != self.teamwork_status:
             self.toolbar_property['teamwork'].setIcon(
-                QtGui.QIcon(config.icon_dir(self.teamwork_icon[Teamwork().is_alive()])))
+                QtGui.QIcon(config.icon_dir(self.teamwork_icon[is_alive])))
             self.teamwork_status = is_alive
 
         try:

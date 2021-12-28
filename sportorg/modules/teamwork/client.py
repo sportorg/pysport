@@ -26,10 +26,10 @@ class ClientSenderThread(Thread):
                 if not main_thread().is_alive() or self._stop_event.is_set():
                     break
             except ConnectionResetError as e:
-                self._logger.debug(str(e))
+                self._logger.exception(e)
                 break
             except Exception as e:
-                self._logger.debug(str(e))
+                self._logger.exception(e)
                 break
         self.conn.close()
         self._logger.debug('Client sender shutdown')
@@ -76,13 +76,13 @@ class ClientReceiverThread(Thread):
                 if not main_thread().is_alive() or self._stop_event.is_set():
                     break
             except ConnectionAbortedError as e:
-                self._logger.debug(str(e))
+                self._logger.exception(e)
                 break
             except ConnectionResetError as e:
-                self._logger.debug(str(e))
+                self._logger.exception(e)
                 break
             except Exception as e:
-                self._logger.debug(str(e))
+                self._logger.exception(e)
                 break
         self._logger.debug('Client receiver shutdown')
         self._stop_event.set()
@@ -116,10 +116,10 @@ class ClientThread(Thread):
                 receiver.join()
 
             except ConnectionRefusedError as e:
-                self._logger.error(str(e))
+                self._logger.exception(e)
                 return
             except Exception as e:
-                self._logger.error(str(e))
+                self._logger.exception(e)
                 return
 
         s.close()

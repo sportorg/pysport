@@ -1,3 +1,4 @@
+import logging
 from functools import partial
 from threading import Thread
 
@@ -22,6 +23,7 @@ class LiveClient:
         return urls
 
     def send(self, data):
+        logging.debug('LiveClient.send started, data = ' + str(data))
         if not self.is_enabled():
             return
 

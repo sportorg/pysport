@@ -31,7 +31,7 @@ class ResultThread(QThread):
                 if not main_thread().is_alive() or self._stop_event.is_set():
                     break
             except Exception as e:
-                self._logger.debug(str(e))
+                self._logger.exception(e)
         self._logger.debug('Teamwork result shutdown')
 
 

@@ -10,6 +10,7 @@ from sportorg.language import translate
 from sportorg.models.constant import StatusComments
 from sportorg.models.memory import ResultManual, ResultStatus, find, race
 from sportorg.models.result.result_calculation import ResultCalculation
+from sportorg.modules.live.live import live_client
 from sportorg.modules.teamwork import Teamwork
 
 
@@ -83,6 +84,7 @@ class NotStartDialog(QDialog):
                     result.person = person
                     result.status = ResultStatus.DID_NOT_START
                     result.status_comment = status_comment
+                    live_client.send(result)
                     Teamwork().send(result.to_dict())
                     obj.add_new_result(result)
                 else:

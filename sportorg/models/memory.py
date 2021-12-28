@@ -791,7 +791,7 @@ class ResultSportident(Result):
     def __repr__(self):
         splits = ''
         for split in self.splits:
-            splits += '{} — {}\n'.format(split[0], split[1])
+            splits += '{} — {}\n'.format(split.code, split.length_leg)
         person = self.person.full_name if self.person else ''
         return 'Card: {}\nStart: {}\nFinish: {}\nPerson: {}\nSplits:\n{}'.format(
             self.card_number, self.start_time, self.finish_time, person, splits
