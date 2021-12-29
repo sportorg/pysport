@@ -59,7 +59,7 @@ class ConsolePanelHandler(logging.Handler):
         self.parent = parent
 
     def emit(self, record):
-        self.parent.logging(self.format(record))
+        self.parent.logging(dict({'text': self.format(record), 'level': record.levelno}))
 
 
 class MainWindow(QMainWindow):
@@ -163,11 +163,15 @@ class MainWindow(QMainWindow):
             logging.error(str(e))
 
         while not self.log_queue.empty():
-            text = self.log_queue.get()
+            rec = self.log_queue.get()
+            text = rec['text']
+            lvl = int(rec['level'])
             self.statusbar_message(text)
             if hasattr(self, 'logging_tab'):
                 self.logging_tab.write(text)
-                self.logging_tab.setStyleSheet("QTabBar::tab:selected { color: #ffffff; }")
+                if lvl >= logging.ERROR and self.tabbar.tabTextColor(self.tabwidget.indexOf(self.logging_tab)) != self.logging_tab.error_color:
+                    self.tabbar.setTabTextColor(self.tabwidget.indexOf(self.logging_tab), self.logging_tab.error_color)
+
 
     def close(self):
         self.conf_write()
@@ -177,6 +181,11 @@ class MainWindow(QMainWindow):
             self.split_printer_thread.terminate()
         if self.split_printer_queue:
             self.split_printer_queue.close()
+
+    def onTabChange(self,i):
+        if i == self.tabwidget.indexOf(self.logging_tab):
+            #if self.tabbar.tabTextColor(i) == common_color:
+            self.tabbar.setTabTextColor(i, self.logging_tab.common_color)
 
     def closeEvent(self, _event):
         quit_msg = translate('Save file before exit?')
@@ -336,6 +345,12 @@ class MainWindow(QMainWindow):
         self.tabwidget.addTab(organizations.Widget(), translate('Teams'))
         self.logging_tab = log.Widget()
         self.tabwidget.addTab(self.logging_tab, translate('Logs'))
+        self.tabbar = self.tabwidget.tabBar()
+
+        self.tabwidget.blockSignals(True)
+        self.tabwidget.currentChanged.connect(self.onTabChange)
+        self.tabwidget.blockSignals(False)
+        """
         self.tabwidget.setStyleSheet("QTabBar::tab:selected {\
                                    color: #00ff00;\
                                    background-color: rgb(0,0,255);\
