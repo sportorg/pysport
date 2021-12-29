@@ -2,18 +2,26 @@ import socket
 from queue import Queue, Empty
 from threading import Thread, Event, main_thread
 import json
+from .packet_header import Header, ObjectTypes, Operations
+import logging
 
 
 class Command:
-    def __init__(self, data=None, addr=None):
+    def __init__(self, data=None, op=Operations.Update.name, addr=None):
         self.data = data
         self.addr = addr
+        self.header = Header(data, op)
         self.addr_exclude = []
+        self.next_cmd_obj_type = ObjectTypes.Unknown.value
 
     def exclude(self, addr):
         self.addr_exclude.append(addr)
         return self
 
+    def get_packet(self):
+        pack_data = json.dumps(self.data).encode()
+        #logging.debug('Command->get_header: Header: {}, Pack_data: {}'.format( self.header.pack_header(len(pack_data)), pack_data))
+        return self.header.pack_header(len(pack_data)) + pack_data
 
 class Connect:
     def __init__(self, conn, addr):
@@ -44,6 +52,8 @@ class ServerReceiverThread(Thread):
             self._logger.info('Connected by {}'.format(self.connect.addr))
             full_data = b''
             self.connect.conn.settimeout(5)
+            hdr = Header()
+            is_new_pack = True
             while True:
                 try:
                     data = self.connect.conn.recv(1024)
@@ -51,24 +61,26 @@ class ServerReceiverThread(Thread):
                         break
                     full_data += data
                     while True:
-                        offset = 0
-                        while True:
-                            try:
-                                json.loads(full_data[:offset].decode())
+                        # getting Header
+                        if is_new_pack:
+                            if len(full_data) >= hdr.header_size:
+                                hdr.unpack_header(full_data[:hdr.header_size])
+                                full_data = full_data[hdr.header_size:]
+                                is_new_pack = False
+                            else:
                                 break
-                            except ValueError:
-                                if offset >= len(full_data):
-                                    offset = -1
-                                    break
-                                offset += 1
-                        if offset != -1:
-                            command = Command(json.loads(full_data[:offset].decode()), self.connect.addr)
-                            command.exclude(self.connect.addr)
-                            self._out_queue.put(command)  # for local
-                            self._in_queue.put(command)  # for child
-                            full_data = full_data[offset:]
+                        #Getting JSON data
                         else:
-                            break
+                            if len(full_data) >= hdr.size:
+                                command = Command(json.loads(full_data[:hdr.size].decode()), Operations(hdr.opType).name, self.connect.addr)
+                                command.exclude(self.connect.addr)
+                                self._out_queue.put(command)  # for local
+                                self._in_queue.put(command)  # for child
+                                full_data = full_data[hdr.size:]
+                                is_new_pack = True
+                            else:
+                                break
+
                 except socket.timeout:
                     if not main_thread().is_alive() or self._stop_event.is_set():
                         break
@@ -98,11 +110,11 @@ class ServerSenderThread(Thread):
         while True:
             try:
                 command = self._in_queue.get(timeout=5)
+                #self._logger.debug('Server sender: Got new command {}'.format(command))
                 for connect in self._connections:
                     try:
                         if connect.addr not in command.addr_exclude and connect.is_alive():
-                            data = json.dumps(command.data)
-                            connect.conn.sendall(data.encode())
+                            connect.conn.sendall(command.get_packet())
                     except ConnectionResetError as e:
                         self._logger.error(str(e))
                         connect.died()

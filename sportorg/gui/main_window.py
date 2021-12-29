@@ -47,7 +47,8 @@ from sportorg.language import translate
 from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.modules.sportiduino.sportiduino import SportiduinoClient
 from sportorg.modules.telegram.telegram import telegram_client
-from sportorg.modules.teamwork import Teamwork
+from sportorg.modules.teamwork import Teamwork, ObjectTypes
+from sportorg.modules.live.live import LiveClient
 
 
 class ConsolePanelHandler(logging.Handler):
@@ -116,11 +117,20 @@ class MainWindow(QMainWindow):
     def teamwork(self, command):
         try:
             race().update_data(command.data)
-            logging.info(repr(command.data))
-            if 'object' in command.data and command.data['object'] in ['ResultManual', 'ResultSportident', 'ResultSFR', 'ResultSportiduino']:
-                ResultCalculation(race()).process_results()
+            #logging.info(repr(command.data))
+            #if 'object' in command.data and command.data['object'] in ['ResultManual', 'ResultSportident', 'ResultSFR', 'ResultSportiduino']:
+            if command.header.objType in [ObjectTypes.Result.value, ObjectTypes.ResultManual.value,
+                                             ObjectTypes.ResultSportident.value,
+                                             ObjectTypes.ResultSFR.value, ObjectTypes.ResultSportiduino.value]:
+               if command.next_cmd_obj_type not in [ObjectTypes.Result.value, ObjectTypes.ResultManual.value, ObjectTypes.ResultSportident.value,
+                                                    ObjectTypes.ResultSFR.value, ObjectTypes.ResultSportiduino.value]:
+                    ResultCalculation(race()).process_results()
+
+                    logging.info('teamwork: Recalculate results ObjType: {}, next_obj_type: {}'.format(command.header.objType, command.next_cmd_obj_type))
             Broker().produce('teamwork_recieving', command.data)
-            self.refresh()
+            if command.header.objType != command.next_cmd_obj_type :
+                self.refresh()
+
         except Exception as e:
             logging.error(str(e))
 
@@ -231,7 +241,7 @@ class MainWindow(QMainWindow):
         self.service_timer.timeout.connect(self.interval)
         self.service_timer.start(1000) # msec
 
-        #LiveClient().init()
+        LiveClient().init()
         self._menu_disable(self.current_tab)
 
     def _setup_ui(self):

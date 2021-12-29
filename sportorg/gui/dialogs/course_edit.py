@@ -9,6 +9,7 @@ from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.result_checker import ResultChecker
 from sportorg.models.result.score_calculation import ScoreCalculation
 from sportorg.models.result.split_calculation import RaceSplits
+from sportorg.modules.teamwork import Teamwork
 
 
 class CourseEditDialog(BaseDialog):
@@ -102,3 +103,4 @@ class CourseEditDialog(BaseDialog):
         ResultCalculation(obj).process_results()
         RaceSplits(obj).generate()
         ScoreCalculation(obj).calculate_scores()
+        Teamwork().send(self.current_object.to_dict())

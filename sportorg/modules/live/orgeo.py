@@ -133,7 +133,7 @@ def _get_person_obj(data, race_data, result=None):
     return obj
 
 
-def create(requests, url, data, race_data):
+def create(requests, url, data, race_data, log):
     """
     data is Dict: Person, Result, Group, Course, Organization
     race_data is Dict: Race
@@ -175,8 +175,13 @@ def create(requests, url, data, race_data):
         obj_for_send = {'persons': persons}
         if is_start:
             obj_for_send['params'] = {'start_list': True}
-        o.send(obj_for_send)
+        try:
+           resp = o.send(obj_for_send)
+        except Exception as e:
+            log.error(e)
 
+        if resp.status_code != 200:
+            log.error("HTTP Status: {}, Msg: {}".format(resp.status_code,resp.content))
 
 def delete(requests, url, data, race_data):
     o = Orgeo(requests, url)

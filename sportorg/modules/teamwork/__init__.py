@@ -1,4 +1,5 @@
 import logging
+import time
 from queue import Queue, Empty
 from threading import Event, main_thread
 
@@ -8,6 +9,8 @@ from sportorg.common.broker import Broker
 from sportorg.common.singleton import singleton
 from .client import ClientThread
 from .server import ServerThread, Command
+from .packet_header import Header, ObjectTypes, Operations
+
 
 
 class ResultThread(QThread):
@@ -25,7 +28,15 @@ class ResultThread(QThread):
         while True:
             try:
                 cmd = self._queue.get(timeout=5)
+                time.sleep(0.03)
+                if self._queue.qsize() > 0:
+                    self._logger.debug('Teamwork result got cmd: self._queue.qsize() > 0')
+                    cmd.next_cmd_obj_type = list(self._queue.queue)[0].header.objType
+                else:
+                    self._logger.debug('Teamwork result got cmd: self._queue.qsize() <= 0')
+                    cmd.next_cmd_obj_type = ObjectTypes.Unknown.value
                 self.data_sender.emit(cmd)
+
             except Empty:
                 if not main_thread().is_alive() or self._stop_event.is_set():
                     break
@@ -119,16 +130,16 @@ class Teamwork(object):
             self.start()
             self._logger.info('{} starting'.format(self.connection_type.upper()))
 
-    def send(self, data):
+    def send(self, data, op=Operations.Update.name):
         """data is Dict or List[Dict]"""
         Broker().produce('teamwork_sending', data)
         if self.is_alive():
             if isinstance(data, list):
                 for item in data:
-                    self._in_queue.put(Command(item))
+                    self._in_queue.put(Command(item, op))
                 return
 
-            self._in_queue.put(Command(data))
+            self._in_queue.put(Command(data, op))
 
     def delete(self, data):
         """data is Dict or List[Dict]"""

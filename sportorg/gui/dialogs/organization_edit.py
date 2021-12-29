@@ -4,6 +4,7 @@ from sportorg.language import translate
 from sportorg.models.constant import get_countries, get_regions
 from sportorg.models.memory import find, race
 from sportorg.modules.live.live import live_client
+from sportorg.modules.teamwork import Teamwork
 
 
 class OrganizationEditDialog(BaseDialog):
@@ -58,3 +59,4 @@ class OrganizationEditDialog(BaseDialog):
         if self.is_new:
             race().organizations.insert(0, org)
         live_client.send(org)
+        Teamwork().send(org.to_dict())
