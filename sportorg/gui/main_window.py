@@ -122,14 +122,9 @@ class MainWindow(QMainWindow):
             if command.header.objType in [ObjectTypes.Result.value, ObjectTypes.ResultManual.value,
                                              ObjectTypes.ResultSportident.value,
                                              ObjectTypes.ResultSFR.value, ObjectTypes.ResultSportiduino.value]:
-               if command.next_cmd_obj_type not in [ObjectTypes.Result.value, ObjectTypes.ResultManual.value, ObjectTypes.ResultSportident.value,
-                                                    ObjectTypes.ResultSFR.value, ObjectTypes.ResultSportiduino.value]:
-                    ResultCalculation(race()).process_results()
-
-                    logging.info('teamwork: Recalculate results ObjType: {}, next_obj_type: {}'.format(command.header.objType, command.next_cmd_obj_type))
+                self.deleyed_res_recalculate(1000)
             Broker().produce('teamwork_recieving', command.data)
-            if command.header.objType != command.next_cmd_obj_type :
-                self.refresh()
+            self.deleyed_refresh(1000)
 
         except Exception as e:
             logging.error(str(e))
@@ -249,6 +244,12 @@ class MainWindow(QMainWindow):
         self.service_timer = QTimer(self)
         self.service_timer.timeout.connect(self.interval)
         self.service_timer.start(1000) # msec
+
+        self.refresh_timer = QTimer(self)
+        self.refresh_timer.timeout.connect(self.refresh_by_timer)
+
+        self.res_recalculate = QTimer(self)
+        self.res_recalculate.timeout.connect(self.res_recalculate_by_timer)
 
         LiveClient().init()
         self._menu_disable(self.current_tab)
@@ -434,6 +435,20 @@ class MainWindow(QMainWindow):
             Broker().produce('init_model')
         except Exception as e:
             logging.error(str(e))
+
+    def refresh_by_timer(self):
+        self.refresh()
+        self.refresh_timer.stop()
+
+    def deleyed_refresh(self, delay=1000): #msec
+        self.refresh_timer.start(delay)
+
+    def res_recalculate_by_timer(self):
+        ResultCalculation(race()).process_results()
+        self.res_recalculate.stop()
+
+    def deleyed_res_recalculate(self, delay=1000): #msec
+        self.res_recalculate.start(delay)
 
     def refresh(self):
         logging.debug('Refreshing interface')

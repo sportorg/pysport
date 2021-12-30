@@ -28,13 +28,6 @@ class ResultThread(QThread):
         while True:
             try:
                 cmd = self._queue.get(timeout=5)
-                time.sleep(0.03)
-                if self._queue.qsize() > 0:
-                    self._logger.debug('Teamwork result got cmd: self._queue.qsize() > 0')
-                    cmd.next_cmd_obj_type = list(self._queue.queue)[0].header.objType
-                else:
-                    self._logger.debug('Teamwork result got cmd: self._queue.qsize() <= 0')
-                    cmd.next_cmd_obj_type = ObjectTypes.Unknown.value
                 self.data_sender.emit(cmd)
 
             except Empty:
