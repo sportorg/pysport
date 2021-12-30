@@ -125,8 +125,8 @@ class Teamwork(object):
 
     def send(self, data, op=Operations.Update.name):
         """data is Dict or List[Dict]"""
-        Broker().produce('teamwork_sending', data)
         if self.is_alive():
+            Broker().produce('teamwork_sending', data)
             if isinstance(data, list):
                 for item in data:
                     self._in_queue.put(Command(item, op))

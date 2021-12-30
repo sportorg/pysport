@@ -34,8 +34,14 @@ class LiveClient:
 
         if not isinstance(data, list):
             data = [data]
-        items = [item.to_dict() for item in data]
+        items = []
+        for item in data:
+            if isinstance(item, dict):
+                items.append(item)
+            else:
+                items.append(item.to_dict())
 
+        #logging.debug('Orgeo send items: {}'.format(items))
         urls = self.get_urls()
         race_data = race().to_dict()
         for url in urls:
