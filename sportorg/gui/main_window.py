@@ -177,11 +177,6 @@ class MainWindow(QMainWindow):
         if self.split_printer_queue:
             self.split_printer_queue.close()
 
-    def onTabChange(self,i):
-        if i == self.tabwidget.indexOf(self.logging_tab):
-            #if self.tabbar.tabTextColor(i) == common_color:
-            self.tabbar.setTabTextColor(i, self.logging_tab.common_color)
-
     def closeEvent(self, _event):
         quit_msg = translate('Save file before exit?')
         reply = messageBoxQuestion(
@@ -348,14 +343,6 @@ class MainWindow(QMainWindow):
         self.tabwidget.addTab(self.logging_tab, translate('Logs'))
         self.tabbar = self.tabwidget.tabBar()
 
-        self.tabwidget.blockSignals(True)
-        self.tabwidget.currentChanged.connect(self.onTabChange)
-        self.tabwidget.blockSignals(False)
-        """
-        self.tabwidget.setStyleSheet("QTabBar::tab:selected {\
-                                   color: #00ff00;\
-                                   background-color: rgb(0,0,255);\
-                               }"  ) #"color: rgb(119, 133, 255);")
         self.tabwidget.currentChanged.connect(self._menu_disable)
 
     def _menu_disable(self, tab_index):
@@ -364,6 +351,9 @@ class MainWindow(QMainWindow):
                 item[0].setDisabled(True)
             else:
                 item[0].setDisabled(False)
+        if tab_index == self.tabwidget.indexOf(self.logging_tab):
+            #if self.tabbar.tabTextColor(i) == common_color:
+            self.tabbar.setTabTextColor(tab_index, self.logging_tab.common_color)
 
     def get_size(self):
 
