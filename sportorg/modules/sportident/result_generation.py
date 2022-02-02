@@ -14,6 +14,8 @@ class FinishSource(Enum):
     readout = 2
     dsq = 3
     penalty = 4
+    cp = 5
+    beam = 6
 
 
 class ResultSportidentGeneration:

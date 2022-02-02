@@ -46,8 +46,9 @@ from sportorg.gui.utils.custom_controls import messageBoxQuestion
 from sportorg.language import translate
 from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.modules.sportiduino.sportiduino import SportiduinoClient
-from sportorg.modules.teamwork import Teamwork
-from sportorg.modules.telegram.telegram import TelegramClient
+from sportorg.modules.telegram.telegram import telegram_client
+from sportorg.modules.teamwork import Teamwork, ObjectTypes
+from sportorg.modules.live.live import LiveClient
 
 
 class ConsolePanelHandler(logging.Handler):
@@ -58,7 +59,7 @@ class ConsolePanelHandler(logging.Handler):
         self.parent = parent
 
     def emit(self, record):
-        self.parent.logging(self.format(record))
+        self.parent.logging(dict({'text': self.format(record), 'level': record.levelno}))
 
 
 class MainWindow(QMainWindow):
@@ -107,14 +108,79 @@ class MainWindow(QMainWindow):
         self.show()
         self.post_show()
 
+    sportident_status = False
+    sportident_icon = {
+        True: 'sportident-on.png',
+        False: 'sportident.png',
+    }
+
+    def teamwork(self, command):
+        try:
+            race().update_data(command.data)
+            # logging.info(repr(command.data))
+            # if 'object' in command.data and command.data['object'] in
+            # ['ResultManual', 'ResultSportident', 'ResultSFR', 'ResultSportiduino']:
+            if command.header.objType in [ObjectTypes.Result.value, ObjectTypes.ResultManual.value,
+                                          ObjectTypes.ResultSportident.value,
+                                          ObjectTypes.ResultSFR.value, ObjectTypes.ResultSportiduino.value]:
+                self.deleyed_res_recalculate(1000)
+            Broker().produce('teamwork_recieving', command.data)
+            self.deleyed_refresh(1000)
+
+        except Exception as e:
+            logging.error(str(e))
+
+    teamwork_status = False
+    teamwork_icon = {
+        True: 'network.svg',
+        False: 'network-off.svg',
+    }
+
+    def interval(self):
+        if SIReaderClient().is_alive() != self.sportident_status and hasattr(self, 'toolbar'):
+            self.toolbar_property['sportident'].setIcon(
+                QtGui.QIcon(config.icon_dir(self.sportident_icon[SIReaderClient().is_alive()])))
+            self.sportident_status = SIReaderClient().is_alive()
+
+        if Teamwork().is_alive() != self.teamwork_status:
+            self.toolbar_property['teamwork'].setIcon(
+                QtGui.QIcon(config.icon_dir(self.teamwork_icon[Teamwork().is_alive()])))
+            self.teamwork_status = Teamwork().is_alive()
+
+        try:
+            if self.get_configuration().get('autosave_interval'):
+                if self.file:
+                    if time.time() - self.last_update > int(self.get_configuration().get('autosave_interval')):
+                        self.save_file()
+                        logging.info(translate('Auto save'))
+                else:
+                    pass
+                    # logging.debug(translate('No file to auto save'))
+        except Exception as e:
+            logging.error(str(e))
+
+        while not self.log_queue.empty():
+            rec = self.log_queue.get()
+            text = rec['text']
+            lvl = int(rec['level'])
+            self.statusbar_message(text)
+            if hasattr(self, 'logging_tab'):
+                self.logging_tab.write(text)
+                if lvl >= logging.ERROR and self.tabbar.tabTextColor(self.tabwidget.indexOf(self.logging_tab)) \
+                        != self.logging_tab.error_color:
+                    self.tabbar.setTabTextColor(self.tabwidget.indexOf(self.logging_tab), self.logging_tab.error_color)
+
     def close(self):
         self.conf_write()
 
-    def closeSplitPrinter(self):
+    def close_split_printer(self):
         if self.split_printer_thread:
             self.split_printer_thread.terminate()
         if self.split_printer_queue:
             self.split_printer_queue.close()
+
+        self.split_printer_thread = None
+        self.split_printer_queue = None
 
     def closeEvent(self, _event):
         quit_msg = translate('Save file before exit?')
@@ -125,7 +191,7 @@ class MainWindow(QMainWindow):
             QMessageBox.Save | QMessageBox.No | QMessageBox.Cancel,
         )
 
-        self.closeSplitPrinter()
+        self.close_split_printer()
         if reply == QMessageBox.Save:
             self.save_file()
             self.close()
@@ -173,9 +239,15 @@ class MainWindow(QMainWindow):
 
         self.service_timer = QTimer(self)
         self.service_timer.timeout.connect(self.interval)
-        self.service_timer.start(1000) #msec
+        self.service_timer.start(1000)  # msec
 
-        #LiveClient().init()
+        self.refresh_timer = QTimer(self)
+        self.refresh_timer.timeout.connect(self.refresh_by_timer)
+
+        self.res_recalculate = QTimer(self)
+        self.res_recalculate.timeout.connect(self.res_recalculate_by_timer)
+
+        LiveClient().init()
         self._menu_disable(self.current_tab)
 
     def _setup_ui(self):
@@ -270,6 +342,8 @@ class MainWindow(QMainWindow):
         self.tabwidget.addTab(organizations.Widget(), translate('Teams'))
         self.logging_tab = log.Widget()
         self.tabwidget.addTab(self.logging_tab, translate('Logs'))
+        self.tabbar = self.tabwidget.tabBar()
+
         self.tabwidget.currentChanged.connect(self._menu_disable)
 
     def _menu_disable(self, tab_index):
@@ -278,18 +352,20 @@ class MainWindow(QMainWindow):
                 item[0].setDisabled(True)
             else:
                 item[0].setDisabled(False)
+        if tab_index == self.tabwidget.indexOf(self.logging_tab):
+            # if self.tabbar.tabTextColor(i) == common_color:
+            self.tabbar.setTabTextColor(tab_index, self.logging_tab.common_color)
 
     def get_size(self):
 
         return {
-            #'x': self.x() + 8,
+            # 'x': self.x() + 8,
             'x': self.geometry().x(),
-            #'y': self.y() + 30,
+            # 'y': self.y() + 30,
             'y': self.geometry().y(),
             'width': self.width(),
             'height': self.height(),
         }
-
 
     def set_title(self, title=None):
         main_title = '{} {}'.format(config.NAME, config.VERSION)
@@ -349,6 +425,20 @@ class MainWindow(QMainWindow):
             Broker().produce('init_model')
         except Exception as e:
             logging.error(str(e))
+
+    def refresh_by_timer(self):
+        self.refresh()
+        self.refresh_timer.stop()
+
+    def deleyed_refresh(self, delay=1000):  # msec
+        self.refresh_timer.start(delay)
+
+    def res_recalculate_by_timer(self):
+        ResultCalculation(race()).process_results()
+        self.res_recalculate.stop()
+
+    def deleyed_res_recalculate(self, delay=1000):  # msec
+        self.res_recalculate.start(delay)
 
     def refresh(self):
         logging.debug('Refreshing interface')
@@ -474,7 +564,7 @@ class MainWindow(QMainWindow):
                         GroupSplits(race(), result.person.group).generate(True)
                     Teamwork().send(result.to_dict())
                     live_client.send(result)
-                    TelegramClient().send_result(result)
+                    telegram_client.send_result(result)
                     if result.person:
                         if result.is_status_ok():
                             Sound().ok()
@@ -525,61 +615,6 @@ class MainWindow(QMainWindow):
 
     def add_sportiduino_result_from_reader(self, result):
         self.add_sportident_result_from_sireader(result)
-
-    def teamwork(self, command):
-        try:
-            race().update_data(command.data)
-            logging.info(repr(command.data))
-            if 'object' in command.data and command.data['object'] in ['ResultManual', 'ResultSportident', 'ResultSFR',
-                                                                       'ResultSportiduino', 'ResultRfidImpinj']:
-                ResultCalculation(race()).process_results()
-            Broker().produce('teamwork_recieving', command.data)
-            self.refresh()
-        except Exception as e:
-            logging.error(str(e))
-
-    sportident_status = False
-    sportident_icon = {
-        True: 'sportident-on.png',
-        False: 'sportident.png',
-    }
-    teamwork_status = False
-    teamwork_icon = {
-        True: 'network.svg',
-        False: 'network-off.svg',
-    }
-
-    def interval(self):
-        is_alive = SIReaderClient().is_alive() \
-                   or SFRReaderClient().is_alive() \
-                   or SportiduinoClient().is_alive()
-
-        if is_alive != self.sportident_status:
-            self.toolbar_property['sportident'].setIcon(
-                QtGui.QIcon(config.icon_dir(self.sportident_icon[is_alive])))
-            self.sportident_status = is_alive
-
-        is_alive = Teamwork().is_alive()
-        if is_alive != self.teamwork_status:
-            self.toolbar_property['teamwork'].setIcon(
-                QtGui.QIcon(config.icon_dir(self.teamwork_icon[is_alive])))
-            self.teamwork_status = is_alive
-
-        try:
-            if self.get_configuration().get('autosave_interval'):
-                if self.file:
-                    if time.time() - self.last_update > int(self.get_configuration().get('autosave_interval')):
-                        self.save_file()
-                        logging.info(translate('Auto save'))
-
-        except Exception as e:
-            logging.error(str(e))
-
-        while not self.log_queue.empty():
-            text = self.log_queue.get()
-            self.statusbar_message(text)
-            if hasattr(self, 'logging_tab'):
-                self.logging_tab.write(text)
 
     # Actions
     def create_file(self, *args, update_data=True):
@@ -635,7 +670,7 @@ class MainWindow(QMainWindow):
                 self.init_model()
                 self.last_update = time.time()
             except Exception as e:
-                logging.exception(str(e))
+                logging.exception(e)
                 self.delete_from_recent_files(file_name)
                 QMessageBox.warning(
                     self,
@@ -718,7 +753,7 @@ class MainWindow(QMainWindow):
                 return
             self._delete_object()
         except Exception as e:
-            logging.error(str(e))
+            logging.exception(e)
 
     def _delete_object(self):
         indexes = self.get_selected_rows()

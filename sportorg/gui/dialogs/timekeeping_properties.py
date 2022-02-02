@@ -137,6 +137,13 @@ class TimekeepingPropertiesDialog(QDialog):
         self.item_finish_station = QRadioButton(translate('Finish station'))
         self.finish_layout.addRow(self.item_finish_station)
 
+        self.item_finish_cp = QRadioButton(translate('Control point'))
+        self.item_finish_cp_value = AdvSpinBox(-1, 999, max_width=60)
+        self.finish_layout.addRow(self.item_finish_cp, self.item_finish_cp_value)
+        self.item_finish_beam = QRadioButton(translate('Light beam'))
+        self.item_finish_beam.setDisabled(True)
+        self.finish_layout.addRow(self.item_finish_beam)
+
         self.missed_finish_group_box = QGroupBox(translate('Missed finish'))
         self.missed_finish_layout = QFormLayout()
         self.missed_finish_zero = QRadioButton(translate('00:00:00'))
@@ -150,12 +157,6 @@ class TimekeepingPropertiesDialog(QDialog):
         self.missed_finish_group_box.setLayout(self.missed_finish_layout)
         self.finish_layout.addRow(self.missed_finish_group_box)
 
-        self.item_finish_cp = QRadioButton(translate('Control point'))
-        self.item_finish_cp_value = AdvSpinBox(-1, 999, max_width=60)
-        self.finish_layout.addRow(self.item_finish_cp, self.item_finish_cp_value)
-        self.item_finish_beam = QRadioButton(translate('Light beam'))
-        self.item_finish_beam.setDisabled(True)
-        self.finish_layout.addRow(self.item_finish_beam)
         self.finish_group_box.setLayout(self.finish_layout)
         self.result_proc_layout.addRow(self.finish_group_box)
 

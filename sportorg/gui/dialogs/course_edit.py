@@ -9,7 +9,6 @@ from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.result_checker import ResultChecker
 from sportorg.models.result.score_calculation import ScoreCalculation
 from sportorg.models.result.split_calculation import RaceSplits
-from sportorg.modules.live.live import live_client
 from sportorg.modules.teamwork import Teamwork
 
 

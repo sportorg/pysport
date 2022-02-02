@@ -1,9 +1,10 @@
-import json
 import queue
 import socket
 from threading import Thread, main_thread
+import json
 
 from .server import Command
+from .packet_header import Header, Operations
 
 
 class ClientSenderThread(Thread):
@@ -20,16 +21,15 @@ class ClientSenderThread(Thread):
         while True:
             try:
                 cmd = self._in_queue.get(timeout=5)
-                data = json.dumps(cmd.data)
-                self.conn.sendall(data.encode())
+                self.conn.sendall(cmd.get_packet())
             except queue.Empty:
                 if not main_thread().is_alive() or self._stop_event.is_set():
                     break
             except ConnectionResetError as e:
-                self._logger.exception(e)
+                self._logger.debug(str(e))
                 break
             except Exception as e:
-                self._logger.exception(e)
+                self._logger.debug(str(e))
                 break
         self.conn.close()
         self._logger.debug('Client sender shutdown')
@@ -49,29 +49,35 @@ class ClientReceiverThread(Thread):
         full_data = b''
         self.conn.settimeout(5)
         self._logger.debug('Client receiver start')
+        hdr = Header()
+        is_new_pack = True
+
         while True:
             try:
                 data = self.conn.recv(1024)
                 if not data:
                     break
                 full_data += data
+                # self._logger.debug('Client got data: {}'.format(full_data))
                 while True:
-                    offset = 0
-                    while True:
-                        try:
-                            json.loads(full_data[:offset].decode())
+                    # getting Header
+                    if is_new_pack:
+                        if len(full_data) >= hdr.header_size:
+                            hdr.unpack_header(full_data[:hdr.header_size])
+                            # self._logger.debug('Client Packet Header: {}, ver: {}, size: {}'.format(full_data[:hdr.header_size], hdr.version, hdr.size))
+                            full_data = full_data[hdr.header_size:]
+                            is_new_pack = False
+                        else:
                             break
-                        except ValueError:
-                            if offset >= len(full_data):
-                                offset = -1
-                                break
-                            offset += 1
-                    if offset != -1:
-                        command = Command(json.loads(full_data[:offset].decode()))
-                        self._out_queue.put(command)  # for local
-                        full_data = full_data[offset:]
+                    # Getting JSON data
                     else:
-                        break
+                        if len(full_data) >= hdr.size:
+                            command = Command(json.loads(full_data[:hdr.size].decode()), Operations(hdr.opType).name)
+                            self._out_queue.put(command)  # for local
+                            full_data = full_data[hdr.size:]
+                            is_new_pack = True
+                        else:
+                            break
             except socket.timeout:
                 if not main_thread().is_alive() or self._stop_event.is_set():
                     break
@@ -103,13 +109,9 @@ class ClientThread(Thread):
             try:
                 s.connect(self.addr)
                 self._logger.info('Client start')
-                sender = ClientSenderThread(
-                    s, self._in_queue, self._stop_event, self._logger
-                )
+                sender = ClientSenderThread(s, self._in_queue, self._stop_event, self._logger)
                 sender.start()
-                receiver = ClientReceiverThread(
-                    s, self._out_queue, self._stop_event, self._logger
-                )
+                receiver = ClientReceiverThread(s, self._out_queue, self._stop_event, self._logger)
                 receiver.start()
 
                 sender.join()

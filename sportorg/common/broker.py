@@ -1,3 +1,4 @@
+import datetime
 import logging
 
 from sportorg.common.singleton import singleton
@@ -35,10 +36,13 @@ class Broker(object):
         return self.add(name, priority).subscribe(call)
 
     def produce(self, name, *args, **kwargs):
+        logging.debug(str(datetime.datetime.now()) + ' Broker.produce started for ' + name)
         if name not in self._consumers:
+            logging.debug(str(datetime.datetime.now()) + ' Broker.produce finished (no consumers) for ' + name)
             return None
 
         if not isinstance(self._consumers[name], list):
+            logging.debug(str(datetime.datetime.now()) + ' Broker.produce finished (no consumers) for ' + name)
             return None
 
         result = []
@@ -62,4 +66,5 @@ class Broker(object):
             if r:
                 result.append(r)
 
+        logging.debug(str(datetime.datetime.now()) + ' Broker.produce finished for ' + name)
         return result if len(result) else None
