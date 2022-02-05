@@ -5,8 +5,10 @@ from multiprocessing import Process
 
 from sportorg import config
 from sportorg.common.fake_std import FakeStd
+from sportorg.common.otime import OTime
 from sportorg.models import memory
 from sportorg.models.memory import ResultSportident, race
+from sportorg.modules.sportident.result_generation import ResultSportidentGeneration
 from sportorg.utils.time import time_to_hhmmss, time_to_otime, hhmmss_to_time
 
 
@@ -47,8 +49,10 @@ def backup_data(card_data):
 
 
 def load_backup(file_name):
-    def time_parse(time):
-        return time_to_otime(hhmmss_to_time(time))
+    def parse_time(hhmmss_time):
+        if hhmmss_time == "":
+            return OTime()
+        return time_to_otime(hhmmss_to_time(hhmmss_time))
 
     obj = race()
 
@@ -76,31 +80,22 @@ def load_backup(file_name):
             result['card_number'] = line
         elif state == 2:
             state = 3
-            if line == '':
-                result['start-time'] = 0
-            else:
-                result['start-time'] = time_parse(line)
+            result['start-time'] = parse_time(line)
         elif state == 3:
             state = 4
-            if line == '':
-                result['finish-time'] = 0
-            else:
-                result['finish-time'] = time_parse(line)
+            result['finish-time'] = parse_time(line)
         elif state == 4 and line == "split_start":
             state = 5
         elif state == 5 and line != "split_end":
             control, time = line.split()
-            control = int(control)
-            time = time_parse(time)
-            result['splits'].append((control, time))
+            result['splits'].append((int(control), parse_time(time)))
         elif state == 5 and line == "split_end":
             state = 6
         elif state == 6 and line == "end":
-            print(result)
-
             mem_result = memory.race().new_result(ResultSportident)
-            person = find_person(int(result['card_number']))
-            mem_result.card_number = int(result['card_number'])
+            card_number = int(result['card_number'])
+            person = find_person(card_number)
+            mem_result.card_number = card_number
             mem_result.person = person
 
             if result['start-time'] != 0:
@@ -115,20 +110,6 @@ def load_backup(file_name):
                 split.days = 0
                 mem_result.splits.append(split)
 
-            obj.results.append(mem_result)
-            # for i in range(len(card_data['punches'])):
-            #     t = card_data['punches'][i][1]
-            #     if t:
-            #         split = memory.Split()
-            #         split.code = str(card_data['punches'][i][0])
-            #         split.time = time_to_otime(t)
-            #         split.days = memory.race().get_days(t)
-            #         result.splits.append(split)
-
-            # else:
-            #     # no finish punch, process
-            #     result.finish_time = None
-
+            ResultSportidentGeneration(mem_result).add_result()
+            logging.debug("Import result with card_number=" + result['card_number'])
             state = 0
-        else:
-            print(state, line)
