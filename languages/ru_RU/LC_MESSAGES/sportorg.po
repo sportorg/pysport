@@ -832,6 +832,9 @@ msgstr "Сохранение IOF xml"
 msgid "IOF xml (*.xml)"
 msgstr "Файл IOF xml (*.xml)"
 
+msgid "SportOrg results reading backup"
+msgstr "Файл резервного копирования при чтении чипов"
+
 msgid "Use bib as card number"
 msgstr "Заменить номера чипов нагрудными номерами"
 

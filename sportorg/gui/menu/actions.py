@@ -251,10 +251,10 @@ class IOFEntryListImportAction(Action, metaclass=ActionFactory):
             self.app.init_model()
 
 
-class SportOrgResultsReadingLog(Action, metaclass=ActionFactory):
+class SportOrgResultsReadingBackupImportAction(Action, metaclass=ActionFactory):
     def execute(self):
         file_name = get_open_file_name(
-            translate('Open SportOrg backup file'), translate('Backup file (*.log)')
+            translate('Open SportOrg backup file'), translate('SportOrg backup file (*.log)')
         )
         if file_name != '':
             try:

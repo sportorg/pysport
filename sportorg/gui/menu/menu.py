@@ -62,8 +62,8 @@ def menu_list():
                             'action': 'IOFEntryListImportAction',
                         },
                         {
-                            'title': translate('SportOrg results reading log'),
-                            'action': 'SportOrgResultsReadingLog',
+                            'title': translate('SportOrg results reading backup'),
+                            'action': 'SportOrgResultsReadingBackupImportAction',
                         },
                     ],
                 },
