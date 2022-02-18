@@ -3,7 +3,7 @@ from lxml.builder import E
 from lxml.etree import ElementTree, Element
 
 from sportorg import config
-from sportorg.models.memory import ResultStatus, Person, find, Race
+from sportorg.models.memory import ResultStatus, Person, Race
 from sportorg.models.result.result_calculation import ResultCalculation
 
 
@@ -25,7 +25,7 @@ def get_iof_status(status):
     return "Disqualified"
 
 
-def generate_result_list(obj):
+def generate_result_list(obj, all_splits=False):
     """Generate the IOF XML ResultList string from the race data"""
 
     xmlns = "http://www.orienteering.org/datastandard/3.0"
@@ -43,6 +43,11 @@ def generate_result_list(obj):
         # Generate ClassResult and Class objects for each group
 
         xml_cr = E.ClassResult(generate_class(group))
+
+        course = group.course
+        if course:
+            xml_cr.append(generate_course(course))
+
         xml_rl.append(xml_cr)
 
         if not group.is_relay():
@@ -53,11 +58,7 @@ def generate_result_list(obj):
                 organization = person.organization
 
                 # generate Result
-                xml_result = generate_result(obj, result)
-
-                # add splits to Result object
-                for split in result.splits:
-                    xml_result.append(generate_split(split))
+                xml_result = generate_result(obj, result, all_splits)
 
                 # compose PersonResult from organization, person and result
                 xml_person_result = E.PersonResult(
@@ -214,7 +215,6 @@ def generate_competitor_list(obj):
 
             xml_competitor = E.Competitor(generate_person(person))
 
-
             if person.organization:
                 xml_competitor.append(generate_organization(person.organization))
 
@@ -247,7 +247,7 @@ def generate_organization(organization):
 def generate_person(person):
 
     person_name = person.name
-    if not person_name or len (person_name) < 1:
+    if not person_name or len(person_name) < 1:
         # mandatory first name (SPORTident Center doesn't work without it)
         person_name = '_'
 
@@ -256,9 +256,11 @@ def generate_person(person):
         E.Name(
             E.Family(person.surname),
             E.Given(person_name),
-        ),
-        E.BirthDate(str(person.birth_date) if person.birth_date else ''),
+        )
     )
+    if person.birth_date:
+        ret.append(E.BirthDate(str(person.birth_date)))
+
     return ret
 
 
@@ -271,10 +273,21 @@ def generate_split(split):
 
 
 def generate_class(group):
+    short_name = group.name
+    long_name = group.name
+    if group.long_name:
+        long_name = group.long_name
+
+    name_limit = 64  # limit of LiveLox service
+    if len(short_name) > name_limit:
+        short_name = short_name[:name_limit]
+    if len(long_name) > name_limit:
+        long_name = long_name[:name_limit]
+
     ret = E.Class(
         E.Id(str(group.id)),
-        E.Name(group.long_name),
-        E.ShortName(group.name),
+        E.Name(long_name),
+        E.ShortName(short_name)
     )
     return ret
 
@@ -289,19 +302,26 @@ def generate_course(course):
     return ret
 
 
-def generate_result(obj, result):
-
-    course = obj.find_course(result)
+def generate_result(obj, result, all_controls=False):
 
     ret = E.Result(
+        E.BibNumber(str(result.get_bib()) if result.get_bib() else ''),
         E.StartTime(otime_to_str(obj, result.get_start_time())),
         E.FinishTime(otime_to_str(obj, result.get_finish_time())),
         E.Time(str(result.get_result_otime().to_sec()) + ".0"),
+        # E.TimeBehind(otime_to_str(obj, result.diff)),
         E.Position(str(result.place)),
         E.Status(get_iof_status(result.status)),
-        E.BibNumber(str(result.get_bib()) if result.get_bib() else ''),
-        E.ControlCard(str(result.card_number)),
-        # E.TimeBehind(otime_to_str(obj, result.diff)),
-        generate_course(course)
     )
+
+    # add splits to Result object
+    for split in result.splits:
+        if all_controls or split.is_correct:
+            ret.append(generate_split(split))
+
+    ret.append(E.ControlCard(str(result.card_number)))
+
+    # course = obj.find_course(result)
+    # ret.append(generate_course(course))  # Livelox compatibility - moved to Class
+
     return ret

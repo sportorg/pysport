@@ -60,6 +60,19 @@
                     return 1;
                 return 0;
             };
+        } else if (sort === 'time') {
+            sortFunc = function (a, b) {
+				if (a.start_time != b.start_time){
+					return a.start_time - b.start_time;
+				}
+				var nameA = a.name && a.name.toLowerCase() || '';
+				var nameB = b.name && b.name.toLowerCase() || '';
+				if (nameA < nameB)
+					return -1;
+				if (nameA > nameB)
+					return 1;
+				return 0;
+            };
         }
         results.sort(sortFunc);
         var index = 0;
@@ -235,7 +248,8 @@
             value: [
                 {text: 'имени', value: 'name'},
                 {text: 'номеру', value: 'bib'},
-                {text: 'группе', value: 'group'}
+                {text: 'группе', value: 'group'},
+				{text: 'времени', value: 'time'}
             ],
             change: function (arr) {
                 render(arr[0]);

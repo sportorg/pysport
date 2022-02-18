@@ -38,6 +38,8 @@ def time_iof_to_otime(t):
     str_t = str(t)
     if str_t.find('T') > 0:
         time_part = str_t[str_t.find('T') + 1:]
+        if time_part.find('+') > 0:
+            time_part = time_part[:time_part.find('+')]
         return hhmmss_to_time(time_part)
     return OTime()
 

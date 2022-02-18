@@ -16,10 +16,10 @@ from sportorg.models.memory import race, Group, find, Organization, Person, Qual
 from sportorg.utils.time import time_to_otime, time_iof_to_otime, str_to_date, hhmmss_to_time, yyyymmdd_to_date
 
 
-def export_result_list(file):
+def export_result_list(file, all_splits=False):
     obj = race()
 
-    result_list = generate_result_list(obj)
+    result_list = generate_result_list(obj, all_splits)
 
     result_list.write(open(file, 'wb'), xml_declaration=True, encoding='UTF-8')
 
@@ -61,7 +61,7 @@ def import_from_iof(file):
         elif result.name == 'ResultList':
             import_from_result_list(result.data)
         elif result.name == 'StartList':
-            import_from_result_list(result.data)
+            import_from_entry_list(result.data)
         elif result.name == 'Event':
             import_from_event_data(result.data)
 
@@ -134,10 +134,14 @@ def create_person(person_entry):
         person.comment = 'C:' + ''.join(person_entry['race_numbers'])
     if 'control_card' in person_entry and person_entry['control_card']:
         person.card_number = int(person_entry['control_card'])
-    if 'bib' in person_entry['person']['extensions'] and person_entry['person']['extensions']['bib']:
+    if 'bib' in person_entry['person'] and person_entry['person']['bib']:
+        person.bib = int(person_entry['person']['bib'])
+    elif 'bib' in person_entry['person']['extensions'] and person_entry['person']['extensions']['bib']:
         person.bib = int(person_entry['person']['extensions']['bib'])
     if 'qual' in person_entry['person']['extensions'] and person_entry['person']['extensions']['qual']:
         person.qual = Qualification.get_qual_by_name(person_entry['person']['extensions']['qual'])
+    if 'start' in person_entry['person'] and person_entry['person']['start']:
+        person.start_time = time_iof_to_otime(person_entry['person']['start'])
 
     obj.persons.append(person)
     return person
@@ -252,7 +256,7 @@ def import_from_event_data(data):
     obj = race()
 
     if 'name' in data:
-        if len(data['name']) > 0 and data['name'] != 'Event':
+        if data['name'] and len(data['name']) > 0 and data['name'] != 'Event':
             obj.data.title = data['name']
 
     if 'start_date' in data:

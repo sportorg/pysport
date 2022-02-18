@@ -237,6 +237,24 @@ class IOFResultListExportAction(Action, metaclass=ActionFactory):
                     translate('Export error') + ': ' + file_name,
                 )
 
+class IOFResultListAllSplitsExportAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        file_name = get_save_file_name(
+            translate('Save As IOF xml'),
+            translate('IOF xml (*.xml)'),
+            '{}_resultList'.format(race().data.get_start_datetime().strftime('%Y%m%d')),
+        )
+        if file_name != '':
+            try:
+                iof_xml.export_result_list(file_name, True)
+            except Exception as e:
+                logging.exception(e)
+                QMessageBox.warning(
+                    self.app,
+                    translate('Error'),
+                    translate('Export error') + ': ' + file_name,
+                )
+
 class IOFEntryListExportAction(Action, metaclass=ActionFactory):
     def execute(self):
         file_name = get_save_file_name(

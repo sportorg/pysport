@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: SportOrg\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-04-12 11:13+0300\n"
-"PO-Revision-Date: 2021-12-18 21:24+0500\n"
+"PO-Revision-Date: 2022-02-18 17:55+0500\n"
 "Last-Translator: SportOrg\n"
 "Language-Team: SportOrg\n"
 "Language: ru_RU\n"
@@ -830,10 +830,10 @@ msgid "Export error"
 msgstr "Ошибка экспорта"
 
 msgid "Save As IOF xml"
-msgstr "Сохранение IOF xml"
+msgstr "Сохранение IOF XML"
 
 msgid "IOF xml (*.xml)"
-msgstr "Файл IOF xml (*.xml)"
+msgstr "Файл IOF XML (*.xml)"
 
 msgid "Use bib as card number"
 msgstr "Заменить номера чипов нагрудными номерами"
@@ -1436,13 +1436,16 @@ msgid "Max intermediate CP"
 msgstr "Максимум промежуточных КП"
 
 msgid "IOF xml"
-msgstr "Файл IOF xml"
+msgstr "Файл IOF XML v.3"
 
 msgid "EntrytList"
-msgstr "EntrytList (заявки"
+msgstr "EntrytList (заявки)"
 
 msgid "ResultList"
-msgstr "ResultList (результаты)"
+msgstr "ResultList (результаты, только правильные отметки)"
+
+msgid "ResultListAllSplits"
+msgstr "ResultList (результаты, все отметки)"
 
 msgid "StartList"
 msgstr "StartList (протокол старта)"
