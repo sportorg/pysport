@@ -325,11 +325,11 @@ def get_property(person, key):
         return str(person.bib)
     elif key == translate('Comment'):
         return str(person.comment)
-    elif key == _('IOF id'):
+    elif key == translate('IOF id'):
         return str(person.world_code)
-    elif key == _('National id'):
+    elif key == translate('National id'):
         return str(person.national_code)
-    elif key == _('Start group'):
+    elif key == translate('Start group'):
         return str(person.start_group)
 
     return ''
@@ -387,12 +387,12 @@ def set_property(person, key, value, **options):
             person.bib = new_bib
     elif key == translate('Comment'):
         person.comment = value
-    elif key == _('IOF id'):
+    elif key == translate('IOF id'):
         if str(value).isdigit():
             person.world_code = int(value)
-    elif key == _('National id'):
+    elif key == translate('National id'):
         if str(value).isdigit():
             person.national_code = int(value)
-    elif key == _('Start group'):
+    elif key == translate('Start group'):
         if str(value).isdigit():
             person.start_group = int(value)
