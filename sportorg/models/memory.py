@@ -1670,6 +1670,10 @@ class Qualification(IntEnum):
         ret = float(ret)
         return ret
 
+    @staticmethod
+    def list_qual():
+        return [q.get_title() for q in Qualification]
+
 
 class RankingItem(object):
     def __init__(

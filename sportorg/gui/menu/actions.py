@@ -18,6 +18,7 @@ from sportorg.gui.dialogs.file_dialog import get_open_file_name, get_save_file_n
 from sportorg.gui.dialogs.live_dialog import LiveDialog
 from sportorg.gui.dialogs.not_start_dialog import NotStartDialog
 from sportorg.gui.dialogs.number_change import NumberChangeDialog
+from sportorg.gui.dialogs.organization_mass_edit import OrganizationMassEditDialog
 from sportorg.gui.dialogs.print_properties import PrintPropertiesDialog
 from sportorg.gui.dialogs.relay_clone_dialog import RelayCloneDialog
 from sportorg.gui.dialogs.relay_number_dialog import RelayNumberDialog
@@ -337,6 +338,10 @@ class MassEditAction(Action, metaclass=ActionFactory):
     def execute(self):
         if self.app.current_tab == 0:
             MassEditDialog().exec_()
+            self.app.refresh()
+
+        if self.app.current_tab == 4:
+            OrganizationMassEditDialog().exec_()
             self.app.refresh()
 
 

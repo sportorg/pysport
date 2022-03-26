@@ -236,6 +236,10 @@ def get_names():
     return PersonNames().get_all()
 
 
+def get_qualification_list():
+    return [q.get_title() for q in Qualification]
+
+
 @singleton
 class PersonNames(object):
     NAMES: List[str] = []

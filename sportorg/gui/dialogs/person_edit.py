@@ -19,7 +19,6 @@ from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.modules.configs.configs import Config
 from sportorg.modules.live.live import live_client
 from sportorg.modules.teamwork import Teamwork
-from sportorg.utils.time import qdate_to_date, time_to_otime, time_to_qtime
 
 
 class PersonEditDialog(BaseDialog):
