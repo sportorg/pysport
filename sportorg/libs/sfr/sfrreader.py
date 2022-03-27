@@ -31,7 +31,7 @@ if platform.system() == 'Windows':
 
 class SFRReader(object):
     SFR_DEBUG = False
-    SFR_ALLOW_DUPLICATE = True  # Don't check card to be new, allow multiple reading of one card - used for debug only
+    SFR_ALLOW_DUPLICATE = False  # Don't check card to be new, allow multiple reading of one card - used for debug only
     TIMEOUT_STEP = 0.001  # Sleeping step while waiting for command response
     TIMEOUT_LIMIT = 200  # Max count of sleeping calls
 
@@ -73,6 +73,7 @@ class SFRReader(object):
 
         self._last_command = None
         self._last_card = None
+        self._last_finish_time = None
         self._reading_process = False
         self._count = 0
         self._block = False
@@ -258,6 +259,7 @@ class SFRReader(object):
             self.ret['check'] = time
         elif code == self.CODE_FINISH:
             self.ret['finish'] = time
+            self._last_finish_time = time
         else:
             self.ret['punches'].append((code, time))
 
@@ -310,13 +312,14 @@ class SFRReader(object):
         return None
 
     def init_card_data(self):
-        self.ret = {}
-        self.ret['punches'] = []
-        self.ret['card_type'] = 'SFR'
-        self.ret['start'] = None
-        self.ret['finish'] = None
-        self.ret['check'] = None
-        self.ret['card_number'] = 0
+        self.ret = {
+            'punches': [],
+            'card_type': 'SFR',
+            'start': None,
+            'finish': None,
+            'check': None,
+            'card_number': 0
+            }
 
     def get_card_data(self):
         """Decodes a data record read from an SFR Card."""
@@ -344,9 +347,10 @@ class SFRReaderReadout(SFRReader):
             self._last_card = None
 
         old_card = self._last_card
+        old_finish = self._last_finish_time
         self.request(1)
 
-        return old_card != self._last_card
+        return (old_card != self._last_card) or (old_finish != self._last_finish_time)
 
     def is_card_connected(self):
         return self._is_card_connected
