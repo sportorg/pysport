@@ -73,7 +73,10 @@ class SIReaderThread(QThread):
                         return
                 card_data = si.read_sicard()
                 card_data['card_type'] = si.cardtype
-                self._queue.put(SIReaderCommand('card_data', card_data), timeout=1)
+                if str(card_data['card_number']).isdigit() and int(card_data['card_number']) > 0:
+                    self._queue.put(SIReaderCommand('card_data', card_data), timeout=1)
+                else:
+                    self._logger.debug('sireader error: got 0 card number')
                 si.ack_sicard()
             except SIReaderException as e:
                 error_count += 1
