@@ -14,6 +14,8 @@ class FinishSource(Enum):
     readout = 2
     dsq = 3
     penalty = 4
+    cp = 5
+    beam = 6
 
 
 class ResultSportidentGeneration:
@@ -27,10 +29,9 @@ class ResultSportidentGeneration:
             'system_duplicate_chip_processing', 'several_results'
         )
         self.card_read_repeated = self.duplicate_chip_processing == 'bib_request'
+
         self.missed_finish = race().get_setting('system_missed_finish', 'zero')
-        self.finish_source = FinishSource[
-            race().get_setting('system_finish_source', 'station')
-        ]
+        self.finish_source = FinishSource[race().get_setting('system_finish_source', 'station')]
         self._process_missed_finish()
 
     def _process_missed_finish(self):

@@ -10,6 +10,10 @@ from sportorg.modules.printing.printing import print_html
 from sportorg.modules.printing.printout_split import SportorgPrinter
 
 
+
+import logging
+import time
+
 class NoResultToPrintException(Exception):
     pass
 
@@ -52,6 +56,8 @@ def split_printout(result):
 
     result.check_who_can_win()
 
+    t = time.process_time()
+
     if not str(template_path).endswith('.html') and platform.system() == 'Windows':
         # Internal split printout, pure python. Works faster, than jinja2 template + pdf
 
@@ -77,7 +83,7 @@ def split_printout(result):
 
     template = get_text_from_file(
         template_path,
-        race=obj.to_dict(),
+        race_data=obj.data.to_dict(),
         person=person.to_dict(),
         result=result.to_dict(),
         group=group.to_dict(),
@@ -86,7 +92,7 @@ def split_printout(result):
         items=s.to_dict(),
     )
     if not printer:
-        raise NoPrinterSelectedException('No printer selected')
+        raise NoPrinterSelectedException('Jinaja2 split: No printer selected')
     print_html(
         printer,
         template,
@@ -95,3 +101,8 @@ def split_printout(result):
         obj.get_setting('print_margin_right', 5.0),
         obj.get_setting('print_margin_bottom', 5.0),
     )
+
+def split_printout_close():
+    print_html(
+        "NO_PRINTER",
+        "CLOSE_SPLIT_PRN")

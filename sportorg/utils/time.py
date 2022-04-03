@@ -34,6 +34,14 @@ def time_to_otime(t):
     return OTime()
 
 
+def time_iof_to_otime(t):
+    str_t = str(t)
+    if str_t.find('T') > 0:
+        time_part = str_t[str_t.find('T') + 1:]
+        return hhmmss_to_time(time_part)
+    return OTime()
+
+
 def time_to_datetime(t):
     otime = time_to_otime(t)
     return datetime.datetime(
@@ -167,4 +175,8 @@ def date_to_qdate(value):
 
 def str_to_date(value, separator='-'):
     day, month, year = str(value).split(separator)
+    return date(int(year), int(month), int(day))
+
+def yyyymmdd_to_date(value, separator='-'):
+    year, month, day = str(value).split(separator)
     return date(int(year), int(month), int(day))
