@@ -159,6 +159,7 @@ class ResultThread(QThread):
 
         if card_data['start']:
             result.start_time = time_to_otime(card_data['start'])
+
         if card_data['finish']:
             result.finish_time = time_to_otime(card_data['finish'])
         else:

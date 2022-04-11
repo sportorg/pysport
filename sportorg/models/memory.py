@@ -541,18 +541,18 @@ class Result:
         self.status = ResultStatus(int(data['status']))
         self.penalty_laps = int(data['penalty_laps'])
         self.scores = data['scores']
-        if 'scores_rogain' in data and data['scores_rogain']:
+        if 'scores_rogain' in data and data['scores_rogain'] is not None:
             self.scores_rogain = data['scores_rogain']
         if str(data['place']).isdigit():
             self.place = int(data['place'])
         self.assigned_rank = Qualification.get_qual_by_code(data['assigned_rank'])
-        if data['start_time']:
+        if data['start_time'] is not None:
             self.start_time = OTime(msec=data['start_time'])
-        if data['finish_time']:
+        if data['finish_time'] is not None:
             self.finish_time = OTime(msec=data['finish_time'])
         if data['penalty_time']:
             self.penalty_time = OTime(msec=data['penalty_time'])
-        if 'credit_time' in data and data['credit_time']:
+        if 'credit_time' in data and data['credit_time'] is not None:
             self.credit_time = OTime(msec=data['credit_time'])
         if 'status_comment' in data:
             self.status_comment = data['status_comment']
