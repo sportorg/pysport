@@ -121,8 +121,7 @@ def _get_person_obj(data, race_data, result=None):
                 time 	int 	seconds of current split - time from previous CP to this CP
                 """
                 # fmt: on
-                current_split = {}
-                current_split['code'] = splits[i]['code']
+                current_split = {'code': splits[i]['code']}
                 end_time = splits[i]['time'] or 0
                 if i > 0:
                     start_time = splits[i - 1]['time'] or 0
@@ -176,12 +175,16 @@ def create(requests, url, data, race_data, log):
         if is_start:
             obj_for_send['params'] = {'start_list': True}
         try:
-           resp = o.send(obj_for_send)
+            resp = o.send(obj_for_send)
+
+            if resp.status_code != 200:
+                log.error("HTTP Status: {}, Msg: {}".format(resp.status_code, str(resp.content)))
+            else:
+                log.info("HTTP Status: {}, Msg: {}".format(resp.status_code, str(resp.content)))
+
         except Exception as e:
             log.error(e)
 
-        if resp.status_code != 200:
-            log.error("HTTP Status: {}, Msg: {}".format(resp.status_code,resp.content))
 
 def delete(requests, url, data, race_data):
     o = Orgeo(requests, url)
