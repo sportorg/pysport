@@ -73,10 +73,22 @@ class PrintProcess(Process):
             while True:
                 t = time.process_time()
                 html = self.queue.get()
+                if html == "CLOSE_SPLIT_PRN":
+                    app.quit()
+                    logging.debug("print_html: printing thread termination: {}".format(time.process_time() - t))
+                    break
+
                 logging.debug("print_html: New task received: {}".format(time.process_time() - t))
+
                 text_document.setHtml(html)
+
                 logging.debug("print_html: text_document setHtml: {}".format(time.process_time() - t))
+
                 text_document.print_(printer)
+
+                # without this timeout virtual printer (e.g. Adobe PDF) doesn't print task, having more than 1 split
+                time.sleep(0.25)
+
                 logging.debug("print_html: text_document printing done: {}".format(time.process_time() - t))
         except Exception as e:
             logging.error(str(e))

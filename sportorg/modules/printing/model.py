@@ -26,6 +26,9 @@ def split_printout(results):
     obj = race()
     template_path = obj.get_setting('split_template', template_dir('split', '1_split_printout.html'))
 
+    # don't process results in one group several times while bulk printing, track processed groups
+    processed_groups = []
+
     if not str(template_path).endswith('.html') and platform.system() == 'Windows':
         # Internal split printout, pure python. Works faster, than jinja2 template + pdf
         isDirectMode = True
@@ -54,7 +57,10 @@ def split_printout(results):
 
         if person.group and course:
 
-            s = GroupSplits(obj, person.group).generate(True)
+            if person.group not in processed_groups:
+                s = GroupSplits(obj, person.group).generate(True)
+                processed_groups.append(person.group)
+
             result.check_who_can_win()
 
             if isDirectMode:
@@ -92,3 +98,9 @@ def split_printout(results):
 
     if isDirectMode:
         pr.end_doc()
+
+
+def split_printout_close():
+    print_html(
+        "NO_PRINTER",
+        "CLOSE_SPLIT_PRN")

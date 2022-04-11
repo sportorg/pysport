@@ -31,6 +31,7 @@ from sportorg.modules.printing.model import (
     NoPrinterSelectedException,
     NoResultToPrintException,
     split_printout,
+    split_printout_close
 )
 from sportorg.modules.sfr.sfrreader import SFRReaderClient
 from sportorg.modules.sound import Sound
@@ -175,12 +176,12 @@ class MainWindow(QMainWindow):
 
     def close_split_printer(self):
         if self.split_printer_thread:
-            self.split_printer_thread.terminate()
+            split_printout_close()
+            self.set_split_printer_thread(None)
+
         if self.split_printer_queue:
             self.split_printer_queue.close()
-
-        self.split_printer_thread = None
-        self.split_printer_queue = None
+            self.set_split_printer_queue(None)
 
     def closeEvent(self, _event):
         quit_msg = translate('Save file before exit?')
