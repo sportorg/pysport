@@ -1,3 +1,5 @@
+from re import subn
+
 RESULT_STATUS = [
     'NONE',
     'OK',
@@ -132,6 +134,18 @@ def _get_person_obj(data, race_data, result=None):
     return obj
 
 
+def make_nice(s):
+    """
+    Converts unicode point string to urf8
+    :param s: unicode point string
+    :return: utf8 string
+    example:
+    in: b'{"response":"OK: \\u00ab\\u043a\\u0440\\u043e\\u0441\\u0441-\\u0441\\u043f\\ ...
+    out: b'{"response":"OK: «кросс-спринт» - Стартовый успешно загружен | Start list loaded"}'
+    """
+    return subn('(\\\\\\\\u[0-9a-f]{4})', lambda cp: chr(int(cp.groups()[0][3:], 16)), s)[0]
+
+
 def create(requests, url, data, race_data, log):
     """
     data is Dict: Person, Result, Group, Course, Organization
@@ -178,9 +192,9 @@ def create(requests, url, data, race_data, log):
             resp = o.send(obj_for_send)
 
             if resp.status_code != 200:
-                log.error("HTTP Status: {}, Msg: {}".format(resp.status_code, str(resp.content)))
+                log.error("HTTP Status: {}, Msg: {}".format(resp.status_code, make_nice(str(resp.content))))
             else:
-                log.info("HTTP Status: {}, Msg: {}".format(resp.status_code, str(resp.content)))
+                log.info("HTTP Status: {}, Msg: {}".format(resp.status_code, make_nice(str(resp.content))))
 
         except Exception as e:
             log.error(e)
