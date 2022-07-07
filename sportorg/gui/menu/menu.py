@@ -307,6 +307,10 @@ def menu_list():
                     'action': 'SplitDeleteAction'
                 },
                 {
+                    'title': translate('Merge results'),
+                    'action': 'MergeResultsAction'
+                },
+                {
                     'title': translate('Assign result by bib'),
                     'action': 'AssignResultByBibAction'
                 },

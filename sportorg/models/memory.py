@@ -1056,6 +1056,16 @@ class ResultSportident(Result):
 
         return is_changed
 
+    def sort_splits(self):
+        self.splits.sort(key=lambda c: c.time)
+
+    def remove_duplicated_splits(self):
+        if len(self.splits) < 2:
+            return
+        for i in reversed(range(len(self.splits)-1)):
+            if self.splits[i] == self.splits[i+1]:
+                self.splits.remove(self.splits[i])
+
 
 class ResultSFR(ResultSportident):
     system_type = SystemType.SFR
