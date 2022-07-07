@@ -1467,3 +1467,15 @@ msgstr "Файл MS Word (*.docx)"
 
 msgid "Save in UTF-8 encoding"
 msgstr "Сохранять в UTF-8"
+
+msgid "Merge results"
+msgstr "Объединение результатов по номеру"
+
+msgid "Min. time interval"
+msgstr "Мин. интервал между КП"
+
+msgid "First CP"
+msgstr "Первый КП"
+
+msgid "CP increment"
+msgstr "Инкремент КП"

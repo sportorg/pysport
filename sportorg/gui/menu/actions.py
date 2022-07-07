@@ -16,6 +16,7 @@ from sportorg.gui.dialogs.entry_mass_edit import MassEditDialog
 from sportorg.gui.dialogs.event_properties import EventPropertiesDialog
 from sportorg.gui.dialogs.file_dialog import get_open_file_name, get_save_file_name
 from sportorg.gui.dialogs.live_dialog import LiveDialog
+from sportorg.gui.dialogs.merge_results import MergeResultsDialog
 from sportorg.gui.dialogs.not_start_dialog import NotStartDialog
 from sportorg.gui.dialogs.number_change import NumberChangeDialog
 from sportorg.gui.dialogs.organization_mass_edit import OrganizationMassEditDialog
@@ -607,6 +608,12 @@ class CPDeleteAction(Action, metaclass=ActionFactory):
 class SplitDeleteAction(Action, metaclass=ActionFactory):
     def execute(self):
         SplitDeleteDialog().exec_()
+        self.app.refresh()
+
+
+class MergeResultsAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        MergeResultsDialog().exec_()
         self.app.refresh()
 
 
