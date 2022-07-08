@@ -1479,3 +1479,18 @@ msgstr "Первый КП"
 
 msgid "CP increment"
 msgstr "Инкремент КП"
+
+msgid "Online results sending"
+msgstr "Отправка онлайн результатов"
+
+msgid "Online CP sending"
+msgstr "Отправка промежуточных КП"
+
+msgid "Online CP settings"
+msgstr "Настройки онлайн КП"
+
+msgid "CP from splits"
+msgstr "КП из сплитов, укажите список КП"
+
+msgid "Finish as CP"
+msgstr "Использовать финиш как КП с кодом:"
