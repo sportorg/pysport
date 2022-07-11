@@ -1,4 +1,5 @@
 import logging
+from copy import deepcopy
 from enum import Enum
 
 from sportorg.common.otime import OTime
@@ -214,7 +215,16 @@ class ResultSportidentGeneration:
     def _create_person(self):
         new_person = Person()
         new_person.bib = self._get_max_bib() + 1
-        new_person.surname = translate('Competitor') + ' #' + str(new_person.bib)
+        existing_person = find(race().persons, card_number=self._result.card_number)
+        if existing_person:
+            new_person_copy = deepcopy(existing_person)
+            new_person_copy.id = new_person.id
+            new_person_copy.bib = new_person.bib
+            new_person = new_person_copy
+            new_person.card_number = 0
+        else:
+            new_person.surname = translate('Competitor') + ' #' + str(new_person.bib)
+
         new_person.group = self._find_group_by_punches()
         self._result.person = new_person
 
