@@ -45,8 +45,13 @@ class LiveClient:
         urls = self.get_urls()
         race_data = race().to_dict()
         for url in urls:
-            func = partial(orgeo.create, requests, url, items, race_data, logging.root)
-            Thread(target=func, name='LiveThread').start()
+            if race().get_setting('live_results_enabled', False):
+                func = partial(orgeo.create, requests, url, items, race_data, logging.root)
+                Thread(target=func, name='LiveThread').start()
+
+            if race().get_setting('live_cp_enabled', False):
+                func = partial(orgeo.create_online_cp, requests, url, items, race_data, logging.root)
+                Thread(target=func, name='LiveThread_OnlineCP').start()
 
     def delete(self, data):
         if not self.is_enabled():

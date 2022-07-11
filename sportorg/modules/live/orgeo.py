@@ -1,5 +1,7 @@
 from re import subn
 
+from sportorg.utils.time import int_to_otime
+
 RESULT_STATUS = [
     'NONE',
     'OK',
@@ -35,6 +37,17 @@ class Orgeo:
         response = self.requests.post(self._get_url(), headers=self._headers, json=data)
         return response
 
+    def send_online_cp(self, chip, code, time):
+
+        url = self._get_url()
+        url += "&si=" + str(chip)
+        url += "&radio=" + str(code)
+        url += "&r=" + str(time)
+        url += "&fl=0"
+
+        response = self.requests.get(url, headers=self._headers)
+        return response
+
 
 def _get_obj(data, race_data, key, key_id):
     if key_id not in data or not data[key_id]:
@@ -59,6 +72,12 @@ def _get_person(data, race_data):
 def _get_result_by_person(data, race_data):
     for obj in race_data['results']:
         if obj['person_id'] and data['id'] == obj['person_id']:
+            return obj
+
+
+def _get_result_by_id(data, race_data):
+    for obj in race_data['results']:
+        if obj['id'] and data['id'] == obj['id']:
             return obj
 
 
@@ -167,8 +186,8 @@ def create(requests, url, data, race_data, log):
         if item['object'] == 'Organization':
             for person_data in race_data['persons']:
                 if (
-                    person_data['organization_id']
-                    and person_data['organization_id'] == item['id']
+                        person_data['organization_id']
+                        and person_data['organization_id'] == item['id']
                 ):
                     result_data = _get_result_by_person(person_data, race_data)
                     persons.append(_get_person_obj(person_data, race_data, result_data))
@@ -198,6 +217,65 @@ def create(requests, url, data, race_data, log):
 
         except Exception as e:
             log.error(e)
+
+
+def create_online_cp(requests, url, data, race_data, log):
+    """
+    data is Dict: Results
+    race_data is Dict: Race
+    """
+
+    if not race_data['settings']['live_cp_enabled']:
+        return
+
+    o = Orgeo(requests, url)
+
+    for item in data:
+
+        if item['object'] in [
+            'Result',
+            'ResultSportident',
+            'ResultSportiduino',
+            'ResultSFR',
+            'ResultManual',
+        ]:
+            try:
+                res = _get_result_by_id(item, race_data)
+
+                if race_data['settings']["live_cp_finish_enabled"]:
+                    # send finish time as cp with specified code
+                    card_number = res["card_number"]
+                    if card_number > 0:
+                        code = race_data['settings']["live_cp_code"]
+                        finish_time = int_to_otime(res["finish_time"]//10).to_str()
+                        resp = o.send_online_cp(card_number, code, finish_time)
+                        if resp.status_code != 200:
+                            log.error("HTTP Status: {}, Msg: {}".format(resp.status_code, make_nice(str(resp.content))))
+                        else:
+                            log.info("HTTP Status: {}, Msg: {}".format(resp.status_code, make_nice(str(resp.content))))
+                    else:
+                        log.info("HTTP Status: {}, Msg: {}".format(401, "Ignoring empty card number"))
+
+                if race_data['settings']["live_cp_splits_enabled"]:
+                    # send split as cp, codes of cp to send are set by the list
+                    card_number = res["card_number"]
+                    if card_number > 0:
+                        codes = race_data['settings']["live_cp_split_codes"].split(",")
+                        for split in res["splits"]:
+                            if split["code"] in codes:
+                                split_time = int_to_otime(split["time"]//10).to_str()
+                                resp = o.send_online_cp(card_number, split["code"], split_time)
+                                if resp.status_code != 200:
+                                    log.error("HTTP Status: {}, Msg: {}".format(resp.status_code,
+                                                                                make_nice(str(resp.content))))
+                                else:
+                                    log.info("HTTP Status: {}, Msg: {}".format(resp.status_code,
+                                                                               make_nice(str(resp.content))))
+                    else:
+                        log.info("HTTP Status: {}, Msg: {}".format(401, "Ignoring empty card number"))
+
+            except Exception as e:
+                log.exception(e)
 
 
 def delete(requests, url, data, race_data):
