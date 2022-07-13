@@ -326,4 +326,4 @@ class ResultCalculation(object):
         if leader_scores:
             ret = round(int(leader_scores) * percent / 100)
             return ret
-        return None
+        return 0

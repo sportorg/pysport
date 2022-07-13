@@ -4,7 +4,7 @@
 #define MyAppName "SportOrg"
 #define MyAppVersion "v1.6.0"
 #define MyVersionInfoVersion "1.6.0.0"
-#define MyAppPublisher "Danil Akhtarov, Sergei Kobelev"
+#define MyAppPublisher "Danil Akhtarov, Alexei Zhulev, Semyon Yakimov, Konstantin Bats, Sergei Kobelev"
 #define MyAppURL "https://sportorg.readthedocs.io"
 #define MyAppExeName "SportOrg.exe"
 
@@ -25,6 +25,7 @@ AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DefaultDirName={pf}\{#MyAppName}
+UsePreviousAppDir=no
 DisableProgramGroupPage=yes
 OutputBaseFilename={#MyAppName}-{#MyAppVersion}
 Compression=lzma

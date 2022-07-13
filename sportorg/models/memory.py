@@ -31,6 +31,7 @@ class SystemType(Enum):
     SPORTIDENT = 2
     SFR = 3
     SPORTIDUINO = 4
+    RFID_IMPINJ = 5
 
     def __str__(self):
         return self._name_
@@ -733,7 +734,7 @@ class Result:
         return self.status == ResultStatus.OK or self.status == ResultStatus.RESTORED
 
     def is_punch(self):
-        return self.is_sportident() or self.is_sfr() or self.is_sportiduino()
+        return self.is_sportident() or self.is_sfr() or self.is_sportiduino() or self.is_rfid_impinj()
 
     def is_sportident(self):
         return self.system_type == SystemType.SPORTIDENT
@@ -743,6 +744,9 @@ class Result:
 
     def is_sportiduino(self):
         return self.system_type == SystemType.SPORTIDUINO
+
+    def is_rfid_impinj(self):
+        return self.system_type == SystemType.RFID_IMPINJ
 
     def is_manual(self):
         return self.system_type == SystemType.MANUAL
@@ -1075,6 +1079,10 @@ class ResultSportiduino(ResultSportident):
     system_type = SystemType.SPORTIDUINO
 
 
+class ResultRfidImpinj(ResultSportident):
+    system_type = SystemType.RFID_IMPINJ
+
+
 class Person(Model):
     def __init__(self):
         self.id = uuid.uuid4()
@@ -1259,6 +1267,7 @@ class Race(Model):
         'ResultSportident': ResultSportident,
         'ResultSFR': ResultSFR,
         'ResultSportiduino': ResultSportiduino,
+        'ResultRfidImpinj': ResultRfidImpinj,
         'Group': Group,
         'Course': Course,
         'Organization': Organization,
@@ -1288,6 +1297,7 @@ class Race(Model):
             'ResultSportident': self.results,
             'ResultSFR': self.results,
             'ResultSportiduino': self.results,
+            'ResultRfidImpinj': self.results,
             'Group': self.groups,
             'Course': self.courses,
             'Organization': self.organizations,
@@ -1345,6 +1355,7 @@ class Race(Model):
             'ResultSportident',
             'ResultSFR',
             'ResultSportiduino',
+            'ResultRfidImpinj'
         ]:
             obj.person = self.get_obj('Person', dict_obj['person_id'])
         elif dict_obj['object'] == 'Group':
@@ -1729,7 +1740,7 @@ class RankingItem(object):
         if data['max_time']:
             self.max_time = OTime(msec=int(data['max_time']))
         if 'min_scores' in data and data['min_scores']:
-            self.min_scores = (data['max_time'])
+            self.min_scores = (data['min_scores'])
         self.is_active = bool(data['is_active'])
         self.percent = int(data['percent'])
 

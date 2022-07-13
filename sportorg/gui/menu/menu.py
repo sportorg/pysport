@@ -340,6 +340,11 @@ def menu_list():
                     'action': 'SFRReadoutAction',
                 },
                 {
+                    'title': translate('on/off RFID Impinj readout'),
+                    'icon': config.icon_dir('rfid_impinj.png'),
+                    'action': 'ImpinjReadoutAction'
+                },
+                {
                    'title': translate('Teamwork'),
                    'icon': config.icon_dir('network.svg'),
                    'actions': [

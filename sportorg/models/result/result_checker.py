@@ -238,9 +238,12 @@ class ResultChecker:
     def calculate_scores_rogain(result):
         user_array = []
         ret = 0
+
+        allow_duplicates = race().get_setting('result_processing_scores_allow_duplicates', False)
+
         for cur_split in result.splits:
             code = str(cur_split.code)
-            if code not in user_array:
+            if code not in user_array or allow_duplicates:
                 user_array.append(code)
                 ret += ResultChecker.get_control_score(code)
         if result.person and result.person.group:

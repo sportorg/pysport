@@ -33,6 +33,7 @@ from sportorg.modules.printing.model import (
     split_printout,
     split_printout_close
 )
+from sportorg.modules.rfid_impinj.rfid_impinj import ImpinjClient
 from sportorg.modules.sfr.sfrreader import SFRReaderClient
 from sportorg.modules.sound import Sound
 from sportorg.modules.sportident.result_generation import ResultSportidentGeneration
@@ -236,6 +237,7 @@ class MainWindow(QMainWindow):
         Teamwork().set_call(self.teamwork)
         SIReaderClient().set_call(self.add_sportident_result_from_sireader)
         SportiduinoClient().set_call(self.add_sportiduino_result_from_reader)
+        ImpinjClient().set_call(self.add_impinj_result_from_reader)
         SFRReaderClient().set_call(self.add_sfr_result_from_reader)
 
         self.service_timer = QTimer(self)
@@ -615,6 +617,9 @@ class MainWindow(QMainWindow):
         self.add_sportident_result_from_sireader(result)
 
     def add_sportiduino_result_from_reader(self, result):
+        self.add_sportident_result_from_sireader(result)
+
+    def add_impinj_result_from_reader(self, result):
         self.add_sportident_result_from_sireader(result)
 
     # Actions

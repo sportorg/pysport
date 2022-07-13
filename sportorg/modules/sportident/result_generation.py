@@ -153,8 +153,14 @@ class ResultSportidentGeneration:
                 self._result = existing_res
                 ResultChecker.calculate_penalty(self._result)
                 ResultChecker.checking(self._result)
+                self.popup_result(self._result)
 
             return True
+
+    def popup_result(self, result):
+        arr = race().results
+        arr.remove(result)
+        arr.insert(0, result)
 
     def add_result(self):
         if self._has_result():
