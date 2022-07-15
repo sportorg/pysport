@@ -244,9 +244,15 @@ def create_online_cp(requests, url, data, race_data, log):
             try:
                 res = _get_result_by_id(item, race_data)
 
-                if race_data['settings']["live_cp_finish_enabled"]:
+                if res and race_data['settings']["live_cp_finish_enabled"]:
                     # send finish time as cp with specified code
+
                     card_number = res["card_number"]
+                    if card_number == 0 and "person_id" in res:
+                        person = _get_person(res, race_data)
+                        if person:
+                            card_number = person["card_number"]
+
                     if card_number > 0:
                         code = race_data['settings']["live_cp_code"]
                         finish_time = int_to_otime(res["finish_time"]//10).to_str()
@@ -258,9 +264,15 @@ def create_online_cp(requests, url, data, race_data, log):
                     else:
                         log.info("HTTP Status: {}, Msg: {}".format(401, "Ignoring empty card number"))
 
-                if race_data['settings']["live_cp_splits_enabled"]:
+                if res and race_data['settings']["live_cp_splits_enabled"]:
                     # send split as cp, codes of cp to send are set by the list
+
                     card_number = res["card_number"]
+                    if card_number == 0 and "person_id" in res:
+                        person = _get_person(res, race_data)
+                        if person:
+                            card_number = person["card_number"]
+
                     if card_number > 0:
                         codes = race_data['settings']["live_cp_split_codes"].split(",")
                         for split in res["splits"]:
