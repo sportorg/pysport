@@ -60,19 +60,6 @@
                     return 1;
                 return 0;
             };
-        } else if (sort === 'time') {
-            sortFunc = function (a, b) {
-				if (a.start_time != b.start_time){
-					return a.start_time - b.start_time;
-				}
-				var nameA = a.name && a.name.toLowerCase() || '';
-				var nameB = b.name && b.name.toLowerCase() || '';
-				if (nameA < nameB)
-					return -1;
-				if (nameA > nameB)
-					return 1;
-				return 0;
-            };
         }
         results.sort(sortFunc);
         var index = 0;
@@ -86,15 +73,15 @@
     var Fields = {
         fields: [
             {key: 'index', title: '№', size: 4},
-            {key: 'name', title: 'Фамилия, имя', size: 40},
-            {key: 'group', title: 'Группа', size: 20},
-            {key: 'year', title: 'ГР', size: 5},
-            {key: 'qual', title: 'Разряд', size: 7},
-            {key: 'bib', title: 'Номер', size: 6},
-            {key: 'card_number', title: 'Номер чипа', size: 11},
-            {key: 'start', title: 'Время старта', size: 13},
-            {key: 'price_show', title: 'Взнос', size: 6},
-            {key: 'comment', title: 'Прим.', size: 30, active: false}
+            {key: 'name', title: 'Name', size: 35},
+            {key: 'group', title: 'Category', size: 5},
+            {key: 'year', title: 'Year', size: 5},
+            //{key: 'qual', title: 'Разряд', size: 7},
+            {key: 'bib', title: 'Bib', size: 6},
+            {key: 'card_number', title: 'Card1', size: 11},
+			{key: 'comment', title: 'Card2', size: 11},
+            {key: 'start', title: 'Start time', size: 13},
+           
         ],
         active: function (key, val) {
             for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
@@ -147,13 +134,13 @@
                 }
             });
             var infoBlock = document.createElement('div');
-            if (price) {
+           /* if (price) {
                 infoBlock.appendChild(document.createTextNode('Стартовый взнос: ' + price + (paid ? ' - ' + paid + ' = ' + (price - paid) : '')));
                 infoBlock.appendChild(document.createElement('br'));
             }
             if (rentedSportidentCards) {
                 infoBlock.appendChild(document.createTextNode('Арендованных ЧИПов: ' + rentedSportidentCards));
-            }
+            }*/
             return infoBlock;
         };
 
@@ -177,7 +164,7 @@
                 }
                 var titleBlock = document.createElement('h2');
                 titleBlock.id = org.name;
-                titleBlock.appendChild(document.createTextNode(dateFormat(race.data.start_datetime) + ' / ' + org.name + ' / ' + org.contact)); 
+                titleBlock.appendChild(document.createTextNode(dateFormat(race.data.start_datetime) + ' / ' + org.name));
                 resultBlock.appendChild(titleBlock);
                 if (store.tableView) {
                     resultBlock.appendChild(new TableGenerator(rows, Fields.fields).getTable({className: 'sportorg-table'}));
@@ -248,8 +235,7 @@
             value: [
                 {text: 'имени', value: 'name'},
                 {text: 'номеру', value: 'bib'},
-                {text: 'группе', value: 'group'},
-				{text: 'времени', value: 'time'}
+                {text: 'группе', value: 'group'}
             ],
             change: function (arr) {
                 render(arr[0]);
