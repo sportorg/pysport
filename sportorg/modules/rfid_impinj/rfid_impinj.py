@@ -49,7 +49,7 @@ class ImpinjThread(QThread):
                 return
 
             impinj_reader.worker_start()
-            impinj_reader.fast_power(22)
+            # impinj_reader.fast_power(22)
 
         except Exception as e:
             self._logger.error(str(e))

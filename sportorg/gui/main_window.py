@@ -140,9 +140,12 @@ class MainWindow(QMainWindow):
 
     def interval(self):
         if SIReaderClient().is_alive() != self.sportident_status and hasattr(self, 'toolbar'):
+            self.sportident_status = SIReaderClient().is_alive() \
+                                     or SFRReaderClient().is_alive() \
+                                     or ImpinjClient().is_alive()
+
             self.toolbar_property['sportident'].setIcon(
-                QtGui.QIcon(config.icon_dir(self.sportident_icon[SIReaderClient().is_alive()])))
-            self.sportident_status = SIReaderClient().is_alive()
+                QtGui.QIcon(config.icon_dir(self.sportident_icon[self.sportident_status])))
 
         if Teamwork().is_alive() != self.teamwork_status:
             self.toolbar_property['teamwork'].setIcon(
@@ -256,7 +259,7 @@ class MainWindow(QMainWindow):
     def _setup_ui(self):
         geometry = ConfigFile.GEOMETRY
 
-        geom = bytearray.fromhex(Configuration().parser.get(geometry, 'main',  fallback='01'))
+        geom = bytearray.fromhex(Configuration().parser.get(geometry, 'main', fallback='01'))
         self.restoreGeometry(geom)
 
         self.setWindowIcon(QtGui.QIcon(config.ICON))
@@ -299,7 +302,7 @@ class MainWindow(QMainWindow):
                 if 'property' in action_item:
                     self.menu_property[action_item['property']] = action
                 if (
-                    'debug' in action_item and action_item['debug']
+                        'debug' in action_item and action_item['debug']
                 ) or 'debug' not in action_item:
                     parent.addAction(action)
             else:
@@ -574,7 +577,7 @@ class MainWindow(QMainWindow):
                         else:
                             Sound().fail()
                         if result.person.is_rented_card or RentCards().exists(
-                            result.person.card_number
+                                result.person.card_number
                         ):
                             Sound().rented_card()
             else:
