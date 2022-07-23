@@ -43,9 +43,11 @@ class ScoreCalculation(object):
                     ).split(',')
                     if len(scores_array):
                         if place > len(scores_array):
-                            result.scores = int(scores_array[-1])
+                            if scores_array[-1].isdigit():
+                                result.scores = int(scores_array[-1])
                         else:
-                            result.scores = int(scores_array[place - 1])
+                            if scores_array[place - 1].isdigit():
+                                result.scores = int(scores_array[place - 1])
                     else:
                         result.scores = 0
                 elif scores_type == 'formula':
