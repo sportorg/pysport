@@ -64,6 +64,10 @@ class ConsolePanelHandler(logging.Handler):
         self.parent.logging(dict({'text': self.format(record), 'level': record.levelno}))
 
 
+def is_reading_active():
+    return SIReaderClient().is_alive() or SFRReaderClient().is_alive() or ImpinjClient().is_alive()
+
+
 class MainWindow(QMainWindow):
     def __init__(self, argv=None):
         super().__init__()
@@ -139,10 +143,8 @@ class MainWindow(QMainWindow):
     }
 
     def interval(self):
-        if SIReaderClient().is_alive() != self.sportident_status and hasattr(self, 'toolbar'):
-            self.sportident_status = SIReaderClient().is_alive() \
-                                     or SFRReaderClient().is_alive() \
-                                     or ImpinjClient().is_alive()
+        if is_reading_active() != self.sportident_status and hasattr(self, 'toolbar'):
+            self.sportident_status = is_reading_active()
 
             self.toolbar_property['sportident'].setIcon(
                 QtGui.QIcon(config.icon_dir(self.sportident_icon[self.sportident_status])))
