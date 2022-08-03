@@ -95,6 +95,9 @@ class TimekeepingPropertiesDialog(QDialog):
         self.assignment_mode.stateChanged.connect(self.on_assignment_mode)
         self.tk_layout.addRow(self.assignment_mode)
 
+        self.ignore_readout_before_start = QCheckBox(translate('Ignore readout before start'))
+        self.tk_layout.addRow(self.ignore_readout_before_start)
+
         self.timekeeping_tab.setLayout(self.tk_layout)
 
         # result processing tab
@@ -307,6 +310,7 @@ class TimekeepingPropertiesDialog(QDialog):
             'system_duplicate_chip_processing', 'several_results'
         )
         assignment_mode = cur_race.get_setting('system_assignment_mode', False)
+        ignore_readout_before_start = cur_race.get_setting('ignore_readout_before_start', False)
         si_port = cur_race.get_setting('system_port', '')
         readout_duplicate_timeout = OTime(msec=cur_race.get_setting('readout_duplicate_timeout', 15000))
 
@@ -364,6 +368,8 @@ class TimekeepingPropertiesDialog(QDialog):
         self.item_duplicate_timeout.setTime(readout_duplicate_timeout.to_time())
 
         self.assignment_mode.setChecked(assignment_mode)
+
+        self.ignore_readout_before_start.setChecked(ignore_readout_before_start)
 
         # result processing
         obj = cur_race
@@ -501,6 +507,8 @@ class TimekeepingPropertiesDialog(QDialog):
 
         readout_duplicate_timeout = self.item_duplicate_timeout.getOTime().to_msec()
 
+        ignore_readout_before_start = self.ignore_readout_before_start.isChecked()
+
         start_cp_number = self.item_start_cp_value.value()
         finish_cp_number = self.item_finish_cp_value.value()
 
@@ -528,6 +536,8 @@ class TimekeepingPropertiesDialog(QDialog):
         obj.set_setting('system_assignment_mode', self.assignment_mode.isChecked())
 
         obj.set_setting('readout_duplicate_timeout', readout_duplicate_timeout)
+
+        obj.set_setting('ignore_readout_before_start', ignore_readout_before_start)
 
         # result processing
         rp_mode = 'time'

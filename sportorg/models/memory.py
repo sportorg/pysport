@@ -1,4 +1,5 @@
 import datetime
+import logging
 import re
 import time
 import uuid
@@ -1571,6 +1572,15 @@ class Race(Model):
         return ret
 
     def add_new_result(self, result):
+        ignore_readout_before_start = self.get_setting('ignore_readout_before_start', False)
+        if ignore_readout_before_start:
+            start = result.get_start_time()
+            finish = result.get_finish_time()
+
+            if finish < start and start.hour < 22:
+                logging.info('Ignoring finish with time before start: {} for card {}'.format(finish, result.card_number))
+                return
+
         self.results.insert(0, result)
 
     def add_result(self, result):
