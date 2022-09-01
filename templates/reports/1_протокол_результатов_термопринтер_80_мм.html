@@ -104,7 +104,8 @@
                         var tblF = document.createElement('table');
                         tblF.className = 'table-split';
                         tblF.appendChild(getTrBlock(toHHMMSS(finishMsec), 0));
-                        tblF.appendChild(getTrBlock(toHHMMSS(r.result_msec) + ' (' + r.place + ')', r.place));
+                        var place_str = r.place > 0 ? r.place : 'в/к';
+                        tblF.appendChild(getTrBlock(toHHMMSS(r.result_msec) + ' (' + place_str + ')', r.place));
                         r.finish_split = tblF;
                     }
                 }
