@@ -1,0 +1,262 @@
+{% extends "base.html" %}
+{% block title %}Team list{% endblock %}
+{% block head %}{{ super() }}{% endblock %}
+
+{% block content %}
+<div id="org-list-tables"></div>
+{% raw %}
+<script>
+    var race = {% endraw %}{{race|tojson}}{% raw %};
+    var rent_cards = {% endraw %}{{rent_cards|tojson}}{% raw %};
+    var selected = {% endraw %}{{selected|tojson}}{% raw %};
+    racePreparation(race);
+
+    function getStartListByOrg(org, sort) {
+        var results = [];
+        for (var _i = 0, _a = race.persons; _i < _a.length; _i++) {
+            var person = _a[_i];
+            if (!org || person.organization && person.organization.id === org.id) {
+                if (!selected.persons.length || selected.persons.some(function (elem) {
+                            return elem.id === person.id;
+                        })) {
+                    person.is_rented_card = person.is_rented_card || rent_cards.indexOf(person.card_number) !== -1;
+                    results.push({
+                        name: person.surname + ' ' + person.name + (person.is_out_of_competition ? ' *' : ''),
+                        group: (person.group && person.group.name) || '',
+                        qual: Qualification[person.qual],
+                        bib: person.bib,
+                        card_number: person.card_number + (person.is_rented_card ? ' *' : ''),
+                        year: person.birth_date ? (new Date(person.birth_date)).getFullYear() : '',
+                        start: toHHMMSS(person.start_time),
+                        start_time: person.start_time,
+                        comment: person.comment,
+                        price: person.group && person.group.price,
+                        price_show: person.group && person.group.price + (person.is_paid ? ' *' : ''),
+                        person: person
+                    });
+                }
+            }
+        }
+        var sortFunc = function (a, b) {
+            var nameA = a.name && a.name.toLowerCase() || '';
+            var nameB = b.name && b.name.toLowerCase() || '';
+            if (nameA < nameB)
+                return -1;
+            if (nameA > nameB)
+                return 1;
+            return 0;
+        };
+        if (sort === 'bib') {
+            sortFunc = function (a, b) {
+                return a.bib - b.bib;
+            }
+        } else if (sort === 'group') {
+            sortFunc = function (a, b) {
+                var nameA = a.group.toLowerCase() || '';
+                var nameB = b.group.toLowerCase() || '';
+                if (nameA < nameB)
+                    return -1;
+                if (nameA > nameB)
+                    return 1;
+                return 0;
+            };
+        } else if (sort === 'time') {
+            sortFunc = function (a, b) {
+				if (a.start_time != b.start_time){
+					return a.start_time - b.start_time;
+				}
+				var nameA = a.name && a.name.toLowerCase() || '';
+				var nameB = b.name && b.name.toLowerCase() || '';
+				if (nameA < nameB)
+					return -1;
+				if (nameA > nameB)
+					return 1;
+				return 0;
+            };
+        }
+        results.sort(sortFunc);
+        var index = 0;
+        results.forEach(function (elem) {
+            index++;
+            elem.index = index
+        });
+        return results;
+    }
+
+    var Fields = {
+        fields: [
+            {key: 'index', title: '№', size: 4},
+            {key: 'name', title: 'Фамилия, имя', size: 32},
+            {key: 'group', title: 'Группа', size: 10},
+            {key: 'year', title: 'ГР', size: 4},
+            {key: 'qual', title: 'Разряд', size: 6},
+            {key: 'bib', title: 'Номер', size: 6},
+            {key: 'card_number', title: 'Номер чипа', size: 11},
+            {key: 'start', title: 'Cтарт', size: 9},
+            {key: 'price_show', title: 'Взнос', size: 6},
+            {key: 'comment', title: 'Прим.', size: 30, active: false}
+        ],
+        active: function (key, val) {
+            for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+                var obj = _a[_i];
+                if (key === obj.key) {
+                    obj.active = val;
+                }
+            }
+        },
+        isActive: function (key) {
+            for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+                var obj = _a[_i];
+                if (key === obj.key) {
+                    if (obj.active === void 0) {
+                        return true;
+                    }
+                    else {
+                        return !!obj.active;
+                    }
+                }
+            }
+            return false;
+        },
+        init: function () {
+            return this;
+        }
+    }.init();
+
+    var store = {};
+
+    function render(sort, noCombine) {
+        if (sort) {
+            store.sort = sort;
+        }
+        if (typeof noCombine === 'boolean') {
+            store.noCombine = noCombine;
+        }
+
+        var getInfoBlock = function (rows) {
+            var price = 0;
+            var paid = 0;
+            var rentedSportidentCards = 0;
+            rows.forEach(function (row) {
+                price += +row.price;
+                if (row.person.is_rented_card) {
+                    rentedSportidentCards++;
+                }
+                if (row.person.is_paid) {
+                    paid += +row.price;
+                }
+            });
+            var infoBlock = document.createElement('div');
+            if (price && Fields.isActive('price_show')) {
+                infoBlock.appendChild(document.createTextNode('Стартовый взнос: ' + price + (paid ? ' - ' + paid + ' = ' + (price - paid) : '')));
+                infoBlock.appendChild(document.createElement('br'));
+            }
+            if (rentedSportidentCards) {
+                infoBlock.appendChild(document.createTextNode('Арендованных ЧИПов: ' + rentedSportidentCards));
+            }
+            return infoBlock;
+        };
+
+        var resultBlock = document.getElementById('org-list-tables');
+        resultBlock.innerHTML = '';
+        if (store.noCombine) {
+            var rows = getStartListByOrg(null, store.sort);
+            if (store.tableView) {
+                resultBlock.appendChild(new TableGenerator(rows, Fields.fields).getTable({className: 'sportorg-table'}));
+            } else {
+                resultBlock.appendChild(new TableTextGenerator(rows, Fields.fields).getTable());
+            }
+            resultBlock.appendChild(getInfoBlock(rows));
+        } else {
+            var i = 0;
+            for (var _i = 0, _a = race.organizations; _i < _a.length; _i++) {
+                var org = _a[_i];
+                var rows = getStartListByOrg(org, store.sort);
+                if (!rows.length) {
+                    continue;
+                }
+                var titleBlock = document.createElement('h2');
+                titleBlock.id = org.name;
+                titleBlock.appendChild(document.createTextNode(dateFormat(race.data.start_datetime) + ' / ' + org.name + ' / ' + org.contact)); 
+                resultBlock.appendChild(titleBlock);
+                if (store.tableView) {
+                    resultBlock.appendChild(new TableGenerator(rows, Fields.fields).getTable({className: 'sportorg-table'}));
+                } else {
+                    resultBlock.appendChild(new TableTextGenerator(rows, Fields.fields).getTable());
+                }
+                resultBlock.appendChild(getInfoBlock(rows));
+                if (i < race.organizations.length - 1) {
+                    var newPage = document.createElement('div');
+                    newPage.className = 'new-page';
+                    resultBlock.appendChild(newPage);
+                }
+                i++;
+            }
+        }
+    }
+    render();
+    new SettingsGenerator([
+        {
+            title: 'Табличный вид',
+            value: !!store.tableView,
+            change: function (checked) {
+                store.tableView = checked;
+                render()
+            }
+        },
+        {
+            title: 'Номер',
+            value: Fields.isActive('bib'),
+            change: function (checked) {
+                Fields.active('bib', checked);
+                render()
+            }
+        },
+        {
+            title: 'Номер чипа',
+            value: Fields.isActive('card_number'),
+            change: function (checked) {
+                Fields.active('card_number', checked);
+                render()
+            }
+        },
+        {
+            title: 'Стартовый взнос',
+            value: Fields.isActive('price_show'),
+            change: function (checked) {
+                Fields.active('price_show', checked);
+                render()
+            }
+        },
+        {
+            title: 'Комментарий',
+            value: Fields.isActive('comment'),
+            change: function (checked) {
+                Fields.active('comment', checked);
+                render()
+            }
+        },
+        {
+            title: 'Объединить по коллективам',
+            value: true,
+            change: function (checked) {
+                render(null, !checked)
+            }
+        },
+        {
+            title: 'Сортировать участников по: ',
+            value: [
+                {text: 'имени', value: 'name'},
+                {text: 'номеру', value: 'bib'},
+                {text: 'группе', value: 'group'},
+				{text: 'времени', value: 'time'}
+            ],
+            change: function (arr) {
+                render(arr[0]);
+            }
+        }
+    ]).show();
+</script>
+{% endraw %}
+{% endblock %}
+{% block footer %}{% endblock %}

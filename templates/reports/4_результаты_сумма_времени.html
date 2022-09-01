@@ -23,6 +23,8 @@
 </div>
 {% raw %}
 <script>
+    var SUM_STAGES=6; //Quantity of stages to sum - user defined value - Количество этапов для суммы
+
     var current_race =  Number({% endraw %}{{current_race}}{%raw %});
     var races = {% endraw %}{{races|tojson}}{%raw %};
     var race = races[current_race];
@@ -32,22 +34,53 @@
         racePreparation(r);
         for (var _a = 0, _b = r.results; _a < _b.length; _a++) {
             var res = _b[_a];
-            if (res.person && res.person.group) {
-                var person_key = res.person.group.name+'_'+res.person.bib;
-                if (!persons[person_key]) {
-                    persons[person_key] = res.person;
-                    persons[person_key].results = {};
+            if (res.person && res.person.group && res.person.surname) {
+                index = res.person.group.name + '_' + res.person.surname + '_' + res.person.name;
+                if (!persons[index]) {
+                    persons[index] = res.person;
+                    persons[index].results = {};
+                    persons[index].ok_count = 0;
                 }
-                persons[person_key].results[r.id] = res;
-                if (!persons[person_key].is_out_of_competition) {
-                    persons[person_key].is_out_of_competition = res.person.is_out_of_competition;
+                persons[index].results[r.id] = res;
+                if (!persons[index].is_out_of_competition) {
+                    persons[index].is_out_of_competition = res.person.is_out_of_competition;
                 }
             }
         }
     }
     var personList = [];
-    for (var p_key in persons) {
-        personList.push(persons[p_key]);
+    for (var p_index in persons) {
+        var sum = 0;
+        var sum_time_ms = 0
+        var r_count = 0;
+        var ok_count = 0;
+        var dsq = false;
+        var score_list = [];
+        for (var race_id in persons[p_index].results) {
+            cur_res = persons[p_index].results[race_id];
+            if (cur_res.status === 1) {
+                score_list.push(cur_res.scores);
+
+                ok_count++;
+                sum_time_ms += cur_res.result_msec;
+            } else {
+                score_list.push(0);
+            }
+            r_count++;
+        }
+        score_list.sort(function (a, b) {
+            return b - a;
+        });
+
+        for (var _i = 0, score_ = score_list; _i < score_.length && _i < SUM_STAGES; _i++) {
+            var s = score_[_i];
+            sum += s
+        }
+
+        //persons[p_index].sumMsec = sum;
+        persons[p_index].sumMsec = sum_time_ms;
+        persons[p_index].ok_count = ok_count;
+        personList.push(persons[p_index]);
     }
 
     function getResultsByGroup(group, count) {
@@ -60,31 +93,6 @@
         for (var _i = 0, _a = personList; _i < _a.length; _i++) {
             var person = _a[_i];
             if (person.group.name === group.name) {
-                var sumMsec = 0;
-                var sumPlaces = 0;
-                var places = [];
-                var r_count = 0;
-                var dsq = false;
-                for (var race_id in person.results) {
-                    if (person.results[race_id].status === 1) {
-                        places.push([person.results[race_id].place,person.results[race_id].result_msec]);
-                    }
-                }
-                places.sort(function(a, b) { return (a[0] - b[0])?(a[0] - b[0]):(a[1]-b[1]); });
-                if (store.bestRaceCount){
-                    places = places.slice(0,store.bestRaceCount);
-                }
-                if (!person.is_out_of_competition){
-                    places.forEach(function (value) {
-                        sumMsec += value[1];
-                        sumPlaces += value[0];
-                        r_count++;
-                    });
-                }
-                if (r_count !== (store.bestRaceCount || races.length)) {
-                    dsq = true;
-                }
-                person.dsq = dsq;
                 var r = {
                     index: 0,
                     name: (person.surname + ' ' + person.name).slice(0, MAX_PERSON_NAME),
@@ -92,30 +100,27 @@
                     qual: Qualification[person.qual],
                     bib: person.bib,
                     year: person.birth_date ? (new Date(person.birth_date)).getFullYear() : '',
-                    resultSumPlaces: sumPlaces?sumPlaces:'',
-                    resultMsec: sumMsec,
-                    result: toHHMMSS(sumMsec),
+                    resultMsec: person.sumMsec,
+                    result: toHHMMSS(person.sumMsec) + ' (' + person.ok_count + ')',
+                    ok_count: person.ok_count,
                     place: '',
                     person: person
                 };
                 for (var _b = 0, races_1 = races; _b < races_1.length; _b++) {
                     var race_ = races_1[_b];
                     if (person.results[race_.id]) {
-                        r[race_.id] = person.results[race_.id].result+(person.results[race_.id].place>0?' ('+person.results[race_.id].place+')':'');
+                        r[race_.id] = person.results[race_.id].result;
                     }
                 }
                 results.push(r);
             }
         }
         results.sort(function (a, b) {
-            if (!a.resultSumPlaces) {
+            if (!a.resultMsec) {
                 return 1;
             }
-            if (!b.resultSumPlaces) {
+            if (!b.resultMsec) {
                 return -1;
-            }
-            if (a.person.dsq && b.person.dsq) {
-                return a.resultSumPlaces - b.resultSumPlaces; 
             }
             if (a.person.dsq) {
                 return 1;
@@ -123,7 +128,10 @@
             if (b.person.dsq) {
                 return -1;
             }
-            return a.resultSumPlaces - b.resultSumPlaces;
+            if (a.person.ok_count != b.person.ok_count) {
+                return b.person.ok_count - a.person.ok_count;
+            }
+            return a.resultMsec - b.resultMsec;
         });
         var prevRes = results[0];
         var place = 0;
@@ -132,7 +140,7 @@
             var result = results_1[_i];
             result.index = _i + 1;
             if (!result.person.dsq && !result.person.is_out_of_competition) {
-               if (result.resultSumPlaces === prevRes.resultSumPlaces && _i != 0) {
+               if (result.resultMsec === prevRes.resultMsec && _i != 0) {
                     doubleplace++;
                 } else {
                     place = place + 1 + doubleplace;
@@ -169,8 +177,7 @@
             {key: 'year', title: 'ГР', size: 5},
             {key: 'qual', title: 'Разряд', size: 7},
             {key: 'bib', title: 'Номер', size: 6},
-            {key: 'resultSumPlaces', title: 'Сумма мест', size: 10},
-            {key: 'result', title: 'Сумма времен', size: 12, active: false},
+            {key: 'result', title: 'Сумма', size: 15},
             {key: 'place', title: 'Место', size: 6}
         ],
         active: function (key, val) {
@@ -213,7 +220,7 @@
                 this.fields.push({
                     key: race_.id,
                     title: day,
-                    size: 16
+                    size: 18
                 });
                 day++;
             }
@@ -298,26 +305,6 @@
             ],
             change: function (arr) {
                 store.count = arr[0];
-                render();
-            }
-        },
-        {
-            title: 'Сумма мест лучших дней: ',
-            value: [
-                {text: 'Все дни', value: 0},
-                {text: '1', value: 1},
-                {text: '2', value: 2},
-                {text: '3', value: 3},
-                {text: '4', value: 4},
-                {text: '5', value: 5},
-                {text: '6', value: 6},
-                {text: '7', value: 7},
-                {text: '8', value: 8},
-                {text: '9', value: 9},
-                {text: '10', value: 10}
-            ],
-            change: function (arr) {
-                store.bestRaceCount = Number(arr[0]);
                 render();
             }
         },

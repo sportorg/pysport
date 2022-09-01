@@ -21,7 +21,7 @@ class ResultChecker:
 
         if race().get_setting('result_processing_mode', 'time') == 'scores':
             # process by score (rogain)
-            result.scores = self.calculate_scores_rogain(result)
+            result.scores_rogain = self.calculate_scores_rogain(result)
             return True
 
         course = race().find_course(result)
@@ -115,6 +115,20 @@ class ResultChecker:
             result.penalty_time = time_for_one_penalty * penalty
 
     @staticmethod
+    def get_marked_route_incorrect_list(controls):
+        ret = []
+        for i in controls:
+            code_str = str(i.code)
+            if code_str and '(' in code_str:
+                correct = code_str.split('(')[0].strip()
+                if correct.isdigit():
+                    for cp in code_str.split('(')[1].split(','):
+                        cp = cp.strip(')').strip()
+                        if cp != correct and cp.isdigit():
+                            ret.append(cp)
+        return ret
+
+    @staticmethod
     def penalty_calculation(splits, controls, check_existence=False):
         """:return quantity of incorrect or duplicated punches, order is ignored
         origin: 31,41,51; athlete: 31,41,51; result:0
@@ -150,17 +164,28 @@ class ResultChecker:
             # add 1 penalty score for missing points
             res = len(origin_array) - len(user_array)
 
-        for i in origin_array:
-            # remove correct points (only one object per loop)
+        incorrect_array = ResultChecker.get_marked_route_incorrect_list(controls)
 
-            if i == '0' and len(user_array):
-                del user_array[0]
+        if len(incorrect_array) > 0:
+            # marked route with choice, controls like 31(31,131), penalty only wrong choice (once),
+            # ignoring controls from another courses, previous punches on uncleared card, duplicates
+            # this mode allows combination of marked route and classic course, but please use different controls
+            for i in incorrect_array:
+                if i in user_array:
+                    res += 1
+        else:
+            # classic penalty model - count correct control punch only once, others are recognized as incorrect
+            # used for orientathlon, corridor training with choice
+            for i in origin_array:
+                # remove correct points (only one object per loop)
+                if i == '0' and len(user_array):
+                    del user_array[0]
 
-            elif i in user_array:
-                user_array.remove(i)
+                elif i in user_array:
+                    user_array.remove(i)
 
-        # now user_array contains only incorrect and duplicated values
-        res += len(user_array)
+            # now user_array contains only incorrect and duplicated values
+            res += len(user_array)
 
         return res
 
@@ -213,9 +238,12 @@ class ResultChecker:
     def calculate_scores_rogain(result):
         user_array = []
         ret = 0
+
+        allow_duplicates = race().get_setting('result_processing_scores_allow_duplicates', False)
+
         for cur_split in result.splits:
             code = str(cur_split.code)
-            if code not in user_array:
+            if code not in user_array or allow_duplicates:
                 user_array.append(code)
                 ret += ResultChecker.get_control_score(code)
         if result.person and result.person.group:

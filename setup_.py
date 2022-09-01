@@ -36,5 +36,6 @@ setup(
     version=config.VERSION.file,
     description=config.NAME,
     options=options,
-    executables=executables
+    executables=executables,
+    packages=[],
 )

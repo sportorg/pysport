@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}Start Times{% endblock %}
+
+{% block head %}
+{{ super() }}
+{% endblock %}
+
+{% block content %}
+<div id="start-times-tables"></div>
+{% raw %}
+<style>
+    @media print {
+		table.sportorg-table {
+		  width: 100%;
+		  table-layout: fixed;
+		}
+		
+        table.sportorg-table th {
+            text-align: left;
+        }
+
+		table.sportorg-table td:nth-child(1) {
+            padding-top: 10px;
+            border-bottom: 1px solid black;
+        }
+        table.sportorg-table td:nth-child(1n+1) {
+            padding-top: 10px;
+            border-bottom: 1px solid black;
+			white-space: normal;
+			font-size: 14px;
+			width: 1%;
+        }
+    }
+	
+	    @media screen {
+		table.sportorg-table {
+		  width: 100%;
+		  table-layout: fixed;
+		}
+		
+        table.sportorg-table th {
+            text-align: left;
+        }
+
+		table.sportorg-table td:nth-child(1) {
+            padding-top: 10px;
+            border-bottom: 1px solid black;
+        }
+
+        table.sportorg-table td:nth-child(1n+1) {
+            padding-top: 10px;
+            border-bottom: 1px solid black;
+			white-space: normal;
+			font-size: 15px;
+			width: 1%;
+        }
+
+    }
+
+</style>
+<script>
+    var race = {% endraw %}{{race|tojson}}{% raw %};
+    racePreparation(race);
+
+    function getStartTimes() {
+        var times = {};
+        for (var _i = 0, _a = race.persons; _i < _a.length; _i++) {
+            var person = _a[_i];
+			var persId = person.group.name + '\n' + person.name + '\n' + person.surname + '\n(' + person.card_number + ')';
+            if (times[person.start_time]) {
+                var val = times[person.start_time][person.group && person.group.start_corridor || 0];
+                if (val) {
+                    //val += ' ' + person.bib;
+					val += ' ' + persId;
+                }
+                else {
+                   //val = person.bib;
+				   val = persId;
+                }
+               times[person.start_time][person.group && person.group.start_corridor || 0] = val;
+            }
+            else {
+                times[person.start_time] = {};
+                //times[person.start_time][person.group && person.group.start_corridor || 0] = person.bib;
+				times[person.start_time][person.group && person.group.start_corridor || 0] = persId;
+            }
+        }
+        var results = [];
+        for (var start_time in times) {
+            times[start_time]['start_time'] = +start_time;
+            times[start_time]['start_time_str'] = toHHMMSS(+start_time);
+            results.push(times[start_time])
+        }
+        results.sort(function (a, b) {
+            return a.start_time - b.start_time;
+        });
+        return results;
+    }
+    var Fields = {
+        fields: [
+            {key: 'start_time_str', title: 'Время'}
+        ],
+        init: function () {
+            var start_corridors = {};
+            for (var _i = 0, _a = race.groups; _i < _a.length; _i++) {
+                var group = _a[_i];
+                start_corridors[group.start_corridor] = group.start_corridor;
+            }
+            for (var c in start_corridors) {
+                this.fields.push({key: c, title: start_corridors[c]})
+            }
+            return this;
+        }
+    }.init();
+    function render() {
+        var resultBlock = document.getElementById('start-times-tables');
+        resultBlock.innerHTML = '';
+        resultBlock.appendChild(new TableGenerator(getStartTimes(), Fields.fields).getTable({className: 'sportorg-table'}));
+    }
+    render();
+</script>
+{% endraw %}
+{% endblock %}

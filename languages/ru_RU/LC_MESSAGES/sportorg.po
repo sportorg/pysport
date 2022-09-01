@@ -3,15 +3,14 @@ msgstr ""
 "Project-Id-Version: SportOrg\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-04-12 11:13+0300\n"
-"PO-Revision-Date: 2019-08-03 09:39+0500\n"
+"PO-Revision-Date: 2022-07-13 14:41+0500\n"
 "Last-Translator: SportOrg\n"
 "Language-Team: SportOrg\n"
 "Language: ru_RU\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Loco-Source-Locale: ru_RU\n"
 "X-Generator: Poedit 2.2.1\n"
 "X-Poedit-SourceCharset: UTF-8\n"
@@ -334,22 +333,13 @@ msgstr "Результат"
 msgid "DNS"
 msgstr "НЕ СТАРТ."
 
-msgid "Did not start"
-msgstr "НЕ СТАРТ."
-
 msgid "DNF"
-msgstr "СОШЕЛ"
-
-msgid "Did not finish"
 msgstr "СОШЕЛ"
 
 msgid "Overtime"
 msgstr "ПРЕВЫШЕНО КВ"
 
 msgid "DSQ"
-msgstr "ДИСКВ."
-
-msgid "Disqualified"
 msgstr "ДИСКВ."
 
 msgid "Days"
@@ -390,6 +380,9 @@ msgstr "Поиск не дал результатов"
 
 msgid "Languages"
 msgstr "Язык интерфейса"
+
+msgid "Show toolbar"
+msgstr "Показать панель инструментов"
 
 msgid "Auto save"
 msgstr "Автосохранение"
@@ -1015,7 +1008,7 @@ msgstr "Да"
 msgid "No"
 msgstr "Нет"
 
-msgid "Mf"
+msgid "MF"
 msgstr "МЖ"
 
 msgid "M"
@@ -1381,6 +1374,18 @@ msgstr "Ctrl+K на группах - отправка стартового пр�
 msgid "Several athletes on one minute"
 msgstr "Несколько участников на 1 минуте"
 
+msgid "Duplicate timeout"
+msgstr "Таймаут повторного чтения"
+
+msgid "on/off RFID Impinj readout"
+msgstr "Запустить/остановить чтение чипов RFID Impinj"
+
+msgid "allow duplicates"
+msgstr "считать все повторные отметки"
+
+msgid "Use this option to count one punch several times, e.g. in trails with ring punching"
+msgstr "Используйте эту опцию для учета всех повторяющихся отметок. Пример использования: трейл-забег в несколько кругов с отметкой на каждом круге"
+
 msgid "Group not found"
 msgstr "Такой группы нет"
 
@@ -1404,3 +1409,105 @@ msgstr "Округление вниз"
 
 msgid "Rounding up"
 msgstr "Округление вверх"
+
+msgid "IOF id"
+msgstr "Код IOF Id"
+
+msgid "National id"
+msgstr "Национальный Id"
+
+msgid "Id"
+msgstr "Код"
+
+msgid "Code"
+msgstr "Код"
+
+msgid "Delete split"
+msgstr "Удаление перегона"
+
+msgid "Delete Split"
+msgstr "Удаление перегона"
+
+msgid "Start CP"
+msgstr "Начальный КП"
+
+msgid "End CP"
+msgstr "Конечный КП"
+
+msgid "Max intermediate CP"
+msgstr "Максимум промежуточных КП"
+
+msgid "IOF xml"
+msgstr "Файл IOF XML v.3"
+
+msgid "EntrytList"
+msgstr "EntrytList (заявки)"
+
+msgid "ResultList"
+msgstr "ResultList (результаты, только правильные отметки)"
+
+msgid "ResultListAllSplits"
+msgstr "ResultList (результаты, все отметки)"
+
+msgid "StartList"
+msgstr "StartList (протокол старта)"
+
+msgid "CompetitorList"
+msgstr "CompetitorList (список участников)"
+
+msgid "Online"
+msgstr "Онлайн"
+
+msgid "Save As MS Word file"
+msgstr "Сохранить в файл Word"
+
+msgid "SportOrg (*.json)"
+msgstr "Файл SportOrg (*.json)"
+
+msgid "MS Word file (*.docx)"
+msgstr "Файл MS Word (*.docx)"
+
+msgid "Save in UTF-8 encoding"
+msgstr "Сохранять в UTF-8"
+
+msgid "Merge results"
+msgstr "Объединение результатов по номеру"
+
+msgid "Min. time interval"
+msgstr "Мин. интервал между КП"
+
+msgid "First CP"
+msgstr "Первый КП"
+
+msgid "CP increment"
+msgstr "Инкремент КП"
+
+msgid "Online results sending"
+msgstr "Отправка онлайн результатов"
+
+msgid "Online CP sending"
+msgstr "Отправка промежуточных КП"
+
+msgid "Online CP settings"
+msgstr "Настройки онлайн КП"
+
+msgid "CP from splits"
+msgstr "КП из сплитов, укажите список КП"
+
+msgid "Finish as CP"
+msgstr "Использовать финиш как КП с кодом:"
+
+msgid "Ignore readout before start"
+msgstr "Игнорировать считывание до старта"
+
+msgid "Ignore readout before start"
+msgstr "Игнорировать считывание до старта"
+
+msgid "Did not start"
+msgstr "НЕ СТАРТ."
+
+msgid "Did not finish"
+msgstr "СОШЕЛ"
+
+msgid "Disqualified"
+msgstr "ДИСКВ."

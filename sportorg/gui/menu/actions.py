@@ -1,4 +1,7 @@
 import logging
+import socket
+import time
+import uuid
 from typing import Any, Dict, Type
 
 from PySide2 import QtCore
@@ -13,8 +16,10 @@ from sportorg.gui.dialogs.entry_mass_edit import MassEditDialog
 from sportorg.gui.dialogs.event_properties import EventPropertiesDialog
 from sportorg.gui.dialogs.file_dialog import get_open_file_name, get_save_file_name
 from sportorg.gui.dialogs.live_dialog import LiveDialog
+from sportorg.gui.dialogs.merge_results import MergeResultsDialog
 from sportorg.gui.dialogs.not_start_dialog import NotStartDialog
 from sportorg.gui.dialogs.number_change import NumberChangeDialog
+from sportorg.gui.dialogs.organization_mass_edit import OrganizationMassEditDialog
 from sportorg.gui.dialogs.print_properties import PrintPropertiesDialog
 from sportorg.gui.dialogs.relay_clone_dialog import RelayCloneDialog
 from sportorg.gui.dialogs.relay_number_dialog import RelayNumberDialog
@@ -22,6 +27,7 @@ from sportorg.gui.dialogs.rent_cards_dialog import RentCardsDialog
 from sportorg.gui.dialogs.report_dialog import ReportDialog
 from sportorg.gui.dialogs.search_dialog import SearchDialog
 from sportorg.gui.dialogs.settings import SettingsDialog
+from sportorg.gui.dialogs.split_delete import SplitDeleteDialog
 from sportorg.gui.dialogs.sportorg_import_dialog import SportOrgImportDialog
 from sportorg.gui.dialogs.start_handicap_dialog import StartHandicapDialog
 from sportorg.gui.dialogs.start_preparation import (
@@ -29,6 +35,7 @@ from sportorg.gui.dialogs.start_preparation import (
     guess_courses_for_groups,
 )
 from sportorg.gui.dialogs.start_time_change_dialog import StartTimeChangeDialog
+from sportorg.gui.dialogs.teamwork_properties import TeamworkPropertiesDialog
 from sportorg.gui.dialogs.telegram_dialog import TelegramDialog
 from sportorg.gui.dialogs.text_io import TextExchangeDialog
 from sportorg.gui.dialogs.timekeeping_properties import TimekeepingPropertiesDialog
@@ -49,9 +56,11 @@ from sportorg.modules.iof import iof_xml
 from sportorg.modules.live.live import live_client
 from sportorg.modules.ocad import ocad
 from sportorg.modules.ocad.ocad import OcadImportException
+from sportorg.modules.rfid_impinj.rfid_impinj import ImpinjClient
 from sportorg.modules.sfr.sfrreader import SFRReaderClient
 from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.modules.sportiduino.sportiduino import SportiduinoClient
+from sportorg.modules.teamwork import Teamwork
 from sportorg.modules.telegram.telegram import telegram_client
 from sportorg.modules.updater import checker
 from sportorg.modules.winorient import winorient
@@ -224,6 +233,42 @@ class IOFResultListExportAction(Action, metaclass=ActionFactory):
             try:
                 iof_xml.export_result_list(file_name)
             except Exception as e:
+                logging.exception(e)
+                QMessageBox.warning(
+                    self.app,
+                    translate('Error'),
+                    translate('Export error') + ': ' + file_name,
+                )
+
+class IOFResultListAllSplitsExportAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        file_name = get_save_file_name(
+            translate('Save As IOF xml'),
+            translate('IOF xml (*.xml)'),
+            '{}_resultList'.format(race().data.get_start_datetime().strftime('%Y%m%d')),
+        )
+        if file_name != '':
+            try:
+                iof_xml.export_result_list(file_name, True)
+            except Exception as e:
+                logging.exception(e)
+                QMessageBox.warning(
+                    self.app,
+                    translate('Error'),
+                    translate('Export error') + ': ' + file_name,
+                )
+
+class IOFEntryListExportAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        file_name = get_save_file_name(
+            translate('Save As IOF xml'),
+            translate('IOF xml (*.xml)'),
+            '{}_entryList'.format(race().data.get_start_datetime().strftime('%Y%m%d')),
+        )
+        if file_name != '':
+            try:
+                iof_xml.export_entry_list(file_name)
+            except Exception as e:
                 logging.error(str(e))
                 QMessageBox.warning(
                     self.app,
@@ -250,6 +295,31 @@ class IOFEntryListImportAction(Action, metaclass=ActionFactory):
             self.app.init_model()
 
 
+class IOFStartListExportAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        file_name = get_save_file_name(translate('Save As IOF xml'), translate('IOF xml (*.xml)'),
+                                       '{}_startList'.format(race().data.get_start_datetime().strftime("%Y%m%d")))
+        if file_name != '':
+            try:
+                iof_xml.export_start_list(file_name)
+            except Exception as e:
+                logging.exception(str(e))
+                QMessageBox.warning(self.app, translate('Error'), translate('Export error') + ': ' + file_name)
+
+
+class IOFCompetitorListExportAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        file_name = get_save_file_name(translate('Save As IOF xml'), translate('IOF xml (*.xml)'),
+                                       '{}_competitorList'.format(
+                                           race().data.get_start_datetime().strftime("%Y%m%d")))
+        if file_name != '':
+            try:
+                iof_xml.export_competitor_list(file_name)
+            except Exception as e:
+                logging.exception(str(e))
+                QMessageBox.warning(self.app, translate('Error'), translate('Export error') + ': ' + file_name)
+
+
 class AddObjectAction(Action, metaclass=ActionFactory):
     def execute(self):
         self.app.add_object()
@@ -270,6 +340,10 @@ class MassEditAction(Action, metaclass=ActionFactory):
     def execute(self):
         if self.app.current_tab == 0:
             MassEditDialog().exec_()
+            self.app.refresh()
+
+        if self.app.current_tab == 4:
+            OrganizationMassEditDialog().exec_()
             self.app.refresh()
 
 
@@ -400,6 +474,8 @@ class CopyCardNumberToBib(Action, metaclass=ActionFactory):
 class ManualFinishAction(Action, metaclass=ActionFactory):
     def execute(self):
         result = race().new_result(ResultManual)
+        Teamwork().send(result.to_dict())
+        live_client.send(result)
         race().add_new_result(result)
         logging.info(translate('Manual finish'))
         self.app.refresh()
@@ -408,17 +484,28 @@ class ManualFinishAction(Action, metaclass=ActionFactory):
 class SPORTidentReadoutAction(Action, metaclass=ActionFactory):
     def execute(self):
         SIReaderClient().toggle()
+        time.sleep(0.5)
+        self.app.interval()
 
 
 class SportiduinoReadoutAction(Action, metaclass=ActionFactory):
     def execute(self):
         SportiduinoClient().toggle()
+        time.sleep(0.5)
+        self.app.interval()
 
+
+class ImpinjReadoutAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        ImpinjClient().toggle()
+        time.sleep(0.5)
+        self.app.interval()
 
 class SFRReadoutAction(Action, metaclass=ActionFactory):
     def execute(self):
         SFRReaderClient().toggle()
-
+        time.sleep(0.5)
+        self.app.interval()
 
 class CreateReportAction(Action, metaclass=ActionFactory):
     def execute(self):
@@ -509,6 +596,8 @@ class ChangeStatusAction(Action, metaclass=ActionFactory):
             result.status = status_dict[result.status]
         else:
             result.status = ResultStatus.OK
+        Teamwork().send(result.to_dict())
+        live_client.send(result)
         self.app.refresh()
 
 
@@ -524,10 +613,23 @@ class CPDeleteAction(Action, metaclass=ActionFactory):
         self.app.refresh()
 
 
+class SplitDeleteAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        SplitDeleteDialog().exec_()
+        self.app.refresh()
+
+
+class MergeResultsAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        MergeResultsDialog().exec_()
+        self.app.refresh()
+
+
 class AddSPORTidentResultAction(Action, metaclass=ActionFactory):
     def execute(self):
         result = race().new_result()
         race().add_new_result(result)
+        Teamwork().send(result.to_dict())
         logging.info('SPORTident result')
         self.app.get_result_table().model().init_cache()
         self.app.refresh()
@@ -537,6 +639,51 @@ class TimekeepingSettingsAction(Action, metaclass=ActionFactory):
     def execute(self):
         TimekeepingPropertiesDialog().exec_()
         self.app.refresh()
+
+
+class TeamworkSettingsAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        TeamworkPropertiesDialog().exec_()
+
+
+class TeamworkEnableAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        host = race().get_setting('teamwork_host', 'localhost')
+        port = race().get_setting('teamwork_port', 50010)
+        token = race().get_setting('teamwork_token', str(uuid.uuid4())[:8])
+        connection_type = race().get_setting('teamwork_type_connection', 'client')
+        if connection_type == 'server' and host in {'localhost', '127.0.0.1'}:
+            host = socket.gethostbyname(socket.gethostname())
+            logging.debug('Server socket address = ' + str(host))
+        Teamwork().set_options(host, port, token, connection_type)
+        Teamwork().toggle()
+
+
+class TeamworkSendAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        try:
+            obj = race()
+            data_list = [
+                obj.persons,
+                obj.results,
+                obj.groups,
+                obj.courses,
+                obj.organizations,
+            ]
+            if not self.app.current_tab < len(data_list):
+                return
+            items = data_list[self.app.current_tab]
+            indexes = self.app.get_selected_rows()
+            items_dict = []
+            for index in indexes:
+                if index < 0:
+                    continue
+                if index >= len(items):
+                    break
+                items_dict.append(items[index].to_dict())
+            Teamwork().send(items_dict)
+        except Exception as e:
+            logging.exception(e)
 
 
 class PrinterSettingsAction(Action, metaclass=ActionFactory):

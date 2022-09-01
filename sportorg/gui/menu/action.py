@@ -10,7 +10,7 @@ class Action:
         try:
             self.execute()
         except Exception as e:
-            logging.error(str(e))
+            logging.exception(e)
 
     @abstractmethod
     def execute(self):

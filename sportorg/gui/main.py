@@ -23,6 +23,7 @@ class Application(metaclass=Singleton):
         self.main_window = MainWindow(self.argv)
         GlobalAccess().set_app(self)
 
+
     def get_main_window(self):
         return self.main_window
 

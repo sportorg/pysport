@@ -1,4 +1,5 @@
 import datetime
+import logging
 import re
 import time
 import uuid
@@ -31,6 +32,7 @@ class SystemType(Enum):
     SPORTIDENT = 2
     SFR = 3
     SPORTIDUINO = 4
+    RFID_IMPINJ = 5
 
     def __str__(self):
         return self._name_
@@ -302,6 +304,7 @@ class Group(Model):
     def get_type(self):
         if self.__type:
             return self.__type
+        return race().data.race_type
 
     def set_type(self, new_type):
         self.__type = new_type
@@ -436,6 +439,7 @@ class Result:
         self.penalty_laps = 0  # count of penalty legs (marked route)
         self.place = 0
         self.scores = 0
+        self.scores_rogain = 0
         self.assigned_rank = Qualification.NOT_QUALIFIED
         self.diff: Optional[OTime] = None  # readonly
         self.diff_scores = 0  # readonly
@@ -448,6 +452,8 @@ class Result:
         self.splits = []  # type: List[Split]
         self.__start_time = None
         self.__finish_time = None
+
+        self.order = 0  # Order number, introduced in 1.6, needed for result templates to sort results correctly
 
     def __str__(self):
         return str(self.system_type)
@@ -466,7 +472,7 @@ class Result:
             else:
                 return False
         else:  # process by score (rogain)
-            eq = eq and self.scores == other.scores
+            eq = eq and self.scores_rogain == other.scores_rogain
             if eq and self.get_start_time() and other.get_start_time():
                 eq = eq and self.get_start_time() == other.get_start_time()
             if eq and self.get_finish_time() and other.get_finish_time():
@@ -485,10 +491,10 @@ class Result:
         if race().get_setting('result_processing_mode', 'time') == 'time':
             return self.get_result_otime() > other.get_result_otime()
         else:  # process by score (rogain)
-            if self.scores == other.scores:
+            if self.scores_rogain == other.scores_rogain:
                 return self.get_result_otime() > other.get_result_otime()
             else:
-                return self.scores < other.scores
+                return self.scores_rogain < other.scores_rogain
 
     @property
     @abstractmethod
@@ -518,6 +524,7 @@ class Result:
             'card_number': self.card_number,
             'speed': self.speed,  # readonly
             'scores': self.scores,  # readonly
+            'scores_rogain': self.scores_rogain,  # readonly
             'created_at': self.created_at,  # readonly
             'result': self.get_result(),  # readonly
             'result_relay': self.get_result_relay(),
@@ -529,22 +536,25 @@ class Result:
             'final_result_time': self.final_result_time.to_str()
             if self.final_result_time
             else None,
+            'order': self.order
         }
 
     def update_data(self, data):
         self.status = ResultStatus(int(data['status']))
         self.penalty_laps = int(data['penalty_laps'])
         self.scores = data['scores']
+        if 'scores_rogain' in data and data['scores_rogain'] is not None:
+            self.scores_rogain = data['scores_rogain']
         if str(data['place']).isdigit():
             self.place = int(data['place'])
         self.assigned_rank = Qualification.get_qual_by_code(data['assigned_rank'])
-        if data['start_time']:
+        if data['start_time'] is not None:
             self.start_time = OTime(msec=data['start_time'])
-        if data['finish_time']:
+        if data['finish_time'] is not None:
             self.finish_time = OTime(msec=data['finish_time'])
         if data['penalty_time']:
             self.penalty_time = OTime(msec=data['penalty_time'])
-        if 'credit_time' in data and data['credit_time']:
+        if 'credit_time' in data and data['credit_time'] is not None:
             self.credit_time = OTime(msec=data['credit_time'])
         if 'status_comment' in data:
             self.status_comment = data['status_comment']
@@ -586,7 +596,7 @@ class Result:
 
         ret = ''
         if race().get_setting('result_processing_mode', 'time') == 'scores':
-            ret += str(self.scores) + ' ' + translate('points') + ' '
+            ret += str(self.scores_rogain) + ' ' + translate('points') + ' '
 
         time_accuracy = race().get_setting('time_accuracy', 0)
         ret += self.get_result_otime().to_str(time_accuracy)
@@ -603,7 +613,7 @@ class Result:
 
         ret = ''
         if race().get_setting('result_processing_mode', 'time') == 'scores':
-            ret += str(self.scores) + ' ' + translate('points') + ' '
+            ret += str(self.scores_rogain) + ' ' + translate('points') + ' '
 
         # time_accuracy = race().get_setting('time_accuracy', 0)
         start = hhmmss_to_time(self.person.comment)
@@ -637,7 +647,7 @@ class Result:
 
         ret = ''
         if race().get_setting('result_processing_mode', 'time') == 'scores':
-            ret += str(self.scores) + ' ' + translate('points') + ' '
+            ret += str(self.scores_rogain) + ' ' + translate('points') + ' '
 
         time_accuracy = race().get_setting('time_accuracy', 0)
         ret += self.get_result_otime_relay().to_str(time_accuracy)
@@ -725,7 +735,7 @@ class Result:
         return self.status == ResultStatus.OK or self.status == ResultStatus.RESTORED
 
     def is_punch(self):
-        return self.is_sportident() or self.is_sfr() or self.is_sportiduino()
+        return self.is_sportident() or self.is_sfr() or self.is_sportiduino() or self.is_rfid_impinj()
 
     def is_sportident(self):
         return self.system_type == SystemType.SPORTIDENT
@@ -735,6 +745,9 @@ class Result:
 
     def is_sportiduino(self):
         return self.system_type == SystemType.SPORTIDUINO
+
+    def is_rfid_impinj(self):
+        return self.system_type == SystemType.RFID_IMPINJ
 
     def is_manual(self):
         return self.system_type == SystemType.MANUAL
@@ -751,15 +764,18 @@ class Result:
 
                 if cur_person.result_count == 0:
                     if not cur_person.is_out_of_competition:
-                        if cur_person.start_time > self.person.start_time:
-                            if (
-                                self.get_result_otime()
-                                > OTime.now() - cur_person.start_time
-                            ):
-                                who_can_win_count += 1
-                                max_unfinished_start_time = max(
-                                    cur_person.start_time, max_unfinished_start_time
-                                )
+                        if cur_person.start_time and self.person.start_time:
+                            if cur_person.start_time > self.person.start_time:
+                                if (
+                                    self.get_result_otime()
+                                    > OTime.now() - cur_person.start_time
+                                ):
+                                    who_can_win_count += 1
+                                    max_unfinished_start_time = max(
+                                        cur_person.start_time, max_unfinished_start_time
+                                    )
+                        else:
+                            who_can_win_count += 1
 
             self.can_win_count = who_can_win_count
             self.final_result_time = max_unfinished_start_time + self.get_result_otime()
@@ -780,7 +796,7 @@ class ResultSportident(Result):
     def __repr__(self):
         splits = ''
         for split in self.splits:
-            splits += '{} — {}\n'.format(split[0], split[1])
+            splits += '{} — {}\n'.format(split.code, split.length_leg)
         person = self.person.full_name if self.person else ''
         return 'Card: {}\nStart: {}\nFinish: {}\nPerson: {}\nSplits:\n{}'.format(
             self.card_number, self.start_time, self.finish_time, person, splits
@@ -898,7 +914,7 @@ class ResultSportident(Result):
                 if ind_begin > 0 and ind_end > 0:
                     list_exists = True
                     # any control from the list e.g. '%(31,32,35-45)'
-                    arr = re.split(r'\s*,\s*', template[ind_begin + 1 : ind_end])
+                    arr = re.split(r'\s*,\s*', template[ind_begin + 1: ind_end])
                     for cp in arr:
                         cp_range = re.split(r'\s*-\s*', cp)
                         if int(cur_code) == int(cp_range[0]):
@@ -916,6 +932,7 @@ class ResultSportident(Result):
                         split.is_correct = True
                         split.has_penalty = False
                         recognized_indexes.append(i)
+                        split.course_index = course_index
                         course_index += 1
 
                 elif template.find('*') > -1:
@@ -948,6 +965,7 @@ class ResultSportident(Result):
                         split.is_correct = True
                         split.has_penalty = False
                         recognized_indexes.append(i)
+                        split.course_index = course_index
                         course_index += 1
 
                 else:
@@ -964,6 +982,7 @@ class ResultSportident(Result):
                             if split.code == correct_code:
                                 split.has_penalty = False
 
+                            split.course_index = course_index
                             course_index += 1
                     else:
                         # just cp '31 989'
@@ -972,6 +991,7 @@ class ResultSportident(Result):
                             split.is_correct = True
                             split.has_penalty = False
                             recognized_indexes.append(i)
+                            split.course_index = course_index
                             course_index += 1
 
                 if course_index == count_controls:
@@ -1041,6 +1061,16 @@ class ResultSportident(Result):
 
         return is_changed
 
+    def sort_splits(self):
+        self.splits.sort(key=lambda c: c.time)
+
+    def remove_duplicated_splits(self):
+        if len(self.splits) < 2:
+            return
+        for i in reversed(range(len(self.splits)-1)):
+            if self.splits[i] == self.splits[i+1]:
+                self.splits.remove(self.splits[i])
+
 
 class ResultSFR(ResultSportident):
     system_type = SystemType.SFR
@@ -1048,6 +1078,10 @@ class ResultSFR(ResultSportident):
 
 class ResultSportiduino(ResultSportident):
     system_type = SystemType.SPORTIDUINO
+
+
+class ResultRfidImpinj(ResultSportident):
+    system_type = SystemType.RFID_IMPINJ
 
 
 class Person(Model):
@@ -1062,8 +1096,8 @@ class Person(Model):
         self.birth_date = None  # type: date
         self.organization = None  # type: Organization
         self.group = None  # type: Group
-        self.world_code = None  # WRE ID for orienteering and the same
-        self.national_code = None
+        self.world_code = ''  # WRE ID for orienteering and the same
+        self.national_code = 0
         self.qual = (
             Qualification.NOT_QUALIFIED
         )  # type: Qualification # 'qualification, used in Russia only'
@@ -1073,7 +1107,7 @@ class Person(Model):
         self.is_personal = False
         self.comment = ''
 
-        self.start_time = None  # type: OTime
+        self.start_time = OTime(0)  # type: OTime
         self.start_group = 0
         self.result_count = 0
 
@@ -1145,8 +1179,10 @@ class Person(Model):
         self.card_number = int(data['card_number'])
         self.bib = int(data['bib'])
         self.contact = []
-        self.world_code = data['world_code']
-        self.national_code = data['national_code']
+        if data['world_code']:
+            self.world_code = str(data['world_code'])
+        if data['national_code']:
+            self.national_code = data['national_code']
         self.qual = Qualification.get_qual_by_code(data['qual'])
         self.is_out_of_competition = bool(data['is_out_of_competition'])
         self.is_paid = bool(data['is_paid'])
@@ -1232,6 +1268,7 @@ class Race(Model):
         'ResultSportident': ResultSportident,
         'ResultSFR': ResultSFR,
         'ResultSportiduino': ResultSportiduino,
+        'ResultRfidImpinj': ResultRfidImpinj,
         'Group': Group,
         'Course': Course,
         'Organization': Organization,
@@ -1261,6 +1298,7 @@ class Race(Model):
             'ResultSportident': self.results,
             'ResultSFR': self.results,
             'ResultSportiduino': self.results,
+            'ResultRfidImpinj': self.results,
             'Group': self.groups,
             'Course': self.courses,
             'Organization': self.organizations,
@@ -1318,6 +1356,7 @@ class Race(Model):
             'ResultSportident',
             'ResultSFR',
             'ResultSportiduino',
+            'ResultRfidImpinj'
         ]:
             obj.person = self.get_obj('Person', dict_obj['person_id'])
         elif dict_obj['object'] == 'Group':
@@ -1533,6 +1572,15 @@ class Race(Model):
         return ret
 
     def add_new_result(self, result):
+        ignore_readout_before_start = self.get_setting('ignore_readout_before_start', False)
+        if ignore_readout_before_start:
+            start = result.get_start_time()
+            finish = result.get_finish_time()
+
+            if finish < start and start.hour < 22:
+                logging.info('Ignoring finish with time before start: {} for card {}'.format(finish, result.card_number))
+                return
+
         self.results.insert(0, result)
 
     def add_result(self, result):
@@ -1564,26 +1612,32 @@ class Race(Model):
 
     def get_duplicate_card_numbers(self):
         ret = []
-        for person in self.persons:
-            for p in self.persons:
-                if (
-                    person.id != p.id
-                    and person.card_number
-                    and person.card_number == p.card_number
-                ):
-                    ret.append(person)
+        current_card = -1
+        previous_person = None
+        for person in sorted(self.persons, key=lambda x: x.card_number):
+            if person.card_number > 0 and person.card_number == current_card:
+                if previous_person:
+                    ret.append(previous_person)
+                    previous_person = None
+                ret.append(person)
+            else:
+                previous_person = person
+                current_card = person.card_number
         return ret
 
     def get_duplicate_names(self):
         ret = []
-        for person in self.persons:
-            for p in self.persons:
-                if (
-                    person.id != p.id
-                    and person.full_name
-                    and person.full_name == p.full_name
-                ):
-                    ret.append(person)
+        current_name = ''
+        previous_person = None
+        for person in sorted(self.persons, key=lambda x: x.full_name):
+            if person.full_name and person.full_name == current_name:
+                if previous_person:
+                    ret.append(previous_person)
+                    previous_person = None
+                ret.append(person)
+            else:
+                previous_person = person
+                current_name = person.full_name
         return ret
 
 
@@ -1647,6 +1701,10 @@ class Qualification(IntEnum):
         ret = float(ret)
         return ret
 
+    @staticmethod
+    def list_qual():
+        return [q.get_title() for q in Qualification]
+
 
 class RankingItem(object):
     def __init__(
@@ -1663,12 +1721,14 @@ class RankingItem(object):
         self.max_time = max_time
         self.is_active = is_active
         self.percent = 0
+        self.min_scores = 0
 
     def get_dict_data(self):
         ret = {}
         ret['qual'] = self.qual.get_title()
         ret['max_place'] = self.max_place
         ret['max_time'] = str(self.max_time)
+        ret['min_scores'] = str(self.min_scores) if self.min_scores else None
         ret['percent'] = self.percent
         return ret
 
@@ -1678,6 +1738,7 @@ class RankingItem(object):
         ret['use_scores'] = self.use_scores
         ret['max_place'] = str(self.max_place)
         ret['max_time'] = self.max_time.to_msec() if self.max_time else None
+        ret['min_scores'] = str(self.min_scores) if self.min_scores else None
         ret['is_active'] = self.is_active
         ret['percent'] = self.percent
         return ret
@@ -1688,6 +1749,8 @@ class RankingItem(object):
         self.max_place = int(data['max_place'])
         if data['max_time']:
             self.max_time = OTime(msec=int(data['max_time']))
+        if 'min_scores' in data and data['min_scores']:
+            self.min_scores = (data['min_scores'])
         self.is_active = bool(data['is_active'])
         self.percent = int(data['percent'])
 
@@ -1915,6 +1978,11 @@ class RelayLeg(object):
         if res and isinstance(res, Result):
             res.place = place
 
+    def set_order(self, order):
+        res = self.get_result()
+        if res and isinstance(res, Result):
+            res.order = order
+
 
 class RelayTeam(object):
     def __init__(self, r):
@@ -1926,6 +1994,7 @@ class RelayTeam(object):
         self.last_finished_leg = 0
         self.last_correct_leg = 0
         self.place = 0
+        self.order = 0
 
     def __eq__(self, other):
         if self.get_is_status_ok() == other.get_is_status_ok():
@@ -1939,6 +2008,12 @@ class RelayTeam(object):
             return False
 
         if not self.get_is_status_ok() and other.get_is_status_ok():
+            return True
+
+        if not self.get_is_out_of_competition() and other.get_is_out_of_competition():
+            return False
+
+        if self.get_is_out_of_competition() and not other.get_is_out_of_competition():
             return True
 
         if self.get_correct_lap_count() != other.get_correct_lap_count():
@@ -2027,6 +2102,11 @@ class RelayTeam(object):
         self.place = place
         for i in self.legs:
             i.set_place(place)
+
+    def set_order(self, order):
+        self.order = order
+        for i in self.legs:
+            i.set_order(order)
 
 
 def create(obj, **kwargs):

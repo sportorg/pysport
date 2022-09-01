@@ -16,6 +16,7 @@ from sportorg.models.constant import get_race_courses
 from sportorg.models.memory import Limit, RaceType, find, race
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.modules.live.live import live_client
+from sportorg.modules.teamwork import Teamwork
 
 
 class GroupEditDialog(BaseDialog):
@@ -189,3 +190,4 @@ class GroupEditDialog(BaseDialog):
 
         ResultCalculation(race()).set_rank(group)
         live_client.send(group)
+        Teamwork().send(group.to_dict())

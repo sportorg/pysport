@@ -1,4 +1,5 @@
 import logging
+from copy import deepcopy
 from enum import Enum
 
 from sportorg.common.otime import OTime
@@ -14,6 +15,8 @@ class FinishSource(Enum):
     readout = 2
     dsq = 3
     penalty = 4
+    cp = 5
+    beam = 6
 
 
 class ResultSportidentGeneration:
@@ -37,7 +40,7 @@ class ResultSportidentGeneration:
         if self._result and self._result.finish_time is None:
             if self.finish_source == FinishSource.station:
                 if self.missed_finish == FinishSource.readout:
-                    self._result.finish_time = OTime.now()
+                    self._result.finish_time = self._result.created_at
                 elif self.missed_finish == FinishSource.zero:
                     self._result.finish_time = OTime(msec=0)
                 elif self.missed_finish == FinishSource.dsq:
@@ -150,8 +153,14 @@ class ResultSportidentGeneration:
                 self._result = existing_res
                 ResultChecker.calculate_penalty(self._result)
                 ResultChecker.checking(self._result)
+                self.popup_result(self._result)
 
             return True
+
+    def popup_result(self, result):
+        arr = race().results
+        arr.remove(result)
+        arr.insert(0, result)
 
     def add_result(self):
         if self._has_result():
@@ -212,7 +221,16 @@ class ResultSportidentGeneration:
     def _create_person(self):
         new_person = Person()
         new_person.bib = self._get_max_bib() + 1
-        new_person.surname = translate('Competitor') + ' #' + str(new_person.bib)
+        existing_person = find(race().persons, card_number=self._result.card_number)
+        if existing_person:
+            new_person_copy = deepcopy(existing_person)
+            new_person_copy.id = new_person.id
+            new_person_copy.bib = new_person.bib
+            new_person = new_person_copy
+            new_person.card_number = 0
+        else:
+            new_person.surname = translate('Competitor') + ' #' + str(new_person.bib)
+
         new_person.group = self._find_group_by_punches()
         self._result.person = new_person
 

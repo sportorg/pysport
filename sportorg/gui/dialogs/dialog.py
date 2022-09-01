@@ -150,7 +150,7 @@ class BaseDialog(QDialog):
             if isinstance(field, LineField):
                 item = QLineEdit()
                 if value is not Empty:
-                    item.setText(value)  # type:ignore
+                    item.setText(str(value))  # type:ignore
                 callback = getattr(self, f'on_{field.id}_changed', None)  # type:ignore
                 if callback:
                     item.textChanged.connect(callback)

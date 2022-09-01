@@ -11,7 +11,7 @@ from PySide2.QtWidgets import (
     QLineEdit,
     QRadioButton,
     QTabWidget,
-    QWidget,
+    QWidget
 )
 
 from sportorg.common.otime import OTime
@@ -85,11 +85,18 @@ class TimekeepingPropertiesDialog(QDialog):
         self.chip_duplicate_merge = QRadioButton(translate('Merge punches'))
         self.chip_duplicate_layout.addRow(self.chip_duplicate_merge)
         self.chip_duplicate_box.setLayout(self.chip_duplicate_layout)
+        self.label_duplicate_timeout = QLabel(translate('Duplicate timeout'))
+        self.item_duplicate_timeout = AdvTimeEdit(max_width=80, display_format="HH:mm:ss")
+        self.chip_duplicate_layout.addRow(self.label_duplicate_timeout, self.item_duplicate_timeout)
+
         self.tk_layout.addRow(self.chip_duplicate_box)
 
         self.assignment_mode = QCheckBox(translate('Assignment mode'))
         self.assignment_mode.stateChanged.connect(self.on_assignment_mode)
         self.tk_layout.addRow(self.assignment_mode)
+
+        self.ignore_readout_before_start = QCheckBox(translate('Ignore readout before start'))
+        self.tk_layout.addRow(self.ignore_readout_before_start)
 
         self.timekeeping_tab.setLayout(self.tk_layout)
 
@@ -115,6 +122,10 @@ class TimekeepingPropertiesDialog(QDialog):
         self.rp_scores_layout.addRow(
             self.rp_scores_minute_penalty_label, self.rp_scores_minute_penalty_edit
         )
+        self.rp_scores_allow_duplicates = QCheckBox(translate('allow duplicates'))
+        self.rp_scores_allow_duplicates.setToolTip(translate('Use this option to count one punch several times,'
+                                                     ' e.g. in trails with ring punching'))
+        self.rp_scores_layout.addRow(self.rp_scores_allow_duplicates)
         self.result_proc_layout.addRow(self.rp_scores_group)
 
         self.start_group_box = QGroupBox(translate('Start time'))
@@ -137,6 +148,13 @@ class TimekeepingPropertiesDialog(QDialog):
         self.item_finish_station = QRadioButton(translate('Finish station'))
         self.finish_layout.addRow(self.item_finish_station)
 
+        self.item_finish_cp = QRadioButton(translate('Control point'))
+        self.item_finish_cp_value = AdvSpinBox(-1, 999, max_width=60)
+        self.finish_layout.addRow(self.item_finish_cp, self.item_finish_cp_value)
+        self.item_finish_beam = QRadioButton(translate('Light beam'))
+        self.item_finish_beam.setDisabled(True)
+        self.finish_layout.addRow(self.item_finish_beam)
+
         self.missed_finish_group_box = QGroupBox(translate('Missed finish'))
         self.missed_finish_layout = QFormLayout()
         self.missed_finish_zero = QRadioButton(translate('00:00:00'))
@@ -150,12 +168,6 @@ class TimekeepingPropertiesDialog(QDialog):
         self.missed_finish_group_box.setLayout(self.missed_finish_layout)
         self.finish_layout.addRow(self.missed_finish_group_box)
 
-        self.item_finish_cp = QRadioButton(translate('Control point'))
-        self.item_finish_cp_value = AdvSpinBox(-1, 999, max_width=60)
-        self.finish_layout.addRow(self.item_finish_cp, self.item_finish_cp_value)
-        self.item_finish_beam = QRadioButton(translate('Light beam'))
-        self.item_finish_beam.setDisabled(True)
-        self.finish_layout.addRow(self.item_finish_beam)
         self.finish_group_box.setLayout(self.finish_layout)
         self.result_proc_layout.addRow(self.finish_group_box)
 
@@ -257,7 +269,7 @@ class TimekeepingPropertiesDialog(QDialog):
             try:
                 self.apply_changes_impl()
             except Exception as e:
-                logging.error(str(e))
+                logging.exception(e)
             self.close()
 
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
@@ -298,7 +310,9 @@ class TimekeepingPropertiesDialog(QDialog):
             'system_duplicate_chip_processing', 'several_results'
         )
         assignment_mode = cur_race.get_setting('system_assignment_mode', False)
+        ignore_readout_before_start = cur_race.get_setting('ignore_readout_before_start', False)
         si_port = cur_race.get_setting('system_port', '')
+        readout_duplicate_timeout = OTime(msec=cur_race.get_setting('readout_duplicate_timeout', 15000))
 
         self.item_zero_time.setTime(QTime(zero_time[0], zero_time[1]))
 
@@ -351,7 +365,11 @@ class TimekeepingPropertiesDialog(QDialog):
         elif duplicate_chip_processing == 'merge':
             self.chip_duplicate_merge.setChecked(True)
 
+        self.item_duplicate_timeout.setTime(readout_duplicate_timeout.to_time())
+
         self.assignment_mode.setChecked(assignment_mode)
+
+        self.ignore_readout_before_start.setChecked(ignore_readout_before_start)
 
         # result processing
         obj = cur_race
@@ -363,6 +381,7 @@ class TimekeepingPropertiesDialog(QDialog):
         rp_scores_minute_penalty = obj.get_setting(
             'result_processing_scores_minute_penalty', 1
         )
+        rp_scores_allow_duplicates = obj.get_setting('result_processing_scores_allow_duplicates', False)
 
         if rp_mode == 'time':
             self.rp_time_radio.setChecked(True)
@@ -376,6 +395,7 @@ class TimekeepingPropertiesDialog(QDialog):
 
         self.rp_fixed_scores_edit.setValue(rp_fixed_scores_value)
         self.rp_scores_minute_penalty_edit.setValue(rp_scores_minute_penalty)
+        self.rp_scores_allow_duplicates.setChecked(rp_scores_allow_duplicates)
 
         # penalty calculation
 
@@ -485,6 +505,10 @@ class TimekeepingPropertiesDialog(QDialog):
         elif self.chip_duplicate_merge.isChecked():
             duplicate_chip_processing = 'merge'
 
+        readout_duplicate_timeout = self.item_duplicate_timeout.getOTime().to_msec()
+
+        ignore_readout_before_start = self.ignore_readout_before_start.isChecked()
+
         start_cp_number = self.item_start_cp_value.value()
         finish_cp_number = self.item_finish_cp_value.value()
 
@@ -511,6 +535,10 @@ class TimekeepingPropertiesDialog(QDialog):
         obj.set_setting('system_duplicate_chip_processing', duplicate_chip_processing)
         obj.set_setting('system_assignment_mode', self.assignment_mode.isChecked())
 
+        obj.set_setting('readout_duplicate_timeout', readout_duplicate_timeout)
+
+        obj.set_setting('ignore_readout_before_start', ignore_readout_before_start)
+
         # result processing
         rp_mode = 'time'
         if self.rp_scores_radio.isChecked():
@@ -523,6 +551,8 @@ class TimekeepingPropertiesDialog(QDialog):
         rp_fixed_scores_value = self.rp_fixed_scores_edit.value()
 
         rp_scores_minute_penalty = self.rp_scores_minute_penalty_edit.value()
+        rp_scores_allow_duplicates = self.rp_scores_allow_duplicates.isChecked()
+
 
         obj.set_setting('result_processing_mode', rp_mode)
         obj.set_setting('result_processing_score_mode', rp_score_mode)
@@ -530,6 +560,7 @@ class TimekeepingPropertiesDialog(QDialog):
         obj.set_setting(
             'result_processing_scores_minute_penalty', rp_scores_minute_penalty
         )
+        obj.set_setting('result_processing_scores_allow_duplicates', rp_scores_allow_duplicates)
 
         # marked route
         mr_mode = 'off'

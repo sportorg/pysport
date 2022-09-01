@@ -2,7 +2,7 @@ CODE = sportorg tests
 
 .PHONY: run
 run:
-	poetry run python SportOrg.pyw
+	python SportOrg.pyw
 
 .PHONY: update
 update:

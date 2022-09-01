@@ -22,7 +22,7 @@ class DialogFilter(QDialog):
         self.init_ui()
         return super().exec_()
 
-    def init_ui(self):
+    def init_ui(self, flt=None):
         self.setWindowModality(QtCore.Qt.WindowModal)
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
@@ -33,14 +33,14 @@ class DialogFilter(QDialog):
         self.group_label = QtWidgets.QLabel(self)
 
         self.group_combo = AdvComboBox(self)
-        self.group_combo.addItem('')
+#        self.group_combo.addItem('')
         self.group_combo.addItems(get_race_groups())
         self.layout.addRow(self.group_label, self.group_combo)
 
         self.team_label = QtWidgets.QLabel(self)
 
         self.team_combo = AdvComboBox(self)
-        self.team_combo.addItem('')
+#        self.team_combo.addItem('')
         self.team_combo.addItems(get_race_teams())
         self.layout.addRow(self.team_label, self.team_combo)
 

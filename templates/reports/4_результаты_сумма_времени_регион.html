@@ -39,6 +39,7 @@
                 if (!persons[index]) {
                     persons[index] = res.person;
                     persons[index].results = {};
+                    persons[index].ok_count = 0;
                 }
                 persons[index].results[r.id] = res;
                 if (!persons[index].is_out_of_competition) {
@@ -50,12 +51,18 @@
     var personList = [];
     for (var p_index in persons) {
         var sum = 0;
+        var sum_time_ms = 0
         var r_count = 0;
+        var ok_count = 0;
         var dsq = false;
         var score_list = [];
         for (var race_id in persons[p_index].results) {
-            if (persons[p_index].results[race_id].status === 1) {
-                score_list.push(persons[p_index].results[race_id].scores);
+            cur_res = persons[p_index].results[race_id];
+            if (cur_res.status === 1) {
+                score_list.push(cur_res.scores);
+
+                ok_count++;
+                sum_time_ms += cur_res.result_msec;
             } else {
                 score_list.push(0);
             }
@@ -70,7 +77,9 @@
             sum += s
         }
 
-        persons[p_index].sumMsec = sum;
+        //persons[p_index].sumMsec = sum;
+        persons[p_index].sumMsec = sum_time_ms;
+        persons[p_index].ok_count = ok_count;
         personList.push(persons[p_index]);
     }
 
@@ -83,23 +92,24 @@
         }
         for (var _i = 0, _a = personList; _i < _a.length; _i++) {
             var person = _a[_i];
-            if (person.sumMsec && person.group.name === group.name) {
+            if (person.group.name === group.name) {
                 var r = {
                     index: 0,
                     name: (person.surname + ' ' + person.name).slice(0, MAX_PERSON_NAME),
-                    org: (person.organization && String(person.organization.name).slice(0, MAX_ORG_NAME)) || '',
+                    org: (person.organization && String(person.organization.region).slice(0, MAX_ORG_NAME)) || '',
                     qual: Qualification[person.qual],
                     bib: person.bib,
                     year: person.birth_date ? (new Date(person.birth_date)).getFullYear() : '',
                     resultMsec: person.sumMsec,
-                    result: person.sumMsec,
+                    result: toHHMMSS(person.sumMsec) + ' (' + person.ok_count + ')',
+                    ok_count: person.ok_count,
                     place: '',
                     person: person
                 };
                 for (var _b = 0, races_1 = races; _b < races_1.length; _b++) {
                     var race_ = races_1[_b];
                     if (person.results[race_.id]) {
-                        r[race_.id] = person.results[race_.id].scores + '(' + person.results[race_.id].result + ')';
+                        r[race_.id] = person.results[race_.id].result;
                     }
                 }
                 results.push(r);
@@ -112,16 +122,16 @@
             if (!b.resultMsec) {
                 return -1;
             }
-            if (a.person.dsq && b.person.dsq) {
-                return b.resultMsec - a.resultMsec;
-            }
             if (a.person.dsq) {
                 return 1;
             }
             if (b.person.dsq) {
                 return -1;
             }
-            return b.resultMsec - a.resultMsec;
+            if (a.person.ok_count != b.person.ok_count) {
+                return b.person.ok_count - a.person.ok_count;
+            }
+            return a.resultMsec - b.resultMsec;
         });
         var prevRes = results[0];
         var place = 0;
@@ -210,7 +220,7 @@
                 this.fields.push({
                     key: race_.id,
                     title: day,
-                    size: 14
+                    size: 18
                 });
                 day++;
             }

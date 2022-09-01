@@ -503,8 +503,8 @@ def reverse_start_time():
     handicap_interval = OTime(
         msec=obj.get_setting('handicap_interval', OTime(minute=30).to_msec())
     )
-    handicap_dsg_offset = OTime(
-        msec=obj.get_setting('handicap_dsg_offset', OTime(minute=10).to_msec())
+    handicap_dsq_offset = OTime(
+        msec=obj.get_setting('handicap_dsq_offset', OTime(minute=10).to_msec())
     )
 
     rc = ResultCalculation(obj)
@@ -534,7 +534,7 @@ def reverse_start_time():
             cur_time += handicap_interval
 
         # add offset after DSQ and DNS
-        cur_time += handicap_dsg_offset - handicap_interval
+        cur_time += handicap_dsq_offset - handicap_interval
 
         # set time for main group
         for person in second_group:

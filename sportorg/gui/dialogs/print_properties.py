@@ -160,3 +160,4 @@ class PrintPropertiesDialog(QDialog):
         obj.set_setting('print_margin_top', self.item_margin_top.value())
         obj.set_setting('print_margin_right', self.item_margin_right.value())
         obj.set_setting('print_margin_bottom', self.item_margin_bottom.value())
+        GlobalAccess().get_main_window().close_split_printer()

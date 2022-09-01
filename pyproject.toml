@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "sportorg"
-version = "1.5.0"
+version = "1.6.0"
 description = "SportOrg, python, sportident, orienteering"
 authors = ["Danil Akhtarov <daxartio@gmail.com>"]
 
@@ -20,6 +20,7 @@ pywinusb = "^0"
 requests = "^2"
 shiboken2 = "^5.15"
 sportident = "^1"
+pyImpinj = "^1.2"
 
 [tool.poetry.dev-dependencies]
 autoflake = "*"
