@@ -70,3 +70,6 @@ msgstr "Length,m"
 
 msgid "Penalty legs title"
 msgstr "Penalty legs"
+
+msgid "Mf"
+msgstr "MF"

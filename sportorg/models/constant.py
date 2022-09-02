@@ -1,8 +1,9 @@
 import logging
 import operator
+from typing import List, Set
 
 from sportorg.common.singleton import singleton
-from sportorg.models.memory import race, Qualification
+from sportorg.models.memory import Qualification, race
 
 
 def get_countries():
@@ -179,7 +180,7 @@ def get_countries():
         'Ethiopia',
         'South Africa',
         'Jamaica',
-        'Japan'
+        'Japan',
     ]
 
 
@@ -235,9 +236,13 @@ def get_names():
     return PersonNames().get_all()
 
 
+def get_qualification_list():
+    return [q.get_title() for q in Qualification]
+
+
 @singleton
 class PersonNames(object):
-    NAMES = []
+    NAMES: List[str] = []
 
     def get_all(self):
         return self.NAMES
@@ -251,7 +256,7 @@ class PersonNames(object):
 
 @singleton
 class Regions(object):
-    REGIONS = []
+    REGIONS: List[str] = []
 
     def get_all(self):
         return self.REGIONS
@@ -265,7 +270,7 @@ class Regions(object):
 
 @singleton
 class StatusComments(object):
-    STATUS_COMMENTS = []
+    STATUS_COMMENTS: List[str] = []
 
     def get_all(self):
         return self.STATUS_COMMENTS
@@ -288,7 +293,7 @@ class StatusComments(object):
 
 @singleton
 class RentCards(object):
-    CARDS = set()
+    CARDS: Set[int] = set()
 
     def exists(self, item):
         return item in self.CARDS
@@ -325,16 +330,18 @@ class RankingTable(object):
     e.g. 850;133;148;166;;
     e.g. 5;;;;;100
     """
-    RANKING = []
-    column_mapping = {Qualification.I: 1,
-                      Qualification.II: 2,
-                      Qualification.III: 3,
-                      Qualification.I_Y: 4,
-                      Qualification.II_Y: 5,
-                      Qualification.III_Y: 6,
-                      Qualification.KMS: 7,
-                      Qualification.MS: 8
-                      }
+
+    RANKING: List[List[int]] = []
+    column_mapping = {
+        Qualification.I: 1,
+        Qualification.II: 2,
+        Qualification.III: 3,
+        Qualification.I_Y: 4,
+        Qualification.II_Y: 5,
+        Qualification.III_Y: 6,
+        Qualification.KMS: 7,
+        Qualification.MS: 8,
+    }
 
     def get_all(self):
         return self.RANKING

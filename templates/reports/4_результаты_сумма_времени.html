@@ -1,0 +1,322 @@
+{% extends "base.html" %}
+{% block title %}Results{% endblock %}
+{% block head %}{{ super() }}{% endblock %}
+{% block content %}
+<div class="text-center">
+    <h3>{{ race.data.description }} <br>{{ race.data.start_datetime|date }} {{ race.data.location }}</h3>
+    <h2>СУММА</h2>
+</div>
+<div id="results-tables"></div>
+<div>
+    <table class="empty-table">
+        <tr>
+            <td><b>Главный судья:</b></td>
+            <td width="150px"></td>
+            <td><b>{{ race.data.chief_referee }}</b></td>
+        </tr>
+        <tr>
+            <td><b>Главный секретарь:</b></td>
+            <td width="150px"></td>
+            <td><b>{{ race.data.secretary }}</b></td>
+        </tr>
+    </table>
+</div>
+{% raw %}
+<script>
+    var SUM_STAGES=6; //Quantity of stages to sum - user defined value - Количество этапов для суммы
+
+    var current_race =  Number({% endraw %}{{current_race}}{%raw %});
+    var races = {% endraw %}{{races|tojson}}{%raw %};
+    var race = races[current_race];
+    var persons = {};
+    for (var _i = 0, races_ = races; _i < races_.length; _i++) {
+        var r = races_[_i];
+        racePreparation(r);
+        for (var _a = 0, _b = r.results; _a < _b.length; _a++) {
+            var res = _b[_a];
+            if (res.person && res.person.group && res.person.surname) {
+                index = res.person.group.name + '_' + res.person.surname + '_' + res.person.name;
+                if (!persons[index]) {
+                    persons[index] = res.person;
+                    persons[index].results = {};
+                    persons[index].ok_count = 0;
+                }
+                persons[index].results[r.id] = res;
+                if (!persons[index].is_out_of_competition) {
+                    persons[index].is_out_of_competition = res.person.is_out_of_competition;
+                }
+            }
+        }
+    }
+    var personList = [];
+    for (var p_index in persons) {
+        var sum = 0;
+        var sum_time_ms = 0
+        var r_count = 0;
+        var ok_count = 0;
+        var dsq = false;
+        var score_list = [];
+        for (var race_id in persons[p_index].results) {
+            cur_res = persons[p_index].results[race_id];
+            if (cur_res.status === 1) {
+                score_list.push(cur_res.scores);
+
+                ok_count++;
+                sum_time_ms += cur_res.result_msec;
+            } else {
+                score_list.push(0);
+            }
+            r_count++;
+        }
+        score_list.sort(function (a, b) {
+            return b - a;
+        });
+
+        for (var _i = 0, score_ = score_list; _i < score_.length && _i < SUM_STAGES; _i++) {
+            var s = score_[_i];
+            sum += s
+        }
+
+        //persons[p_index].sumMsec = sum;
+        persons[p_index].sumMsec = sum_time_ms;
+        persons[p_index].ok_count = ok_count;
+        personList.push(persons[p_index]);
+    }
+
+    function getResultsByGroup(group, count) {
+        count = +count || 0;
+        var results = [];
+        if (group.__type ? group.__type === 3 : race.data.race_type === 3) {
+            console.log(group.name, 'Сумма только для индивидуальных гонок!');
+            return results;
+        }
+        for (var _i = 0, _a = personList; _i < _a.length; _i++) {
+            var person = _a[_i];
+            if (person.group.name === group.name) {
+                var r = {
+                    index: 0,
+                    name: (person.surname + ' ' + person.name).slice(0, MAX_PERSON_NAME),
+                    org: (person.organization && String(person.organization.name).slice(0, MAX_ORG_NAME)) || '',
+                    qual: Qualification[person.qual],
+                    bib: person.bib,
+                    year: person.birth_date ? (new Date(person.birth_date)).getFullYear() : '',
+                    resultMsec: person.sumMsec,
+                    result: toHHMMSS(person.sumMsec) + ' (' + person.ok_count + ')',
+                    ok_count: person.ok_count,
+                    place: '',
+                    person: person
+                };
+                for (var _b = 0, races_1 = races; _b < races_1.length; _b++) {
+                    var race_ = races_1[_b];
+                    if (person.results[race_.id]) {
+                        r[race_.id] = person.results[race_.id].result;
+                    }
+                }
+                results.push(r);
+            }
+        }
+        results.sort(function (a, b) {
+            if (!a.resultMsec) {
+                return 1;
+            }
+            if (!b.resultMsec) {
+                return -1;
+            }
+            if (a.person.dsq) {
+                return 1;
+            }
+            if (b.person.dsq) {
+                return -1;
+            }
+            if (a.person.ok_count != b.person.ok_count) {
+                return b.person.ok_count - a.person.ok_count;
+            }
+            return a.resultMsec - b.resultMsec;
+        });
+        var prevRes = results[0];
+        var place = 0;
+        var doubleplace = 0;
+        for (var _i = 0, results_1 = results; _i < results_1.length; _i++) {
+            var result = results_1[_i];
+            result.index = _i + 1;
+            if (!result.person.dsq && !result.person.is_out_of_competition) {
+               if (result.resultMsec === prevRes.resultMsec && _i != 0) {
+                    doubleplace++;
+                } else {
+                    place = place + 1 + doubleplace;
+                    doubleplace = 0;
+                }
+                result.place = place;
+                if (doubleplace != 0){
+                    result.place = place + ' =';
+                }
+            } else if (!result.person.dsq && result.person.is_out_of_competition) {
+                result.place = 'в/к';
+            }
+            prevRes = result;
+        }
+
+        if (count) {
+            var ret = results.slice();
+            results = [];
+            ret.forEach(function (value) {
+                if (value.index < count + 1) {
+                    results.push(value);
+                }
+            });
+        }
+        
+        return results;
+    }
+
+    var Fields = {
+        fields: [
+            {key: 'index', title: '№', size: 4},
+            {key: 'name', title: 'Фамилия, имя', size: 30},
+            {key: 'org', title: 'Коллектив', size: 20},
+            {key: 'year', title: 'ГР', size: 5},
+            {key: 'qual', title: 'Разряд', size: 7},
+            {key: 'bib', title: 'Номер', size: 6},
+            {key: 'result', title: 'Сумма', size: 15},
+            {key: 'place', title: 'Место', size: 6}
+        ],
+        active: function (key, val) {
+            for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+                var obj = _a[_i];
+                if (key === obj.key) {
+                    obj.active = val;
+                }
+            }
+        },
+        isActive: function (key) {
+            for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+                var obj = _a[_i];
+                if (key === obj.key) {
+                    if (obj.active === void 0) {
+                        return true;
+                    }
+                    else {
+                        return !!obj.active;
+                    }
+                }
+            }
+            return false;
+        },
+        getField: function (key) {
+            for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+                var obj = _a[_i];
+                if (key === obj.key) {
+                    return obj
+                }
+            }
+        },
+        getCopyFields: function () {
+            return JSON.parse(JSON.stringify(this.fields))
+        },
+        init: function () {
+            var day = 1;
+            for (var _i = 0, races_1 = races; _i < races_1.length; _i++) {
+                var race_ = races_1[_i];
+                this.fields.push({
+                    key: race_.id,
+                    title: day,
+                    size: 18
+                });
+                day++;
+            }
+            return this;
+        }
+    }.init();
+
+    store = {
+        showLinkForGroups: true
+    };
+
+    function render() {
+        var resultBlock = document.getElementById('results-tables');
+        resultBlock.innerHTML = '';
+        for (var _i = 0, _a = race.groups; _i < _a.length; _i++) {
+            var group = _a[_i];
+            var rows = getResultsByGroup(group, store.count);
+            if (!rows.length) {
+                continue;
+            }
+            var titleBlock = document.createElement('h2');
+            titleBlock.id = group.name;
+            titleBlock.appendChild(document.createTextNode(group.name));
+            resultBlock.appendChild(titleBlock);
+            if (store.showLinkForGroups) {
+                resultBlock.appendChild(getGroupsBlockElement(race));
+            }
+            var fields = Fields.getCopyFields();
+            if (!store.tableView && !store.splitsShow && !Fields.isActive('all_splits')) {
+                resultBlock.appendChild(new TableTextGenerator(rows, fields).getTable());
+            } else {
+                resultBlock.appendChild(new TableGenerator(rows, fields).getTable({className: 'sportorg-table'}));
+            }
+            if (store.newPage && _i < _a.length - 1) {
+                var newPage = document.createElement('div');
+                newPage.className = 'new-page';
+                resultBlock.appendChild(newPage);
+            }
+        }
+    }
+
+    render();
+
+    new SettingsGenerator([
+        {
+            title: 'Ссылки на группы',
+            value: !!store.showLinkForGroups,
+            change: function (checked) {
+                store.showLinkForGroups = checked;
+                render()
+            }
+        },
+        {
+            title: 'Табличный вид',
+            value: !!store.tableView,
+            change: function (checked) {
+                store.tableView = checked;
+                render()
+            }
+        },
+        {
+            title: 'Номер',
+            value: Fields.isActive('bib'),
+            change: function (checked) {
+                Fields.active('bib', checked);
+                render()
+            }
+        },
+        {
+            title: 'Показать первые: ',
+            value: [
+                {text: 'Все результаты', value: 0},
+                {text: '1', value: 1},
+                {text: '3', value: 3},
+                {text: '4', value: 4},
+                {text: '5', value: 5},
+                {text: '6', value: 6},
+                {text: '10', value: 10},
+                {text: '12', value: 12},
+                {text: '15', value: 15},
+                {text: '20', value: 20}
+            ],
+            change: function (arr) {
+                store.count = arr[0];
+                render();
+            }
+        },
+        {
+            title: 'Печатать на отдельной странице',
+            value: false,
+            change: function (checked) {
+                store.newPage = checked;
+                render()
+            }
+        }
+    ]).show();
+</script>
+{% endraw %}
+{% endblock %}

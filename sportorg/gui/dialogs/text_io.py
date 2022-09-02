@@ -1,21 +1,36 @@
 import logging
 
 from PySide2 import QtCore, QtWidgets
-from PySide2.QtWidgets import QDialog, QDialogButtonBox, QVBoxLayout, QWidget, QCheckBox
+from PySide2.QtWidgets import QCheckBox, QDialog, QDialogButtonBox, QVBoxLayout, QWidget
 
 from sportorg.gui.global_access import GlobalAccess
-from sportorg.language import _
-from sportorg.models.memory import race, Person, Qualification, ResultManual
-from sportorg.utils.time import time_to_hhmmss, hhmmss_to_time
+from sportorg.language import translate
+from sportorg.models.memory import Qualification, ResultManual, race
+from sportorg.utils.time import hhmmss_to_time, time_to_hhmmss
 
 
 def get_value_options():
-    return [_('Start'), _('Finish'), _('Result'), _('Credit'), _('Penalty time'), _('Penalty legs'), _('Card number'),
-            _('Group'), _('Team'), _('Qualification'), _('Bib'), _('Comment')]
+    return [
+        translate('Start'),
+        translate('Finish'),
+        translate('Result'),
+        translate('Credit'),
+        translate('Penalty time'),
+        translate('Penalty legs'),
+        translate('Card number'),
+        translate('Group'),
+        translate('Team'),
+        translate('Qualification'),
+        translate('Bib'),
+        translate('Comment'),
+        translate('Start group'),
+        translate('IOF id'),
+        translate('National id'),
+    ]
 
 
 def get_readonly_options():
-    return [_('Result')]
+    return [translate('Result')]
 
 
 class TextExchangeDialog(QDialog):
@@ -88,8 +103,12 @@ class TextExchangeDialog(QDialog):
 
         self.options_group_box = QtWidgets.QGroupBox(self)
         self.options_grid_layout = QtWidgets.QGridLayout(self.options_group_box)
-        self.option_creating_new_result_checkbox = QCheckBox(_("Create new result, if doesn't exist"))
-        self.options_grid_layout.addWidget(self.option_creating_new_result_checkbox, 0, 0, 1, 1)
+        self.option_creating_new_result_checkbox = QCheckBox(
+            translate("Create new result, if doesn't exist")
+        )
+        self.options_grid_layout.addWidget(
+            self.option_creating_new_result_checkbox, 0, 0, 1, 1
+        )
         self.grid_layout.addWidget(self.options_group_box, 1, 0, 1, 2)
 
         self.text_edit = QtWidgets.QPlainTextEdit(self)
@@ -97,19 +116,11 @@ class TextExchangeDialog(QDialog):
 
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         self.button_ok = button_box.button(QDialogButtonBox.Ok)
-        self.button_ok.setText(_('OK'))
+        self.button_ok.setText(translate('OK'))
         self.button_ok.clicked.connect(self.accept)
         self.button_cancel = button_box.button(QDialogButtonBox.Cancel)
-        self.button_cancel.setText(_('Cancel'))
+        self.button_cancel.setText(translate('Cancel'))
         self.button_cancel.clicked.connect(self.reject)
-
-        stf_button = button_box.addButton(_('Save to file'), QDialogButtonBox.ActionRole)
-        stf_button.clicked.connect(self.save_to_file)
-        stf_button.setDisabled(True)
-
-        lff_button = button_box.addButton(_('Load from file'), QDialogButtonBox.ActionRole)
-        lff_button.clicked.connect(self.load_from_file)
-        lff_button.setDisabled(True)
 
         self.layout.addWidget(widget)
         self.layout.addWidget(button_box)
@@ -123,18 +134,18 @@ class TextExchangeDialog(QDialog):
         pass
 
     def retranslate_ui(self, text_io):
-        text_io.setWindowTitle(_("Dialog"))
-        self.value_group_box.setTitle(_("Values"))
-        self.id_label.setText(_("Identifier"))
-        self.bib_radio_button.setText(_("Bib"))
-        self.name_radio_button.setText(_("Person name"))
-        self.value_label.setText(_("Value"))
-        self.separator_group_box.setTitle(_("Separator"))
-        self.space_radio_button.setText(_("space"))
-        self.tab_radio_button.setText(_("tab"))
-        self.semicolon_radio_button.setText(_("semicolon"))
-        self.custom_radio_button.setText(_("custom"))
-        self.options_group_box.setTitle(_("Options"))
+        text_io.setWindowTitle(translate('Dialog'))
+        self.value_group_box.setTitle(translate('Values'))
+        self.id_label.setText(translate('Identifier'))
+        self.bib_radio_button.setText(translate('Bib'))
+        self.name_radio_button.setText(translate('Person name'))
+        self.value_label.setText(translate('Value'))
+        self.separator_group_box.setTitle(translate('Separator'))
+        self.space_radio_button.setText(translate('space'))
+        self.tab_radio_button.setText(translate('tab'))
+        self.semicolon_radio_button.setText(translate('semicolon'))
+        self.custom_radio_button.setText(translate('custom'))
+        self.options_group_box.setTitle(translate('Options'))
         self.text_edit.setPlainText('')
 
         self.get_text_wrapper()
@@ -163,7 +174,7 @@ class TextExchangeDialog(QDialog):
             else:
                 self.button_ok.setDisabled(False)
 
-            if key == _('Finish'):
+            if key == translate('Finish'):
                 self.option_creating_new_result_checkbox.setDisabled(False)
             else:
                 self.option_creating_new_result_checkbox.setDisabled(True)
@@ -216,14 +227,20 @@ class TextExchangeDialog(QDialog):
                                 person,
                                 key,
                                 value,
-                                creating_new_result=self.option_creating_new_result_checkbox.isChecked()
+                                creating_new_result=self.option_creating_new_result_checkbox.isChecked(),
                             )
                             success_count += 1
                         else:
                             logging.debug('text_io: no person found for line ' + i)
                     else:
                         logging.debug('text_io: empty value for line ' + i)
-            logging.debug('text_io: processed ' + str(success_count) + ' from ' + str(len(lines)) + ' lines')
+            logging.debug(
+                'text_io: processed '
+                + str(success_count)
+                + ' from '
+                + str(len(lines))
+                + ' lines'
+            )
         except Exception as e:
             logging.error(e)
 
@@ -233,7 +250,6 @@ class TextExchangeDialog(QDialog):
 def get_text(key, value, separator):
     ret = []
     for i in race().persons:
-        assert isinstance(i, Person)
         id_str = get_id(i, key)
         if id_str:
             value_str = get_property(i, value)
@@ -244,7 +260,6 @@ def get_text(key, value, separator):
 
 
 def get_id(person, index):
-    assert isinstance(person, Person)
     if index == 'bib':
         return str(person.bib)
     elif index == 'person name':
@@ -255,7 +270,6 @@ def get_id(person, index):
 
 def get_person_by_id(index, value):
     for i in race().persons:
-        assert isinstance(i, Person)
         if index == 'bib':
             if i.bib == int(value):
                 return i
@@ -266,67 +280,70 @@ def get_person_by_id(index, value):
 
 
 def get_property(person, key):
-    assert isinstance(person, Person)
-
-    if key == _('Start'):
+    if key == translate('Start'):
         result = race().find_person_result(person)
         if result:
             return time_to_hhmmss(result.get_start_time())
         else:
             return time_to_hhmmss(person.start_time)
-    elif key == _('Finish'):
+    elif key == translate('Finish'):
         result = race().find_person_result(person)
         if result:
             return time_to_hhmmss(result.get_finish_time())
-    elif key == _('Result'):
+    elif key == translate('Result'):
         result = race().find_person_result(person)
         if result:
             return result.get_result()
-    elif key == _('Credit'):
+    elif key == translate('Credit'):
         result = race().find_person_result(person)
         if result:
             return time_to_hhmmss(result.get_credit_time())
         else:
             return '00:00:00'
-    elif key == _('Penalty time'):
+    elif key == translate('Penalty time'):
         result = race().find_person_result(person)
         if result:
             return time_to_hhmmss(result.get_penalty_time())
         else:
             return '00:00:00'
-    elif key == _('Penalty legs'):
+    elif key == translate('Penalty legs'):
         result = race().find_person_result(person)
         if result and result.penalty_laps:
             return str(result.penalty_laps)
-    elif key == _('Card number'):
+    elif key == translate('Card number'):
         if person.card_number:
             return str(person.card_number)
-    elif key == _('Group'):
+    elif key == translate('Group'):
         if person.group:
             return person.group.name
-    elif key == _('Team'):
+    elif key == translate('Team'):
         if person.organization:
             return person.organization.name
-    elif key == _('Qualification'):
+    elif key == translate('Qualification'):
         return person.qual.get_title()
-    elif key == _('Bib'):
+    elif key == translate('Bib'):
         return str(person.bib)
-    elif key == _('Comment'):
+    elif key == translate('Comment'):
         return str(person.comment)
+    elif key == translate('IOF id'):
+        return str(person.world_code)
+    elif key == translate('National id'):
+        return str(person.national_code)
+    elif key == translate('Start group'):
+        return str(person.start_group)
 
     return ''
 
 
 def set_property(person, key, value, **options):
-    assert isinstance(person, Person)
-    if key == _('Start'):
+    if key == translate('Start'):
         result = race().find_person_result(person)
         if result:
             result.start_time = hhmmss_to_time(value)
             person.start_time = hhmmss_to_time(value)
         else:
             person.start_time = hhmmss_to_time(value)
-    elif key == _('Finish'):
+    elif key == translate('Finish'):
         result = race().find_person_result(person)
         if result:
             result.finish_time = hhmmss_to_time(value)
@@ -336,37 +353,46 @@ def set_property(person, key, value, **options):
             result.bib = person.bib
             result.finish_time = hhmmss_to_time(value)
             race().add_new_result(result)
-    elif key == _('Result'):
+    elif key == translate('Result'):
         pass
-    elif key == _('Credit'):
+    elif key == translate('Credit'):
         result = race().find_person_result(person)
         if result:
             result.credit_time = hhmmss_to_time(value)
-    elif key == _('Penalty time'):
+    elif key == translate('Penalty time'):
         result = race().find_person_result(person)
         if result:
             result.penalty_time = hhmmss_to_time(value)
-    elif key == _('Penalty legs'):
+    elif key == translate('Penalty legs'):
         result = race().find_person_result(person)
         if result:
             result.penalty_laps = int(value)
-    elif key == _('Card number'):
+    elif key == translate('Card number'):
         race().person_card_number(person, int(value))
-    elif key == _('Group'):
+    elif key == translate('Group'):
         group = race().find_group(value)
         if group:
             person.group = group
-    elif key == _('Team'):
+    elif key == translate('Team'):
         team = race().find_team(value)
         if team:
             person.organization = team
-    elif key == _('Qualification'):
+    elif key == translate('Qualification'):
         qual = Qualification.get_qual_by_name(value)
-        if qual:
+        if qual is not None:
             person.qual = qual
-    elif key == _('Bib'):
+    elif key == translate('Bib'):
         if value.isdigit():
             new_bib = int(value)
             person.bib = new_bib
-    elif key == _('Comment'):
+    elif key == translate('Comment'):
         person.comment = value
+    elif key == translate('IOF id'):
+        if str(value).isdigit():
+            person.world_code = int(value)
+    elif key == translate('National id'):
+        if str(value).isdigit():
+            person.national_code = int(value)
+    elif key == translate('Start group'):
+        if str(value).isdigit():
+            person.start_group = int(value)

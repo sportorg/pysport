@@ -1,12 +1,16 @@
 import logging
 
 from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QFormLayout, QDialog, QDialogButtonBox, QLabel, QSpinBox
+from PySide2.QtWidgets import QDialog, QDialogButtonBox, QFormLayout, QLabel
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
-from sportorg.language import _
-from sportorg.models.start.relay import set_next_relay_number, get_next_relay_number_protocol
+from sportorg.gui.utils.custom_controls import AdvSpinBox
+from sportorg.language import translate
+from sportorg.models.start.relay import (
+    get_next_relay_number_protocol,
+    set_next_relay_number,
+)
 
 
 class RelayNumberDialog(QDialog):
@@ -18,16 +22,14 @@ class RelayNumberDialog(QDialog):
         return super().exec_()
 
     def init_ui(self):
-        self.setWindowTitle(_('Relay number'))
+        self.setWindowTitle(translate('Relay number'))
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(True)
         self.layout = QFormLayout(self)
 
-        self.number_label = QLabel(_('First relay number'))
-        self.number_item = QSpinBox()
-        self.number_item.setMinimum(1001)
-        self.number_item.setMaximum(9999)
+        self.number_label = QLabel(translate('First relay number'))
+        self.number_item = AdvSpinBox(1001, 9999)
 
         next_number = get_next_relay_number_protocol()
         self.number_item.setValue(next_number)
@@ -46,10 +48,10 @@ class RelayNumberDialog(QDialog):
 
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         self.button_ok = button_box.button(QDialogButtonBox.Ok)
-        self.button_ok.setText(_('OK'))
+        self.button_ok.setText(translate('OK'))
         self.button_ok.clicked.connect(apply_changes)
         self.button_cancel = button_box.button(QDialogButtonBox.Cancel)
-        self.button_cancel.setText(_('Cancel'))
+        self.button_cancel.setText(translate('Cancel'))
         self.button_cancel.clicked.connect(cancel_changes)
         self.layout.addRow(button_box)
 

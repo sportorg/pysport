@@ -1,7 +1,7 @@
 import os
 
-from sportorg.libs.template import template
 from sportorg import config
+from sportorg.libs.template import template
 
 
 def get_templates(path='', exclude_path=''):

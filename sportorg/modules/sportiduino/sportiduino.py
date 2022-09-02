@@ -1,16 +1,16 @@
 import datetime
 import logging
-from queue import Queue, Empty
-from threading import main_thread, Event
-
 import time
-import serial
+from queue import Empty, Queue
+from threading import Event, main_thread
 
+import serial
 from PySide2.QtCore import QThread, Signal
 
 from sportorg.common.singleton import singleton
 from sportorg.libs.sportiduino import sportiduino
 from sportorg.models import memory
+from sportorg.modules.sportident import backup
 from sportorg.utils.time import time_to_otime
 
 
@@ -75,11 +75,13 @@ class ResultThread(QThread):
                 if cmd.command == 'card_data':
                     result = self._get_result(cmd.data)
                     self.data_sender.emit(result)
+                    backup.backup_data(cmd.data)
             except Empty:
                 if not main_thread().is_alive() or self._stop_event.is_set():
                     break
             except Exception as e:
                 self._logger.error(str(e))
+                raise e
         self._logger.debug('Stop adder result')
 
     @staticmethod
@@ -96,9 +98,9 @@ class ResultThread(QThread):
                 split.days = memory.race().get_days(t)
                 result.splits.append(split)
 
-        if card_data['start']:
+        if 'start' in card_data and card_data['start']:
             result.start_time = time_to_otime(card_data['start'])
-        if card_data['finish']:
+        if 'finish' in card_data and card_data['finish']:
             result.finish_time = time_to_otime(card_data['finish'])
 
         return result
@@ -106,7 +108,12 @@ class ResultThread(QThread):
     @staticmethod
     def time_to_sec(value):
         if isinstance(value, datetime.datetime):
-            ret = value.hour * 3600 + value.minute * 60 + value.second + value.microsecond / 1000000
+            ret = (
+                value.hour * 3600
+                + value.minute * 60
+                + value.second
+                + value.microsecond / 1000000
+            )
             return ret
 
         return 0
@@ -131,15 +138,11 @@ class SportiduinoClient(object):
     def _start_sportiduino_thread(self):
         if self._sportiduino_thread is None:
             self._sportiduino_thread = SportiduinoThread(
-                self.port,
-                self._queue,
-                self._stop_event,
-                self._logger,
-                debug=True
+                self.port, self._queue, self._stop_event, self._logger, debug=True
             )
             self._sportiduino_thread.start()
         elif self._sportiduino_thread.isFinished():
-            self._sportiduino_thread= None
+            self._sportiduino_thread = None
             self._start_sportiduino_thread()
 
     def _start_result_thread(self):
@@ -149,7 +152,7 @@ class SportiduinoClient(object):
                 self._stop_event,
                 self._logger,
             )
-            if self._call_back is not None:
+            if self._call_back:
                 self._result_thread.data_sender.connect(self._call_back)
             self._result_thread.start()
         # elif not self._result_thread.is_alive():
@@ -158,8 +161,11 @@ class SportiduinoClient(object):
             self._start_result_thread()
 
     def is_alive(self):
-        if self._sportiduino_thread is not None and self._result_thread is not None:
-            return not self._sportiduino_thread.isFinished() and not self._result_thread.isFinished()
+        if self._sportiduino_thread and self._result_thread:
+            return (
+                not self._sportiduino_thread.isFinished()
+                and not self._result_thread.isFinished()
+            )
 
         return False
 
@@ -180,4 +186,3 @@ class SportiduinoClient(object):
 
     def choose_port(self):
         return memory.race().get_setting('system_port', None)
-

@@ -1,0 +1,804 @@
+{% extends "base.html" %}
+{% block title %}Results{% endblock %}
+{% block head %}{{ super() }}{% endblock %}
+{% block content %}
+<div class="text-center">
+    <h3>{{ race.data.description }} <br>{{ race.data.start_datetime|date }} {{ race.data.location }}</h3>
+    <h2>RESULT LIST</h2>
+</div>
+<div id="results-tables"></div>
+<!--
+<div>
+    <table class="empty-table">
+        <tr>
+            <td><b>Chief referee:</b></td>
+            <td width="150px"></td>
+            <td><b>{{ race.data.chief_referee }}</b></td>
+        </tr>
+        <tr>
+            <td><b>Secretary:</b></td>
+            <td width="150px"></td>
+            <td><b>{{ race.data.secretary }}</b></td>
+        </tr>
+    </table>
+</div>
+-->
+{% raw %}
+<style>
+    table.table-split {
+        margin: 0;
+    }
+    table.table-split td{
+        border: 0;
+        padding: 0;
+    }
+</style>
+<script>
+    var race = {% endraw %}{{race|tojson}}{%raw %};
+    var selected = {% endraw %}{{selected|tojson}}{%raw %};
+    racePreparation(race);
+
+    function getResultsByGroup(group, count) {
+        count = +count || 0;
+        var isRelay = group.__type ? group.__type === 3 : race.data.race_type === 3;
+        var results = [];
+        for (var _i = 0, _a = race.results; _i < _a.length; _i++) {
+            var result = _a[_i];
+            if (result.status !== 13 && result.person && result.person.group && result.person.group.id === group.id && (count ? result.place <= count && result.place > 0 : 1)) {
+                var r = {
+                    index: 0,
+                    name: (result.person.surname + ' ' + result.person.name).slice(0, MAX_PERSON_NAME),
+                    org: (result.person.organization && String(result.person.organization.name).slice(0, MAX_ORG_NAME)) || '',
+                    qual: Qualification[result.person.qual],
+                    bib: result.person.bib,
+                    year: result.person.birth_date ? (new Date(result.person.birth_date)).getFullYear() : '',
+                    penalty_time: toHHMMSS(result.penalty_time),
+                    penalty_laps: result.penalty_laps,
+                    result: result.result,
+                    result_relay: result.result_relay,
+                    result_msec: result.result_msec,
+                    diff: race.settings.result_processing_mode === 'scores' ? result.diff_scores : toHHMMSS(result.diff),
+                    place: result.place,
+                    status: result.status,
+                    scores: result.scores,
+                    place_show: result.person.is_out_of_competition ? 'o/c' : result.place === 0 ? '' : result.place === -1 ? '' : result.place,
+                    is_out_of_competition: result.person.is_out_of_competition,
+                    speed: result.speed,
+                    data: result
+                };
+                if (result.status !== 1) {
+                    r.diff = '';
+                    r.place_show = '';
+                    r.speed = '';
+                    r.scores = '';
+                    r.penalty_time = '';
+                    r.penalty_laps = '';
+                }
+
+                // SPLITS
+                var control_index = 0;
+                if (result.splits) {
+                    var getTrBlock = function (t, p) {
+                        var tr = document.createElement('tr');
+                        var td1 = document.createElement('td');
+                        td1.className = 'result-' + p;
+                        td1.appendChild(document.createTextNode(t));
+                        tr.appendChild(td1);
+                        return tr;
+                    };
+                    var lastSplit = 0;
+                    for (var _b = 0, _c = result.splits; _b < _c.length; _b++) {
+                        var split = _c[_b];
+                        if (split.is_correct) {
+
+                            var tbl = document.createElement('table');
+                            tbl.className = 'table-split';
+                            tbl.appendChild(getTrBlock(toHHMMSS(split.leg_time) + ' (' + split.leg_place + ')', split.leg_place));
+                            tbl.appendChild(getTrBlock(toHHMMSS(split.relative_time) + ' (' + split.relative_place + ')', split.relative_place));
+                            r[control_index + '_' + split.code] = tbl;
+                            control_index++;
+                            lastSplit = split.relative_time;
+                        }
+                    }
+
+                    var finishMsec = r.result_msec - lastSplit;
+
+                    if (r.status === 1 && finishMsec > 0) {
+                        var tblF = document.createElement('table');
+                        tblF.className = 'table-split';
+                        tblF.appendChild(getTrBlock(toHHMMSS(finishMsec), 0));
+                        var place_str = r.place > 0 ? r.place : 'o/c';
+                        tblF.appendChild(getTrBlock(toHHMMSS(r.result_msec) + ' (' + place_str + ')', r.place));
+                        r.finish_split = tblF;
+                    }
+                }
+
+                var getMultipleTrBlock = function () {
+                    var tr = document.createElement('tr');
+                    for (var i = 0; i < arguments.length; i++) {
+                        var td1 = document.createElement('td');
+                        td1.appendChild(document.createTextNode(arguments[i]));
+                        tr.appendChild(td1);
+                    }
+                    return tr;
+                };
+
+                // ALL PUNCHES
+                var splitTable = document.createElement('table');
+                splitTable.className = 'table-split';
+                var splitTr = document.createElement('tr');
+                splitTable.appendChild(splitTr);
+                var prevTime = result.start_msec;
+                for (var _b = 0, _c = result.splits; _b < _c.length; _b++) {
+                    var split = _c[_b];
+                    var tbl = document.createElement('table');
+                    tbl.className = 'table-split';
+                    tbl.appendChild(getMultipleTrBlock('( ' + split.code + ' )', toHHMMSS(split.time - prevTime)));
+                    tbl.appendChild(getMultipleTrBlock('', toHHMMSS(split.time - result.start_msec)));
+                    var splitTd = document.createElement('td');
+                    splitTd.appendChild(tbl);
+                    splitTr.appendChild(splitTd);
+                    prevTime = split.time;
+                }
+                r.all_splits = splitTable;
+
+                results.push(r);
+            }
+        }
+        results.sort(function (a, b) {
+            if (isRelay) {
+                if (a.place < 1) {
+                    return 1
+                }
+                if (b.place < 1) {
+                    return -1
+                }
+                if (a.place === b.place) {
+                    return ~~(a.bib / 1000) - ~~(b.bib / 1000)
+                }
+                return a.place - b.place
+
+            } else {
+                if (a.status !== 1 && b.status !== 1) {
+                    return STATUS_PRIORITY.indexOf(a.status) - STATUS_PRIORITY.indexOf(b.status);
+                }
+                if (a.status !== 1) {
+                    return 1
+                }
+                if (b.status !== 1) {
+                    return -1
+                }
+                if (a.is_out_of_competition || b.is_out_of_competition) {
+                    if (race.settings.result_processing_mode === 'scores' && a.scores !== b.scores) {
+                        return a.scores - b.scores;
+                    }
+                    return a.result_msec - b.result_msec;
+                }
+                if (a.place < 1) {
+                    return 1
+                }
+                if (b.place < 1) {
+                    return -1
+                }
+                return a.place - b.place
+            }
+        });
+        var index = 0;
+        if (isRelay) {
+            var prevBib = 0;
+            var resultsList = results.slice();
+            results = [];
+            for (var _i = 0, resultsList_ = resultsList; _i < resultsList_.length; _i++) {
+                var r = resultsList_[_i];
+                r.index = '';
+                if (r.bib % 1000 !== prevBib) {
+                    index++;
+                    results.push({index: index});
+                    prevBib = r.bib % 1000;
+                }
+                results.push(r);
+            }
+        } else {
+            results.forEach(function (elem) {
+                index++;
+                elem.index = index;
+            })
+        }
+        return results;
+    }
+	function getResultsByCourse(group, count) {
+		count = +count || 0;
+        var isRelay = group.__type ? group.__type === 3 : race.data.race_type === 3;
+        var results = [];
+        var splits_recalc_times = {};
+        var splits_recalc_times_total = {};
+        group.controls.forEach(function (control, index) {
+            splits_recalc_times[index + '_' + control.code] = [];
+            splits_recalc_times_total[index + '_' + control.code] = [];
+        });
+        for (var _i = 0, _a = race.results; _i < _a.length; _i++) {
+            var result = _a[_i];
+            if (result.status !== 13 && result.person && result.person.group && result.person.group.course && result.person.group.course.id === group.id) { //} && (count ? result.place <= count && result.place > 0 : 1)) {
+                var r = {
+                    index: 0,
+                    name: (result.person.surname + ' ' + result.person.name).slice(0, MAX_PERSON_NAME),
+                    org: (result.person.organization && String(result.person.organization.name).slice(0, MAX_ORG_NAME)) || '',
+                    qual: Qualification[result.person.qual],
+                    bib: result.person.bib,
+                    year: result.person.birth_date ? (new Date(result.person.birth_date)).getFullYear() : '',
+                    penalty_time: toHHMMSS(result.penalty_time),
+                    penalty_laps: result.penalty_laps,
+                    result: result.result,
+                    result_msec: result.result_msec,
+                    diff: race.settings.result_processing_mode === 'scores' ? result.diff_scores : toHHMMSS(result.diff),
+                    place: result.place,
+                    status: result.status,
+                    scores: result.scores,
+                    place_show: result.person.is_out_of_competition ? 'o/c' : result.place === 0 ? '' : result.place === -1 ? '' : result.place,
+                    is_out_of_competition: result.person.is_out_of_competition,
+                    speed: result.speed,
+					group: result.person.group.name,
+                    data: result
+                };
+                if (result.status !== 1) {
+                    r.diff = '';
+                    r.place_show = '';
+                    r.speed = '';
+                    r.scores = '';
+                    r.penalty_time = '';
+                    r.penalty_laps = '';
+                }
+
+                // SPLITS
+                var control_index = 0;
+                if (result.splits) {
+                    for (var _b = 0, _c = result.splits; _b < _c.length; _b++) {
+                        var split = _c[_b];
+                        if (split.is_correct) {
+                            if ((control_index + '_' + split.code) in splits_recalc_times){
+                                splits_recalc_times[control_index + '_' + split.code].push(split.leg_time);
+                                splits_recalc_times_total[control_index + '_' + split.code].push(split.relative_time);
+                            }
+                            control_index++;
+                        }
+                    }
+                }
+
+                var getMultipleTrBlock = function () {
+                    var tr = document.createElement('tr');
+                    for (var i = 0; i < arguments.length; i++) {
+                        var td1 = document.createElement('td');
+                        td1.appendChild(document.createTextNode(arguments[i]));
+                        tr.appendChild(td1);
+                    }
+                    return tr;
+                };
+
+                // ALL PUNCHES
+                var splitTable = document.createElement('table');
+                splitTable.className = 'table-split';
+                var splitTr = document.createElement('tr');
+                splitTable.appendChild(splitTr);
+                var prevTime = result.start_msec;
+                for (var _b = 0, _c = result.splits; _b < _c.length; _b++) {
+                    var split = _c[_b];
+                    var tbl = document.createElement('table');
+                    tbl.className = 'table-split';
+                    tbl.appendChild(getMultipleTrBlock('( ' + split.code + ' )', toHHMMSS(split.time - prevTime)));
+                    tbl.appendChild(getMultipleTrBlock('', toHHMMSS(split.time - result.start_msec)));
+                    var splitTd = document.createElement('td');
+                    splitTd.appendChild(tbl);
+                    splitTr.appendChild(splitTd);
+                    prevTime = split.time;
+                }
+                r.all_splits = splitTable;
+
+                results.push(r);
+            }
+        }
+        results.sort(function (a, b) {
+            if (isRelay) {
+                if (a.place < 1) {
+                    return 1
+                }
+                if (b.place < 1) {
+                    return -1
+                }
+                if (a.place === b.place) {
+                    return ~~(a.bib / 1000) - ~~(b.bib / 1000)
+                }
+                return a.place - b.place
+            } else {
+                if (a.status !== 1 && b.status !== 1) {
+                    return STATUS_PRIORITY.indexOf(a.status) - STATUS_PRIORITY.indexOf(b.status);
+                }
+                if (a.status !== 1) {
+                    return 1
+                }
+                if (b.status !== 1) {
+                    return -1
+                }
+                if (a.is_out_of_competition || b.is_out_of_competition) {
+                    if (race.settings.result_processing_mode === 'scores' && a.scores !== b.scores) {
+                        return a.scores - b.scores;
+                    }
+                    return a.result_msec - b.result_msec;
+                }
+                if (a.place < 1) {
+                    return 1
+                }
+                if (b.place < 1) {
+                    return -1
+                }
+                return a.result_msec - b.result_msec;
+            }
+        });
+        var sort_splits_recalc_fnc = function(a,b){
+            return a-b;
+        }
+        group.controls.forEach(function (control, index) {
+            splits_recalc_times[index + '_' + control.code].sort(sort_splits_recalc_fnc);
+            splits_recalc_times_total[index + '_' + control.code].sort(sort_splits_recalc_fnc);
+        });
+        var index = 0;
+        if (isRelay) {
+            var prevBib = 0;
+            var resultsList = results.slice();
+            results = [];
+            for (var _i = 0, resultsList_ = resultsList; _i < resultsList_.length; _i++) {
+                var r = resultsList_[_i];
+                r.index = '';
+                if (r.bib % 1000 !== prevBib) {
+                    index++;
+                    results.push({index: index});
+                    prevBib = r.bib % 1000;
+                }
+                results.push(r);
+            }
+        } else {
+			var newplace = 1;
+			var doubleplace = -1;
+			var best_result_msec = results[0] ? results[0].result_msec : 0;
+			var last_result_msec = results[0] ? results[0].result_msec : 0;
+            var binary_search = function(arr,required){
+				if (!arr){
+					return 0;
+				}
+                var l = -1;
+                var r = arr.length-1;
+                while (r-l>1){
+                    var m = Math.floor((l+r)/2);
+                    if (arr[m]>=required){
+                        r = m;
+                    } else {
+                        l = m;
+                    }
+                }
+                if (arr[r]==required){
+                    return r+1;
+                }
+                return 0;
+            }
+            results.forEach(function (elem) {
+                index++;
+                elem.index = index;
+				if (!elem.data.person.is_out_of_competition && elem.place !== 0 && elem.place !== -1) {
+					if (last_result_msec < elem.result_msec){
+						newplace += 1 + doubleplace;
+						doubleplace = 0;
+						last_result_msec = elem.result_msec;
+					} else {
+						doubleplace++;
+					}
+					elem.diff = race.settings.result_processing_mode === 'scores' ? elem.diff_scores : toHHMMSS(elem.result_msec - best_result_msec);
+					elem.place = newplace;
+					elem.place_show = newplace;
+                }
+                var control_index = 0;
+                if (elem.data.splits) {
+                    var getTrBlock = function (t, p) {
+                        var tr = document.createElement('tr');
+                        var td1 = document.createElement('td');
+                        td1.className = 'result-' + p;
+                        td1.appendChild(document.createTextNode(t));
+                        tr.appendChild(td1);
+                        return tr;
+                    };
+                    var lastSplit = 0;
+                    for (var _b = 0, _c = elem.data.splits; _b < _c.length; _b++) {
+                        var split = _c[_b];
+                        if (split.is_correct) {
+                            var leg_place = binary_search(splits_recalc_times[control_index + '_' + split.code],split.leg_time);
+                            var relative_place = binary_search(splits_recalc_times_total[control_index + '_' + split.code],split.relative_time);
+                            if (leg_place>0 && relative_place>0){
+                                var tbl = document.createElement('table');
+                                tbl.className = 'table-split';
+                                tbl.appendChild(getTrBlock(toHHMMSS(split.leg_time) + ' (' + leg_place + ')', leg_place));
+                                tbl.appendChild(getTrBlock(toHHMMSS(split.relative_time) + ' (' + relative_place + ')', relative_place));
+                                elem[control_index + '_' + split.code] = tbl;
+                            }
+                            control_index++;
+                            lastSplit = split.relative_time;
+                        }
+                    }
+
+                    var finishMsec = elem.result_msec - lastSplit;
+
+                    if (elem.status === 1 && finishMsec > 0) {
+                        var tblF = document.createElement('table');
+                        tblF.className = 'table-split';
+                        tblF.appendChild(getTrBlock(toHHMMSS(finishMsec), 0));
+                        tblF.appendChild(getTrBlock(toHHMMSS(elem.result_msec) + ' (' + elem.place_show + ')', elem.place));
+                        elem.finish_split = tblF;
+                    }
+                }
+            });
+        }
+        return results;
+    }
+
+    function getRankingByGroup(group) {
+        var rankingBlock = document.createElement('span');
+        var ranking = group.ranking;
+        if (ranking && ranking.is_active && ranking.rank_scores > 0) {
+            var text = 'Ranking, scores: ' + ranking.rank_scores.toFixed(0);
+            rankingBlock.appendChild(document.createTextNode(text));
+
+            for (var _i = 0; _i < ranking.rank.length; _i++) {
+                var rank = ranking.rank[_i];
+                if (rank.is_active) {
+                    if (rank.max_place > 0) {
+                        var text = Qualification[rank.qual] + ' - up to ' + rank.max_place + ' place';
+                        rankingBlock.appendChild(document.createElement("br"));
+                        rankingBlock.appendChild(document.createTextNode(text));
+                    }
+                    else {
+                        if (rank.max_time > 0) {
+                            var text = Qualification[rank.qual] + ' - ' + toHHMMSS(rank.max_time);
+                            if (rank.percent > 0) {
+                                text += ' (' + rank.percent + '%)';
+                            }
+                            rankingBlock.appendChild(document.createElement("br"));
+                            rankingBlock.appendChild(document.createTextNode(text));
+                        }
+                    }
+                }
+            }
+        }
+        else {
+            var text = 'Ранг не подсчитывался';
+            rankingBlock.appendChild(document.createTextNode(text));
+        }
+
+        return rankingBlock;
+    }
+
+    var Fields = {
+        fields: [
+            {key: 'index', title: '№', size: 4},
+            {key: 'group', title: 'Class', size: 10, active: false},
+            {key: 'name', title: 'Name', size: 30},
+            {key: 'org', title: 'Orgznization', size: 20},
+            {key: 'year', title: 'Year', size: 5},
+            //{key: 'qual', title: 'Qual', size: 7},
+            {key: 'bib', title: 'Bib', size: 6},
+            {key: 'penalty_time', title: 'Penalty', size: 9, active: false},
+            {key: 'penalty_laps', title: 'Penalty,l', size: 9, active: false},
+            {key: 'result', title: 'Result', size: 14},
+            {key: 'result_relay', title: 'Team result', size: 14},
+            {key: 'diff', title: 'Diff', size: 11},
+            {key: 'speed', title: 'Pace', size: 12, active: false},
+            {key: 'place_show', title: 'Place', size: 6},
+            {key: 'scores', title: 'Scores', size: 5, active: false},
+            {key: 'all_splits', title: 'Splits', active: false}
+        ],
+        active: function (key, val) {
+            for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+                var obj = _a[_i];
+                if (key === obj.key) {
+                    obj.active = val;
+                }
+            }
+        },
+        isActive: function (key) {
+            for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+                var obj = _a[_i];
+                if (key === obj.key) {
+                    if (obj.active === void 0) {
+                        return true;
+                    }
+                    else {
+                        return !!obj.active;
+                    }
+                }
+            }
+            return false;
+        },
+        getField: function (key) {
+            for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+                var obj = _a[_i];
+                if (key === obj.key) {
+                    return obj
+                }
+            }
+        },
+        getCopyFields: function () {
+            return JSON.parse(JSON.stringify(this.fields))
+        },
+        init: function () {
+            try {
+                var isRelay = race.data.race_type === 3
+                this.getField('all_splits').active = location.href.indexOf('all_splits=1') > -1;
+                this.getField('scores').active = location.href.indexOf('scores=1') > -1;
+                this.getField('penalty_time').active = location.href.indexOf('penalty_time=1') > -1;
+
+                this.getField('result_relay').active = isRelay
+            } catch (e){}
+            return this;
+        }
+    }.init();
+
+    store = {
+        showLinkForGroups: true
+    };
+
+    try {
+        store.splitsShow = location.href.indexOf('s_splits=1') > -1;
+        store.rankingShow = location.href.indexOf('ranking=1') > -1;
+        store.showProtocolByCourse = location.href.indexOf('by_course=1') > -1;
+    } catch (e) {}
+
+    function render() {
+        var resultBlock = document.getElementById('results-tables');
+        resultBlock.innerHTML = '';
+        Fields.active('group', store.showProtocolByCourse);
+        if (store.showProtocolByCourse){
+            var _a = race.courses;
+        } else {
+            var _a = race.groups;
+        }
+        for (var _i = 0; _i < _a.length; _i++) {
+            if (store.showProtocolByCourse){
+                var course = _a[_i];
+                var rows = getResultsByCourse(course, store.count);
+                var groupName = course.name;
+            } else {
+                var group = _a[_i];
+                var rows = getResultsByGroup(group, store.count);
+                var course = group.course;
+                var groupName = group.name;
+            }
+            if (!rows.length) {
+                continue;
+            }
+            var titleBlock = document.createElement('h2');
+            titleBlock.id = groupName;
+            var groupTitle = groupName;
+            if (course && course.controls && course.controls.length){
+                groupTitle += ', ' + course.controls.length + ' controls';
+            }
+            if (course && course.length){
+                groupTitle += ', ' + course.length / 1000 + ' km';
+            }
+            titleBlock.appendChild(document.createTextNode(groupTitle));
+            resultBlock.appendChild(titleBlock);
+            if (!store.showProtocolByCourse && store.showLinkForGroups) {
+                resultBlock.appendChild(getGroupsBlockElement(race));
+            }
+            var fields = Fields.getCopyFields();
+            if (store.splitsShow && course) {
+                course.controls.forEach(function (control, index) {
+                    fields.push({key: index + '_' + control.code, title: control.code})
+                });
+                fields.push({key: 'finish_split', title: 'F'})
+            }
+            if (!store.tableView && !store.splitsShow && !Fields.isActive('all_splits')) {
+                resultBlock.appendChild(new TableTextGenerator(rows, fields).getTable());
+            } else {
+                resultBlock.appendChild(new TableGenerator(rows, fields).getTable({className: 'sportorg-table'}));
+            }
+            //show ranking information
+            if (!store.showProtocolByCourse && store.rankingShow) {
+                resultBlock.appendChild(getRankingByGroup(group))
+            }
+            if (store.newPage && _i < _a.length - 1) {
+                var newPage = document.createElement('div');
+                newPage.className = 'new-page';
+                resultBlock.appendChild(newPage);
+            }
+        }
+        var query = {
+            s_splits: store.splitsShow ? 1 : 0,
+            ranking: store.rankingShow ? 1 : 0,
+            by_course: store.showProtocolByCourse ? 1 : 0,
+            all_splits: Fields.isActive('all_splits') ? 1 : 0,
+            scores: Fields.isActive('scores') ? 1 : 0,
+            penalty_time: Fields.isActive('penalty_time') ? 1 : 0
+        };
+        var queryString = '?';
+        Object.keys(query).forEach(function (key) {
+            if (query[key]) {
+                queryString += key + '=' + query[key] + '&';
+            }
+        });
+        queryString += 'sportorg=1';
+        try {
+            var href = location.href.split('?')[0];
+            history.pushState({}, null, href + queryString);
+        } catch (e) {}
+    }
+
+    render();
+
+    var Scrolling = {
+        direction: 1,
+        enabled: false,
+        lock: false,
+        prev: 0,
+        intervalTimer: 0,
+        init: function () {
+            var _this = this;
+            if (_this.intervalTimer) {
+                clearInterval(_this.intervalTimer)
+            }
+            _this.intervalTimer = setInterval(function () {
+                _this.lock = !_this.lock;
+            }, 5000);
+            window.onscroll = function () {
+                var d = document.documentElement;
+                var offset = d.scrollTop + window.innerHeight;
+                var height = d.offsetHeight;
+
+                if (offset === height) {
+                    _this.direction = -1;
+                }
+                if (offset <= window.innerHeight) {
+                    _this.direction = 1;
+                }
+            };
+            this.pageScroll();
+            return this;
+        },
+        pageScroll: function () {
+            var _this = this;
+            if (_this.enabled && ! _this.lock) {
+                window.scrollBy(10, _this.direction);
+            }
+            setTimeout(function () {
+                _this.pageScroll();
+            }, 10);
+        }
+    }.init();
+
+    new SettingsGenerator([
+        {
+            title: 'Classes links',
+            value: !!store.showLinkForGroups,
+            change: function (checked) {
+                store.showLinkForGroups = checked;
+                render()
+            }
+        },
+        {
+            title: 'Results by courses',
+            value: !!store.showProtocolByCourse,
+            change: function (checked) {
+                store.showProtocolByCourse = checked;
+                render()
+            }
+        },
+        {
+            title: 'Table view',
+            value: !!store.tableView,
+            change: function (checked) {
+                store.tableView = checked;
+                render()
+            }
+        },
+        {
+            title: 'Bib',
+            value: Fields.isActive('bib'),
+            change: function (checked) {
+                Fields.active('bib', checked);
+                render()
+            }
+        },
+        {
+            title: 'Penalty time',
+            value: Fields.isActive('penalty_time'),
+            change: function (checked) {
+                Fields.active('penalty_time', checked);
+                render()
+            }
+        },
+        {
+            title: 'Penalty laps',
+            value: Fields.isActive('penalty_laps'),
+            change: function (checked) {
+                Fields.active('penalty_laps', checked);
+                render()
+            }
+        },
+        {
+            title: 'Diff',
+            value: Fields.isActive('diff'),
+            change: function (checked) {
+                Fields.active('diff', checked);
+                render()
+            }
+        },
+        {
+            title: 'Pace',
+            value: Fields.isActive('speed'),
+            change: function (checked) {
+                Fields.active('speed', checked);
+                render()
+            }
+        },
+        {
+            title: 'Splits (no forking)',
+            value: !!store.splitsShow,
+            change: function (checked) {
+                store.splitsShow = checked;
+                render()
+            }
+        },
+        {
+            title: 'Splits (all)',
+            value: Fields.isActive('all_splits'),
+            change: function (checked) {
+                Fields.active('all_splits', checked);
+                render()
+            }
+        },
+        {
+            title: 'Scores',
+            value: Fields.isActive('scores'),
+            change: function (checked) {
+                Fields.active('scores', checked);
+                render()
+            }
+        },
+        {
+            title: 'Ranking (Russian)',
+            value: store.rankingShow,
+            change: function (checked) {
+                store.rankingShow = checked;
+                render()
+            }
+        },
+        {
+            title: 'Show first: ',
+            value: [
+                {text: 'All', value: 0},
+                {text: '1', value: 1},
+                {text: '3', value: 3},
+                {text: '4', value: 4},
+                {text: '5', value: 5},
+                {text: '6', value: 6},
+                {text: '10', value: 10}
+            ],
+            change: function (arr) {
+                store.count = arr[0];
+                render();
+            }
+        },
+        {
+            title: 'Each class from new page',
+            value: false,
+            change: function (checked) {
+                store.newPage = checked;
+                render()
+            }
+        },
+        {
+            title: 'Autoscroll',
+            value: Scrolling.enabled,
+            change: function (checked) {
+                Scrolling.enabled = checked;
+            }
+        },
+    ]).show();
+</script>
+{% endraw %}
+{% endblock %}

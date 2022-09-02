@@ -1,405 +1,434 @@
 from sportorg import config
-from sportorg.language import _
+from sportorg.language import translate
 
 
 def menu_list():
     return [
         {
-            'title': _('File'),
+            'title': translate('File'),
             'actions': [
                 {
-                    'title': _('New'),
+                    'title': translate('New'),
                     'shortcut': 'Ctrl+N',
                     'icon': config.icon_dir('file.svg'),
-                    'action': 'NewAction'
+                    'action': 'NewAction',
                 },
                 {
-                    'title': _('Save'),
+                    'title': translate('Save'),
                     'shortcut': 'Ctrl+S',
                     'icon': config.icon_dir('save.svg'),
-                    'action': 'SaveAction'
+                    'action': 'SaveAction',
                 },
                 {
-                    'title': _('Open'),
+                    'title': translate('Open'),
                     'shortcut': 'Ctrl+O',
                     'icon': config.icon_dir('folder.svg'),
-                    'action': 'OpenAction'
+                    'action': 'OpenAction',
                 },
                 {
-                    'title': _('Save As'),
+                    'title': translate('Save As'),
                     'shortcut': 'Ctrl+Shift+S',
                     'icon': config.icon_dir('save.svg'),
-                    'action': 'SaveAsAction'
+                    'action': 'SaveAsAction',
                 },
                 {
                     'type': 'separator',
                 },
                 {
-                    'title': _('Settings'),
+                    'title': translate('Settings'),
                     'shortcut': 'Ctrl+Alt+S',
                     'icon': config.icon_dir('settings.svg'),
-                    'action': 'SettingsAction'
+                    'action': 'SettingsAction',
                 },
                 {
-                    'title': _('Event Settings'),
+                    'title': translate('Event Settings'),
                     'icon': config.icon_dir('form.svg'),
-                    'action': 'EventSettingsAction'
+                    'action': 'EventSettingsAction',
                 },
                 {
                     'type': 'separator',
                 },
                 {
-                    'title': _('Import'),
+                    'title': translate('Import'),
                     'actions': [
                         {
-                            'title': _('Import from SportOrg file'),
-                            'action': 'ImportSportOrgAction'
+                            'title': translate('Import from SportOrg file'),
+                            'action': 'ImportSportOrgAction',
                         },
                         {
-                            'title': _('CSV Winorient'),
+                            'title': translate('CSV Winorient'),
                             'icon': config.icon_dir('csv.svg'),
-                            'action': 'CSVWinorientImportAction'
+                            'action': 'CSVWinorientImportAction',
                         },
                         {
-                            'title': _('WDB Winorient'),
-                            'action': 'WDBWinorientImportAction'
+                            'title': translate('WDB Winorient'),
+                            'action': 'WDBWinorientImportAction',
                         },
                         {
-                            'title': _('Ocad txt v8'),
-                            'action': 'OcadTXTv8ImportAction'
+                            'title': translate('Ocad txt v8'),
+                            'action': 'OcadTXTv8ImportAction',
                         },
                         {
-                            'title': _('IOF xml'),
-                            'action': 'IOFEntryListImportAction'
+                            'title': translate('IOF xml'),
+                            'action': 'IOFEntryListImportAction',
                         },
-                    ]
+                    ],
                 },
                 {
-                    'title': _('Export'),
+                    'title': translate('Export'),
                     'actions': [
                         {
-                            'title': _('WDB Winorient'),
-                            'action': 'WDBWinorientExportAction'
+                            'title': translate('WDB Winorient'),
+                            'action': 'WDBWinorientExportAction',
                         },
-                        # {
-                        #     'title': 'IOF xml',
-                        #     'actions': [
-                        #         {
-                        #             'title': _('ResultList'),
-                        #             'action': 'IOFResultListExportAction'
-                        #         }
-                        #     ]
-                        # },
+                        {
+                            'title': translate('IOF xml'),
+                            'actions': [
+                                {
+                                    'title': translate('ResultList'),
+                                    'action': 'IOFResultListExportAction'
+                                },
+                                {
+                                    'title': translate('ResultListAllSplits'),
+                                    'action': 'IOFResultListAllSplitsExportAction'
+                                },
+                                {
+                                    'title': translate('EntrytList'),
+                                    'action': 'IOFEntryListExportAction'
+                                },
+                                {
+                                    'title': translate('CompetitorList'),
+                                    'action': 'IOFCompetitorListExportAction'
+                                },
+                                {
+                                    'title': translate('StartList'),
+                                    'action': 'IOFStartListExportAction'
+                                },
+                            ]
+                        },
                     ]
                 }
             ]
         },
         {
-            'title': _('Edit'),
+            'title': translate('Edit'),
             'actions': [
                 {
-                    'title': _('Add object'),
+                    'title': translate('Add object'),
                     'tabs': list(range(5)),
                     'shortcut': ['insert', 'i'],
                     'icon': config.icon_dir('add.svg'),
-                    'action': 'AddObjectAction'
+                    'action': 'AddObjectAction',
                 },
                 {
-                    'title': _('Delete'),
+                    'title': translate('Delete'),
                     'shortcut': 'Del',
                     'tabs': list(range(5)),
                     'icon': config.icon_dir('delete.svg'),
-                    'action': 'DeleteAction'
+                    'action': 'DeleteAction',
                 },
                 {
-                    'title': _('Copy'),
+                    'title': translate('Copy'),
                     'shortcut': 'Ctrl+C',
                     'tabs': list(range(5)),
-                    'action': 'CopyAction'
+                    'action': 'CopyAction',
                 },
                 {
-                    'title': _('Duplicate'),
+                    'title': translate('Duplicate'),
                     'shortcut': 'Ctrl+D',
                     'tabs': list(range(5)),
-                    'action': 'DuplicateAction'
+                    'action': 'DuplicateAction',
                 },
                 {
-                    'title': _('Text exchange'),
-                    'action': 'TextExchangeAction'
-                },
+                    'title': translate('Text exchange'),
+                    'action': 'TextExchangeAction'},
                 {
-                    'title': _('Mass edit'),
-                    'tabs': [0],
-                    'action': 'MassEditAction'
-                }
-            ]
+                    'title': translate('Mass edit'),
+                    'tabs': [0, 4],
+                    'action': 'MassEditAction',
+                },
+            ],
         },
         {
-            'title': _('View'),
+            'title': translate('View'),
             'actions': [
                 {
-                    'title': _('Refresh'),
+                    'title': translate('Refresh'),
                     'icon': config.icon_dir('refresh.svg'),
                     'shortcut': 'F5',
-                    'action': 'RefreshAction'
+                    'action': 'RefreshAction',
                 },
                 {
-                    'title': _('Filter'),
+                    'title': translate('Filter'),
                     'shortcut': 'F2',
                     'tabs': [0, 1],
                     'icon': config.icon_dir('filter.svg'),
-                    'action': 'FilterAction'
+                    'action': 'FilterAction',
                 },
                 {
-                    'title': _('Search'),
+                    'title': translate('Search'),
                     'shortcut': 'Ctrl+F',
                     'tabs': list(range(5)),
                     'icon': config.icon_dir('search.svg'),
-                    'action': 'SearchAction'
+                    'action': 'SearchAction',
                 },
                 {
                     'type': 'separator',
                 },
                 {
-                    'title': _('Start Preparation'),
+                    'title': translate('Start Preparation'),
                     'shortcut': 'Ctrl+1',
-                    'action': 'ToStartPreparationAction'
+                    'action': 'ToStartPreparationAction',
                 },
                 {
-                    'title': _('Race Results'),
+                    'title': translate('Race Results'),
                     'shortcut': 'Ctrl+2',
-                    'action': 'ToRaceResultsAction'
+                    'action': 'ToRaceResultsAction',
                 },
                 {
-                    'title': _('Groups'),
+                    'title': translate('Groups'),
                     'shortcut': 'Ctrl+3',
-                    'action': 'ToGroupsAction'
+                    'action': 'ToGroupsAction',
                 },
                 {
-                    'title': _('Courses'),
+                    'title': translate('Courses'),
                     'shortcut': 'Ctrl+4',
-                    'action': 'ToCoursesAction'
+                    'action': 'ToCoursesAction',
                 },
                 {
-                    'title': _('Teams'),
+                    'title': translate('Teams'),
                     'shortcut': 'Ctrl+5',
-                    'action': 'ToTeamsAction'
-                }
-            ]
+                    'action': 'ToTeamsAction',
+                },
+            ],
         },
         {
-            'title': _('Start Preparation'),
+            'title': translate('Start Preparation'),
             'actions': [
                 {
-                    'title': _('Start Preparation'),
-                    'action': 'StartPreparationAction'
+                    'title': translate('Start Preparation'),
+                    'action': 'StartPreparationAction',
+                },
+                {'title': translate('Guess courses'), 'action': 'GuessCoursesAction'},
+                {
+                    'title': translate('Guess corridors'),
+                    'action': 'GuessCorridorsAction',
                 },
                 {
-                    'title': _('Guess courses'),
-                    'action': 'GuessCoursesAction'
-                },
-                {
-                    'title': _('Guess corridors'),
-                    'action': 'GuessCorridorsAction'
-                },
-                {
-                    'title': _('Relay number assign mode'),
+                    'title': translate('Relay number assign mode'),
                     'tabs': [0],
-                    'action': 'RelayNumberAction'
+                    'action': 'RelayNumberAction',
                 },
                 {
-                    'title': _('Start time change'),
-                    'action': 'StartTimeChangeAction'
+                    'title': translate('Start time change'),
+                    'action': 'StartTimeChangeAction',
                 },
                 {
-                    'title': _('Handicap start time'),
-                    'action': 'StartHandicapAction'
+                    'title': translate('Handicap start time'),
+                    'action': 'StartHandicapAction',
                 },
                 {
-                    'title': _('Clone relay legs'),
-                    'action': 'RelayCloneAction'
+                    'title': translate('Clone relay legs'),
+                    'action': 'RelayCloneAction'},
+                {
+                    'title': translate('Use bib as card number'),
+                    'action': 'CopyBibToCardNumber',
                 },
                 {
-                    'title': _('Use bib as card number'),
-                    'action': 'CopyBibToCardNumber'
+                    'title': translate('Use card number as bib'),
+                    'action': 'CopyCardNumberToBib',
                 },
-            ]
+            ],
         },
         {
-            'title': _('Race'),
+            'title': translate('Race'),
             'actions': [
                 {
-                    'title': _('Manual finish'),
+                    'title': translate('Manual finish'),
                     'shortcut': 'F3',
                     'icon': config.icon_dir('flag.svg'),
-                    'action': 'ManualFinishAction'
+                    'action': 'ManualFinishAction',
                 },
                 {
-                    'title': _('Add SPORTident result'),
-                    'action': 'AddSPORTidentResultAction'
+                    'title': translate('Add SPORTident result'),
+                    'action': 'AddSPORTidentResultAction',
                 },
-            ]
+            ],
         },
         {
-            'title': _('Results'),
+            'title': translate('Results'),
             'actions': [
                 {
-                    'title': _('Create report'),
+                    'title': translate('Create report'),
                     'shortcut': 'Ctrl+P',
-                    'action': 'CreateReportAction'
+                    'action': 'CreateReportAction',
                 },
                 {
-                    'title': _('Split printout'),
+                    'title': translate('Split printout'),
                     'shortcut': 'Ctrl+L',
-                    'action': 'SplitPrintoutAction'
+                    'action': 'SplitPrintoutAction',
                 },
                 {
                     'type': 'separator',
                 },
                 {
-                    'title': _('Rechecking'),
+                    'title': translate('Rechecking'),
                     'shortcut': 'Ctrl+R',
-                    'action': 'RecheckingAction'
+                    'action': 'RecheckingAction',
                 },
                 {
-                    'title': _('Find group by punches'),
+                    'title': translate('Find group by punches'),
                     'tabs': [1],
-                    'action': 'GroupFinderAction'
+                    'action': 'GroupFinderAction',
                 },
                 {
-                    'title': _('Penalty calculation'),
-                    'action': 'PenaltyCalculationAction'
+                    'title': translate('Penalty calculation'),
+                    'action': 'PenaltyCalculationAction',
                 },
                 {
-                    'title': _('Penalty removing'),
-                    'action': 'PenaltyRemovingAction'
+                    'title': translate('Penalty removing'),
+                    'action': 'PenaltyRemovingAction',
                 },
                 {
-                    'title': _('Change status'),
+                    'title': translate('Change status'),
                     'shortcut': 'F4',
                     'tabs': [1],
-                    'action': 'ChangeStatusAction'
+                    'action': 'ChangeStatusAction',
                 },
                 {
-                    'title': _('Set DNS numbers'),
-                    'action': 'SetDNSNumbersAction'
+                    'title': translate('Set DNS numbers'),
+                    'action': 'SetDNSNumbersAction',
                 },
                 {
-                    'title': _('Delete CP'),
-                    'action': 'CPDeleteAction'
+                    'title': translate('Delete CP'),
+                    'action': 'CPDeleteAction'},
+                {
+                    'title': translate('Delete Split'),
+                    'action': 'SplitDeleteAction'
                 },
                 {
-                    'title': _('Assign result by bib'),
+                    'title': translate('Merge results'),
+                    'action': 'MergeResultsAction'
+                },
+                {
+                    'title': translate('Assign result by bib'),
                     'action': 'AssignResultByBibAction'
                 },
                 {
-                    'title': _('Assign result by card number'),
-                    'action': 'AssignResultByCardNumberAction'
+                    'title': translate('Assign result by card number'),
+                    'action': 'AssignResultByCardNumberAction',
                 },
-            ]
+            ],
         },
         {
-            'title': _('Service'),
+            'title': translate('Service'),
             'actions': [
                 {
-                    'title': _('on/off SPORTident readout'),
+                    'title': translate('on/off SPORTident readout'),
                     'icon': config.icon_dir('sportident.png'),
                     'shortcut': 'F8',
-                    'action': 'SPORTidentReadoutAction'
+                    'action': 'SPORTidentReadoutAction',
                 },
                 {
-                    'title': _('on/off Sportiduino readout'),
+                    'title': translate('on/off Sportiduino readout'),
                     'icon': config.icon_dir('sportiduino.png'),
-                    'action': 'SportiduinoReadoutAction'
+                    'action': 'SportiduinoReadoutAction',
                 },
                 {
-                    'title': _('on/off SFR readout'),
+                    'title': translate('on/off SFR readout'),
                     'icon': config.icon_dir('sfr.png'),
-                    'action': 'SFRReadoutAction'
+                    'action': 'SFRReadoutAction',
                 },
                 {
-                    'title': _('Teamwork'),
-                    'icon': config.icon_dir('network.svg'),
-                    'actions': [
-                        {
-                            'title': _('Send selected'),
-                            'shortcut': 'Ctrl+K',
-                            'tabs': list(range(5)),
-                            'action': 'TeamworkSendAction'
-                        },
-                        {
-                            'type': 'separator',
-                        },
-                        {
-                            'title': _('On/Off'),
-                            'action': 'TeamworkEnableAction'
-                        }
-                    ]
+                    'title': translate('on/off RFID Impinj readout'),
+                    'icon': config.icon_dir('rfid_impinj.png'),
+                    'action': 'ImpinjReadoutAction'
                 },
                 {
-                    'title': _('Telegram'),
+                   'title': translate('Teamwork'),
+                   'icon': config.icon_dir('network.svg'),
+                   'actions': [
+                       {
+                           'title': translate('Send selected'),
+                           'shortcut': 'Ctrl+Shift+K',
+                           'tabs': list(range(5)),
+                           'action': 'TeamworkSendAction'
+                       },
+                       {
+                           'type': 'separator',
+                       },
+                       {
+                           'title': translate('On/Off'),
+                           'action': 'TeamworkEnableAction'
+                       }
+                   ]
+                },
+                {
+                    'title': translate('Telegram'),
                     'actions': [
                         {
-                            'title': _('Send results'),
+                            'title': translate('Send results'),
                             'tabs': [1],
-                            'action': 'TelegramSendAction'
+                            'action': 'TelegramSendAction',
                         },
-                    ]
+                    ],
                 },
-            ]
+                {
+                    'title': translate('Online'),
+                    'actions': [
+                        {
+                            'title': translate('Send selected'),
+                            'shortcut': 'Ctrl+K',
+                            'tabs': [0, 1, 2, 3, 4],
+                            'action': 'OnlineSendAction',
+                        },
+                    ],
+                },
+            ],
         },
         {
-            'title': _('Options'),
+            'title': translate('Options'),
             'actions': [
                 {
-                    'title': _('Timekeeping settings'),
+                    'title': translate('Timekeeping settings'),
                     'icon': config.icon_dir('stopwatch.svg'),
-                    'action': 'TimekeepingSettingsAction'
+                    'action': 'TimekeepingSettingsAction',
                 },
+                {'title': translate('Teamwork'), 'action': 'TeamworkSettingsAction'},
                 {
-                    'title': _('Teamwork'),
+                    'title': translate('Teamwork'),
                     'icon': config.icon_dir('network.svg'),
-                    'action': 'TeamworkSettingsAction'
+                    'action': 'TeamworkSettingsAction',
                 },
                 {
-                    'title': _('Printer settings'),
+                    'title': translate('Printer settings'),
                     'icon': config.icon_dir('printer.svg'),
-                    'action': 'PrinterSettingsAction'
+                    'action': 'PrinterSettingsAction',
                 },
                 {
-                    'title': _('Live'),
+                    'title': translate('Live'),
                     'icon': config.icon_dir('live.svg'),
-                    'action': 'LiveSettingsAction'
+                    'action': 'LiveSettingsAction',
                 },
                 {
-                    'title': _('Telegram'),
-                    'action': 'TelegramSettingsAction'
+                    'title': translate('Telegram'),
+                    'action': 'TelegramSettingsAction',
                 },
                 {
-                    'title': _('Rent cards'),
-                    'action': 'RentCardsAction'
+                    'title': translate('Rent cards'),
+                    'action': 'RentCardsAction',
                 },
             ]
         },
         {
-            'title': _('Help'),
+            'title': translate('Help'),
             'actions': [
                 {
-                    'title': _('About'),
+                    'title': translate('About'),
                     'shortcut': 'F1',
-                    'action': 'AboutAction'
+                    'action': 'AboutAction',
                 },
-                {
-                    'title': _('Check updates'),
-                    'action': 'CheckUpdatesAction'
-                },
-                {
-                    'title': _('Testing'),
-                    'show': config.DEBUG and not config.is_executable(),
-                    'shortcut': 'F10',
-                    'action': 'TestingAction',
-                    'debug': True
-                }
-            ]
+                {'title': translate('Check updates'), 'action': 'CheckUpdatesAction'},
+            ],
         },
     ]

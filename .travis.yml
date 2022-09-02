@@ -1,16 +1,19 @@
 language: python
+
+cache: pip
+
 python:
-  - "3.5"
-  - "3.6"
-  - "3.7-dev"
-# command to install dependencies
+  - "3.8"
+
 install:
-  - pip install -r requirements.txt
-  - git submodule init
-# command to run tests
+  - pip install poetry codecov
+  - poetry install
+  - cp .env.example .env
+
 script:
-  - python SportOrg_test.py
-  - python setup.py build
+  - make test lint
+  - python setup_.py build
+
 branches:
   only:
-    - dev
+    - develop

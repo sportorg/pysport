@@ -1,0 +1,317 @@
+{% extends "base.html" %}
+{% block title %}Results{% endblock %}
+{% block head %}{{ super() }}{% endblock %}
+{% block content %}
+<div class="text-center">
+    <h3>{{ race.data.description }} <br>{{ race.data.start_datetime|date }} {{ race.data.location }}</h3>
+    <h2>ПРОТОКОЛ РЕЗУЛЬТАТОВ</h2>
+</div>
+<div id="groups-table"></div>
+<div id="not-results-table"></div>
+<div id="results-tables"></div>
+<div>
+    <table class="empty-table">
+        <tr>
+            <td><b>Главный судья:</b></td>
+            <td width="150px"></td>
+            <td><b>{{ race.data.chief_referee }}</b></td>
+        </tr>
+        <tr>
+            <td><b>Главный секретарь:</b></td>
+            <td width="150px"></td>
+            <td><b>{{ race.data.secretary }}</b></td>
+        </tr>
+    </table>
+</div>
+{% raw %}
+<script>
+    var race = {% endraw %}{{race|tojson}}{% raw %};
+    var selected = {% endraw %}{{selected|tojson}}{% raw %};
+    racePreparation(race);
+    var RaceData = {
+        race: race,
+        selected: selected,
+        groupFields: [
+            {key: 'index', title: '№'},
+            {key: 'name', title: 'Группа'},
+            {key: 'count_person', title: 'Кол-во участников'},
+            {key: 'count_not_finished', title: 'Бегут'}
+        ],
+        didNotFields: [
+            {key: 'group', title: 'Группа'},
+            {key: 'name', title: 'Фамилия, имя'},
+            {key: 'bib', title: 'Номер'},
+            {key: 'start', title: 'Время старта'},
+            {key: 'year', title: 'ГР'},
+            {key: 'qual', title: 'Разряд'},
+            {key: 'org', title: 'Коллектив'},
+            {key: 'contact', title: 'Контактные данные'}
+        ],
+        fields: [
+            {key: 'index', title: '№'},
+            {key: 'name', title: 'Фамилия, имя'},
+            {key: 'org', title: 'Коллектив'},
+            {key: 'year', title: 'ГР'},
+            {key: 'qual', title: 'Разряд'},
+            {key: 'bib', title: 'Номер'},
+            {key: 'start', title: 'Время старта'},
+            {key: 'result', title: 'Результат'},
+            {key: 'diff', title: 'Отставание'},
+            {key: 'speed', title: 'Темп', active: false},
+            {key: 'place_show', title: 'Место'},
+            {key: 'contact', title: 'Контактные данные'}
+        ],
+        init: function () {
+            var _this = this;
+            var personsMap = {};
+            this.race.results.forEach(function (result) {
+                if (result.person) {
+                    personsMap[result.person.id] = true;
+                }
+            });
+            this.race.persons.forEach(function (person) {
+                if (!personsMap[person.id]) {
+                   _this.race.results.push(_this.newResult(person));
+                }
+            });
+            this.render();
+            return this;
+        },
+        newResult: function (person) {
+            return {
+                assigned_rank: 0,
+                created_at: 0,
+                days: 0,
+                diff: null,
+                finish_msec: 86400000,
+                finish_time: 86400000,
+                id: guid(),
+                object: "ResultSportident",
+                penalty_laps: 0,
+                penalty_time: null,
+                person_id: person && person.id,
+                person: person,
+                place: -2,
+                result: "НЕТ ФИНИША",
+                result_msec: 86400000,
+                scores: 0,
+                speed: "",
+                splits: [],
+                card_number: person && person.card_number,
+                start_msec: person && person.start_time || 0,
+                start_time: person && person.start_time,
+                status: 14,
+                status_comment: "",
+                system_type: 2
+            }
+        },
+        getResults: function (group) {
+            var isRelay = group.__type ? group.__type === 3 : this.race.data.race_type === 3;
+            var results = [];
+            var countDidNotEnter = 0;
+            for (var _i = 0, _a = this.race.results; _i < _a.length; _i++) {
+                var result = _a[_i];
+                if (result.person && result.person.group && result.person.group.id === group.id) {
+                    var r = {
+                        index: 0,
+                        name: result.person.surname + ' ' + result.person.name,
+                        org: (result.person.organization && String(result.person.organization.name).slice(0, MAX_ORG_NAME)) || '',
+                        qual: Qualification[result.person.qual],
+                        bib: result.person.bib,
+                        year: result.person.birth_date ? (new Date(result.person.birth_date)).getFullYear() : '',
+                        penalty_time: toHHMMSS(result.penalty_time),
+                        penalty_laps: result.penalty_laps,
+                        result: result.result,
+                        resultMsec: result.result_msec,
+                        diff: toHHMMSS(result.diff),
+                        place: result.place,
+                        status: result.status,
+                        place_show: result.person.is_out_of_competition ? 'в/к' : result.place === 0 ? '' : result.place <= -1 ? '' : result.place,
+                        speed: result.speed,
+                        contact: result.person.organization && result.person.organization.contact.value,
+                        start: toHHMMSS(result.start_msec),
+                        data: result
+                    };
+                    if (result.status !== 1) {
+                        r.diff = '';
+                        r.place_show = '';
+                        r.speed = '';
+                        r.penalty_time = '';
+                        r.penalty_laps = '';
+                    }
+                    if (result.status === 14) {
+                        countDidNotEnter++;
+                    }
+                    results.push(r);
+                }
+            }
+            results.sort(function(a, b) {
+                if (isRelay) {
+                    if (a.place < 1) {
+                        return 1
+                    }
+                    if (b.place < 1) {
+                        return -1
+                    }
+                    if (isRelay && a.place === b.place) {
+                        return ~~(a.bib / 1000) - ~~(b.bib / 1000)
+                    }
+                    return a.place - b.place
+
+                } else {
+                    if (a.status !== 1 && b.status !== 1) {
+                        return STATUS_PRIORITY.indexOf(a.status) - STATUS_PRIORITY.indexOf(b.status);
+                    }
+                    if (a.status !== 1) {
+                        return 1
+                    }
+                    if (b.status !== 1) {
+                        return -1
+                    }
+                    if (a.place < 1) {
+                        return 1
+                    }
+                    if (b.place < 1) {
+                        return -1
+                    }
+                    return a.place - b.place
+                }
+            });
+            var index = 0;
+            if (isRelay) {
+                var prevBib = 0;
+                var resultsList = results.slice();
+                results = [];
+                for (var _i = 0, resultsList_ = resultsList; _i < resultsList_.length; _i++) {
+                    var r = resultsList_[_i];
+                    r.index = '';
+                    if (r.bib % 1000 !== prevBib) {
+                        index++;
+                        results.push({ index: index });
+                        prevBib = r.bib % 1000;
+                    }
+                    results.push(r);
+                }
+            } else {
+                results.forEach(function (elem) {
+                    index++;
+                    elem.index = index;
+                })
+            }
+            return {results: results, countDidNotEnter: countDidNotEnter};
+        },
+        getDidNotEnterResults: function () {
+            var results = [];
+            for (var _i = 0, _a = this.race.results; _i < _a.length; _i++) {
+                var result = _a[_i];
+                if (result.status === 14) {
+                    var r = {
+                        name: result.person.surname + ' ' + result.person.name,
+                        group: (result.person.group && result.person.group.name) || '',
+                        org: (result.person.organization && String(result.person.organization.name).slice(0, MAX_ORG_NAME)) || '',
+                        qual: Qualification[result.person.qual],
+                        bib: result.person.bib,
+                        start: toHHMMSS(result.start_msec),
+                        contact: result.person.organization && result.person.organization.contact.value,
+                        year: result.person.birth_date ? (new Date(result.person.birth_date)).getFullYear() : '',
+                        data: result
+                    };
+                    results.push(r);
+                }
+            }
+            results.sort(function (a, b) {
+                var nameA = a.group.toLowerCase() || '';
+                var nameB = b.group.toLowerCase() || '';
+                if (nameA === nameB) {
+                    return a.data.start_msec - b.data.start_msec;
+                }
+                if (nameA < nameB)
+                    return -1;
+                if (nameA > nameB)
+                    return 1;
+                return 0;
+            });
+            return results;
+        },
+        countDidNotEnter: function (group) {
+            var count = 0;
+            this.race.results.forEach(function (result) {
+                if ((group && result.person && result.person.group && result.person.group.id === group.id && result.status === 14)|| (!group && result.status === 14)) {
+                    count++;
+                }
+            });
+            return count;
+        },
+        getGroupRows: function () {
+            var _this = this;
+            var rows = [];
+            var countPersons = 0;
+            var countNotFinished = 0;
+            this.race.groups.forEach(function (group, index) {
+                var g = {
+                    index: index+1,
+                    name: group.name,
+                    count_person: group.count_person,
+                    count_not_finished: _this.countDidNotEnter(group)
+                };
+                rows.push(g);
+                countPersons += g.count_person;
+                countNotFinished += g.count_not_finished;
+            });
+            rows.push({
+                name: 'Всего',
+                count_person: countPersons,
+                count_not_finished: countNotFinished
+            });
+
+            return rows;
+        },
+        render: function () {
+            var resultBlock = document.getElementById('results-tables');
+            resultBlock.innerHTML = '';
+            var notResultBlock = document.getElementById('not-results-table');
+            notResultBlock.innerHTML = '';
+            var groupBlock = document.getElementById('groups-table');
+            groupBlock.innerHTML = '';
+
+            groupBlock.appendChild(new TableGenerator(this.getGroupRows().map(function (group) {
+                if (group.name !== 'Всего') {
+                    var a = document.createElement('a');
+                    a.href = '#' + group.name;
+                    a.appendChild(document.createTextNode(group.name));
+                    group.name = a;
+                }
+                return group;
+            }), this.groupFields).getTable({ className: 'sportorg-table' }));
+
+            groupBlock.appendChild(document.createElement('hr'));
+
+            notResultBlock.appendChild(new TableGenerator(
+                this.getDidNotEnterResults(),
+                this.didNotFields
+            ).getTable({ className: 'sportorg-table' }));
+
+            notResultBlock.appendChild(document.createElement('hr'));
+
+            for (var _i = 0, _a = this.race.groups; _i < _a.length; _i++) {
+                var group = _a[_i];
+                var r = this.getResults(group);
+
+                var titleBlock = document.createElement('h2');
+                titleBlock.id = group.name;
+                titleBlock.appendChild(document.createTextNode(group.name));
+                if (group.max_time) {
+                    titleBlock.appendChild(document.createTextNode(', Контрольное время: ' + toHHMMSS(group.max_time)));
+                }
+                if (r.countDidNotEnter) {
+                    titleBlock.appendChild(document.createTextNode(', Не финишировали: ' + r.countDidNotEnter));
+                }
+                resultBlock.appendChild(titleBlock);
+                resultBlock.appendChild(getGroupsBlockElement(race));
+                resultBlock.appendChild(new TableGenerator(r.results, this.fields).getTable({ className: 'sportorg-table' }));
+            }
+        }
+    }.init();
+</script>
+{% endraw %}
+{% endblock %}

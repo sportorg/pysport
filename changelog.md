@@ -1,5 +1,34 @@
 # Changelog
 
+# 2022-09-01 v1.6.0
+
++ RFID Impinj equipment support
++ Sum results by places and time
++ Split removing
++ Labyrinth mode - clone existing person, found by card number 
++ Group start
++ New formats of export, IOF XML v.3
++ Split printout for DSQ persons in "any course" mode
++ Sending intermediate times to online (orgeo.ru)
++ Enhanced bulk edit 
++ Result merging
++ Printing several split printouts into single document
++ Naming of report by template name
++ Rounding of result time settings
++ New ranking for rogain
++ Ranking calculation by first X person
+
+- Fixed: sending relay results to online (orgeo.ru)
+- Ignoring of duplicated SFR readout
+- Fixed: error in creation of results for person without start time
+- Fixed: import of person without qualification
+- Printout speed increased (template-based)
+- Increased spead of card and person duplicate checking while import
+- Fixed: memory leaks while printout
+- New teamwork (not compatible with 1.5)
+- Last control code increased from 99 to 999
+- Checking of score list
+
 # 2019-08-07 v1.5.0
 
 + Table refresh speed increased (comfortable work with >1000 rows)

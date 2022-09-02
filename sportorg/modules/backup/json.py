@@ -1,21 +1,33 @@
 import json
 import uuid
+import os
 
 from sportorg import config
-from sportorg.models.memory import races, new_event, Race, race, get_current_race_index, set_current_race_index
+from sportorg.models.memory import (
+    Race,
+    get_current_race_index,
+    new_event,
+    race,
+    races,
+    set_current_race_index,
+)
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.result_checker import ResultChecker
 from sportorg.models.result.score_calculation import ScoreCalculation
 from sportorg.models.result.split_calculation import RaceSplits
+from sportorg.modules.configs.configs import Config
 
 
 def dump(file):
     data = {
         'version': config.VERSION.file,
         'current_race': get_current_race_index(),
-        'races': [race_downgrade(r.to_dict()) for r in races()]
+        'races': [race_downgrade(r.to_dict()) for r in races()],
     }
-    json.dump(data, file, sort_keys=True, indent=2)
+    use_utf8 = Config().configuration.get('save_in_utf8', False)
+    json.dump(data, file, sort_keys=True, indent=2, ensure_ascii=not use_utf8)
+    file.flush()
+    os.fsync(file.fileno())
 
 
 def load(file):
@@ -27,6 +39,7 @@ def load(file):
     ResultCalculation(obj).process_results()
     RaceSplits(obj).generate()
     ScoreCalculation(obj).calculate_scores()
+    obj.set_setting('live_enabled', False)  # force user to activate Live broadcast manually (not to loose live results)
 
 
 def get_races_from_file(file):
@@ -34,7 +47,7 @@ def get_races_from_file(file):
     if 'races' not in data:
         data = {
             'races': [data] if not isinstance(data, list) else data,
-            'current_race': 0
+            'current_race': 0,
         }
     event = []
     for race_dict in data['races']:
@@ -81,7 +94,9 @@ def race_migrate(data):
     if 'sportident_finish_cp_number' in settings:
         settings['system_finish_cp_number'] = settings['sportident_finish_cp_number']
     if 'sportident_assign_chip_reading' in settings:
-        settings['system_assign_chip_reading'] = settings['sportident_assign_chip_reading']
+        settings['system_assign_chip_reading'] = settings[
+            'sportident_assign_chip_reading'
+        ]
     if 'sportident_assignment_mode' in settings:
         settings['system_assignment_mode'] = settings['sportident_assignment_mode']
     if 'sportident_port' in settings:

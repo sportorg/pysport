@@ -1,6 +1,8 @@
-import sys
 import logging
-from multiprocessing import Process
+import sys
+from multiprocessing import Process, Queue
+
+from sportorg.gui.global_access import GlobalAccess
 
 from PySide2.QtCore import QSizeF
 from PySide2.QtGui import QTextDocument
@@ -9,9 +11,11 @@ from PySide2.QtWidgets import QApplication
 
 from sportorg.common.fake_std import FakeStd
 
+import time
+
 
 class PrintProcess(Process):
-    def __init__(self, printer_name, html, left=5.0, top=5.0, right=5.0, bottom=5.0):
+    def __init__(self, queue, printer_name, html, left=5.0, top=5.0, right=5.0, bottom=5.0):
         super().__init__()
         self.printer_name = printer_name
         self.html = html
@@ -19,20 +23,33 @@ class PrintProcess(Process):
         self.margin_top = top
         self.margin_right = right
         self.margin_bottom = bottom
+        self.queue = queue
+
+    def set_app_printer(self, app, printer):
+        self.app = app
+        self.printer_name = printer
+        self.mw.set_split_printer_app(app)
+        self.mw.set_split_printer(printer)
 
     def run(self):
+        t = time.process_time()
         try:
             sys.stdout = FakeStd()
             sys.stderr = FakeStd()
+            logging.debug('print_html: RUN')
             app = QApplication.instance()
             if app is None:
                 app = QApplication(['--platform', 'minimal'])
-            # we need this call to correctly render images...
+                # we need this call to correctly render images...
             app.processEvents()
+
+            logging.debug("print_html: App instance is ready done: {}".format(time.process_time() - t))
 
             printer = QPrinter()
             if self.printer_name:
                 printer.setPrinterName(self.printer_name)
+
+            logging.debug("print_html: got Printer done: {}".format(time.process_time() - t))
 
             # printer.setResolution(96)
 
@@ -44,7 +61,7 @@ class PrintProcess(Process):
                 self.margin_top,
                 self.margin_right,
                 self.margin_bottom,
-                QPrinter.Millimeter
+                QPrinter.Millimeter,
             )
 
             page_size = QSizeF()
@@ -53,13 +70,43 @@ class PrintProcess(Process):
             text_document.setPageSize(page_size)
             text_document.setDocumentMargin(0.0)
 
-            text_document.setHtml(self.html)
-            text_document.print_(printer)
+            while True:
+                t = time.process_time()
+                html = self.queue.get()
+                if html == "CLOSE_SPLIT_PRN":
+                    app.quit()
+                    logging.debug("print_html: printing thread termination: {}".format(time.process_time() - t))
+                    break
+
+                logging.debug("print_html: New task received: {}".format(time.process_time() - t))
+
+                text_document.setHtml(html)
+
+                logging.debug("print_html: text_document setHtml: {}".format(time.process_time() - t))
+
+                text_document.print_(printer)
+
+                # without this timeout virtual printer (e.g. Adobe PDF) doesn't print task, having more than 1 split
+                time.sleep(0.25)
+
+                logging.debug("print_html: text_document printing done: {}".format(time.process_time() - t))
         except Exception as e:
             logging.error(str(e))
 
 
-def print_html(printer_name, html, left=5.0, top=5.0, right=5.0, bottom=5.0):
-    thread = PrintProcess(printer_name, html, left, top, right, bottom)
-    thread.start()
-    logging.info('printing poccess started')
+def print_html(printer_name, html, left=5.0, top=5.0, right=5.0, bottom=5.0, scale=100.0):
+    logging.info('print_html: Starting printing process')
+    thread = GlobalAccess().get_main_window().get_split_printer_thread()
+    queue = GlobalAccess().get_main_window().get_split_printer_queue()
+    if not queue:
+        queue = Queue()
+        GlobalAccess().get_main_window().set_split_printer_queue(queue)
+        logging.info('print_html:  Queue created')
+    if not thread:
+        thread = PrintProcess(queue, printer_name, html, left, top, right, bottom)
+        thread.start()
+        GlobalAccess().get_main_window().set_split_printer_thread(thread)
+        logging.info('print_html:  Process initialized and started')
+
+    queue.put(html)
+    logging.info('print_html: Task has been put to queue')

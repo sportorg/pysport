@@ -1,7 +1,17 @@
 import logging
 import sys
 
-from PySide2.QtWidgets import QFormLayout, QLabel, QLineEdit, QDialog, QPushButton, QApplication, QFileDialog, QTextEdit
+from PySide2.QtWidgets import (
+    QApplication,
+    QDialog,
+    QFileDialog,
+    QFormLayout,
+    QLabel,
+    QLineEdit,
+    QPushButton,
+    QTextEdit,
+)
+
 from sportorg.libs.winorient.wdb_online_sender import WdbOnlineSender
 
 
@@ -15,9 +25,13 @@ class WdbOnlineSenderDialog(QDialog):
         self.layout = QFormLayout(self)
 
         self.file_button = QPushButton('Select wdb file')
+
         def select_file():
-            result = QFileDialog.getOpenFileName(None, 'select wdb file', '', 'WDB Winorient (*.wdb)')[0]
+            result = QFileDialog.getOpenFileName(
+                None, 'select wdb file', '', 'WDB Winorient (*.wdb)'
+            )[0]
             self.file_path.setText(result)
+
         self.file_button.clicked.connect(select_file)
         self.file_path = QLineEdit()
         self.layout.addRow(self.file_button, self.file_path)
@@ -57,6 +71,7 @@ class WdbOnlineSenderDialog(QDialog):
         self.online_sender.file_path = file_path
         self.online_sender.url = url
         self.online_sender.start()
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

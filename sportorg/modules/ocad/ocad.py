@@ -21,17 +21,19 @@ def import_txt_v8(source):
                     memory.Course,
                     name=name,
                     length=int(course.length * 1000),
-                    climb=course.climb
+                    climb=course.climb,
                 )
                 controls = []
                 for order, control in course.controls.items():
                     if str(control.code).isdecimal():  # don't use start and finish
-                        controls.append(memory.create(
-                            memory.CourseControl,
-                            code=control.code,
-                            order=control.order,
-                            length=int(control.length * 1000)
-                        ))
+                        controls.append(
+                            memory.create(
+                                memory.CourseControl,
+                                code=control.code,
+                                order=control.order,
+                                length=int(control.length * 1000),
+                            )
+                        )
                 c.controls = controls
                 memory.race().courses.append(c)
     except Exception as e:

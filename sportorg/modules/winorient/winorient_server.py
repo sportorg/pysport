@@ -26,9 +26,15 @@ Format of WDB data package
 def int_to_time(value):
     """ convert value from 1/100 s to time """
     today = datetime.datetime.now()
-    assert (isinstance(today, datetime.datetime))
-    ret = datetime.datetime(today.year, today.month, today.day, value // 360000 % 24, (value % 360000) // 6000,
-                            (value % 6000) // 100, (value % 100) * 10000)
+    ret = datetime.datetime(
+        today.year,
+        today.month,
+        today.day,
+        value // 360000 % 24,
+        (value % 360000) // 6000,
+        (value % 6000) // 100,
+        (value % 100) * 10000,
+    )
 
     return ret
 
@@ -70,11 +76,17 @@ while True:
     init_offset = 172
     punches = []
     for i in range(punch_qty):
-        cp = int.from_bytes(conn[init_offset + i*8:init_offset + i*8 + 1], byteorder)
-        time = int_to_time(int.from_bytes(conn[init_offset + i*8 + 4:init_offset + i*8 + 8], byteorder))
+        cp = int.from_bytes(
+            conn[init_offset + i * 8 : init_offset + i * 8 + 1], byteorder
+        )
+        time = int_to_time(
+            int.from_bytes(
+                conn[init_offset + i * 8 + 4 : init_offset + i * 8 + 8], byteorder
+            )
+        )
         punches.append((cp, time_to_hhmmss(time)))
 
-    print("bib=" + bib + " result=" + time_to_hhmmss(result) + " punches=")
+    print('bib=' + bib + ' result=' + time_to_hhmmss(result) + ' punches=')
     print(punches)
 
     # sendto - responce

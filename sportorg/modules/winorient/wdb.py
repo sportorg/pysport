@@ -1,7 +1,27 @@
 from sportorg.common.otime import OTime
-from sportorg.libs.winorient.wdb import WDB, WDBMan, WDBTeam, WDBGroup, WDBDistance, WDBPunch, WDBFinish, WDBChip
-from sportorg.models.memory import Race, Organization, Group, Person, race, find, Course, \
-    CourseControl, ResultStatus, Qualification, ResultSportident, Split
+from sportorg.libs.winorient.wdb import (
+    WDB,
+    WDBChip,
+    WDBDistance,
+    WDBFinish,
+    WDBGroup,
+    WDBMan,
+    WDBPunch,
+    WDBTeam,
+)
+from sportorg.models.memory import (
+    Course,
+    CourseControl,
+    Group,
+    Organization,
+    Person,
+    Qualification,
+    ResultSportident,
+    ResultStatus,
+    Split,
+    find,
+    race,
+)
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.utils.time import int_to_otime, time_to_int
 
@@ -16,7 +36,7 @@ class WinOrientBinary:
         1: ResultStatus.DISQUALIFIED,
         2: ResultStatus.OVERTIME,
         7: ResultStatus.DID_NOT_FINISH,
-        8: ResultStatus.DID_NOT_START
+        8: ResultStatus.DID_NOT_START,
     }
 
     status_reverse = {
@@ -26,7 +46,7 @@ class WinOrientBinary:
         ResultStatus.DISQUALIFIED: 1,
         ResultStatus.OVERTIME: 2,
         ResultStatus.DID_NOT_FINISH: 7,
-        ResultStatus.DID_NOT_START: 8
+        ResultStatus.DID_NOT_START: 8,
     }
 
     def __init__(self, file=None):
@@ -54,7 +74,6 @@ class WinOrientBinary:
     def create_objects(self):
         """Create objects in memory, according to model"""
         my_race = race()
-        assert(isinstance(my_race, Race))
 
         my_race.data.title = '\n'.join(self.wdb_object.info.title)
         my_race.data.location = self.wdb_object.info.place
@@ -62,13 +81,11 @@ class WinOrientBinary:
         my_race.data.secretary = self.wdb_object.info.secretary
 
         for team in self.wdb_object.team:
-            assert (isinstance(team, WDBTeam))
             new_team = Organization()
             new_team.name = team.name
             my_race.organizations.append(new_team)
 
         for course in self.wdb_object.dist:
-            assert (isinstance(course, WDBDistance))
             new_course = Course()
             new_course.controls = []
             new_course.name = course.name
@@ -89,20 +106,18 @@ class WinOrientBinary:
             my_race.courses.append(new_course)
 
         for group in self.wdb_object.group:
-            assert (isinstance(group, WDBGroup))
             new_group = Group()
             new_group.name = group.name
             new_group.price = group.owner_cost
             course = group.get_course()
-            if course is not None:
+            if course:
                 new_group.course = find(race().courses, name=course.name)
             my_race.groups.append(new_group)
 
         for man in self.wdb_object.man:
-            assert (isinstance(man, WDBMan))
             new_person = Person()
-            new_person.surname = man.name.strip().split(" ")[0]
-            new_person.name = man.name.strip().split(" ")[-1]
+            new_person.surname = man.name.strip().split(' ')[0]
+            new_person.name = man.name.strip().split(' ')[-1]
             new_person.bib = man.number
             if man.qualification:
                 if man.qualification == 10:
@@ -120,7 +135,7 @@ class WinOrientBinary:
             if found_group:
                 group_name = found_group.name
                 new_person.group = find(race().groups, name=group_name)
-            
+
             found_team = man.get_team()
             if found_team:
                 team_name = found_team.name
@@ -132,7 +147,6 @@ class WinOrientBinary:
 
         # result
         for fin in self.wdb_object.fin:
-            assert (isinstance(fin, WDBFinish))
             result = ResultSportident()
             result.finish_time = int_to_otime(fin.time)
             result.bib = fin.number
@@ -149,7 +163,6 @@ class WinOrientBinary:
 
         # punches
         for chip in self.wdb_object.chip:
-            assert (isinstance(chip, WDBChip))
 
             person = find(my_race.persons, card_number=chip.id)
             if person:
@@ -166,7 +179,6 @@ class WinOrientBinary:
             result.splits = []
             for i in range(chip.quantity):
                 p = chip.punch[i]
-                assert isinstance(p, WDBPunch)
                 code = p.code
                 time = int_to_otime(p.time)
                 split = Split()
@@ -182,7 +194,7 @@ class WinOrientBinary:
         my_race = race()
 
         title = my_race.data.description
-        wdb_object.info.title = title.replace("<br>", "").split('\n')
+        wdb_object.info.title = title.replace('<br>', '').split('\n')
         wdb_object.info.place = my_race.data.location
         wdb_object.info.referee = my_race.data.chief_referee
         wdb_object.info.secretary = my_race.data.secretary
@@ -239,9 +251,8 @@ class WinOrientBinary:
             new_group.id = len(wdb_object.group)
 
         for man in my_race.persons:
-            assert isinstance(man, Person)
             new_person = WDBMan(wdb_object)
-            new_person.name = str(man.surname) + " " + str(man.name)
+            new_person.name = str(man.surname) + ' ' + str(man.name)
             if man.bib:
                 new_person.number = int(man.bib)
 

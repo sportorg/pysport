@@ -1,5 +1,6 @@
 import pickle
 import uuid
+import os
 
 from sportorg import config
 from sportorg.models import memory
@@ -18,6 +19,8 @@ def dump(file):
     data['organizations'] = obj.organizations
     data['settings'] = obj.settings
     pickle.dump(data, file)
+    file.flush()
+    os.fsync(file.fileno())
 
 
 def load(file):

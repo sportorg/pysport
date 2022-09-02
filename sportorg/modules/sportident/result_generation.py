@@ -1,19 +1,60 @@
 import logging
+from copy import deepcopy
+from enum import Enum
 
+from sportorg.common.otime import OTime
 from sportorg.gui.dialogs.bib_dialog import BibDialog
+from sportorg.language import translate
+from sportorg.models.memory import Person, ResultSportident, ResultStatus, find, race
 from sportorg.models.result.result_checker import ResultChecker, ResultCheckerException
-from sportorg.models.memory import race, Person, Result, ResultSportident, find
-from sportorg.language import _
+
+
+class FinishSource(Enum):
+    station = 0
+    zero = 1
+    readout = 2
+    dsq = 3
+    penalty = 4
+    cp = 5
+    beam = 6
 
 
 class ResultSportidentGeneration:
     def __init__(self, result: ResultSportident):
-        assert result, Result
         self._result = result
         self._person = None
-        self.assign_chip_reading = race().get_setting('system_assign_chip_reading', 'off')
-        self.duplicate_chip_processing = race().get_setting('system_duplicate_chip_processing', 'several_results')
+        self.assign_chip_reading = race().get_setting(
+            'system_assign_chip_reading', 'off'
+        )
+        self.duplicate_chip_processing = race().get_setting(
+            'system_duplicate_chip_processing', 'several_results'
+        )
         self.card_read_repeated = self.duplicate_chip_processing == 'bib_request'
+        self.missed_finish = race().get_setting('system_missed_finish', 'zero')
+        self.finish_source = FinishSource[
+            race().get_setting('system_finish_source', 'station')
+        ]
+        self._process_missed_finish()
+
+    def _process_missed_finish(self):
+        if self._result and self._result.finish_time is None:
+            if self.finish_source == FinishSource.station:
+                if self.missed_finish == FinishSource.readout:
+                    self._result.finish_time = self._result.created_at
+                elif self.missed_finish == FinishSource.zero:
+                    self._result.finish_time = OTime(msec=0)
+                elif self.missed_finish == FinishSource.dsq:
+                    self._result.finish_time = OTime(msec=0)
+                    self._result.status = ResultStatus.DISQUALIFIED
+                elif self.missed_finish == FinishSource.penalty:
+                    if len(self._result.splits) > 0:
+                        last_cp_time = self._result.splits[-1].time
+                        penalty_time = OTime(
+                            msec=race().get_setting('marked_route_penalty_time', 60000)
+                        )
+                        self._result.finish_time = last_cp_time + penalty_time
+                    else:
+                        self._result.finish_time = OTime(msec=0)
 
     def _add_result_to_race(self):
         race().add_result(self._result)
@@ -45,7 +86,7 @@ class ResultSportidentGeneration:
         return False
 
     def _find_person_by_result(self):
-        if self._person is not None:
+        if self._person:
             return True
         for person in race().persons:
             if person.card_number and person.card_number == self._result.card_number:
@@ -85,7 +126,11 @@ class ResultSportidentGeneration:
                     if not next_leg_res:
                         self._person = next_leg
                         self._result.person = next_leg
-                        logging.info('Relay: Card {} assigned to bib {}'.format(self._result.card_number, bib))
+                        logging.info(
+                            'Relay: Card {} assigned to bib {}'.format(
+                                self._result.card_number, bib
+                            )
+                        )
                         break
                 else:
                     # All legs of relay team finished
@@ -108,9 +153,14 @@ class ResultSportidentGeneration:
                 self._result = existing_res
                 ResultChecker.calculate_penalty(self._result)
                 ResultChecker.checking(self._result)
+                self.popup_result(self._result)
 
             return True
 
+    def popup_result(self, result):
+        arr = race().results
+        arr.remove(result)
+        arr.insert(0, result)
 
     def add_result(self):
         if self._has_result():
@@ -126,7 +176,9 @@ class ResultSportidentGeneration:
         elif self._has_sportident_card():
             if self.duplicate_chip_processing == 'bib_request':
                 self._bib_dialog()
-            elif self.duplicate_chip_processing == 'relay_find_leg' and race().is_relay():
+            elif (
+                self.duplicate_chip_processing == 'relay_find_leg' and race().is_relay()
+            ):
                 self._relay_find_leg()  # assign chip to the next unfinished leg of a relay team
             elif self.duplicate_chip_processing == 'merge':
                 return self._merge_punches()
@@ -155,7 +207,9 @@ class ResultSportidentGeneration:
 
             self._add_result_to_race()
 
-            logging.info('{} {}'.format(self._result.system_type, self._result.card_number))
+            logging.info(
+                '{} {}'.format(self._result.system_type, self._result.card_number)
+            )
         else:
             if self._find_person_by_result():
                 self._result.person = self._person
@@ -167,7 +221,16 @@ class ResultSportidentGeneration:
     def _create_person(self):
         new_person = Person()
         new_person.bib = self._get_max_bib() + 1
-        new_person.surname = _('Competitor') + ' #' + str(new_person.bib)
+        existing_person = find(race().persons, card_number=self._result.card_number)
+        if existing_person:
+            new_person_copy = deepcopy(existing_person)
+            new_person_copy.id = new_person.id
+            new_person_copy.bib = new_person.bib
+            new_person = new_person_copy
+            new_person.card_number = 0
+        else:
+            new_person.surname = translate('Competitor') + ' #' + str(new_person.bib)
+
         new_person.group = self._find_group_by_punches()
         self._result.person = new_person
 

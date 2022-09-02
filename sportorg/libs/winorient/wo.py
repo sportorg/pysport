@@ -37,7 +37,7 @@ class CSVReader:
             'bib': int(person[5]) if len(person[5]) else 0,
             'year': int(person[6]) if len(person[6]) else 0,
             'sportident_card': int(person[7]) if str(person[7]).isdigit() else 0,
-            'comment': person[8]
+            'comment': person[8],
         }
 
         if len(str(person[1]).split(' ')) == 2:

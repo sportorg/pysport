@@ -1,5 +1,5 @@
 from sportorg.common.otime import OTime
-from sportorg.models.memory import race, Person, find
+from sportorg.models.memory import find, race
 
 
 def get_last_relay_number_protocol():
@@ -49,7 +49,6 @@ def get_leg_count():
 
 
 def set_next_relay_number_to_person(person):
-    assert isinstance(person, Person)
     person.bib = get_next_relay_number_setting()
     set_next_relay_number(get_next_relay_number(person.bib))
 

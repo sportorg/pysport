@@ -8,6 +8,7 @@ from sportorg.common.broker import Broker
 from sportorg.common.singleton import singleton
 from .client import ClientThread
 from .server import ServerThread, Command
+from .packet_header import Header, ObjectTypes, Operations
 
 
 class ResultThread(QThread):
@@ -26,6 +27,7 @@ class ResultThread(QThread):
             try:
                 cmd = self._queue.get(timeout=5)
                 self.data_sender.emit(cmd)
+
             except Empty:
                 if not main_thread().is_alive() or self._stop_event.is_set():
                     break
@@ -74,7 +76,7 @@ class Teamwork(object):
                 self._in_queue,
                 self._out_queue,
                 self._stop_event,
-                self._logger
+                self._logger,
             )
             self._thread.start()
         elif not self._thread.is_alive():
@@ -84,9 +86,7 @@ class Teamwork(object):
     def _start_result_thread(self):
         if self._result_thread is None:
             self._result_thread = ResultThread(
-                self._out_queue,
-                self._stop_event,
-                self._logger
+                self._out_queue, self._stop_event, self._logger
             )
             if self._call_back is not None:
                 self._result_thread.data_sender.connect(self._call_back)
@@ -97,8 +97,12 @@ class Teamwork(object):
             self._start_result_thread()
 
     def is_alive(self):
-        return self._thread is not None and self._thread.is_alive() \
-               and self._result_thread is not None and not self._result_thread.isFinished()
+        return (
+            self._thread is not None
+            and self._thread.is_alive()
+            and self._result_thread is not None
+            and not self._result_thread.isFinished()
+        )
 
     def stop(self):
         self._stop_event.set()
@@ -119,16 +123,16 @@ class Teamwork(object):
             self.start()
             self._logger.info('{} starting'.format(self.connection_type.upper()))
 
-    def send(self, data):
+    def send(self, data, op=Operations.Update.name):
         """data is Dict or List[Dict]"""
-        Broker().produce('teamwork_sending', data)
         if self.is_alive():
+            Broker().produce('teamwork_sending', data)
             if isinstance(data, list):
                 for item in data:
-                    self._in_queue.put(Command(item))
+                    self._in_queue.put(Command(item, op))
                 return
 
-            self._in_queue.put(Command(data))
+            self._in_queue.put(Command(data, op))
 
     def delete(self, data):
         """data is Dict or List[Dict]"""

@@ -1,15 +1,19 @@
-from multiprocessing import freeze_support
 import sys
-import glob
+from multiprocessing import freeze_support
 
 from PySide2.QtWidgets import QApplication
 
 from sportorg import config
 from sportorg.common.singleton import Singleton
-from sportorg.common.scripts import SCRIPTS, Script
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.main_window import MainWindow
-from sportorg.models.constant import StatusComments, PersonNames, Regions, RankingTable, RentCards
+from sportorg.models.constant import (
+    PersonNames,
+    RankingTable,
+    Regions,
+    RentCards,
+    StatusComments,
+)
 
 
 class Application(metaclass=Singleton):
@@ -18,6 +22,7 @@ class Application(metaclass=Singleton):
         self.app = QApplication(self.argv)
         self.main_window = MainWindow(self.argv)
         GlobalAccess().set_app(self)
+
 
     def get_main_window(self):
         return self.main_window
@@ -28,7 +33,6 @@ class Application(metaclass=Singleton):
         self.set_names()
         self.set_regions()
         self.set_ranking()
-        self.set_scripts()
         self.set_rent_cards()
         self.main_window.show_window()
         sys.exit(self.app.exec_())
@@ -77,26 +81,5 @@ class Application(metaclass=Singleton):
             RentCards().set_from_text(content)
         except FileNotFoundError:
             pass
-        except Exception as e:
-            print(str(e))
-
-    @staticmethod
-    def set_scripts():
-        try:
-            for file in glob.glob(config.script_dir('*.py')):
-                try:
-                    with open(file, encoding='utf-8') as f:
-                        content = f.read()
-                        exec(content)
-                        conf = locals()['CONFIG'] if 'CONFIG' in locals() else {}
-                        script = Script(conf)
-                        if script.is_type('live'):
-                            script.actions = {
-                                'create': locals()['create'],
-                                'delete': locals()['delete']
-                            }
-                        SCRIPTS.append(script)
-                except Exception as e:
-                    print(str(e))
         except Exception as e:
             print(str(e))

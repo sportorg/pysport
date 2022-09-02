@@ -1,6 +1,6 @@
-from PySide2 import QtWidgets, QtCore
-from PySide2.QtWidgets import QMenu, QAbstractItemView, QHeaderView
+from PySide2 import QtCore, QtWidgets
 from PySide2.QtCore import QPoint
+from PySide2.QtWidgets import QAbstractItemView, QHeaderView, QMenu
 
 
 class TableView(QtWidgets.QTableView):
@@ -15,7 +15,6 @@ class TableView(QtWidgets.QTableView):
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         hor_header = self.horizontalHeader()
-        assert (isinstance(hor_header, QHeaderView))
         hor_header.setSectionsMovable(True)
         hor_header.setDropIndicatorShown(True)
         hor_header.setSectionResizeMode(QHeaderView.Interactive)

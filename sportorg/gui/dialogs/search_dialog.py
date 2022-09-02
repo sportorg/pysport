@@ -2,19 +2,23 @@ import logging
 
 from PySide2 import QtCore
 from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QDialog, QTableView, QDialogButtonBox, QVBoxLayout, QLineEdit, QMessageBox
+from PySide2.QtWidgets import (
+    QDialog,
+    QDialogButtonBox,
+    QLineEdit,
+    QMessageBox,
+    QVBoxLayout,
+)
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
-from sportorg.language import _
+from sportorg.language import translate
 
 
 class SearchDialog(QDialog):
-
     def __init__(self, table=None):
         super().__init__(GlobalAccess().get_main_window())
-        if table is not None:
-            assert (isinstance(table, QTableView))
+        if table:
             self.table = table
 
     def exec_(self):
@@ -30,7 +34,7 @@ class SearchDialog(QDialog):
         self.layout = QVBoxLayout(self)
 
         self.item_serach = QLineEdit()
-        if self.table is not None:
+        if self.table:
             self.item_serach.setText(self.table.model().search)
             self.item_serach.selectAll()
 
@@ -49,7 +53,7 @@ class SearchDialog(QDialog):
 
     def ok(self):
         try:
-            if self.table is not None:
+            if self.table:
                 proxy_model = self.table.model()
 
                 proxy_model.search = self.item_serach.text()
@@ -57,7 +61,11 @@ class SearchDialog(QDialog):
                 proxy_model.apply_search()
                 offset = proxy_model.search_offset
                 if offset == -1 and proxy_model.search:
-                    QMessageBox.warning(self, _('Search'), _('The search has not given any results'))
+                    QMessageBox.warning(
+                        self,
+                        translate('Search'),
+                        translate('The search has not given any results'),
+                    )
                 self.table.selectRow(offset)
         except Exception as e:
             logging.error(str(e))
@@ -66,6 +74,6 @@ class SearchDialog(QDialog):
         self.close()
 
     def retranslate_ui(self):
-        self.setWindowTitle(_('Search'))
-        self.button_ok.setText(_('OK'))
-        self.button_cancel.setText(_('Cancel'))
+        self.setWindowTitle(translate('Search'))
+        self.button_ok.setText(translate('OK'))
+        self.button_cancel.setText(translate('Cancel'))

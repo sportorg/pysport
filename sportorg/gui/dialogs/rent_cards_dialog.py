@@ -1,11 +1,11 @@
 import logging
 
 from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QFormLayout, QLabel, QDialog, QDialogButtonBox, QTextEdit
+from PySide2.QtWidgets import QDialog, QDialogButtonBox, QFormLayout, QLabel, QTextEdit
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
-from sportorg.language import _
+from sportorg.language import translate
 from sportorg.models.constant import RentCards
 
 
@@ -18,14 +18,16 @@ class RentCardsDialog(QDialog):
         return super().exec_()
 
     def init_ui(self):
-        self.setWindowTitle(_('Rent cards'))
+        self.setWindowTitle(translate('Rent cards'))
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(True)
 
         self.layout = QFormLayout(self)
 
-        self.label_cards = QLabel('\n\n8654842\n8654844\n8654815\n8654825\n...\n1654815')
+        self.label_cards = QLabel(
+            '\n\n8654842\n8654844\n8654815\n8654825\n...\n1654815'
+        )
         self.item_cards = QTextEdit()
         self.item_cards.setPlainText(RentCards().to_text())
 
@@ -43,10 +45,10 @@ class RentCardsDialog(QDialog):
 
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         self.button_ok = button_box.button(QDialogButtonBox.Ok)
-        self.button_ok.setText(_('OK'))
+        self.button_ok.setText(translate('OK'))
         self.button_ok.clicked.connect(apply_changes)
         self.button_cancel = button_box.button(QDialogButtonBox.Cancel)
-        self.button_cancel.setText(_('Cancel'))
+        self.button_cancel.setText(translate('Cancel'))
         self.button_cancel.clicked.connect(cancel_changes)
         self.layout.addRow(button_box)
 

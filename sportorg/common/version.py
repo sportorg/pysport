@@ -34,10 +34,7 @@ class Version:
     @property
     def file(self):
         return '{major}.{minor}.{patch}.{build}'.format(
-            major=self._major,
-            minor=self._minor,
-            patch=self._patch,
-            build=self._build
+            major=self._major, minor=self._minor, patch=self._patch, build=self._build
         )
 
     def __str__(self):
@@ -55,7 +52,7 @@ class Version:
             patch=self._patch,
             build=self._build,
             prefix=self._prefix,
-            suffix=self._suffix
+            suffix=self._suffix,
         )
 
     def __repr__(self):

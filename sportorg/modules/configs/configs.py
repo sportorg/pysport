@@ -3,7 +3,6 @@ import logging
 import os
 
 from sportorg import config as sportorg_config
-
 from sportorg.common.singleton import Singleton
 
 
@@ -69,7 +68,6 @@ class Configurations:
 
 
 class Config(metaclass=Singleton):
-
     def __init__(self):
         self._config_parser = configparser.ConfigParser()
         self._configurations = {
@@ -81,6 +79,8 @@ class Config(metaclass=Singleton):
                 'use_birthday': False,
                 'check_updates': True,
                 'autosave_interval': 0,
+                'logging_level': 'INFO',
+                'log_window_row_count': 1000
             }),
             ConfigFile.SOUND: Configurations({
                 'enabled': False,
@@ -109,10 +109,10 @@ class Config(metaclass=Singleton):
                 'finish_limit_relay': 4,
                 'sum_count': 10,
                 'sum_count_relay': 10,
-                'relay_ranking_method': 'personal'  # also use 'average' to get average
-            }),
+                'individual_ranking_method': 'best',  # 'best' or 'first'
+                'relay_ranking_method': 'personal'  # 'personal', 'average', 'first'
+            })
         }
-
 
     @property
     def parser(self):
@@ -143,10 +143,17 @@ class Config(metaclass=Singleton):
                     for option in self.parser.options(config_name):
                         self._configurations[config_name].set_parse(
                             option,
-                            self.parser.get(config_name, option, fallback=self._configurations[config_name].get(option))
+                            self.parser.get(
+                                config_name,
+                                option,
+                                fallback=self._configurations[config_name].get(option),
+                            ),
                         )
 
-            self.configuration.set('current_locale', self.parser.get(ConfigFile.LOCALE, 'current', fallback='ru_RU'))
+            self.configuration.set(
+                'current_locale',
+                self.parser.get(ConfigFile.LOCALE, 'current', fallback='ru_RU'),
+            )
         except Exception as e:
             logging.exception(e)
             # remove incorrect config
@@ -157,7 +164,9 @@ class Config(metaclass=Singleton):
         for config_name in self._configurations.keys():
             self.parser[config_name] = self._configurations[config_name].get_all()
 
-        self.parser[ConfigFile.LOCALE] = {'current': self.configuration.get('current_locale')}
+        self.parser[ConfigFile.LOCALE] = {
+            'current': self.configuration.get('current_locale')
+        }
 
         with open(sportorg_config.CONFIG_INI, 'w') as configfile:
             self.parser.write(configfile)

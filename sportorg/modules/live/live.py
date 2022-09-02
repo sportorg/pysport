@@ -1,15 +1,15 @@
+from functools import partial
 from threading import Thread
-import logging
 
+import logging
 import requests
 
-from sportorg.common.broker import Broker
-from sportorg.common.scripts import SCRIPTS
-from sportorg.common.singleton import Singleton
 from sportorg.models.memory import race
+from sportorg.modules.live import orgeo
+from sportorg.common.broker import Broker
 
 
-class LiveClient(metaclass=Singleton):
+class LiveClient:
     def init(self):
         Broker().subscribe('teamwork_recieving', self.send)
         Broker().subscribe('teamwork_sending', self.send)
@@ -19,35 +19,56 @@ class LiveClient(metaclass=Singleton):
     def is_enabled():
         obj = race()
         live_enabled = obj.get_setting('live_enabled', False)
-        url = obj.get_setting('live_url', '')
-        return live_enabled and bool(url)
+        urls = obj.get_setting('live_urls', [])
+        return live_enabled and urls
 
     @staticmethod
-    def get_url():
+    def get_urls():
         obj = race()
-        url = obj.get_setting('live_url', '')
-        return url
+        urls = obj.get_setting('live_urls', [])
+        return urls
 
     def send(self, data):
-        if self.is_enabled():
-            url = self.get_url()
-            race_data = race().to_dict()
-            for s in SCRIPTS:
-                if s.is_type('live') and s.is_enabled():
-                    Thread(
-                        target=lambda: s.call('create', requests, url, data, race_data, logging.root),
-                        name='LiveThread'
-                    ).start()
-                    break
+        logging.debug('LiveClient.send started, data = ' + str(data))
+        if not self.is_enabled():
+            return
+
+        if not isinstance(data, list):
+            data = [data]
+        items = []
+        for item in data:
+            if isinstance(item, dict):
+                items.append(item)
+            else:
+                items.append(item.to_dict())
+
+        urls = self.get_urls()
+        race_data = race().to_dict()
+        for url in urls:
+            if race().get_setting('live_results_enabled', False):
+                func = partial(orgeo.create, requests, url, items, race_data, logging.root)
+                Thread(target=func, name='LiveThread').start()
+
+            if race().get_setting('live_cp_enabled', False):
+                func = partial(orgeo.create_online_cp, requests, url, items, race_data, logging.root)
+                Thread(target=func, name='LiveThread_OnlineCP').start()
 
     def delete(self, data):
-        if self.is_enabled():
-            url = self.get_url()
-            race_data = race().to_dict()
-            for s in SCRIPTS:
-                if s.is_type('live') and s.is_enabled():
-                    Thread(
-                        target=lambda: s.call('delete', requests, url, data, race_data, logging.root),
-                        name='LiveThread'
-                    ).start()
-                    break
+        if not self.is_enabled():
+            return
+
+        items = []
+        for item in data:
+            if isinstance(item, dict):
+                items.append(item)
+            else:
+                items.append(item.to_dict())
+
+        urls = self.get_urls()
+        race_data = race().to_dict()
+        for url in urls:
+            func = partial(orgeo.delete, requests, url, items, race_data)
+            Thread(target=func, name='LiveThread').start()
+
+
+live_client = LiveClient()

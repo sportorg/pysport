@@ -1,12 +1,21 @@
 import logging
 
 from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QFormLayout, QLabel, QDialog, QDialogButtonBox, QLineEdit, QCheckBox, QGroupBox, \
-    QRadioButton, QTextEdit
+from PySide2.QtWidgets import (
+    QCheckBox,
+    QDialog,
+    QDialogButtonBox,
+    QFormLayout,
+    QGroupBox,
+    QLabel,
+    QLineEdit,
+    QRadioButton,
+    QTextEdit,
+)
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
-from sportorg.language import _
+from sportorg.language import translate
 from sportorg.models.memory import race
 
 
@@ -20,35 +29,35 @@ class TelegramDialog(QDialog):
         return super().exec_()
 
     def init_ui(self):
-        self.setWindowTitle(_('Telegram'))
+        self.setWindowTitle(translate('Telegram'))
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(True)
 
         self.layout = QFormLayout(self)
 
-        self.label_token = QLabel(_('Token'))
+        self.label_token = QLabel(translate('Token'))
         self.item_token = QLineEdit()
         self.layout.addRow(self.label_token, self.item_token)
 
-        self.label_chat_id = QLabel(_('Chat id'))
+        self.label_chat_id = QLabel(translate('Chat id'))
         self.item_chat_id = QLineEdit()
         self.layout.addRow(self.label_chat_id, self.item_chat_id)
 
-        self.label_template = QLabel(_('Template'))
+        self.label_template = QLabel(translate('Template'))
         self.item_template = QTextEdit()
         self.item_template.setMinimumHeight(150)
         self.layout.addRow(self.label_template, self.item_template)
 
-        self.item_enabled = QCheckBox(_('Enabled'))
+        self.item_enabled = QCheckBox(translate('Enabled'))
         self.layout.addRow(self.item_enabled)
 
         self.parse_mode_groupbox = QGroupBox()
-        self.parse_mode_groupbox.setTitle(_('Parse mode'))
+        self.parse_mode_groupbox.setTitle(translate('Parse mode'))
         self.parse_mode_groupbox_layout = QFormLayout()
-        self.parse_mode_item_text = QRadioButton(_('Text'))
-        self.parse_mode_item_markdown = QRadioButton(_('Markdown'))
-        self.parse_mode_item_html = QRadioButton(_('HTML'))
+        self.parse_mode_item_text = QRadioButton(translate('Text'))
+        self.parse_mode_item_markdown = QRadioButton(translate('Markdown'))
+        self.parse_mode_item_html = QRadioButton(translate('HTML'))
         self.parse_mode_groupbox_layout.addRow(self.parse_mode_item_text)
         self.parse_mode_groupbox_layout.addRow(self.parse_mode_item_markdown)
         self.parse_mode_groupbox_layout.addRow(self.parse_mode_item_html)
@@ -67,10 +76,10 @@ class TelegramDialog(QDialog):
 
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         self.button_ok = button_box.button(QDialogButtonBox.Ok)
-        self.button_ok.setText(_('OK'))
+        self.button_ok.setText(translate('OK'))
         self.button_ok.clicked.connect(apply_changes)
         self.button_cancel = button_box.button(QDialogButtonBox.Cancel)
-        self.button_cancel.setText(_('Cancel'))
+        self.button_cancel.setText(translate('Cancel'))
         self.button_cancel.clicked.connect(cancel_changes)
         self.layout.addRow(button_box)
 
@@ -81,7 +90,9 @@ class TelegramDialog(QDialog):
         token = obj.get_setting('telegram_token', '')
         url = obj.get_setting('telegram_chat_id', '')
         parse_mode = obj.get_setting('telegram_parse_mode', '')
-        template = obj.get_setting('telegram_template', '{group} {name} {bib} {result} {place}')
+        template = obj.get_setting(
+            'telegram_template', '{group} {name} {bib} {result} {place}'
+        )
         telegram_enabled = obj.get_setting('telegram_enabled', False)
 
         self.item_chat_id.setText(url)

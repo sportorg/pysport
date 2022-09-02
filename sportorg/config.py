@@ -1,12 +1,21 @@
+import logging.config
 import os
 import sys
-import logging.config
+
+from pydantic import BaseSettings
 
 from sportorg.common.version import Version
 
+
+class Env(BaseSettings):
+    DEBUG: bool = False
+
+    class Config:
+        env_file = '.env'
+
+
 NAME = 'SportOrg'
-VERSION = Version(1, 5, 0, 0, 'v')
-DEBUG = True
+VERSION = Version(1, 6, 0, 0, 'v')
 
 
 def is_executable():
@@ -15,9 +24,7 @@ def is_executable():
 
 def module_path():
     if is_executable():
-        return os.path.dirname(
-            sys.executable
-        )
+        return os.path.dirname(sys.executable)
 
     return os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
 
@@ -71,13 +78,6 @@ def sound_dir(*paths):
     return os.path.join(SOUND_DIR, *paths)
 
 
-SCRIPT_DIR = base_dir('scripts')
-
-
-def script_dir(*paths):
-    return os.path.join(SCRIPT_DIR, *paths)
-
-
 STYLE_DIR = base_dir('styles')
 
 
@@ -85,19 +85,22 @@ def style_dir(*paths):
     return os.path.join(STYLE_DIR, *paths)
 
 
+env = Env(_env_file=base_dir('.env'))
+DEBUG = env.DEBUG
+
 ICON = icon_dir('sportorg.svg')
 
 CONFIG_INI = data_dir('config.ini')
 
 LOCALE_DIR = base_dir('languages')
 
-NAMES_FILE = base_dir('names.txt')
+NAMES_FILE = base_dir('configs', 'names.txt')
 
-REGIONS_FILE = base_dir('regions.txt')
+REGIONS_FILE = base_dir('configs', 'regions.txt')
 
-STATUS_COMMENTS_FILE = base_dir('status_comments.txt')
+STATUS_COMMENTS_FILE = base_dir('configs', 'status_comments.txt')
 
-RANKING_SCORE_FILE = base_dir('ranking.txt')
+RANKING_SCORE_FILE = base_dir('configs', 'ranking.txt')
 
 DIRS = [
     IMG_DIR,
@@ -107,7 +110,6 @@ DIRS = [
     LOG_DIR,
     TEMPLATE_DIR,
     SOUND_DIR,
-    SCRIPT_DIR,
     STYLE_DIR,
 ]
 
@@ -120,43 +122,36 @@ LOG_CONFIG = {
     'formatters': {
         'detailed': {
             'class': 'logging.Formatter',
-            'format': '%(levelname)s %(asctime)-15s %(threadName)s@%(filename)s:%(lineno)d %(message)s'
+            'format': '%(levelname)s %(asctime)-15s %(threadName)s@%(filename)s:%(lineno)d %(message)s',
         },
         'cls': {
             'class': 'logging.Formatter',
-            'format': '%(levelname)s %(threadName)s@%(filename)s:%(lineno)d %(message)s'
-        }
+            'format': '%(levelname)s %(threadName)s@%(filename)s:%(lineno)d %(message)s',
+        },
     },
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
             'level': logging.DEBUG,
             'formatter': 'cls',
-            'stream': sys.stdout
+            'stream': sys.stdout,
         },
         'file': {
             'class': 'logging.FileHandler',
             'filename': log_dir(NAME.lower() + '.log'),
             'mode': 'a',
-            'formatter': 'detailed'
+            'formatter': 'detailed',
         },
         'errors': {
             'class': 'logging.FileHandler',
             'filename': log_dir(NAME.lower() + '-errors.log'),
             'mode': 'a',
             'level': logging.ERROR,
-            'formatter': 'detailed'
+            'formatter': 'detailed',
         },
     },
-    'loggers': {
-        'main': {
-            'handlers': ['file']
-        }
-    },
-    'root': {
-        'level': logging.DEBUG,
-        'handlers': ['console', 'file', 'errors']
-    },
+    'loggers': {'main': {'handlers': ['file']}},
+    'root': {'level': logging.DEBUG, 'handlers': ['console', 'file', 'errors']},
 }
 
 logging.config.dictConfig(LOG_CONFIG)
