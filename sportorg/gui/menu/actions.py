@@ -52,6 +52,7 @@ from sportorg.models.start.start_preparation import (
     guess_corridors_for_groups,
 )
 from sportorg.modules.backup.json import get_races_from_file
+from sportorg.modules.configs.configs import Config
 from sportorg.modules.iof import iof_xml
 from sportorg.modules.live.live import live_client
 from sportorg.modules.ocad import ocad
@@ -790,8 +791,25 @@ class ImportSportOrgAction(Action, metaclass=ActionFactory):
             translate('Open SportOrg json'), translate('SportOrg (*.json)')
         )
         if file_name != '':
-            with open(file_name) as f:
-                attr = get_races_from_file(f)
+            use_utf8 = Config().configuration.get('save_in_utf8', False)
+            # if user set UTF-8 usage, first try to open file in UTF-8, then in system locale (1251 for RU Windows)
+            try:
+                def_encoding = None
+                if use_utf8:
+                    def_encoding = 'utf-8'
+
+                with open(file_name, encoding=def_encoding) as f:
+                    attr = get_races_from_file(f)
+            except UnicodeDecodeError:
+                f.close()
+
+                alt_encoding = 'utf-8'
+                if use_utf8:
+                    alt_encoding = None
+
+                with open(file_name, encoding=alt_encoding) as f:
+                    attr = get_races_from_file(f)
+
             SportOrgImportDialog(*attr).exec_()
             self.app.refresh()
 
