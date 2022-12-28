@@ -1500,9 +1500,6 @@ msgstr "Использовать финиш как КП с кодом:"
 msgid "Ignore readout before start"
 msgstr "Игнорировать считывание до старта"
 
-msgid "Ignore readout before start"
-msgstr "Игнорировать считывание до старта"
-
 msgid "Did not start"
 msgstr "НЕ СТАРТ."
 
