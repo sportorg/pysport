@@ -15,6 +15,7 @@ from sportorg.gui.dialogs.entry_filter import DialogFilter
 from sportorg.gui.dialogs.entry_mass_edit import MassEditDialog
 from sportorg.gui.dialogs.event_properties import EventPropertiesDialog
 from sportorg.gui.dialogs.file_dialog import get_open_file_name, get_save_file_name
+from sportorg.gui.dialogs.group_mass_edit import GroupMassEditDialog
 from sportorg.gui.dialogs.live_dialog import LiveDialog
 from sportorg.gui.dialogs.merge_results import MergeResultsDialog
 from sportorg.gui.dialogs.not_start_dialog import NotStartDialog
@@ -341,6 +342,10 @@ class MassEditAction(Action, metaclass=ActionFactory):
     def execute(self):
         if self.app.current_tab == 0:
             MassEditDialog().exec_()
+            self.app.refresh()
+
+        if self.app.current_tab == 2:
+            GroupMassEditDialog().exec_()
             self.app.refresh()
 
         if self.app.current_tab == 4:

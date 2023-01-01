@@ -144,7 +144,7 @@ def menu_list():
                     'action': 'TextExchangeAction'},
                 {
                     'title': translate('Mass edit'),
-                    'tabs': [0, 4],
+                    'tabs': [0, 2, 4],
                     'action': 'MassEditAction',
                 },
             ],
