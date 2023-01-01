@@ -447,7 +447,7 @@ class TimekeepingPropertiesDialog(QDialog):
 
         # time settings
         time_accuracy = obj.get_setting('time_accuracy', 0)
-        time_rounding = obj.get_setting('time_rounding', 'math')
+        time_rounding = obj.get_setting('time_rounding', 'down')
         time_format_24 = obj.get_setting('time_format_24', 'less24')
 
         self.time_settings_accuracy_edit.setValue(time_accuracy)

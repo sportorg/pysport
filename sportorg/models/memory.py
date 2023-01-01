@@ -1769,15 +1769,9 @@ class Ranking(object):
         self.rank[Qualification.I] = RankingItem(qual=Qualification.I)
         self.rank[Qualification.II] = RankingItem(qual=Qualification.II)
         self.rank[Qualification.III] = RankingItem(qual=Qualification.III)
-        self.rank[Qualification.I_Y] = RankingItem(
-            qual=Qualification.I_Y, is_active=False
-        )
-        self.rank[Qualification.II_Y] = RankingItem(
-            qual=Qualification.II_Y, is_active=False
-        )
-        self.rank[Qualification.III_Y] = RankingItem(
-            qual=Qualification.III_Y, is_active=False
-        )
+        self.rank[Qualification.I_Y] = RankingItem(qual=Qualification.I_Y)
+        self.rank[Qualification.II_Y] = RankingItem(qual=Qualification.II_Y)
+        self.rank[Qualification.III_Y] = RankingItem(qual=Qualification.III_Y)
 
     def get_max_qual(self):
         max_qual = Qualification.NOT_QUALIFIED
