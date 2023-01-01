@@ -114,7 +114,8 @@ class Organization(Model):
             'id': str(self.id),
             'name': self.name,
             'country': self.country,
-            'region': self.region,
+            'region': self.region[3:] if
+            self.region and len(self.region) > 3 and self.region[2] == '_' else self.region,
             'contact': self.contact,
             'code': self.code,
             'count_person': self.count_person,  # readonly
