@@ -139,6 +139,14 @@ class SoundTab(Tab):
         )
         self.layout.addRow(self.label_rented_card, self.item_rented_card)
 
+        self.label_enter_number = QLabel(translate('Enter number sound'))
+        self.item_enter_number = AdvComboBox()
+        self.item_enter_number.addItems(self.sounds)
+        self.item_enter_number.setCurrentText(
+            Config().sound.get('enter_number') or config.sound_dir('enter_number.wav')
+        )
+        self.layout.addRow(self.label_enter_number, self.item_enter_number)
+
         self.widget.setLayout(self.layout)
 
     def save(self):
@@ -149,6 +157,7 @@ class SoundTab(Tab):
             'enabled_rented_card', self.item_enabled_rented_card.isChecked()
         )
         Config().sound.set('rented_card', self.item_rented_card.currentText())
+        Config().sound.set('enter_number', self.item_enter_number.currentText())
 
 
 class MultidayTab(Tab):

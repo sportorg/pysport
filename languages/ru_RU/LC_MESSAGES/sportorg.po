@@ -408,6 +408,9 @@ msgstr "Включить звук при аренде чипа"
 msgid "Rented card sound"
 msgstr "Звук при аренде чипа"
 
+msgid "Enter number sound"
+msgstr "Звук при запросе номера"
+
 msgid "Main settings"
 msgstr "Основные настройки"
 

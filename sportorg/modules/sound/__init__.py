@@ -27,3 +27,6 @@ class Sound(object):
     def rented_card(self):
         if self.is_enabled_rented_card():
             self._play('rented_card')
+
+    def enter_number(self):
+        self._play('enter_number')

@@ -7,6 +7,7 @@ from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import translate
 from sportorg.models import memory
+from sportorg.modules.sound import Sound
 
 
 class BibDialog(QDialog):
@@ -18,6 +19,7 @@ class BibDialog(QDialog):
 
     def exec_(self):
         self.init_ui()
+        Sound().enter_number()
         return super().exec_()
 
     def init_ui(self):
