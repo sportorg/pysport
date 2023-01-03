@@ -99,8 +99,9 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
             self.set_source_array(whole_list)
             self.filter_backup.clear()
 
-    def set_filter_for_column(self, column_num, filter_regexp):
-        self.filter.update({column_num: re.escape(filter_regexp)})
+    def set_filter_for_column(self, column_num, filter_regexp, action):
+
+        self.filter.update({column_num: [filter_regexp, action]})
 
     def apply_filter(self):
         # get initial list and filter it
@@ -108,14 +109,18 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
         current_array.extend(self.filter_backup)
         self.filter_backup.clear()
         for column in self.filter.keys():
-            check_regexp = self.filter.get(column)
-            check = re.compile(check_regexp)
-            # current_array = list(filter(lambda x:  check.match(self.get_item(x, column)), current_array))
+            check_regexp = re.escape(self.filter.get(column)[0])
+            action = self.filter.get(column)[1]
+
+            check = re.compile('.*' + check_regexp + '.*')
+
+            if action == translate('equal to'):
+                check = re.compile(check_regexp + "$")
+
             i = 0
             while i < len(current_array):
                 value = self.get_item(current_array[i], column)
-                #if not check.match(value):
-                if check_regexp and check_regexp != re.escape(value):
+                if not check.match(str(value)):
                     self.filter_backup.append(current_array.pop(i))
                     i -= 1
                 i += 1
@@ -212,6 +217,10 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
 
     def get_item(self, obj, n_col):
         return self.get_values_from_object(obj)[n_col]
+
+    def get_column_unique_values(self, n_col):
+        # returns sorted unique values from specified column
+        return sorted(set([str(row[n_col]) for row in self.cache]))
 
 
 class PersonMemoryModel(AbstractSportOrgMemoryModel):

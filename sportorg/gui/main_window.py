@@ -482,7 +482,7 @@ class MainWindow(QMainWindow):
         if self.get_person_table():
             self.get_person_table().model().clear_filter(remove_condition)
             self.get_result_table().model().clear_filter(remove_condition)
-            self.get_person_table().model().clear_filter(remove_condition)
+            self.get_group_table().model().clear_filter(remove_condition)
             self.get_course_table().model().clear_filter(remove_condition)
             self.get_organization_table().model().clear_filter(remove_condition)
 
@@ -490,7 +490,7 @@ class MainWindow(QMainWindow):
         if self.get_person_table():
             self.get_person_table().model().apply_filter()
             self.get_result_table().model().apply_filter()
-            self.get_person_table().model().apply_filter()
+            self.get_group_table().model().apply_filter()
             self.get_course_table().model().apply_filter()
             self.get_organization_table().model().apply_filter()
 

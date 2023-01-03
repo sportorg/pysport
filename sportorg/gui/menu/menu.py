@@ -161,7 +161,7 @@ def menu_list():
                 {
                     'title': translate('Filter'),
                     'shortcut': 'F2',
-                    'tabs': [0, 1],
+                    'tabs': list(range(5)),
                     'icon': config.icon_dir('filter.svg'),
                     'action': 'FilterAction',
                 },

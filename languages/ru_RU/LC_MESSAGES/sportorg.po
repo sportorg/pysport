@@ -1511,3 +1511,12 @@ msgstr "СОШЕЛ"
 
 msgid "Disqualified"
 msgstr "ДИСКВ."
+
+msgid "contain"
+msgstr "содержит"
+
+msgid "equal to"
+msgstr "равно"
+
+msgid "Clear"
+msgstr "Очистить"
