@@ -294,7 +294,6 @@ class StartPreparationDialog(QDialog):
         try:
             progressbar_delay = 0.01
             obj = race()
-            obj.update_counters()
             if self.reserve_check_box.isChecked():
                 reserve_prefix = self.reserve_prefix.text()
                 reserve_count = self.reserve_group_count_spin_box.value()
@@ -355,6 +354,7 @@ class StartPreparationDialog(QDialog):
                         'interval', first_number, interval, mix_groups=mix_groups
                     )
 
+            obj.update_counters()
             self.progress_bar.setValue(100)
 
             self.save_state()

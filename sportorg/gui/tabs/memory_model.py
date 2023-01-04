@@ -436,6 +436,9 @@ class GroupMemoryModel(AbstractSportOrgMemoryModel):
             translate('Start interval title'),
             translate('Start corridor title'),
             translate('Order in corridor title'),
+            translate('Count of person'),
+            translate('Count of finished'),
+            translate('Count of not finished')
         ]
 
     def init_cache(self):
@@ -473,6 +476,9 @@ class GroupMemoryModel(AbstractSportOrgMemoryModel):
             group.start_interval,
             group.start_corridor,
             group.order_in_corridor,
+            group.count_person,
+            group.count_finished,
+            group.count_person - group.count_finished
         ]
 
     def get_source_array(self):
@@ -493,6 +499,10 @@ class CourseMemoryModel(AbstractSportOrgMemoryModel):
             translate('Point count title'),
             translate('Climb title'),
             translate('Controls'),
+            translate('Count of person'),
+            translate('Count of finished'),
+            translate('Count of not finished'),
+            translate('Count of groups'),
         ]
 
     def init_cache(self):
@@ -519,6 +529,10 @@ class CourseMemoryModel(AbstractSportOrgMemoryModel):
             len(course.controls),
             course.climb,
             ' '.join(course.get_code_list()),
+            course.count_person,
+            course.count_finished,
+            course.count_person - course.count_finished,
+            course.count_group
         ]
 
     def get_source_array(self):
@@ -539,6 +553,9 @@ class OrganizationMemoryModel(AbstractSportOrgMemoryModel):
             translate('Country'),
             translate('Region'),
             translate('Contact'),
+            translate('Count of person'),
+            translate('Count of finished'),
+            translate('Count of not finished')
         ]
 
     def init_cache(self):
@@ -564,6 +581,9 @@ class OrganizationMemoryModel(AbstractSportOrgMemoryModel):
             organization.country,
             organization.region,
             organization.contact,
+            organization.count_person,
+            organization.count_finished,
+            organization.count_person - organization.count_finished
         ]
 
     def get_source_array(self):

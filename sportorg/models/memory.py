@@ -101,6 +101,7 @@ class Organization(Model):
         self.contact = ''
         self.code = ''
         self.count_person = 0
+        self.count_finished = 0
 
     def __str__(self):
         return self.name
@@ -205,6 +206,9 @@ class Course(Model):
         self.count_person = 0
         self.count_group = 0
         self.corridor = 0
+
+        self.count_person = 0
+        self.count_finished = 0
 
     def __repr__(self):
         return 'Course {}'.format(self.name)
@@ -1417,7 +1421,6 @@ class Race(Model):
         return results
 
     def delete_groups(self, indexes):
-        self.update_counters()
         groups = []
         for i in indexes:
             group = self.groups[i]  # type: Group
@@ -1431,7 +1434,6 @@ class Race(Model):
         return groups
 
     def delete_courses(self, indexes):
-        self.update_counters()
         courses = []
         for i in indexes:
             course = self.courses[i]  # type: Course
@@ -1445,7 +1447,6 @@ class Race(Model):
         return courses
 
     def delete_organizations(self, indexes):
-        self.update_counters()
         organizations = []
         for i in indexes:
             organization = self.organizations[i]  # type: Organization
@@ -1538,28 +1539,33 @@ class Race(Model):
         # recalculate group counters
         for i in self.groups:
             i.count_person = 0
+            i.count_finished = 0
+
+        for i in self.organizations:
+            i.count_person = 0
+            i.count_finished = 0
 
         for i in self.persons:
             if i.group:
                 i.group.count_person += 1
+                if i.result_count > 0:
+                    i.group.count_finished += 1
+            if i.organization:
+                i.organization.count_person += 1
+                if i.result_count > 0:
+                    i.organization.count_finished += 1
 
         # recalculate course counters
         for i in self.courses:
             i.count_person = 0
+            i.count_finished = 0
             i.count_group = 0
 
         for i in self.groups:
             if i.course:
                 i.course.count_person += i.count_person
+                i.course.count_finished += i.count_finished
                 i.course.count_group += 1
-
-        # recalculate team counters
-        for i in self.organizations:
-            i.count_person = 0
-
-        for i in self.persons:
-            if i.organization:
-                i.organization.count_person += 1
 
     def get_persons_by_group(self, group):
         return find(self.persons, group=group, return_all=True)

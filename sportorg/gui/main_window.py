@@ -352,6 +352,7 @@ class MainWindow(QMainWindow):
         self.tabbar = self.tabwidget.tabBar()
 
         self.tabwidget.currentChanged.connect(self._menu_disable)
+        self.tabwidget.currentChanged.connect(self._update_counters)
 
     def _menu_disable(self, tab_index):
         for item in self.menu_list_for_disabled:
@@ -362,6 +363,12 @@ class MainWindow(QMainWindow):
         if tab_index == self.tabwidget.indexOf(self.logging_tab):
             # if self.tabbar.tabTextColor(i) == common_color:
             self.tabbar.setTabTextColor(tab_index, self.logging_tab.common_color)
+
+    def _update_counters(self, tab_index):
+        if tab_index > 1:
+            # calculate group, team and course statistics only when tabs activated not to hang application
+            race().update_counters()
+            self.refresh()
 
     def get_size(self):
 

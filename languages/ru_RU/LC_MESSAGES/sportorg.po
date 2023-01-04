@@ -1520,3 +1520,15 @@ msgstr "равно"
 
 msgid "Clear"
 msgstr "Очистить"
+
+msgid "Count of person"
+msgstr "Кол-во человек"
+
+msgid "Count of groups"
+msgstr "Кол-во групп"
+
+msgid "Count of finished"
+msgstr "Финишировали"
+
+msgid "Count of not finished"
+msgstr "Не финишировали"
