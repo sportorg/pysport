@@ -4,6 +4,7 @@ import os
 
 from sportorg import config as sportorg_config
 from sportorg.common.singleton import Singleton
+from sportorg.gui.global_access import GlobalAccess
 
 
 class ConfigFile(object):
@@ -104,13 +105,17 @@ class Config(metaclass=Singleton):
                 'msmk': 100,
                 'zms': 100,
                 'start_limit': 10,
-                'finish_limit': 5,
+                'finish_limit': 6,
                 'start_limit_relay': 6,
-                'finish_limit_relay': 4,
+                'finish_limit_relay': 6,
                 'sum_count': 10,
                 'sum_count_relay': 10,
                 'individual_ranking_method': 'best',  # 'best' or 'first'
                 'relay_ranking_method': 'personal'  # 'personal', 'average', 'first'
+            }),
+            ConfigFile.GEOMETRY: Configurations({
+                'x': 0,
+                'y': 0
             })
         }
 
@@ -133,6 +138,10 @@ class Config(metaclass=Singleton):
     @property
     def ranking(self):
         return self._configurations[ConfigFile.RANKING]
+
+    @property
+    def geometry(self):
+        return self._configurations[ConfigFile.GEOMETRY]
 
     def read(self):
         self.parser.read(sportorg_config.CONFIG_INI)
@@ -167,6 +176,8 @@ class Config(metaclass=Singleton):
         self.parser[ConfigFile.LOCALE] = {
             'current': self.configuration.get('current_locale')
         }
+        self.parser[ConfigFile.GEOMETRY]['main'] = \
+            bytes(GlobalAccess().get_main_window().saveGeometry().toHex()).decode()
 
         with open(sportorg_config.CONFIG_INI, 'w') as configfile:
             self.parser.write(configfile)
