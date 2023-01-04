@@ -326,16 +326,17 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
             translate('First name'),
             translate('Group'),
             translate('Team'),
+            translate('Place'),
+            translate('Result'),
+            translate('Diff'),
+            translate('Status'),
             translate('Bib'),
             translate('Card title'),
             translate('Start'),
             translate('Finish'),
-            translate('Result'),
-            translate('Status'),
             translate('Credit'),
             translate('Penalty'),
             translate('Penalty legs title'),
-            translate('Place'),
             translate('Type'),
             translate('Rented card'),
         ]
@@ -391,24 +392,26 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
             time_accuracy = self.race.get_setting('time_accuracy', 0)
             finish = i.get_finish_time().to_str(time_accuracy)
 
-        return [
+        ret = [
             last_name,
             first_name,
             group,
             team,
+            i.get_place(),
+            i.get_result(),
+            time_to_hhmmss(i.diff),
+            i.status.get_title(),
             bib,
             i.card_number,
             start,
             finish,
-            i.get_result(),
-            i.status.get_title(),
             time_to_hhmmss(i.get_credit_time()),
             time_to_hhmmss(i.get_penalty_time()),
             i.penalty_laps,
-            i.get_place(),
             str(i.system_type),
             rented_card,
         ]
+        return ret
 
     def get_source_array(self):
         return self.race.results
