@@ -394,7 +394,6 @@ def menu_list():
                     'icon': config.icon_dir('stopwatch.svg'),
                     'action': 'TimekeepingSettingsAction',
                 },
-                {'title': translate('Teamwork'), 'action': 'TeamworkSettingsAction'},
                 {
                     'title': translate('Teamwork'),
                     'icon': config.icon_dir('network.svg'),
