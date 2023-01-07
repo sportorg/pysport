@@ -35,9 +35,37 @@ def incorrect(course: List[int], splits: List[int]) -> bool:
     return not check(course, splits)
 
 
-def test_advanced_check():
+def test_specific_order_courses():
     assert correct(course=[31, 32, 33],
                    splits=[31, 32, 33])
 
+    # Лишний КП
+    assert correct(course=[    31, 32, 33],
+                   splits=[99, 31, 32, 33])
+
+    assert correct(course=[31,     32, 33],
+                   splits=[31, 99, 32, 33])
+
+    assert correct(course=[31, 32, 33    ],
+                   splits=[31, 32, 33, 99])
+
+    # Пропущен КП
     assert incorrect(course=[31, 32, 33],
-                     splits=[31, 32])
+                     splits=[    32, 33])
+
+    assert incorrect(course=[31, 32, 33],
+                     splits=[31,     33])
+
+    assert incorrect(course=[31, 32, 33],
+                     splits=[31, 32    ])
+
+    assert incorrect(course=[31, 32, 33],
+                     splits=[99, 32, 33])
+
+    # Взят не тот КП
+    assert incorrect(course=[31, 32, 33],
+                     splits=[51, 99, 33])
+
+    assert incorrect(course=[31, 32, 33],
+                     splits=[31, 32, 99])
+
