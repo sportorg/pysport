@@ -1,5 +1,14 @@
 from typing import List, Union
-from sportorg.models.memory import ResultSportident, Person, Course, CourseControl, Split
+
+import pytest
+
+from sportorg.models.memory import (
+    Course,
+    CourseControl,
+    Person,
+    ResultSportident,
+    Split,
+)
 
 
 def make_course(course: List[Union[int, str]]) -> Course:
@@ -61,6 +70,19 @@ def dsq(course: List[Union[int, str]], splits: List[int]) -> bool:
         Возвращает True если отметка признана неправильной
     '''
     return not check(course, splits)
+
+@pytest.mark.skip(reason='Not implemented')
+def test_special_symbols():
+    # TODO: Протестировать возможности SportOrg для задания дистанций.
+    #   31                         # Номер КП задан числом
+    #   '31'                       # Номер КП задан строкой
+    #   '31(31,32,33)'             # Истинный КП и допустисмые КП
+    #                              # (отметка ок, но начисляется штраф?)
+    #   '*(31,32,33)'              # Допустимые КП, осуществляется проверка на уникальность
+    #   '%(31,32,33)'              # Допустимые КП, без проверки на уникальность
+    #   '31(31-33)'                # Вместо перечисления можно задавать диапазон КП
+    #   '31(31,41-43,51,61-63,70)' # Комбинация отдельных КП и диапазонов
+    pass
 
 
 def test_specific_order_courses():
