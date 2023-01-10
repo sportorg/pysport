@@ -1,7 +1,5 @@
 from typing import List, Union
 
-import pytest
-
 from sportorg.models.memory import (
     Course,
     CourseControl,
@@ -71,24 +69,168 @@ def dsq(course: List[Union[int, str]], splits: List[int]) -> bool:
     '''
     return not check(course, splits)
 
-@pytest.mark.skip(reason='Not implemented')
-def test_special_symbols():
-    # TODO: Протестировать возможности SportOrg для задания дистанций.
-    #   31                         # Номер КП задан числом
-    #   '31'                       # Номер КП задан строкой
-    #   '31(31,32,33)'             # Истинный КП и допустисмые КП
-    #                              # (отметка ок, но начисляется штраф?)
-    #   '*(31,32,33)'              # Допустимые КП, осуществляется проверка на уникальность
-    #   '%(31,32,33)'              # Допустимые КП, без проверки на уникальность
-    #   '31(31-33)'                # Вместо перечисления можно задавать диапазон КП
-    #   '31(31,41-43,51,61-63,70)' # Комбинация отдельных КП и диапазонов
-    pass
+
+def test_controls_as_int():
+    # Номера КП заданы числом
+    assert ok(course=[31, 32, 33],
+              splits=[31, 32, 33])
+
+    assert dsq(course=[31, 32, 33],
+              splits=[])
 
 
-def test_specific_order_courses():
+def test_controls_as_str():
+    # Номера КП заданы строкой
+    assert ok(course=['31', '32', '33'],
+              splits=[ 31,   32,   33 ])
+
+    assert dsq(course=['31', '32', '33'],
+              splits=[])
+
+
+def test_controls_with_optional_codes():
+    # Возможность задать номера контрольных пунктов,
+    # которые будут приняты как правильные
+    assert  ok(course=['31(31,32,33)'],
+               splits=[31])
+    assert  ok(course=['31(31,32,33)'],
+               splits=[32])
+    assert dsq(course=['31(31,32,33)'],
+               splits=[70])
+
+    # Правильными считаются только КП, указанные в скобках
+    assert dsq(course=['31(41,42,43)'],
+               splits=[31])
+    assert ok(course=['31(41,42,43)'],
+              splits=[41])
+
+    # КП31 — отметка ок, штрафа нет
+    course_object = make_course(['31(31,32,33)'])
+    result = make_result([31])
+    assert result.check(course_object) == True
+    assert result.splits[0].code == '31'
+    assert result.splits[0].is_correct == True
+    assert result.splits[0].has_penalty == False
+
+    # КП32 — отметка ок, штраф есть
+    course_object = make_course(['31(31,32,33)'])
+    result = make_result([32])
+    assert result.check(course_object) == True
+    assert result.splits[0].code == '32'
+    assert result.splits[0].is_correct == True
+    assert result.splits[0].has_penalty == True
+
+    # Другой КП — плохая отметка, штраф есть
+    course_object = make_course(['31(31,32,33)'])
+    result = make_result([70])
+    assert result.check(course_object) == False
+    assert result.splits[0].code == '70'
+    assert result.splits[0].is_correct == False
+    assert result.splits[0].has_penalty == True
+
+
+def test_controls_with_optional_code_ranges():
+    # Возможность задать номера контрольных пунктов, используя диапазон
+    course = ['31(31-33)']
+    assert  ok(course, splits=[31])
+    assert  ok(course, splits=[32])
+    assert  ok(course, splits=[33])
+    assert dsq(course, splits=[34])
+
+    # Возможность комбинировать отдельные КП и диапазоны
+    course = ['31(31,41-43,51,61-64)']
+    assert  ok(course, splits=[31])
+    assert  ok(course, splits=[41])
+    assert  ok(course, splits=[42])
+    assert  ok(course, splits=[43])
+    assert  ok(course, splits=[51])
+    assert  ok(course, splits=[61])
+    assert  ok(course, splits=[62])
+    assert  ok(course, splits=[63])
+    assert dsq(course, splits=[32])
+    assert dsq(course, splits=[44])
+    assert dsq(course, splits=[60])
+    assert dsq(course, splits=[65])
+
+
+def test_free_course_order_unique_controls():
+    '''Возможность задать «любой контрольный пункт» ['*'] или
+    «любой контрольный пункт из списка» ['*(31,32,33)'].
+    Такие контрольные пункты будут приняты как правильные.
+    Осуществляется проверка на уникальность.
+    '''
+    assert  ok(course=['*'], splits=[31])
+    assert  ok(course=['*'], splits=[71])
+
+    assert  ok(course=['*(31,32,33)'], splits=[31])
+    assert  ok(course=['*(31,32,33)'], splits=[32])
+    assert dsq(course=['*(31,32,33)'], splits=[34])
+
+    course =                  ['*', '*', '*']
+    assert  ok(course, splits=[ 31,  32,  33])
+    assert  ok(course, splits=[ 31,  32,  33,  34])
+    assert  ok(course, splits=[ 31,  32,  31,  33])
+    assert dsq(course, splits=[ 31,  32,  31])
+    assert dsq(course, splits=[ 31,  32     ])
+
+    # Возможно комбинировать способы задания «любых» контрольных пунктов
+    course =                  ['*(31-33)', '*(41-43)', '*(51-53)', '*']
+    assert  ok(course, splits=[ 31,         41,         51,         32])
+    assert  ok(course, splits=[ 31,         42,         53,         32])
+    assert dsq(course, splits=[ 31,         42,         53,         31])
+
+    course =                  [31, '*', '*(31-33)']
+    # Возможно комбинировать заданные контрольные пункты и «любые»
+    assert  ok(course, splits=[31,  32,  33])
+    # Проверка уникальности производится только среди «любых»
+    assert  ok(course, splits=[31,  31,  33])
+    assert dsq(course, splits=[31,  33,  33])
+
+
+def test_free_course_order_any_controls():
+    # Возможность задать «любой контрольный пункт» ['%'] или
+    # «любой контрольный пункт из списка» ['%(31,32,33)'].
+    # Такие контрольные пункты будут приняты как правильные.
+    # Проверка на уникальность не осуществляется.
+    assert  ok(course=['%'], splits=[31])
+    assert  ok(course=['%'], splits=[71])
+
+    assert  ok(course=['%(31,32,33)'], splits=[31])
+    assert  ok(course=['%(31,32,33)'], splits=[32])
+    assert dsq(course=['%(31,32,33)'], splits=[34])
+
+    course =                  ['%', '%', '%']
+    assert  ok(course, splits=[ 31,  32,  33])
+    assert  ok(course, splits=[ 31,  32,  33,  34])
+    assert  ok(course, splits=[ 31,  32,  31,  33])
+    assert  ok(course, splits=[ 31,  32,  31])
+    assert  ok(course, splits=[ 31,  31,  31])
+    assert dsq(course, splits=[ 31,  32])
+
+    # Возможно комбинировать способы задания «любых» контрольных пунктов
+    course =                  ['%(31-33)', '%(41-43)', '%(51-53)', '%'],
+    assert  ok(course, splits=[ 31,         41,         51,         32])
+    assert  ok(course, splits=[ 31,         42,         53,         32])
+    assert  ok(course, splits=[ 31,         42,         53,         31])
+
+    # Возможно комбинировать заданные контрольные пункты и «любые»
+    course =                  [31, '%', '%(31-33)']
+    assert  ok(course, splits=[31,  32,  33])
+    assert  ok(course, splits=[31,  31,  31])
+
+    # Возможно комбинировать «любые уникальные» и «любые не уникальные»
+    course =                  [31, '*', '*', '%', '%']
+    assert  ok(course, splits=[31,  32,  33,  34,  35])
+    assert  ok(course, splits=[31,  31,  32,  31,  31])
+    assert dsq(course, splits=[31,  32,  32,  34,  35])
+    course =                  [31, '%', '%', '*', '*']
+    assert  ok(course, splits=[31,  31,  31,  31,  32])
+
+
+def test_course_pre_ordered():
     '''Дистанция в заданном направлении. Спортсмену необходимо пройти 
     контрольные пункты в заданном порядке. Лишние КП не учитываются.
-    '''    
+    '''
     assert ok(course=[31, 32, 33],
               splits=[31, 32, 33])
 
