@@ -16,8 +16,13 @@ from sportorg.models.result.result_checker import ResultChecker
 
 def test_playground():
     create_race()
-    assert ok(course=[31, 32, "33"], splits=[31, 32, 33], penalty=0)
-    assert dsq(course=[31, 32, "33"], splits=[31, 32, 70], penalty=0)
+    race().set_setting('marked_route_mode', 'laps')
+    assert ok(course=[31, 41, '51'], splits=[31, 41, 51], penalty=0)
+    assert dsq(course=[31, 41, '51'], splits=[31, 41, 52], penalty=1)
+
+    race().set_setting('marked_route_mode', 'time')
+    assert ok(course=[31, 41, '51'], splits=[31, 41, 51], penalty=0)
+    assert dsq(course=[31, 41, '51'], splits=[31, 41, 52], penalty=1)
 
 
 def ok(
@@ -108,7 +113,9 @@ def check(
     result = race().results[0]
     result.splits = make_splits(splits)
     ResultChecker.checking(result)
-    return result.status == result_status, result.penalty_laps == penalty
+    ResultChecker.calculate_penalty(result)
+    result_penalty = get_penalty(result)
+    return result.status == result_status, result_penalty == penalty
 
 
 def create_race():
@@ -135,9 +142,20 @@ def make_course_controls(course: List[Union[int, str]]) -> List[CourseControl]:
 
 def make_course_control(code: Union[int, str]) -> CourseControl:
     control = CourseControl()
-    control.update_data({"code": code, "length": 0})
+    control.update_data({'code': code, 'length': 0})
     return control
 
 
 def make_splits(splits: List[int]) -> List[Split]:
     return [create(Split, code=str(code)) for code in splits]
+
+
+def get_penalty(result: ResultSportident) -> int:
+    marked_route_mode = race().get_setting('marked_route_mode', 'off')
+    if marked_route_mode == 'laps':
+        return result.penalty_laps
+    elif marked_route_mode == 'time':
+        penalty_time = race().get_setting('marked_route_penalty_time', 60000)
+        return result.penalty_time.to_msec() / penalty_time
+    else:
+        return 0
