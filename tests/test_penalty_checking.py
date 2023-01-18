@@ -14,15 +14,20 @@ from sportorg.models.memory import (
 from sportorg.models.result.result_checker import ResultChecker
 
 
-def test_playground():
+def test_basic_syntax():
     create_race()
+
     race().set_setting('marked_route_mode', 'laps')
-    assert ok(course=[31, 41, '51'], splits=[31, 41, 51], penalty=0)
-    assert dsq(course=[31, 41, '51'], splits=[31, 41, 52], penalty=1)
+    assert ok(course=[31, '41', '51(51,52)'], splits=[31, 41, 51], penalty=0)
+    assert ok(course=[31, '41', '51(51,52)'], splits=[31, 41, 52], penalty=1)
+    assert dsq(course=[31, '41', '51(51,52)'], splits=[31, 41, 59], penalty=0)
 
     race().set_setting('marked_route_mode', 'time')
-    assert ok(course=[31, 41, '51'], splits=[31, 41, 51], penalty=0)
-    assert dsq(course=[31, 41, '51'], splits=[31, 41, 52], penalty=1)
+    assert ok(course=[31, '41', '51(51,52)'], splits=[31, 41, 51], penalty=0)
+    assert ok(course=[31, '41', '51(51,52)'], splits=[31, 41, 52], penalty=1)
+    assert dsq(course=[31, '41', '51(51,52)'], splits=[31, 41, 59], penalty=0)
+
+
 
 
 def ok(
