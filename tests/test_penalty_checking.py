@@ -14,6 +14,21 @@ from sportorg.models.memory import (
 from sportorg.models.result.result_checker import ResultChecker
 
 
+# Настройки проверки отметки, относящиеся к маркированной трассе.
+# marked_route_mode [str] - режим начисления штрафа. Допустимые начения:
+#   'off' - штраф не начисляется
+#   'time' - начисляется штрафное время
+#   'laps' - начисляются штрафные круги
+# marked_route_penalty_time [int] - стоимость одного штрафа в миллисекундах (ms)
+# marked_route_if_counting_lap [bool] - режим проверки количества пройденных штрафных кругов
+# marked_route_if_station_check [bool] - режим проверки количества пройденных штрафных кругов
+# marked_route_station_code [int] - номер станции на штрафном круге
+# marked_route_dont_dsq [bool] - дисквалифицировать ли спортсмена за пропущенные КП
+#   True - проверяет функцией penalty_calculation_free_order()
+#   False - проверяет функцией penalty_calculation(<...>, check_existence=True)
+# marked_route_max_penalty_by_cp [bool] - максимальный штраф - количество КП на дистанции
+
+
 def test_basic_syntax():
     create_race()
 
@@ -29,9 +44,9 @@ def test_basic_syntax():
 
 
 def test_non_obvious_behavior():
-    '''Неочевидное поведение при проверке дистанции. Не всегда это некорректная работа
+    """Неочевидное поведение при проверке дистанции. Не всегда это некорректная работа
     алгоритма, иногда может возникать из-за недочётов при составлении курсов.
-    '''
+    """
     create_race()
     race().set_setting('marked_route_mode', 'laps')
 
