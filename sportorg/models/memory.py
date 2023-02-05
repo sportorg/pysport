@@ -1322,6 +1322,78 @@ class Race(Model):
             'persons': [item.to_dict() for item in self.persons],
         }
 
+    def to_dict_partial(self, person_list=[], group_list=[], course_list=[], orgs_list=[], result_list=[]):
+
+        if course_list and len(course_list) > 0:
+            for group in self.groups:
+                if group.course and group.course in course_list:
+                    group_list.append(group.name)
+
+        if group_list and len(group_list) > 0:
+            for person in self.persons:
+                if person.group and person.group.name in group_list and person not in person_list:
+                    person_list.append(person)
+
+        if orgs_list and len(orgs_list) > 0:
+            person_list = []
+            for person in self.persons:
+                if person.organization and person.organization in orgs_list and person not in person_list:
+                    person_list.append(person)
+
+        if result_list and len(result_list) > 0:
+            person_list = []
+            for result in result_list:
+                if result.person and result.person not in person_list:
+                    person_list.append(result.person)
+
+        if person_list and len(person_list) > 0:
+            # person list to filter specified
+            return_groups = set()
+            return_orgs = set()
+            return_results = list()
+            return_courses = list()
+            for person in person_list:
+                if person.group:
+                    return_groups.add(person.group)
+                if person.organization:
+                    return_orgs.add(person.organization)
+            for group in return_groups:
+                if group.course and group.course not in return_courses:
+                    return_courses.append(group.course)
+            for result in self.results:
+                if result.person in person_list:
+                    return_results.append(result)
+
+            # person list to filter specified
+            return_groups = set()
+            return_orgs = set()
+            return_results = list()
+            return_courses = list()
+            for person in person_list:
+                if person.group:
+                    return_groups.add(person.group)
+                if person.organization:
+                    return_orgs.add(person.organization)
+            for group in return_groups:
+                if group.course and group.course not in return_courses:
+                    return_courses.append(group.course)
+            for result in self.results:
+                if result.person in person_list:
+                    return_results.append(result)
+
+            return {
+                'object': self.__class__.__name__,
+                'id': str(self.id),
+                'data': self.data.to_dict(),
+                'settings': self.settings,
+                'organizations': [item.to_dict() for item in return_orgs],
+                'courses': [item.to_dict() for item in return_courses],
+                'groups': [item.to_dict() for item in return_groups],
+                'results': [item.to_dict() for item in return_results],
+                'persons': [item.to_dict() for item in person_list],
+            }
+        return None
+
     def update_data(self, dict_obj):
         if 'object' not in dict_obj:
             return
