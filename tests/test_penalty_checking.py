@@ -1,3 +1,4 @@
+from itertools import zip_longest
 from typing import List, Tuple, Union
 
 from sportorg.models.memory import (
@@ -153,7 +154,20 @@ def check(
     ResultChecker.checking(result)
     ResultChecker.calculate_penalty(result)
     result_penalty = get_penalty(result)
-    return result.status == result_status, result_penalty == penalty
+
+    check_result = result.status == result_status, result_penalty == penalty
+
+    if not all(check_result):
+        message = exceprion_message(
+            course=course,
+            splits=splits,
+            result_status_expected=result_status,
+            result_status_recieved=result.status,
+            penalty_expected=penalty,
+            penalty_recieved=result_penalty)
+        raise ValueError(message)
+
+    return check_result
 
 
 def create_race():
@@ -197,3 +211,71 @@ def get_penalty(result: ResultSportident) -> int:
         return result.penalty_time.to_msec() / penalty_time
     else:
         return 0
+
+
+def exceprion_message(
+    course: List[Union[int, str]],
+    splits: List[int],
+    result_status_expected: ResultStatus,
+    result_status_recieved: ResultStatus,
+    penalty_expected: int,
+    penalty_recieved: int
+) -> str:
+    """Формирование отладочного сообщения при создании исключения. Отладочное 
+    сообщение содержит сравнение дистанции и отметок и причину несоответствия.
+
+    Parameters
+    ----------
+    course : List[Union[int, str]]
+        Порядок прохождения дистанции
+    splits : List[int]
+        Отметки спортсмена на дистанции
+    result_status_expected : ResultStatus,
+        Ожидаемый результат проверки.
+    result_status_recieved : ResultStatus,
+        Полученный результат проверки.
+    penalty_expected : int
+        Ожидаемое количество штрафа.
+    penalty_recieved : int
+        Полученное количество штрафа.
+
+    Returns
+    -------
+    str
+        Строка отладочного сообщения
+    """
+    message = 'Check failed'
+    message += '\n' + split_and_course_repr(course, splits)
+    if result_status_expected != result_status_recieved:
+        message += '\n' + f'Result status failed!'
+        message += '\n' + f'Expected: {result_status_expected}'
+        message += '\n' + f'Recieved: {result_status_recieved}'
+    if penalty_expected != penalty_recieved:
+        message += '\n' + f'Penalty failed!'
+        message += '\n' + f'Expected: {penalty_expected}'
+        message += '\n' + f'Recieved: {penalty_recieved}'
+    return message
+
+
+def split_and_course_repr(course: List[Union[int, str]], splits: List[int]) -> str:
+    """Формирование строки для визуального сравнения отметок и дистанции.
+    Spl  Crs
+     31  31
+     41  41
+     52  51(51,52)
+
+    Parameters
+    ----------
+    course : List[Union[int, str]]
+        Порядок прохождения дистанции
+    splits : List[int]
+        Отметки спортсмена на дистанции
+
+    Returns
+    -------
+    str
+        Строка со сравнением отметок и дистанции
+    """
+    spl = ['Spl'] + splits
+    crs = ['Crs'] + course
+    return '\n'.join([f'{s:3}  {c}' for s, c in zip_longest(spl, crs, fillvalue='')])
