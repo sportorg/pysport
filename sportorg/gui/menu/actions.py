@@ -365,6 +365,14 @@ class FilterAction(Action, metaclass=ActionFactory):
         self.app.refresh()
 
 
+class FilterResetAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        table = self.app.get_current_table()
+        proxy_model = table.model()
+        proxy_model.clear_filter()
+        self.app.refresh()
+
+
 class SearchAction(Action, metaclass=ActionFactory):
     def execute(self):
         if self.app.current_tab not in range(5):

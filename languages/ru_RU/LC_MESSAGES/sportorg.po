@@ -891,6 +891,9 @@ msgstr "Обновить"
 msgid "Filter"
 msgstr "Фильтрация"
 
+msgid "Filter reset"
+msgstr "Сбросить фильтры"
+
 msgid "Guess courses"
 msgstr "Подбор дистанций для групп"
 

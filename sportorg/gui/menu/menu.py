@@ -166,6 +166,13 @@ def menu_list():
                     'action': 'FilterAction',
                 },
                 {
+                    'title': translate('Filter reset'),
+                    'shortcut': 'Ctrl+F2',
+                    'tabs': list(range(5)),
+                    'icon': config.icon_dir('filter_reset.svg'),
+                    'action': 'FilterResetAction',
+                },
+                {
                     'title': translate('Search'),
                     'shortcut': 'Ctrl+F',
                     'tabs': list(range(5)),
