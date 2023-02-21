@@ -20,14 +20,21 @@ from sportorg.models.result.result_checker import ResultChecker
 #   'off' - штраф не начисляется
 #   'time' - начисляется штрафное время
 #   'laps' - начисляются штрафные круги
+#       default value: marked_route_mode = 'off'
 # marked_route_penalty_time [int] - стоимость одного штрафа в миллисекундах (ms)
+#       default value: marked_route_penalty_time = 60000
 # marked_route_if_counting_lap [bool] - режим проверки количества пройденных штрафных кругов
+#       default value: marked_route_if_counting_lap = True
 # marked_route_if_station_check [bool] - режим проверки количества пройденных штрафных кругов
+#       default value: marked_route_if_station_check = False
 # marked_route_station_code [int] - номер станции на штрафном круге
+#       default value: marked_route_station_code = 80
 # marked_route_dont_dsq [bool] - дисквалифицировать ли спортсмена за пропущенные КП
 #   True - проверяет функцией penalty_calculation_free_order()
 #   False - проверяет функцией penalty_calculation(<...>, check_existence=True)
+#       default value: marked_route_dont_dsq = False
 # marked_route_max_penalty_by_cp [bool] - максимальный штраф - количество КП на дистанции
+#       default value: marked_route_max_penalty_by_cp = False
 
 
 def test_basic_syntax():
