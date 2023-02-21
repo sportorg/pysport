@@ -153,9 +153,15 @@ class ResultChecker:
         origin: 31,41,51; athlete: no punches; result:3
 
         wildcard support for free order
-        origin: *,*,* athlete: 31; result:2
-        origin: *,*,* athlete: 31,31; result:2
-        origin: *,*,* athlete: 31,31,31,31; result:3
+        origin: *,*,* athlete: 31; result:2          // wrong: 
+                                                     // returns 0 if check_existence=False
+                                                     // returns 2 if check_existence=True
+        origin: *,*,* athlete: 31,31; result:2       // wrong:
+                                                     // returns 0 if check_existence=False
+                                                     // returns 1 if check_existence=True
+        origin: *,*,* athlete: 31,31,31,31; result:3 // wrong:
+                                                     // returns 1 if check_existence=False
+                                                     // returns 1 if check_existence=True
         """
         user_array = [i.code for i in splits]
         origin_array = [i.get_number_code() for i in controls]

@@ -44,6 +44,131 @@ def test_basic_syntax():
     assert dsq(course=[31, '41', '51(51,52)'], splits=[31, 41, 59], penalty=0)
 
 
+def test_penalty_calculation_function():
+    """Тесты из строки документации к функции penalty_calculation()
+
+    В этом тесте вызывается penalty_calculation(<...>, check_existence=True)
+    так как с параметрами penalty_calculation(<...>, check_existence=False)
+    эта функция нигде не вызывается.
+    """
+    create_race()
+    race().set_setting('marked_route_mode', 'time')
+
+    # return quantity of incorrect or duplicated punches, order is ignored
+    # origin: 31,41,51; athlete: 31,41,51; result:0
+    assert  ok(course=[31, 41, 51],
+               splits=[31, 41, 51], penalty=0)
+
+    # origin: 31,41,51; athlete: 31; result:0
+    # check_existence=False
+    assert 0 == ResultChecker.penalty_calculation(
+        splits=make_splits([31]),
+        controls=make_course_controls([31, 41, 51]), check_existence=False)
+
+    # origin: 31,41,51; athlete: 31; result:2
+    # check_existence=True
+    assert dsq(course=[31, 41, 51],
+               splits=[31,       ], penalty=2)
+
+    # origin: 31,41,51; athlete: 41,31,51; result:0
+    assert dsq(course=[31, 41, 51],
+               splits=[41, 31, 51], penalty=0)
+
+    # origin: 31,41,51; athlete: 41,31,51; result:0
+    assert dsq(course=[31, 41, 51],
+               splits=[41, 31, 51], penalty=0)
+
+    # origin: 31,41,51; athlete: 31,42,51; result:1
+    assert dsq(course=[31, 41, 51],
+               splits=[31, 42, 51], penalty=1)
+
+    # origin: 31,41,51; athlete: 31,41,51,52; result:1
+    assert  ok(course=[31, 41, 51],
+               splits=[31, 41, 51, 52], penalty=1)
+
+    # origin: 31,41,51; athlete: 31,42,51,52; result:2
+    assert dsq(course=[31, 41, 51],
+               splits=[31, 42, 51, 52], penalty=2)
+
+    # origin: 31,41,51; athlete: 31,31,41,51; result:1
+    assert  ok(course=[31, 41, 51],
+               splits=[31, 31, 41, 51], penalty=1)
+
+    # origin: 31,41,51; athlete: 31,41,51,51; result:1
+    assert  ok(course=[31, 41, 51],
+               splits=[31, 41, 51, 51], penalty=1)
+
+    # origin: 31,41,51; athlete: 32,42,52; result:3
+    assert dsq(course=[31, 41, 51],
+               splits=[32, 42, 52], penalty=3)
+
+    # origin: 31,41,51; athlete: 31,41,51,61,71,81,91; result:4
+    assert  ok(course=[31, 41, 51],
+               splits=[31, 41, 51, 61, 71, 81, 91], penalty=4)
+
+    # origin: 31,41,51; athlete: 31,41,52,61,71,81,91; result:5
+    assert dsq(course=[31, 41, 51],
+               splits=[31, 41, 52, 61, 71, 81, 91], penalty=5)
+
+    # origin: 31,41,51; athlete: 51,61,71,81,91,31,41; result:4
+    assert dsq(course=[31, 41, 51],
+               splits=[51, 61, 71, 81, 91, 31, 41], penalty=4)
+
+    # origin: 31,41,51; athlete: 51,61,71,81,91,32,41; result:5
+    assert dsq(course=[31, 41, 51],
+               splits=[51, 61, 71, 81, 91, 32, 41], penalty=5)
+
+    # origin: 31,41,51; athlete: 51,61,71,81,91,32,42; result:6
+    assert dsq(course=[31, 41, 51],
+               splits=[51, 61, 71, 81, 91, 32, 42], penalty=6)
+
+    # origin: 31,41,51; athlete: 52,61,71,81,91,32,42; result:7
+    assert dsq(course=[31, 41, 51],
+               splits=[52, 61, 71, 81, 91, 32, 42], penalty=7)
+
+    # origin: 31,41,51; athlete: no punches; result:0
+    # check_existence=False
+    assert 0 == ResultChecker.penalty_calculation(
+        splits=make_splits([]),
+        controls=make_course_controls([31, 41, 51]), check_existence=False)
+
+    # origin: 31,41,51; athlete: no punches; result:3
+    # check_existence=True
+    assert dsq(course=[31, 41, 51],
+               splits=[], penalty=3)
+
+    # wildcard support for free order
+    # origin: *,*,* athlete: 31; result:2
+    # check_existence=False
+    assert 0 == ResultChecker.penalty_calculation(
+        splits=make_splits([31]),
+        controls=make_course_controls(['*', '*', '*']), check_existence=False)
+
+    # check_existence=True
+    assert dsq(course=['*', '*', '*'],
+               splits=[31], penalty=2)
+
+    # origin: *,*,* athlete: 31,31; result:2 //wrong
+    # check_existence=False
+    assert 0 == ResultChecker.penalty_calculation(
+        splits=make_splits([31, 31]),
+        controls=make_course_controls(['*', '*', '*']), check_existence=False)
+
+    # check_existence=True
+    assert dsq(course=['*', '*', '*'],
+               splits=[31, 31], penalty=1)
+
+    # origin: *,*,* athlete: 31,31,31,31; result:3 //wrong
+    # check_existence=False
+    assert 1 == ResultChecker.penalty_calculation(
+        splits=make_splits([31, 31, 31, 31]),
+        controls=make_course_controls(['*', '*', '*']), check_existence=False)
+
+    # check_existence=True
+    assert dsq(course=['*', '*', '*'],
+               splits=[31, 31, 31, 31], penalty=1)
+
+
 def test_non_obvious_behavior():
     """Неочевидное поведение при проверке дистанции. Не всегда это некорректная работа
     алгоритма, иногда может возникать из-за недочётов при составлении курсов.
