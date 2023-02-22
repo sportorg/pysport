@@ -6,10 +6,12 @@ from sportorg.models.memory import (
     CourseControl,
     Group,
     Person,
+    Race,
     ResultSportident,
     ResultStatus,
     Split,
     create,
+    new_event,
     race,
 )
 from sportorg.models.result.result_checker import ResultChecker
@@ -331,6 +333,7 @@ def create_race():
     person = create(Person, group=group)
     result = ResultSportident()
     result.person = person
+    new_event([create(Race)])
     race().courses.append(course)
     race().groups.append(group)
     race().persons.append(person)
