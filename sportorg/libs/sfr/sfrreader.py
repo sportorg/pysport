@@ -58,6 +58,9 @@ class SFRReader(object):
     CODE_START = 241
     CODE_FINISH = 240
     CODE_CHECK = 242
+    CODE_START_01 = 244
+    CODE_FINISH_01 = 245
+    CODE_FINISH_01_1 = 246
 
     def __init__(self, debug=False, logfile=None, logger=None):
         """Initializes communication with sfr station via HID interface.
@@ -255,9 +258,15 @@ class SFRReader(object):
         time = self._decode_time(data[6:9])
         if code == self.CODE_START:
             self.ret['start'] = time
+        elif code == self.CODE_START_01:
+            self.ret['start'] = self._decode_time_subseconds(data[6:9])
         elif code == self.CODE_CHECK:
             self.ret['check'] = time
         elif code == self.CODE_FINISH:
+            self.ret['finish'] = time
+            self._last_finish_time = time
+        elif code in {self.CODE_FINISH_01, self.CODE_FINISH_01_1}:
+            time = self._decode_time_subseconds(data[6:9])
             self.ret['finish'] = time
             self._last_finish_time = time
         else:
@@ -294,7 +303,7 @@ class SFRReader(object):
 
     @staticmethod
     def _decode_time(raw_time):
-        """Decodes a raw time value read from an sfr card into a datetime object.
+        """Decodes a raw time value read from a sfr card into a datetime object.
         The returned time is the nearest time matching the data before reftime."""
         if len(raw_time) > 2:
             h = int(raw_time[0]) // 16 * 10 + int(raw_time[0]) % 16
@@ -307,6 +316,65 @@ class SFRReader(object):
             now = datetime.now()
             ret = datetime(
                 minute=m, second=s, hour=h, day=now.day, month=now.month, year=now.year
+            )
+            return ret
+        return None
+
+    @staticmethod
+    def _decode_time_subseconds(raw_time, ref_h=-1):
+        """Decodes a raw time value read from a sfr card into a datetime object.
+        The returned time is the nearest time matching the data before reftime.
+        Note, SFR writes sub seconds into 1 digit of hours byte
+        You need to adjust hours with the reference to splits or PC time while readout
+
+        01:02:03,4 = 0x410203 = 65 02 03 (dec)
+        01:02:03,5 = 0x510203 = 81 02 03 (dec)
+        01:53:23,7 = 0x715323 = 113 83 35 (dec)
+        11:53:23,7 = 0x715323 = 113 83 35 (dec)
+        21:53:23,7 = 0x715323 = 113 83 35 (dec)
+        """
+
+        if len(raw_time) > 2:
+            h = int(raw_time[0]) % 16
+            m = int(raw_time[1]) // 16 * 10 + int(raw_time[1]) % 16
+            s = int(raw_time[2]) // 16 * 10 + int(raw_time[2]) % 16
+            ssec = int(raw_time[0]) // 16
+
+            if h > 9 or m > 59 or s > 59 or ssec > 9:
+                return None
+
+            now = datetime.now()
+
+            if ref_h < 0:
+                ref_h = now.hour
+
+            if ref_h >= 20:
+                # reference time after 20:00:00, add 10 or 20 h
+                # 02:00 at 23:00 -> 22:00
+                # 02:00 at 20:00 -> 12:00
+                if ref_h - 20 >= h:
+                    h += 20
+                else:
+                    h += 10
+            elif ref_h >= 10:
+                # reference time 10:00:00 - 19:59:59
+                # 02:00 at 13:00 -> 12:00
+                # 02:00 at 10:00 -> 02:00 (no change)
+                if ref_h - 10 >= h:
+                    h += 10
+            elif ref_h < 10:
+                # reference time 00:00:00 - 09:59:59
+                # 02:00 at 03:00 -> 02:00 (no change)
+                # 02:00 at 00:00 -> 22:00
+                # 04:00 at 03:00 -> 14:00
+                if ref_h < h:
+                    if h < 4:
+                        h += 20
+                    else:
+                        h += 10
+
+            ret = datetime(
+                minute=m, second=s, hour=h, day=now.day, month=now.month, year=now.year, microsecond=ssec * 100000
             )
             return ret
         return None
