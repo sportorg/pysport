@@ -2,7 +2,7 @@ import logging
 
 from sportorg.common.otime import OTime
 from sportorg.models.constant import RankingTable
-from sportorg.models.memory import Group, Qualification, RaceType, RelayTeam, find, ResultStatus
+from sportorg.models.memory import Group, Qualification, RaceType, RelayTeam, find, ResultStatus, Person
 from sportorg.modules.configs.configs import Config
 
 
@@ -15,6 +15,12 @@ class ResultCalculation(object):
         self.race.relay_teams.clear()
         for person in self.race.persons:
             person.result_count = 0
+            if person.start_time and person.group:
+                if person.group.pursuit_start_time != OTime():
+                    person.group.pursuit_start_time = min(person.start_time, person.group.pursuit_start_time)
+                else:
+                    person.group.pursuit_start_time = person.start_time
+
         for result in self.race.results:
             if result.person:
                 result.person.result_count += 1

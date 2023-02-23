@@ -66,7 +66,7 @@ class _TitleType(Enum):
 class RaceType(_TitleType):
     INDIVIDUAL_RACE = 0
     # MASS_START = 1
-    # PURSUIT = 2
+    PURSUIT = 2
     RELAY = 3
     # ONE_MAN_RELAY = 4
     # SPRINT_RELAY = 5
@@ -284,6 +284,7 @@ class Group(Model):
         self.first_number = 0
         self.count_person = 0
         self.count_finished = 0
+        self.pursuit_start_time = OTime()
 
         self.ranking = Ranking()
         self.__type = None  # type: RaceType
@@ -681,6 +682,11 @@ class Result:
         return OTime(msec=ret_ms).round(time_accuracy, TimeRounding[time_rounding])
 
     def get_start_time(self):
+        if self.person and self.person.group:
+            group = self.person.group
+            if group.get_type() == RaceType.PURSUIT:
+                return group.pursuit_start_time
+
         if self.start_time and self.start_time.to_msec():
             return self.start_time
         if self.person and self.person.start_time and self.person.start_time.to_msec():
@@ -819,6 +825,12 @@ class ResultSportident(Result):
 
     def get_start_time(self):
         obj = race()
+
+        if self.person and self.person.group:
+            group = self.person.group
+            if group.get_type() == RaceType.PURSUIT:
+                return group.pursuit_start_time
+
         start_source = obj.get_setting('system_start_source', 'protocol')
         if start_source == 'protocol':
             if (
