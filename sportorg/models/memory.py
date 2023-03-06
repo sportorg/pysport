@@ -70,6 +70,7 @@ class RaceType(_TitleType):
     RELAY = 3
     # ONE_MAN_RELAY = 4
     # SPRINT_RELAY = 5
+    MULTI_DAY_RACE = 6
 
 
 class ResultStatus(_TitleType):
@@ -459,6 +460,9 @@ class Result:
         self.__start_time = None
         self.__finish_time = None
 
+        self.current_result = None  # Keep current day result (multi day), general result will have sum
+        self.qty_ok_days = 0  # Quantity of multi day finishes with OK status
+
         self.order = 0  # Order number, introduced in 1.6, needed for result templates to sort results correctly
 
     def __str__(self):
@@ -495,6 +499,10 @@ class Result:
             return self.status.value > other.status.value
 
         if race().get_setting('result_processing_mode', 'time') == 'time':
+            if self.get_result_otime() == OTime() and other.get_result_otime() > OTime():
+                return True
+            if self.get_result_otime() > OTime() and other.get_result_otime() == OTime():
+                return False
             return self.get_result_otime() > other.get_result_otime()
         else:  # process by score (rogain)
             if self.scores_rogain == other.scores_rogain:
@@ -664,6 +672,18 @@ class Result:
         return self.status, ret.to_msec()
 
     def get_result_otime(self):
+        race_type = RaceType.INDIVIDUAL_RACE
+        if self.person and self.person.group:
+            race_type = self.person.group.race_type
+
+        if race_type == RaceType.INDIVIDUAL_RACE:
+            return self.get_result_otime_current_day()
+        if race_type == RaceType.MULTI_DAY_RACE:
+            return self.get_result_otime_multi_day()
+        if race_type == RaceType.RELAY:
+            return self.get_result_otime_relay()
+
+    def get_result_otime_current_day(self):
         time_accuracy = race().get_setting('time_accuracy', 0)
         time_rounding = race().get_setting('time_rounding', 'math')
         ret_ms = self.get_finish_time().to_msec() - self.get_start_time().to_msec()
@@ -680,6 +700,26 @@ class Result:
         ret_ms += self.get_penalty_time().to_msec()
         ret_ms -= self.get_credit_time().to_msec()
         return OTime(msec=ret_ms).round(time_accuracy, TimeRounding[time_rounding])
+
+    def get_result_otime_multi_day(self):
+        person_id = self.person.multi_day_id
+        sum_result = OTime()
+        for day in races():
+            result_found = False
+            for result in day.results:
+                assert isinstance(result, Result)
+                if result.person and result.person.multi_day_id == person_id:
+                    if result.is_status_ok():
+                        sum_result += result.get_result_otime_current_day()
+                        result_found = True
+                        continue
+                    else:
+                        self.status = ResultStatus.DISQUALIFIED
+                        return OTime()  # DSQ/DNS
+            if not result_found:
+                self.status = ResultStatus.DISQUALIFIED
+                return OTime()  # result not found in that day
+        return sum_result
 
     def get_start_time(self):
         if self.person and self.person.group:
@@ -1162,6 +1202,13 @@ class Person(Model):
         if surname:
             surname += ' '
         return '{}{}'.format(surname, self.name)
+
+    @property
+    def multi_day_id(self):
+        if self.group:
+            return self.full_name + " " + self.group.name
+        else:
+            return self.full_name
 
     def to_dict(self):
         return {

@@ -1538,3 +1538,6 @@ msgstr "Не финишировали"
 
 msgid "Diff"
 msgstr "Отставание"
+
+msgid "Result day/leg"
+msgstr "Текущий день/этап"
