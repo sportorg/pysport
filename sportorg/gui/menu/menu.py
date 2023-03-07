@@ -245,6 +245,10 @@ def menu_list():
                     'title': translate('Use card number as bib'),
                     'action': 'CopyCardNumberToBib',
                 },
+                {
+                    'title': translate('Marked route course generation'),
+                    'action': 'MarkedRouteCourseGeneration',
+                },
             ],
         },
         {

@@ -17,6 +17,7 @@ from sportorg.gui.dialogs.event_properties import EventPropertiesDialog
 from sportorg.gui.dialogs.file_dialog import get_open_file_name, get_save_file_name
 from sportorg.gui.dialogs.group_mass_edit import GroupMassEditDialog
 from sportorg.gui.dialogs.live_dialog import LiveDialog
+from sportorg.gui.dialogs.marked_route_dialog import MarkedRouteDialog
 from sportorg.gui.dialogs.merge_results import MergeResultsDialog
 from sportorg.gui.dialogs.not_start_dialog import NotStartDialog
 from sportorg.gui.dialogs.number_change import NumberChangeDialog
@@ -828,4 +829,10 @@ class ImportSportOrgAction(Action, metaclass=ActionFactory):
 class RentCardsAction(Action, metaclass=ActionFactory):
     def execute(self):
         RentCardsDialog().exec_()
+        self.app.refresh()
+
+
+class MarkedRouteCourseGeneration(Action, metaclass=ActionFactory ):
+    def execute(self):
+        MarkedRouteDialog().exec_()
         self.app.refresh()
