@@ -1,8 +1,7 @@
 import logging
 
 from sportorg.common.otime import OTime
-from sportorg.models.constant import StatusComments
-from sportorg.models.memory import Person, ResultStatus, find, race
+from sportorg.models.memory import Person, ResultStatus, find, race, Result
 
 
 class ResultCheckerException(Exception):
@@ -54,14 +53,13 @@ class ResultChecker:
             result.status = ResultStatus.OK
             if not o.check_result(result):
                 result.status = ResultStatus.MISSING_PUNCH
-                if not result.status_comment:
-                    result.status_comment = StatusComments().remove_hint(
-                        StatusComments().get()
-                    )
+                result.status_comment = "п.п.3.13.12.2"
+
             elif result.person.group and result.person.group.max_time.to_msec():
                 if result.get_result_otime() > result.person.group.max_time:
                     if race().get_setting('result_processing_mode', 'time') == 'time':
                         result.status = ResultStatus.OVERTIME
+                        result.status_comment = "п.п.5.4.7"
 
         return o
 
@@ -108,6 +106,9 @@ class ResultChecker:
 
         if mode == 'laps':
             result.penalty_laps = penalty
+            if result.status == ResultStatus.OK:
+                ResultChecker.marked_route_check_penalty_laps(result)
+
         elif mode == 'time':
             time_for_one_penalty = OTime(
                 msec=race().get_setting('marked_route_penalty_time', 60000)
@@ -260,3 +261,24 @@ class ResultChecker:
         if ret < 0:
             ret = 0
         return ret
+
+    @staticmethod
+    def marked_route_check_penalty_laps(result: Result):
+        obj = race()
+
+        mr_if_counting_lap = obj.get_setting('marked_route_if_counting_lap', False)
+        mr_if_station_check = obj.get_setting('marked_route_if_station_check', False)
+        mr_station_code = obj.get_setting('marked_route_station_code', 0)
+
+        if mr_if_station_check and int(mr_station_code) > 0:
+            count_laps = 0
+            if mr_if_counting_lap:
+                count_laps = -1
+
+            for split in result.splits:
+                if str(split.code) == str(mr_station_code):
+                    count_laps += 1
+
+            if count_laps < result.penalty_laps:
+                result.status = ResultStatus.MISSING_PUNCH
+                result.status_comment = "п.п.4.6.12.7"

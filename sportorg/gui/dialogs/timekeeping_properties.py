@@ -184,10 +184,8 @@ class TimekeepingPropertiesDialog(QDialog):
         self.mr_laps_radio = QRadioButton(translate('penalty laps'))
         self.mr_layout.addRow(self.mr_laps_radio)
         self.mr_counting_lap_check = QCheckBox(translate('counting lap'))
-        self.mr_counting_lap_check.setDisabled(True)  # TODO
         self.mr_layout.addRow(self.mr_counting_lap_check)
         self.mr_lap_station_check = QCheckBox(translate('lap station'))
-        self.mr_lap_station_check.setDisabled(True)  # TODO
         self.mr_lap_station_edit = AdvSpinBox(max_width=50)
         self.mr_layout.addRow(self.mr_lap_station_check, self.mr_lap_station_edit)
         self.mr_dont_dqs_check = QCheckBox(translate("Don't disqualify"))
