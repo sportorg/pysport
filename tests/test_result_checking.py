@@ -1,3 +1,4 @@
+from itertools import zip_longest
 from typing import List, Union
 
 from sportorg.models.memory import (
@@ -7,67 +8,6 @@ from sportorg.models.memory import (
     ResultSportident,
     Split,
 )
-
-
-def make_course(course: List[Union[int, str]]) -> Course:
-    course_object = Course()
-    course_object.controls = [make_course_control(code) for code in course]
-    return course_object
-
-def make_course_control(code: Union[int, str]) -> CourseControl:
-    control = CourseControl()
-    control.update_data({'code': code, 'length': 0})
-    return control
-
-def make_result(splits: List[int]) -> ResultSportident:
-    result = ResultSportident()
-    result.person = Person()
-    result.splits = [make_split_control(code) for code in splits]
-    return result
-
-def make_split_control(code: int) -> Split:
-    split = Split()
-    split.update_data({'code': code, 'time': 0})
-    return split
-
-def check(course: List[Union[int, str]], splits: List[int]) -> bool:
-    result = make_result(splits)
-    course_object = make_course(course)
-    return result.check(course_object)
-
-def ok(course: List[Union[int, str]], splits: List[int]) -> bool:
-    '''Проверка отметки: результат засчитан
-
-    Parameters
-    ----------
-    course : List[Union[int, str]]
-        Порядок прохождения дистанции
-    splits : List[int]
-        Отметки спортсмена на дистанции
-
-    Returns
-    -------
-    bool
-        Возвращает True если отметка признана правильной
-    '''
-    return check(course, splits)
-
-def dsq(course: List[Union[int, str]], splits: List[int]) -> bool:
-    '''Проверка отметки: результат не засчитан, нарушение порядка прохождения дистанции
-
-    Parameters
-    ----------
-    course : List[Union[int, str]]
-        Порядок прохождения дистанции
-    splits : List[int]
-        Отметки спортсмена на дистанции
-
-    Returns
-    -------
-    bool
-        Возвращает True если отметка признана неправильной
-    '''
-    return not check(course, splits)
 
 
 def test_controls_as_int():
@@ -472,3 +412,163 @@ def test_non_obvious_behavior():
     assert result.check(make_course(course)) == True
     assert result.splits[0].is_correct == True
     assert result.splits[0].has_penalty == True
+
+
+def ok(course: List[Union[int, str]], splits: List[int]) -> bool:
+    '''Проверка отметки: результат засчитан
+
+    Parameters
+    ----------
+    course : List[Union[int, str]]
+        Порядок прохождения дистанции
+    splits : List[int]
+        Отметки спортсмена на дистанции
+
+    Returns
+    -------
+    bool
+        Возвращает True если отметка признана правильной
+    '''
+    return check(course, splits, True)
+
+
+def dsq(course: List[Union[int, str]], splits: List[int]) -> bool:
+    '''Проверка отметки: результат не засчитан, нарушение порядка прохождения дистанции
+
+    Parameters
+    ----------
+    course : List[Union[int, str]]
+        Порядок прохождения дистанции
+    splits : List[int]
+        Отметки спортсмена на дистанции
+
+    Returns
+    -------
+    bool
+        Возвращает True если отметка признана неправильной
+    '''
+    return not check(course, splits, False)
+
+
+def check(
+    course: List[Union[int, str]],
+    splits: List[int],
+    expected: bool = True
+) -> bool:
+    """Проверка отметки и создание исключения при отклонении от ожидания.
+
+    Parameters
+    ----------
+    course : List[Union[int, str]]
+        Порядок прохождения дистанции
+    splits : List[int]
+        Отметки спортсмена на дистанции
+    expected: bool,
+        Ожидаемый результат проверки. По умолчанию True
+
+    Returns
+    -------
+    bool
+        Возвращает результат проверки если он совпадает с ожидаемым исходом
+    """
+    result = make_result(splits)
+    course_object = make_course(course)
+    check_result = result.check(course_object)
+
+    if check_result != expected:
+        message = exception_message(
+            course=course,
+            splits=splits,
+            check_result_expected=expected,
+            check_result_received=check_result
+        )
+        raise ValueError(message)
+
+    return check_result
+
+
+def make_course(course: List[Union[int, str]]) -> Course:
+    course_object = Course()
+    course_object.controls = make_course_controls(course)
+    return course_object
+
+
+def make_course_controls(course: List[Union[int, str]]) -> List[CourseControl]:
+    return [make_course_control(code) for code in course]
+
+
+def make_course_control(code: Union[int, str]) -> CourseControl:
+    control = CourseControl()
+    control.update_data({'code': code, 'length': 0})
+    return control
+
+
+def make_result(splits: List[int]) -> ResultSportident:
+    result = ResultSportident()
+    result.person = Person()
+    result.splits = [make_split_control(code) for code in splits]
+    return result
+
+
+def make_split_control(code: int) -> Split:
+    split = Split()
+    split.update_data({'code': code, 'time': 0})
+    return split
+
+
+def exception_message(
+    course: List[Union[int, str]],
+    splits: List[int],
+    check_result_expected: bool,
+    check_result_received: bool
+) -> str:
+    """Формирование отладочного сообщения при создании исключения. Отладочное 
+    сообщение содержит сравнение дистанции и отметок и причину несоответствия.
+
+    Parameters
+    ----------
+    course : List[Union[int, str]]
+        Порядок прохождения дистанции
+    splits : List[int]
+        Отметки спортсмена на дистанции
+    result_status_expected : bool,
+        Ожидаемый результат проверки.
+    result_status_received : bool,
+        Полученный результат проверки.
+
+    Returns
+    -------
+    str
+        Строка отладочного сообщения
+    """
+    message = 'Check failed'
+    message += '\n' + split_and_course_repr(course, splits)
+    if check_result_expected != check_result_received:
+        message += '\n' + f'Result status failed!'
+        message += '\n' + f'Expected: {check_result_expected}'
+        message += '\n' + f'Received: {check_result_received}'
+    return message
+
+
+def split_and_course_repr(course: List[Union[int, str]], splits: List[int]) -> str:
+    """Формирование строки для визуального сравнения отметок и дистанции.
+    Spl  Crs
+     31  31
+     41  41
+     52  51(51,52)
+
+    Parameters
+    ----------
+    course : List[Union[int, str]]
+        Порядок прохождения дистанции
+    splits : List[int]
+        Отметки спортсмена на дистанции
+
+    Returns
+    -------
+    str
+        Строка со сравнением отметок и дистанции
+    """
+    spl = ['Spl'] + splits
+    crs = ['Crs'] + course
+    return '\n'.join([f'{s:3}  {c}' for s, c in zip_longest(spl, crs, fillvalue='')])

@@ -18,7 +18,7 @@ from sportorg.models.result.result_checker import ResultChecker
 
 
 # Настройки проверки отметки, относящиеся к маркированной трассе.
-# marked_route_mode [str] - режим начисления штрафа. Допустимые начения:
+# marked_route_mode [str] - режим начисления штрафа. Допустимые значения:
 #   'off' - штраф не начисляется
 #   'time' - начисляется штрафное время
 #   'laps' - начисляются штрафные круги
@@ -256,7 +256,7 @@ def test_non_obvious_behavior():
 
     # Различие в обработке двух случаев. Тестовый случай:
     # 1) Спортсмен пропустил нужный КП -> получает штраф
-    # 2) Спортсмен пропустил нужный КП, но отметился на чужом -> нет штрфа
+    # 2) Спортсмен пропустил нужный КП, но отметился на чужом -> нет штрафа
     # Должен быть одинаковый штраф. Или начисляться за каждый лишний КП.
     # Но лишние отметки в чипе не должны уменьшать количество штрафа.
     # Да, по результатам проверки спортсмен снят. Но его могут восстановить
@@ -331,7 +331,7 @@ def check(
     penalty: int = 0,
 ) -> Tuple[bool, bool]:
     """Проверка отметки с начислением штрафа. Параметры проверки задаются
-    заранее и хранятся в объекте race().get_setings().
+    заранее и хранятся в объекте race().get_settings().
 
     Parameters
     ----------
@@ -361,13 +361,13 @@ def check(
     check_result = result.status == result_status, result_penalty == penalty
 
     if not all(check_result):
-        message = exceprion_message(
+        message = exception_message(
             course=course,
             splits=splits,
             result_status_expected=result_status,
-            result_status_recieved=result.status,
+            result_status_received=result.status,
             penalty_expected=penalty,
-            penalty_recieved=result_penalty)
+            penalty_received=result_penalty)
         raise ValueError(message)
 
     return check_result
@@ -417,13 +417,13 @@ def get_penalty(result: ResultSportident) -> int:
         return 0
 
 
-def exceprion_message(
+def exception_message(
     course: List[Union[int, str]],
     splits: List[int],
     result_status_expected: ResultStatus,
-    result_status_recieved: ResultStatus,
+    result_status_received: ResultStatus,
     penalty_expected: int,
-    penalty_recieved: int
+    penalty_received: int
 ) -> str:
     """Формирование отладочного сообщения при создании исключения. Отладочное 
     сообщение содержит сравнение дистанции и отметок и причину несоответствия.
@@ -436,11 +436,11 @@ def exceprion_message(
         Отметки спортсмена на дистанции
     result_status_expected : ResultStatus,
         Ожидаемый результат проверки.
-    result_status_recieved : ResultStatus,
+    result_status_received : ResultStatus,
         Полученный результат проверки.
     penalty_expected : int
         Ожидаемое количество штрафа.
-    penalty_recieved : int
+    penalty_received : int
         Полученное количество штрафа.
 
     Returns
@@ -450,14 +450,14 @@ def exceprion_message(
     """
     message = 'Check failed'
     message += '\n' + split_and_course_repr(course, splits)
-    if result_status_expected != result_status_recieved:
+    if result_status_expected != result_status_received:
         message += '\n' + f'Result status failed!'
         message += '\n' + f'Expected: {result_status_expected}'
-        message += '\n' + f'Recieved: {result_status_recieved}'
-    if penalty_expected != penalty_recieved:
+        message += '\n' + f'Received: {result_status_received}'
+    if penalty_expected != penalty_received:
         message += '\n' + f'Penalty failed!'
         message += '\n' + f'Expected: {penalty_expected}'
-        message += '\n' + f'Recieved: {penalty_recieved}'
+        message += '\n' + f'Received: {penalty_received}'
     return message
 
 
