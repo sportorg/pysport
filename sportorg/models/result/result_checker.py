@@ -217,7 +217,7 @@ class ResultChecker:
             if not i.has_penalty:
                 correct_count += 1
 
-        res += len(controls) - correct_count
+        res += max(len(controls) - correct_count, 0)
 
         return res
 
