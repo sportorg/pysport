@@ -438,15 +438,6 @@ class MainWindow(QMainWindow):
             table = self.get_organization_table()
             table.setModel(OrganizationMemoryModel())
 
-            if race().get_setting('marked_route_mode', 'off') != 'off':
-                for result in race().results:
-                    if result.person:
-                        ResultChecker.calculate_penalty(result)
-                logging.debug('Penalty calculation finish')
-
-            ResultCalculation(race()).process_results()
-            self.app.refresh()
-
             Broker().produce('init_model')
         except Exception as e:
             logging.error(str(e))

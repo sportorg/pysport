@@ -69,6 +69,7 @@ class ResultChecker:
         for result in race().results:
             if result.person:
                 ResultChecker.checking(result)
+                ResultChecker.calculate_penalty(result)
 
     @staticmethod
     def calculate_penalty(result):
