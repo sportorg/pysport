@@ -176,7 +176,8 @@ def create(requests, url, data, race_data, log):
     persons = []
     for item in data:
         if item['object'] == 'Person':
-            persons.append(_get_person_obj(item, race_data))
+            result_data = _get_result_by_person(item, race_data)
+            persons.append(_get_person_obj(item, race_data, result_data))
         if item['object'] == 'Group':
             group_i += 1
             for person_data in race_data['persons']:
