@@ -103,7 +103,15 @@ def _get_person_obj(data, race_data, result=None):
         'world_code': None,
         'out_of_competition': data['is_out_of_competition'],
         'start': round(data['start_time'] / 1000) if data['start_time'] else 0,
+        'year': data['year'],
     }
+
+    # TODO
+    if 'email' in data:
+        obj['email'] = data['email']
+    if 'phone' in data:
+        obj['phone'] = data['phone']
+
     is_relay = group and group['__type'] == 3 or race_data['data']['race_type'] == 3
     if is_relay:
         # send relay fields only for relay events (requested by Ivan Churakoff)
@@ -150,6 +158,15 @@ def _get_person_obj(data, race_data, result=None):
                     start_time = result['start_msec']
                 current_split['time'] = round((end_time - start_time) / 1000)
                 obj['splits'].append(current_split)
+
+            # add split from last control (or start if no splits) to finish
+            end_time = result['finish_msec']
+            start_time = result['start_msec']
+            if len(splits) > 0:
+                start_time = splits[-1]['time'] or 0
+            current_split = {'code': 'FIN', 'time': round((end_time - start_time) / 1000)}
+            obj['splits'].append(current_split)
+
     return obj
 
 
