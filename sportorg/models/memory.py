@@ -33,6 +33,7 @@ class SystemType(Enum):
     SFR = 3
     SPORTIDUINO = 4
     RFID_IMPINJ = 5
+    SRPID = 6
 
     def __str__(self):
         return self._name_
@@ -542,10 +543,12 @@ class Result:
             'created_at': self.created_at,  # readonly
             'result': self.get_result(),  # readonly
             'result_relay': self.get_result_relay(),
+            'result_current': self.get_result_otime_current_day().to_str(),
             'start_msec': self.get_start_time().to_msec(),  # readonly
             'finish_msec': self.get_finish_time().to_msec(),  # readonly
             'result_msec': self.get_result_otime().to_msec(),  # readonly
             'result_relay_msec': self.get_result_otime_relay().to_msec(),  # readonly
+            'result_current_msec': self.get_result_otime_current_day().to_msec(),  # readonly
             'can_win_count': self.can_win_count,
             'final_result_time': self.final_result_time.to_str()
             if self.final_result_time
@@ -786,7 +789,11 @@ class Result:
         return self.status == ResultStatus.OK or self.status == ResultStatus.RESTORED
 
     def is_punch(self):
-        return self.is_sportident() or self.is_sfr() or self.is_sportiduino() or self.is_rfid_impinj()
+        return self.is_sportident() \
+            or self.is_sfr() \
+            or self.is_sportiduino() \
+            or self.is_rfid_impinj() \
+            or self.is_srpid()
 
     def is_sportident(self):
         return self.system_type == SystemType.SPORTIDENT
@@ -799,6 +806,9 @@ class Result:
 
     def is_rfid_impinj(self):
         return self.system_type == SystemType.RFID_IMPINJ
+
+    def is_srpid(self):
+        return self.system_type == SystemType.SRPID
 
     def is_manual(self):
         return self.system_type == SystemType.MANUAL
@@ -1139,6 +1149,10 @@ class ResultSportiduino(ResultSportident):
 
 class ResultRfidImpinj(ResultSportident):
     system_type = SystemType.RFID_IMPINJ
+
+
+class ResultSrpid(ResultSportident):
+    system_type = SystemType.SRPID
 
 
 class Person(Model):

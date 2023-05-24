@@ -63,6 +63,7 @@ from sportorg.modules.rfid_impinj.rfid_impinj import ImpinjClient
 from sportorg.modules.sfr.sfrreader import SFRReaderClient
 from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.modules.sportiduino.sportiduino import SportiduinoClient
+from sportorg.modules.srpid.srpid import SrpidClient
 from sportorg.modules.teamwork import Teamwork
 from sportorg.modules.telegram.telegram import telegram_client
 from sportorg.modules.updater import checker
@@ -513,6 +514,14 @@ class ImpinjReadoutAction(Action, metaclass=ActionFactory):
         ImpinjClient().toggle()
         time.sleep(0.5)
         self.app.interval()
+
+
+class SrpidReadoutAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        SrpidClient().toggle()
+        time.sleep(0.5)
+        self.app.interval()
+
 
 class SFRReadoutAction(Action, metaclass=ActionFactory):
     def execute(self):

@@ -49,6 +49,7 @@ from sportorg.gui.utils.custom_controls import messageBoxQuestion
 from sportorg.language import translate
 from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.modules.sportiduino.sportiduino import SportiduinoClient
+from sportorg.modules.srpid.srpid import SrpidClient
 from sportorg.modules.telegram.telegram import telegram_client
 from sportorg.modules.teamwork import Teamwork, ObjectTypes
 from sportorg.modules.live.live import LiveClient
@@ -66,7 +67,12 @@ class ConsolePanelHandler(logging.Handler):
 
 
 def is_reading_active():
-    return SIReaderClient().is_alive() or SFRReaderClient().is_alive() or ImpinjClient().is_alive()
+    return SIReaderClient().is_alive() \
+        or SFRReaderClient().is_alive() \
+        or ImpinjClient().is_alive() \
+        or SportiduinoClient().is_alive() \
+        or SrpidClient().is_alive() \
+
 
 
 class MainWindow(QMainWindow):
@@ -244,6 +250,7 @@ class MainWindow(QMainWindow):
         SportiduinoClient().set_call(self.add_sportiduino_result_from_reader)
         ImpinjClient().set_call(self.add_impinj_result_from_reader)
         SFRReaderClient().set_call(self.add_sfr_result_from_reader)
+        SrpidClient().set_call(self.add_srpid_result_from_reader)
 
         self.service_timer = QTimer(self)
         self.service_timer.timeout.connect(self.interval)
@@ -633,6 +640,9 @@ class MainWindow(QMainWindow):
         self.add_sportident_result_from_sireader(result)
 
     def add_impinj_result_from_reader(self, result):
+        self.add_sportident_result_from_sireader(result)
+
+    def add_srpid_result_from_reader(self, result):
         self.add_sportident_result_from_sireader(result)
 
     # Actions

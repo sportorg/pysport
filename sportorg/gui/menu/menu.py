@@ -356,6 +356,11 @@ def menu_list():
                     'action': 'ImpinjReadoutAction'
                 },
                 {
+                    'title': translate('on/off SRPid readout'),
+                    'icon': config.icon_dir('srpid.png'),
+                    'action': 'SrpidReadoutAction'
+                },
+                {
                    'title': translate('Teamwork'),
                    'icon': config.icon_dir('network.svg'),
                    'actions': [
