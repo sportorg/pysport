@@ -33,7 +33,7 @@ class SrpidThread(QThread):
         try:
             srpid = SRPid(port=self.port, debug=True, logger=logging.root)
         except Exception as e:
-            self._logger.error(str(e))
+            self._logger.exception(e)
             return
 
         while True:
@@ -48,12 +48,12 @@ class SrpidThread(QThread):
                 self._queue.put(SrpidCommand('card_data', card_data), timeout=1)
                 srpid.beep_ok()
             except SRPidException as e:
-                self._logger.error(str(e))
+                self._logger.exception(e)
             except serial.serialutil.SerialException as e:
-                self._logger.error(str(e))
+                self._logger.exception(e)
                 return
             except Exception as e:
-                self._logger.error(str(e))
+                self._logger.exception(e)
 
 
 class ResultThread(QThread):
@@ -74,12 +74,12 @@ class ResultThread(QThread):
                 if cmd.command == 'card_data':
                     result = self._get_result(cmd.data)
                     self.data_sender.emit(result)
-                    backup.backup_data(cmd.data)
+                    backup.backup_data(convert_data(cmd.data))
             except Empty:
                 if not main_thread().is_alive() or self._stop_event.is_set():
                     break
             except Exception as e:
-                self._logger.error(str(e))
+                self._logger.exception(e)
                 raise e
         self._logger.debug('Stop adder result')
 
@@ -181,3 +181,19 @@ class SrpidClient(object):
 
     def choose_port(self):
         return memory.race().get_setting('system_port', None)
+
+
+def convert_data(data):
+    # convert SRpid data to classic SPORTident-like data
+    # ChipNum -> card_number
+    # CP -> punches
+
+    new_data = {'card_number': '0', 'punches': {}}
+    if not data:
+        return new_data
+
+    if 'ChipNum' in data:
+        new_data['card_number'] = data['ChipNum']
+    if 'CP' in data:
+        new_data['punches'] = data['CP']
+    return new_data
