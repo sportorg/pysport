@@ -27,7 +27,7 @@ def format_string_to_bytes(string, length):
     """
     if string is None:
         string = ''
-    ret = bytearray(string, get_wdb_encoding())
+    ret = bytearray(string, get_wdb_encoding(), 'replace')
     if len(string) > length:
         return ret[0:length]
     for i in range(len(string), length):
@@ -164,7 +164,7 @@ class WDBChip:
             punch_limit = 64
         for i in range(punch_limit):
             new_obj = WDBPunch()
-            new_obj.parse_bytes(byte_array[44 + i * 8 : 52 + i * 8])
+            new_obj.parse_bytes(byte_array[44 + i * 8: 52 + i * 8])
             self.punch.append(new_obj)
 
     def get_bytes(self, is_new_format=True):
@@ -272,9 +272,9 @@ class WDBDistance:
         self.point.clear()
         self.leg.clear()
         for i in range(max_point_qty):
-            self.point.append(int.from_bytes(byte_array[16 + i : 17 + i], byteorder))
+            self.point.append(int.from_bytes(byte_array[16 + i: 17 + i], byteorder))
             self.leg.append(
-                int.from_bytes(byte_array[116 + i * 2 : 118 + i * 2], byteorder)
+                int.from_bytes(byte_array[116 + i * 2: 118 + i * 2], byteorder)
             )
         self.length = int.from_bytes(byte_array[316:320], byteorder)
         self.corridor = int.from_bytes(byte_array[320:324], byteorder)
@@ -640,7 +640,7 @@ class WDBInfo:
 
         self.title.clear()
         for i in range(10):
-            self.title.append(encode(byte_array[i * 80 : (i + 1) * 80]))
+            self.title.append(encode(byte_array[i * 80: (i + 1) * 80]))
         self.place = encode(byte_array[800:825])
         self.secretary = encode(byte_array[825:850])
         self.referee = encode(byte_array[850:875])
@@ -649,7 +649,7 @@ class WDBInfo:
         self.relay_type = int.from_bytes(byte_array[897:898], byteorder)
         for i in range(4):
             self.distance_service.append(
-                encode(byte_array[898 + i * 25 : 923 + i * 25])
+                encode(byte_array[898 + i * 25: 923 + i * 25])
             )
         self.team_filer = int.from_bytes(byte_array[998:1000], byteorder)
         self.group_filter = int.from_bytes(byte_array[1000:1002], byteorder)
@@ -738,10 +738,10 @@ class WDBInfo:
         dsq_size = 12
         for i in range(dsq_count):
             self.dsq_reason.append(
-                encode(byte_array[1137 + i * dsq_size : 1137 + i * dsq_size + dsq_size])
+                encode(byte_array[1137 + i * dsq_size: 1137 + i * dsq_size + dsq_size])
             )
             self.dsq_text.append(
-                encode(byte_array[1245 + i * dsq_size : 1245 + i * dsq_size + dsq_size])
+                encode(byte_array[1245 + i * dsq_size: 1245 + i * dsq_size + dsq_size])
             )
         self.note = encode(byte_array[1353:1453])
         self.is_print_note = byte_array[1453] == 0x01
@@ -750,7 +750,7 @@ class WDBInfo:
         self.reserve.clear()
         for i in range(10):
             self.reserve.append(
-                int.from_bytes(byte_array[1456 + i : 1457 + i], byteorder)
+                int.from_bytes(byte_array[1456 + i: 1457 + i], byteorder)
             )
         self.online_url = encode(byte_array[1466:1525])
         self.server_name = encode(byte_array[1526:1540])
@@ -768,7 +768,7 @@ class WDBInfo:
             string = ''
             if len(self.title) > i:
                 string = self.title[i]
-            ret[i * 80 : (i + 1) * 80] = format_string_to_bytes(string, 80)
+            ret[i * 80: (i + 1) * 80] = format_string_to_bytes(string, 80)
         ret[800:825] = format_string_to_bytes(self.place, 25)
         ret[825:850] = format_string_to_bytes(self.referee, 25)
         ret[850:875] = format_string_to_bytes(self.secretary, 25)
@@ -780,7 +780,7 @@ class WDBInfo:
             string = ''
             if len(self.distance_service) > i:
                 string = self.distance_service[i]
-            ret[898 + i * obj_size : 898 + (i + 1) * obj_size] = format_string_to_bytes(
+            ret[898 + i * obj_size: 898 + (i + 1) * obj_size] = format_string_to_bytes(
                 string, obj_size
             )
         ret[998:1000] = self.filter_team.to_bytes(2, byteorder)
@@ -862,7 +862,7 @@ class WDBInfo:
             cur_object = True
             if len(self.multi_day) > i:
                 cur_object = self.multi_day[i]
-            ret[1124 + i : 1125 + i] = cur_object.to_bytes(1, byteorder)
+            ret[1124 + i: 1125 + i] = cur_object.to_bytes(1, byteorder)
 
         ret[1134:1135] = self.is_print_relay_number_dashed.to_bytes(1, byteorder)
         ret[1135:1136] = self.is_si_usb.to_bytes(1, byteorder)
@@ -875,10 +875,10 @@ class WDBInfo:
                 dsq_reason = self.dsq_reason[i]
                 dsq_text = self.dsq_text[i]
             ret[
-                1137 + i * obj_size : 1137 + (i + 1) * obj_size
+                1137 + i * obj_size: 1137 + (i + 1) * obj_size
             ] = format_string_to_bytes(dsq_reason, obj_size)
             ret[
-                1245 + i * obj_size : 1245 + (i + 1) * obj_size
+                1245 + i * obj_size: 1245 + (i + 1) * obj_size
             ] = format_string_to_bytes(dsq_text, obj_size)
         ret[1353:1453] = format_string_to_bytes(self.note, 100)
         ret[1453:1454] = self.is_print_note.to_bytes(1, byteorder)
@@ -888,7 +888,7 @@ class WDBInfo:
             cur_object = 0
             if len(self.reserve) > i:
                 cur_object = self.reserve[i]
-            ret[1456 + i : 1457 + i] = cur_object.to_bytes(1, byteorder)
+            ret[1456 + i: 1457 + i] = cur_object.to_bytes(1, byteorder)
         ret[1466:1525] = format_string_to_bytes(self.online_url, 59)
         ret[1526:1540] = format_string_to_bytes(self.server_name, 14)
         ret[1541:1542] = self.server_sending_mode.to_bytes(1, byteorder)
@@ -995,7 +995,7 @@ class WDB:
         #  reading of man objects - int (4 bytes) of quantity + set of 196 byte blocks
         object_size = 196
         initial_start = 4
-        qty = int.from_bytes(byte_array[initial_start : initial_start + 4], byteorder)
+        qty = int.from_bytes(byte_array[initial_start: initial_start + 4], byteorder)
         initial_start += 4
         end_pos = initial_start
         self.man.clear()
@@ -1012,7 +1012,7 @@ class WDB:
         # reading of team objects - int (4 bytes) of quantity + set of 56 byte blocks
         object_size = 56
         initial_start = end_pos
-        qty = int.from_bytes(byte_array[initial_start : initial_start + 4], byteorder)
+        qty = int.from_bytes(byte_array[initial_start: initial_start + 4], byteorder)
         initial_start += 4
         end_pos = initial_start
         self.team.clear()
@@ -1029,7 +1029,7 @@ class WDB:
         # reading of group objects - int (4 bytes) of quantity + set of 36 byte blocks
         object_size = 36
         initial_start = end_pos
-        qty = int.from_bytes(byte_array[initial_start : initial_start + 4], byteorder)
+        qty = int.from_bytes(byte_array[initial_start: initial_start + 4], byteorder)
         initial_start += 4
         end_pos = initial_start
         self.group.clear()
@@ -1047,7 +1047,7 @@ class WDB:
         # reading of course objects - int (4 bytes) of quantity + set of 352 byte blocks
         object_size = 352
         initial_start = end_pos
-        qty = int.from_bytes(byte_array[initial_start : initial_start + 4], byteorder)
+        qty = int.from_bytes(byte_array[initial_start: initial_start + 4], byteorder)
         initial_start += 4
         end_pos = initial_start
         self.dist.clear()
@@ -1074,7 +1074,7 @@ class WDB:
         #  reading of finish objects - int (4 bytes) of quantity + set of 12 byte blocks
         object_size = 12
         initial_start = end_pos
-        qty = int.from_bytes(byte_array[initial_start : initial_start + 4], byteorder)
+        qty = int.from_bytes(byte_array[initial_start: initial_start + 4], byteorder)
         initial_start += 4
         end_pos = initial_start
         self.fin.clear()
@@ -1091,11 +1091,11 @@ class WDB:
         initial_start = end_pos
         si_punch_count = 64  # format changing of 2009/03-2010/09: 64 -> 200 punches + added Adventure block
 
-        qty = int.from_bytes(byte_array[initial_start : initial_start + 4], byteorder)
+        qty = int.from_bytes(byte_array[initial_start: initial_start + 4], byteorder)
         initial_start += 4
         if qty == 0:
             check = int.from_bytes(
-                byte_array[initial_start : initial_start + 4], byteorder
+                byte_array[initial_start: initial_start + 4], byteorder
             )
             if check == 257:
                 si_punch_count = 200
@@ -1119,7 +1119,7 @@ class WDB:
 
                 initial_start = end_pos
             qty = int.from_bytes(
-                byte_array[initial_start : initial_start + 4], byteorder
+                byte_array[initial_start: initial_start + 4], byteorder
             )
             initial_start += 4
 

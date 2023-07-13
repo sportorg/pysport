@@ -33,6 +33,7 @@ class SystemType(Enum):
     SFR = 3
     SPORTIDUINO = 4
     RFID_IMPINJ = 5
+    SRPID = 6
 
     def __str__(self):
         return self._name_
@@ -66,10 +67,11 @@ class _TitleType(Enum):
 class RaceType(_TitleType):
     INDIVIDUAL_RACE = 0
     # MASS_START = 1
-    # PURSUIT = 2
+    PURSUIT = 2
     RELAY = 3
     # ONE_MAN_RELAY = 4
     # SPRINT_RELAY = 5
+    MULTI_DAY_RACE = 6
 
 
 class ResultStatus(_TitleType):
@@ -101,6 +103,7 @@ class Organization(Model):
         self.contact = ''
         self.code = ''
         self.count_person = 0
+        self.count_finished = 0
 
     def __str__(self):
         return self.name
@@ -114,7 +117,8 @@ class Organization(Model):
             'id': str(self.id),
             'name': self.name,
             'country': self.country,
-            'region': self.region,
+            'region': self.region[3:] if
+            self.region and len(self.region) > 3 and self.region[2] == '_' else self.region,
             'contact': self.contact,
             'code': self.code,
             'count_person': self.count_person,  # readonly
@@ -205,6 +209,9 @@ class Course(Model):
         self.count_group = 0
         self.corridor = 0
 
+        self.count_person = 0
+        self.count_finished = 0
+
     def __repr__(self):
         return 'Course {}'.format(self.name)
 
@@ -279,6 +286,7 @@ class Group(Model):
         self.first_number = 0
         self.count_person = 0
         self.count_finished = 0
+        self.pursuit_start_time = OTime()
 
         self.ranking = Ranking()
         self.__type = None  # type: RaceType
@@ -453,6 +461,9 @@ class Result:
         self.__start_time = None
         self.__finish_time = None
 
+        self.current_result = None  # Keep current day result (multi day), general result will have sum
+        self.qty_ok_days = 0  # Quantity of multi day finishes with OK status
+
         self.order = 0  # Order number, introduced in 1.6, needed for result templates to sort results correctly
 
     def __str__(self):
@@ -489,6 +500,10 @@ class Result:
             return self.status.value > other.status.value
 
         if race().get_setting('result_processing_mode', 'time') == 'time':
+            if self.get_result_otime() == OTime() and other.get_result_otime() > OTime():
+                return True
+            if self.get_result_otime() > OTime() and other.get_result_otime() == OTime():
+                return False
             return self.get_result_otime() > other.get_result_otime()
         else:  # process by score (rogain)
             if self.scores_rogain == other.scores_rogain:
@@ -528,10 +543,12 @@ class Result:
             'created_at': self.created_at,  # readonly
             'result': self.get_result(),  # readonly
             'result_relay': self.get_result_relay(),
+            'result_current': self.get_result_otime_current_day().to_str(),
             'start_msec': self.get_start_time().to_msec(),  # readonly
             'finish_msec': self.get_finish_time().to_msec(),  # readonly
             'result_msec': self.get_result_otime().to_msec(),  # readonly
             'result_relay_msec': self.get_result_otime_relay().to_msec(),  # readonly
+            'result_current_msec': self.get_result_otime_current_day().to_msec(),  # readonly
             'can_win_count': self.can_win_count,
             'final_result_time': self.final_result_time.to_str()
             if self.final_result_time
@@ -658,6 +675,18 @@ class Result:
         return self.status, ret.to_msec()
 
     def get_result_otime(self):
+        race_type = RaceType.INDIVIDUAL_RACE
+        if self.person and self.person.group:
+            race_type = self.person.group.race_type
+
+        if race_type == RaceType.INDIVIDUAL_RACE:
+            return self.get_result_otime_current_day()
+        if race_type == RaceType.MULTI_DAY_RACE:
+            return self.get_result_otime_multi_day()
+        if race_type == RaceType.RELAY:
+            return self.get_result_otime_relay()
+
+    def get_result_otime_current_day(self):
         time_accuracy = race().get_setting('time_accuracy', 0)
         time_rounding = race().get_setting('time_rounding', 'math')
         ret_ms = self.get_finish_time().to_msec() - self.get_start_time().to_msec()
@@ -675,7 +704,32 @@ class Result:
         ret_ms -= self.get_credit_time().to_msec()
         return OTime(msec=ret_ms).round(time_accuracy, TimeRounding[time_rounding])
 
+    def get_result_otime_multi_day(self):
+        person_id = self.person.multi_day_id
+        sum_result = OTime()
+        for day in races():
+            result_found = False
+            for result in day.results:
+                assert isinstance(result, Result)
+                if result.person and result.person.multi_day_id == person_id:
+                    if result.is_status_ok():
+                        sum_result += result.get_result_otime_current_day()
+                        result_found = True
+                        continue
+                    else:
+                        self.status = ResultStatus.DISQUALIFIED
+                        return OTime()  # DSQ/DNS
+            if not result_found:
+                self.status = ResultStatus.DISQUALIFIED
+                return OTime()  # result not found in that day
+        return sum_result
+
     def get_start_time(self):
+        if self.person and self.person.group:
+            group = self.person.group
+            if group.get_type() == RaceType.PURSUIT:
+                return group.pursuit_start_time
+
         if self.start_time and self.start_time.to_msec():
             return self.start_time
         if self.person and self.person.start_time and self.person.start_time.to_msec():
@@ -735,7 +789,11 @@ class Result:
         return self.status == ResultStatus.OK or self.status == ResultStatus.RESTORED
 
     def is_punch(self):
-        return self.is_sportident() or self.is_sfr() or self.is_sportiduino() or self.is_rfid_impinj()
+        return self.is_sportident() \
+            or self.is_sfr() \
+            or self.is_sportiduino() \
+            or self.is_rfid_impinj() \
+            or self.is_srpid()
 
     def is_sportident(self):
         return self.system_type == SystemType.SPORTIDENT
@@ -748,6 +806,9 @@ class Result:
 
     def is_rfid_impinj(self):
         return self.system_type == SystemType.RFID_IMPINJ
+
+    def is_srpid(self):
+        return self.system_type == SystemType.SRPID
 
     def is_manual(self):
         return self.system_type == SystemType.MANUAL
@@ -814,6 +875,12 @@ class ResultSportident(Result):
 
     def get_start_time(self):
         obj = race()
+
+        if self.person and self.person.group:
+            group = self.person.group
+            if group.get_type() == RaceType.PURSUIT:
+                return group.pursuit_start_time
+
         start_source = obj.get_setting('system_start_source', 'protocol')
         if start_source == 'protocol':
             if (
@@ -1084,6 +1151,10 @@ class ResultRfidImpinj(ResultSportident):
     system_type = SystemType.RFID_IMPINJ
 
 
+class ResultSrpid(ResultSportident):
+    system_type = SystemType.SRPID
+
+
 class Person(Model):
     def __init__(self):
         self.id = uuid.uuid4()
@@ -1145,6 +1216,13 @@ class Person(Model):
         if surname:
             surname += ' '
         return '{}{}'.format(surname, self.name)
+
+    @property
+    def multi_day_id(self):
+        if self.group:
+            return self.full_name + " " + self.group.name
+        else:
+            return self.full_name
 
     def to_dict(self):
         return {
@@ -1317,6 +1395,78 @@ class Race(Model):
             'persons': [item.to_dict() for item in self.persons],
         }
 
+    def to_dict_partial(self, person_list=[], group_list=[], course_list=[], orgs_list=[], result_list=[]):
+
+        if course_list and len(course_list) > 0:
+            for group in self.groups:
+                if group.course and group.course in course_list:
+                    group_list.append(group.name)
+
+        if group_list and len(group_list) > 0:
+            for person in self.persons:
+                if person.group and person.group.name in group_list and person not in person_list:
+                    person_list.append(person)
+
+        if orgs_list and len(orgs_list) > 0:
+            person_list = []
+            for person in self.persons:
+                if person.organization and person.organization in orgs_list and person not in person_list:
+                    person_list.append(person)
+
+        if result_list and len(result_list) > 0:
+            person_list = []
+            for result in result_list:
+                if result.person and result.person not in person_list:
+                    person_list.append(result.person)
+
+        if person_list and len(person_list) > 0:
+            # person list to filter specified
+            return_groups = set()
+            return_orgs = set()
+            return_results = list()
+            return_courses = list()
+            for person in person_list:
+                if person.group:
+                    return_groups.add(person.group)
+                if person.organization:
+                    return_orgs.add(person.organization)
+            for group in return_groups:
+                if group.course and group.course not in return_courses:
+                    return_courses.append(group.course)
+            for result in self.results:
+                if result.person in person_list:
+                    return_results.append(result)
+
+            # person list to filter specified
+            return_groups = set()
+            return_orgs = set()
+            return_results = list()
+            return_courses = list()
+            for person in person_list:
+                if person.group:
+                    return_groups.add(person.group)
+                if person.organization:
+                    return_orgs.add(person.organization)
+            for group in return_groups:
+                if group.course and group.course not in return_courses:
+                    return_courses.append(group.course)
+            for result in self.results:
+                if result.person in person_list:
+                    return_results.append(result)
+
+            return {
+                'object': self.__class__.__name__,
+                'id': str(self.id),
+                'data': self.data.to_dict(),
+                'settings': self.settings,
+                'organizations': [item.to_dict() for item in return_orgs],
+                'courses': [item.to_dict() for item in return_courses],
+                'groups': [item.to_dict() for item in return_groups],
+                'results': [item.to_dict() for item in return_results],
+                'persons': [item.to_dict() for item in person_list],
+            }
+        return None
+
     def update_data(self, dict_obj):
         if 'object' not in dict_obj:
             return
@@ -1416,7 +1566,6 @@ class Race(Model):
         return results
 
     def delete_groups(self, indexes):
-        self.update_counters()
         groups = []
         for i in indexes:
             group = self.groups[i]  # type: Group
@@ -1430,7 +1579,6 @@ class Race(Model):
         return groups
 
     def delete_courses(self, indexes):
-        self.update_counters()
         courses = []
         for i in indexes:
             course = self.courses[i]  # type: Course
@@ -1444,7 +1592,6 @@ class Race(Model):
         return courses
 
     def delete_organizations(self, indexes):
-        self.update_counters()
         organizations = []
         for i in indexes:
             organization = self.organizations[i]  # type: Organization
@@ -1537,28 +1684,33 @@ class Race(Model):
         # recalculate group counters
         for i in self.groups:
             i.count_person = 0
+            i.count_finished = 0
+
+        for i in self.organizations:
+            i.count_person = 0
+            i.count_finished = 0
 
         for i in self.persons:
             if i.group:
                 i.group.count_person += 1
+                if i.result_count > 0:
+                    i.group.count_finished += 1
+            if i.organization:
+                i.organization.count_person += 1
+                if i.result_count > 0:
+                    i.organization.count_finished += 1
 
         # recalculate course counters
         for i in self.courses:
             i.count_person = 0
+            i.count_finished = 0
             i.count_group = 0
 
         for i in self.groups:
             if i.course:
                 i.course.count_person += i.count_person
+                i.course.count_finished += i.count_finished
                 i.course.count_group += 1
-
-        # recalculate team counters
-        for i in self.organizations:
-            i.count_person = 0
-
-        for i in self.persons:
-            if i.organization:
-                i.organization.count_person += 1
 
     def get_persons_by_group(self, group):
         return find(self.persons, group=group, return_all=True)
@@ -1769,15 +1921,9 @@ class Ranking(object):
         self.rank[Qualification.I] = RankingItem(qual=Qualification.I)
         self.rank[Qualification.II] = RankingItem(qual=Qualification.II)
         self.rank[Qualification.III] = RankingItem(qual=Qualification.III)
-        self.rank[Qualification.I_Y] = RankingItem(
-            qual=Qualification.I_Y, is_active=False
-        )
-        self.rank[Qualification.II_Y] = RankingItem(
-            qual=Qualification.II_Y, is_active=False
-        )
-        self.rank[Qualification.III_Y] = RankingItem(
-            qual=Qualification.III_Y, is_active=False
-        )
+        self.rank[Qualification.I_Y] = RankingItem(qual=Qualification.I_Y)
+        self.rank[Qualification.II_Y] = RankingItem(qual=Qualification.II_Y)
+        self.rank[Qualification.III_Y] = RankingItem(qual=Qualification.III_Y)
 
     def get_max_qual(self):
         max_qual = Qualification.NOT_QUALIFIED

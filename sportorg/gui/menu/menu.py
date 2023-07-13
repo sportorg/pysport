@@ -144,7 +144,7 @@ def menu_list():
                     'action': 'TextExchangeAction'},
                 {
                     'title': translate('Mass edit'),
-                    'tabs': [0, 4],
+                    'tabs': [0, 2, 4],
                     'action': 'MassEditAction',
                 },
             ],
@@ -161,9 +161,16 @@ def menu_list():
                 {
                     'title': translate('Filter'),
                     'shortcut': 'F2',
-                    'tabs': [0, 1],
+                    'tabs': list(range(5)),
                     'icon': config.icon_dir('filter.svg'),
                     'action': 'FilterAction',
+                },
+                {
+                    'title': translate('Filter reset'),
+                    'shortcut': 'Ctrl+F2',
+                    'tabs': list(range(5)),
+                    'icon': config.icon_dir('filter_reset.svg'),
+                    'action': 'FilterResetAction',
                 },
                 {
                     'title': translate('Search'),
@@ -237,6 +244,10 @@ def menu_list():
                 {
                     'title': translate('Use card number as bib'),
                     'action': 'CopyCardNumberToBib',
+                },
+                {
+                    'title': translate('Marked route course generation'),
+                    'action': 'MarkedRouteCourseGeneration',
                 },
             ],
         },
@@ -345,6 +356,11 @@ def menu_list():
                     'action': 'ImpinjReadoutAction'
                 },
                 {
+                    'title': translate('on/off SRPid readout'),
+                    'icon': config.icon_dir('srpid.png'),
+                    'action': 'SrpidReadoutAction'
+                },
+                {
                    'title': translate('Teamwork'),
                    'icon': config.icon_dir('network.svg'),
                    'actions': [
@@ -394,7 +410,6 @@ def menu_list():
                     'icon': config.icon_dir('stopwatch.svg'),
                     'action': 'TimekeepingSettingsAction',
                 },
-                {'title': translate('Teamwork'), 'action': 'TeamworkSettingsAction'},
                 {
                     'title': translate('Teamwork'),
                     'icon': config.icon_dir('network.svg'),

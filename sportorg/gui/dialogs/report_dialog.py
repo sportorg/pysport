@@ -111,21 +111,6 @@ class ReportDialog(QDialog):
     def apply_changes_impl(self):
         obj = race()
         mw = GlobalAccess().get_main_window()
-        map_items = [
-            obj.persons,
-            obj.results,
-            obj.groups,
-            obj.courses,
-            obj.organizations,
-        ]
-        map_names = ['persons', 'results', 'groups', 'courses', 'organizations']
-        selected_items = {
-            'persons': [],
-            'results': [],
-            'groups': [],
-            'courses': [],
-            'organizations': [],
-        }
 
         template_path = self.item_template.currentText()
 
@@ -134,17 +119,64 @@ class ReportDialog(QDialog):
         _settings['save_to_last_file'] = self.item_save_to_last_file.isChecked()
         _settings['selected'] = self.item_selected.isChecked()
 
-        if _settings['selected']:
-            cur_items = map_items[mw.current_tab]
-
-            for i in mw.get_selected_rows():
-                selected_items[map_names[mw.current_tab]].append(cur_items[i].to_dict())
-
         ResultCalculation(obj).process_results()
         RaceSplits(obj).generate()
         ScoreCalculation(obj).calculate_scores()
 
-        races_dict = [r.to_dict() for r in races()]
+        races_dict = []
+        if _settings['selected']:
+            if mw.current_tab == 0:
+                person_list = []
+                for i in mw.get_selected_rows():
+                    person_list.append(obj.persons[i])
+                races_dict = [r.to_dict_partial(person_list=person_list,
+                                                result_list=[],
+                                                group_list=[],
+                                                orgs_list=[],
+                                                course_list=[]
+                                                ) for r in races()]
+            elif mw.current_tab == 1:
+                result_list = []
+                for i in mw.get_selected_rows():
+                    result_list.append(obj.results[i])
+                races_dict = [r.to_dict_partial(person_list=[],
+                                                result_list=result_list,
+                                                group_list=[],
+                                                orgs_list=[],
+                                                course_list=[]
+                                                ) for r in races()]
+            elif mw.current_tab == 2:
+                group_list = []
+                for i in mw.get_selected_rows():
+                    group_list.append(obj.groups[i].name)
+                races_dict = [r.to_dict_partial(person_list=[],
+                                                result_list=[],
+                                                group_list=group_list,
+                                                orgs_list=[],
+                                                course_list=[]
+                                                ) for r in races()]
+            elif mw.current_tab == 3:
+                course_list = []
+                for i in mw.get_selected_rows():
+                    course_list.append(obj.courses[i])
+                races_dict = [r.to_dict_partial(person_list=[],
+                                                result_list=[],
+                                                group_list=[],
+                                                orgs_list=[],
+                                                course_list=course_list
+                                                ) for r in races()]
+            elif mw.current_tab == 4:
+                orgs_list = []
+                for i in mw.get_selected_rows():
+                    orgs_list.append(obj.organizations[i])
+                races_dict = [r.to_dict_partial(person_list=[],
+                                                result_list=[],
+                                                group_list=[],
+                                                orgs_list=orgs_list,
+                                                course_list=[]
+                                                ) for r in races()]
+        else:
+            races_dict = [r.to_dict() for r in races()]
 
         template_path_items = template_path.split('/')[-1]
         template_path_items = '.'.join(template_path_items.split('.')[:-1]).split('_')
@@ -186,7 +218,7 @@ class ReportDialog(QDialog):
                 races=races_dict,
                 rent_cards=list(RentCards().get()),
                 current_race=get_current_race_index(),
-                selected=selected_items,
+                selected={'persons': []}  # leave here for back compatibility
             )
 
             if _settings['save_to_last_file']:

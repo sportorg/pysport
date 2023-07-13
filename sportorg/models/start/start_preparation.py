@@ -91,7 +91,6 @@ class DrawManager(object):
 
     def process(self, split_start_groups, split_teams, split_regions, mix_groups=False):
         current_race = self.race
-        current_race.update_counters()
         ret = self.process_array(
             current_race.persons,
             split_start_groups,
@@ -327,8 +326,6 @@ class StartTimeManager(object):
         one_minute_qty=1,
         mix_groups=False,
     ):
-        current_race = self.race
-        current_race.update_counters()
 
         corridors = get_corridors()
         for cur_corridor in corridors:
@@ -563,7 +560,7 @@ def clone_relay_legs(min_bib, max_bib, increment):
 
     obj = race()
     for person in obj.persons:
-        if person.bib and person.bib >= min_bib and person.bib <= max_bib:
+        if person.bib and min_bib <= person.bib <= max_bib:
             new_person = copy(person)
             new_person.id = uuid.uuid4()
             new_person.bib = person.bib + increment

@@ -184,10 +184,8 @@ class TimekeepingPropertiesDialog(QDialog):
         self.mr_laps_radio = QRadioButton(translate('penalty laps'))
         self.mr_layout.addRow(self.mr_laps_radio)
         self.mr_counting_lap_check = QCheckBox(translate('counting lap'))
-        self.mr_counting_lap_check.setDisabled(True)  # TODO
         self.mr_layout.addRow(self.mr_counting_lap_check)
         self.mr_lap_station_check = QCheckBox(translate('lap station'))
-        self.mr_lap_station_check.setDisabled(True)  # TODO
         self.mr_lap_station_edit = AdvSpinBox(max_width=50)
         self.mr_layout.addRow(self.mr_lap_station_check, self.mr_lap_station_edit)
         self.mr_dont_dqs_check = QCheckBox(translate("Don't disqualify"))
@@ -447,7 +445,7 @@ class TimekeepingPropertiesDialog(QDialog):
 
         # time settings
         time_accuracy = obj.get_setting('time_accuracy', 0)
-        time_rounding = obj.get_setting('time_rounding', 'math')
+        time_rounding = obj.get_setting('time_rounding', 'down')
         time_format_24 = obj.get_setting('time_format_24', 'less24')
 
         self.time_settings_accuracy_edit.setValue(time_accuracy)

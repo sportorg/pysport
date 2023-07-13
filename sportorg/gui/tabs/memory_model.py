@@ -99,8 +99,9 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
             self.set_source_array(whole_list)
             self.filter_backup.clear()
 
-    def set_filter_for_column(self, column_num, filter_regexp):
-        self.filter.update({column_num: re.escape(filter_regexp)})
+    def set_filter_for_column(self, column_num, filter_regexp, action):
+
+        self.filter.update({column_num: [filter_regexp, action]})
 
     def apply_filter(self):
         # get initial list and filter it
@@ -108,14 +109,18 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
         current_array.extend(self.filter_backup)
         self.filter_backup.clear()
         for column in self.filter.keys():
-            check_regexp = self.filter.get(column)
-            check = re.compile(check_regexp)
-            # current_array = list(filter(lambda x:  check.match(self.get_item(x, column)), current_array))
+            check_regexp = re.escape(self.filter.get(column)[0])
+            action = self.filter.get(column)[1]
+
+            check = re.compile('.*' + check_regexp + '.*')
+
+            if action == translate('equal to'):
+                check = re.compile(check_regexp + "$")
+
             i = 0
             while i < len(current_array):
                 value = self.get_item(current_array[i], column)
-                #if not check.match(value):
-                if check_regexp and check_regexp != re.escape(value):
+                if not check.match(str(value)):
                     self.filter_backup.append(current_array.pop(i))
                     i -= 1
                 i += 1
@@ -212,6 +217,10 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
 
     def get_item(self, obj, n_col):
         return self.get_values_from_object(obj)[n_col]
+
+    def get_column_unique_values(self, n_col):
+        # returns sorted unique values from specified column
+        return sorted(set([str(row[n_col]) for row in self.cache]))
 
 
 class PersonMemoryModel(AbstractSportOrgMemoryModel):
@@ -317,18 +326,20 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
             translate('First name'),
             translate('Group'),
             translate('Team'),
+            translate('Place'),
+            translate('Result'),
+            translate('Diff'),
+            translate('Status'),
             translate('Bib'),
             translate('Card title'),
             translate('Start'),
             translate('Finish'),
-            translate('Result'),
-            translate('Status'),
             translate('Credit'),
             translate('Penalty'),
             translate('Penalty legs title'),
-            translate('Place'),
             translate('Type'),
             translate('Rented card'),
+            translate('Result day/leg'),
         ]
 
     def init_cache(self):
@@ -382,24 +393,27 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
             time_accuracy = self.race.get_setting('time_accuracy', 0)
             finish = i.get_finish_time().to_str(time_accuracy)
 
-        return [
+        ret = [
             last_name,
             first_name,
             group,
             team,
+            i.get_place(),
+            i.get_result(),
+            time_to_hhmmss(i.diff),
+            i.status.get_title(),
             bib,
             i.card_number,
             start,
             finish,
-            i.get_result(),
-            i.status.get_title(),
             time_to_hhmmss(i.get_credit_time()),
             time_to_hhmmss(i.get_penalty_time()),
             i.penalty_laps,
-            i.get_place(),
             str(i.system_type),
             rented_card,
+            time_to_hhmmss(i.get_result_otime_current_day()) if i.is_status_ok() else "",
         ]
+        return ret
 
     def get_source_array(self):
         return self.race.results
@@ -427,6 +441,9 @@ class GroupMemoryModel(AbstractSportOrgMemoryModel):
             translate('Start interval title'),
             translate('Start corridor title'),
             translate('Order in corridor title'),
+            translate('Count of person'),
+            translate('Count of finished'),
+            translate('Count of not finished')
         ]
 
     def init_cache(self):
@@ -464,6 +481,9 @@ class GroupMemoryModel(AbstractSportOrgMemoryModel):
             group.start_interval,
             group.start_corridor,
             group.order_in_corridor,
+            group.count_person,
+            group.count_finished,
+            group.count_person - group.count_finished
         ]
 
     def get_source_array(self):
@@ -484,6 +504,10 @@ class CourseMemoryModel(AbstractSportOrgMemoryModel):
             translate('Point count title'),
             translate('Climb title'),
             translate('Controls'),
+            translate('Count of person'),
+            translate('Count of finished'),
+            translate('Count of not finished'),
+            translate('Count of groups'),
         ]
 
     def init_cache(self):
@@ -510,6 +534,10 @@ class CourseMemoryModel(AbstractSportOrgMemoryModel):
             len(course.controls),
             course.climb,
             ' '.join(course.get_code_list()),
+            course.count_person,
+            course.count_finished,
+            course.count_person - course.count_finished,
+            course.count_group
         ]
 
     def get_source_array(self):
@@ -530,6 +558,9 @@ class OrganizationMemoryModel(AbstractSportOrgMemoryModel):
             translate('Country'),
             translate('Region'),
             translate('Contact'),
+            translate('Count of person'),
+            translate('Count of finished'),
+            translate('Count of not finished')
         ]
 
     def init_cache(self):
@@ -555,6 +586,9 @@ class OrganizationMemoryModel(AbstractSportOrgMemoryModel):
             organization.country,
             organization.region,
             organization.contact,
+            organization.count_person,
+            organization.count_finished,
+            organization.count_person - organization.count_finished
         ]
 
     def get_source_array(self):

@@ -186,11 +186,19 @@ class SportorgPrinter(object):
 
         # Result
         if is_penalty_used:
-            self.print_line(
-                translate('Penalty') + ': ' + result.get_penalty_time().to_str(),
-                fn,
-                fs_main,
-            )
+            if obj.get_setting("marked_route_mode") == "time":
+                self.print_line(
+                    translate('Penalty') + ': ' + result.get_penalty_time().to_str(),
+                    fn,
+                    fs_main,
+                )
+            elif obj.get_setting("marked_route_mode") == "laps":
+                self.print_line(
+                    translate('Penalty') + ': ' + str(result.penalty_laps),
+                    fn,
+                    fs_main,
+                )
+
 
         if result.is_status_ok():
             self.print_line(
