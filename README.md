@@ -1,4 +1,3 @@
-[![Build Status](https://api.travis-ci.com/sportorg/pysport.svg?branch=develop)](https://travis-ci.com/sportorg/pysport)
 [![Python 3.8](https://img.shields.io/badge/python-v3.8-blue.svg?logo=pythonlang)](https://www.python.org/downloads/)
 [![License: GPL v3](https://img.shields.io/badge/license-GPLv3-blue.svg)](https://github.com/sportorg/pysport/blob/develop/LICENSE)
 [![Orienteering](https://img.shields.io/badge/sport-orienteering-blue.svg)](https://github.com/sportorg)
@@ -26,15 +25,8 @@ poetry run python SportOrg.pyw
 ![Dialogedit sportorg](img/dialogedit.png)
 ![Bibprintout sportorg](img/bibprintout.png)
 
-
 ## build
 
 ### cx_Freeze
 
 `python setup_.py build`
-
-
-## Roadmap
-
-- [ ] Publish to pypi
-- [ ] Deploy to telegram
