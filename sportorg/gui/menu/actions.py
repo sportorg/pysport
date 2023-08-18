@@ -11,11 +11,13 @@ from sportorg import config
 from sportorg.common.otime import OTime
 from sportorg.gui.dialogs.about import AboutDialog
 from sportorg.gui.dialogs.cp_delete import CPDeleteDialog
-from sportorg.gui.dialogs.entry_filter import DialogFilter
+from sportorg.gui.dialogs.filter_dialog import DialogFilter
 from sportorg.gui.dialogs.entry_mass_edit import MassEditDialog
 from sportorg.gui.dialogs.event_properties import EventPropertiesDialog
 from sportorg.gui.dialogs.file_dialog import get_open_file_name, get_save_file_name
+from sportorg.gui.dialogs.group_mass_edit import GroupMassEditDialog
 from sportorg.gui.dialogs.live_dialog import LiveDialog
+from sportorg.gui.dialogs.marked_route_dialog import MarkedRouteDialog
 from sportorg.gui.dialogs.merge_results import MergeResultsDialog
 from sportorg.gui.dialogs.not_start_dialog import NotStartDialog
 from sportorg.gui.dialogs.number_change import NumberChangeDialog
@@ -52,6 +54,7 @@ from sportorg.models.start.start_preparation import (
     guess_corridors_for_groups,
 )
 from sportorg.modules.backup.json import get_races_from_file
+from sportorg.modules.configs.configs import Config
 from sportorg.modules.iof import iof_xml
 from sportorg.modules.live.live import live_client
 from sportorg.modules.ocad import ocad
@@ -60,6 +63,7 @@ from sportorg.modules.rfid_impinj.rfid_impinj import ImpinjClient
 from sportorg.modules.sfr.sfrreader import SFRReaderClient
 from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.modules.sportiduino.sportiduino import SportiduinoClient
+from sportorg.modules.srpid.srpid import SrpidClient
 from sportorg.modules.teamwork import Teamwork
 from sportorg.modules.telegram.telegram import telegram_client
 from sportorg.modules.updater import checker
@@ -342,6 +346,10 @@ class MassEditAction(Action, metaclass=ActionFactory):
             MassEditDialog().exec_()
             self.app.refresh()
 
+        if self.app.current_tab == 2:
+            GroupMassEditDialog().exec_()
+            self.app.refresh()
+
         if self.app.current_tab == 4:
             OrganizationMassEditDialog().exec_()
             self.app.refresh()
@@ -354,10 +362,16 @@ class RefreshAction(Action, metaclass=ActionFactory):
 
 class FilterAction(Action, metaclass=ActionFactory):
     def execute(self):
-        if self.app.current_tab not in range(2):
-            return
         table = self.app.get_current_table()
         DialogFilter(table).exec_()
+        self.app.refresh()
+
+
+class FilterResetAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        table = self.app.get_current_table()
+        proxy_model = table.model()
+        proxy_model.clear_filter()
         self.app.refresh()
 
 
@@ -500,6 +514,14 @@ class ImpinjReadoutAction(Action, metaclass=ActionFactory):
         ImpinjClient().toggle()
         time.sleep(0.5)
         self.app.interval()
+
+
+class SrpidReadoutAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        SrpidClient().toggle()
+        time.sleep(0.5)
+        self.app.interval()
+
 
 class SFRReadoutAction(Action, metaclass=ActionFactory):
     def execute(self):
@@ -790,8 +812,25 @@ class ImportSportOrgAction(Action, metaclass=ActionFactory):
             translate('Open SportOrg json'), translate('SportOrg (*.json)')
         )
         if file_name != '':
-            with open(file_name) as f:
-                attr = get_races_from_file(f)
+            use_utf8 = Config().configuration.get('save_in_utf8', False)
+            # if user set UTF-8 usage, first try to open file in UTF-8, then in system locale (1251 for RU Windows)
+            try:
+                def_encoding = None
+                if use_utf8:
+                    def_encoding = 'utf-8'
+
+                with open(file_name, encoding=def_encoding) as f:
+                    attr = get_races_from_file(f)
+            except UnicodeDecodeError:
+                f.close()
+
+                alt_encoding = 'utf-8'
+                if use_utf8:
+                    alt_encoding = None
+
+                with open(file_name, encoding=alt_encoding) as f:
+                    attr = get_races_from_file(f)
+
             SportOrgImportDialog(*attr).exec_()
             self.app.refresh()
 
@@ -799,4 +838,10 @@ class ImportSportOrgAction(Action, metaclass=ActionFactory):
 class RentCardsAction(Action, metaclass=ActionFactory):
     def execute(self):
         RentCardsDialog().exec_()
+        self.app.refresh()
+
+
+class MarkedRouteCourseGeneration(Action, metaclass=ActionFactory ):
+    def execute(self):
+        MarkedRouteDialog().exec_()
         self.app.refresh()

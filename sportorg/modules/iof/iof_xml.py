@@ -256,7 +256,8 @@ def import_from_event_data(data):
     obj = race()
 
     if 'name' in data:
-        if data['name'] and len(data['name']) > 0 and data['name'] != 'Event':
+        new_name = data['name']
+        if new_name and len(new_name) > 0 and new_name != 'Event' and new_name.find('Example') < 0:
             obj.data.title = data['name']
 
     if 'start_date' in data:

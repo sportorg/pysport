@@ -117,7 +117,9 @@ class WinOrientBinary:
         for man in self.wdb_object.man:
             new_person = Person()
             new_person.surname = man.name.strip().split(' ')[0]
-            new_person.name = man.name.strip().split(' ')[-1]
+            index_of_first_space = str(man.name.strip()).find(' ')
+            if index_of_first_space > 0:
+                new_person.name = man.name.strip()[index_of_first_space + 1:].strip()
             new_person.bib = man.number
             if man.qualification:
                 if man.qualification == 10:
@@ -319,5 +321,20 @@ class WinOrientBinary:
                         new_chip.punch.append(new_punch)
 
                     wdb_object.chip.append(new_chip)
+
+                # write start time from start station to person
+                if my_race.get_setting("system_start_source") == "station":
+                    if result.start_time and result.start_time > OTime(0):
+                        new_person.start = time_to_int(result.start_time)
+
+        if my_race.get_setting("system_start_source") == "station":
+            wdb_object.info.si_start_source = 1
+        elif my_race.get_setting("system_start_source") == "cp":
+            wdb_object.info.si_start_source = 2
+
+        if my_race.get_setting("system_finish_source") == "station":
+            wdb_object.info.si_finish_source = 1
+        elif my_race.get_setting("system_finish_source") == "cp":
+            wdb_object.info.si_finish_source = 2
 
         return wdb_object

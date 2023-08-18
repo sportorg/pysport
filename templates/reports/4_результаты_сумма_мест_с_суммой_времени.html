@@ -161,6 +161,7 @@
                     year: person.birth_date ? (new Date(person.birth_date)).getFullYear() : '',
                     sum: person.sum_places,
                     sum_time: person.sum_time,
+                    sum_time_hhmmss: toHHMMSS(person.sum_time),
                     sum_places: person.sum_places,
                     sum_scores: person.sum_scores.toFixed(1),
                     ok_count: person.ok_count,
@@ -251,6 +252,7 @@
             {key: 'bib', title: 'Номер', size: 6},
             {key: 'sum', title: 'Сумма', size: 6},
             {key: 'ok_count', title: 'Старты', size: 6},
+            {key: 'sum_time_hhmmss', title: 'Сумма времени', size: 13},
             {key: 'place', title: 'Место', size: 6}
         ],
         active: function (key, val) {

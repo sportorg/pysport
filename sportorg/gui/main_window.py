@@ -22,6 +22,7 @@ from sportorg.models.memory import (
     set_current_race_index,
 )
 from sportorg.models.result.result_calculation import ResultCalculation
+from sportorg.models.result.result_checker import ResultChecker
 from sportorg.models.result.split_calculation import GroupSplits
 from sportorg.modules.backup.file import File
 from sportorg.modules.configs.configs import Config as Configuration
@@ -48,6 +49,7 @@ from sportorg.gui.utils.custom_controls import messageBoxQuestion
 from sportorg.language import translate
 from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.modules.sportiduino.sportiduino import SportiduinoClient
+from sportorg.modules.srpid.srpid import SrpidClient
 from sportorg.modules.telegram.telegram import telegram_client
 from sportorg.modules.teamwork import Teamwork, ObjectTypes
 from sportorg.modules.live.live import LiveClient
@@ -65,7 +67,12 @@ class ConsolePanelHandler(logging.Handler):
 
 
 def is_reading_active():
-    return SIReaderClient().is_alive() or SFRReaderClient().is_alive() or ImpinjClient().is_alive()
+    return SIReaderClient().is_alive() \
+        or SFRReaderClient().is_alive() \
+        or ImpinjClient().is_alive() \
+        or SportiduinoClient().is_alive() \
+        or SrpidClient().is_alive() \
+
 
 
 class MainWindow(QMainWindow):
@@ -229,7 +236,6 @@ class MainWindow(QMainWindow):
         self._handler.setLevel(Configuration().configuration.get('logging_level'))
 
     def conf_write(self):
-        Configuration().parser[ConfigFile.GEOMETRY]['main'] = bytes(self.saveGeometry().toHex()).decode()
         Configuration().save()
 
     def post_show(self):
@@ -244,6 +250,7 @@ class MainWindow(QMainWindow):
         SportiduinoClient().set_call(self.add_sportiduino_result_from_reader)
         ImpinjClient().set_call(self.add_impinj_result_from_reader)
         SFRReaderClient().set_call(self.add_sfr_result_from_reader)
+        SrpidClient().set_call(self.add_srpid_result_from_reader)
 
         self.service_timer = QTimer(self)
         self.service_timer.timeout.connect(self.interval)
@@ -353,6 +360,7 @@ class MainWindow(QMainWindow):
         self.tabbar = self.tabwidget.tabBar()
 
         self.tabwidget.currentChanged.connect(self._menu_disable)
+        self.tabwidget.currentChanged.connect(self._update_counters)
 
     def _menu_disable(self, tab_index):
         for item in self.menu_list_for_disabled:
@@ -363,6 +371,12 @@ class MainWindow(QMainWindow):
         if tab_index == self.tabwidget.indexOf(self.logging_tab):
             # if self.tabbar.tabTextColor(i) == common_color:
             self.tabbar.setTabTextColor(tab_index, self.logging_tab.common_color)
+
+    def _update_counters(self, tab_index):
+        if tab_index > 1:
+            # calculate group, team and course statistics only when tabs activated not to hang application
+            race().update_counters()
+            self.refresh()
 
     def get_size(self):
 
@@ -430,6 +444,7 @@ class MainWindow(QMainWindow):
             table.setModel(CourseMemoryModel())
             table = self.get_organization_table()
             table.setModel(OrganizationMemoryModel())
+
             Broker().produce('init_model')
         except Exception as e:
             logging.error(str(e))
@@ -482,7 +497,7 @@ class MainWindow(QMainWindow):
         if self.get_person_table():
             self.get_person_table().model().clear_filter(remove_condition)
             self.get_result_table().model().clear_filter(remove_condition)
-            self.get_person_table().model().clear_filter(remove_condition)
+            self.get_group_table().model().clear_filter(remove_condition)
             self.get_course_table().model().clear_filter(remove_condition)
             self.get_organization_table().model().clear_filter(remove_condition)
 
@@ -490,7 +505,7 @@ class MainWindow(QMainWindow):
         if self.get_person_table():
             self.get_person_table().model().apply_filter()
             self.get_result_table().model().apply_filter()
-            self.get_person_table().model().apply_filter()
+            self.get_group_table().model().apply_filter()
             self.get_course_table().model().apply_filter()
             self.get_organization_table().model().apply_filter()
 
@@ -625,6 +640,9 @@ class MainWindow(QMainWindow):
         self.add_sportident_result_from_sireader(result)
 
     def add_impinj_result_from_reader(self, result):
+        self.add_sportident_result_from_sireader(result)
+
+    def add_srpid_result_from_reader(self, result):
         self.add_sportident_result_from_sireader(result)
 
     # Actions

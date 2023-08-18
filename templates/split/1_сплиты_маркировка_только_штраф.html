@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{name}} Split</title>
+    {% raw %}
+    <style>
+        td {
+            padding-right: 7px;
+        }
+		code{
+			font-family: Lucida console;
+			font-weight: normal;
+			font-size: 12px;
+			line-height: 14px;
+		}
+		code2{
+			font-family: Lucida console;
+			font-weight: bold;
+			font-size: 15px;
+		}
+    </style>
+    {% endraw %}
+</head>
+<body>
+    <code>
+        {{ race.data.title }}
+		<div style="height:12px;font-size:12px;">&nbsp;</div>
+        {{ race.data.start_datetime|date }}, {{ race.data.location }}
+        <br> <code2>{{ person.surname }} {{ person.name }}</code2>
+		<br> Группа: {{ group.name }}
+        <br> Команда: {{organization.name}}
+        <br> Номер: {{person.bib}} Номер чипа: {{person.card_number}}
+        <br> Старт: {{result.start_msec|tohhmmss}}
+        <table>
+        {% for leg in result.splits %}
+            {% if leg.is_correct %}
+                <tr>
+                    <td>{{leg.course_index}}</td>
+                    <td>{{leg.code}}</td>
+                    <td>{{leg.relative_time|tohhmmss}}</td>
+                    <td>{{leg.leg_time|tohhmmss('%M:%S')}}</td>
+                    <td>{{leg.speed}}</td>
+                    <td>{{leg.leg_place}}</td>
+                    <td></td>
+                    {% set data = namespace(plus='') %}
+					{% for control in course.controls %}
+                        {% if leg.code == (control.code[0:3] | replace('(', '')) %}
+                            {% set data.plus = '+' %}
+                        {% endif %}
+                    {% endfor %}
+                    <!--{{ data.plus }}-->
+                </tr>
+            {% else %}
+                <tr>
+                    <td></td>
+                    <td>{{leg.code}}</td>
+                    <td>{{leg.relative_time|tohhmmss}}</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+        </table>
+		<div style="height:12px;font-size:12px;">&nbsp;</div>
+        <br> Финиш: {{result.finish_msec|tohhmmss}} {%if result.splits|length > 0%} {{(result.finish_msec - result.splits[-1].relative_time - result.start_msec)|tohhmmss('%M:%S')}} {%endif%}
+        <br> Результат: {{result.result}} {{result.speed}}
+        {% if race.settings.marked_route_mode == 'time' %}
+		    <br> Штраф, время: {{result.penalty_time|tohhmmss('%H:%M:%S')}}
+        {% endif %}
+        {% if race.settings.marked_route_mode == 'laps' %}
+            <br> Штраф, круги: {{result.penalty_laps}}
+        {% endif %}
+        {% if result.place > 0 %}
+            <br> Место: {{result.place}} из {{group.count_finished}} (всего {{group.count_person}})
+        {% endif %}
+        <br>
+        {% if result.status != 1 %}
+			<code2>Отметка: ПЛОХАЯ</code2>
+			<br>
+            {% for control in course.controls %}
+                ({{control.code[3:] | replace('(', '')}}
+            {% endfor %}
+		{% else %}
+			<code2>Отметка: ОК</code2>
+        {% endif %}
+		<br>
+		Предварительные результаты
+        <table>
+            {% for item in items %}
+                {% if item.result.place|int < 11 and item.result.place|int > 0 %}
+                    <tr>
+                        <td>{{item.result.place}}</td>
+                        <td>{{item.person.surname}} {{item.person.name}}</td>
+                        <td>{{item.result.result}}</td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+        </table>
+        <br> {{ race.data.url }}
+		<!--
+		<br><img src="C:\img.png"  width="150" align="left">
+		-->
+		<br>
+		<img src="C:\Program Files (x86)\SportOrg\templates\split\qr-code.png" width="200">
+		<br>
+		<img src="C:\Program Files (x86)\SportOrg\templates\split\img.png" width="200">
+    </code>
+</body>
+</html>
