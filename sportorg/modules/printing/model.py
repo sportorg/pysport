@@ -3,7 +3,7 @@ import platform
 from sportorg.common.template import get_text_from_file
 from sportorg.config import template_dir
 from sportorg.language import translate
-from sportorg.models.memory import Course, Group, Organization, race
+from sportorg.models.memory import Organization, race
 from sportorg.models.result.split_calculation import GroupSplits
 from sportorg.modules.configs.configs import Config
 from sportorg.modules.printing.printing import print_html
@@ -19,12 +19,13 @@ class NoPrinterSelectedException(Exception):
 
 
 def split_printout(results):
-
     isDirectMode = False
 
     printer = Config().printer.get('split')
     obj = race()
-    template_path = obj.get_setting('split_template', template_dir('split', '1_split_printout.html'))
+    template_path = obj.get_setting(
+        'split_template', template_dir('split', '1_split_printout.html')
+    )
 
     # don't process results in one group several times while bulk printing, track processed groups
     processed_groups = []
@@ -41,13 +42,14 @@ def split_printout(results):
             if scale.isdecimal():
                 size = int(scale) * size // 100
 
-        pr = SportorgPrinter(printer,
-                             size,
-                             int(obj.get_setting('print_margin_left', 5.0)),
-                             int(obj.get_setting('print_margin_top', 5.0)))
+        pr = SportorgPrinter(
+            printer,
+            size,
+            int(obj.get_setting('print_margin_left', 5.0)),
+            int(obj.get_setting('print_margin_top', 5.0)),
+        )
 
     for result in results:
-
         person = result.person
 
         if not person:
@@ -56,7 +58,6 @@ def split_printout(results):
         course = obj.find_course(result)
 
         if person.group and course:
-
             if person.group not in processed_groups:
                 s = GroupSplits(obj, person.group).generate(True)
                 processed_groups.append(person.group)
@@ -67,7 +68,6 @@ def split_printout(results):
                 pr.print_split(result)
 
             else:
-
                 organization = person.organization
                 if not organization:
                     organization = Organization()
@@ -80,7 +80,7 @@ def split_printout(results):
                     group=person.group.to_dict(),
                     course=course.to_dict(),
                     organization=organization.to_dict(),
-                    items=s.to_dict()
+                    items=s.to_dict(),
                 )
                 if not printer:
                     raise NoPrinterSelectedException('No printer selected')
@@ -101,6 +101,4 @@ def split_printout(results):
 
 
 def split_printout_close():
-    print_html(
-        "NO_PRINTER",
-        "CLOSE_SPLIT_PRN")
+    print_html('NO_PRINTER', 'CLOSE_SPLIT_PRN')

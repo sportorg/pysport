@@ -126,21 +126,11 @@ class StartHandicapDialog(QDialog):
     def apply_changes_impl(self):
         obj = race()
         obj.set_setting('handicap_mode', self.handicap_mode.isChecked())
-        obj.set_setting(
-            'handicap_start', self.zero_time.getOTime().to_msec()
-        )
-        obj.set_setting(
-            'handicap_max_gap', self.max_gap.getOTime().to_msec()
-        )
-        obj.set_setting(
-            'handicap_second_start', self.second_time.getOTime().to_msec()
-        )
-        obj.set_setting(
-            'handicap_interval', self.interval_time.getOTime().to_msec()
-        )
-        obj.set_setting(
-            'handicap_dsq_offset', self.dsq_offset.getOTime().to_msec()
-        )
+        obj.set_setting('handicap_start', self.zero_time.getOTime().to_msec())
+        obj.set_setting('handicap_max_gap', self.max_gap.getOTime().to_msec())
+        obj.set_setting('handicap_second_start', self.second_time.getOTime().to_msec())
+        obj.set_setting('handicap_interval', self.interval_time.getOTime().to_msec())
+        obj.set_setting('handicap_dsq_offset', self.dsq_offset.getOTime().to_msec())
 
         if obj.get_setting('handicap_mode', True):
             handicap_start_time()

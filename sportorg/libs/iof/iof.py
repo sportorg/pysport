@@ -202,7 +202,7 @@ class PersonName(BaseElement):
 
 class Person(BaseElement):
     def __init__(self):
-        self.id = []  # type: List[Id]
+        self.id: List[Id] = []
         self.name = PersonName()
 
     def to_elem(self):
@@ -271,8 +271,8 @@ class PersonEntry(BaseElement):
     def __init__(self):
         self.person = Person()
         self.organisation = Organisation()
-        self.control_card = []  # type: List[ControlCard]
-        self.class_ = []  # type: List[Class]
+        self.control_card: List[ControlCard] = []
+        self.class_: List[Class] = []
         self.entry_time = EntryTime()
 
     def to_elem(self):
@@ -294,7 +294,7 @@ class EntryList(BaseElement):
     def __init__(self):
         self.iof = IOF30()
         self.event = Event()
-        self.person_entry = []  # type: List[PersonEntry]
+        self.person_entry: List[PersonEntry] = []
 
     def to_elem(self):
         childs = [self.event]
@@ -309,7 +309,7 @@ class TeamEntryPerson(BaseElement):
         self.person = Person()
         self.organisation = Organisation()
         self.leg = 0
-        self.control_card = []  # type: List[ControlCard]
+        self.control_card: List[ControlCard] = []
 
     def to_elem(self):
         childs = [self.person, self.organisation, self.get_elem('Leg', str(self.leg))]
@@ -323,7 +323,7 @@ class TeamEntry(BaseElement):
         self.id = Id
         self.name = Name()
         self.organisation = Organisation()
-        self.team_entry_person = []  # type: List[TeamEntryPerson]
+        self.team_entry_person: List[TeamEntryPerson] = []
         self.class_ = Class()
         self.entry_time = EntryTime()
 
@@ -341,7 +341,7 @@ class TeamEntryList(BaseElement):
     def __init__(self):
         self.iof = IOF30()
         self.event = Event()
-        self.team_entry = []  # type: List[TeamEntry]
+        self.team_entry: List[TeamEntry] = []
 
     def to_elem(self):
         childs = [self.event]
@@ -355,7 +355,7 @@ class Start(BaseElement):
     def __init__(self):
         self.bib_number = ''
         self.start_time = StartTimeStr()
-        self.control_card = []  # type: List[ControlCard]
+        self.control_card: List[ControlCard] = []
 
     def to_elem(self):
         childs = [
@@ -385,7 +385,7 @@ class ClassStart(BaseElement):
     def __init__(self):
         self.start_name = []
         self.class_ = Class()
-        self.person_start = []  # type: List[PersonStart]
+        self.person_start: List[PersonStart] = []
         self.course = Course()
 
     def to_elem(self):
@@ -402,7 +402,7 @@ class StartList(BaseElement):
     def __init__(self):
         self.iof = IOF30()
         self.event = Event()
-        self.class_start = []  # type: List[ClassStart]
+        self.class_start: List[ClassStart] = []
 
     def to_elem(self):
         childs = [self.event]
@@ -433,7 +433,7 @@ class ResultStatus:
 class Result(BaseElement):
     def __init__(self):
         self.bib_number = ''
-        self.control_card = []  # type: List[ControlCard]
+        self.control_card: List[ControlCard] = []
         self.start_time = StartTimeStr()
         self.finish_time = ''  # 2011-07-30T10:39:42+01:00
         self.time = 0.0
@@ -441,9 +441,9 @@ class Result(BaseElement):
         self.position = 0
         self.course = Course()
         self.status = ResultStatus.OK
-        self.split_time = []  # type: List[SplitTime]
+        self.split_time: List[SplitTime] = []
         self.route = ''
-        self.assigned_fee = []  # type: List[AssignedFee]
+        self.assigned_fee: List[AssignedFee] = []
         self.service_request = ServiceRequest()
 
     def to_elem(self):
@@ -494,7 +494,7 @@ class Amount(BaseElement):
 class Fee(BaseElement):
     def __init__(self):
         self.id = Id()
-        self.name = []  # type: List[Name]
+        self.name: List[Name] = []
         self.amount = Amount()
         self.taxable_amount = Amount()
 
@@ -517,7 +517,7 @@ class AssignedFee(BaseElement):
 class Service(BaseElement):
     def __init__(self):
         self.id = Id()
-        self.name = []  # type: List[Name]
+        self.name: List[Name] = []
 
     def to_elem(self):
         childs = [self.id]
@@ -530,7 +530,7 @@ class ServiceRequest(BaseElement):
     def __init__(self):
         self.service = Service()
         self.requested_quantity = 0.0
-        self.assigned_fee = []  # type: List[AssignedFee]
+        self.assigned_fee: List[AssignedFee] = []
 
     def to_elem(self):
         childs = [
@@ -561,7 +561,7 @@ class ClassResult(BaseElement):
     def __init__(self):
         self.class_ = Class()
         self.course = Course()
-        self.person_result = []  # type: List[PersonResult]
+        self.person_result: List[PersonResult] = []
 
     def to_elem(self):
         childs = [self.class_, self.course]
@@ -575,7 +575,7 @@ class ResultList(BaseElement):
         self.iof = IOF30()
         self.event = Event()
         self.status = ''
-        self.class_result = []  # type: List[ClassResult]
+        self.class_result: List[ClassResult] = []
 
     def to_elem(self):
         childs = [self.event, self.get_elem('Status', self.status)]

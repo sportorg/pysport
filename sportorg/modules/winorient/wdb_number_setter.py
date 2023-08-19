@@ -25,7 +25,6 @@ def set_numbers(wdb_target, wdb_source):
 
 
 if __name__ == '__main__':
-
     app = QApplication(sys.argv)
     file1 = get_open_file_name(
         translate('Open target WDB file'), translate('WDB file (*.wdb)')

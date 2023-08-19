@@ -24,7 +24,7 @@ Format of WDB data package
 
 
 def int_to_time(value):
-    """ convert value from 1/100 s to time """
+    """convert value from 1/100 s to time"""
     today = datetime.datetime.now()
     ret = datetime.datetime(
         today.year,
@@ -49,7 +49,6 @@ udp_socket.bind(addr)
 
 # main loop
 while True:
-
     print('wait data...')
 
     # recvfrom - receiving of data
@@ -69,19 +68,21 @@ while True:
     start = int_to_time(int(text_array[4]))
     byteorder = 'little'
 
-    punch_qty = int.from_bytes(conn[136:140], byteorder)
-    card_start = int_to_time(int.from_bytes(conn[144:148], byteorder))
-    card_finish = int_to_time(int.from_bytes(conn[152:156], byteorder))
+    punch_qty = int.from_bytes(conn[136:140], byteorder)  # type:ignore
+    card_start = int_to_time(int.from_bytes(conn[144:148], byteorder))  # type:ignore
+    card_finish = int_to_time(int.from_bytes(conn[152:156], byteorder))  # type:ignore
 
     init_offset = 172
     punches = []
     for i in range(punch_qty):
         cp = int.from_bytes(
-            conn[init_offset + i * 8 : init_offset + i * 8 + 1], byteorder
+            conn[init_offset + i * 8 : init_offset + i * 8 + 1],
+            byteorder,  # type:ignore
         )
         time = int_to_time(
             int.from_bytes(
-                conn[init_offset + i * 8 + 4 : init_offset + i * 8 + 8], byteorder
+                conn[init_offset + i * 8 + 4 : init_offset + i * 8 + 8],
+                byteorder,  # type:ignore
             )
         )
         punches.append((cp, time_to_hhmmss(time)))

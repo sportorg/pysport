@@ -1,7 +1,7 @@
 from boltons.fileutils import atomic_rename
 
-from . import binary, json
 from ..configs.configs import Config
+from . import binary, json
 
 
 class File:

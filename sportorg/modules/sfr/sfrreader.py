@@ -22,7 +22,6 @@ class SFRReaderCommand:
 
 
 class SFRReaderThread(QThread):
-
     POLL_TIMEOUT = 0.2
 
     def __init__(self, queue, stop_event, logger, debug=False):

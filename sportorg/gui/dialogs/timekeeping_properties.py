@@ -11,7 +11,7 @@ from PySide2.QtWidgets import (
     QLineEdit,
     QRadioButton,
     QTabWidget,
-    QWidget
+    QWidget,
 )
 
 from sportorg.common.otime import OTime
@@ -86,8 +86,12 @@ class TimekeepingPropertiesDialog(QDialog):
         self.chip_duplicate_layout.addRow(self.chip_duplicate_merge)
         self.chip_duplicate_box.setLayout(self.chip_duplicate_layout)
         self.label_duplicate_timeout = QLabel(translate('Duplicate timeout'))
-        self.item_duplicate_timeout = AdvTimeEdit(max_width=80, display_format="HH:mm:ss")
-        self.chip_duplicate_layout.addRow(self.label_duplicate_timeout, self.item_duplicate_timeout)
+        self.item_duplicate_timeout = AdvTimeEdit(
+            max_width=80, display_format='HH:mm:ss'
+        )
+        self.chip_duplicate_layout.addRow(
+            self.label_duplicate_timeout, self.item_duplicate_timeout
+        )
 
         self.tk_layout.addRow(self.chip_duplicate_box)
 
@@ -95,7 +99,9 @@ class TimekeepingPropertiesDialog(QDialog):
         self.assignment_mode.stateChanged.connect(self.on_assignment_mode)
         self.tk_layout.addRow(self.assignment_mode)
 
-        self.ignore_readout_before_start = QCheckBox(translate('Ignore readout before start'))
+        self.ignore_readout_before_start = QCheckBox(
+            translate('Ignore readout before start')
+        )
         self.tk_layout.addRow(self.ignore_readout_before_start)
 
         self.timekeeping_tab.setLayout(self.tk_layout)
@@ -123,8 +129,12 @@ class TimekeepingPropertiesDialog(QDialog):
             self.rp_scores_minute_penalty_label, self.rp_scores_minute_penalty_edit
         )
         self.rp_scores_allow_duplicates = QCheckBox(translate('allow duplicates'))
-        self.rp_scores_allow_duplicates.setToolTip(translate('Use this option to count one punch several times,'
-                                                     ' e.g. in trails with ring punching'))
+        self.rp_scores_allow_duplicates.setToolTip(
+            translate(
+                'Use this option to count one punch several times,'
+                ' e.g. in trails with ring punching'
+            )
+        )
         self.rp_scores_layout.addRow(self.rp_scores_allow_duplicates)
         self.result_proc_layout.addRow(self.rp_scores_group)
 
@@ -308,9 +318,13 @@ class TimekeepingPropertiesDialog(QDialog):
             'system_duplicate_chip_processing', 'several_results'
         )
         assignment_mode = cur_race.get_setting('system_assignment_mode', False)
-        ignore_readout_before_start = cur_race.get_setting('ignore_readout_before_start', False)
+        ignore_readout_before_start = cur_race.get_setting(
+            'ignore_readout_before_start', False
+        )
         si_port = cur_race.get_setting('system_port', '')
-        readout_duplicate_timeout = OTime(msec=cur_race.get_setting('readout_duplicate_timeout', 15000))
+        readout_duplicate_timeout = OTime(
+            msec=cur_race.get_setting('readout_duplicate_timeout', 15000)
+        )
 
         self.item_zero_time.setTime(QTime(zero_time[0], zero_time[1]))
 
@@ -379,7 +393,9 @@ class TimekeepingPropertiesDialog(QDialog):
         rp_scores_minute_penalty = obj.get_setting(
             'result_processing_scores_minute_penalty', 1
         )
-        rp_scores_allow_duplicates = obj.get_setting('result_processing_scores_allow_duplicates', False)
+        rp_scores_allow_duplicates = obj.get_setting(
+            'result_processing_scores_allow_duplicates', False
+        )
 
         if rp_mode == 'time':
             self.rp_time_radio.setChecked(True)
@@ -551,14 +567,15 @@ class TimekeepingPropertiesDialog(QDialog):
         rp_scores_minute_penalty = self.rp_scores_minute_penalty_edit.value()
         rp_scores_allow_duplicates = self.rp_scores_allow_duplicates.isChecked()
 
-
         obj.set_setting('result_processing_mode', rp_mode)
         obj.set_setting('result_processing_score_mode', rp_score_mode)
         obj.set_setting('result_processing_fixed_score_value', rp_fixed_scores_value)
         obj.set_setting(
             'result_processing_scores_minute_penalty', rp_scores_minute_penalty
         )
-        obj.set_setting('result_processing_scores_allow_duplicates', rp_scores_allow_duplicates)
+        obj.set_setting(
+            'result_processing_scores_allow_duplicates', rp_scores_allow_duplicates
+        )
 
         # marked route
         mr_mode = 'off'

@@ -374,7 +374,13 @@ class SFRReader(object):
                         h += 10
 
             ret = datetime(
-                minute=m, second=s, hour=h, day=now.day, month=now.month, year=now.year, microsecond=ssec * 100000
+                minute=m,
+                second=s,
+                hour=h,
+                day=now.day,
+                month=now.month,
+                year=now.year,
+                microsecond=ssec * 100000,
             )
             return ret
         return None
@@ -386,8 +392,8 @@ class SFRReader(object):
             'start': None,
             'finish': None,
             'check': None,
-            'card_number': 0
-            }
+            'card_number': 0,
+        }
 
     def get_card_data(self):
         """Decodes a data record read from an SFR Card."""
@@ -435,7 +441,6 @@ class SFRReaderReadout(SFRReader):
         i = 3
         self._count = 5  # will be overwritten in request(4)
         while i < self._count:
-
             self.request(i)  # see callback processing in data_handler method
 
             if not self.is_card_connected():  # card was removed during readout

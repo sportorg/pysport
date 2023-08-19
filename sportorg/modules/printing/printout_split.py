@@ -1,7 +1,7 @@
 import platform
 
 from sportorg.language import translate
-from sportorg.models.memory import ResultStatus, race, Group
+from sportorg.models.memory import Group, ResultStatus, race
 from sportorg.models.result.result_calculation import ResultCalculation
 
 if platform.system() == 'Windows':  # current realisation works on Windows only
@@ -12,7 +12,6 @@ if platform.system() == 'Windows':  # current realisation works on Windows only
 
 class SportorgPrinter(object):
     def __init__(self, printer_name, scale_factor=60, x_offset=5, y_offset=5):
-
         if not printer_name:
             printer_name = win32print.GetDefaultPrinter()
 
@@ -70,7 +69,7 @@ class SportorgPrinter(object):
         is_group_existed = True
         if group is None:
             group = Group()
-            group.name = "-"
+            group.name = '-'
             is_group_existed = False
 
         course = obj.find_course(result)
@@ -115,11 +114,11 @@ class SportorgPrinter(object):
         for split in result.splits:
             if not is_group_existed:
                 line = (
-                        ('  ' + str(index))[-3:]
-                        + ' '
-                        + ('  ' + split.code)[-3:]
-                        + ' '
-                        + split.time.to_str()[-7:]
+                    ('  ' + str(index))[-3:]
+                    + ' '
+                    + ('  ' + split.code)[-3:]
+                    + ' '
+                    + split.time.to_str()[-7:]
                 )
                 index += 1
                 self.print_line(line, fn, fs_main)
@@ -186,19 +185,18 @@ class SportorgPrinter(object):
 
         # Result
         if is_penalty_used:
-            if obj.get_setting("marked_route_mode") == "time":
+            if obj.get_setting('marked_route_mode') == 'time':
                 self.print_line(
                     translate('Penalty') + ': ' + result.get_penalty_time().to_str(),
                     fn,
                     fs_main,
                 )
-            elif obj.get_setting("marked_route_mode") == "laps":
+            elif obj.get_setting('marked_route_mode') == 'laps':
                 self.print_line(
                     translate('Penalty') + ': ' + str(result.penalty_laps),
                     fn,
                     fs_main,
                 )
-
 
         if result.is_status_ok():
             self.print_line(

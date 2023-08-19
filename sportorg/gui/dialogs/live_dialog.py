@@ -8,9 +8,10 @@ from PySide2.QtWidgets import (
     QDialog,
     QDialogButtonBox,
     QFormLayout,
+    QGroupBox,
     QLabel,
     QLineEdit,
-    QGroupBox, QTextEdit,
+    QTextEdit,
 )
 
 from sportorg import config
@@ -73,12 +74,18 @@ class LiveDialog(QDialog):
         self.online_cp_from_splits.setChecked(True)
         self.online_cp_from_splits_codes = QLineEdit('90,91,92')
         self.online_cp_from_splits_codes.setMaximumWidth(120)
-        self.online_cp_layout.addRow(self.online_cp_from_splits, self.online_cp_from_splits_codes)
+        self.online_cp_layout.addRow(
+            self.online_cp_from_splits, self.online_cp_from_splits_codes
+        )
 
         self.online_cp_from_finish = QCheckBox(translate('Finish as CP'))
         self.online_cp_from_finish.setChecked(True)
-        self.online_cp_from_finish_code = AdvSpinBox(minimum=0, maximum=1024, value=80, max_width=60)
-        self.online_cp_layout.addRow(self.online_cp_from_finish, self.online_cp_from_finish_code)
+        self.online_cp_from_finish_code = AdvSpinBox(
+            minimum=0, maximum=1024, value=80, max_width=60
+        )
+        self.online_cp_layout.addRow(
+            self.online_cp_from_finish, self.online_cp_from_finish_code
+        )
 
         self.online_cp_box.setLayout(self.online_cp_layout)
         self.layout.addRow(self.online_cp_box)
@@ -89,7 +96,9 @@ class LiveDialog(QDialog):
         self.hint.setMaximumHeight(70)
         self.layout.addRow(self.hint)
 
-        self.item_live_enabled.stateChanged.connect(self.on_enable_checkbox_state_changed)
+        self.item_live_enabled.stateChanged.connect(
+            self.on_enable_checkbox_state_changed
+        )
         self.item_cp_sending.stateChanged.connect(self.on_cp_sending_state_changed)
 
         def cancel_changes():
@@ -146,7 +155,7 @@ class LiveDialog(QDialog):
         live_cp_enabled = obj.get_setting('live_cp_enabled', False)
         live_cp_code = obj.get_setting('live_cp_code', '10')
         live_cp_split_codes = obj.get_setting('live_cp_split_codes', '91,91,92')
-        live_cp_finish_enabled = obj.get_setting('live_cp_finish_enabled',  True)
+        live_cp_finish_enabled = obj.get_setting('live_cp_finish_enabled', True)
         live_cp_splits_enabled = obj.get_setting('live_cp_splits_enabled', True)
 
         self.item_url.setText(encode_urls(urls))
@@ -166,9 +175,13 @@ class LiveDialog(QDialog):
         obj.set_setting('live_enabled', self.item_live_enabled.isChecked())
         obj.set_setting('live_results_enabled', self.item_result_sending.isChecked())
         obj.set_setting('live_cp_enabled', self.item_cp_sending.isChecked())
-        obj.set_setting('live_cp_finish_enabled', self.online_cp_from_finish.isChecked())
+        obj.set_setting(
+            'live_cp_finish_enabled', self.online_cp_from_finish.isChecked()
+        )
         obj.set_setting('live_cp_code', self.online_cp_from_finish_code.text())
-        obj.set_setting('live_cp_splits_enabled', self.online_cp_from_splits.isChecked())
+        obj.set_setting(
+            'live_cp_splits_enabled', self.online_cp_from_splits.isChecked()
+        )
         obj.set_setting('live_cp_split_codes', self.online_cp_from_splits_codes.text())
 
         logging.debug('Saving settings of live')

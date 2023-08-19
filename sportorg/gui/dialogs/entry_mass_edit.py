@@ -4,12 +4,13 @@ import logging
 from PySide2 import QtCore, QtWidgets
 from PySide2.QtGui import QIcon
 from PySide2.QtWidgets import QDialog, QDialogButtonBox, QFormLayout
+
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox, AdvSpinBox, AdvTimeEdit
 from sportorg.language import translate
 from sportorg.models.constant import get_race_groups, get_race_teams
-from sportorg.models.memory import find, race, Qualification
+from sportorg.models.memory import Qualification, find, race
 
 
 class MassEditDialog(QDialog):
@@ -21,7 +22,6 @@ class MassEditDialog(QDialog):
         return super().exec_()
 
     def init_ui(self):
-
         self.setWindowModality(QtCore.Qt.WindowModal)
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
@@ -53,7 +53,11 @@ class MassEditDialog(QDialog):
         self.layout.addRow(self.team_checkbox, self.team_combo)
 
         self.year_checkbox = QtWidgets.QCheckBox(self)
-        self.year_spinbox = AdvSpinBox(minimum=1900, maximum=datetime.datetime.now().year, max_width=max_field_width)
+        self.year_spinbox = AdvSpinBox(
+            minimum=1900,
+            maximum=datetime.datetime.now().year,
+            max_width=max_field_width,
+        )
         self.layout.addRow(self.year_checkbox, self.year_spinbox)
 
         self.qual_checkbox = QtWidgets.QCheckBox(self)
@@ -62,27 +66,39 @@ class MassEditDialog(QDialog):
         self.layout.addRow(self.qual_checkbox, self.qual_combo)
 
         self.bib_checkbox = QtWidgets.QCheckBox(self)
-        self.bib_spinbox = AdvSpinBox(minimum=0, maximum=9999999, max_width=max_field_width)
+        self.bib_spinbox = AdvSpinBox(
+            minimum=0, maximum=9999999, max_width=max_field_width
+        )
         self.layout.addRow(self.bib_checkbox, self.bib_spinbox)
 
         self.world_code_checkbox = QtWidgets.QCheckBox(self)
-        self.world_code_spinbox = AdvSpinBox(minimum=0, maximum=9999999, max_width=max_field_width)
+        self.world_code_spinbox = AdvSpinBox(
+            minimum=0, maximum=9999999, max_width=max_field_width
+        )
         self.layout.addRow(self.world_code_checkbox, self.world_code_spinbox)
 
         self.national_code_checkbox = QtWidgets.QCheckBox(self)
-        self.national_code_spinbox = AdvSpinBox(minimum=0, maximum=9999999, max_width=max_field_width)
+        self.national_code_spinbox = AdvSpinBox(
+            minimum=0, maximum=9999999, max_width=max_field_width
+        )
         self.layout.addRow(self.national_code_checkbox, self.national_code_spinbox)
 
         self.card_checkbox = QtWidgets.QCheckBox(self)
-        self.card_spinbox = AdvSpinBox(minimum=0, maximum=99999999, max_width=max_field_width)
+        self.card_spinbox = AdvSpinBox(
+            minimum=0, maximum=99999999, max_width=max_field_width
+        )
         self.layout.addRow(self.card_checkbox, self.card_spinbox)
 
         self.start_time_checkbox = QtWidgets.QCheckBox(self)
-        self.start_time_edit = AdvTimeEdit(display_format='hh:mm:ss', max_width=max_field_width)
+        self.start_time_edit = AdvTimeEdit(
+            display_format='hh:mm:ss', max_width=max_field_width
+        )
         self.layout.addRow(self.start_time_checkbox, self.start_time_edit)
 
         self.start_group_checkbox = QtWidgets.QCheckBox(self)
-        self.start_group_spinbox = AdvSpinBox(minimum=0, maximum=99, max_width=max_field_width)
+        self.start_group_spinbox = AdvSpinBox(
+            minimum=0, maximum=99, max_width=max_field_width
+        )
         self.layout.addRow(self.start_group_checkbox, self.start_group_spinbox)
 
         self.comment_checkbox = QtWidgets.QCheckBox(self)
@@ -138,7 +154,6 @@ class MassEditDialog(QDialog):
         self.show()
 
     def accept(self, *args, **kwargs):
-
         yes = translate('Yes')
         try:
             # apply mass edit here
@@ -152,7 +167,9 @@ class MassEditDialog(QDialog):
                     obj.organizations, name=self.team_combo.currentText()
                 )
                 change_year = int(self.year_spinbox.value())
-                change_qual = Qualification.get_qual_by_name(self.qual_combo.currentText())
+                change_qual = Qualification.get_qual_by_name(
+                    self.qual_combo.currentText()
+                )
                 change_bib = int(self.bib_spinbox.value())
                 change_world_code = int(self.world_code_spinbox.value())
                 change_national_code = int(self.national_code_spinbox.value())

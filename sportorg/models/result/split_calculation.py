@@ -7,7 +7,6 @@ from sportorg.utils.time import get_speed_min_per_km
 
 class PersonSplits(object):
     def __init__(self, r, result):
-
         self.race = r
         self.result = result
         self._course = None

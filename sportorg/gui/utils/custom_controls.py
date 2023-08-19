@@ -4,7 +4,7 @@ from PySide2.QtWidgets import QComboBox, QCompleter, QMessageBox, QSpinBox, QTim
 
 from sportorg.common.otime import OTime
 from sportorg.language import translate
-from sportorg.utils.time import time_to_qtime, time_to_otime
+from sportorg.utils.time import time_to_otime, time_to_qtime
 
 
 class AdvComboBox(QComboBox):
@@ -94,6 +94,7 @@ class AdvTimeEdit(QTimeEdit):
     def wheelEvent(self, ev):
         if ev.type() == QtCore.QEvent.Wheel:
             ev.ignore()
+
 
 def messageBoxQuestion(
     parent=None, title='', text='', buttons=(QMessageBox.Yes | QMessageBox.No)

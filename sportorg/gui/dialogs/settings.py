@@ -29,6 +29,7 @@ from sportorg.models.memory import (
 )
 from sportorg.modules.configs.configs import Config
 
+
 class Tab:
     def save(self):
         pass
@@ -47,7 +48,9 @@ class MainTab(Tab):
         )
         self.layout.addRow(self.label_lang, self.item_lang)
 
-        self.item_auto_save = AdvSpinBox(maximum=3600 * 24, value=Config().configuration.get('autosave_interval'))
+        self.item_auto_save = AdvSpinBox(
+            maximum=3600 * 24, value=Config().configuration.get('autosave_interval')
+        )
         self.item_auto_save.setMinimum(5)
         self.layout.addRow(translate('Auto save') + ' (sec)', self.item_auto_save)
 
@@ -70,7 +73,9 @@ class MainTab(Tab):
         # self.layout.addRow(self.item_check_updates)
 
         self.item_save_in_utf8 = QCheckBox(translate('Save in UTF-8 encoding'))
-        self.item_save_in_utf8.setChecked(Config().configuration.get('save_in_utf8', False))
+        self.item_save_in_utf8.setChecked(
+            Config().configuration.get('save_in_utf8', False)
+        )
         self.layout.addRow(self.item_save_in_utf8)
 
         self.widget.setLayout(self.layout)
@@ -82,16 +87,19 @@ class MainTab(Tab):
             'open_recent_file', self.item_open_recent_file.isChecked()
         )
 
-        if(bool(Config().configuration.get('show_toolbar')) != self.item_show_toolbar.isChecked()):
-            if( self.item_show_toolbar.isChecked()):
+        if (
+            bool(Config().configuration.get('show_toolbar'))
+            != self.item_show_toolbar.isChecked()
+        ):
+            if self.item_show_toolbar.isChecked():
                 mw = GlobalAccess().get_main_window()
-                if(hasattr(mw, 'toolbar')):
-                  mw.toolbar.show();
+                if hasattr(mw, 'toolbar'):
+                    mw.toolbar.show()
                 else:
                     mw._setup_toolbar()
             else:
                 mw = GlobalAccess().get_main_window()
-                mw.toolbar.hide();
+                mw.toolbar.hide()
         Config().configuration.set('show_toolbar', self.item_show_toolbar.isChecked())
         Config().configuration.set('use_birthday', self.item_use_birthday.isChecked())
         Config().configuration.set('check_updates', self.item_check_updates.isChecked())

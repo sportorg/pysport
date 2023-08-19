@@ -8,11 +8,25 @@ from PySide2.QtCore import QTimer
 from PySide2.QtWidgets import QMainWindow, QMessageBox
 
 from sportorg import config
+from sportorg.common.broker import Broker
 from sportorg.gui.dialogs.course_edit import CourseEditDialog
+from sportorg.gui.dialogs.file_dialog import get_save_file_name
 from sportorg.gui.dialogs.group_edit import GroupEditDialog
 from sportorg.gui.dialogs.organization_edit import OrganizationEditDialog
 from sportorg.gui.dialogs.person_edit import PersonEditDialog
 from sportorg.gui.global_access import GlobalAccess
+from sportorg.gui.menu import Factory, menu_list
+from sportorg.gui.tabs import courses, groups, log, organizations, persons, results
+from sportorg.gui.tabs.memory_model import (
+    CourseMemoryModel,
+    GroupMemoryModel,
+    OrganizationMemoryModel,
+    PersonMemoryModel,
+    ResultMemoryModel,
+)
+from sportorg.gui.toolbar import toolbar_list
+from sportorg.gui.utils.custom_controls import messageBoxQuestion
+from sportorg.language import translate
 from sportorg.models.constant import RentCards
 from sportorg.models.memory import (
     NotEmptyException,
@@ -22,37 +36,27 @@ from sportorg.models.memory import (
     set_current_race_index,
 )
 from sportorg.models.result.result_calculation import ResultCalculation
-from sportorg.models.result.result_checker import ResultChecker
 from sportorg.models.result.split_calculation import GroupSplits
 from sportorg.modules.backup.file import File
 from sportorg.modules.configs.configs import Config as Configuration
 from sportorg.modules.configs.configs import ConfigFile
-from sportorg.modules.live.live import live_client
+from sportorg.modules.live.live import LiveClient, live_client
 from sportorg.modules.printing.model import (
     NoPrinterSelectedException,
     NoResultToPrintException,
     split_printout,
-    split_printout_close
+    split_printout_close,
 )
 from sportorg.modules.rfid_impinj.rfid_impinj import ImpinjClient
 from sportorg.modules.sfr.sfrreader import SFRReaderClient
 from sportorg.modules.sound import Sound
 from sportorg.modules.sportident.result_generation import ResultSportidentGeneration
-from sportorg.common.broker import Broker
-from sportorg.gui.dialogs.file_dialog import get_save_file_name
-from sportorg.gui.menu import menu_list, Factory
-from sportorg.gui.tabs import persons, groups, organizations, results, courses, log
-from sportorg.gui.tabs.memory_model import PersonMemoryModel, ResultMemoryModel, GroupMemoryModel, \
-    CourseMemoryModel, OrganizationMemoryModel
-from sportorg.gui.toolbar import toolbar_list
-from sportorg.gui.utils.custom_controls import messageBoxQuestion
-from sportorg.language import translate
 from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.modules.sportiduino.sportiduino import SportiduinoClient
 from sportorg.modules.srpid.srpid import SrpidClient
+from sportorg.modules.teamwork import Teamwork
+from sportorg.modules.teamwork.packet_header import ObjectTypes
 from sportorg.modules.telegram.telegram import telegram_client
-from sportorg.modules.teamwork import Teamwork, ObjectTypes
-from sportorg.modules.live.live import LiveClient
 
 
 class ConsolePanelHandler(logging.Handler):
@@ -63,16 +67,19 @@ class ConsolePanelHandler(logging.Handler):
         self.parent = parent
 
     def emit(self, record):
-        self.parent.logging(dict({'text': self.format(record), 'level': record.levelno}))
+        self.parent.logging(
+            dict({'text': self.format(record), 'level': record.levelno})
+        )
 
 
 def is_reading_active():
-    return SIReaderClient().is_alive() \
-        or SFRReaderClient().is_alive() \
-        or ImpinjClient().is_alive() \
-        or SportiduinoClient().is_alive() \
-        or SrpidClient().is_alive() \
-
+    return (
+        SIReaderClient().is_alive()
+        or SFRReaderClient().is_alive()
+        or ImpinjClient().is_alive()
+        or SportiduinoClient().is_alive()
+        or SrpidClient().is_alive()
+    )
 
 
 class MainWindow(QMainWindow):
@@ -133,9 +140,13 @@ class MainWindow(QMainWindow):
             # logging.info(repr(command.data))
             # if 'object' in command.data and command.data['object'] in
             # ['ResultManual', 'ResultSportident', 'ResultSFR', 'ResultSportiduino']:
-            if command.header.objType in [ObjectTypes.Result.value, ObjectTypes.ResultManual.value,
-                                          ObjectTypes.ResultSportident.value,
-                                          ObjectTypes.ResultSFR.value, ObjectTypes.ResultSportiduino.value]:
+            if command.header.objType in [
+                ObjectTypes.Result.value,
+                ObjectTypes.ResultManual.value,
+                ObjectTypes.ResultSportident.value,
+                ObjectTypes.ResultSFR.value,
+                ObjectTypes.ResultSportiduino.value,
+            ]:
                 self.deleyed_res_recalculate(1000)
             Broker().produce('teamwork_recieving', command.data)
             self.deleyed_refresh(1000)
@@ -154,17 +165,23 @@ class MainWindow(QMainWindow):
             self.sportident_status = is_reading_active()
 
             self.toolbar_property['sportident'].setIcon(
-                QtGui.QIcon(config.icon_dir(self.sportident_icon[self.sportident_status])))
+                QtGui.QIcon(
+                    config.icon_dir(self.sportident_icon[self.sportident_status])
+                )
+            )
 
         if Teamwork().is_alive() != self.teamwork_status:
             self.toolbar_property['teamwork'].setIcon(
-                QtGui.QIcon(config.icon_dir(self.teamwork_icon[Teamwork().is_alive()])))
+                QtGui.QIcon(config.icon_dir(self.teamwork_icon[Teamwork().is_alive()]))
+            )
             self.teamwork_status = Teamwork().is_alive()
 
         try:
             if self.get_configuration().get('autosave_interval'):
                 if self.file:
-                    if time.time() - self.last_update > int(self.get_configuration().get('autosave_interval')):
+                    if time.time() - self.last_update > int(
+                        self.get_configuration().get('autosave_interval')
+                    ):
                         self.save_file()
                         logging.info(translate('Auto save'))
                 else:
@@ -180,9 +197,17 @@ class MainWindow(QMainWindow):
             self.statusbar_message(text)
             if hasattr(self, 'logging_tab'):
                 self.logging_tab.write(text)
-                if lvl >= logging.ERROR and self.tabbar.tabTextColor(self.tabwidget.indexOf(self.logging_tab)) \
-                        != self.logging_tab.error_color:
-                    self.tabbar.setTabTextColor(self.tabwidget.indexOf(self.logging_tab), self.logging_tab.error_color)
+                if (
+                    lvl >= logging.ERROR
+                    and self.tabbar.tabTextColor(
+                        self.tabwidget.indexOf(self.logging_tab)
+                    )
+                    != self.logging_tab.error_color
+                ):
+                    self.tabbar.setTabTextColor(
+                        self.tabwidget.indexOf(self.logging_tab),
+                        self.logging_tab.error_color,
+                    )
 
     def close(self):
         self.conf_write()
@@ -268,7 +293,9 @@ class MainWindow(QMainWindow):
     def _setup_ui(self):
         geometry = ConfigFile.GEOMETRY
 
-        geom = bytearray.fromhex(Configuration().parser.get(geometry, 'main', fallback='01'))
+        geom = bytearray.fromhex(
+            Configuration().parser.get(geometry, 'main', fallback='01')
+        )
         self.restoreGeometry(geom)
 
         self.setWindowIcon(QtGui.QIcon(config.ICON))
@@ -311,7 +338,7 @@ class MainWindow(QMainWindow):
                 if 'property' in action_item:
                     self.menu_property[action_item['property']] = action
                 if (
-                        'debug' in action_item and action_item['debug']
+                    'debug' in action_item and action_item['debug']
                 ) or 'debug' not in action_item:
                     parent.addAction(action)
             else:
@@ -379,7 +406,6 @@ class MainWindow(QMainWindow):
             self.refresh()
 
     def get_size(self):
-
         return {
             # 'x': self.x() + 8,
             'x': self.geometry().x(),
@@ -594,7 +620,7 @@ class MainWindow(QMainWindow):
                         else:
                             Sound().fail()
                         if result.person.is_rented_card or RentCards().exists(
-                                result.person.card_number
+                            result.person.card_number
                         ):
                             Sound().rented_card()
             else:

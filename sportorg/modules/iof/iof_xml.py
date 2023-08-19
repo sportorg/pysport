@@ -6,14 +6,28 @@ import dateutil.parser
 
 from sportorg.common.otime import OTime
 from sportorg.language import translate
-from sportorg.libs.iof.generator import generate_result_list, generate_entry_list, generate_start_list, \
-    generate_competitor_list
-
+from sportorg.libs.iof.generator import (
+    generate_competitor_list,
+    generate_entry_list,
+    generate_result_list,
+    generate_start_list,
+)
 from sportorg.libs.iof.parser import parse
-
-from sportorg.models.memory import race, Group, find, Organization, Person, Qualification, create, Course, \
-    CourseControl, Result, ResultSportident, ResultStatus, Split
-from sportorg.utils.time import time_to_otime, time_iof_to_otime, str_to_date, hhmmss_to_time, yyyymmdd_to_date
+from sportorg.models.memory import (
+    Course,
+    CourseControl,
+    Group,
+    Organization,
+    Person,
+    Qualification,
+    ResultSportident,
+    ResultStatus,
+    Split,
+    create,
+    find,
+    race,
+)
+from sportorg.utils.time import hhmmss_to_time, time_iof_to_otime, yyyymmdd_to_date
 
 
 def export_result_list(file, all_splits=False):
@@ -99,13 +113,19 @@ def create_person(person_entry):
     person = Person()
 
     name = person_entry['group']['name']
-    if 'short_name' in person_entry['group'] and len(person_entry['group']['short_name']) > 0:
-         name = person_entry['group']['short_name']
+    if (
+        'short_name' in person_entry['group']
+        and len(person_entry['group']['short_name']) > 0
+    ):
+        name = person_entry['group']['short_name']
     group = find(obj.groups, name=name)
     if group is None:
         group = Group()
         group.long_name = person_entry['group']['name']
-        if 'short_name' in person_entry['group'] and len(person_entry['group']['short_name']) > 0:
+        if (
+            'short_name' in person_entry['group']
+            and len(person_entry['group']['short_name']) > 0
+        ):
             group.name = person_entry['group']['short_name']
         else:
             group.name = group.long_name
@@ -128,18 +148,29 @@ def create_person(person_entry):
     if 'id' in person_entry['person']:
         person.world_code = str(person_entry['person']['id'])
     if 'birth_date' in person_entry['person']:
-        person.birth_date = dateutil.parser.parse(person_entry['person']['birth_date']).date() \
-            if person_entry['person']['birth_date'] else 0
+        person.birth_date = (
+            dateutil.parser.parse(person_entry['person']['birth_date']).date()
+            if person_entry['person']['birth_date']
+            else 0
+        )
     if 'race_numbers' in person_entry and len(person_entry['race_numbers']):
         person.comment = 'C:' + ''.join(person_entry['race_numbers'])
     if 'control_card' in person_entry and person_entry['control_card']:
         person.card_number = int(person_entry['control_card'])
     if 'bib' in person_entry['person'] and person_entry['person']['bib']:
         person.bib = int(person_entry['person']['bib'])
-    elif 'bib' in person_entry['person']['extensions'] and person_entry['person']['extensions']['bib']:
+    elif (
+        'bib' in person_entry['person']['extensions']
+        and person_entry['person']['extensions']['bib']
+    ):
         person.bib = int(person_entry['person']['extensions']['bib'])
-    if 'qual' in person_entry['person']['extensions'] and person_entry['person']['extensions']['qual']:
-        person.qual = Qualification.get_qual_by_name(person_entry['person']['extensions']['qual'])
+    if (
+        'qual' in person_entry['person']['extensions']
+        and person_entry['person']['extensions']['qual']
+    ):
+        person.qual = Qualification.get_qual_by_name(
+            person_entry['person']['extensions']['qual']
+        )
     if 'start' in person_entry['person'] and person_entry['person']['start']:
         person.start_time = time_iof_to_otime(person_entry['person']['start'])
 
@@ -184,7 +215,6 @@ def import_from_entry_list(entries):
 
 
 def import_from_result_list(results):
-
     obj = race()
 
     for person_obj in results:
@@ -243,7 +273,7 @@ def import_from_result_list(results):
                 new_split.code = cur_split['control_code']
                 split_time = cur_split['time']
                 time_ms = int(float(str(split_time).replace(',', '.')) * 1000)
-                new_time = start + OTime(msec = time_ms)
+                new_time = start + OTime(msec=time_ms)
                 new_split.time = new_time
                 new_result.splits.append(new_split)
 
@@ -257,7 +287,12 @@ def import_from_event_data(data):
 
     if 'name' in data:
         new_name = data['name']
-        if new_name and len(new_name) > 0 and new_name != 'Event' and new_name.find('Example') < 0:
+        if (
+            new_name
+            and len(new_name) > 0
+            and new_name != 'Event'
+            and new_name.find('Example') < 0
+        ):
             obj.data.title = data['name']
 
     if 'start_date' in data:
@@ -271,6 +306,7 @@ def import_from_event_data(data):
         if 'date' in race_data and 'time' in race_data:
             date_val = yyyymmdd_to_date(race_data['date'], '-')
             otime_val = hhmmss_to_time(str(race_data['time']).split('+')[0])
-            time_val = time(hour=otime_val.hour, minute=otime_val.minute, second=otime_val.sec)
+            time_val = time(
+                hour=otime_val.hour, minute=otime_val.minute, second=otime_val.sec
+            )
             obj.data.start_datetime = datetime.datetime.combine(date_val, time_val)
-

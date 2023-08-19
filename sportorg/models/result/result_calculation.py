@@ -2,7 +2,14 @@ import logging
 
 from sportorg.common.otime import OTime
 from sportorg.models.constant import RankingTable
-from sportorg.models.memory import Group, Qualification, RaceType, RelayTeam, find, ResultStatus, Person
+from sportorg.models.memory import (
+    Group,
+    Qualification,
+    RaceType,
+    RelayTeam,
+    ResultStatus,
+    find,
+)
 from sportorg.modules.configs.configs import Config
 
 
@@ -17,7 +24,9 @@ class ResultCalculation(object):
             person.result_count = 0
             if person.start_time and person.group:
                 if person.group.pursuit_start_time != OTime():
-                    person.group.pursuit_start_time = min(person.start_time, person.group.pursuit_start_time)
+                    person.group.pursuit_start_time = min(
+                        person.start_time, person.group.pursuit_start_time
+                    )
                 else:
                     person.group.pursuit_start_time = person.start_time
 
@@ -106,7 +115,10 @@ class ResultCalculation(object):
             place = 1  # place to show
             order = 1  # order for templates
             for cur_team in teams_sorted:
-                if not cur_team.get_is_status_ok() or cur_team.get_is_out_of_competition():
+                if (
+                    not cur_team.get_is_status_ok()
+                    or cur_team.get_is_out_of_competition()
+                ):
                     cur_team.set_place(-1)
                 else:
                     cur_team.set_place(place)
@@ -133,8 +145,9 @@ class ResultCalculation(object):
                 rank = self.get_group_rank(group)
             ranking.rank_scores = rank
             if rank > 0:
-
-                is_score_processing_mode = self.race.get_setting('result_processing_mode', 'time') == 'scores'
+                is_score_processing_mode = (
+                    self.race.get_setting('result_processing_mode', 'time') == 'scores'
+                )
                 leader_time = OTime(0)
                 leader_scores = 0
                 if is_score_processing_mode:
@@ -150,9 +163,13 @@ class ResultCalculation(object):
                         i.percent = self.get_percent_for_rank(i.qual, rank)
                         i.max_place = 0
                         if is_score_processing_mode:
-                            i.min_scores = self.get_scores_for_rank(leader_scores, i.qual, rank)
+                            i.min_scores = self.get_scores_for_rank(
+                                leader_scores, i.qual, rank
+                            )
                         else:
-                            i.max_time = self.get_time_for_rank(leader_time, i.qual, rank)
+                            i.max_time = self.get_time_for_rank(
+                                leader_time, i.qual, rank
+                            )
                     else:
                         i.percent = 0
 
@@ -178,10 +195,9 @@ class ResultCalculation(object):
                         if j.max_time and j.max_time >= result_time:
                             i.assigned_rank = j.qual
                             break
-                        if  result_scores >= j.min_scores > 0:
+                        if result_scores >= j.min_scores > 0:
                             i.assigned_rank = j.qual
                             break
-
 
     def get_group_leader_time(self, group):
         if self.race.get_type(group) == RaceType.RELAY:
@@ -212,12 +228,16 @@ class ResultCalculation(object):
         start_limit = Config().ranking.get('start_limit', 10)
         finish_limit = Config().ranking.get('finish_limit', 5)
         sum_count = Config().ranking.get('sum_count', 10)
-        individual_ranking_method = Config().ranking.get('individual_ranking_method', 'best')
+        individual_ranking_method = Config().ranking.get(
+            'individual_ranking_method', 'best'
+        )
 
         started_count = 0
         for i in array:
             person = i.person
-            if not person.is_out_of_competition and i.status not in [ResultStatus.DID_NOT_START]:
+            if not person.is_out_of_competition and i.status not in [
+                ResultStatus.DID_NOT_START
+            ]:
                 started_count += 1
                 if i.is_status_ok():
                     qual = person.qual

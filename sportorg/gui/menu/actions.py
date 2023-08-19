@@ -11,10 +11,10 @@ from sportorg import config
 from sportorg.common.otime import OTime
 from sportorg.gui.dialogs.about import AboutDialog
 from sportorg.gui.dialogs.cp_delete import CPDeleteDialog
-from sportorg.gui.dialogs.filter_dialog import DialogFilter
 from sportorg.gui.dialogs.entry_mass_edit import MassEditDialog
 from sportorg.gui.dialogs.event_properties import EventPropertiesDialog
 from sportorg.gui.dialogs.file_dialog import get_open_file_name, get_save_file_name
+from sportorg.gui.dialogs.filter_dialog import DialogFilter
 from sportorg.gui.dialogs.group_mass_edit import GroupMassEditDialog
 from sportorg.gui.dialogs.live_dialog import LiveDialog
 from sportorg.gui.dialogs.marked_route_dialog import MarkedRouteDialog
@@ -244,6 +244,7 @@ class IOFResultListExportAction(Action, metaclass=ActionFactory):
                     translate('Export error') + ': ' + file_name,
                 )
 
+
 class IOFResultListAllSplitsExportAction(Action, metaclass=ActionFactory):
     def execute(self):
         file_name = get_save_file_name(
@@ -261,6 +262,7 @@ class IOFResultListAllSplitsExportAction(Action, metaclass=ActionFactory):
                     translate('Error'),
                     translate('Export error') + ': ' + file_name,
                 )
+
 
 class IOFEntryListExportAction(Action, metaclass=ActionFactory):
     def execute(self):
@@ -301,27 +303,42 @@ class IOFEntryListImportAction(Action, metaclass=ActionFactory):
 
 class IOFStartListExportAction(Action, metaclass=ActionFactory):
     def execute(self):
-        file_name = get_save_file_name(translate('Save As IOF xml'), translate('IOF xml (*.xml)'),
-                                       '{}_startList'.format(race().data.get_start_datetime().strftime("%Y%m%d")))
+        file_name = get_save_file_name(
+            translate('Save As IOF xml'),
+            translate('IOF xml (*.xml)'),
+            '{}_startList'.format(race().data.get_start_datetime().strftime('%Y%m%d')),
+        )
         if file_name != '':
             try:
                 iof_xml.export_start_list(file_name)
             except Exception as e:
                 logging.exception(str(e))
-                QMessageBox.warning(self.app, translate('Error'), translate('Export error') + ': ' + file_name)
+                QMessageBox.warning(
+                    self.app,
+                    translate('Error'),
+                    translate('Export error') + ': ' + file_name,
+                )
 
 
 class IOFCompetitorListExportAction(Action, metaclass=ActionFactory):
     def execute(self):
-        file_name = get_save_file_name(translate('Save As IOF xml'), translate('IOF xml (*.xml)'),
-                                       '{}_competitorList'.format(
-                                           race().data.get_start_datetime().strftime("%Y%m%d")))
+        file_name = get_save_file_name(
+            translate('Save As IOF xml'),
+            translate('IOF xml (*.xml)'),
+            '{}_competitorList'.format(
+                race().data.get_start_datetime().strftime('%Y%m%d')
+            ),
+        )
         if file_name != '':
             try:
                 iof_xml.export_competitor_list(file_name)
             except Exception as e:
                 logging.exception(str(e))
-                QMessageBox.warning(self.app, translate('Error'), translate('Export error') + ': ' + file_name)
+                QMessageBox.warning(
+                    self.app,
+                    translate('Error'),
+                    translate('Export error') + ': ' + file_name,
+                )
 
 
 class AddObjectAction(Action, metaclass=ActionFactory):
@@ -528,6 +545,7 @@ class SFRReadoutAction(Action, metaclass=ActionFactory):
         SFRReaderClient().toggle()
         time.sleep(0.5)
         self.app.interval()
+
 
 class CreateReportAction(Action, metaclass=ActionFactory):
     def execute(self):
@@ -841,7 +859,7 @@ class RentCardsAction(Action, metaclass=ActionFactory):
         self.app.refresh()
 
 
-class MarkedRouteCourseGeneration(Action, metaclass=ActionFactory ):
+class MarkedRouteCourseGeneration(Action, metaclass=ActionFactory):
     def execute(self):
         MarkedRouteDialog().exec_()
         self.app.refresh()

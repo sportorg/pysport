@@ -67,7 +67,6 @@ class WdbOnlineSender(object):
                             old_finish = self.current_wdb.find_finish_by_number(bib)
 
                             if old_finish and isinstance(old_finish, WDBFinish):
-
                                 if old_finish.time != new_finish.time:
                                     # result changed
                                     ret.append(new_finish)

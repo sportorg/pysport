@@ -85,7 +85,7 @@ def style_dir(*paths):
     return os.path.join(STYLE_DIR, *paths)
 
 
-env = Env(_env_file=base_dir('.env'))
+env = Env(_env_file=base_dir('.env'))  # type:ignore
 DEBUG = env.DEBUG
 
 ICON = icon_dir('sportorg.svg')

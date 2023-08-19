@@ -119,7 +119,7 @@ class WinOrientBinary:
             new_person.surname = man.name.strip().split(' ')[0]
             index_of_first_space = str(man.name.strip()).find(' ')
             if index_of_first_space > 0:
-                new_person.name = man.name.strip()[index_of_first_space + 1:].strip()
+                new_person.name = man.name.strip()[index_of_first_space + 1 :].strip()
             new_person.bib = man.number
             if man.qualification:
                 if man.qualification == 10:
@@ -165,7 +165,6 @@ class WinOrientBinary:
 
         # punches
         for chip in self.wdb_object.chip:
-
             person = find(my_race.persons, card_number=chip.id)
             if person:
                 result = find(my_race.results, person=person)
@@ -217,7 +216,6 @@ class WinOrientBinary:
 
             # controls
             for i in range(len(course.controls)):
-
                 if len(new_course.point) >= i:
                     new_course.point.append(0)
                     new_course.leg.append(0)
@@ -323,18 +321,18 @@ class WinOrientBinary:
                     wdb_object.chip.append(new_chip)
 
                 # write start time from start station to person
-                if my_race.get_setting("system_start_source") == "station":
+                if my_race.get_setting('system_start_source') == 'station':
                     if result.start_time and result.start_time > OTime(0):
                         new_person.start = time_to_int(result.start_time)
 
-        if my_race.get_setting("system_start_source") == "station":
+        if my_race.get_setting('system_start_source') == 'station':
             wdb_object.info.si_start_source = 1
-        elif my_race.get_setting("system_start_source") == "cp":
+        elif my_race.get_setting('system_start_source') == 'cp':
             wdb_object.info.si_start_source = 2
 
-        if my_race.get_setting("system_finish_source") == "station":
+        if my_race.get_setting('system_finish_source') == 'station':
             wdb_object.info.si_finish_source = 1
-        elif my_race.get_setting("system_finish_source") == "cp":
+        elif my_race.get_setting('system_finish_source') == 'cp':
             wdb_object.info.si_finish_source = 2
 
         return wdb_object

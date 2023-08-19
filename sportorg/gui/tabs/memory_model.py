@@ -100,7 +100,6 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
             self.filter_backup.clear()
 
     def set_filter_for_column(self, column_num, filter_regexp, action):
-
         self.filter.update({column_num: [filter_regexp, action]})
 
     def apply_filter(self):
@@ -115,7 +114,7 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
             check = re.compile('.*' + check_regexp + '.*')
 
             if action == translate('equal to'):
-                check = re.compile(check_regexp + "$")
+                check = re.compile(check_regexp + '$')
 
             i = 0
             while i < len(current_array):
@@ -411,7 +410,9 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
             i.penalty_laps,
             str(i.system_type),
             rented_card,
-            time_to_hhmmss(i.get_result_otime_current_day()) if i.is_status_ok() else "",
+            time_to_hhmmss(i.get_result_otime_current_day())
+            if i.is_status_ok()
+            else '',
         ]
         return ret
 
@@ -443,7 +444,7 @@ class GroupMemoryModel(AbstractSportOrgMemoryModel):
             translate('Order in corridor title'),
             translate('Count of person'),
             translate('Count of finished'),
-            translate('Count of not finished')
+            translate('Count of not finished'),
         ]
 
     def init_cache(self):
@@ -483,7 +484,7 @@ class GroupMemoryModel(AbstractSportOrgMemoryModel):
             group.order_in_corridor,
             group.count_person,
             group.count_finished,
-            group.count_person - group.count_finished
+            group.count_person - group.count_finished,
         ]
 
     def get_source_array(self):
@@ -537,7 +538,7 @@ class CourseMemoryModel(AbstractSportOrgMemoryModel):
             course.count_person,
             course.count_finished,
             course.count_person - course.count_finished,
-            course.count_group
+            course.count_group,
         ]
 
     def get_source_array(self):
@@ -560,7 +561,7 @@ class OrganizationMemoryModel(AbstractSportOrgMemoryModel):
             translate('Contact'),
             translate('Count of person'),
             translate('Count of finished'),
-            translate('Count of not finished')
+            translate('Count of not finished'),
         ]
 
     def init_cache(self):
@@ -588,7 +589,7 @@ class OrganizationMemoryModel(AbstractSportOrgMemoryModel):
             organization.contact,
             organization.count_person,
             organization.count_finished,
-            organization.count_person - organization.count_finished
+            organization.count_person - organization.count_finished,
         ]
 
     def get_source_array(self):

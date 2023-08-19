@@ -4,12 +4,13 @@ import logging
 from PySide2 import QtCore, QtWidgets
 from PySide2.QtGui import QIcon
 from PySide2.QtWidgets import QDialog, QDialogButtonBox, QFormLayout
+
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox, AdvSpinBox, AdvTimeEdit
 from sportorg.language import translate
 from sportorg.models.constant import get_race_courses
-from sportorg.models.memory import find, race, RaceType
+from sportorg.models.memory import RaceType, find, race
 
 
 class GroupMassEditDialog(QDialog):
@@ -21,7 +22,6 @@ class GroupMassEditDialog(QDialog):
         return super().exec_()
 
     def init_ui(self):
-
         self.setWindowModality(QtCore.Qt.WindowModal)
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
@@ -46,15 +46,21 @@ class GroupMassEditDialog(QDialog):
         self.layout.addRow(self.any_course_checkbox, self.any_course_combobox)
 
         self.min_year_checkbox = QtWidgets.QCheckBox(self)
-        self.min_year_spinbox = AdvSpinBox(minimum=0, maximum=cur_year, max_width=max_field_width)
+        self.min_year_spinbox = AdvSpinBox(
+            minimum=0, maximum=cur_year, max_width=max_field_width
+        )
         self.layout.addRow(self.min_year_checkbox, self.min_year_spinbox)
 
         self.max_year_checkbox = QtWidgets.QCheckBox(self)
-        self.max_year_spinbox = AdvSpinBox(minimum=0, maximum=cur_year, max_width=max_field_width)
+        self.max_year_spinbox = AdvSpinBox(
+            minimum=0, maximum=cur_year, max_width=max_field_width
+        )
         self.layout.addRow(self.max_year_checkbox, self.max_year_spinbox)
 
         self.time_limit_checkbox = QtWidgets.QCheckBox(self)
-        self.time_limit_edit = AdvTimeEdit(display_format='hh:mm:ss', max_width=max_field_width)
+        self.time_limit_edit = AdvTimeEdit(
+            display_format='hh:mm:ss', max_width=max_field_width
+        )
         self.layout.addRow(self.time_limit_checkbox, self.time_limit_edit)
 
         self.start_corridor_checkbox = QtWidgets.QCheckBox(self)
@@ -62,11 +68,17 @@ class GroupMassEditDialog(QDialog):
         self.layout.addRow(self.start_corridor_checkbox, self.start_corridor_spinbox)
 
         self.order_in_corridor_checkbox = QtWidgets.QCheckBox(self)
-        self.order_in_corridor_spinbox = AdvSpinBox(minimum=0, max_width=max_field_width)
-        self.layout.addRow(self.order_in_corridor_checkbox, self.order_in_corridor_spinbox)
+        self.order_in_corridor_spinbox = AdvSpinBox(
+            minimum=0, max_width=max_field_width
+        )
+        self.layout.addRow(
+            self.order_in_corridor_checkbox, self.order_in_corridor_spinbox
+        )
 
         self.start_interval_checkbox = QtWidgets.QCheckBox(self)
-        self.start_interval_edit = AdvTimeEdit(display_format='hh:mm:ss', max_width=max_field_width)
+        self.start_interval_edit = AdvTimeEdit(
+            display_format='hh:mm:ss', max_width=max_field_width
+        )
         self.layout.addRow(self.start_interval_checkbox, self.start_interval_edit)
 
         self.fee_checkbox = QtWidgets.QCheckBox(self)
@@ -96,7 +108,6 @@ class GroupMassEditDialog(QDialog):
         self.show()
 
     def accept(self, *args, **kwargs):
-
         yes = translate('Yes')
         try:
             # apply mass edit here
@@ -105,7 +116,9 @@ class GroupMassEditDialog(QDialog):
             if selection:
                 obj = race()
 
-                change_course = find(obj.courses, name=self.course_combobox.currentText())
+                change_course = find(
+                    obj.courses, name=self.course_combobox.currentText()
+                )
                 change_any_course = self.any_course_combobox.currentText() == yes
                 change_min_year = int(self.min_year_spinbox.value())
                 change_max_year = int(self.max_year_spinbox.value())

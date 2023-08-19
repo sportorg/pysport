@@ -140,7 +140,6 @@ class DrawManager(object):
     def process_conflicts(self):
         start = 0
         while start < len(self.person_array):
-
             if self.split_start_groups:
                 end = self.get_last_index_in_start_group(start)
             else:
@@ -164,7 +163,6 @@ class DrawManager(object):
                 if self.conflict(i, i + 1):
                     j = i + 2
                     while j != i:
-
                         # boundary processing
                         if j > end:
                             # go to the beginning of array
@@ -275,7 +273,6 @@ class StartNumberManager(object):
     def set_numbers_by_minute(self, persons, first_number=1):
         max_assigned_num = first_number
         if persons and len(persons) > 0:
-
             # first find minimal start time
             first_start = min(persons, key=lambda x: x.start_time).start_time
             if not first_start:
@@ -326,7 +323,6 @@ class StartTimeManager(object):
         one_minute_qty=1,
         mix_groups=False,
     ):
-
         corridors = get_corridors()
         for cur_corridor in corridors:
             cur_start = corridor_first_start
