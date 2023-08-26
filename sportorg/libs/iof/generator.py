@@ -4,12 +4,15 @@ from lxml.builder import E
 from lxml.etree import Element, ElementTree
 
 from sportorg import config
-from sportorg.models.memory import Person, Race, ResultStatus
+from sportorg.models.memory import Race, ResultStatus
 from sportorg.models.result.result_calculation import ResultCalculation
 
 
 def otime_to_str(race_obj, otime):
-    """Convert time to the date string, expressed in ISO 8601 format. Day is taken from settings of race"""
+    """
+    Convert time to the date string, expressed in ISO 8601 format.
+    Day is taken from settings of race
+    """
     day = race_obj.data.get_start_datetime()
     return day.strftime('%Y-%m-%d') + 'T' + otime.to_str(3)
 
@@ -58,7 +61,6 @@ def generate_result_list(obj, all_splits=False):
                 person = result.person
                 organization = person.organization
 
-                # generate Result
                 xml_result = generate_result(obj, result, all_splits)
 
                 # compose PersonResult from organization, person and result
@@ -138,7 +140,6 @@ def generate_entry_list(obj):
     xml_el.append(generate_evant(obj))
 
     for person in obj.persons:
-        assert isinstance(person, Person)
         # Generate PersonEntry objects for each person
         organization = person.organization
         group = person.group
