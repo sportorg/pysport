@@ -3,13 +3,18 @@ import os
 from queue import Queue
 from threading import Thread
 
-from playsound import playsound
+try:
+    from playsound import playsound
+except ModuleNotFoundError:
+    playsound = None
 
 from sportorg import config
 from sportorg.common.singleton import singleton
 
 
 def play(sound):
+    if not playsound:
+        return None
     playsound(sound)
 
 

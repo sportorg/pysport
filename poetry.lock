@@ -1321,7 +1321,7 @@ test = ["appdirs (==1.4.4)", "covdefaults (>=2.3)", "pytest (>=7.4)", "pytest-co
 name = "playsound"
 version = "1.3.0"
 description = "Pure Python, cross platform, single function module with no dependencies for playing sounds."
-optional = false
+optional = true
 python-versions = "*"
 files = [
     {file = "playsound-1.3.0.tar.gz", hash = "sha256:cc6ed11d773034b0ef624e6bb4bf50f4b76b8414a59ce6d38afb89b423297ced"},
@@ -2070,4 +2070,4 @@ win = ["pywin32"]
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.8.1"
-content-hash = "b9ea5113ec944efc97445b731b1430cd5089dcf30f11211ab9a316ee3c91c269"
+content-hash = "f0d118ec2fe2eaefe2cf22be597675e2c7b0552d6ddb12a85ef701a5202f1009"

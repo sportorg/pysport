@@ -8,12 +8,12 @@ authors = ["Danil Akhtarov <daxartio@gmail.com>"]
 python = "~3.8.1"
 pywin32 = {version="^228", optional = true}
 pyImpinj = {version="^1.2", optional = true}
+playsound = {version="^1", optional = true}
 boltons = "^20"
 chardet = "^5.2.0"
 docxtpl = "^0"
 jinja2 = "^2"
 markupsafe = "2.0.1"
-playsound = "^1"
 polib = "^1"
 pydantic = "^1"
 PySide2 = "^5"
