@@ -22,7 +22,7 @@ def singleton(cls, *args, **kw):
     Decorator
 
     >>>@singleton
-    >>>class SomeClass(object):
+    >>>class SomeClass:
     >>>    pass
     """
     instances = {}

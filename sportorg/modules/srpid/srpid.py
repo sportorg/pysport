@@ -116,7 +116,7 @@ class ResultThread(QThread):
 
 
 @singleton
-class SrpidClient(object):
+class SrpidClient:
     def __init__(self):
         self._queue = Queue()
         self._stop_event = Event()

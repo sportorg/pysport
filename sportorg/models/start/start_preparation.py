@@ -9,7 +9,7 @@ from sportorg.models.memory import Person, race
 from sportorg.models.result.result_calculation import ResultCalculation
 
 
-class ReserveManager(object):
+class ReserveManager:
     def __init__(self, r):
         self.race = r
 
@@ -48,7 +48,7 @@ class ReserveManager(object):
                 current_race.persons.append(new_person)
 
 
-class DrawManager(object):
+class DrawManager:
     """
     Execute draw in each group
     Now effect on all groups, but in future we'll possible implement working with filtered persons
@@ -229,7 +229,7 @@ class DrawManager(object):
         return k - 1
 
 
-class StartNumberManager(object):
+class StartNumberManager:
     def __init__(self, r):
         self.race = r
 
@@ -306,7 +306,7 @@ class StartNumberManager(object):
         return cur_number
 
 
-class StartTimeManager(object):
+class StartTimeManager:
     def __init__(self, r):
         self.race = r
 

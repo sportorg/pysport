@@ -38,7 +38,7 @@ class ResultThread(QThread):
 
 
 @singleton
-class Teamwork(object):
+class Teamwork:
     def __init__(self):
         self._in_queue = Queue()
         self._out_queue = Queue()

@@ -26,7 +26,7 @@ def indent(elem, level=0):
             elem.tail = i
 
 
-class BaseElement(object):
+class BaseElement:
     @abstractmethod
     def to_elem(self) -> ET.Element:
         pass
@@ -56,7 +56,7 @@ class BaseElement(object):
         return ET.ElementTree(el).write(file, **kwargs)
 
 
-class IOF30(object):
+class IOF30:
     def __init__(self):
         self.iof_version = 3.0
         self.xmlns = 'http://www.orienteering.org/datastandard/3.0'

@@ -39,10 +39,12 @@ if PY3:
             return x
 
 
-class Sportiduino(object):
+class Sportiduino:
     """Protocol functions and constants to interact with Sportiduino master station."""
 
-    _translate = lambda _, s: s
+    @staticmethod
+    def _translate(_, s):
+        return s
 
     # Constants
     START_BYTE = b'\xFE'
@@ -103,7 +105,7 @@ class Sportiduino(object):
     MIN_CARD_NUM = 1
     MAX_CARD_NUM = 65000
 
-    class Version(object):
+    class Version:
         """Sportiduino version."""
 
         def __init__(self, major, minor=None, patch=None):
@@ -142,7 +144,7 @@ class Sportiduino(object):
             int(self.patch) if self.patch is not None else 'x'
             return 'v%d.%d.%s' % (self.major, self.minor, vers_suffix)
 
-    class Config(object):
+    class Config:
         def __init__(self, antenna_gain=0, timezone=0):
             self.antenna_gain = antenna_gain
             self.timezone = timezone
@@ -161,7 +163,7 @@ class Sportiduino(object):
             config_data += int2byte(int(self.timezone.total_seconds() / 60 / 15))
             return config_data
 
-    class SerialProtocol(object):
+    class SerialProtocol:
         OFFSET = 0x1E
         MAX_DATA_LEN = 28
 

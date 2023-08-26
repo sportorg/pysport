@@ -6,7 +6,7 @@ from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.start.relay import get_team_result
 
 
-class ScoreCalculation(object):
+class ScoreCalculation:
     def __init__(self, r):
         self.race = r
         self.formula = None

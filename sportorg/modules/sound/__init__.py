@@ -4,7 +4,7 @@ from sportorg.modules.configs.configs import Config
 
 
 @singleton
-class Sound(object):
+class Sound:
     @staticmethod
     def is_enabled():
         return Config().sound.get('enabled')

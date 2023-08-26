@@ -4,7 +4,7 @@ from sportorg.common.singleton import singleton
 
 
 @singleton
-class GlobalAccess(object):
+class GlobalAccess:
     def __init__(self):
         self.app = None
 
@@ -19,7 +19,7 @@ class GlobalAccess(object):
 
 
 @singleton
-class NumberClicker(object):
+class NumberClicker:
     def __init__(self):
         self.key = ''
         self.time = time.time()

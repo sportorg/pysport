@@ -1,7 +1,7 @@
 from sportorg.gui.menu.actions import ActionFactory
 
 
-class Factory(object):
+class Factory:
     def __init__(self, app):
         self._actions = {}
         for key, cls in ActionFactory.actions.items():

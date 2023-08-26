@@ -22,7 +22,7 @@ ONLINE_SI = 'si'
 ONLINE_COMMENT = 'com'
 
 
-class WdbOnlineSender(object):
+class WdbOnlineSender:
     def __init__(self):
         self.url = ''
         self.file_path = ''

@@ -13,7 +13,7 @@ from sportorg.models.memory import (
 from sportorg.modules.configs.configs import Config
 
 
-class ResultCalculation(object):
+class ResultCalculation:
     def __init__(self, r):
         self.race = r
 
@@ -103,7 +103,7 @@ class ResultCalculation(object):
                 bib = res.person.bib
 
                 team_number = bib % 1000
-                if not str(team_number) in relay_teams:
+                if str(team_number) not in relay_teams:
                     new_team = RelayTeam(self.race)
                     new_team.group = group
                     new_team.bib_number = team_number
@@ -217,8 +217,9 @@ class ResultCalculation(object):
 
     def get_group_rank(self, group):
         """
-        Rank calculation, takes sums or scores from qualification of best X (default=10) athletes, who have OK result
-        and are not out of competition
+        Rank calculation, takes sums or scores from qualification of best X (default=10)
+        athletes, who have OK result and are not out of competition
+
         :param group:
         :return: rank of group, -1 if we have < X (default=5) successfull results
         """
@@ -258,14 +259,15 @@ class ResultCalculation(object):
         if individual_ranking_method == 'best':
             scores = sorted(scores)
         else:
-            # Use points of first N in protocol, reverse list and get last values (1st place in the end)
+            # Use points of first N in protocol,
+            # reverse list and get last values (1st place in the end)
             scores.reverse()
         return sum(scores[-sum_count:])
 
     def get_group_rank_relay(self, group):
         """
-        Rank calculation, takes sums or scores from qualification of best X (default=10) athletes, who have OK result
-        and are not out of competition
+        Rank calculation, takes sums or scores from qualification of best X (default=10)
+        athletes, who have OK result and are not out of competition
         :param group:
         :return: rank of group, -1 if we have < X (default=4) successfull teams
         """
@@ -306,7 +308,8 @@ class ResultCalculation(object):
                     scores.append(qual.get_score())
 
             if len(scores) <= sum_count:
-                # get rank sum of X (default=10) best (by qualification, ignoring places) finished
+                # get rank sum of X (default=10) best
+                # (by qualification, ignoring places) finished
                 return sum(scores)
 
             if relay_ranking_method == 'personal':

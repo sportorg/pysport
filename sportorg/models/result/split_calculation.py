@@ -5,7 +5,7 @@ from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.utils.time import get_speed_min_per_km
 
 
-class PersonSplits(object):
+class PersonSplits:
     def __init__(self, r, result):
         self.race = r
         self.result = result
@@ -115,7 +115,7 @@ class PersonSplits(object):
         }
 
 
-class GroupSplits(object):
+class GroupSplits:
     def __init__(self, r, group):
         self.race = r
         self.group = group
@@ -256,7 +256,7 @@ class GroupSplits(object):
         return [ps.to_dict() for ps in self.person_splits]
 
 
-class RaceSplits(object):
+class RaceSplits:
     def __init__(self, r):
         self.race = r
 

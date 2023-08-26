@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as ET
 
 
-class IOFParseResult(object):
+class IOFParseResult:
     def __init__(self, name, data):
         self.name = name
         self.data = data

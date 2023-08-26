@@ -33,7 +33,8 @@ from sportorg.utils.time import hhmmss_to_time, time_iof_to_otime, yyyymmdd_to_d
 def export_result_list(file, all_splits=False):
     obj = race()
 
-    result_list = generate_result_list(obj, all_splits)
+    # TODO add creator
+    result_list = generate_result_list(obj, all_splits=all_splits)
 
     result_list.write(open(file, 'wb'), xml_declaration=True, encoding='UTF-8')
 
@@ -41,6 +42,7 @@ def export_result_list(file, all_splits=False):
 def export_entry_list(file):
     obj = race()
 
+    # TODO add creator
     entry_list = generate_entry_list(obj)
 
     entry_list.write(open(file, 'wb'), xml_declaration=True, encoding='UTF-8')
@@ -49,6 +51,7 @@ def export_entry_list(file):
 def export_start_list(file):
     obj = race()
 
+    # TODO add creator
     start_list = generate_start_list(obj)
 
     start_list.write(open(file, 'wb'), xml_declaration=True, encoding='UTF-8')
@@ -57,6 +60,7 @@ def export_start_list(file):
 def export_competitor_list(file):
     obj = race()
 
+    # TODO add creator
     start_list = generate_competitor_list(obj)
 
     start_list.write(open(file, 'wb'), xml_declaration=True, encoding='UTF-8')

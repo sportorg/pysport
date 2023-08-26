@@ -155,3 +155,7 @@ LOG_CONFIG = {
 }
 
 logging.config.dictConfig(LOG_CONFIG)
+
+
+def get_creator_name() -> str:
+    return f'{NAME} {VERSION}'

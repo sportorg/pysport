@@ -29,7 +29,7 @@ from six import PY3, byte2int, int2byte, iterbytes, print_
 #                                         Classs  SRPid
 #                                  for master station connect
 # ================================================
-class SRPid(object):
+class SRPid:
     # ------------------------------------------------------------------------------------
     #                                                 INIT
     #                              communication with master station

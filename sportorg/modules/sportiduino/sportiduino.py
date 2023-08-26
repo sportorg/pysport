@@ -120,7 +120,7 @@ class ResultThread(QThread):
 
 
 @singleton
-class SportiduinoClient(object):
+class SportiduinoClient:
     def __init__(self):
         self._queue = Queue()
         self._stop_event = Event()

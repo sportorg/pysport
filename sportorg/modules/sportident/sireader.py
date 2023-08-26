@@ -188,7 +188,7 @@ class ResultThread(QThread):
 
 
 @singleton
-class SIReaderClient(object):
+class SIReaderClient:
     def __init__(self):
         self._queue = Queue()
         self._stop_event = Event()

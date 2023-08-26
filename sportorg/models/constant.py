@@ -241,7 +241,7 @@ def get_qualification_list():
 
 
 @singleton
-class PersonNames(object):
+class PersonNames:
     NAMES: List[str] = []
 
     def get_all(self):
@@ -255,7 +255,7 @@ class PersonNames(object):
 
 
 @singleton
-class Regions(object):
+class Regions:
     REGIONS: List[str] = []
 
     def get_all(self):
@@ -269,7 +269,7 @@ class Regions(object):
 
 
 @singleton
-class StatusComments(object):
+class StatusComments:
     STATUS_COMMENTS: List[str] = []
 
     def get_all(self):
@@ -292,7 +292,7 @@ class StatusComments(object):
 
 
 @singleton
-class RentCards(object):
+class RentCards:
     CARDS: Set[int] = set()
 
     def exists(self, item):
@@ -322,7 +322,7 @@ class RentCards(object):
 
 
 @singleton
-class RankingTable(object):
+class RankingTable:
     """
     Ranking is read from configuration file called 'ranking_score.txt'
     Format: RANK;I;II;III;I_Y;II_Y[;III_Y[;KMS[;MS]]]

@@ -1,6 +1,6 @@
 import pytest
 
-from sportorg.common.version import *
+from sportorg.common.version import Version
 
 
 @pytest.mark.parametrize(
@@ -31,3 +31,7 @@ def test_version_is_compatible():
     assert version1.is_compatible(version2)
     assert not version1.is_compatible(version3)
     assert version2 <= version1 < version3
+
+
+def test_f_str():
+    assert f'{Version(1, 0, 0, 0)}' == '1.0.0'
