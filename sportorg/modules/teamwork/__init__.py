@@ -1,14 +1,15 @@
 import logging
-from queue import Queue, Empty
+from queue import Empty, Queue
 from threading import Event, main_thread
 
 from PySide2.QtCore import QThread, Signal
 
 from sportorg.common.broker import Broker
 from sportorg.common.singleton import singleton
+
 from .client import ClientThread
-from .server import ServerThread, Command
-from .packet_header import Header, ObjectTypes, Operations
+from .packet_header import Operations
+from .server import Command, ServerThread
 
 
 class ResultThread(QThread):
@@ -42,10 +43,7 @@ class Teamwork(object):
         self._in_queue = Queue()
         self._out_queue = Queue()
         self._stop_event = Event()
-        self.factory = {
-            'client': ClientThread,
-            'server': ServerThread
-        }
+        self.factory = {'client': ClientThread, 'server': ServerThread}
         self._thread = None
         self._result_thread = None
         self._call_back = None

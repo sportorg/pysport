@@ -1,7 +1,7 @@
 import logging
 
 from sportorg.common.otime import OTime
-from sportorg.models.memory import Person, ResultStatus, find, race, Result
+from sportorg.models.memory import Person, Result, ResultStatus, find, race
 
 
 class ResultCheckerException(Exception):
@@ -53,13 +53,13 @@ class ResultChecker:
             result.status = ResultStatus.OK
             if not o.check_result(result):
                 result.status = ResultStatus.MISSING_PUNCH
-                result.status_comment = "п.п.3.13.12.2"
+                result.status_comment = 'п.п.3.13.12.2'
 
             elif result.person.group and result.person.group.max_time.to_msec():
                 if result.get_result_otime() > result.person.group.max_time:
                     if race().get_setting('result_processing_mode', 'time') == 'time':
                         result.status = ResultStatus.OVERTIME
-                        result.status_comment = "п.п.5.4.7"
+                        result.status_comment = 'п.п.5.4.7'
 
         return o
 
@@ -155,7 +155,7 @@ class ResultChecker:
         origin: 31,41,51; athlete: no punches; result:3
 
         wildcard support for free order
-        origin: *,*,* athlete: 31; result:2          // wrong: 
+        origin: *,*,* athlete: 31; result:2          // wrong:
                                                      // returns 0 if check_existence=False
                                                      // returns 2 if check_existence=True
         origin: *,*,* athlete: 31,31; result:2       // wrong:
@@ -247,7 +247,9 @@ class ResultChecker:
         user_array = []
         ret = 0
 
-        allow_duplicates = race().get_setting('result_processing_scores_allow_duplicates', False)
+        allow_duplicates = race().get_setting(
+            'result_processing_scores_allow_duplicates', False
+        )
 
         for cur_split in result.splits:
             code = str(cur_split.code)
@@ -288,4 +290,4 @@ class ResultChecker:
 
             if count_laps < result.penalty_laps:
                 result.status = ResultStatus.MISSING_PUNCH
-                result.status_comment = "п.п.4.6.12.7"
+                result.status_comment = 'п.п.4.6.12.7'

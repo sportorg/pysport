@@ -3,11 +3,12 @@ import logging
 from PySide2 import QtCore, QtWidgets
 from PySide2.QtGui import QIcon
 from PySide2.QtWidgets import QDialog, QDialogButtonBox, QFormLayout, QTextEdit
+
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import translate
-from sportorg.models.constant import get_race_teams, get_countries, get_regions
+from sportorg.models.constant import get_countries, get_race_teams, get_regions
 from sportorg.models.memory import find, race
 
 
@@ -20,7 +21,6 @@ class OrganizationMassEditDialog(QDialog):
         return super().exec_()
 
     def init_ui(self):
-
         self.setWindowModality(QtCore.Qt.WindowModal)
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
@@ -31,7 +31,9 @@ class OrganizationMassEditDialog(QDialog):
         max_field_width = 200
 
         self.orzanization_checkbox = QtWidgets.QCheckBox(self)
-        self.orzanization_combo = AdvComboBox(self, val_list=get_race_teams(), max_width=max_field_width)
+        self.orzanization_combo = AdvComboBox(
+            self, val_list=get_race_teams(), max_width=max_field_width
+        )
         self.layout.addRow(self.orzanization_checkbox, self.orzanization_combo)
 
         self.code_checkbox = QtWidgets.QCheckBox(self)
@@ -41,7 +43,9 @@ class OrganizationMassEditDialog(QDialog):
         self.layout.addRow(self.code_checkbox, self.code_textedit)
 
         self.country_checkbox = QtWidgets.QCheckBox(self)
-        self.country_combo = AdvComboBox(self, val_list=get_countries(), max_width=max_field_width)
+        self.country_combo = AdvComboBox(
+            self, val_list=get_countries(), max_width=max_field_width
+        )
         self.layout.addRow(self.country_checkbox, self.country_combo)
 
         self.region_checkbox = QtWidgets.QCheckBox(self)
@@ -62,7 +66,6 @@ class OrganizationMassEditDialog(QDialog):
         self.show()
 
     def accept(self, *args, **kwargs):
-
         try:
             # apply mass edit here
             mv = GlobalAccess().get_main_window()
@@ -70,7 +73,9 @@ class OrganizationMassEditDialog(QDialog):
             if selection:
                 obj = race()
 
-                change_organization = find(obj.organizations, name=self.orzanization_combo.currentText())
+                change_organization = find(
+                    obj.organizations, name=self.orzanization_combo.currentText()
+                )
                 change_code = self.code_textedit.toPlainText()
                 change_country = self.country_combo.currentText()
                 change_region = self.region_combo.currentText()

@@ -6,7 +6,7 @@ import uuid
 from abc import abstractmethod
 from datetime import date
 from enum import Enum, IntEnum
-from typing import Any, Dict, List, Optional
+from typing import Optional
 
 import dateutil.parser
 
@@ -117,8 +117,9 @@ class Organization(Model):
             'id': str(self.id),
             'name': self.name,
             'country': self.country,
-            'region': self.region[3:] if
-            self.region and len(self.region) > 3 and self.region[2] == '_' else self.region,
+            'region': self.region[3:]
+            if self.region and len(self.region) > 3 and self.region[2] == '_'
+            else self.region,
             'contact': self.contact,
             'code': self.code,
             'count_person': self.count_person,  # readonly
@@ -461,7 +462,9 @@ class Result:
         self.__start_time = None
         self.__finish_time = None
 
-        self.current_result = None  # Keep current day result (multi day), general result will have sum
+        self.current_result = (
+            None  # Keep current day result (multi day), general result will have sum
+        )
         self.qty_ok_days = 0  # Quantity of multi day finishes with OK status
 
         self.order = 0  # Order number, introduced in 1.6, needed for result templates to sort results correctly
@@ -500,9 +503,15 @@ class Result:
             return self.status.value > other.status.value
 
         if race().get_setting('result_processing_mode', 'time') == 'time':
-            if self.get_result_otime() == OTime() and other.get_result_otime() > OTime():
+            if (
+                self.get_result_otime() == OTime()
+                and other.get_result_otime() > OTime()
+            ):
                 return True
-            if self.get_result_otime() > OTime() and other.get_result_otime() == OTime():
+            if (
+                self.get_result_otime() > OTime()
+                and other.get_result_otime() == OTime()
+            ):
                 return False
             return self.get_result_otime() > other.get_result_otime()
         else:  # process by score (rogain)
@@ -553,7 +562,7 @@ class Result:
             'final_result_time': self.final_result_time.to_str()
             if self.final_result_time
             else None,
-            'order': self.order
+            'order': self.order,
         }
 
     def update_data(self, data):
@@ -789,11 +798,13 @@ class Result:
         return self.status == ResultStatus.OK or self.status == ResultStatus.RESTORED
 
     def is_punch(self):
-        return self.is_sportident() \
-            or self.is_sfr() \
-            or self.is_sportiduino() \
-            or self.is_rfid_impinj() \
+        return (
+            self.is_sportident()
+            or self.is_sfr()
+            or self.is_sportiduino()
+            or self.is_rfid_impinj()
             or self.is_srpid()
+        )
 
     def is_sportident(self):
         return self.system_type == SystemType.SPORTIDENT
@@ -822,7 +833,6 @@ class Result:
             max_unfinished_start_time = OTime()
 
             for cur_person in race().get_persons_by_group(self.person.group):
-
                 if cur_person.result_count == 0:
                     if not cur_person.is_out_of_competition:
                         if cur_person.start_time and self.person.start_time:
@@ -981,7 +991,7 @@ class ResultSportident(Result):
                 if ind_begin > 0 and ind_end > 0:
                     list_exists = True
                     # any control from the list e.g. '%(31,32,35-45)'
-                    arr = re.split(r'\s*,\s*', template[ind_begin + 1: ind_end])
+                    arr = re.split(r'\s*,\s*', template[ind_begin + 1 : ind_end])
                     for cp in arr:
                         cp_range = re.split(r'\s*-\s*', cp)
                         if int(cur_code) == int(cp_range[0]):
@@ -1017,7 +1027,6 @@ class ResultSportident(Result):
                             course_index_current += 1
 
                         if prev_split.code == cur_code and j in recognized_indexes:
-
                             if (
                                 course_index_current < 0
                                 or str(controls[course_index_current].code).find('*')
@@ -1134,8 +1143,8 @@ class ResultSportident(Result):
     def remove_duplicated_splits(self):
         if len(self.splits) < 2:
             return
-        for i in reversed(range(len(self.splits)-1)):
-            if self.splits[i] == self.splits[i+1]:
+        for i in reversed(range(len(self.splits) - 1)):
+            if self.splits[i] == self.splits[i + 1]:
                 self.splits.remove(self.splits[i])
 
 
@@ -1220,7 +1229,7 @@ class Person(Model):
     @property
     def multi_day_id(self):
         if self.group:
-            return self.full_name + " " + self.group.name
+            return self.full_name + ' ' + self.group.name
         else:
             return self.full_name
 
@@ -1395,8 +1404,14 @@ class Race(Model):
             'persons': [item.to_dict() for item in self.persons],
         }
 
-    def to_dict_partial(self, person_list=[], group_list=[], course_list=[], orgs_list=[], result_list=[]):
-
+    def to_dict_partial(
+        self,
+        person_list=[],
+        group_list=[],
+        course_list=[],
+        orgs_list=[],
+        result_list=[],
+    ):
         if course_list and len(course_list) > 0:
             for group in self.groups:
                 if group.course and group.course in course_list:
@@ -1404,13 +1419,21 @@ class Race(Model):
 
         if group_list and len(group_list) > 0:
             for person in self.persons:
-                if person.group and person.group.name in group_list and person not in person_list:
+                if (
+                    person.group
+                    and person.group.name in group_list
+                    and person not in person_list
+                ):
                     person_list.append(person)
 
         if orgs_list and len(orgs_list) > 0:
             person_list = []
             for person in self.persons:
-                if person.organization and person.organization in orgs_list and person not in person_list:
+                if (
+                    person.organization
+                    and person.organization in orgs_list
+                    and person not in person_list
+                ):
                     person_list.append(person)
 
         if result_list and len(result_list) > 0:
@@ -1506,7 +1529,7 @@ class Race(Model):
             'ResultSportident',
             'ResultSFR',
             'ResultSportiduino',
-            'ResultRfidImpinj'
+            'ResultRfidImpinj',
         ]:
             obj.person = self.get_obj('Person', dict_obj['person_id'])
         elif dict_obj['object'] == 'Group':
@@ -1724,13 +1747,19 @@ class Race(Model):
         return ret
 
     def add_new_result(self, result):
-        ignore_readout_before_start = self.get_setting('ignore_readout_before_start', False)
+        ignore_readout_before_start = self.get_setting(
+            'ignore_readout_before_start', False
+        )
         if ignore_readout_before_start:
             start = result.get_start_time()
             finish = result.get_finish_time()
 
             if finish < start and start.hour < 22:
-                logging.info('Ignoring finish with time before start: {} for card {}'.format(finish, result.card_number))
+                logging.info(
+                    'Ignoring finish with time before start: {} for card {}'.format(
+                        finish, result.card_number
+                    )
+                )
                 return
 
         self.results.insert(0, result)
@@ -1902,7 +1931,7 @@ class RankingItem(object):
         if data['max_time']:
             self.max_time = OTime(msec=int(data['max_time']))
         if 'min_scores' in data and data['min_scores']:
-            self.min_scores = (data['min_scores'])
+            self.min_scores = data['min_scores']
         self.is_active = bool(data['is_active'])
         self.percent = int(data['percent'])
 

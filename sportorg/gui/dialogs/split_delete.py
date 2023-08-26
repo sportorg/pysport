@@ -1,7 +1,7 @@
 import logging
 
 from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QFormLayout, QDialog, QDialogButtonBox, QSpinBox, QLabel
+from PySide2.QtWidgets import QDialog, QDialogButtonBox, QFormLayout, QLabel, QSpinBox
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
@@ -40,7 +40,9 @@ class SplitDeleteDialog(QDialog):
         self.item_max_intermediate = QSpinBox()
         self.item_max_intermediate.setValue(5)
         self.item_max_intermediate.setMaximum(999)
-        self.layout.addRow(QLabel(translate('Max intermediate CP')), self.item_max_intermediate)
+        self.layout.addRow(
+            QLabel(translate('Max intermediate CP')), self.item_max_intermediate
+        )
 
         def cancel_changes():
             self.close()
@@ -64,7 +66,6 @@ class SplitDeleteDialog(QDialog):
         self.show()
 
     def apply_changes_impl(self):
-
         from_cp = str(self.item_start_cp.value())
         to_cp = str(self.item_end_cp.value())
         max_offset = self.item_max_intermediate.value()

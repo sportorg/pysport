@@ -129,52 +129,72 @@ class ReportDialog(QDialog):
                 person_list = []
                 for i in mw.get_selected_rows():
                     person_list.append(obj.persons[i])
-                races_dict = [r.to_dict_partial(person_list=person_list,
-                                                result_list=[],
-                                                group_list=[],
-                                                orgs_list=[],
-                                                course_list=[]
-                                                ) for r in races()]
+                races_dict = [
+                    r.to_dict_partial(
+                        person_list=person_list,
+                        result_list=[],
+                        group_list=[],
+                        orgs_list=[],
+                        course_list=[],
+                    )
+                    for r in races()
+                ]
             elif mw.current_tab == 1:
                 result_list = []
                 for i in mw.get_selected_rows():
                     result_list.append(obj.results[i])
-                races_dict = [r.to_dict_partial(person_list=[],
-                                                result_list=result_list,
-                                                group_list=[],
-                                                orgs_list=[],
-                                                course_list=[]
-                                                ) for r in races()]
+                races_dict = [
+                    r.to_dict_partial(
+                        person_list=[],
+                        result_list=result_list,
+                        group_list=[],
+                        orgs_list=[],
+                        course_list=[],
+                    )
+                    for r in races()
+                ]
             elif mw.current_tab == 2:
                 group_list = []
                 for i in mw.get_selected_rows():
                     group_list.append(obj.groups[i].name)
-                races_dict = [r.to_dict_partial(person_list=[],
-                                                result_list=[],
-                                                group_list=group_list,
-                                                orgs_list=[],
-                                                course_list=[]
-                                                ) for r in races()]
+                races_dict = [
+                    r.to_dict_partial(
+                        person_list=[],
+                        result_list=[],
+                        group_list=group_list,
+                        orgs_list=[],
+                        course_list=[],
+                    )
+                    for r in races()
+                ]
             elif mw.current_tab == 3:
                 course_list = []
                 for i in mw.get_selected_rows():
                     course_list.append(obj.courses[i])
-                races_dict = [r.to_dict_partial(person_list=[],
-                                                result_list=[],
-                                                group_list=[],
-                                                orgs_list=[],
-                                                course_list=course_list
-                                                ) for r in races()]
+                races_dict = [
+                    r.to_dict_partial(
+                        person_list=[],
+                        result_list=[],
+                        group_list=[],
+                        orgs_list=[],
+                        course_list=course_list,
+                    )
+                    for r in races()
+                ]
             elif mw.current_tab == 4:
                 orgs_list = []
                 for i in mw.get_selected_rows():
                     orgs_list.append(obj.organizations[i])
-                races_dict = [r.to_dict_partial(person_list=[],
-                                                result_list=[],
-                                                group_list=[],
-                                                orgs_list=orgs_list,
-                                                course_list=[]
-                                                ) for r in races()]
+                races_dict = [
+                    r.to_dict_partial(
+                        person_list=[],
+                        result_list=[],
+                        group_list=[],
+                        orgs_list=orgs_list,
+                        course_list=[],
+                    )
+                    for r in races()
+                ]
         else:
             races_dict = [r.to_dict() for r in races()]
 
@@ -218,7 +238,7 @@ class ReportDialog(QDialog):
                 races=races_dict,
                 rent_cards=list(RentCards().get()),
                 current_race=get_current_race_index(),
-                selected={'persons': []}  # leave here for back compatibility
+                selected={'persons': []},  # leave here for back compatibility
             )
 
             if _settings['save_to_last_file']:

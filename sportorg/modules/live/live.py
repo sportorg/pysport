@@ -1,12 +1,12 @@
+import logging
 from functools import partial
 from threading import Thread
 
-import logging
 import requests
 
+from sportorg.common.broker import Broker
 from sportorg.models.memory import race
 from sportorg.modules.live import orgeo
-from sportorg.common.broker import Broker
 
 
 class LiveClient:
@@ -46,11 +46,20 @@ class LiveClient:
         race_data = race().to_dict()
         for url in urls:
             if race().get_setting('live_results_enabled', False):
-                func = partial(orgeo.create, requests, url, items, race_data, logging.root)
+                func = partial(
+                    orgeo.create, requests, url, items, race_data, logging.root
+                )
                 Thread(target=func, name='LiveThread').start()
 
             if race().get_setting('live_cp_enabled', False):
-                func = partial(orgeo.create_online_cp, requests, url, items, race_data, logging.root)
+                func = partial(
+                    orgeo.create_online_cp,
+                    requests,
+                    url,
+                    items,
+                    race_data,
+                    logging.root,
+                )
                 Thread(target=func, name='LiveThread_OnlineCP').start()
 
     def delete(self, data):

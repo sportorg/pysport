@@ -1,6 +1,6 @@
-from enum import Enum
-import struct
 import logging
+import struct
+from enum import Enum
 
 
 class ObjectTypes(Enum):
@@ -82,7 +82,11 @@ class Header:
                 obj_uuid = obj_data['id']
             except AttributeError:
                 raise ValueError
-            logging.debug('Header Init: obj_type: {}, op_type: {}, uuid: {}'.format(obj_type, op_type, obj_uuid))
+            logging.debug(
+                'Header Init: obj_type: {}, op_type: {}, uuid: {}'.format(
+                    obj_type, op_type, obj_uuid
+                )
+            )
             self.opType = Operations[op_type].value
             self.objType = ObjectTypes[obj_type].value
             self.uuid = obj_uuid
@@ -96,8 +100,14 @@ class Header:
             self.size = 0
 
     def unpack_header(self, header):
-        self.packTag, self.opType, self.objType, self.uuid, self.version, self.size = struct.unpack(
-            Header.header_struck, header)
+        (
+            self.packTag,
+            self.opType,
+            self.objType,
+            self.uuid,
+            self.version,
+            self.size,
+        ) = struct.unpack(Header.header_struck, header)
 
     def prepare_header(self, obj_data, op_type):
         try:
@@ -120,5 +130,12 @@ class Header:
 
     def pack_header(self, psize):
         self.size = psize
-        return struct.pack(Header.header_struck, self.packTag, self.opType, self.objType, bytes(self.uuid, 'ascii'),
-                           self.version, self.size)
+        return struct.pack(
+            Header.header_struck,
+            self.packTag,
+            self.opType,
+            self.objType,
+            bytes(self.uuid, 'ascii'),
+            self.version,
+            self.size,
+        )

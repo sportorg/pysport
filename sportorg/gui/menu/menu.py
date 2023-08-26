@@ -86,29 +86,29 @@ def menu_list():
                             'actions': [
                                 {
                                     'title': translate('ResultList'),
-                                    'action': 'IOFResultListExportAction'
+                                    'action': 'IOFResultListExportAction',
                                 },
                                 {
                                     'title': translate('ResultListAllSplits'),
-                                    'action': 'IOFResultListAllSplitsExportAction'
+                                    'action': 'IOFResultListAllSplitsExportAction',
                                 },
                                 {
                                     'title': translate('EntrytList'),
-                                    'action': 'IOFEntryListExportAction'
+                                    'action': 'IOFEntryListExportAction',
                                 },
                                 {
                                     'title': translate('CompetitorList'),
-                                    'action': 'IOFCompetitorListExportAction'
+                                    'action': 'IOFCompetitorListExportAction',
                                 },
                                 {
                                     'title': translate('StartList'),
-                                    'action': 'IOFStartListExportAction'
+                                    'action': 'IOFStartListExportAction',
                                 },
-                            ]
+                            ],
                         },
-                    ]
-                }
-            ]
+                    ],
+                },
+            ],
         },
         {
             'title': translate('Edit'),
@@ -139,9 +139,7 @@ def menu_list():
                     'tabs': list(range(5)),
                     'action': 'DuplicateAction',
                 },
-                {
-                    'title': translate('Text exchange'),
-                    'action': 'TextExchangeAction'},
+                {'title': translate('Text exchange'), 'action': 'TextExchangeAction'},
                 {
                     'title': translate('Mass edit'),
                     'tabs': [0, 2, 4],
@@ -234,9 +232,7 @@ def menu_list():
                     'title': translate('Handicap start time'),
                     'action': 'StartHandicapAction',
                 },
-                {
-                    'title': translate('Clone relay legs'),
-                    'action': 'RelayCloneAction'},
+                {'title': translate('Clone relay legs'), 'action': 'RelayCloneAction'},
                 {
                     'title': translate('Use bib as card number'),
                     'action': 'CopyBibToCardNumber',
@@ -310,20 +306,12 @@ def menu_list():
                     'title': translate('Set DNS numbers'),
                     'action': 'SetDNSNumbersAction',
                 },
-                {
-                    'title': translate('Delete CP'),
-                    'action': 'CPDeleteAction'},
-                {
-                    'title': translate('Delete Split'),
-                    'action': 'SplitDeleteAction'
-                },
-                {
-                    'title': translate('Merge results'),
-                    'action': 'MergeResultsAction'
-                },
+                {'title': translate('Delete CP'), 'action': 'CPDeleteAction'},
+                {'title': translate('Delete Split'), 'action': 'SplitDeleteAction'},
+                {'title': translate('Merge results'), 'action': 'MergeResultsAction'},
                 {
                     'title': translate('Assign result by bib'),
-                    'action': 'AssignResultByBibAction'
+                    'action': 'AssignResultByBibAction',
                 },
                 {
                     'title': translate('Assign result by card number'),
@@ -353,31 +341,31 @@ def menu_list():
                 {
                     'title': translate('on/off RFID Impinj readout'),
                     'icon': config.icon_dir('rfid_impinj.png'),
-                    'action': 'ImpinjReadoutAction'
+                    'action': 'ImpinjReadoutAction',
                 },
                 {
                     'title': translate('on/off SRPid readout'),
                     'icon': config.icon_dir('srpid.png'),
-                    'action': 'SrpidReadoutAction'
+                    'action': 'SrpidReadoutAction',
                 },
                 {
-                   'title': translate('Teamwork'),
-                   'icon': config.icon_dir('network.svg'),
-                   'actions': [
-                       {
-                           'title': translate('Send selected'),
-                           'shortcut': 'Ctrl+Shift+K',
-                           'tabs': list(range(5)),
-                           'action': 'TeamworkSendAction'
-                       },
-                       {
-                           'type': 'separator',
-                       },
-                       {
-                           'title': translate('On/Off'),
-                           'action': 'TeamworkEnableAction'
-                       }
-                   ]
+                    'title': translate('Teamwork'),
+                    'icon': config.icon_dir('network.svg'),
+                    'actions': [
+                        {
+                            'title': translate('Send selected'),
+                            'shortcut': 'Ctrl+Shift+K',
+                            'tabs': list(range(5)),
+                            'action': 'TeamworkSendAction',
+                        },
+                        {
+                            'type': 'separator',
+                        },
+                        {
+                            'title': translate('On/Off'),
+                            'action': 'TeamworkEnableAction',
+                        },
+                    ],
                 },
                 {
                     'title': translate('Telegram'),
@@ -433,7 +421,7 @@ def menu_list():
                     'title': translate('Rent cards'),
                     'action': 'RentCardsAction',
                 },
-            ]
+            ],
         },
         {
             'title': translate('Help'),

@@ -1,16 +1,20 @@
 import logging
 import queue
-from queue import Queue, Empty
-from random import randint
-from threading import main_thread, Event
-
 import time
+from queue import Empty, Queue
+from random import randint
+from threading import Event, main_thread
 from time import sleep
 
 import serial
 from PySide2.QtCore import QThread, Signal
-from pyImpinj import ImpinjR2KReader
-from pyImpinj.enums import ImpinjR2KFastSwitchInventory
+
+try:
+    from pyImpinj import ImpinjR2KReader
+    from pyImpinj.enums import ImpinjR2KFastSwitchInventory
+except ModuleNotFoundError:
+    ImpinjR2KReader = None
+    ImpinjR2KFastSwitchInventory = None
 
 from sportorg.common.otime import OTime
 from sportorg.common.singleton import singleton
@@ -38,6 +42,8 @@ class ImpinjThread(QThread):
         self.timeout = race().get_setting('readout_duplicate_timeout', 15000)
 
     def run(self):
+        if not ImpinjR2KReader or not ImpinjR2KFastSwitchInventory:
+            return
         try:
             tag_queue = queue.Queue(1024)
             impinj_reader = ImpinjR2KReader(tag_queue, address=1)
@@ -56,7 +62,6 @@ class ImpinjThread(QThread):
             return
 
         while True:
-
             if not main_thread().is_alive() or self._stop_event.is_set():
                 impinj_reader.worker_close()
                 self._logger.debug('Stop Impinj reader')
@@ -65,16 +70,23 @@ class ImpinjThread(QThread):
             try:
                 data = tag_queue.get(timeout=0.1)
             except Exception:
-                impinj_reader.fast_switch_ant_inventory(param=dict(A=ImpinjR2KFastSwitchInventory.ANTENNA1, Aloop=1,
-                                                                   B=ImpinjR2KFastSwitchInventory.ANTENNA2, Bloop=1,
-                                                                   C=ImpinjR2KFastSwitchInventory.ANTENNA3, Cloop=1,
-                                                                   D=ImpinjR2KFastSwitchInventory.ANTENNA4, Dloop=1,
-                                                                   Interval=0,
-                                                                   Repeat=1))
+                impinj_reader.fast_switch_ant_inventory(
+                    param=dict(
+                        A=ImpinjR2KFastSwitchInventory.ANTENNA1,
+                        Aloop=1,
+                        B=ImpinjR2KFastSwitchInventory.ANTENNA2,
+                        Bloop=1,
+                        C=ImpinjR2KFastSwitchInventory.ANTENNA3,
+                        Cloop=1,
+                        D=ImpinjR2KFastSwitchInventory.ANTENNA4,
+                        Dloop=1,
+                        Interval=0,
+                        Repeat=1,
+                    )
+                )
                 continue
 
             try:
-
                 self._logger.debug('Impinj RFID data: {}'.format(data))
                 card_data = data
                 card_data['time'] = OTime.now()
@@ -85,7 +97,9 @@ class ImpinjThread(QThread):
                 if card_id in self.timeout_list:
                     old_time = self.timeout_list[card_id]
                     if card_time - old_time < OTime(msec=self.timeout):
-                        self._logger.debug('Duplicated result for tag {}, ignoring'.format(card_id))
+                        self._logger.debug(
+                            'Duplicated result for tag {}, ignoring'.format(card_id)
+                        )
                         continue
 
                 self.timeout_list[card_id] = card_time
@@ -107,8 +121,13 @@ class ImpinjThread(QThread):
                 sleep(1)
                 card_data = {}
                 card_data['time'] = OTime.now()
-                epc_list = ['00 00 00 01', '00 00 00 14', '00 00 00 0E', 'BFACACACACACACACACA']
-                card_data['epc'] = epc_list[randint(0,3)]
+                epc_list = [
+                    '00 00 00 01',
+                    '00 00 00 14',
+                    '00 00 00 0E',
+                    'BFACACACACACACACACA',
+                ]
+                card_data['epc'] = epc_list[randint(0, 3)]
                 self._queue.put(ImpinjCommand('card_data', card_data), timeout=1)
 
             except Exception as e:
@@ -167,7 +186,7 @@ class ResultThread(QThread):
 
         limit = 10**8
         hex_offset = 5000000
-        epc = str(card_data['epc']).replace(" ", "")
+        epc = str(card_data['epc']).replace(' ', '')
 
         # if epc contains only digits, use it directly
         # otherwise convert hex -> dec + add offset
@@ -201,15 +220,11 @@ class ImpinjClient(object):
     def _start_impinj_thread(self):
         if self._impinj_thread is None:
             self._impinj_thread = ImpinjThread(
-                self.port,
-                self._queue,
-                self._stop_event,
-                self._logger,
-                debug=True
+                self.port, self._queue, self._stop_event, self._logger, debug=True
             )
             self._impinj_thread.start()
         elif self._impinj_thread.isFinished():
-            self._impinj_thread= None
+            self._impinj_thread = None
             self._start_impinj_thread()
 
     def _start_result_thread(self):
@@ -229,7 +244,10 @@ class ImpinjClient(object):
 
     def is_alive(self):
         if self._impinj_thread is not None and self._result_thread is not None:
-            return not self._impinj_thread.isFinished() and not self._result_thread.isFinished()
+            return (
+                not self._impinj_thread.isFinished()
+                and not self._result_thread.isFinished()
+            )
 
         return False
 

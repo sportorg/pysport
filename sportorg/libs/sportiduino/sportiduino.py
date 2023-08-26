@@ -674,7 +674,6 @@ class Sportiduino(object):
 
         err_code = int2byte(data[0])
         if func == Sportiduino.RESP_ERROR:
-
             card_type = data[1]
             card = Sportiduino.card_name(data[1])
 

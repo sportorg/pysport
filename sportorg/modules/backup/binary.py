@@ -1,6 +1,6 @@
+import os
 import pickle
 import uuid
-import os
 
 from sportorg import config
 from sportorg.models import memory

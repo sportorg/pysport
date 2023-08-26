@@ -1,0 +1,48 @@
+name: CI Tests/Lints
+
+on:
+  push:
+    paths:
+      - "sportorg/**"
+      - "tests/**"
+      - "poetry.lock"
+    branches: [ master ]
+  pull_request:
+    paths:
+      - "sportorg/**"
+      - "tests/**"
+      - "poetry.lock"
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+
+      - name: Install python dependencies
+        run: make install-poetry install
+
+      - name: Run linters
+        run: make lint
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+
+      - name: Init .env
+        run: cp .env.example .env
+
+      - name: Install python dependencies
+        run: make install-poetry install
+
+      - name: Run test
+        run: make test

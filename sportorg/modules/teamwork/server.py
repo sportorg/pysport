@@ -1,7 +1,8 @@
-import socket
-from queue import Queue, Empty
-from threading import Thread, Event, main_thread
 import json
+import socket
+from queue import Empty, Queue
+from threading import Event, Thread, main_thread
+
 from .packet_header import Header, ObjectTypes, Operations
 
 
@@ -64,20 +65,23 @@ class ServerReceiverThread(Thread):
                         # getting Header
                         if is_new_pack:
                             if len(full_data) >= hdr.header_size:
-                                hdr.unpack_header(full_data[:hdr.header_size])
-                                full_data = full_data[hdr.header_size:]
+                                hdr.unpack_header(full_data[: hdr.header_size])
+                                full_data = full_data[hdr.header_size :]
                                 is_new_pack = False
                             else:
                                 break
                         # Getting JSON data
                         else:
                             if len(full_data) >= hdr.size:
-                                command = Command(json.loads(full_data[:hdr.size].decode()),
-                                                  Operations(hdr.opType).name, self.connect.addr)
+                                command = Command(
+                                    json.loads(full_data[: hdr.size].decode()),
+                                    Operations(hdr.opType).name,
+                                    self.connect.addr,
+                                )
                                 command.exclude(self.connect.addr)
                                 self._out_queue.put(command)  # for local
                                 self._in_queue.put(command)  # for child
-                                full_data = full_data[hdr.size:]
+                                full_data = full_data[hdr.size :]
                                 is_new_pack = True
                             else:
                                 break
@@ -114,7 +118,10 @@ class ServerSenderThread(Thread):
                 # self._logger.debug('Server sender: Got new command {}'.format(command))
                 for connect in self._connections:
                     try:
-                        if connect.addr not in command.addr_exclude and connect.is_alive():
+                        if (
+                            connect.addr not in command.addr_exclude
+                            and connect.is_alive()
+                        ):
                             connect.conn.sendall(command.get_packet())
                     except ConnectionResetError as e:
                         self._logger.error(str(e))
@@ -158,7 +165,9 @@ class ServerThread(Thread):
             self._logger.info('Server start')
 
             conns_queue = Queue()
-            sender = ServerSenderThread(self._in_queue, conns_queue, self._stop_event, self._logger)
+            sender = ServerSenderThread(
+                self._in_queue, conns_queue, self._stop_event, self._logger
+            )
             sender.start()
 
             connections = []
@@ -168,7 +177,13 @@ class ServerThread(Thread):
                     conn, addr = s.accept()
                     connect = Connect(conn, addr)
                     conns_queue.put(connect)
-                    srt = ServerReceiverThread(connect, self._in_queue, self._out_queue, self._stop_event, self._logger)
+                    srt = ServerReceiverThread(
+                        connect,
+                        self._in_queue,
+                        self._out_queue,
+                        self._stop_event,
+                        self._logger,
+                    )
                     srt.start()
                     connections.append(srt)
                 except socket.timeout:

@@ -1,42 +1,44 @@
 from datetime import datetime
+
 from lxml.builder import E
-from lxml.etree import ElementTree, Element
+from lxml.etree import Element, ElementTree
 
 from sportorg import config
-from sportorg.models.memory import ResultStatus, Person, Race
+from sportorg.models.memory import Person, Race, ResultStatus
 from sportorg.models.result.result_calculation import ResultCalculation
 
 
 def otime_to_str(race_obj, otime):
     """Convert time to the date string, expressed in ISO 8601 format. Day is taken from settings of race"""
     day = race_obj.data.get_start_datetime()
-    return day.strftime('%Y-%m-%d') + "T" + otime.to_str(3)
+    return day.strftime('%Y-%m-%d') + 'T' + otime.to_str(3)
 
 
 def get_iof_status(status):
     """Convert to IOF status string"""
     if status == 1 or status == ResultStatus.OK or status == ResultStatus.RESTORED:
-        return "OK"
+        return 'OK'
     elif status == ResultStatus.DID_NOT_START:
-        return "DidNotStart"
+        return 'DidNotStart'
     elif status == ResultStatus.DID_NOT_FINISH:
-        return "DidNotFinish"
+        return 'DidNotFinish'
 
-    return "Disqualified"
+    return 'Disqualified'
 
 
 def generate_result_list(obj, all_splits=False):
     """Generate the IOF XML ResultList string from the race data"""
 
-    xmlns = "http://www.orienteering.org/datastandard/3.0"
-    xsi = "http://www.w3.org/2001/XMLSchema-instance"
+    xmlns = 'http://www.orienteering.org/datastandard/3.0'
+    xsi = 'http://www.w3.org/2001/XMLSchema-instance'
 
-    xml_rl = Element('{' + xmlns + '}ResultList',
-                     nsmap={'xsi': xsi, None: xmlns},
-                     iofVersion='3.0',
-                     creator=config.NAME + ' ' + str(config.VERSION),
-                     createTime=datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
-                     )
+    xml_rl = Element(
+        '{' + xmlns + '}ResultList',
+        nsmap={'xsi': xsi, None: xmlns},
+        iofVersion='3.0',
+        creator=config.NAME + ' ' + str(config.VERSION),
+        createTime=datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),
+    )
     xml_rl.append(generate_evant(obj))
 
     for group in obj.groups:
@@ -53,7 +55,6 @@ def generate_result_list(obj, all_splits=False):
         if not group.is_relay():
             # individual race - PersonResult object
             for result in ResultCalculation(obj).get_group_finishes(group):
-
                 person = result.person
                 organization = person.organization
 
@@ -64,7 +65,7 @@ def generate_result_list(obj, all_splits=False):
                 xml_person_result = E.PersonResult(
                     generate_person(person),
                     generate_organization(organization),
-                    xml_result
+                    xml_result,
                 )
                 xml_cr.append(xml_person_result)
 
@@ -75,7 +76,7 @@ def generate_result_list(obj, all_splits=False):
                 xml_team_result = E.TeamResult(
                     E.Name(organization.name if organization else ''),
                     generate_organization(organization),
-                    E.BibNumber(str(relay_team.bib_number))
+                    E.BibNumber(str(relay_team.bib_number)),
                 )
                 xml_cr.append(xml_team_result)
 
@@ -91,17 +92,20 @@ def generate_result_list(obj, all_splits=False):
                         E.Leg(str(team_member.leg)),
                         E.StartTime(otime_to_str(obj, result.get_start_time())),
                         E.FinishTime(otime_to_str(obj, result.get_finish_time())),
-                        E.Time(str(result.get_result_otime().to_sec()) + ".0"),
+                        E.Time(str(result.get_result_otime().to_sec()) + '.0'),
                         E.Status(get_iof_status(result.status)),
                         E.OverallResult(
-                            E.Time(str(result.get_result_otime_relay().to_sec()) + ".0"),
+                            E.Time(
+                                str(result.get_result_otime_relay().to_sec()) + '.0'
+                            ),
                             E.Position(str(relay_team.place)),
-                            E.Status(get_iof_status(ResultStatus.DISQUALIFIED)
-                                     if relay_team.get_correct_lap_count() < team_member.leg
-                                     else get_iof_status(ResultStatus.OK)
-                                     ),
+                            E.Status(
+                                get_iof_status(ResultStatus.DISQUALIFIED)
+                                if relay_team.get_correct_lap_count() < team_member.leg
+                                else get_iof_status(ResultStatus.OK)
+                            ),
                         ),
-                        generate_course(course)
+                        generate_course(course),
                     )
                     # append splits to Result object
                     for split in result.splits:
@@ -121,15 +125,16 @@ def generate_result_list(obj, all_splits=False):
 def generate_entry_list(obj):
     """Generate the IOF XML EntryList string from the race data"""
 
-    xmlns = "http://www.orienteering.org/datastandard/3.0"
-    xsi = "http://www.w3.org/2001/XMLSchema-instance"
+    xmlns = 'http://www.orienteering.org/datastandard/3.0'
+    xsi = 'http://www.w3.org/2001/XMLSchema-instance'
 
-    xml_el = Element('{' + xmlns + '}EntryList',
-                     nsmap={'xsi': xsi, None: xmlns},
-                     iofVersion='3.0',
-                     creator=config.NAME + ' ' + str(config.VERSION),
-                     createTime=datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
-                     )
+    xml_el = Element(
+        '{' + xmlns + '}EntryList',
+        nsmap={'xsi': xsi, None: xmlns},
+        iofVersion='3.0',
+        creator=config.NAME + ' ' + str(config.VERSION),
+        createTime=datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),
+    )
     xml_el.append(generate_evant(obj))
 
     for person in obj.persons:
@@ -141,7 +146,7 @@ def generate_entry_list(obj):
         xml_pe = E.PersonEntry(
             generate_person(person),
             generate_organization(organization),
-            generate_class(group)
+            generate_class(group),
         )
         xml_el.append(xml_pe)
 
@@ -152,23 +157,21 @@ def generate_start_list(obj):
     """Generate the IOF XML StartList string from the race data"""
 
     if isinstance(obj, Race):
+        xmlns = 'http://www.orienteering.org/datastandard/3.0'
+        xsi = 'http://www.w3.org/2001/XMLSchema-instance'
 
-        xmlns = "http://www.orienteering.org/datastandard/3.0"
-        xsi = "http://www.w3.org/2001/XMLSchema-instance"
-
-        xml_sl = Element('{' + xmlns + '}StartList',
-                         nsmap={'xsi': xsi, None: xmlns},
-                         iofVersion='3.0',
-                         creator=config.NAME + ' ' + str(config.VERSION),
-                         createTime=datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
-                         )
+        xml_sl = Element(
+            '{' + xmlns + '}StartList',
+            nsmap={'xsi': xsi, None: xmlns},
+            iofVersion='3.0',
+            creator=config.NAME + ' ' + str(config.VERSION),
+            createTime=datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),
+        )
         xml_sl.append(generate_evant(obj))
 
         for group in obj.groups:
             # Generate ClassStart and Class objects for each group
-            xml_cs = E.ClassStart(
-                generate_class(group)
-            )
+            xml_cs = E.ClassStart(generate_class(group))
             xml_sl.append(xml_cs)
 
             if not group.is_relay():
@@ -184,7 +187,7 @@ def generate_start_list(obj):
                     xml_person_start = E.PersonStart(
                         generate_person(person),
                         generate_organization(person.organization),
-                        xml_start
+                        xml_start,
                     )
                     xml_cs.append(xml_person_start)
 
@@ -198,16 +201,16 @@ def generate_competitor_list(obj):
     """Generate the IOF XML CompetitorList string from the race data"""
 
     if isinstance(obj, Race):
+        xmlns = 'http://www.orienteering.org/datastandard/3.0'
+        xsi = 'http://www.w3.org/2001/XMLSchema-instance'
 
-        xmlns = "http://www.orienteering.org/datastandard/3.0"
-        xsi = "http://www.w3.org/2001/XMLSchema-instance"
-
-        xml_cl = Element('{' + xmlns + '}CompetitorList',
-                         nsmap={'xsi': xsi, None: xmlns},
-                         iofVersion='3.0',
-                         creator=config.NAME + ' ' + str(config.VERSION),
-                         createTime=datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
-                         )
+        xml_cl = Element(
+            '{' + xmlns + '}CompetitorList',
+            nsmap={'xsi': xsi, None: xmlns},
+            iofVersion='3.0',
+            creator=config.NAME + ' ' + str(config.VERSION),
+            createTime=datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),
+        )
         xml_cl.append(generate_evant(obj))
 
         for person in obj.persons:
@@ -229,9 +232,7 @@ def generate_competitor_list(obj):
 
 
 def generate_evant(obj):
-    ret = E.Event(
-        E.Name(obj.data.title if obj.data else 'Event')
-    )
+    ret = E.Event(E.Name(obj.data.title if obj.data else 'Event'))
     return ret
 
 
@@ -239,13 +240,12 @@ def generate_organization(organization):
     ret = E.Organisation(
         E.Id(str(organization.id) if organization else ''),
         E.Name(organization.name if organization else ''),
-        E.ShortName(organization.name if organization else '')
+        E.ShortName(organization.name if organization else ''),
     )
     return ret
 
 
 def generate_person(person):
-
     person_name = person.name
     if not person_name or len(person_name) < 1:
         # mandatory first name (SPORTident Center doesn't work without it)
@@ -256,7 +256,7 @@ def generate_person(person):
         E.Name(
             E.Family(person.surname),
             E.Given(person_name),
-        )
+        ),
     )
     if person.birth_date:
         ret.append(E.BirthDate(str(person.birth_date)))
@@ -266,8 +266,7 @@ def generate_person(person):
 
 def generate_split(split):
     ret = E.SplitTime(
-        E.ControlCode(str(split.code)),
-        E.Time(str(split.relative_time.to_sec()))
+        E.ControlCode(str(split.code)), E.Time(str(split.relative_time.to_sec()))
     )
     return ret
 
@@ -284,11 +283,7 @@ def generate_class(group):
     if len(long_name) > name_limit:
         long_name = long_name[:name_limit]
 
-    ret = E.Class(
-        E.Id(str(group.id)),
-        E.Name(long_name),
-        E.ShortName(short_name)
-    )
+    ret = E.Class(E.Id(str(group.id)), E.Name(long_name), E.ShortName(short_name))
     return ret
 
 
@@ -297,18 +292,17 @@ def generate_course(course):
         E.Id(str(course.id) if course else ''),
         E.Name(course.name if course else ''),
         E.Length(str(course.length) if course else ''),
-        E.NumberOfControls(str(len(course.controls)) if course else '')
+        E.NumberOfControls(str(len(course.controls)) if course else ''),
     )
     return ret
 
 
 def generate_result(obj, result, all_controls=False):
-
     ret = E.Result(
         E.BibNumber(str(result.get_bib()) if result.get_bib() else ''),
         E.StartTime(otime_to_str(obj, result.get_start_time())),
         E.FinishTime(otime_to_str(obj, result.get_finish_time())),
-        E.Time(str(result.get_result_otime().to_sec()) + ".0"),
+        E.Time(str(result.get_result_otime().to_sec()) + '.0'),
         # E.TimeBehind(otime_to_str(obj, result.diff)),
         E.Position(str(result.place)),
         E.Status(get_iof_status(result.status)),

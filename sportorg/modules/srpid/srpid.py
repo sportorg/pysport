@@ -114,6 +114,7 @@ class ResultThread(QThread):
 
         return result
 
+
 @singleton
 class SrpidClient(object):
     def __init__(self):

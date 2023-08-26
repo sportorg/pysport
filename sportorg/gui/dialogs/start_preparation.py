@@ -70,7 +70,9 @@ class StartPreparationDialog(QDialog):
         self.reserve_layout.setWidget(
             3, QtWidgets.QFormLayout.LabelRole, self.reserve_group_percent_label
         )
-        self.reserve_group_percent_spin_box = AdvSpinBox(parent=self.widget_reserve, maximum=100)
+        self.reserve_group_percent_spin_box = AdvSpinBox(
+            parent=self.widget_reserve, maximum=100
+        )
         self.reserve_group_percent_spin_box.setEnabled(False)
         self.reserve_group_percent_spin_box.setSingleStep(5)
         self.reserve_layout.setWidget(
@@ -131,7 +133,9 @@ class StartPreparationDialog(QDialog):
         self.start_layout.setWidget(
             1, QtWidgets.QFormLayout.LabelRole, self.start_first_label
         )
-        self.start_first_time_edit = AdvTimeEdit(display_format=self.time_format, parent=self.widget_start)
+        self.start_first_time_edit = AdvTimeEdit(
+            display_format=self.time_format, parent=self.widget_start
+        )
         self.start_first_time_edit.setEnabled(False)
         self.start_layout.setWidget(
             1, QtWidgets.QFormLayout.FieldRole, self.start_first_time_edit
@@ -141,7 +145,9 @@ class StartPreparationDialog(QDialog):
         self.start_layout.setWidget(
             2, QtWidgets.QFormLayout.LabelRole, self.start_interval_radio_button
         )
-        self.start_interval_time_edit = AdvTimeEdit(display_format=self.time_format, parent=self.widget_start)
+        self.start_interval_time_edit = AdvTimeEdit(
+            display_format=self.time_format, parent=self.widget_start
+        )
         self.start_interval_time_edit.setEnabled(False)
         self.start_layout.setWidget(
             2, QtWidgets.QFormLayout.FieldRole, self.start_interval_time_edit
@@ -180,7 +186,9 @@ class StartPreparationDialog(QDialog):
         self.numbers_interval_radio_button.setChecked(True)
         self.numbers_interval_radio_button.setMinimumWidth(70)
         self.numbers_interval_hor_layout.addWidget(self.numbers_interval_radio_button)
-        self.numbers_first_spin_box = AdvSpinBox(parent=self.widget_numbers, maximum=Limit.BIB)
+        self.numbers_first_spin_box = AdvSpinBox(
+            parent=self.widget_numbers, maximum=Limit.BIB
+        )
         self.numbers_first_spin_box.setEnabled(False)
         self.numbers_first_spin_box.setMinimumWidth(47)
         self.numbers_first_spin_box.setMinimumHeight(20)
@@ -320,7 +328,6 @@ class StartPreparationDialog(QDialog):
             sleep(progressbar_delay)
 
             if self.start_check_box.isChecked():
-
                 corridor_first_start = self.start_first_time_edit.getOTime()
                 fixed_start_interval = self.start_interval_time_edit.getOTime()
 

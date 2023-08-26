@@ -13,7 +13,6 @@ def get_last_relay_number_protocol():
 
 
 def get_next_relay_number(num):
-
     last_num = num
     if last_num == 1000:
         return 1001

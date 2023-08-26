@@ -1,7 +1,9 @@
 import logging
+
 from PySide2 import QtCore, QtWidgets
 from PySide2.QtGui import QIcon, Qt
 from PySide2.QtWidgets import QDialog, QDialogButtonBox, QGridLayout, QPushButton
+
 from sportorg import config
 from sportorg.gui.dialogs.person_edit import PersonEditDialog
 from sportorg.gui.global_access import GlobalAccess
@@ -30,7 +32,9 @@ class DialogFilter(QDialog):
             self.label.setText(headers[i])
             self.label.setObjectName('filter_label_' + str(i))
             self.label.setMaximumWidth(120)
-            self.combo_action = AdvComboBox(self, {translate('contain'), translate('equal to')}, max_width=90)
+            self.combo_action = AdvComboBox(
+                self, {translate('contain'), translate('equal to')}, max_width=90
+            )
             self.combo_action.setObjectName('filter_action_' + str(i))
             self.combo_value = AdvComboBox(self)
             self.combo_value.setMinimumWidth(150)
@@ -69,7 +73,6 @@ class DialogFilter(QDialog):
         return super().exec_()
 
     def accept(self, *args, **kwargs):
-
         try:
             # apply filter here
             if self.table:
@@ -82,7 +85,9 @@ class DialogFilter(QDialog):
                     value_combo = self.findChild(AdvComboBox, 'filter_value_' + str(i))
                     assert isinstance(value_combo, AdvComboBox)
                     value = value_combo.currentText()
-                    action_combo = self.findChild(AdvComboBox, 'filter_action_' + str(i))
+                    action_combo = self.findChild(
+                        AdvComboBox, 'filter_action_' + str(i)
+                    )
                     assert isinstance(action_combo, AdvComboBox)
                     action = action_combo.currentText()
                     if len(value):
@@ -107,7 +112,9 @@ class DialogFilter(QDialog):
             value_combo = self.findChild(AdvComboBox, 'filter_value_' + str(filter_key))
             assert isinstance(value_combo, AdvComboBox)
             value_combo.setCurrentText(value)
-            action_combo = self.findChild(AdvComboBox, 'filter_action_' + str(filter_key))
+            action_combo = self.findChild(
+                AdvComboBox, 'filter_action_' + str(filter_key)
+            )
             assert isinstance(action_combo, AdvComboBox)
             action_combo.setCurrentText(action)
 

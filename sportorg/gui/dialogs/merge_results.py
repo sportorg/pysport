@@ -1,19 +1,14 @@
 import logging
 
 from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import (
-    QDialog,
-    QDialogButtonBox,
-    QFormLayout,
-    QLabel,
-)
+from PySide2.QtWidgets import QDialog, QDialogButtonBox, QFormLayout, QLabel
 
 from sportorg import config
 from sportorg.common.otime import OTime
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvSpinBox, AdvTimeEdit
 from sportorg.language import translate
-from sportorg.models.memory import race, ResultSportident, Split
+from sportorg.models.memory import ResultSportident, Split, race
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.result_checker import ResultChecker
 from sportorg.models.result.score_calculation import ScoreCalculation
@@ -37,7 +32,9 @@ class MergeResultsDialog(QDialog):
         self.layout = QFormLayout(self)
 
         self.item_min_time_interval = AdvTimeEdit(time=OTime(minute=1))
-        self.layout.addRow(QLabel(translate('Min. time interval')), self.item_min_time_interval)
+        self.layout.addRow(
+            QLabel(translate('Min. time interval')), self.item_min_time_interval
+        )
 
         self.item_first_cp = AdvSpinBox(value=101, minimum=1, maximum=1024)
         self.layout.addRow(QLabel(translate('First CP')), self.item_first_cp)
@@ -84,7 +81,9 @@ class MergeResultsDialog(QDialog):
 
         for cur_bib in duplicated_set:
             result_list = []
-            for res in reversed(obj.results):  # reversed order because of removing objects from iterated list
+            for res in reversed(
+                obj.results
+            ):  # reversed order because of removing objects from iterated list
                 if res.get_bib() == cur_bib:
                     result_list.append(res)
                     obj.results.remove(res)
@@ -100,14 +99,20 @@ class MergeResultsDialog(QDialog):
             cur_cp = first_cp
 
             for i in result_list:
-                if len(final_result.splits) < 1 or (i.finish_time - final_result.splits[-1].time) > min_time_interval:
+                if (
+                    len(final_result.splits) < 1
+                    or (i.finish_time - final_result.splits[-1].time)
+                    > min_time_interval
+                ):
                     new_split = Split()
                     new_split.code = cur_cp
                     new_split.time = i.finish_time
                     final_result.splits.append(new_split)
                     cur_cp += cp_increment
                 else:
-                    logging.debug("skip time: " + str(i.finish_time) + " for bib " + str(cur_bib))
+                    logging.debug(
+                        'skip time: ' + str(i.finish_time) + ' for bib ' + str(cur_bib)
+                    )
 
             # append splits from existing objects
             append_splits = True

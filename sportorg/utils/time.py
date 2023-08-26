@@ -37,9 +37,9 @@ def time_to_otime(t):
 def time_iof_to_otime(t):
     str_t = str(t)
     if str_t.find('T') > 0:
-        time_part = str_t[str_t.find('T') + 1:]
+        time_part = str_t[str_t.find('T') + 1 :]
         if time_part.find('+') > 0:
-            time_part = time_part[:time_part.find('+')]
+            time_part = time_part[: time_part.find('+')]
         return hhmmss_to_time(time_part)
     return OTime()
 
@@ -59,7 +59,7 @@ def time_to_qtime(t):
 
 
 def _int_to_time(value):
-    """ convert value from 1/100 s to time """
+    """convert value from 1/100 s to time"""
 
     today = datetime.datetime.now()
     ret = datetime.datetime(
@@ -75,7 +75,7 @@ def _int_to_time(value):
 
 
 def int_to_otime(value):
-    """ convert value from 1/100 s to otime """
+    """convert value from 1/100 s to otime"""
     ret = OTime(
         0,
         value // 360000 % 24,
@@ -87,7 +87,7 @@ def int_to_otime(value):
 
 
 def time_to_int(value):
-    """ convert value from time to 1/100s """
+    """convert value from time to 1/100s"""
     return round(time_to_sec(value) * 100)
 
 
@@ -131,7 +131,6 @@ def time_remove_day(value):
 
 
 def _time_to_sec(value, max_val=86400):  # default max value = 24h
-
     if isinstance(value, datetime.datetime):
         ret = (
             value.hour * 3600
@@ -178,6 +177,7 @@ def date_to_qdate(value):
 def str_to_date(value, separator='-'):
     day, month, year = str(value).split(separator)
     return date(int(year), int(month), int(day))
+
 
 def yyyymmdd_to_date(value, separator='-'):
     year, month, day = str(value).split(separator)

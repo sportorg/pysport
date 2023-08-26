@@ -23,7 +23,6 @@ class Widget(QtWidgets.QWidget):
         self.setup_ui()
 
     def setup_ui(self):
-
         self.course_table.setObjectName('CourseTable')
         self.course_table.setModel(CourseMemoryModel())
 

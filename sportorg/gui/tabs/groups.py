@@ -23,7 +23,6 @@ class Widget(QtWidgets.QWidget):
         self.setup_ui()
 
     def setup_ui(self):
-
         self.group_table.setObjectName('GroupTable')
         self.group_table.setModel(GroupMemoryModel())
 

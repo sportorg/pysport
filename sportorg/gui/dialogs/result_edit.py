@@ -29,9 +29,8 @@ from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.result_checker import ResultChecker, ResultCheckerException
 from sportorg.models.result.split_calculation import GroupSplits
 from sportorg.modules.live.live import live_client
-from sportorg.utils.time import hhmmss_to_time
 from sportorg.modules.teamwork import Teamwork
-from sportorg.utils.time import hhmmss_to_time, time_to_otime, time_to_qtime
+from sportorg.utils.time import hhmmss_to_time
 
 
 class ResultEditDialog(QDialog):
@@ -187,7 +186,9 @@ class ResultEditDialog(QDialog):
             self.splits.splits(self.current_object.splits)
             self.splits.show()
         if self.current_object.created_at:
-            self.item_created_at.setOTime(datetime.fromtimestamp(self.current_object.created_at))
+            self.item_created_at.setOTime(
+                datetime.fromtimestamp(self.current_object.created_at)
+            )
         if self.current_object.finish_time:
             self.item_finish.setOTime(self.current_object.finish_time)
         if self.current_object.start_time:
