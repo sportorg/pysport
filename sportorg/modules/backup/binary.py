@@ -25,7 +25,7 @@ def dump(file):
 
 def load(file):
     data = pickle.load(file)
-    if not ('version' in data):
+    if 'version' not in data:
         return
     # FIXME
     if True or data['version'] == config.VERSION:

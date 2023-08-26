@@ -28,7 +28,8 @@ class File:
     @staticmethod
     def backup(file_name, func, mode='wb'):
         use_utf8 = Config().configuration.get('save_in_utf8', False)
-        # if user set UTF-8 usage, first try to open file in UTF-8, then in system locale (1251 for RU Windows)
+        # if user set UTF-8 usage, first try to open file in UTF-8,
+        # then in system locale (1251 for RU Windows)
         try:
             def_encoding = None
             if use_utf8:
