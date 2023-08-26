@@ -20,7 +20,6 @@ class AboutDialog(QDialog):
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(True)
-        self.setStyleSheet('background:white')
         self.setMinimumWidth(540)
         self.setMaximumWidth(640)
         self.layout = QFormLayout(self)
@@ -35,9 +34,14 @@ class AboutDialog(QDialog):
 
         contributors_text = QLabel()
         contributors_text.setText(
-            '\n{}:{}'.format(
+            '\n{}:\n{}'.format(
                 translate('Contributors'),
-                '\n\t- Danil Akhtarov,\n\t- Sergei Kobelev,\n\t- Semyon Yakimov,\n\t- Konstantin Bats.',
+                (
+                    '\t- Danil Akhtarov,\n'
+                    '\t- Sergei Kobelev,\n'
+                    '\t- Semyon Yakimov,\n'
+                    '\t- Konstantin Bats.'
+                ),
             )
         )
         self.layout.addRow(contributors_text)
