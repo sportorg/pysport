@@ -218,14 +218,13 @@ def import_from_result_list(results) -> None:
     obj = race()
 
     for person_obj in results:
-        bib = 0
-
         result_obj = person_obj['result']
 
         person = create_person(person_obj)
 
-        if 'bib' in result_obj and len(result_obj['bib']) > 0:
-            bib = result_obj['bib']
+        bib = 0
+        if 'bib' in result_obj and str(result_obj['bib']).strip():
+            bib = int(result_obj['bib'])
         start = OTime()
         if 'start_time' in result_obj:
             start = time_iof_to_otime(result_obj['start_time'])
@@ -233,8 +232,8 @@ def import_from_result_list(results) -> None:
         if 'finish_time' in result_obj:
             finish = time_iof_to_otime(result_obj['finish_time'])
         card = 0
-        if 'control_card' in result_obj:
-            card = result_obj['control_card']
+        if 'control_card' in result_obj and str(result_obj['control_card']).strip():
+            card = int(result_obj['control_card'])
 
         status = ResultStatus.OK
 
@@ -254,12 +253,12 @@ def import_from_result_list(results) -> None:
         new_result = ResultSportident()
         new_result.status = status
 
-        if int(bib) > 0:
-            new_result.bib = int(bib)
+        if bib > 0:
+            new_result.bib = bib
         new_result.start_time = start
         new_result.finish_time = finish
-        if int(card) > 0:
-            new_result.card_number = int(card)
+        if card > 0:
+            new_result.card_number = card
         if person.card_number == 0:
             person.card_number = new_result.card_number
 
