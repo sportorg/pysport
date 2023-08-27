@@ -26,7 +26,7 @@ options = {
     "build_exe": {
         "includes": includes,
         "excludes": excludes,
-        "packages": ["idna", "requests", "encodings", "asyncio", "pywinusb/hid"],
+        "packages": ["idna", "requests", "encodings", "asyncio", "pywinusb"],
         "include_files": include_files,
     }
 }
@@ -36,7 +36,7 @@ executables = [
         "SportOrg.pyw",
         base=base,
         icon=config.icon_dir("sportorg.ico"),
-        shortcutDir=config.NAME.lower(),
+        shortcut_dir=config.NAME.lower(),
         copyright="GNU GENERAL PUBLIC LICENSE {}".format(config.NAME),
     )
 ]
