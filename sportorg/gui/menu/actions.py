@@ -82,7 +82,7 @@ class ActionFactory(type):
 
 class NewAction(Action, metaclass=ActionFactory):
     def execute(self):
-        self.app.create_file()
+        self.app.create_file(is_new=True)
 
 
 class SaveAction(Action, metaclass=ActionFactory):

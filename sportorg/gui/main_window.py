@@ -1,8 +1,11 @@
 import ast
 import logging
+import os
 import time
+
 from queue import Queue
 
+import pylocker
 from PySide2 import QtCore, QtGui, QtWidgets
 from PySide2.QtCore import QTimer
 from PySide2.QtWidgets import QMainWindow, QMessageBox
@@ -105,6 +108,11 @@ class MainWindow(QMainWindow):
         self.relay_number_assign = False
         self.split_printer_thread = None
         self.split_printer_queue = None
+
+        self.file_locker = pylocker.FACTORY(
+            key='sportorg_locker_key', password='str(uuid.uuid1())', autoconnect=False
+        )
+        self.file_lock_id = None
 
     def _set_style(self):
         try:
@@ -211,6 +219,7 @@ class MainWindow(QMainWindow):
 
     def close(self):
         self.conf_write()
+        self.unlock_file()
 
     def close_split_printer(self):
         if self.split_printer_thread:
@@ -672,7 +681,7 @@ class MainWindow(QMainWindow):
         self.add_sportident_result_from_sireader(result)
 
     # Actions
-    def create_file(self, *args, update_data=True):
+    def create_file(self, *args, update_data=True, is_new=False):
         file_name = get_save_file_name(
             translate('Create SportOrg file'),
             translate('SportOrg file (*.json)'),
@@ -680,6 +689,21 @@ class MainWindow(QMainWindow):
         )
         if file_name:
             try:
+                # protect from overwriting with empty file
+                if is_new and os.path.exists(file_name):
+                    if os.path.getsize(file_name) > 1000:
+                        QMessageBox.warning(
+                            self,
+                            translate('Error'),
+                            translate('Cannot overwrite existing file with new')
+                            + ': '
+                            + file_name,
+                        )
+                        return
+
+                if not self.lock_file(file_name):
+                    return
+
                 if update_data:
                     new_event([Race()])
                     set_current_race_index(0)
@@ -701,7 +725,7 @@ class MainWindow(QMainWindow):
             self.refresh()
 
     def save_file_as(self):
-        self.create_file(update_data=False)
+        self.create_file(update_data=False, is_new=False)
 
     def save_file(self):
         if self.file:
@@ -718,6 +742,9 @@ class MainWindow(QMainWindow):
     def open_file(self, file_name=None):
         if file_name:
             try:
+                if not self.lock_file(file_name):
+                    return
+
                 File(file_name, logging.root, File.JSON).open()
                 self.file = file_name
                 self.set_title()
@@ -880,3 +907,29 @@ class MainWindow(QMainWindow):
 
     def set_split_printer_queue(self, split_printer_app):
         self.split_printer_queue = split_printer_app
+
+    def lock_file(self, file_name: str):
+        if self.file == file_name:
+            # already locked by current process ('Save as' or 'Open' for the same file)
+            return True
+
+        # try to acquire the lock a single file path
+        acquired, lock_id = self.file_locker.acquire_lock(file_name, timeout=0.5)
+        if acquired:
+            # new lock created, release previous lock if exists
+            self.unlock_file()
+            self.file_lock_id = lock_id
+            logging.info(translate('File lock created') + ': ' + file_name)
+        else:
+            # already locked = opened in another process, avoid parallel opening
+            QMessageBox.warning(
+                self,
+                translate('Error'),
+                translate('Cannot open file, already locked') + ': ' + file_name,
+            )
+            return False
+        return True
+
+    def unlock_file(self):
+        logging.info(translate('File lock released'))
+        self.file_locker.release(self.file_lock_id)
