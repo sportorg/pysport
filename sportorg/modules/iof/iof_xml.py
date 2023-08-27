@@ -30,43 +30,39 @@ from sportorg.models.memory import (
 from sportorg.utils.time import hhmmss_to_time, time_iof_to_otime, yyyymmdd_to_date
 
 
-def export_result_list(file, all_splits=False):
+def export_result_list(file, *, creator: str, all_splits: bool = False) -> None:
     obj = race()
 
-    # TODO add creator
-    result_list = generate_result_list(obj, all_splits=all_splits)
+    result_list = generate_result_list(obj, creator=creator, all_splits=all_splits)
 
     result_list.write(open(file, 'wb'), xml_declaration=True, encoding='UTF-8')
 
 
-def export_entry_list(file):
+def export_entry_list(file, *, creator: str) -> None:
     obj = race()
 
-    # TODO add creator
-    entry_list = generate_entry_list(obj)
+    entry_list = generate_entry_list(obj, creator=creator)
 
     entry_list.write(open(file, 'wb'), xml_declaration=True, encoding='UTF-8')
 
 
-def export_start_list(file):
+def export_start_list(file, *, creator: str) -> None:
     obj = race()
 
-    # TODO add creator
-    start_list = generate_start_list(obj)
+    start_list = generate_start_list(obj, creator=creator)
 
     start_list.write(open(file, 'wb'), xml_declaration=True, encoding='UTF-8')
 
 
-def export_competitor_list(file):
+def export_competitor_list(file, *, creator: str) -> None:
     obj = race()
 
-    # TODO add creator
-    start_list = generate_competitor_list(obj)
+    start_list = generate_competitor_list(obj, creator=creator)
 
     start_list.write(open(file, 'wb'), xml_declaration=True, encoding='UTF-8')
 
 
-def import_from_iof(file):
+def import_from_iof(file) -> None:
     results = parse(file)
     if not len(results):
         return
@@ -84,7 +80,7 @@ def import_from_iof(file):
             import_from_event_data(result.data)
 
 
-def import_from_course_data(courses):
+def import_from_course_data(courses) -> None:
     obj = race()
     for course in courses:
         if find(obj.courses, name=course['name']) is None:
@@ -182,7 +178,7 @@ def create_person(person_entry):
     return person
 
 
-def import_from_entry_list(entries):
+def import_from_entry_list(entries) -> None:
     obj = race()
     for person_entry in entries:
         create_person(person_entry)
@@ -218,7 +214,7 @@ def import_from_entry_list(entries):
             )
 
 
-def import_from_result_list(results):
+def import_from_result_list(results) -> None:
     obj = race()
 
     for person_obj in results:
@@ -262,7 +258,7 @@ def import_from_result_list(results):
             new_result.bib = int(bib)
         new_result.start_time = start
         new_result.finish_time = finish
-        if len(card) > 0:
+        if int(card) > 0:
             new_result.card_number = int(card)
         if person.card_number == 0:
             person.card_number = new_result.card_number
@@ -284,7 +280,7 @@ def import_from_result_list(results):
         obj.results.append(new_result)
 
 
-def import_from_event_data(data):
+def import_from_event_data(data) -> None:
     """Get info about event from Event and Event-Race[0] elements"""
 
     obj = race()

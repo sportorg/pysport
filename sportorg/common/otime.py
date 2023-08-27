@@ -126,7 +126,8 @@ class OTime:
     def get_msec(day=0, hour=0, minute=0, sec=0, msec=0):
         ret = day * 86400000 + hour * 3600000 + minute * 60000 + sec * 1000 + msec
         if ret < 0:
-            # emulation of midnight - add 1 day if time < 0. Note, that now we don't support races > 24h
+            # emulation of midnight - add 1 day if time < 0.
+            # Note, that now we don't support races > 24h
             # TODO: real day difference, support races > 24h
             ret += 86400000
         return ret

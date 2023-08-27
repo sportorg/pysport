@@ -235,7 +235,7 @@ class IOFResultListExportAction(Action, metaclass=ActionFactory):
         )
         if file_name != '':
             try:
-                iof_xml.export_result_list(file_name)
+                iof_xml.export_result_list(file_name, creator=config.get_creator_name())
             except Exception as e:
                 logging.exception(e)
                 QMessageBox.warning(
@@ -254,7 +254,9 @@ class IOFResultListAllSplitsExportAction(Action, metaclass=ActionFactory):
         )
         if file_name != '':
             try:
-                iof_xml.export_result_list(file_name, True)
+                iof_xml.export_result_list(
+                    file_name, creator=config.get_creator_name(), all_splits=True
+                )
             except Exception as e:
                 logging.exception(e)
                 QMessageBox.warning(
@@ -273,7 +275,7 @@ class IOFEntryListExportAction(Action, metaclass=ActionFactory):
         )
         if file_name != '':
             try:
-                iof_xml.export_entry_list(file_name)
+                iof_xml.export_entry_list(file_name, creator=config.get_creator_name())
             except Exception as e:
                 logging.error(str(e))
                 QMessageBox.warning(
@@ -310,7 +312,7 @@ class IOFStartListExportAction(Action, metaclass=ActionFactory):
         )
         if file_name != '':
             try:
-                iof_xml.export_start_list(file_name)
+                iof_xml.export_start_list(file_name, creator=config.get_creator_name())
             except Exception as e:
                 logging.exception(str(e))
                 QMessageBox.warning(
@@ -331,7 +333,9 @@ class IOFCompetitorListExportAction(Action, metaclass=ActionFactory):
         )
         if file_name != '':
             try:
-                iof_xml.export_competitor_list(file_name)
+                iof_xml.export_competitor_list(
+                    file_name, creator=config.get_creator_name()
+                )
             except Exception as e:
                 logging.exception(str(e))
                 QMessageBox.warning(
