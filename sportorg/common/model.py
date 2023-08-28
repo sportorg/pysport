@@ -1,4 +1,4 @@
-class Model(object):
+class Model:
     @classmethod
     def create(cls, **kwargs):
         o = cls()

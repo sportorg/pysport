@@ -29,7 +29,7 @@ if platform.system() == 'Windows':
     from pywinusb.hid import HidDevice, HidDeviceFilter
 
 
-class SFRReader(object):
+class SFRReader:
     SFR_DEBUG = False
     SFR_ALLOW_DUPLICATE = False  # Don't check card to be new, allow multiple reading of one card - used for debug only
     TIMEOUT_STEP = 0.001  # Sleeping step while waiting for command response

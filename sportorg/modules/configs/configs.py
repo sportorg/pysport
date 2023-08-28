@@ -7,7 +7,7 @@ from sportorg.common.singleton import Singleton
 from sportorg.gui.global_access import GlobalAccess
 
 
-class ConfigFile(object):
+class ConfigFile:
     GEOMETRY = 'geometry'
     CONFIGURATION = 'configuration'
     LOCALE = 'locale'

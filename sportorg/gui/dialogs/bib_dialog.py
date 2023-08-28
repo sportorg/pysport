@@ -65,7 +65,7 @@ class BibDialog(QDialog):
         self.show()
 
     def show_person_info(self):
-        bib_or_name = self.item_bib_or_name.text()  # type: str
+        bib_or_name = self.item_bib_or_name.text()
         self.label_person_info.setText('')
         person = None
         if bib_or_name:

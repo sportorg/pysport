@@ -1887,7 +1887,7 @@ class Qualification(IntEnum):
         return [q.get_title() for q in Qualification]
 
 
-class RankingItem(object):
+class RankingItem:
     def __init__(
         self,
         qual=Qualification.NOT_QUALIFIED,
@@ -1936,7 +1936,7 @@ class RankingItem(object):
         self.percent = int(data['percent'])
 
 
-class Ranking(object):
+class Ranking:
     def __init__(self):
         self.is_active = False
         self.rank_scores = 0
@@ -2000,7 +2000,7 @@ class Ranking(object):
             self.rank[rank.qual] = rank
 
 
-class RelayLeg(object):
+class RelayLeg:
     """
     Describes one leg of relay team
     Has the distribution of relay variant
@@ -2159,7 +2159,7 @@ class RelayLeg(object):
             res.order = order
 
 
-class RelayTeam(object):
+class RelayTeam:
     def __init__(self, r):
         self.race = r
         self.group = None  # type: Group

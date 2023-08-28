@@ -129,7 +129,7 @@ class ResultThread(QThread):
 
 
 @singleton
-class SFRReaderClient(object):
+class SFRReaderClient:
     def __init__(self):
         self._queue = Queue()
         self._stop_event = Event()

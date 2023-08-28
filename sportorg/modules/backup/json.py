@@ -1,6 +1,7 @@
-import json
 import os
 import uuid
+
+import orjson
 
 from sportorg import config
 from sportorg.models.memory import (
@@ -15,7 +16,6 @@ from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.result_checker import ResultChecker
 from sportorg.models.result.score_calculation import ScoreCalculation
 from sportorg.models.result.split_calculation import RaceSplits
-from sportorg.modules.configs.configs import Config
 
 
 def dump(file):
@@ -24,8 +24,8 @@ def dump(file):
         'current_race': get_current_race_index(),
         'races': [race_downgrade(r.to_dict()) for r in races()],
     }
-    use_utf8 = Config().configuration.get('save_in_utf8', False)
-    json.dump(data, file, sort_keys=True, indent=2, ensure_ascii=not use_utf8)
+    raw = orjson.dumps(data, option=orjson.OPT_INDENT_2)
+    file.write(raw.decode())
     file.flush()
     os.fsync(file.fileno())
 
@@ -45,7 +45,7 @@ def load(file):
 
 
 def get_races_from_file(file):
-    data = json.load(file)
+    data = orjson.loads(file.read())
     if 'races' not in data:
         data = {
             'races': [data] if not isinstance(data, list) else data,

@@ -22,7 +22,7 @@ class Consumer:
 
 
 @singleton
-class Broker(object):
+class Broker:
     def __init__(self):
         self._consumers = {}
         self._logger = logging.root

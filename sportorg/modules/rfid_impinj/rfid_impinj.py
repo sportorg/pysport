@@ -202,7 +202,7 @@ class ResultThread(QThread):
 
 
 @singleton
-class ImpinjClient(object):
+class ImpinjClient:
     def __init__(self):
         self._queue = Queue()
         self._stop_event = Event()

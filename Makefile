@@ -16,7 +16,7 @@ run:
 
 .PHONY: test
 test:
-	$(POETRY_RUN) pytest --verbosity=2 --showlocals --strict --log-level=DEBUG $(args) --cov
+	$(POETRY_RUN) pytest --verbosity=2 --showlocals --strict-markers --log-level=DEBUG $(args) --cov
 
 .PHONY: lint
 lint:

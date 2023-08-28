@@ -35,7 +35,7 @@ def get_sounds(path=None):
 
 
 @singleton
-class Audio(object):
+class Audio:
     def __init__(self):
         self._queue = Queue()
         self._thread = None

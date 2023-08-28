@@ -10,7 +10,7 @@ if platform.system() == 'Windows':  # current realisation works on Windows only
     import win32ui
 
 
-class SportorgPrinter(object):
+class SportorgPrinter:
     def __init__(self, printer_name, scale_factor=60, x_offset=5, y_offset=5):
         if not printer_name:
             printer_name = win32print.GetDefaultPrinter()
