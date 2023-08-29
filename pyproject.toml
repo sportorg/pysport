@@ -48,6 +48,7 @@ flake8-requirements = "*"
 flake8-return = "*"
 mypy = "^1.4"
 pep8-naming = "*"
+poethepoet = "^0.22.0"
 pylint = "^2.17"
 pytest = "^7.4"
 pytest-cov = "*"
@@ -66,3 +67,46 @@ win = ["pywin32"]
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poe.env]
+CODE = "tests sportorg"
+
+[tool.poe.tasks.all]
+help = "Run format lint test"
+sequence = ["format", "lint", "test"]
+default_item_type = "ref"
+
+[tool.poe.tasks.test]
+help = "Test with coverage"
+cmd = "pytest -vv --cov"
+
+[tool.poe.tasks.test-fast]
+help = "Test until error"
+cmd = "pytest -vv --exitfirst"
+
+[tool.poe.tasks.test-failed]
+help = "Test failed"
+cmd = "pytest -vv --last-failed"
+
+[tool.poe.tasks.lint]
+help = "Check code"
+sequence = [
+    # {cmd = "flake8 --jobs 4 --statistics --show-source ${CODE}"},
+    # {cmd = "pylint --jobs 1 --rcfile=setup.cfg ${CODE}"},
+    {cmd = "black --skip-string-normalization --line-length=88 --check ${CODE}"},
+    {cmd = "pytest --dead-fixtures --dup-fixtures"},
+    {cmd = "mypy ${CODE}"},
+]
+
+[tool.poe.tasks.format]
+help = "Formating code"
+sequence = [
+	{cmd = "autoflake --recursive --in-place --remove-all-unused-imports ${CODE}"},
+	{cmd = "isort ${CODE}"},
+	{cmd = "black --skip-string-normalization --line-length=88 ${CODE}"},
+	{cmd = "unify --in-place --recursive ${CODE}"},
+]
+
+[tool.poe.tasks.run]
+help = "Run"
+cmd = "python SportOrg.pyw"

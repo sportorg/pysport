@@ -15,7 +15,15 @@ poetry install -E win  # for Windows
 Add `DEBUG=True` to `.env` file or `cp .env.example .env`
 
 ```
-poetry run python SportOrg.pyw
+poe run
+```
+
+## Write a code
+
+```
+poe format
+poe lint
+poe test
 ```
 
 ## Build
