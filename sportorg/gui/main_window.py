@@ -2,7 +2,6 @@ import ast
 import logging
 import os
 import time
-
 from queue import Queue
 
 import pylocker
