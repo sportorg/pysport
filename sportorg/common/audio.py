@@ -47,7 +47,9 @@ class Audio:
 
     def _start(self):
         if self._thread is None:
-            self._thread = Thread(target=self._run, name=self.__class__.__name__)
+            self._thread = Thread(
+                target=self._run, name=self.__class__.__name__, daemon=True
+            )
             self._thread.start()
         elif not self._thread.is_alive():
             self._thread = None

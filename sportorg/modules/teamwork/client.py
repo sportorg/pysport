@@ -9,7 +9,7 @@ from .server import Command
 
 class ClientSenderThread(Thread):
     def __init__(self, conn, in_queue, stop_event, logger=None):
-        super().__init__()
+        super().__init__(daemon=True)
         self.setName(self.__class__.__name__)
         self.conn = conn
         self._in_queue = in_queue

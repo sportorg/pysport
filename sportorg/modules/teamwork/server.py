@@ -39,7 +39,7 @@ class Connect:
 
 class ServerReceiverThread(Thread):
     def __init__(self, conn, in_queue, out_queue, stop_event, logger=None):
-        super().__init__()
+        super().__init__(daemon=True)
         # self.setName(self.__class__.__name__)
         self.connect = conn
         self._in_queue = in_queue
@@ -102,7 +102,7 @@ class ServerReceiverThread(Thread):
 
 class ServerSenderThread(Thread):
     def __init__(self, in_queue, connections_queue, stop_event, logger=None):
-        super().__init__()
+        super().__init__(daemon=True)
         self.setName(self.__class__.__name__)
         self._connections_queue = connections_queue
         self._connections = []
@@ -142,7 +142,7 @@ class ServerSenderThread(Thread):
 
 class ServerThread(Thread):
     def __init__(self, addr, in_queue, out_queue, stop_event, logger=None):
-        super().__init__()
+        super().__init__(daemon=True)
         self.setName(self.__class__.__name__)
         self.addr = addr
         self._in_queue = in_queue

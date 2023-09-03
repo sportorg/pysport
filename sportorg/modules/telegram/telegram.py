@@ -9,8 +9,8 @@ from sportorg.models.memory import race
 
 class TelegramSendThread(Thread):
     def __init__(self, token, chat_id, text, parse_mode=''):
-        super().__init__()
-        self.setName(TelegramSendThread.__class__.__name__)
+        super().__init__(daemon=True)
+        self.setName('TelegramSendThread')
         self.token = token
         self.chat_id = chat_id
         self.text = text

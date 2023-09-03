@@ -49,7 +49,7 @@ class LiveClient:
                 func = partial(
                     orgeo.create, requests, url, items, race_data, logging.root
                 )
-                Thread(target=func, name='LiveThread').start()
+                Thread(target=func, name='LiveThread', daemon=True).start()
 
             if race().get_setting('live_cp_enabled', False):
                 func = partial(
@@ -60,7 +60,7 @@ class LiveClient:
                     race_data,
                     logging.root,
                 )
-                Thread(target=func, name='LiveThread_OnlineCP').start()
+                Thread(target=func, name='LiveThread_OnlineCP', daemon=True).start()
 
     def delete(self, data):
         if not self.is_enabled():
@@ -77,7 +77,7 @@ class LiveClient:
         race_data = race().to_dict()
         for url in urls:
             func = partial(orgeo.delete, requests, url, items, race_data)
-            Thread(target=func, name='LiveThread').start()
+            Thread(target=func, name='LiveThread', daemon=True).start()
 
 
 live_client = LiveClient()
