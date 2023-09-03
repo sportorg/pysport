@@ -34,7 +34,7 @@ class WdbOnlineSender:
         self.tr = None
 
     def start(self):
-        self.tr = threading.Thread(target=self.run)
+        self.tr = threading.Thread(target=self.run, daemon=True)
         self.tr.start()
 
     def run(self):
