@@ -563,6 +563,7 @@ class Result:
             if self.final_result_time
             else None,
             'order': self.order,
+            'multi_day_results': self.get_multi_day_dict()
         }
 
     def update_data(self, data):
@@ -717,18 +718,14 @@ class Result:
         person_id = self.person.multi_day_id
         sum_result = OTime()
         for day in races():
-            result_found = False
-            for result in day.results:
-                assert isinstance(result, Result)
-                if result.person and result.person.multi_day_id == person_id:
-                    if result.is_status_ok():
-                        sum_result += result.get_result_otime_current_day()
-                        result_found = True
-                        continue
-                    else:
-                        self.status = ResultStatus.DISQUALIFIED
-                        return OTime()  # DSQ/DNS
-            if not result_found:
+            result_tmp = day.find_result_by_person_id(person_id)
+            if result_tmp:
+                if result_tmp.is_status_ok():
+                    sum_result += result_tmp.get_result_otime_current_day()
+                else:
+                    self.status = ResultStatus.DISQUALIFIED
+                    return OTime()  # DSQ/DNS
+            else:
                 self.status = ResultStatus.DISQUALIFIED
                 return OTime()  # result not found in that day
         return sum_result
@@ -850,6 +847,24 @@ class Result:
 
             self.can_win_count = who_can_win_count
             self.final_result_time = max_unfinished_start_time + self.get_result_otime()
+
+    def get_multi_day_dict(self):
+        """
+        Get list of multi day results, None if group type not Multi Day
+        Returns:
+            str:
+        """
+        if self.person and self.person.group and self.person.group.get_type() == RaceType.MULTI_DAY_RACE:
+            ret = ''
+            person_id = self.person.multi_day_id
+            for day in races():
+                cur_res: Result = day.find_result_by_person_id(person_id)
+                text = ''
+                if cur_res.is_status_ok():
+                    text = cur_res.get_result_otime_current_day().to_str()
+                ret += (text + '              ')[0:14]
+            return ret
+        return ''
 
 
 class ResultManual(Result):
@@ -1372,6 +1387,7 @@ class Race(Model):
         self.relay_teams = []  # type: List[RelayTeam]
         self.settings = {}  # type: Dict[str, Any]
         self.controls = []  # type: List[ControlPoint]
+        self.result_index = None
 
     def __repr__(self):
         return repr(self.data)
@@ -1820,6 +1836,19 @@ class Race(Model):
                 previous_person = person
                 current_name = person.full_name
         return ret
+
+    def find_result_by_person_id(self, person_id) -> Result:
+        if self.result_index is None:
+            self.result_index = {}
+            for res in self.results:
+                if res.person:
+                    id = res.person.multi_day_id
+                    self.result_index[id] = res
+
+        if person_id in self.result_index:
+            return self.result_index[person_id]
+        else:
+            return None
 
 
 class Qualification(IntEnum):

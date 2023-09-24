@@ -715,7 +715,7 @@ class MainWindow(QMainWindow):
                 self.set_title()
                 self.init_model()
             except Exception as e:
-                logging.error(str(e))
+                logging.exception(e)
                 QMessageBox.warning(
                     self,
                     translate('Error'),
