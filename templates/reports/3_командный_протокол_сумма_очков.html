@@ -40,68 +40,59 @@
         fields: [
             {key: 'index', title: '№'},
             {key: 'name', title: 'Коллектив'},
-            {key: 'scores', title: 'Очки'},
-            {key: 'count', title: 'Участников'}
+            {key: 'scores', title: 'Сумма очков'},
+            {key: 'count', title: 'Участников'},
+            {key: 'people', title: 'Участники'}
         ],
         init: function () {
             this.showSettings();
             this.render();
             return this;
         },
-        getScores: function (org) {
+        getScores: function (org, group) {
             // org is organization or region, interface {id: string, name: string}
             var _this = this;
             var scores = 0;
             var count = 0;
-            var equal = function (organization) {
+            var people = "";
+            var equal = function (organization, gr) {
                 if (_this.store.grouping === 'organizations') {
-                    return organization.id === org.id;
+                    return organization.id === org.id && group.id === gr.id;
                 } else if (_this.store.grouping === 'regions') {
-                    return organization.address.state === org.name;
+                    return organization.address.state === org.name && group.id === gr.id;
                 }
             };
             var results = this.race.results.filter(function (result) {
-                if (result.person && result.person.group && result.person.organization && equal(result.person.organization)) {
-                    return !_this.selected.groups.length || _this.selected.groups.some(function (elem) {
+                if (result.status === 1 && result.person && !result.person.is_out_of_competition && result.person.group && result.person.organization && equal(result.person.organization, result.person.group)) {
+                    return !_this.selected.groups || !_this.selected.groups.length || _this.selected.groups.some(function (elem) {
                         return elem.id === result.person.group.id;
                     })
                 }
                 return false;
             });
-            if (_this.store.sum === 'n_all') {
-                results.sort(function (a, b) {
-                    return b.scores - a.scores;
-                });
-                if (+_this.store.nsum) {
-                    results = results.slice(0, +_this.store.nsum);
-                }
-            } else if (_this.store.sum === 'n_group') {
-                var groups = {};
-                results.forEach(function (elem) {
-                    if (groups[elem.person.group.id]) {
-                        groups[elem.person.group.id].push(elem);
-                    } else {
-                        groups[elem.person.group.id] = [elem];
-                    }
-                });
-                results = [];
-                Object.keys(groups).forEach(function (value) {
-                    groups[value].sort(function (a, b) {
-                        return b.scores - a.scores;
-                    });
-                    if (+_this.store.nsum) {
-                        groups[value] = groups[value].slice(0, +_this.store.nsum);
-                    }
-                    results.push.apply(results, groups[value]);
-                });
+
+            results.sort(function (a, b) {
+                return b.scores - a.scores;
+            });
+            if (+_this.store.nsum) {
+                results = results.slice(0, +_this.store.nsum);
             }
+
             results.forEach(function (elem) {
                 count++;
                 scores += elem.scores;
+                for (var _i = 0, _a = this.race.persons; _i < _a.length; _i++) {
+                    var person = _a[_i];
+                    if (person.id === elem.person_id){
+                        people += elem.scores.toFixed(1) + ": " + person.surname + " " + person.name + "; "
+                        break;
+                    }
+                }
             });
-            return {scores: scores, count: count};
+
+            return {scores: scores.toFixed(1), count: count, people: people};
         },
-        getScoresTable: function () {
+        getScoresTable: function (group) {
             var ret = [];
             var data = [];
             if (this.store.grouping === 'organizations') {
@@ -120,17 +111,18 @@
             }
             for (var _i = 0, _a = data; _i < _a.length; _i++) {
                 var obj = _a[_i];
-                var s = this.getScores(obj);
+                var s = this.getScores(obj, group);
                 ret.push({
                     index: 0,
                     name: obj.name,
                     scores: s.scores,
-                    count: s.count
+                    count: s.count,
+                    people: s.people
                 })
             }
             if (this.store.hideNull) {
                 ret = ret.filter(function (elem) {
-                    return !!elem.scores;
+                    return elem.scores != (0).toFixed(1);
                 });
             }
             var sortByName = function (a, b) {
@@ -143,10 +135,13 @@
                 return 0;
             };
             var sortFunc = function (a, b) {
-                if (a.scores === b.scores) {
-                    return sortByName(a, b);
+                if (a.count === b.count){
+                    if (a.scores === b.scores) {
+                        return sortByName(a, b);
+                    }
+                    return b.scores - a.scores;
                 }
-                return b.scores - a.scores;
+                return b.count - a.count;
             };
             if (this.store.sort === 'name') {
                 sortFunc = sortByName;
@@ -161,7 +156,12 @@
         render: function () {
             var resultBlock = document.getElementById('results-tables');
             resultBlock.innerHTML = '';
-            resultBlock.appendChild(new TableGenerator(this.getScoresTable(), this.fields).getTable({className: 'sportorg-table'}));
+            for (var _i = 0, _a = this.race.groups; _i < _a.length; _i++) {
+                var group = _a[_i];
+                var groupTitle = document.createTextNode(group.name);
+                resultBlock.appendChild(groupTitle);
+                resultBlock.appendChild(new TableGenerator(this.getScoresTable(group), this.fields).getTable({className: 'sportorg-table'}));
+            }
         },
         showSettings: function () {
             var _this = this;
@@ -192,9 +192,16 @@
                     title: 'n: ',
                     value: [
                         {text: 'все участники', value: 0},
+                        {text: '1', value: 1},
+                        {text: '2', value: 2},
                         {text: '3', value: 3},
                         {text: '4', value: 4},
+                        {text: '5', value: 5},
+                        {text: '6', value: 6},
+                        {text: '7', value: 7},
+                        {text: '8', value: 8},
                         {text: '9', value: 9},
+                        {text: '10', value: 10},
                         {text: '101', value: 101}
                     ],
                     change: function (arr) {
@@ -205,7 +212,7 @@
                 {
                     title: 'Сортировать по: ',
                     value: [
-                        {text: 'очкам', value: 'scores'},
+                        {text: 'сумме очков', value: 'scores'},
                         {text: 'названию', value: 'name'}
                     ],
                     change: function (arr) {

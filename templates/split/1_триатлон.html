@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{name}} Split</title>
+    {% raw %}
+    <style>
+        td {
+            padding-right: 7px;
+        }
+        body {
+            font-weight: bold;
+        }
+
+        .small-text {
+            font-size: 75%;
+        }
+
+        p,
+        blockquote,
+        ul,
+        ol,
+        dl,
+        pre {
+            margin-top: 0;
+            margin-bottom: 16px;
+        }
+
+        hr {
+            box-sizing: content-box;
+            height: 0;
+        }
+
+        hr {
+            height: 0;
+            margin: 15px 0;
+            overflow: hidden;
+            background: transparent;
+            border: 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        hr:before {
+            display: table;
+            content: "";
+        }
+
+        hr:after {
+            display: table;
+            clear: both;
+            content: "";
+        }
+
+        hr {
+            height: 4px;
+            padding: 0;
+            margin: 16px 0;
+            background-color: #e7e7e7;
+            border: 0 none;
+        }
+
+        a:not([href]) {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        a {
+            color: #4078c0;
+            text-decoration: none;
+        }
+
+        a:hover,
+        a:active {
+            text-decoration: underline;
+        }
+
+        a {
+            background-color: transparent;
+        }
+
+        a:active,
+        a:hover {
+            outline: 0;
+        }
+
+        .print {
+            display: none;
+        }
+
+        .no-print {
+            display: block;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        @media print {
+            @page {
+                margin: 0.5cm;
+            }
+            body {
+                font-size: 85%;
+            }
+            pre {
+                margin-bottom: 1px;
+            }
+            h1,
+            h2,
+            h3,
+            h4,
+            h5,
+            h6 {
+                margin: 1px 0;
+            }
+            section {
+                page-break-before: always;
+            }
+            ul {
+                page-break-inside: avoid;
+            }
+            p {
+                widows: 4;
+            }
+            a[href^="http"]:after {
+                content: " (" attr(href) ")";
+            }
+            abbr[title]:after {
+                content: " (" attr(title) ")";
+            }
+            .print {
+                display: block;
+            }
+            .no-print {
+                display: none;
+            }
+        }
+    </style>
+    {% endraw %}
+</head>
+<body>
+    <code>
+        {{ race.data.title }}
+        <br> {{ race.data.start_datetime|date }}
+        <h2>{{ person.surname }} {{ person.name }} - {{ group.name }}</h2>
+        <br> Команда: {{organization.name}}
+        <br> Номер: {{person.bib}} Card: {{person.card_number}}
+        <br> Старт: {{result.start_msec|tohhmmss}}
+        <table>
+        {% for leg in result.splits %}
+            {% if leg.is_correct %}
+                <tr>
+                    <td>{{leg.course_index}}</td>
+                    <td>{{leg.code}}</td>
+                    <td>{{leg.relative_time|tohhmmss}}</td>
+                    <td>{{leg.leg_time|tohhmmss('%M:%S')}}</td>
+                    <td>{{leg.speed}}</td>
+                    {% if leg.leg_place %}
+                        <td>{{leg.leg_place}}</td>
+                     {% else %}
+                        <td></td>
+                    {% endif %}    
+                    {% if leg.course_index == 1 %}
+						<td>ПЛАВАНИЕ</td>
+					{% elif leg.course_index == 2 %}
+						<td>ТРАНЗИТ-1</td>
+					{% elif leg.course_index == 3 %}
+						<td>ВЕЛО</td>
+					{% elif leg.course_index == 4 %}
+						<td>ТРАНЗИТ-2</td>
+					{% elif leg.course_index == 5 %}
+						<td>БЕГ</td>
+					{% endif %} 
+                </tr>
+            {% else %}
+                <tr>
+                    <td></td>
+                    <td>{{leg.code}}</td>
+                    <td>{{leg.relative_time|tohhmmss}}</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+        </table>
+        <br> Финиш: {{result.finish_msec|tohhmmss}} {{result.speed}}
+        <br> Результат: {{result.result}}
+        {% if result.place > 0 %}
+            <br> Место: {{result.place}} из {{group.count_finished}} (всего {{group.count_person}})
+            <!--
+			{% if "can_win_count" in result %}
+                {% if result.can_win_count > 0 %}
+                    <br>Вас могут выиграть: {{result.can_win_count}} чел.
+                    <br>В {{result.final_result_time}} определится результат
+                {% else %}
+                    <br>Вас уже никто не обгонит!
+                {% endif %}
+            {% endif %}
+			<br>
+			-->
+        {% endif %}
+        <br>
+        <table>
+            {% for item in items %}
+                {% if item.result.place|int < 15 and item.result.place|int > 0 %}
+                    <tr>
+                        <td>{{item.result.place}}</td>
+                        <td>{{item.person.surname}} {{item.person.name}}</td>
+                        <td>{{item.person.bib}}</td>
+                        <td>{{item.result.result}}</td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+        </table>
+        <br> {{ race.data.url }}
+    </code>
+</body>
+</html>

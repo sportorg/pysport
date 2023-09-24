@@ -64,7 +64,7 @@
             };
             var results = this.race.results.filter(function (result) {
                 if (result.status === 1 && result.person && !result.person.is_out_of_competition && result.person.group && result.person.organization && equal(result.person.organization, result.person.group)) {
-                    return !_this.selected.groups.length || _this.selected.groups.some(function (elem) {
+                    return !_this.selected.groups || !_this.selected.groups.length || _this.selected.groups.some(function (elem) {
                         return elem.id === result.person.group.id;
                     })
                 }
@@ -193,9 +193,16 @@
                     title: 'n: ',
                     value: [
                         {text: 'все участники', value: 0},
+                        {text: '1', value: 1},
+                        {text: '2', value: 2},
                         {text: '3', value: 3},
                         {text: '4', value: 4},
+                        {text: '5', value: 5},
+                        {text: '6', value: 6},
+                        {text: '7', value: 7},
+                        {text: '8', value: 8},
                         {text: '9', value: 9},
+                        {text: '10', value: 10},
                         {text: '101', value: 101}
                     ],
                     change: function (arr) {
