@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+{% block title %}Results{% endblock %}
+{% block head %}{{ super() }}{% endblock %}
+{% block content %}
+<div class="text-center">
+    <h3>{{ race.data.description }} <br>{{ race.data.start_datetime|date }} {{ race.data.location }}</h3>
+    <h2>ПРОТОКОЛ РЕЗУЛЬТАТОВ</h2>
+</div>
+<div id="results-tables"></div>
+<div>
+    <table class="empty-table">
+        <tr>
+            <td><b>Главный судья:</b></td>
+            <td width="150px"></td>
+            <td><b>{{ race.data.chief_referee }}</b></td>
+        </tr>
+        <tr>
+            <td><b>Главный секретарь:</b></td>
+            <td width="150px"></td>
+            <td><b>{{ race.data.secretary }}</b></td>
+        </tr>
+    </table>
+</div>
+{% raw %}
+<script>
+    var race = {% endraw %}{{race|tojson}}{%raw %};
+    var selected = {% endraw %}{{selected|tojson}}{%raw %};
+    racePreparation(race);
+
+    var Scores = {
+        race: race,
+        selected: selected,
+        store: {
+            hideNull: true,
+            sort: 'scores',
+            grouping: 'organizations',
+            sum: 'n_all',
+            nsum: 0
+        },
+        fields: [
+            {key: 'index', title: '№'},
+            {key: 'name', title: 'Коллектив'},
+            {key: 'scores', title: 'Очки'},
+            {key: 'count', title: 'Участников'}
+        ],
+        init: function () {
+            this.showSettings();
+            this.render();
+            return this;
+        },
+        getScores: function (org) {
+            // org is organization or region, interface {id: string, name: string}
+            var _this = this;
+            var scores = 0;
+            var count = 0;
+            var equal = function (organization) {
+                if (_this.store.grouping === 'organizations') {
+                    return organization.id === org.id;
+                } else if (_this.store.grouping === 'regions') {
+                    return organization.address.state === org.name;
+                }
+            };
+            var results = this.race.results.filter(function (result) {
+                if (result.person && result.person.group && result.person.organization && equal(result.person.organization)) {
+                    return !_this.selected.groups || !_this.selected.groups.length || _this.selected.groups.some(function (elem) {
+                        return elem.id === result.person.group.id;
+                    })
+                }
+                return false;
+            });
+            if (_this.store.sum === 'n_all') {
+                results.sort(function (a, b) {
+                    return b.scores - a.scores;
+                });
+                if (+_this.store.nsum) {
+                    results = results.slice(0, +_this.store.nsum);
+                }
+            } else if (_this.store.sum === 'n_group') {
+                var groups = {};
+                results.forEach(function (elem) {
+                    if (groups[elem.person.group.id]) {
+                        groups[elem.person.group.id].push(elem);
+                    } else {
+                        groups[elem.person.group.id] = [elem];
+                    }
+                });
+                results = [];
+                Object.keys(groups).forEach(function (value) {
+                    groups[value].sort(function (a, b) {
+                        return b.scores - a.scores;
+                    });
+                    if (+_this.store.nsum) {
+                        groups[value] = groups[value].slice(0, +_this.store.nsum);
+                    }
+                    results.push.apply(results, groups[value]);
+                });
+            }
+            results.forEach(function (elem) {
+                count++;
+                scores += elem.scores;
+            });
+            return {scores: scores, count: count};
+        },
+        getScoresTable: function () {
+            var ret = [];
+            var data = [];
+            if (this.store.grouping === 'organizations') {
+                data = this.race.organizations;
+            } else if (this.store.grouping === 'regions') {
+                var regions = {};
+                this.race.organizations.forEach(function (elem) {
+                    regions[elem.address.state] = true;
+                });
+                Object.keys(regions).forEach(function (value) {
+                    data.push({
+                        id: guid(),
+                        name: value
+                    });
+                });
+            }
+            for (var _i = 0, _a = data; _i < _a.length; _i++) {
+                var obj = _a[_i];
+                var s = this.getScores(obj);
+                ret.push({
+                    index: 0,
+                    name: obj.name,
+                    scores: s.scores,
+                    count: s.count
+                })
+            }
+            if (this.store.hideNull) {
+                ret = ret.filter(function (elem) {
+                    return !!elem.scores;
+                });
+            }
+            var sortByName = function (a, b) {
+                var nameA = a.name && a.name.toLowerCase() || '';
+                var nameB = b.name && b.name.toLowerCase() || '';
+                if (nameA < nameB)
+                    return -1;
+                if (nameA > nameB)
+                    return 1;
+                return 0;
+            };
+            var sortFunc = function (a, b) {
+                if (a.scores === b.scores) {
+                    return sortByName(a, b);
+                }
+                return b.scores - a.scores;
+            };
+            if (this.store.sort === 'name') {
+                sortFunc = sortByName;
+            }
+            ret.sort(sortFunc);
+            var index = 0;
+            ret.forEach(function (elem) {
+                elem.index = ++index;
+            });
+            return ret;
+        },
+        render: function () {
+            var resultBlock = document.getElementById('results-tables');
+            resultBlock.innerHTML = '';
+            resultBlock.appendChild(new TableGenerator(this.getScoresTable(), this.fields).getTable({className: 'sportorg-table'}));
+        },
+        showSettings: function () {
+            var _this = this;
+            new SettingsGenerator([
+                {
+                    title: 'Объеденить по: ',
+                    value: [
+                        {text: 'коллективам', value: 'organizations'},
+                        {text: 'регионам', value: 'regions'}
+                    ],
+                    change: function (arr) {
+                        _this.store.grouping = arr[0];
+                        _this.render();
+                    }
+                },
+                {
+                    title: 'Сумма: ',
+                    value: [
+                        {text: 'лучшие n среди всех групп', value: 'n_all'},
+                        {text: 'лучшие n в группе', value: 'n_group'}
+                    ],
+                    change: function (arr) {
+                        _this.store.sum = arr[0];
+                        _this.render();
+                    }
+                },
+                {
+                    title: 'n: ',
+                    value: [
+                        {text: 'все участники', value: 0},
+                        {text: '1', value: 1},
+                        {text: '2', value: 2},
+                        {text: '3', value: 3},
+                        {text: '4', value: 4},
+                        {text: '5', value: 5},
+                        {text: '6', value: 6},
+                        {text: '7', value: 7},
+                        {text: '8', value: 8},
+                        {text: '9', value: 9},
+                        {text: '10', value: 10},
+                        {text: '101', value: 101}
+                    ],
+                    change: function (arr) {
+                        _this.store.nsum = arr[0];
+                        _this.render();
+                    }
+                },
+                {
+                    title: 'Сортировать по: ',
+                    value: [
+                        {text: 'очкам', value: 'scores'},
+                        {text: 'названию', value: 'name'}
+                    ],
+                    change: function (arr) {
+                        _this.store.sort = arr[0];
+                        _this.render();
+                    }
+                },
+                {
+                    title: 'Скрыть нулевые очки',
+                    value: this.store.hideNull,
+                    change: function (checked) {
+                        _this.store.hideNull = checked;
+                        _this.render()
+                    }
+                }
+            ]).show();
+        }
+    }.init()
+</script>
+{% endraw %}
+{% endblock %}
