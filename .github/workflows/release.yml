@@ -2,6 +2,7 @@ name: Release
 
 on:
   push:
+    branches: [ 'workflows/release' ]
     tags:
       - "v*"
   workflow_dispatch:
