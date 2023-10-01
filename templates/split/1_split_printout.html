@@ -143,9 +143,9 @@
         {{ race.data.title }}
         <br> {{ race.data.start_datetime|date }}
         <h2>{{ person.surname }} {{ person.name }} - {{ group.name }}</h2>
-        <br> Команда: {{organization.name}}
-        <br> Номер: {{person.bib}} Card: {{person.card_number}}
-        <br> Старт: {{result.start_msec|tohhmmss}}
+        <br> Team: {{organization.name}}
+        <br> BIB: {{person.bib}} Card: {{person.card_number}}
+        <br> Start: {{result.start_msec|tohhmmss}}
         <table>
         {% for leg in result.splits %}
             {% if leg.is_correct %}
@@ -159,7 +159,7 @@
                         <td>{{leg.leg_place}}</td>
                      {% else %}
                         <td></td>
-                    {% endif %}    
+                    {% endif %}
                     <td></td>
                 </tr>
             {% else %}
@@ -174,25 +174,25 @@
             {% endif %}
         {% endfor %}
         </table>
-        <br> Финиш: {{result.finish_msec|tohhmmss}} {{result.speed}}
+        <br> Finish: {{result.finish_msec|tohhmmss}} {{result.speed}}
         {% if race['settings'].get('result_processing_mode', 'time') == 'scores' and result.rogaine_penalty > 0 %}
-        <br> Набрано очков: {{result.rogaine_score + result.rogaine_penalty}}
-        <br> Штраф за превышение: {{result.rogaine_penalty}}
+        <br> Score: {{result.rogaine_score + result.rogaine_penalty}}
+        <br> Penalty: {{result.rogaine_penalty}}
         {% endif%}
         {% if race['settings'].get('marked_route_mode', 'off') == 'laps' %}
-        <br> Штрафных кругов: {{result.penalty_laps}}
+        <br> Penalty laps: {{result.penalty_laps}}
         {% elif race['settings'].get('marked_route_mode', 'off') == 'time' %}
-        <br> Штраф: {{result.penalty_time|tohhmmss}}
+        <br> Penalty: {{result.penalty_time|tohhmmss}}
         {% endif %}
-        <br> Результат: {{result.result}}
+        <br> Result: {{result.result}}
         {% if result.place > 0 %}
-            <br> Место: {{result.place}} из {{group.count_finished}} (всего {{group.count_person}})
+            <br> Place: {{result.place}}/{{group.count_finished}} ({{group.count_person}})
             {% if "can_win_count" in result %}
                 {% if result.can_win_count > 0 %}
-                    <br>Вас могут выиграть: {{result.can_win_count}} чел.
-                    <br>В {{result.final_result_time}} определится результат
+                    <br>The number of participants can overtake and beat you: {{result.can_win_count}}
+                    <br>Final result at {{result.final_result_time}}
                 {% else %}
-                    <br>Вас уже никто не обгонит!
+                    <br>No participant can beat you
                 {% endif %}
             {% endif %}
         {% endif %}
@@ -200,9 +200,9 @@
             {% for control in course.controls %}
                 {{control.code}}
             {% endfor %}<br>
-			<h1>ПЛОХАЯ ОТМЕТКА</h1>
+			<h1>BAD</h1>
 		{% else %}
-			<h1>ОТМЕТКА - OK</h1>
+			<h1>OK</h1>
         {% endif %}
         <table class="small-text">
             {% for item in items %}
