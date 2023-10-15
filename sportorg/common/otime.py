@@ -10,7 +10,9 @@ class TimeRounding(Enum):
 
 
 class OTime:
-    def __init__(self, day=0, hour=0, minute=0, sec=0, msec=0):
+    def __init__(
+        self, day: int = 0, hour: int = 0, minute: int = 0, sec: int = 0, msec: int = 0
+    ):
         self._msec = self.get_msec(day, hour, minute, sec, msec)
         self._args = None
 
@@ -84,11 +86,11 @@ class OTime:
         return self.__str__()
 
     @classmethod
-    def now(cls):
+    def now(cls) -> 'OTime':
         now = datetime.datetime.now()
         return OTime(0, now.hour, now.minute, now.second, round(now.microsecond / 1000))
 
-    def replace(self, day=None, hour=None, minute=None, sec=None, msec=None):
+    def replace(self, day=None, hour=None, minute=None, sec=None, msec=None) -> 'OTime':
         return OTime(
             self.if_none(day, self.day),
             self.if_none(hour, self.hour),
@@ -97,7 +99,7 @@ class OTime:
             self.if_none(msec, self.msec),
         )
 
-    def copy(self):
+    def copy(self) -> 'OTime':
         return OTime(msec=self.to_msec())
 
     def to_minute(self):
@@ -106,7 +108,7 @@ class OTime:
     def to_sec(self):
         return trunc(self.to_msec() / 1000)
 
-    def to_msec(self, sub_sec=3):
+    def to_msec(self, sub_sec: int = 3) -> int:
         if not 0 <= sub_sec <= 3:
             sub_sec = 3
         mlt = 10 ** (3 - sub_sec)
@@ -133,10 +135,10 @@ class OTime:
         return ret
 
     @staticmethod
-    def if_none(val, default=None):
+    def if_none(val: int, default: int) -> int:
         return default if val is None else val
 
-    def to_str(self, time_accuracy=0):
+    def to_str(self, time_accuracy: int = 0) -> str:
         hour = self.hour + self.day * 24
         if time_accuracy == 0:
             return f'{hour:02}:{self.minute:02}:{self.sec:02}'
@@ -146,8 +148,11 @@ class OTime:
             return f'{hour:02}:{self.minute:02}:{self.sec:02}.{self.msec // 10:02}'
         elif time_accuracy == 1:
             return f'{hour:02}:{self.minute:02}:{self.sec:02}.{self.msec // 100}'
+        raise ValueError('time_accuracy is invalid')
 
-    def round(self, time_accuracy: int = 0, time_rounding: Enum = TimeRounding.math):
+    def round(
+        self, time_accuracy: int = 0, time_rounding: TimeRounding = TimeRounding.math
+    ) -> 'OTime':
         ms = self.to_msec()
         multiplier = 10 ** (3 - time_accuracy)
         if time_rounding == TimeRounding.math:

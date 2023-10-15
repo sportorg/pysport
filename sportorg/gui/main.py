@@ -7,6 +7,7 @@ from sportorg import config
 from sportorg.common.singleton import Singleton
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.main_window import MainWindow
+from sportorg.language import generate_mo
 from sportorg.models.constant import (
     PersonNames,
     RankingTable,
@@ -27,6 +28,8 @@ class Application(metaclass=Singleton):
         return self.main_window
 
     def run(self):
+        if config.DEBUG:
+            generate_mo()
         freeze_support()
         self.set_status_comments()
         self.set_names()

@@ -45,7 +45,7 @@ def get_text_from_path(path, **kwargs):
     return template.render(**kwargs)
 
 
-def get_text_from_template(searchpath, path, **kwargs):
+def get_text_from_template(searchpath: str, path: str, **kwargs):
     env = Environment(loader=FileSystemLoader(searchpath), finalize=finalize)
     env.filters['tohhmmss'] = to_hhmmss
     env.filters['date'] = date

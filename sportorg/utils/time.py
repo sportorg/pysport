@@ -1,6 +1,7 @@
 import datetime
 import time
 from datetime import date
+from typing import Any
 
 from PySide2.QtCore import QDate, QTime
 
@@ -8,7 +9,7 @@ from sportorg.common.otime import OTime
 
 
 def timeit(method):
-    def timed(*args, **kw):
+    def timed(*args: Any, **kw: Any) -> Any:
         ts = time.time()
         result = method(*args, **kw)
         te = time.time()
@@ -22,7 +23,7 @@ def timeit(method):
     return timed
 
 
-def time_to_otime(t):
+def time_to_otime(t) -> OTime:
     if isinstance(t, datetime.datetime):
         return OTime(0, t.hour, t.minute, t.second, round(t.microsecond / 1000))
     if isinstance(t, QTime):
@@ -34,7 +35,7 @@ def time_to_otime(t):
     return OTime()
 
 
-def time_iof_to_otime(t):
+def time_iof_to_otime(t) -> OTime:
     str_t = str(t)
     if str_t.find('T') > 0:
         time_part = str_t[str_t.find('T') + 1 :]
@@ -44,21 +45,21 @@ def time_iof_to_otime(t):
     return OTime()
 
 
-def time_to_datetime(t):
+def time_to_datetime(t) -> datetime.datetime:
     otime = time_to_otime(t)
     return datetime.datetime(
         2000, 1, 1, otime.hour, otime.minute, otime.sec, otime.msec * 1000
     )
 
 
-def time_to_qtime(t):
+def time_to_qtime(t) -> OTime:
     otime = time_to_otime(t)
     time_ = QTime()
     time_.setHMS(otime.hour, otime.minute, otime.sec, otime.msec)
     return time_
 
 
-def _int_to_time(value):
+def _int_to_time(value) -> datetime.datetime:
     """convert value from 1/100 s to time"""
 
     today = datetime.datetime.now()
@@ -74,7 +75,7 @@ def _int_to_time(value):
     return ret
 
 
-def int_to_otime(value):
+def int_to_otime(value) -> OTime:
     """convert value from 1/100 s to otime"""
     ret = OTime(
         0,

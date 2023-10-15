@@ -18,11 +18,11 @@ NAME = 'SportOrg'
 VERSION = Version(1, 6, 0, 0, 'v')
 
 
-def is_executable():
+def is_executable() -> bool:
     return hasattr(sys, 'frozen')
 
 
-def module_path():
+def module_path() -> str:
     if is_executable():
         return os.path.dirname(sys.executable)
 
@@ -32,56 +32,56 @@ def module_path():
 BASE_DIR = module_path()
 
 
-def base_dir(*paths):
+def base_dir(*paths) -> str:
     return os.path.join(BASE_DIR, *paths)
 
 
 IMG_DIR = base_dir('img')
 
 
-def img_dir(*paths):
+def img_dir(*paths) -> str:
     return os.path.join(IMG_DIR, *paths)
 
 
 ICON_DIR = img_dir('icon')
 
 
-def icon_dir(*paths):
+def icon_dir(*paths) -> str:
     return os.path.join(ICON_DIR, *paths)
 
 
 LOG_DIR = base_dir('log')
 
 
-def log_dir(*paths):
+def log_dir(*paths) -> str:
     return os.path.join(LOG_DIR, *paths)
 
 
 DATA_DIR = base_dir('data')
 
 
-def data_dir(*paths):
+def data_dir(*paths) -> str:
     return os.path.join(DATA_DIR, *paths)
 
 
 TEMPLATE_DIR = base_dir('templates')
 
 
-def template_dir(*paths):
+def template_dir(*paths) -> str:
     return os.path.join(TEMPLATE_DIR, *paths)
 
 
 SOUND_DIR = base_dir('sounds')
 
 
-def sound_dir(*paths):
+def sound_dir(*paths) -> str:
     return os.path.join(SOUND_DIR, *paths)
 
 
 STYLE_DIR = base_dir('styles')
 
 
-def style_dir(*paths):
+def style_dir(*paths) -> str:
     return os.path.join(STYLE_DIR, *paths)
 
 

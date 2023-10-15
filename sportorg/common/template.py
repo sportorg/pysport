@@ -1,10 +1,11 @@
 import os
+from typing import Any, List
 
 from sportorg import config
 from sportorg.libs.template import template
 
 
-def get_templates(path='', exclude_path=''):
+def get_templates(path: str = '', exclude_path: str = '') -> List[str]:
     if not path:
         path = config.template_dir()
     if not exclude_path:
@@ -26,10 +27,10 @@ def get_templates(path='', exclude_path=''):
     return files
 
 
-def get_text_from_file(path, **kwargs):
+def get_text_from_file(path: str, **kwargs: Any) -> str:
     kwargs['name'] = config.NAME
     kwargs['version'] = str(config.VERSION)
     if os.path.isfile(path):
         return template.get_text_from_path(path, **kwargs)
-    else:
-        return template.get_text_from_template(config.template_dir(), path, **kwargs)
+
+    return template.get_text_from_template(config.template_dir(), path, **kwargs)
