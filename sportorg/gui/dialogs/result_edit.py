@@ -29,7 +29,7 @@ from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.result_checker import ResultChecker, ResultCheckerException
 from sportorg.models.result.split_calculation import GroupSplits
 from sportorg.modules.live.live import live_client
-from sportorg.modules.teamwork import Teamwork
+from sportorg.modules.teamwork.teamwork import Teamwork
 from sportorg.utils.time import hhmmss_to_time
 
 

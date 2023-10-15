@@ -4,7 +4,7 @@ from sportorg.language import translate
 from sportorg.models.constant import get_countries, get_regions
 from sportorg.models.memory import find, race
 from sportorg.modules.live.live import live_client
-from sportorg.modules.teamwork import Teamwork
+from sportorg.modules.teamwork.teamwork import Teamwork
 
 
 class OrganizationEditDialog(BaseDialog):

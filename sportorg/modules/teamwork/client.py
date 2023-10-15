@@ -1,14 +1,15 @@
-import json
 import queue
 import socket
-from threading import Thread, main_thread
+from threading import Event, Thread, main_thread
+
+import orjson
 
 from .packet_header import Header, Operations
 from .server import Command
 
 
 class ClientSenderThread(Thread):
-    def __init__(self, conn, in_queue, stop_event, logger=None):
+    def __init__(self, conn, in_queue, stop_event, logger):
         super().__init__(daemon=True)
         self.setName(self.__class__.__name__)
         self.conn = conn
@@ -37,7 +38,7 @@ class ClientSenderThread(Thread):
 
 
 class ClientReceiverThread(Thread):
-    def __init__(self, conn, out_queue, stop_event, logger=None):
+    def __init__(self, conn, out_queue, stop_event, logger):
         super().__init__()
         self.setName(self.__class__.__name__)
         self.conn = conn
@@ -58,13 +59,11 @@ class ClientReceiverThread(Thread):
                 if not data:
                     break
                 full_data += data
-                # self._logger.debug('Client got data: {}'.format(full_data))
                 while True:
                     # getting Header
                     if is_new_pack:
                         if len(full_data) >= hdr.header_size:
                             hdr.unpack_header(full_data[: hdr.header_size])
-                            # self._logger.debug('Client Packet Header: {}, ver: {}, size: {}'.format(full_data[:hdr.header_size], hdr.version, hdr.size))
                             full_data = full_data[hdr.header_size :]
                             is_new_pack = False
                         else:
@@ -73,7 +72,7 @@ class ClientReceiverThread(Thread):
                     else:
                         if len(full_data) >= hdr.size:
                             command = Command(
-                                json.loads(full_data[: hdr.size].decode()),
+                                orjson.loads(full_data[: hdr.size].decode()),
                                 Operations(hdr.opType).name,
                             )
                             self._out_queue.put(command)  # for local
@@ -98,7 +97,7 @@ class ClientReceiverThread(Thread):
 
 
 class ClientThread(Thread):
-    def __init__(self, addr, in_queue, out_queue, stop_event, logger=None):
+    def __init__(self, addr, in_queue, out_queue, stop_event, logger):
         super().__init__()
         self.setName(self.__class__.__name__)
         self.addr = addr
@@ -106,8 +105,12 @@ class ClientThread(Thread):
         self._out_queue = out_queue
         self._stop_event = stop_event
         self._logger = logger
+        self._client_started = Event()
 
-    def run(self):
+    def join_client(self) -> None:
+        self._client_started.wait()
+
+    def run(self) -> None:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             try:
                 s.connect(self.addr)
@@ -120,6 +123,7 @@ class ClientThread(Thread):
                     s, self._out_queue, self._stop_event, self._logger
                 )
                 receiver.start()
+                self._client_started.set()
 
                 sender.join()
                 receiver.join()

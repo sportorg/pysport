@@ -56,8 +56,8 @@ from sportorg.modules.sportident.result_generation import ResultSportidentGenera
 from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.modules.sportiduino.sportiduino import SportiduinoClient
 from sportorg.modules.srpid.srpid import SrpidClient
-from sportorg.modules.teamwork import Teamwork
 from sportorg.modules.teamwork.packet_header import ObjectTypes
+from sportorg.modules.teamwork.teamwork import Teamwork
 from sportorg.modules.telegram.telegram import telegram_client
 
 

@@ -14,13 +14,15 @@ class Command:
         self.addr_exclude = []
         self.next_cmd_obj_type = ObjectTypes.Unknown.value
 
+    def __repr__(self) -> str:
+        return str(self.data)
+
     def exclude(self, addr):
         self.addr_exclude.append(addr)
         return self
 
     def get_packet(self):
         pack_data = json.dumps(self.data).encode()
-        # logging.debug('Command->get_header: Header: {}, Pack_data: {}'.format( self.header.pack_header(len(pack_data)), pack_data))
         return self.header.pack_header(len(pack_data)) + pack_data
 
 
@@ -38,9 +40,8 @@ class Connect:
 
 
 class ServerReceiverThread(Thread):
-    def __init__(self, conn, in_queue, out_queue, stop_event, logger=None):
+    def __init__(self, conn, in_queue, out_queue, stop_event, logger):
         super().__init__(daemon=True)
-        # self.setName(self.__class__.__name__)
         self.connect = conn
         self._in_queue = in_queue
         self._out_queue = out_queue
@@ -101,7 +102,7 @@ class ServerReceiverThread(Thread):
 
 
 class ServerSenderThread(Thread):
-    def __init__(self, in_queue, connections_queue, stop_event, logger=None):
+    def __init__(self, in_queue, connections_queue, stop_event, logger):
         super().__init__(daemon=True)
         self.setName(self.__class__.__name__)
         self._connections_queue = connections_queue
@@ -115,7 +116,6 @@ class ServerSenderThread(Thread):
         while True:
             try:
                 command = self._in_queue.get(timeout=5)
-                # self._logger.debug('Server sender: Got new command {}'.format(command))
                 for connect in self._connections:
                     try:
                         if (
@@ -141,7 +141,7 @@ class ServerSenderThread(Thread):
 
 
 class ServerThread(Thread):
-    def __init__(self, addr, in_queue, out_queue, stop_event, logger=None):
+    def __init__(self, addr, in_queue, out_queue, stop_event, logger):
         super().__init__(daemon=True)
         self.setName(self.__class__.__name__)
         self.addr = addr
@@ -149,8 +149,12 @@ class ServerThread(Thread):
         self._out_queue = out_queue
         self._stop_event = stop_event
         self._logger = logger
+        self._server_started = Event()
 
-    def run(self):
+    def join_server(self) -> None:
+        self._server_started.wait()
+
+    def run(self) -> None:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
@@ -164,11 +168,12 @@ class ServerThread(Thread):
 
             self._logger.info('Server start')
 
-            conns_queue = Queue()
+            conns_queue = Queue()  # type: ignore
             sender = ServerSenderThread(
                 self._in_queue, conns_queue, self._stop_event, self._logger
             )
             sender.start()
+            self._server_started.set()
 
             connections = []
 

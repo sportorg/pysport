@@ -40,22 +40,25 @@ class Operations(Enum):
 
 
 """
- obj_type = ObjectTypes['Race']
- obj_type.value 
- 
- op = Operations['Create']
- 
- >>> Operations(0).name
+```python
+obj_type = ObjectTypes['Race']
+obj_type.value
+
+op = Operations['Create']
+
+Operations(0).name
 'Create'
+```
 """
 
 """
+```
 ?: boolean
 H: Unsigned short
 L: unsigned long
 i: int
 f: float
-Q: Unsigned long long int 
+Q: Unsigned long long int
 s: bytes string
 
 Header Tag: 2 Bytes
@@ -66,6 +69,7 @@ version: 4 Bytes (Unsigned Long)
 size: 8 Bytes (Unsigned Long long)
 
 Total Header Size = 56 Bytes
+```
 """
 
 
@@ -120,7 +124,7 @@ class Header:
 
         try:
             self.objType = ObjectTypes[obj_type].value
-        except:
+        except Exception:
             self.objType = 255  # Unknown
 
         self.uuid = obj_uuid

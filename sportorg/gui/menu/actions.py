@@ -64,7 +64,7 @@ from sportorg.modules.sfr.sfrreader import SFRReaderClient
 from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.modules.sportiduino.sportiduino import SportiduinoClient
 from sportorg.modules.srpid.srpid import SrpidClient
-from sportorg.modules.teamwork import Teamwork
+from sportorg.modules.teamwork.teamwork import Teamwork
 from sportorg.modules.telegram.telegram import telegram_client
 from sportorg.modules.updater import checker
 from sportorg.modules.winorient import winorient

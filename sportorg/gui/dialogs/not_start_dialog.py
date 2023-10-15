@@ -11,7 +11,7 @@ from sportorg.models.constant import StatusComments
 from sportorg.models.memory import ResultManual, ResultStatus, find, race
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.modules.live.live import live_client
-from sportorg.modules.teamwork import Teamwork
+from sportorg.modules.teamwork.teamwork import Teamwork
 
 
 class NotStartDialog(QDialog):
