@@ -1,32 +1,21 @@
+import logging
+from typing import Optional
+
 from boltons.fileutils import atomic_rename
 
-from ..configs.configs import Config
-from . import binary, json
+from sportorg.modules.configs.configs import Config
+
+from . import json
+
+logger = logging.getLogger(__name__)
 
 
 class File:
-    BINARY = 'binary'
-    JSON = 'json'
-
-    def __init__(self, file_name, logger, ft='binary'):
+    def __init__(self, file_name: str):
         self._file_name = file_name
-        self._logger = logger
-        self._format = ft
-        self._factory = {
-            self.BINARY: binary,
-            self.JSON: json,
-        }
-        self._factory_mode = {
-            self.BINARY: 'wb',
-            self.JSON: 'w',
-        }
-        self._factory_mode_read = {
-            self.BINARY: 'rb',
-            self.JSON: 'r',
-        }
 
     @staticmethod
-    def backup(file_name, func, mode='wb'):
+    def backup(file_name: str, func, mode: str = 'r') -> None:
         use_utf8 = Config().configuration.get('save_in_utf8', False)
         # if user set UTF-8 usage, first try to open file in UTF-8,
         # then in system locale (1251 for RU Windows)
@@ -41,35 +30,35 @@ class File:
         except UnicodeDecodeError:
             f.close()
 
-            alt_encoding = 'utf-8'
+            alt_encoding: Optional[str] = 'utf-8'
             if use_utf8:
                 alt_encoding = None
 
             with open(file_name, mode, encoding=alt_encoding) as f:
                 func(f)
 
-    def create(self):
-        self._logger.info('Create ' + self._file_name)
+    def create(self) -> None:
+        logger.info('Create ' + self._file_name)
         self.backup(
             self._file_name + '.tmp',
-            self._factory[self._format].dump,
-            self._factory_mode[self._format],
+            json.dump,
+            'w',
         )
         atomic_rename(self._file_name + '.tmp', self._file_name, overwrite=True)
 
-    def save(self):
-        self._logger.info('Save ' + self._file_name)
+    def save(self) -> None:
+        logger.info('Save ' + self._file_name)
         self.backup(
             self._file_name + '.tmp',
-            self._factory[self._format].dump,
-            self._factory_mode[self._format],
+            json.dump,
+            'w',
         )
         atomic_rename(self._file_name + '.tmp', self._file_name, overwrite=True)
 
-    def open(self):
-        self._logger.info('Open ' + self._file_name)
+    def open(self) -> None:
+        logger.info('Open ' + self._file_name)
         self.backup(
             self._file_name,
-            self._factory[self._format].load,
-            self._factory_mode_read[self._format],
+            json.load,
+            'r',
         )

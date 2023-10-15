@@ -1,11 +1,9 @@
-import logging
-
 from sportorg.models.memory import Group, Organization, Person, race
 from sportorg.modules.backup.file import File
 
 
 def test_main():
-    File('tests/data/test.json', logging.root, File.JSON).open()
+    File('tests/data/test.json').open()
     r = race()
     person = None
     for p in r.persons:

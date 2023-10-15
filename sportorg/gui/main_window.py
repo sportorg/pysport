@@ -707,7 +707,7 @@ class MainWindow(QMainWindow):
                     new_event([Race()])
                     set_current_race_index(0)
                 self.clear_filters(remove_condition=False)
-                File(file_name, logging.root, File.JSON).create()
+                File(file_name).create()
                 self.apply_filters()
                 self.last_update = time.time()
                 self.file = file_name
@@ -730,7 +730,7 @@ class MainWindow(QMainWindow):
         if self.file:
             try:
                 self.clear_filters(remove_condition=False)
-                File(self.file, logging.root, File.JSON).save()
+                File(self.file).save()
                 self.apply_filters()
                 self.last_update = time.time()
             except Exception as e:
@@ -744,7 +744,7 @@ class MainWindow(QMainWindow):
                 if not self.lock_file(file_name):
                     return
 
-                File(file_name, logging.root, File.JSON).open()
+                File(file_name).open()
                 self.file = file_name
                 self.set_title()
                 self.add_recent_file(self.file)
