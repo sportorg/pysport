@@ -133,6 +133,7 @@ class ResultChecker:
     @staticmethod
     def penalty_calculation(splits, controls, check_existence=False):
         """:return quantity of incorrect or duplicated punches, order is ignored
+        ```
         origin: 31,41,51; athlete: 31,41,51; result:0
         origin: 31,41,51; athlete: 31; result:0
         origin: 31,41,51; athlete: 41,31,51; result:0
@@ -164,6 +165,7 @@ class ResultChecker:
         origin: *,*,* athlete: 31,31,31,31; result:3 // wrong:
                                                      // returns 1 if check_existence=False
                                                      // returns 1 if check_existence=True
+        ```
         """
         user_array = [i.code for i in splits]
         origin_array = [i.get_number_code() for i in controls]
@@ -200,6 +202,7 @@ class ResultChecker:
     @staticmethod
     def penalty_calculation_free_order(splits, controls):
         """:return quantity penalty, duplication checked
+        ```
         origin: * ,* ,* ; athlete: 31,41,51; result:0
         origin: * ,* ,* ; athlete: 31,31,51; result:1
         origin: * ,* ,* ; athlete: 31,31,31; result:2
@@ -217,6 +220,7 @@ class ResultChecker:
         origin: 40,* ,* ,90; athlete: 31,40,31,40; result:2
         origin: 40,* ,* ,90; athlete: 40,40,90,90; result:2
         origin: 40,* ,* ,90; athlete: 40,41,90,90; result:0 TODO:1 - only one incorrect case
+        ```
         """
         res = 0
         correct_count = 0

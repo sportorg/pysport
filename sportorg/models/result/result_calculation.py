@@ -220,7 +220,6 @@ class ResultCalculation:
         Rank calculation, takes sums or scores from qualification of best X (default=10)
         athletes, who have OK result and are not out of competition
 
-        :param group:
         :return: rank of group, -1 if we have < X (default=5) successfull results
         """
         scores = []
@@ -268,7 +267,7 @@ class ResultCalculation:
         """
         Rank calculation, takes sums or scores from qualification of best X (default=10)
         athletes, who have OK result and are not out of competition
-        :param group:
+
         :return: rank of group, -1 if we have < X (default=4) successfull teams
         """
         teams = find(self.race.relay_teams, group=group, return_all=True)

@@ -42,8 +42,6 @@ def locale():
 
     def get_text(message):
         result = cat.gettext(message)
-        # if result == message:
-        #     logging.debug('No translation "{}"'.format(result))
         return result
 
     return get_text

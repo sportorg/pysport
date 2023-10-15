@@ -10,16 +10,17 @@ from sportorg.models.result.result_calculation import ResultCalculation
 
 
 class ReserveManager:
+    """Inserts reserve athletes into each group.
+
+    You can specify minimum quantity of person or percentage to add in each group.
+    Reserve record is marked with prefix, that can be specified by user.
+
+    Now effect on all groups, but in future we'll possible implement working
+    with selected groups only.
+    """
+
     def __init__(self, r):
         self.race = r
-
-    """
-        Inserts reserve athletes into each group
-        You can specify minimum quantity of person or percentage to add in each group
-        Reserve record is marked with prefix, that can be specified by user
-
-        Now effect on all groups, but in future we'll possible implement working with selected groups only
-    """
 
     def process(self, reserve_prefix, reserve_count, reserve_percent):
         current_race = self.race
@@ -49,9 +50,10 @@ class ReserveManager:
 
 
 class DrawManager:
-    """
-    Execute draw in each group
-    Now effect on all groups, but in future we'll possible implement working with filtered persons
+    """Execute draw in each group.
+
+    Now effect on all groups, but in future we'll possible implement working
+    with filtered persons.
     """
 
     def __init__(self, r):
@@ -230,13 +232,10 @@ class DrawManager:
 
 
 class StartNumberManager:
+    """Assign new start numbers."""
+
     def __init__(self, r):
         self.race = r
-
-    """
-        Assign new start numbers
-
-    """
 
     def process(
         self, mode='interval', first_number=None, interval=None, mix_groups=False
@@ -259,9 +258,8 @@ class StartNumberManager:
 
     def process_corridor_by_order(self, corridor, first_number=1, interval=1):
         current_race = self.race
-        persons = current_race.get_persons_by_corridor(
-            corridor
-        )  # get persons of current corridor
+        # get persons of current corridor
+        persons = current_race.get_persons_by_corridor(corridor)
         # persons = sorted(persons, key=lambda item: item.start_time)  # sort by start time
         return self.set_numbers_by_order(persons, first_number, interval)
 
@@ -307,13 +305,10 @@ class StartNumberManager:
 
 
 class StartTimeManager:
+    """Set new start time for athletes."""
+
     def __init__(self, r):
         self.race = r
-
-    """
-        Set new start time for athletes
-
-    """
 
     def process(
         self,

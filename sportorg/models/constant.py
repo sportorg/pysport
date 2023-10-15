@@ -325,10 +325,12 @@ class RentCards:
 class RankingTable:
     """
     Ranking is read from configuration file called 'ranking_score.txt'
+    ```
     Format: RANK;I;II;III;I_Y;II_Y[;III_Y[;KMS[;MS]]]
     e.g. 1000;136;151;169;;
     e.g. 850;133;148;166;;
     e.g. 5;;;;;100
+    ```
     """
 
     RANKING: List[List[int]] = []
