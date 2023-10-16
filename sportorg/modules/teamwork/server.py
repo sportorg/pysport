@@ -76,7 +76,7 @@ class ServerReceiverThread(Thread):
                             if len(full_data) >= hdr.size:
                                 command = Command(
                                     json.loads(full_data[: hdr.size].decode()),
-                                    Operations(hdr.opType).name,
+                                    Operations(hdr.op_type).name,
                                     self.connect.addr,
                                 )
                                 command.exclude(self.connect.addr)

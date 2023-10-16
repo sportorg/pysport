@@ -73,7 +73,7 @@ class ClientReceiverThread(Thread):
                         if len(full_data) >= hdr.size:
                             command = Command(
                                 orjson.loads(full_data[: hdr.size].decode()),
-                                Operations(hdr.opType).name,
+                                Operations(hdr.op_type).name,
                             )
                             self._out_queue.put(command)  # for local
                             full_data = full_data[hdr.size :]

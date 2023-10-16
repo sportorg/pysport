@@ -51,3 +51,8 @@ def get_languages() -> List[str]:
 
 
 translate = locale()
+
+
+if __name__ == '__main__':
+    logger.info('Generate mo files')
+    generate_mo()

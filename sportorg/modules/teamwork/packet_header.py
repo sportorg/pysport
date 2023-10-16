@@ -4,6 +4,13 @@ from enum import Enum
 
 
 class ObjectTypes(Enum):
+    """
+    ```python
+    obj_type = ObjectTypes['Race']
+    obj_type.value
+    ```
+    """
+
     Race = 0
     Course = 1
     Group = 2
@@ -24,6 +31,15 @@ class ObjectTypes(Enum):
 
 
 class Operations(Enum):
+    """
+    ```python
+    op = Operations['Create']
+
+    Operations(0).name
+    'Create'
+    ```
+    """
+
     Create = 0
     Read = 1
     Update = 2
@@ -39,46 +55,33 @@ class Operations(Enum):
         return self.__str__()
 
 
-"""
-```python
-obj_type = ObjectTypes['Race']
-obj_type.value
-
-op = Operations['Create']
-
-Operations(0).name
-'Create'
-```
-"""
-
-"""
-```
-?: boolean
-H: Unsigned short
-L: unsigned long
-i: int
-f: float
-Q: Unsigned long long int
-s: bytes string
-
-Header Tag: 2 Bytes
-Operation type:  1 Byte (Unsigned Short)
-Object type: 1 Byte (Unsigned Short)
-uuid: 36 Bytes string
-version: 4 Bytes (Unsigned Long)
-size: 8 Bytes (Unsigned Long long)
-
-Total Header Size = 56 Bytes
-```
-"""
-
-
 class Header:
+    """
+    ```
+    ?: boolean
+    H: Unsigned short
+    L: unsigned long
+    i: int
+    f: float
+    Q: Unsigned long long int
+    s: bytes string
+
+    Header Tag: 2 Bytes
+    Operation type:  1 Byte (Unsigned Short)
+    Object type: 1 Byte (Unsigned Short)
+    uuid: 36 Bytes string
+    version: 4 Bytes (Unsigned Long)
+    size: 8 Bytes (Unsigned Long long)
+
+    Total Header Size = 56 Bytes
+    ```
+    """
+
     header_struck = '=2s2H36sLQ'
     header_size = struct.calcsize(header_struck)
 
     def __init__(self, obj_data=None, op_type=Operations.Update.name):
-        self.packTag = b'SO'
+        self.pack_tag = b'SO'
         if obj_data:
             try:
                 obj_type = obj_data['object']
@@ -91,23 +94,23 @@ class Header:
                     obj_type, op_type, obj_uuid
                 )
             )
-            self.opType = Operations[op_type].value
-            self.objType = ObjectTypes[obj_type].value
+            self.op_type = Operations[op_type].value
+            self.obj_type = ObjectTypes[obj_type].value
             self.uuid = obj_uuid
             self.version = 0  # int(obj_ver)
             self.size = len(obj_data)
         else:
-            self.opType = Operations[op_type].value
-            self.objType = 0
+            self.op_type = Operations[op_type].value
+            self.obj_type = 0
             self.uuid = ''
             self.version = 0  # int(obj_ver)
             self.size = 0
 
     def unpack_header(self, header):
         (
-            self.packTag,
-            self.opType,
-            self.objType,
+            self.pack_tag,
+            self.op_type,
+            self.obj_type,
             self.uuid,
             self.version,
             self.size,
@@ -120,12 +123,12 @@ class Header:
             obj_uuid = obj_data['id']
         except AttributeError:
             return False
-        self.opType = Operations[op_type].value
+        self.op_type = Operations[op_type].value
 
         try:
-            self.objType = ObjectTypes[obj_type].value
+            self.obj_type = ObjectTypes[obj_type].value
         except Exception:
-            self.objType = 255  # Unknown
+            self.obj_type = 255  # Unknown
 
         self.uuid = obj_uuid
         self.version = 0  # int(obj_ver)
@@ -136,9 +139,9 @@ class Header:
         self.size = psize
         return struct.pack(
             Header.header_struck,
-            self.packTag,
-            self.opType,
-            self.objType,
+            self.pack_tag,
+            self.op_type,
+            self.obj_type,
             bytes(self.uuid, 'ascii'),
             self.version,
             self.size,

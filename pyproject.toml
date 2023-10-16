@@ -78,7 +78,10 @@ default_item_type = "ref"
 
 [tool.poe.tasks.test]
 help = "Test with coverage"
-cmd = "pytest -vv --cov"
+sequence = [
+    {ref = "generate-mo"},
+    {cmd = "pytest -vv --cov"},
+]
 
 [tool.poe.tasks.test-fast]
 help = "Test until error"
@@ -91,6 +94,7 @@ cmd = "pytest -vv --last-failed"
 [tool.poe.tasks.lint]
 help = "Check code"
 sequence = [
+    {ref = "generate-mo"},
     # {cmd = "flake8 --jobs 4 --statistics --show-source ${CODE}"},
     # {cmd = "pylint --jobs 1 --rcfile=setup.cfg ${CODE}"},
     {cmd = "black --skip-string-normalization --line-length=88 --check ${CODE}"},
@@ -101,11 +105,16 @@ sequence = [
 [tool.poe.tasks.format]
 help = "Formating code"
 sequence = [
+    {ref = "generate-mo"},
 	{cmd = "autoflake --recursive --in-place --remove-all-unused-imports ${CODE}"},
 	{cmd = "isort ${CODE}"},
 	{cmd = "black --skip-string-normalization --line-length=88 ${CODE}"},
 	{cmd = "unify --in-place --recursive ${CODE}"},
 ]
+
+[tool.poe.tasks.generate-mo]
+help = "Generate mo files"
+cmd = "python -m sportorg.language"
 
 [tool.poe.tasks.run]
 help = "Run"
