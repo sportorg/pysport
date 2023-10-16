@@ -35,6 +35,12 @@ def generate_mo() -> None:
         logger.error(str(e))
 
 
+if __name__ == '__main__':
+    # FIXME move to another file
+    logger.info('Generate mo files')
+    generate_mo()
+
+
 def locale() -> Callable[[str], str]:
     cat = gettext.Catalog(
         config.NAME.lower(), config.LOCALE_DIR, languages=[locale_current]
@@ -51,8 +57,3 @@ def get_languages() -> List[str]:
 
 
 translate = locale()
-
-
-if __name__ == '__main__':
-    logger.info('Generate mo files')
-    generate_mo()
