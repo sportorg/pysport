@@ -94,6 +94,8 @@ class ResultCalculation:
 
                 res.place = last_place
                 current_place += 1
+            else:
+                res.current_result = res.get_result()
 
     def process_relay_results(self, group):
         if group and isinstance(group, Group):

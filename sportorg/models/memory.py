@@ -552,7 +552,8 @@ class Result:
             'created_at': self.created_at,  # readonly
             'result': self.get_result(),  # readonly
             'result_relay': self.get_result_relay(),
-            'result_current': self.get_result_otime_current_day().to_str(),
+            'result_current': self.get_result_otime_current_day().to_str() if self.is_status_ok()
+            else self.get_result(),
             'start_msec': self.get_start_time().to_msec(),  # readonly
             'finish_msec': self.get_finish_time().to_msec(),  # readonly
             'result_msec': self.get_result_otime().to_msec(),  # readonly

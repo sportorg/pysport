@@ -123,6 +123,7 @@
 				sum_places += s
 			}
 
+            ok_count = Math.min(store.best, ok_count);
 			//if(store.best < 99 and store.best > ok_count){
 			//   dsq = true;
 			//}
@@ -158,6 +159,7 @@
                     sum_time: person.sum_time,
                     sum_places: person.sum_places,
                     sum_scores: person.sum_scores.toFixed(1),
+                    ok_count: person.ok_count,
                     place: '',
                     person: person
                 };
@@ -233,6 +235,7 @@
             {key: 'qual', title: 'Разряд', size: 7},
             {key: 'bib', title: 'Номер', size: 6},
             {key: 'sum', title: 'Сумма', size: 6},
+            {key: 'ok_count', title: 'Старты', size: 6},
             {key: 'place', title: 'Место', size: 6}
         ],
         active: function (key, val) {

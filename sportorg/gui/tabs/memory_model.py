@@ -412,7 +412,7 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
             rented_card,
             time_to_hhmmss(i.get_result_otime_current_day())
             if i.is_status_ok()
-            else '',
+            else i.get_result(),
         ]
         return ret
 
