@@ -552,7 +552,8 @@ class Result:
             'created_at': self.created_at,  # readonly
             'result': self.get_result(),  # readonly
             'result_relay': self.get_result_relay(),
-            'result_current': self.get_result_otime_current_day().to_str() if self.is_status_ok()
+            'result_current': self.get_result_otime_current_day().to_str()
+            if self.is_status_ok()
             else self.get_result(),
             'start_msec': self.get_start_time().to_msec(),  # readonly
             'finish_msec': self.get_finish_time().to_msec(),  # readonly
@@ -564,7 +565,7 @@ class Result:
             if self.final_result_time
             else None,
             'order': self.order,
-            'multi_day_results': self.get_multi_day_dict()
+            'multi_day_results': self.get_multi_day_dict(),
         }
 
     def update_data(self, data):
@@ -855,7 +856,11 @@ class Result:
         Returns:
             str:
         """
-        if self.person and self.person.group and self.person.group.get_type() == RaceType.MULTI_DAY_RACE:
+        if (
+            self.person
+            and self.person.group
+            and self.person.group.get_type() == RaceType.MULTI_DAY_RACE
+        ):
             ret = ''
             person_id = self.person.multi_day_id
             for day in races():
