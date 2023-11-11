@@ -1843,7 +1843,7 @@ class Race(Model):
                 current_name = person.full_name
         return ret
 
-    def find_result_by_person_id(self, person_id) -> Result:
+    def find_result_by_person_id(self, person_id) -> Optional[Result]:
         if self.result_index is None:
             self.result_index = {}
             for res in self.results:
