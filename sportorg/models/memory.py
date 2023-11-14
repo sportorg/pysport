@@ -6,6 +6,7 @@ import uuid
 from abc import abstractmethod
 from datetime import date
 from enum import Enum, IntEnum
+from typing import Dict
 from typing import Optional
 
 import dateutil.parser
@@ -431,6 +432,19 @@ class Split(Model):
             self.days = int(data['days'])
 
 
+def format_result(result, length):
+    # Format result string, appending with spaces to have specified length
+    # used in multi day result string filling
+    # e.g. 12:00:12, 14 -> '12:00:12      '
+    ret = ''
+    if result is not None:
+        if result.is_status_ok():
+            ret = result.get_result_otime_current_day().to_str()
+        else:
+            ret = result.status_comment
+    return (ret + ' ' * length)[0:length]
+
+
 class Result:
     def __init__(self):
         if type(self) == Result:
@@ -565,7 +579,7 @@ class Result:
             if self.final_result_time
             else None,
             'order': self.order,
-            'multi_day_results': self.get_multi_day_dict(),
+            'multi_day_results': self.get_multi_day_result_str(),
         }
 
     def update_data(self, data):
@@ -850,27 +864,30 @@ class Result:
             self.can_win_count = who_can_win_count
             self.final_result_time = max_unfinished_start_time + self.get_result_otime()
 
-    def get_multi_day_dict(self):
+    def get_multi_day_result_str(self):
+        # get
+        ret = ''
+        for cur_res in self.get_multi_days():
+            ret += format_result(cur_res, 14)
+        return ret
+
+    def get_multi_days(self):  # Type = List[Result]
         """
         Get list of multi day results, None if group type not Multi Day
         Returns:
-            str:
+            List[Result]:
         """
+        ret = []
         if (
             self.person
             and self.person.group
             and self.person.group.get_type() == RaceType.MULTI_DAY_RACE
         ):
-            ret = ''
             person_id = self.person.multi_day_id
             for day in races():
                 cur_res: Result = day.find_result_by_person_id(person_id)
-                text = ''
-                if cur_res.is_status_ok():
-                    text = cur_res.get_result_otime_current_day().to_str()
-                ret += (text + '              ')[0:14]
-            return ret
-        return ''
+                ret.append(cur_res)
+        return ret
 
 
 class ResultManual(Result):
@@ -1393,7 +1410,7 @@ class Race(Model):
         self.relay_teams = []  # type: List[RelayTeam]
         self.settings = {}  # type: Dict[str, Any]
         self.controls = []  # type: List[ControlPoint]
-        self.result_index = None
+        self.result_index = {}  # type: Dict[str, Result]
 
     def __repr__(self):
         return repr(self.data)
@@ -1844,8 +1861,7 @@ class Race(Model):
         return ret
 
     def find_result_by_person_id(self, person_id) -> Optional[Result]:
-        if self.result_index is None:
-            self.result_index = {}
+        if len(self.result_index) < 1:
             for res in self.results:
                 if res.person:
                     id = res.person.multi_day_id
