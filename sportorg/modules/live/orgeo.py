@@ -220,6 +220,7 @@ def create(requests, url, data, race_data, log):
             'ResultSFR',
             'ResultManual',
             'ResultRfidImpinj',
+            'ResultSrpid',
         ]:
             person_data = _get_person(item, race_data)
             if person_data:
@@ -269,6 +270,7 @@ def create_online_cp(requests, url, data, race_data, log):
             'ResultSFR',
             'ResultManual',
             'ResultRfidImpinj',
+            'ResultSrpid',
         ]:
             try:
                 res = _get_result_by_id(item, race_data)
@@ -360,6 +362,7 @@ def delete(requests, url, data, race_data):
             'ResultSFR',
             'ResultManual',
             'ResultRfidImpinj',
+            'ResultSrpid',
         ]:
             person_data = _get_person(item, race_data)
             if person_data:

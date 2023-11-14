@@ -1394,6 +1394,7 @@ class Race(Model):
         'ResultSFR': ResultSFR,
         'ResultSportiduino': ResultSportiduino,
         'ResultRfidImpinj': ResultRfidImpinj,
+        'ResultSrpid': ResultSrpid,
         'Group': Group,
         'Course': Course,
         'Organization': Organization,
@@ -1425,6 +1426,7 @@ class Race(Model):
             'ResultSFR': self.results,
             'ResultSportiduino': self.results,
             'ResultRfidImpinj': self.results,
+            'ResultSrpid': self.results,
             'Group': self.groups,
             'Course': self.courses,
             'Organization': self.organizations,
@@ -1569,6 +1571,7 @@ class Race(Model):
             'ResultSFR',
             'ResultSportiduino',
             'ResultRfidImpinj',
+            'ResultSrpid'
         ]:
             obj.person = self.get_obj('Person', dict_obj['person_id'])
         elif dict_obj['object'] == 'Group':
