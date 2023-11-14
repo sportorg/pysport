@@ -67,6 +67,9 @@
 		<div style="height:12px;font-size:12px;">&nbsp;</div>
         <br> Финиш: {{result.finish_msec|tohhmmss}} {%if result.splits|length > 0%} {{(result.finish_msec - result.splits[-1].relative_time - result.start_msec)|tohhmmss('%M:%S')}} {%endif%}
         <br> Результат: {{result.result}} {{result.speed}}
+        {% if 'result_current' in result and result.result_current != result.result%}
+            <br> Рез.этапа: {{result.result_current}}
+        {% endif %}
         {% if race.settings.marked_route_mode == 'time' %}
 		    <br> Штраф, время: {{result.penalty_time|tohhmmss('%H:%M:%S')}}
         {% endif %}

@@ -6,6 +6,7 @@ import uuid
 from abc import abstractmethod
 from datetime import date
 from enum import Enum, IntEnum
+from typing import Dict
 from typing import Optional
 
 import dateutil.parser
@@ -431,6 +432,19 @@ class Split(Model):
             self.days = int(data['days'])
 
 
+def format_result(result, length):
+    # Format result string, appending with spaces to have specified length
+    # used in multi day result string filling
+    # e.g. 12:00:12, 14 -> '12:00:12      '
+    ret = ''
+    if result is not None:
+        if result.is_status_ok():
+            ret = result.get_result_otime_current_day().to_str()
+        else:
+            ret = result.status_comment
+    return (ret + ' ' * length)[0:length]
+
+
 class Result:
     def __init__(self):
         if type(self) == Result:
@@ -552,7 +566,9 @@ class Result:
             'created_at': self.created_at,  # readonly
             'result': self.get_result(),  # readonly
             'result_relay': self.get_result_relay(),
-            'result_current': self.get_result_otime_current_day().to_str(),
+            'result_current': self.get_result_otime_current_day().to_str()
+            if self.is_status_ok()
+            else self.get_result(),
             'start_msec': self.get_start_time().to_msec(),  # readonly
             'finish_msec': self.get_finish_time().to_msec(),  # readonly
             'result_msec': self.get_result_otime().to_msec(),  # readonly
@@ -563,6 +579,7 @@ class Result:
             if self.final_result_time
             else None,
             'order': self.order,
+            'multi_day_results': self.get_multi_day_result_str(),
         }
 
     def update_data(self, data):
@@ -717,18 +734,14 @@ class Result:
         person_id = self.person.multi_day_id
         sum_result = OTime()
         for day in races():
-            result_found = False
-            for result in day.results:
-                assert isinstance(result, Result)
-                if result.person and result.person.multi_day_id == person_id:
-                    if result.is_status_ok():
-                        sum_result += result.get_result_otime_current_day()
-                        result_found = True
-                        continue
-                    else:
-                        self.status = ResultStatus.DISQUALIFIED
-                        return OTime()  # DSQ/DNS
-            if not result_found:
+            result_tmp = day.find_result_by_person_id(person_id)
+            if result_tmp:
+                if result_tmp.is_status_ok():
+                    sum_result += result_tmp.get_result_otime_current_day()
+                else:
+                    self.status = ResultStatus.DISQUALIFIED
+                    return OTime()  # DSQ/DNS
+            else:
                 self.status = ResultStatus.DISQUALIFIED
                 return OTime()  # result not found in that day
         return sum_result
@@ -850,6 +863,31 @@ class Result:
 
             self.can_win_count = who_can_win_count
             self.final_result_time = max_unfinished_start_time + self.get_result_otime()
+
+    def get_multi_day_result_str(self):
+        # get
+        ret = ''
+        for cur_res in self.get_multi_days():
+            ret += format_result(cur_res, 14)
+        return ret
+
+    def get_multi_days(self):  # Type = List[Result]
+        """
+        Get list of multi day results, None if group type not Multi Day
+        Returns:
+            List[Result]:
+        """
+        ret = []
+        if (
+            self.person
+            and self.person.group
+            and self.person.group.get_type() == RaceType.MULTI_DAY_RACE
+        ):
+            person_id = self.person.multi_day_id
+            for day in races():
+                cur_res: Result = day.find_result_by_person_id(person_id)
+                ret.append(cur_res)
+        return ret
 
 
 class ResultManual(Result):
@@ -1372,6 +1410,7 @@ class Race(Model):
         self.relay_teams = []  # type: List[RelayTeam]
         self.settings = {}  # type: Dict[str, Any]
         self.controls = []  # type: List[ControlPoint]
+        self.result_index = {}  # type: Dict[str, Result]
 
     def __repr__(self):
         return repr(self.data)
@@ -1820,6 +1859,18 @@ class Race(Model):
                 previous_person = person
                 current_name = person.full_name
         return ret
+
+    def find_result_by_person_id(self, person_id) -> Optional[Result]:
+        if len(self.result_index) < 1:
+            for res in self.results:
+                if res.person:
+                    id = res.person.multi_day_id
+                    self.result_index[id] = res
+
+        if person_id in self.result_index:
+            return self.result_index[person_id]
+        else:
+            return None
 
 
 class Qualification(IntEnum):

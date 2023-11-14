@@ -62,7 +62,7 @@
             };
             var results = this.race.results.filter(function (result) {
                 if (result.person && result.person.group && result.person.organization && equal(result.person.organization)) {
-                    return !_this.selected.groups.length || _this.selected.groups.some(function (elem) {
+                    return !_this.selected.groups || !_this.selected.groups.length || _this.selected.groups.some(function (elem) {
                         return elem.id === result.person.group.id;
                     })
                 }

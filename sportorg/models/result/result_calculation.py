@@ -20,6 +20,7 @@ class ResultCalculation:
     def process_results(self):
         logging.debug('Process results')
         self.race.relay_teams.clear()
+        self.race.result_index = {}
         for person in self.race.persons:
             person.result_count = 0
             if person.start_time and person.group:
@@ -93,6 +94,8 @@ class ResultCalculation:
 
                 res.place = last_place
                 current_place += 1
+            else:
+                res.current_result = res.get_result()
 
     def process_relay_results(self, group):
         if group and isinstance(group, Group):

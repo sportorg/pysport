@@ -52,7 +52,7 @@
                     year: result.person.birth_date ? (new Date(result.person.birth_date)).getFullYear() : '',
                     penalty_time: toHHMMSS(result.penalty_time),
                     penalty_laps: result.penalty_laps,
-                    result: result.result,
+                    result: result.result_current,
                     result_relay: result.result_relay,
                     result_msec: result.result_msec,
                     diff: race.settings.result_processing_mode === 'scores' ? result.diff_scores : toHHMMSS(result.diff),
@@ -72,8 +72,6 @@
                     r.speed = '';
                     r.speed_kmh = '';
                     r.scores = '';
-                    r.penalty_time = '';
-                    r.penalty_laps = '';
                 }
 
                 // SPLITS
@@ -243,8 +241,6 @@
                     r.speed = '';
                     r.speed_kmh = '';
                     r.scores = '';
-                    r.penalty_time = '';
-                    r.penalty_laps = '';
                 }
 
                 // SPLITS
@@ -534,7 +530,7 @@
                 this.getField('all_splits').active = location.href.indexOf('all_splits=1') > -1;
                 this.getField('scores').active = location.href.indexOf('scores=1') > -1;
                 this.getField('penalty_time').active = location.href.indexOf('penalty_time=1') > -1;
-
+                this.getField('penalty_laps').active = location.href.indexOf('penalty_laps=1') > -1;
                 this.getField('result_relay').active = isRelay
             } catch (e){}
             return this;
@@ -620,7 +616,8 @@
             by_course: store.showProtocolByCourse ? 1 : 0,
             all_splits: Fields.isActive('all_splits') ? 1 : 0,
             scores: Fields.isActive('scores') ? 1 : 0,
-            penalty_time: Fields.isActive('penalty_time') ? 1 : 0
+            penalty_time: Fields.isActive('penalty_time') ? 1 : 0,
+            penalty_laps: Fields.isActive('penalty_laps') ? 1 : 0
         };
         var queryString = '?';
         Object.keys(query).forEach(function (key) {
