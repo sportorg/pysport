@@ -63,106 +63,64 @@ def test_marked_route_yes_no():
     отметиться в станции НЕТ. За неправильную отметку спортсмен получает штраф.
     За отсутствующую отметку спортсмен должен быть дисквалифицирован.
     """
+    # fmt: off
     create_race()
     race().set_setting('marked_route_mode', 'time')
 
     # Отметка ок, без штрафа
-    assert ok(
-        course=['31(31,32)', '41(41,42)', '51(51,52)', 100],
-        splits=[31, 41, 51, 100],
-        penalty=0,
-    )
+    assert  ok(course=['31(31,32)', '41(41,42)', '51(51,52)', 100],
+               splits=[ 31,          41,          51,         100], penalty=0)
 
     # Отметка ок, 1 штраф - неверный выбор на одном КП
-    assert ok(
-        course=['31(31,32)', '41(41,42)', '51(51,52)', 100],
-        splits=[31, 42, 51, 100],
-        penalty=1,
-    )
+    assert  ok(course=['31(31,32)', '41(41,42)', '51(51,52)', 100],
+               splits=[ 31,          42,          51,         100], penalty=1)
 
     # Отметка ок, 3 штрафа - неверный выбор на трёх КП
-    assert ok(
-        course=['31(31,32)', '41(41,42)', '51(51,52)', 100],
-        splits=[32, 42, 52, 100],
-        penalty=3,
-    )
+    assert  ok(course=['31(31,32)', '41(41,42)', '51(51,52)', 100],
+               splits=[ 32,          42,          52,         100], penalty=3)
 
     # Отметка ок, 0 штрафа - лишняя отметка на одном истинном КП
-    assert ok(
-        course=['31(31,32)', '41(41,42)', '51(51,52)', 100],
-        splits=[31, 31, 41, 51, 100],
-        penalty=0,
-    )
+    assert  ok(course=['31(31,32)', '41(41,42)', '51(51,52)', 100],
+               splits=[ 31, 31,      41,          51,         100], penalty=0)
 
     # Отметка ок, 1 штраф - лишняя отметка на одном ложном КП
-    assert ok(
-        course=['31(31,32)', '41(41,42)', '51(51,52)', 100],
-        splits=[31, 41, 52, 52, 100],
-        penalty=1,
-    )
+    assert  ok(course=['31(31,32)', '41(41,42)', '51(51,52)', 100],
+               splits=[ 31,          41,          52, 52,     100], penalty=1)
 
     # Отметка ок, 1 штраф - отметка на обоих станциях на одном КП
-    assert ok(
-        course=['31(31,32)', '41(41,42)', '51(51,52)', 100],
-        splits=[32, 31, 41, 51, 100],
-        penalty=1,
-    )
+    assert  ok(course=['31(31,32)', '41(41,42)', '51(51,52)', 100],
+               splits=[ 32, 31,      41,          51,         100], penalty=1)
 
     # Дисквалифицирован, 1 штраф - отсутствует отметка на одном КП
-    assert dsq(
-        course=['31(31,32)', '41(41,42)', '51(51,52)', 100],
-        splits=[31, 51, 100],
-        penalty=1,
-    )
+    assert dsq(course=['31(31,32)', '41(41,42)', '51(51,52)', 100],
+               splits=[ 31,                       51,         100], penalty=1)
 
     # Дисквалифицирован, 1 штраф - отсутствует отметка на последнем КП100
-    assert dsq(
-        course=['31(31,32)', '41(41,42)', '51(51,52)', 100],
-        splits=[
-            31,
-            41,
-            51,
-        ],
-        penalty=1,
-    )
+    assert dsq(course=['31(31,32)', '41(41,42)', '51(51,52)', 100],
+               splits=[ 31,          41,          51,            ], penalty=1)
 
     # Дисквалифицирован, 4 штрафа - пустой чип
-    assert dsq(
-        course=['31(31,32)', '41(41,42)', '51(51,52)', 100], splits=[], penalty=4
-    )
+    assert dsq(course=['31(31,32)', '41(41,42)', '51(51,52)', 100],
+               splits=[                                          ], penalty=4)
 
     # Отметка ок, 0 штрафа - отметка на КП, которого нет на карте
-    assert ok(
-        course=['31(31,32)', '41(41,42)', '51(51,52)', 100],
-        splits=[31, 75, 41, 51, 100],
-        penalty=0,
-    )
+    assert  ok(course=['31(31,32)', '41(41,42)', '51(51,52)', 100],
+               splits=[ 31, 75,      41,          51,         100], penalty=0)
 
     # Отметка ок, 0 штрафа - отметка на КП, которого нет на карте
-    assert ok(
-        course=['31(31,32)', '41(41,42)', '51(51,52)', 100],
-        splits=[31, 75, 41, 51, 100],
-        penalty=0,
-    )
+    assert  ok(course=['31(31,32)', '41(41,42)', '51(51,52)', 100],
+               splits=[ 31, 75,      41,          51,         100], penalty=0)
 
     # Отметка ок, 0 штрафа - неочищенный чип НЕ содержит часть дистанции
-    assert ok(
-        course=['31(31,32)', '41(41,42)', '51(51,52)', 100],
-        splits=[70, 71, 72, 73, 31, 41, 51, 100],
-        penalty=0,
-    )
+    assert  ok(course=['31(31,32)', '41(41,42)', '51(51,52)', 100],
+               splits=[ 70, 71, 72, 73,   31, 41, 51,         100], penalty=0)
 
     # Отметка ок, 1 штраф - неочищенный чип содержит часть дистанции
-    assert ok(
-        course=['31(31,32)', '41(41,42)', '51(51,52)', 100],
-        splits=[40, 41, 42, 43, 31, 41, 51, 100],
-        penalty=1,
-    )
-    assert ok(
-        course=['31(31,32)', '41(41,42)', '51(51,52)', 100],
-        splits=[40, 41, 42, 43, 31, 42, 51, 100],
-        penalty=1,
-    )
+    assert  ok(course=['31(31,32)', '41(41,42)', '51(51,52)', 100],
+               splits=[ 40, 41, 42, 43,   31, 41, 51,         100], penalty=1)
+    assert  ok(course=['31(31,32)', '41(41,42)', '51(51,52)', 100],
+               splits=[ 40, 41, 42, 43,   31, 42, 51,         100], penalty=1)
+    # fmt: on
 
 
 def test_penalty_calculation_function():
@@ -172,118 +130,124 @@ def test_penalty_calculation_function():
     так как с параметрами penalty_calculation(<...>, check_existence=False)
     эта функция нигде не вызывается.
     """
+    # fmt: off
     create_race()
     race().set_setting('marked_route_mode', 'time')
 
     # return quantity of incorrect or duplicated punches, order is ignored
     # origin: 31,41,51; athlete: 31,41,51; result:0
-    assert ok(course=[31, 41, 51], splits=[31, 41, 51], penalty=0)
+    assert  ok(course=[31, 41, 51],
+               splits=[31, 41, 51], penalty=0)
 
     # origin: 31,41,51; athlete: 31; result:0
     # check_existence=False
     assert 0 == ResultChecker.penalty_calculation(
         splits=make_splits([31]),
-        controls=make_course_controls([31, 41, 51]),
-        check_existence=False,
-    )
+        controls=make_course_controls([31, 41, 51]), check_existence=False)
 
     # origin: 31,41,51; athlete: 31; result:2
     # check_existence=True
-    assert dsq(
-        course=[31, 41, 51],
-        splits=[
-            31,
-        ],
-        penalty=2,
-    )
+    assert dsq(course=[31, 41, 51],
+               splits=[31,       ], penalty=2)
 
     # origin: 31,41,51; athlete: 41,31,51; result:0
-    assert dsq(course=[31, 41, 51], splits=[41, 31, 51], penalty=0)
+    assert dsq(course=[31, 41, 51],
+               splits=[41, 31, 51], penalty=0)
 
     # origin: 31,41,51; athlete: 41,31,51; result:0
-    assert dsq(course=[31, 41, 51], splits=[41, 31, 51], penalty=0)
+    assert dsq(course=[31, 41, 51],
+               splits=[41, 31, 51], penalty=0)
 
     # origin: 31,41,51; athlete: 31,42,51; result:1
-    assert dsq(course=[31, 41, 51], splits=[31, 42, 51], penalty=1)
+    assert dsq(course=[31, 41, 51],
+               splits=[31, 42, 51], penalty=1)
 
     # origin: 31,41,51; athlete: 31,41,51,52; result:1
-    assert ok(course=[31, 41, 51], splits=[31, 41, 51, 52], penalty=1)
+    assert  ok(course=[31, 41, 51],
+               splits=[31, 41, 51, 52], penalty=1)
 
     # origin: 31,41,51; athlete: 31,42,51,52; result:2
-    assert dsq(course=[31, 41, 51], splits=[31, 42, 51, 52], penalty=2)
+    assert dsq(course=[31, 41, 51],
+               splits=[31, 42, 51, 52], penalty=2)
 
     # origin: 31,41,51; athlete: 31,31,41,51; result:1
-    assert ok(course=[31, 41, 51], splits=[31, 31, 41, 51], penalty=1)
+    assert  ok(course=[31, 41, 51],
+               splits=[31, 31, 41, 51], penalty=1)
 
     # origin: 31,41,51; athlete: 31,41,51,51; result:1
-    assert ok(course=[31, 41, 51], splits=[31, 41, 51, 51], penalty=1)
+    assert  ok(course=[31, 41, 51],
+               splits=[31, 41, 51, 51], penalty=1)
 
     # origin: 31,41,51; athlete: 32,42,52; result:3
-    assert dsq(course=[31, 41, 51], splits=[32, 42, 52], penalty=3)
+    assert dsq(course=[31, 41, 51],
+               splits=[32, 42, 52], penalty=3)
 
     # origin: 31,41,51; athlete: 31,41,51,61,71,81,91; result:4
-    assert ok(course=[31, 41, 51], splits=[31, 41, 51, 61, 71, 81, 91], penalty=4)
+    assert  ok(course=[31, 41, 51],
+               splits=[31, 41, 51, 61, 71, 81, 91], penalty=4)
 
     # origin: 31,41,51; athlete: 31,41,52,61,71,81,91; result:5
-    assert dsq(course=[31, 41, 51], splits=[31, 41, 52, 61, 71, 81, 91], penalty=5)
+    assert dsq(course=[31, 41, 51],
+               splits=[31, 41, 52, 61, 71, 81, 91], penalty=5)
 
     # origin: 31,41,51; athlete: 51,61,71,81,91,31,41; result:4
-    assert dsq(course=[31, 41, 51], splits=[51, 61, 71, 81, 91, 31, 41], penalty=4)
+    assert dsq(course=[31, 41, 51],
+               splits=[51, 61, 71, 81, 91, 31, 41], penalty=4)
 
     # origin: 31,41,51; athlete: 51,61,71,81,91,32,41; result:5
-    assert dsq(course=[31, 41, 51], splits=[51, 61, 71, 81, 91, 32, 41], penalty=5)
+    assert dsq(course=[31, 41, 51],
+               splits=[51, 61, 71, 81, 91, 32, 41], penalty=5)
 
     # origin: 31,41,51; athlete: 51,61,71,81,91,32,42; result:6
-    assert dsq(course=[31, 41, 51], splits=[51, 61, 71, 81, 91, 32, 42], penalty=6)
+    assert dsq(course=[31, 41, 51],
+               splits=[51, 61, 71, 81, 91, 32, 42], penalty=6)
 
     # origin: 31,41,51; athlete: 52,61,71,81,91,32,42; result:7
-    assert dsq(course=[31, 41, 51], splits=[52, 61, 71, 81, 91, 32, 42], penalty=7)
+    assert dsq(course=[31, 41, 51],
+               splits=[52, 61, 71, 81, 91, 32, 42], penalty=7)
 
     # origin: 31,41,51; athlete: no punches; result:0
     # check_existence=False
     assert 0 == ResultChecker.penalty_calculation(
         splits=make_splits([]),
-        controls=make_course_controls([31, 41, 51]),
-        check_existence=False,
-    )
+        controls=make_course_controls([31, 41, 51]), check_existence=False)
 
     # origin: 31,41,51; athlete: no punches; result:3
     # check_existence=True
-    assert dsq(course=[31, 41, 51], splits=[], penalty=3)
+    assert dsq(course=[31, 41, 51],
+               splits=[], penalty=3)
 
     # wildcard support for free order
     # origin: *,*,* athlete: 31; result:2
     # check_existence=False
     assert 0 == ResultChecker.penalty_calculation(
         splits=make_splits([31]),
-        controls=make_course_controls(['*', '*', '*']),
-        check_existence=False,
-    )
+        controls=make_course_controls(['*', '*', '*']), check_existence=False)
 
     # check_existence=True
-    assert dsq(course=['*', '*', '*'], splits=[31], penalty=2)
+    assert dsq(course=['*', '*', '*'],
+               splits=[31], penalty=2)
 
     # origin: *,*,* athlete: 31,31; result:2 //wrong
     # check_existence=False
     assert 0 == ResultChecker.penalty_calculation(
         splits=make_splits([31, 31]),
-        controls=make_course_controls(['*', '*', '*']),
-        check_existence=False,
-    )
+        controls=make_course_controls(['*', '*', '*']), check_existence=False)
 
     # check_existence=True
-    assert dsq(course=['*', '*', '*'], splits=[31, 31], penalty=1)
+    assert dsq(course=['*', '*', '*'],
+               splits=[31, 31], penalty=1)
 
     # origin: *,*,* athlete: 31,31,31,31; result:3 //wrong
     # check_existence=False
     assert 1 == ResultChecker.penalty_calculation(
         splits=make_splits([31, 31, 31, 31]),
-        controls=make_course_controls(['*', '*', '*']),
-        check_existence=False,
-    )
+        controls=make_course_controls(['*', '*', '*']), check_existence=False)
 
     # check_existence=True
-    assert dsq(course=['*', '*', '*'], splits=[31, 31, 31, 31], penalty=1)
+    assert dsq(course=['*', '*', '*'],
+               splits=[31, 31, 31, 31], penalty=1)
+    # fmt: on
 
 
 def test_non_obvious_behavior():
@@ -304,6 +268,11 @@ def test_non_obvious_behavior():
     assert dsq(course=['31', '41(41,42)'], splits=[41], penalty=1)
     assert dsq(course=['31', '41(41,42)'], splits=[39, 41], penalty=0)
     assert dsq(course=['31', '41(41,42)'], splits=[31, 49], penalty=0)
+
+    # Различные способы задания дистанции приводят к различному
+    # начислению штрафа за лишние отметки
+    assert ok(course=['31', '41'], splits=[31, 77, 41], penalty=1)
+    assert ok(course=['31', '41(41,42)'], splits=[31, 77, 41], penalty=0)
 
 
 def ok(

@@ -1,7 +1,7 @@
 import platform
 
 from sportorg.language import translate
-from sportorg.models.memory import Group, ResultStatus, race
+from sportorg.models.memory import Group, Result, ResultStatus, race
 from sportorg.models.result.result_calculation import ResultCalculation
 
 if platform.system() == 'Windows':  # current realisation works on Windows only
@@ -56,6 +56,83 @@ class SportorgPrinter:
         self.move_cursor(font_size * 1.3)
 
     def print_split(self, result):
+        if not race().get_setting('marked_route_if_counting_lap', False):
+            # Обычный сплит
+            self.print_split_normal(result)
+        else:
+            # Печать штрафа на пункте оценки: сверху номер, снизу штраф
+            self.print_penalty_laps(result)
+
+    def print_penalty_laps(self, result: Result):
+        person = result.person
+        if person is None:
+            return
+
+        for _ in range(20):
+            self.print_line('.', 'Arial', 1)  # empty vertical space
+        self.print_bib_line(result)
+        for _ in range(7):
+            self.print_line('.', 'Arial', 1)  # empty vertical space
+        self.print_penalty_line(result)
+
+    def print_bib_line(self, result: Result):
+        text = str(result.person.bib)
+
+        font_name = 'Arial Black'
+        font_size = 50
+        font_weight = 400
+
+        font = win32ui.CreateFont(
+            {
+                'name': font_name,
+                'height': int(self.scale_factor * font_size),
+                'weight': font_weight,
+            }
+        )
+        self.dc.SelectObject(font)
+        self.dc.TextOut(self.x, self.y, str(text))
+
+        self.move_cursor(font_size * 1.3)
+
+    def print_penalty_line(self, result: Result):
+        text = str(result.penalty_laps).rjust(2)
+
+        font_name = 'Arial Black'
+        font_size = 50
+        font_weight = 400
+
+        font = win32ui.CreateFont(
+            {
+                'name': font_name,
+                'height': int(self.scale_factor * font_size),
+                'weight': font_weight,
+            }
+        )
+        self.dc.SelectObject(font)
+        self.dc.TextOut(self.x, self.y, str(text))
+
+        dx1, dy1 = self.dc.GetTextExtent(str(text))
+
+        text_small = ' ' + translate('laps')
+        font_name_small = 'Arial'
+        font_size_small = 15
+        font_weight = 400
+
+        font = win32ui.CreateFont(
+            {
+                'name': font_name_small,
+                'height': int(self.scale_factor * font_size_small),
+                'weight': font_weight,
+            }
+        )
+        self.dc.SelectObject(font)
+        _, dy2 = self.dc.GetTextExtent(str(text_small))
+        dy = int(0.8 * (dy1 - dy2))  # calculate font baseline position
+        self.dc.TextOut(self.x + dx1, self.y - dy, str(text_small))
+
+        self.move_cursor(font_size * 1.3)
+
+    def print_split_normal(self, result):
         obj = race()
 
         person = result.person

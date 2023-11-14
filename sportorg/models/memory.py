@@ -93,6 +93,7 @@ class ResultStatus(_TitleType):
     DID_NOT_ENTER = 14
     CANCELLED = 15
     RESTORED = 16
+    MISS_PENALTY_LAP = 17
 
 
 class Organization(Model):

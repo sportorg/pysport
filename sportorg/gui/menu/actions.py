@@ -594,6 +594,7 @@ class PenaltyCalculationAction(Action, metaclass=ActionFactory):
         for result in race().results:
             if result.person:
                 ResultChecker.calculate_penalty(result)
+                ResultChecker.checking(result)
         logging.debug('Penalty calculation finish')
         ResultCalculation(race()).process_results()
         self.app.refresh()
