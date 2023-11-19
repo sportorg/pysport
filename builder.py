@@ -10,7 +10,7 @@ if sys.platform == "win32":
 
 include_files = [
     config.LOCALE_DIR,
-    config.TEMPLATE_DIR,
+    # config.TEMPLATE_DIR,
     config.IMG_DIR,
     config.SOUND_DIR,
     config.base_dir("LICENSE"),
