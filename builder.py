@@ -19,8 +19,8 @@ include_files = [
     config.base_dir("configs"),
     config.STYLE_DIR,
 ]
-includes = ["atexit", "codecs"]
-excludes = ["Tkinter"]
+includes = ["atexit", "codecs", "playsound", "pyImpinj"]
+excludes = ["Tkinter", "unittest", "test", "pydoc"]
 
 options = {
     "build_exe": {
@@ -28,6 +28,8 @@ options = {
         "excludes": excludes,
         "packages": ["idna", "requests", "encodings", "asyncio", "pywinusb"],
         "include_files": include_files,
+        "zip_include_packages": ["PySide2"],
+        "optimize": 2,
     }
 }
 
