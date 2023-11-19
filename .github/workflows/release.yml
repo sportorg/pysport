@@ -26,6 +26,8 @@ jobs:
         run: pip install poetry && poetry install -E win
       - name: Build
         run: poetry run python builder.py build
+      - name: Show
+        run: dir build
       # - name: Publish
       #   uses: softprops/action-gh-release@v1
       #   with:
