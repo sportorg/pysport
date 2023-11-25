@@ -147,7 +147,7 @@ class MainWindow(QMainWindow):
             # logging.info(repr(command.data))
             # if 'object' in command.data and command.data['object'] in
             # ['ResultManual', 'ResultSportident', 'ResultSFR', 'ResultSportiduino']:
-            if command.header.objType in [
+            if command.header.obj_type in [
                 ObjectTypes.Result.value,
                 ObjectTypes.ResultManual.value,
                 ObjectTypes.ResultSportident.value,

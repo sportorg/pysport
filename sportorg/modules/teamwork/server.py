@@ -1,7 +1,8 @@
-import json
 import socket
 from queue import Empty, Queue
 from threading import Event, Thread, main_thread
+
+import orjson
 
 from .packet_header import Header, ObjectTypes, Operations
 
@@ -22,7 +23,7 @@ class Command:
         return self
 
     def get_packet(self):
-        pack_data = json.dumps(self.data).encode()
+        pack_data = orjson.dumps(self.data)
         return self.header.pack_header(len(pack_data)) + pack_data
 
 
@@ -50,7 +51,7 @@ class ServerReceiverThread(Thread):
 
     def run(self):
         with self.connect.conn:
-            self._logger.debug('Server receiver start')
+            self._logger.debug('Server receiver started')
             self._logger.info('Connected by {}'.format(self.connect.addr))
             full_data = b''
             self.connect.conn.settimeout(5)
@@ -75,7 +76,7 @@ class ServerReceiverThread(Thread):
                         else:
                             if len(full_data) >= hdr.size:
                                 command = Command(
-                                    json.loads(full_data[: hdr.size].decode()),
+                                    orjson.loads(full_data[: hdr.size].decode()),
                                     Operations(hdr.op_type).name,
                                     self.connect.addr,
                                 )
@@ -166,7 +167,7 @@ class ServerThread(Thread):
             s.listen(1)
             s.settimeout(5)
 
-            self._logger.info('Server start')
+            self._logger.info('Server started')
 
             conns_queue = Queue()  # type: ignore
             sender = ServerSenderThread(
@@ -199,4 +200,4 @@ class ServerThread(Thread):
             sender.join()
             for srt in connections:
                 srt.join()
-            self._logger.info('Server shutdown')
+            self._logger.info('Server stopped')

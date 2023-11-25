@@ -33,7 +33,7 @@ def test_teamwork():
             'Create',
         )
     )
-    result = client_out_queue.get(timeout=5)
+    result = client_out_queue.get(timeout=10)
     assert result.data == {
         'object': 'Person',
         'id': 'c24eef6c-a33b-4581-a6d1-78294711aef1',

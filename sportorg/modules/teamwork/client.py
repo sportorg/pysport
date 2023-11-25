@@ -1,6 +1,8 @@
 import queue
+import select
 import socket
-from threading import Event, Thread, main_thread
+from threading import Event, Thread
+from typing import Tuple
 
 import orjson
 
@@ -8,99 +10,68 @@ from .packet_header import Header, Operations
 from .server import Command
 
 
-class ClientSenderThread(Thread):
-    def __init__(self, conn, in_queue, stop_event, logger):
-        super().__init__(daemon=True)
-        self.setName(self.__class__.__name__)
-        self.conn = conn
+class ClientSender:
+    def __init__(self, in_queue: queue.Queue):
         self._in_queue = in_queue
-        self._stop_event = stop_event
-        self._logger = logger
 
-    def run(self):
-        self._logger.debug('Client sender start')
-        while True:
-            try:
-                cmd = self._in_queue.get(timeout=5)
-                self.conn.sendall(cmd.get_packet())
-            except queue.Empty:
-                if not main_thread().is_alive() or self._stop_event.is_set():
-                    break
-            except ConnectionResetError as e:
-                self._logger.debug(str(e))
-                break
-            except Exception as e:
-                self._logger.debug(str(e))
-                break
-        self.conn.close()
-        self._logger.debug('Client sender shutdown')
-        self._stop_event.set()
+    def send(self, conn: socket.socket) -> None:
+        try:
+            while True:
+                cmd = self._in_queue.get_nowait()
+                conn.sendall(cmd.get_packet())
+        except queue.Empty:
+            return
 
 
-class ClientReceiverThread(Thread):
-    def __init__(self, conn, out_queue, stop_event, logger):
-        super().__init__()
-        self.setName(self.__class__.__name__)
-        self.conn = conn
+class ClientReceiver:
+    MSG_SIZE = 1024
+
+    def __init__(self, out_queue: queue.Queue):
         self._out_queue = out_queue
-        self._stop_event = stop_event
-        self._logger = logger
+        self._full_data = b''
+        self._hdr = Header()
+        self._is_new_pack = True
 
-    def run(self):
-        full_data = b''
-        self.conn.settimeout(5)
-        self._logger.debug('Client receiver start')
-        hdr = Header()
-        is_new_pack = True
-
+    def read(self, conn: socket.socket) -> None:
+        data = conn.recv(self.MSG_SIZE)
+        if not data:
+            return
+        self._full_data += data
         while True:
-            try:
-                data = self.conn.recv(1024)
-                if not data:
+            # getting Header
+            if self._is_new_pack:
+                if len(self._full_data) >= self._hdr.header_size:
+                    self._hdr.unpack_header(self._full_data[: self._hdr.header_size])
+                    self._full_data = self._full_data[self._hdr.header_size :]
+                    self._is_new_pack = False
+                else:
                     break
-                full_data += data
-                while True:
-                    # getting Header
-                    if is_new_pack:
-                        if len(full_data) >= hdr.header_size:
-                            hdr.unpack_header(full_data[: hdr.header_size])
-                            full_data = full_data[hdr.header_size :]
-                            is_new_pack = False
-                        else:
-                            break
-                    # Getting JSON data
-                    else:
-                        if len(full_data) >= hdr.size:
-                            command = Command(
-                                orjson.loads(full_data[: hdr.size].decode()),
-                                Operations(hdr.op_type).name,
-                            )
-                            self._out_queue.put(command)  # for local
-                            full_data = full_data[hdr.size :]
-                            is_new_pack = True
-                        else:
-                            break
-            except socket.timeout:
-                if not main_thread().is_alive() or self._stop_event.is_set():
+            # Getting JSON data
+            else:
+                if len(self._full_data) >= self._hdr.size:
+                    command = Command(
+                        orjson.loads(self._full_data[: self._hdr.size].decode()),
+                        Operations(self._hdr.op_type).name,
+                    )
+                    self._out_queue.put_nowait(command)
+                    self._full_data = self._full_data[self._hdr.size :]
+                    self._is_new_pack = True
+                else:
                     break
-            except ConnectionAbortedError as e:
-                self._logger.exception(e)
-                break
-            except ConnectionResetError as e:
-                self._logger.exception(e)
-                break
-            except Exception as e:
-                self._logger.exception(e)
-                break
-        self._logger.debug('Client receiver shutdown')
-        self._stop_event.set()
 
 
 class ClientThread(Thread):
-    def __init__(self, addr, in_queue, out_queue, stop_event, logger):
+    def __init__(
+        self,
+        addr: Tuple[str, int],
+        in_queue: queue.Queue,
+        out_queue: queue.Queue,
+        stop_event: Event,
+        logger,
+    ):
         super().__init__()
-        self.setName(self.__class__.__name__)
-        self.addr = addr
+        self.setName('Teamwork Client')
+        self._addr = addr
         self._in_queue = in_queue
         self._out_queue = out_queue
         self._stop_event = stop_event
@@ -113,27 +84,31 @@ class ClientThread(Thread):
     def run(self) -> None:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             try:
-                s.connect(self.addr)
-                self._logger.info('Client start')
-                sender = ClientSenderThread(
-                    s, self._in_queue, self._stop_event, self._logger
-                )
-                sender.start()
-                receiver = ClientReceiverThread(
-                    s, self._out_queue, self._stop_event, self._logger
-                )
-                receiver.start()
+                s.connect(self._addr)
+                s.settimeout(5)
+                s.setblocking(False)
+                self._logger.info('Client started')
                 self._client_started.set()
-
-                sender.join()
-                receiver.join()
+                sender = ClientSender(self._in_queue)
+                receiver = ClientReceiver(self._out_queue)
+                sockets = [s]
+                while True:
+                    if self._stop_event.is_set():
+                        break
+                    rread, rwrite, err = select.select(sockets, sockets, [], 1)
+                    if rread:
+                        receiver.read(s)
+                    if rwrite:
+                        sender.send(s)
 
             except ConnectionRefusedError as e:
                 self._logger.exception(e)
+                self._stop_event.set()
                 return
             except Exception as e:
                 self._logger.exception(e)
+                self._stop_event.set()
                 return
 
         s.close()
-        self._logger.info('Client shutdown')
+        self._logger.info('Client stopped')
