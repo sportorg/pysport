@@ -13,14 +13,14 @@ def test_teamwork():
     event = Event()
     server = ServerThread(('0.0.0.0', 50010), in_queue, out_queue, event, logging.root)
     server.start()
-    server.join_server()
+    server.wait()
     client_in_queue = Queue()
     client_out_queue = Queue()
     client = ClientThread(
         ('localhost', 50010), client_in_queue, client_out_queue, event, logging.root
     )
     client.start()
-    client.join_client()
+    client.wait()
     time.sleep(5)
 
     in_queue.put(
