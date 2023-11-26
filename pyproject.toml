@@ -9,6 +9,7 @@ python = "~3.8.1"
 pywin32 = {version="^228", optional = true}
 pyImpinj = {version="^1.2", optional = true}
 playsound = {version="=1.2.2", optional = true}
+aiohttp = "^3.9.0"
 boltons = "^20"
 chardet = "^5.2.0"
 docxtpl = "^0"
@@ -17,6 +18,7 @@ markupsafe = "2.0.1"
 orjson = "^3.9.5"
 polib = "^1"
 pydantic = "^1"
+pylocker = "^3.1.0"
 PySide2 = "^5"
 python-dateutil = "^2"
 python-dotenv = '^0.14'
@@ -24,7 +26,6 @@ pywinusb = "^0"
 requests = "^2"
 shiboken2 = "^5.15"
 sportident = "^1"
-pylocker = "^3.1.0"
 
 [tool.poetry.group.dev.dependencies]
 autoflake = "*"

@@ -42,7 +42,7 @@ from sportorg.models.result.split_calculation import GroupSplits
 from sportorg.modules.backup.file import File
 from sportorg.modules.configs.configs import Config as Configuration
 from sportorg.modules.configs.configs import ConfigFile
-from sportorg.modules.live.live import LiveClient, live_client
+from sportorg.modules.live.live import live_client
 from sportorg.modules.printing.model import (
     NoPrinterSelectedException,
     NoResultToPrintException,
@@ -295,7 +295,7 @@ class MainWindow(QMainWindow):
         self.res_recalculate = QTimer(self)
         self.res_recalculate.timeout.connect(self.res_recalculate_by_timer)
 
-        LiveClient().init()
+        live_client.init()
         self._menu_disable(self.current_tab)
 
     def _setup_ui(self):
