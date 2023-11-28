@@ -332,7 +332,7 @@ class ResultChecker:
 
         mr_if_counting_lap = obj.get_setting('marked_route_if_counting_lap', False)
         mr_if_station_check = obj.get_setting('marked_route_if_station_check', False)
-        mr_station_code = obj.get_setting('marked_route_station_code', 0)
+        mr_station_code = obj.get_setting('marked_route_penalty_lap_station_code', 0)
 
         if mr_if_station_check and int(mr_station_code) > 0:
             count_laps = 0

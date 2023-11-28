@@ -28,8 +28,8 @@ from sportorg.models.result.result_checker import ResultChecker
 #       default value: marked_route_if_counting_lap = True
 # marked_route_if_station_check [bool] - режим проверки количества пройденных штрафных кругов
 #       default value: marked_route_if_station_check = False
-# marked_route_station_code [int] - номер станции на штрафном круге
-#       default value: marked_route_station_code = 80
+# marked_route_penalty_lap_station_code [int] - номер станции на штрафном круге
+#       default value: marked_route_penalty_lap_station_code = 80
 # marked_route_dont_dsq [bool] - дисквалифицировать ли спортсмена за пропущенные КП
 #   True - проверяет функцией penalty_calculation_free_order()
 #   False - проверяет функцией penalty_calculation(<...>, check_existence=True)
