@@ -1545,9 +1545,6 @@ msgstr "СОШЕЛ"
 msgid "Disqualified"
 msgstr "ДИСКВ."
 
-msgid "Missing penalty lap"
-msgstr "Пропущен штрафной круг"
-
 msgid "laps"
 msgstr "кр."
 
