@@ -204,8 +204,18 @@ class TimekeepingPropertiesDialog(QDialog):
         self.mr_laps_radio.toggled.connect(self.penalty_calculation_mode)
         self.mr_layout.addRow(self.mr_laps_radio)
         self.mr_counting_lap_check = QCheckBox(translate('counting lap'))
+        self.mr_counting_lap_check.setToolTip(
+            translate('Operating mode: evaluation point') + '\n' +
+            translate('Print number of penalty laps instead of splits') + '\n' +
+            translate('when competitor reads out his card'))
+        self.mr_counting_lap_check.stateChanged.connect(self.penalty_calculation_mode)
         self.mr_layout.addRow(self.mr_counting_lap_check)
         self.mr_lap_station_check = QCheckBox(translate('lap station'))
+        self.mr_lap_station_check.setToolTip(
+            translate('Station number on the penalty lap') + '\n' +
+            translate('Competitor must punch at station') + '\n' +
+            translate('every time he/she passes a penalty lap'))
+        self.mr_lap_station_check.stateChanged.connect(self.penalty_calculation_mode)
         self.mr_lap_station_edit = AdvSpinBox(max_width=50)
         self.mr_layout.addRow(self.mr_lap_station_check, self.mr_lap_station_edit)
         self.mr_dont_dqs_check = QCheckBox(translate("Don't disqualify"))
@@ -318,29 +328,28 @@ class TimekeepingPropertiesDialog(QDialog):
         self.chip_duplicate_box.setDisabled(mode)
 
     def penalty_calculation_mode(self):
-        self.mr_time_edit.setDisabled(not self.mr_time_radio.isChecked())
+        self.mr_time_edit.setDisabled(
+            not self.mr_time_radio.isChecked()
+        )
         self.mr_counting_lap_check.setDisabled(
-            not (
-                self.mr_laps_radio.isChecked()
-                and not self.mr_lap_station_check.isChecked()
-            )
+            not (self.mr_laps_radio.isChecked() and 
+                 not self.mr_lap_station_check.isChecked())
         )
         self.mr_lap_station_check.setDisabled(
-            not (
-                self.mr_laps_radio.isChecked()
-                and not self.mr_counting_lap_check.isChecked()
-            )
+            not (self.mr_laps_radio.isChecked() and
+                 not self.mr_counting_lap_check.isChecked())
         )
         self.mr_lap_station_edit.setDisabled(
-            not (
-                self.mr_laps_radio.isChecked() and self.mr_lap_station_check.isChecked()
-            )
+            not (self.mr_laps_radio.isChecked() and
+                 self.mr_lap_station_check.isChecked())
         )
         self.mr_dont_dqs_check.setDisabled(
-            not (self.mr_laps_radio.isChecked() or self.mr_time_radio.isChecked())
+            not (self.mr_laps_radio.isChecked() or
+                 self.mr_time_radio.isChecked())
         )
         self.mr_max_penalty_by_cp.setDisabled(
-            not (self.mr_laps_radio.isChecked() or self.mr_time_radio.isChecked())
+            not (self.mr_laps_radio.isChecked() or
+                 self.mr_time_radio.isChecked())
         )
 
     def set_values_from_model(self):
