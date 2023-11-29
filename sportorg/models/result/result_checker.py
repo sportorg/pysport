@@ -63,8 +63,8 @@ class ResultChecker:
 
         return o
 
-    @classmethod
-    def check_all(cls):
+    @staticmethod
+    def check_all():
         logging.debug('Checking all results')
         for result in race().results:
             if result.person:

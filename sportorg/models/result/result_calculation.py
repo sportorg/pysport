@@ -3,7 +3,6 @@ import logging
 from sportorg.common.otime import OTime
 from sportorg.models.constant import RankingTable
 from sportorg.models.memory import (
-    Group,
     Qualification,
     RaceType,
     RelayTeam,
@@ -16,6 +15,8 @@ from sportorg.modules.configs.configs import Config
 class ResultCalculation:
     def __init__(self, r):
         self.race = r
+        self._group_finishes = {}
+        self._group_persons = {}
 
     def process_results(self):
         logging.debug('Process results')
@@ -47,6 +48,8 @@ class ResultCalculation:
             self.set_rank(i)
 
     def get_group_finishes(self, group):
+        if group in self._group_finishes:
+            return self._group_finishes[group]
         ret = []
         for i in self.race.results:
             person = i.person
@@ -55,15 +58,19 @@ class ResultCalculation:
                     ret.append(i)
         ret.sort()
         group.count_finished = len(ret)
+        self._group_finishes[group] = ret
         return ret
 
     def get_group_persons(self, group):
+        if group in self._group_persons:
+            return self._group_persons[group]
         ret = []
         for i in self.race.persons:
             person = i
             if person.group is group:
                 ret.append(i)
         group.count_person = len(ret)
+        self._group_persons[group] = ret
         return ret
 
     @staticmethod
@@ -98,40 +105,36 @@ class ResultCalculation:
                 res.current_result = res.get_result()
 
     def process_relay_results(self, group):
-        if group and isinstance(group, Group):
-            results = self.get_group_finishes(group)
+        results = self.get_group_finishes(group)
 
-            relay_teams = {}
-            for res in results:
-                bib = res.person.bib
+        relay_teams = {}
+        for res in results:
+            bib = res.person.bib
 
-                team_number = bib % 1000
-                if str(team_number) not in relay_teams:
-                    new_team = RelayTeam(self.race)
-                    new_team.group = group
-                    new_team.bib_number = team_number
-                    relay_teams[str(team_number)] = new_team
+            team_number = bib % 1000
+            if str(team_number) not in relay_teams:
+                new_team = RelayTeam(self.race)
+                new_team.group = group
+                new_team.bib_number = team_number
+                relay_teams[str(team_number)] = new_team
 
-                team = relay_teams[str(team_number)]
-                team.add_result(res)
-            teams_sorted = sorted(relay_teams.values())
-            place = 1  # place to show
-            order = 1  # order for templates
-            for cur_team in teams_sorted:
-                if (
-                    not cur_team.get_is_status_ok()
-                    or cur_team.get_is_out_of_competition()
-                ):
-                    cur_team.set_place(-1)
-                else:
-                    cur_team.set_place(place)
-                    place += 1
+            team = relay_teams[str(team_number)]
+            team.add_result(res)
+        teams_sorted = sorted(relay_teams.values())
+        place = 1  # place to show
+        order = 1  # order for templates
+        for cur_team in teams_sorted:
+            if not cur_team.get_is_status_ok() or cur_team.get_is_out_of_competition():
+                cur_team.set_place(-1)
+            else:
+                cur_team.set_place(place)
+                place += 1
 
-                cur_team.set_order(order)
-                order += 1
+            cur_team.set_order(order)
+            order += 1
 
-                cur_team.set_start_times()
-            return relay_teams.values()
+            cur_team.set_start_times()
+        return relay_teams.values()
 
     def set_rank(self, group):
         ranking = group.ranking

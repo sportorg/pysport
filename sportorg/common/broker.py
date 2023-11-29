@@ -1,4 +1,3 @@
-import datetime
 import logging
 
 from sportorg.common.singleton import singleton
