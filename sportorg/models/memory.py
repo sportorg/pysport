@@ -1570,7 +1570,7 @@ class Race(Model):
             'ResultSFR',
             'ResultSportiduino',
             'ResultRfidImpinj',
-            'ResultSrpid'
+            'ResultSrpid',
         ]:
             obj.person = self.get_obj('Person', dict_obj['person_id'])
         elif dict_obj['object'] == 'Group':
