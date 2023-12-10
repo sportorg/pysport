@@ -107,9 +107,8 @@ class ScoreCalculation:
 
     @staticmethod
     def get_region_for_organization(org):
-        if org:
-            if org.region:
-                return org.region
+        if org and org.region:
+            return org.region
         return None
 
     def get_all_regions(self):

@@ -6,7 +6,6 @@ import uuid
 from abc import abstractmethod
 from datetime import date
 from enum import Enum, IntEnum
-from typing import Dict
 from typing import Optional
 
 import dateutil.parser

@@ -1,19 +1,67 @@
+import asyncio
 import logging
+import os
 from functools import partial
-from threading import Thread
+from queue import Empty, Queue
+from threading import Event, Thread
 
-import requests
+import aiohttp
 
-from sportorg.common.broker import Broker
 from sportorg.models.memory import race
 from sportorg.modules.live import orgeo
 
+LIVE_TIMEOUT = int(os.getenv('SPORTORG_LIVE_TIMEOUT', '10'))
+
+
+async def create_session(timeout: int) -> aiohttp.ClientSession:
+    return aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=timeout))
+
+
+class LiveThread(Thread):
+    def __init__(self):
+        super().__init__(name='LiveThread', daemon=True)
+        self._queue = Queue()
+        self._stop_event = Event()
+        self._delay = 0.5
+
+    def send(self, func) -> None:
+        self._queue.put_nowait(func)
+
+    def stop(self) -> None:
+        self._stop_event.set()
+
+    def run(self) -> None:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        session = loop.run_until_complete(create_session(LIVE_TIMEOUT))
+        while not self._stop_event.is_set():
+            try:
+                funcs = []
+                while True:
+                    try:
+                        funcs.append(self._queue.get_nowait())
+                        self._queue.task_done()
+                    except Empty:
+                        break
+                if funcs:
+                    loop.run_until_complete(
+                        asyncio.gather(
+                            *[func(session=session) for func in funcs],
+                            return_exceptions=True
+                        )
+                    )
+                else:
+                    self._stop_event.wait(self._delay)
+            except Exception as e:
+                logging.error('Error: %s', str(e))
+
 
 class LiveClient:
+    def __init__(self):
+        self._thread = LiveThread()
+
     def init(self):
-        Broker().subscribe('teamwork_recieving', self.send)
-        Broker().subscribe('teamwork_sending', self.send)
-        Broker().subscribe('teamwork_deleting', self.delete)
+        self._thread.start()
 
     @staticmethod
     def is_enabled():
@@ -29,7 +77,7 @@ class LiveClient:
         return urls
 
     def send(self, data):
-        logging.debug('LiveClient.send started, data = ' + str(data))
+        logging.debug('LiveClient.send started, data = %s', str(data))
         if not self.is_enabled():
             return
 
@@ -46,21 +94,18 @@ class LiveClient:
         race_data = race().to_dict()
         for url in urls:
             if race().get_setting('live_results_enabled', False):
-                func = partial(
-                    orgeo.create, requests, url, items, race_data, logging.root
-                )
-                Thread(target=func, name='LiveThread', daemon=True).start()
+                func = partial(orgeo.create, url, items, race_data, logging.root)
+                self._thread.send(func)
 
             if race().get_setting('live_cp_enabled', False):
                 func = partial(
                     orgeo.create_online_cp,
-                    requests,
                     url,
                     items,
                     race_data,
                     logging.root,
                 )
-                Thread(target=func, name='LiveThread_OnlineCP', daemon=True).start()
+                self._thread.send(func)
 
     def delete(self, data):
         if not self.is_enabled():
@@ -76,8 +121,8 @@ class LiveClient:
         urls = self.get_urls()
         race_data = race().to_dict()
         for url in urls:
-            func = partial(orgeo.delete, requests, url, items, race_data)
-            Thread(target=func, name='LiveThread', daemon=True).start()
+            func = partial(orgeo.delete, url, items, race_data, logging.root)
+            self._thread.send(func)
 
 
 live_client = LiveClient()

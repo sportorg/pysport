@@ -1,6 +1,9 @@
 from re import subn
+from typing import Any, Dict
 
 from sportorg.utils.time import int_to_otime
+
+LOG_MSG = 'HTTP Status: %s, Msg: %s'
 
 RESULT_STATUS = [
     'NONE',
@@ -23,29 +26,17 @@ RESULT_STATUS = [
 
 
 class Orgeo:
-    def __init__(self, requests, url, user_agent=None):
-        if not user_agent:
-            user_agent = 'SportOrg'
-        self.requests = requests
+    def __init__(self, session, url: str, user_agent: str = 'SportOrg'):
+        self.session = session
         self._url = url
         self._headers = {'User-Agent': user_agent}
 
-    def _get_url(self, text=''):
-        return '{}{}'.format(self._url, text)
+    async def send(self, data):
+        return await self.session.post(self._url, headers=self._headers, json=data)
 
-    def send(self, data):
-        response = self.requests.post(self._get_url(), headers=self._headers, json=data)
-        return response
-
-    def send_online_cp(self, chip, code, time):
-        url = self._get_url()
-        url += '&si=' + str(chip)
-        url += '&radio=' + str(code)
-        url += '&r=' + str(time)
-        url += '&fl=0'
-
-        response = self.requests.get(url, headers=self._headers)
-        return response
+    async def send_online_cp(self, chip, code, time):
+        url = f'{self._url}&si={chip}&radio={code}&r={time}&fl=0'
+        return await self.session.get(url, headers=self._headers)
 
 
 def _get_obj(data, race_data, key, key_id):
@@ -186,12 +177,12 @@ def make_nice(s):
     )[0]
 
 
-def create(requests, url, data, race_data, log):
+async def create(url, data, race_data, log, *, session):
     """
     data is Dict: Person, Result, Group, Course, Organization
     race_data is Dict: Race
     """
-    o = Orgeo(requests, url)
+    o = Orgeo(session, url)
     is_start = False
     group_i = 0
     persons = []
@@ -228,30 +219,23 @@ def create(requests, url, data, race_data, log):
     if group_i == len(race_data['groups']):
         is_start = True
     if persons:
-        obj_for_send = {'persons': persons}
+        obj_for_send: Dict[str, Any] = {'persons': persons}
         if is_start:
             obj_for_send['params'] = {'start_list': True}
         try:
-            resp = o.send(obj_for_send)
+            resp = await o.send(obj_for_send)
 
-            if resp.status_code != 200:
-                log.error(
-                    'HTTP Status: {}, Msg: {}'.format(
-                        resp.status_code, make_nice(str(resp.content))
-                    )
-                )
+            result_txt = make_nice(str(await resp.text()))
+            if resp.status != 200:
+                log.error(LOG_MSG, resp.status, result_txt)
             else:
-                log.info(
-                    'HTTP Status: {}, Msg: {}'.format(
-                        resp.status_code, make_nice(str(resp.content))
-                    )
-                )
+                log.info(LOG_MSG, resp.status, result_txt)
 
         except Exception as e:
-            log.error(e)
+            log.error('Error: %s', str(e))
 
 
-def create_online_cp(requests, url, data, race_data, log):
+async def create_online_cp(url, data, race_data, log, *, session):
     """
     data is Dict: Results
     race_data is Dict: Race
@@ -260,7 +244,7 @@ def create_online_cp(requests, url, data, race_data, log):
     if not race_data['settings']['live_cp_enabled']:
         return
 
-    o = Orgeo(requests, url)
+    o = Orgeo(session, url)
 
     for item in data:
         if item['object'] in [
@@ -287,25 +271,16 @@ def create_online_cp(requests, url, data, race_data, log):
                     if card_number > 0:
                         code = race_data['settings']['live_cp_code']
                         finish_time = int_to_otime(res['finish_time'] // 10).to_str()
-                        resp = o.send_online_cp(card_number, code, finish_time)
-                        if resp.status_code != 200:
-                            log.error(
-                                'HTTP Status: {}, Msg: {}'.format(
-                                    resp.status_code, make_nice(str(resp.content))
-                                )
-                            )
+                        resp = await o.send_online_cp(card_number, code, finish_time)
+
+                        result_txt = make_nice(str(await resp.text()))
+
+                        if resp.status != 200:
+                            log.error(LOG_MSG, resp.status, result_txt)
                         else:
-                            log.info(
-                                'HTTP Status: {}, Msg: {}'.format(
-                                    resp.status_code, make_nice(str(resp.content))
-                                )
-                            )
+                            log.info(LOG_MSG, resp.status, result_txt)
                     else:
-                        log.info(
-                            'HTTP Status: {}, Msg: {}'.format(
-                                401, 'Ignoring empty card number'
-                            )
-                        )
+                        log.info(LOG_MSG, 401, 'Ignoring empty card number')
 
                 if res and race_data['settings']['live_cp_splits_enabled']:
                     # send split as cp, codes of cp to send are set by the list
@@ -321,36 +296,23 @@ def create_online_cp(requests, url, data, race_data, log):
                         for split in res['splits']:
                             if split['code'] in codes:
                                 split_time = int_to_otime(split['time'] // 10).to_str()
-                                resp = o.send_online_cp(
+                                resp = await o.send_online_cp(
                                     card_number, split['code'], split_time
                                 )
-                                if resp.status_code != 200:
-                                    log.error(
-                                        'HTTP Status: {}, Msg: {}'.format(
-                                            resp.status_code,
-                                            make_nice(str(resp.content)),
-                                        )
-                                    )
+                                result_txt = make_nice(str(await resp.text()))
+                                if resp.status != 200:
+                                    log.error(LOG_MSG, resp.status, result_txt)
                                 else:
-                                    log.info(
-                                        'HTTP Status: {}, Msg: {}'.format(
-                                            resp.status_code,
-                                            make_nice(str(resp.content)),
-                                        )
-                                    )
+                                    log.info(LOG_MSG, resp.status, result_txt)
                     else:
-                        log.info(
-                            'HTTP Status: {}, Msg: {}'.format(
-                                401, 'Ignoring empty card number'
-                            )
-                        )
+                        log.info(LOG_MSG, 401, 'Ignoring empty card number')
 
             except Exception as e:
-                log.exception(e)
+                log.error('Error: %s', str(e))
 
 
-def delete(requests, url, data, race_data):
-    o = Orgeo(requests, url)
+async def delete(url, data, race_data, log, *, session):
+    o = Orgeo(session, url)
     persons = []
     for item in data:
         if item['object'] == 'Person':
@@ -367,5 +329,14 @@ def delete(requests, url, data, race_data):
             person_data = _get_person(item, race_data)
             if person_data:
                 persons.append({'ref_id': person_data['id']})
-    if persons:
-        o.send({'persons': persons})
+    try:
+        if persons:
+            resp = await o.send({'persons': persons})
+            result_txt = make_nice(str(await resp.text()))
+            if resp.status != 200:
+                log.error(LOG_MSG, resp.status, result_txt)
+            else:
+                log.info(LOG_MSG, resp.status, result_txt)
+
+    except Exception as e:
+        log.error('Error: %s', str(e))
