@@ -445,11 +445,6 @@ class DrawManager:
             duplicated_array = separated_dict[max_name][limit:]
             separated_dict[max_name] = separated_dict[max_name][:limit]
             rest_count -= len(duplicated_array)
-            logging.debug(
-                f'Cannot toss, {max_count} elements from {len(persons)} have property: '
-                f'{self.get_split_property(duplicated_array[0], split_teams, split_regions)}'
-                f'in group {duplicated_array[0].group.name}'
-            )
 
         cur_index = 0
         while max_count > 0:

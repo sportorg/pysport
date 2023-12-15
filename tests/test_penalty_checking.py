@@ -420,9 +420,10 @@ def get_penalty(result: ResultSportident) -> int:
         return result.penalty_laps
     elif marked_route_mode == 'time':
         penalty_time = race().get_setting('marked_route_penalty_time', 60000)
-        return result.penalty_time.to_msec() / penalty_time
-    else:
-        return 0
+        if result.penalty_time:
+            return result.penalty_time.to_msec() / penalty_time
+
+    return 0
 
 
 def exception_message(

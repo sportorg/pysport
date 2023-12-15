@@ -1,22 +1,28 @@
-from datetime import datetime
+from datetime import datetime, timezone
+from typing import Union
 
 from lxml.builder import E
 from lxml.etree import Element, ElementTree
 
+from sportorg.common.otime import OTime
 from sportorg.models.memory import Race, ResultStatus
 from sportorg.models.result.result_calculation import ResultCalculation
 
 
-def otime_to_str(race_obj, otime):
+def make_create_time() -> str:
+    return datetime.now(timezone.utc).isoformat(timespec='seconds')
+
+
+def otime_to_str(obj: Race, otime: OTime) -> str:
     """
     Convert time to the date string, expressed in ISO 8601 format.
     Day is taken from settings of race
     """
-    day = race_obj.data.get_start_datetime()
+    day = obj.data.get_start_datetime()
     return day.strftime('%Y-%m-%d') + 'T' + otime.to_str(3)
 
 
-def get_iof_status(status):
+def get_iof_status(status: Union[int, ResultStatus]) -> str:
     """Convert to IOF status string"""
     if status == 1 or status == ResultStatus.OK or status == ResultStatus.RESTORED:
         return 'OK'
@@ -28,7 +34,9 @@ def get_iof_status(status):
     return 'Disqualified'
 
 
-def generate_result_list(obj, creator: str, all_splits: bool = False):
+def generate_result_list(
+    obj: Race, creator: str, all_splits: bool = False
+) -> ElementTree:
     """Generate the IOF XML ResultList string from the race data"""
 
     xmlns = 'http://www.orienteering.org/datastandard/3.0'
@@ -39,7 +47,7 @@ def generate_result_list(obj, creator: str, all_splits: bool = False):
         nsmap={'xsi': xsi, None: xmlns},
         iofVersion='3.0',
         creator=creator,
-        createTime=datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),
+        createTime=make_create_time(),
     )
     xml_rl.append(generate_evant(obj))
 
@@ -123,7 +131,7 @@ def generate_result_list(obj, creator: str, all_splits: bool = False):
     return ElementTree(xml_rl)
 
 
-def generate_entry_list(obj, creator: str):
+def generate_entry_list(obj: Race, creator: str) -> ElementTree:
     """Generate the IOF XML EntryList string from the race data"""
 
     xmlns = 'http://www.orienteering.org/datastandard/3.0'
@@ -134,7 +142,7 @@ def generate_entry_list(obj, creator: str):
         nsmap={'xsi': xsi, None: xmlns},
         iofVersion='3.0',
         creator=creator,
-        createTime=datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),
+        createTime=make_create_time(),
     )
     xml_el.append(generate_evant(obj))
 
@@ -153,46 +161,42 @@ def generate_entry_list(obj, creator: str):
     return ElementTree(xml_el)
 
 
-def generate_start_list(obj, creator: str):
+def generate_start_list(obj: Race, creator: str) -> ElementTree:
     """Generate the IOF XML StartList string from the race data"""
 
-    if isinstance(obj, Race):
-        xmlns = 'http://www.orienteering.org/datastandard/3.0'
-        xsi = 'http://www.w3.org/2001/XMLSchema-instance'
+    xmlns = 'http://www.orienteering.org/datastandard/3.0'
+    xsi = 'http://www.w3.org/2001/XMLSchema-instance'
 
-        xml_sl = Element(
-            '{' + xmlns + '}StartList',
-            nsmap={'xsi': xsi, None: xmlns},
-            iofVersion='3.0',
-            creator=creator,
-            createTime=datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),
-        )
-        xml_sl.append(generate_evant(obj))
+    xml_sl = Element(
+        '{' + xmlns + '}StartList',
+        nsmap={'xsi': xsi, None: xmlns},
+        iofVersion='3.0',
+        creator=creator,
+        createTime=make_create_time(),
+    )
+    xml_sl.append(generate_evant(obj))
 
-        for group in obj.groups:
-            # Generate ClassStart and Class objects for each group
-            xml_cs = E.ClassStart(generate_class(group))
-            xml_sl.append(xml_cs)
+    for group in obj.groups:
+        # Generate ClassStart and Class objects for each group
+        xml_cs = E.ClassStart(generate_class(group))
+        xml_sl.append(xml_cs)
 
-            if not group.is_relay():
-                # individual race - PersonStart object
-                for person in obj.get_persons_by_group(group):
-                    # generate Start
-                    xml_start = E.Start(
-                        E.StartTime(otime_to_str(obj, person.start_time)),
-                        E.BibNumber(str(person.bib) if person.bib else ''),
-                        E.ControlCard(str(person.card_number)),
-                    )
-                    # compose PersonStart from organization, person and result
-                    xml_person_start = E.PersonStart(
-                        generate_person(person),
-                        generate_organization(person.organization),
-                        xml_start,
-                    )
-                    xml_cs.append(xml_person_start)
-
-            else:
-                pass
+        if not group.is_relay():
+            # individual race - PersonStart object
+            for person in obj.get_persons_by_group(group):
+                # generate Start
+                xml_start = E.Start(
+                    E.StartTime(otime_to_str(obj, person.start_time)),
+                    E.BibNumber(str(person.bib) if person.bib else ''),
+                    E.ControlCard(str(person.card_number)),
+                )
+                # compose PersonStart from organization, person and result
+                xml_person_start = E.PersonStart(
+                    generate_person(person),
+                    generate_organization(person.organization),
+                    xml_start,
+                )
+                xml_cs.append(xml_person_start)
 
     return ElementTree(xml_sl)
 
@@ -209,7 +213,7 @@ def generate_competitor_list(obj, creator: str):
             nsmap={'xsi': xsi, None: xmlns},
             iofVersion='3.0',
             creator=creator,
-            createTime=datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),
+            createTime=make_create_time(),
         )
         xml_cl.append(generate_evant(obj))
 

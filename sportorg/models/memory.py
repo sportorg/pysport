@@ -6,7 +6,7 @@ import uuid
 from abc import abstractmethod
 from datetime import date
 from enum import Enum, IntEnum
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
 import dateutil.parser
 
@@ -35,18 +35,18 @@ class SystemType(Enum):
     RFID_IMPINJ = 5
     SRPID = 6
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self._name_
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.__str__()
 
 
 class _TitleType(Enum):
-    def __str__(self):
+    def __str__(self) -> str:
         return self._name_
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.__str__()
 
     def get_title(self):
@@ -106,13 +106,13 @@ class Organization(Model):
         self.count_person = 0
         self.count_finished = 0
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return 'Organization {}'.format(self.name)
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, Any]:
         return {
             'object': self.__class__.__name__,
             'id': str(self.id),
@@ -129,7 +129,7 @@ class Organization(Model):
             'sex': 0,
         }
 
-    def update_data(self, data):
+    def update_data(self, data: Dict[str, Any]) -> None:
         self.name = str(data['name']) if 'name' in data else ''
         self.country = str(data['country']) if 'country' in data else ''
         self.region = str(data['region']) if 'region' in data else ''
@@ -143,13 +143,13 @@ class CourseControl(Model):
         self.length = 0
         self.order = 0
 
-    def __str__(self):
+    def __str__(self) -> str:
         return '{} {}'.format(self.code, self.length)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.__str__()
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         return self.code == other.code
 
     def get_number_code(self) -> str:
@@ -216,10 +216,10 @@ class Course(Model):
         self.count_person = 0
         self.count_finished = 0
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return 'Course {} {}'.format(self.name, repr(self.controls))
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if len(self.controls) != len(other.controls):
             return False
         for i in range(len(self.controls)):
@@ -271,7 +271,7 @@ class Group(Model):
     def __init__(self):
         self.id = uuid.uuid4()
         self.name = ''
-        self.course = None  # type: Course
+        self.course: Optional[Course] = None
         self.is_any_course = False
         self.price = 0
         self.long_name = ''
@@ -293,10 +293,10 @@ class Group(Model):
         self.pursuit_start_time = OTime()
 
         self.ranking = Ranking()
-        self.__type = None  # type: RaceType
+        self.__type: Optional[RaceType] = None
         self.relay_legs = 0
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return 'Group {}'.format(self.name)
 
     def get_count_finished(self):
@@ -380,9 +380,9 @@ class Split(Model):
         self.course_index = -1
         self.code = ''
         self.days = 0
-        self._time = OTime()  # type: OTime
-        self.leg_time = OTime()  # type: OTime
-        self.relative_time = OTime()  # type: OTime
+        self._time: OTime = OTime()
+        self.leg_time: OTime = OTime()
+        self.relative_time: OTime = OTime()
         self.leg_place = 0
         self.relative_place = 0
         self.is_correct = True
@@ -403,7 +403,7 @@ class Split(Model):
             value = OTime()
         self._time = value
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if self.code == 0 or other.code == 0:
             return False
         if self.time is None or other.time is None:
@@ -457,13 +457,13 @@ class Result:
         self.id = uuid.uuid4()
         self.days = 0
         self.bib = 0
-        self.start_time = None  # type: OTime
-        self.finish_time = OTime.now()  # type: OTime
-        self.person = None  # type: Person
+        self.start_time: Optional[OTime] = None
+        self.finish_time: OTime = OTime.now()
+        self.person: Optional[Person] = None
         self.status = ResultStatus.OK
         self.status_comment = ''
-        self.penalty_time = None  # type: OTime
-        self.credit_time = None  # type: OTime
+        self.penalty_time: Optional[OTime] = None
+        self.credit_time: Optional[OTime] = None
         self.penalty_laps = 0  # count of penalty legs (marked route)
         self.place = 0
         self.scores = 0
@@ -477,7 +477,7 @@ class Result:
         self.final_result_time: Optional[OTime] = None  # real time, when nobody can win
 
         self.card_number = 0
-        self.splits = []  # type: List[Split]
+        self.splits: List[Split] = []
         self.__start_time = None
         self.__finish_time = None
 
@@ -488,13 +488,13 @@ class Result:
 
         self.order = 0  # Order number, introduced in 1.6, needed for result templates to sort results correctly
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.system_type)
 
-    def __repr__(self):
-        return 'Result {} {}'.format(self.system_type, self.status)
+    def __repr__(self) -> str:
+        return f'Result {self.system_type} {self.status}'
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         eq = self.system_type and other.system_type
 
         if race().get_setting('result_processing_mode', 'time') == 'time':
@@ -512,9 +512,9 @@ class Result:
                 eq = eq and self.get_finish_time() == other.get_finish_time()
             else:
                 return False
-        return eq
+        return bool(eq)
 
-    def __gt__(self, other):  # greater is worse
+    def __gt__(self, other) -> bool:  # greater is worse
         if self.is_status_ok() != other.is_status_ok():
             return other.is_status_ok()
         elif self.status != other.status and not self.is_status_ok():
@@ -627,15 +627,15 @@ class Result:
                 split.update_data(item)
                 self.splits.append(split)
 
-    def clear(self):
+    def clear(self) -> None:
         pass
 
-    def get_bib(self):
+    def get_bib(self) -> int:
         if self.person:
             return self.person.bib
         return self.bib
 
-    def get_result(self):
+    def get_result(self) -> str:
         if not self.is_status_ok():
             if self.status_comment:
                 return self.status_comment
@@ -646,7 +646,7 @@ class Result:
 
         ret = ''
         if race().get_setting('result_processing_mode', 'time') == 'scores':
-            ret += str(self.scores_rogain) + ' ' + translate('points') + ' '
+            ret += f"{self.scores_rogain} {translate('points')} "
 
         time_accuracy = race().get_setting('time_accuracy', 0)
         ret += self.get_result_otime().to_str(time_accuracy)
@@ -663,7 +663,7 @@ class Result:
 
         ret = ''
         if race().get_setting('result_processing_mode', 'time') == 'scores':
-            ret += str(self.scores_rogain) + ' ' + translate('points') + ' '
+            ret += f"{self.scores_rogain} {translate('points')} "
 
         # time_accuracy = race().get_setting('time_accuracy', 0)
         start = hhmmss_to_time(self.person.comment)
@@ -672,7 +672,7 @@ class Result:
         ret += str(self.get_finish_time() - start)
         return ret
 
-    def get_result_relay(self):
+    def get_result_relay(self) -> str:
         if not self.is_status_ok():
             if self.status_comment:
                 return self.status_comment
@@ -697,7 +697,7 @@ class Result:
 
         ret = ''
         if race().get_setting('result_processing_mode', 'time') == 'scores':
-            ret += str(self.scores_rogain) + ' ' + translate('points') + ' '
+            ret += f"{self.scores_rogain} {translate('points')} "
 
         time_accuracy = race().get_setting('time_accuracy', 0)
         ret += self.get_result_otime_relay().to_str(time_accuracy)
@@ -797,18 +797,18 @@ class Result:
                     return first_leg_person.start_time
         return OTime()
 
-    def get_finish_time(self):
+    def get_finish_time(self) -> OTime:
         if self.finish_time:
             return self.finish_time
 
         return OTime.now()
 
-    def get_penalty_time(self):
+    def get_penalty_time(self) -> OTime:
         if self.penalty_time:
             return self.penalty_time
         return OTime()
 
-    def get_credit_time(self):
+    def get_credit_time(self) -> OTime:
         if self.credit_time:
             return self.credit_time
         return OTime()
@@ -885,17 +885,16 @@ class Result:
             self.final_result_time = max_unfinished_start_time + self.get_result_otime()
 
     def get_multi_day_result_str(self):
-        # get
         ret = ''
         for cur_res in self.get_multi_days():
             ret += format_result(cur_res, 14)
         return ret
 
-    def get_multi_days(self):  # Type = List[Result]
+    def get_multi_days(self) -> List['Result']:
         """
         Get list of multi day results, None if group type not Multi Day
         Returns:
-            List[Result]:
+            list[Result]:
         """
         ret = []
         if (
@@ -906,7 +905,8 @@ class Result:
             person_id = self.person.multi_day_id
             for day in races():
                 cur_res: Result = day.find_result_by_person_id(person_id)
-                ret.append(cur_res)
+                if cur_res:
+                    ret.append(cur_res)
         return ret
 
 
@@ -922,16 +922,22 @@ class ResultSportident(Result):
         self.__start_time = None
         self.__finish_time = None
 
-    def __repr__(self):
-        splits = ''
-        for split in self.splits:
-            splits += '{} — {}\n'.format(split.code, split.length_leg)
-        person = self.person.full_name if self.person else ''
-        return 'Card: {}\nStart: {}\nFinish: {}\nPerson: {}\nSplits:\n{}'.format(
-            self.card_number, self.start_time, self.finish_time, person, splits
+    def __repr__(self) -> str:
+        splits = '\n'.join(
+            f'{split.code} — {split.length_leg}' for split in self.splits
         )
 
-    def __eq__(self, other):
+        person = self.person.full_name if self.person else ''
+        return (
+            f'Card: {self.card_number}\n'
+            f'Start: {self.start_time}\n'
+            f'Finish: {self.finish_time}\n'
+            f'Person: {person}\n'
+            'Splits:\n'
+            f'{splits}'
+        )
+
+    def __eq__(self, other) -> bool:
         eq = self.card_number == other.card_number and super().__eq__(other)
         if len(self.splits) == len(other.splits):
             for i in range(len(self.splits)):
@@ -983,7 +989,7 @@ class ResultSportident(Result):
 
         return OTime()
 
-    def get_finish_time(self):
+    def get_finish_time(self) -> OTime:
         obj = race()
         finish_source = obj.get_setting('system_finish_source', 'station')
         if finish_source == 'station':
@@ -1241,26 +1247,24 @@ class Person(Model):
         self.card_number = 0
         self.bib = 0
 
-        self.birth_date = None  # type: date
-        self.organization = None  # type: Organization
-        self.group = None  # type: Group
+        self.birth_date: Optional[date] = None
+        self.organization: Optional[Organization] = None
+        self.group: Optional[Group] = None
         self.world_code = ''  # WRE ID for orienteering and the same
         self.national_code = 0
-        self.qual = (
-            Qualification.NOT_QUALIFIED
-        )  # type: Qualification # 'qualification, used in Russia only'
+        self.qual: Qualification = Qualification.NOT_QUALIFIED
         self.is_out_of_competition = False  # e.g. 20-years old person, running in M12
         self.is_paid = False
         self.is_rented_card = False
         self.is_personal = False
         self.comment = ''
 
-        self.start_time = OTime(0)  # type: OTime
+        self.start_time: OTime = OTime(0)
         self.start_group = 0
         self.result_count = 0
 
-    def __repr__(self):
-        return '{} {} {}'.format(self.full_name, self.bib, self.group)
+    def __repr__(self) -> str:
+        return f'{self.full_name} {self.bib} {self.group}'
 
     @property
     def year(self):
@@ -1289,15 +1293,14 @@ class Person(Model):
 
     @property
     def full_name(self):
-        surname = self.surname
-        if surname:
-            surname += ' '
-        return '{}{}'.format(surname, self.name)
+        if self.surname:
+            return f'{self.surname} {self.name}'
+        return self.name
 
     @property
     def multi_day_id(self):
         if self.group:
-            return self.full_name + ' ' + self.group.name
+            return f'{self.full_name} {self.group.name}'
         else:
             return self.full_name
 
@@ -1382,11 +1385,11 @@ class RaceData(Model):
         self.secretary = ''
         self.url = ''
         self.race_type = RaceType.INDIVIDUAL_RACE
-        self.start_datetime = None  # type: datetime
-        self.end_datetime = None  # type: datetime
+        self.start_datetime: Optional[datetime.datetime] = None
+        self.end_datetime: Optional[datetime.datetime] = None
         self.relay_leg_count = 3
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return 'Race {}'.format(self.title)
 
     def get_start_datetime(self):
@@ -1453,23 +1456,23 @@ class Race(Model):
     def __init__(self):
         self.id = uuid.uuid4()
         self.data = RaceData()
-        self.organizations = []  # type: List[Organization]
-        self.courses = []  # type: List[Course]
-        self.groups = []  # type: List[Group]
-        self.results = []  # type: List[Result]
-        self.persons = []  # type: List[Person]
-        self.relay_teams = []  # type: List[RelayTeam]
-        self.settings = {}  # type: Dict[str, Any]
-        self.controls = []  # type: List[ControlPoint]
-        self.result_index = {}  # type: Dict[str, Result]
-        self.person_index_bib = {}  # type: Dict[int, Person]
-        self.person_index_card = {}  # type: Dict[int, Person]
-        self.person_index = {}  # type: Dict[str, Result]
-        self.group_index = {}  # type: Dict[str, Result]
-        self.organization_index = {}  # type: Dict[str, Result]
-        self.course_index = {}  # type: Dict[str, Result]
+        self.organizations: List[Organization] = []
+        self.courses: List[Course] = []
+        self.groups: List[Group] = []
+        self.results: List[Result] = []
+        self.persons: List[Person] = []
+        self.relay_teams: List[RelayTeam] = []
+        self.settings: Dict[str, Any] = {}
+        self.controls: List[ControlPoint] = []
+        self.result_index: Dict[str, Result] = {}
+        self.person_index_bib: Dict[int, Person] = {}
+        self.person_index_card: Dict[int, Person] = {}
+        self.person_index: Dict[str, Result] = {}
+        self.group_index: Dict[str, Result] = {}
+        self.organization_index: Dict[str, Result] = {}
+        self.course_index: Dict[str, Result] = {}
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return repr(self.data)
 
     @property
@@ -1703,10 +1706,10 @@ class Race(Model):
             del self.results[i]
         return results
 
-    def delete_groups(self, indexes):
+    def delete_groups(self, indexes: List[int]) -> List[Group]:
         groups = []
         for i in indexes:
-            group = self.groups[i]  # type: Group
+            group = self.groups[i]
             if group.count_person > 0:
                 raise NotEmptyException('Cannot remove group')
             groups.append(group)
@@ -1716,10 +1719,10 @@ class Race(Model):
             del self.groups[i]
         return groups
 
-    def delete_courses(self, indexes):
+    def delete_courses(self, indexes: List[int]) -> List[Course]:
         courses = []
         for i in indexes:
-            course = self.courses[i]  # type: Course
+            course = self.courses[i]
             if course.count_group > 0:
                 raise NotEmptyException('Cannot remove course')
             courses.append(course)
@@ -1729,10 +1732,10 @@ class Race(Model):
             del self.courses[i]
         return courses
 
-    def delete_organizations(self, indexes):
+    def delete_organizations(self, indexes: List[int]) -> List[Organization]:
         organizations = []
         for i in indexes:
-            organization = self.organizations[i]  # type: Organization
+            organization = self.organizations[i]
             if organization.count_person > 0:
                 raise NotEmptyException('Cannot remove organization')
             organizations.append(organization)
@@ -1742,7 +1745,7 @@ class Race(Model):
             del self.organizations[i]
         return organizations
 
-    def find_person_result(self, person):
+    def find_person_result(self, person: Person) -> Optional[Result]:
         for i in self.results:
             if i.person is person:
                 return i
@@ -1758,24 +1761,26 @@ class Race(Model):
             return self.person_index_card[card]
         return None
 
-    def find_course(self, result):
+    def find_course(self, result: Result) -> Optional[Course]:
         # first get course by number
         person = result.person
-        if person:
-            bib = person.bib
-            ret = find(self.courses, name=str(bib))
-            if not ret and bib > 1000:
-                course_name = '{}.{}'.format(bib % 1000, bib // 1000)
-                ret = find(self.courses, name=course_name)
-            # usual connection via group
-            if not ret and person.group:
-                if person.group.is_any_course:
-                    for course in self.courses:
-                        if result.check(course):
-                            return course
-                else:
-                    ret = person.group.course
-            return ret
+        if not person:
+            return None
+
+        bib = person.bib
+        ret = find(self.courses, name=str(bib))
+        if not ret and bib > 1000:
+            course_name = '{}.{}'.format(bib % 1000, bib // 1000)
+            ret = find(self.courses, name=course_name)
+        # usual connection via group
+        if not ret and person.group:
+            if person.group.is_any_course:
+                for course in self.courses:
+                    if result.check(course):
+                        return course
+            else:
+                ret = person.group.course
+        return ret
 
     def find_group(self, group_name):
         # get group by name
@@ -1790,11 +1795,12 @@ class Race(Model):
     def find_team(self, team_name):
         return self.find_organization(team_name)
 
-    def get_course_splits(self, result):
-        """List[Split]"""
+    def get_course_splits(self, result: Result) -> List[Split]:
         if not result.person:
             return result.get_course_splits()
-        course = self.find_course(result)  # type: Course
+        course: Optional[Course] = self.find_course(result)
+        if not course:
+            return []
         return result.get_course_splits(course)
 
     def new_result(self, obj=None):
@@ -1877,9 +1883,8 @@ class Race(Model):
     def get_persons_by_corridor(self, corridor):
         ret = []
         for person in self.persons:
-            if person.group:
-                if person.group.start_corridor == corridor:
-                    ret.append(person)
+            if person.group and person.group.start_corridor == corridor:
+                ret.append(person)
         return ret
 
     def add_new_result(self, result):
@@ -1899,12 +1904,10 @@ class Race(Model):
         self.results.insert(0, result)
 
     def add_result(self, result):
-        add = True
         for r in self.results:
             if r is result:
-                add = False
                 break
-        if add:
+        else:
             self.add_new_result(result)
 
     def clear_results(self):
@@ -2165,10 +2168,10 @@ class RelayLeg:
         self.course = None  # optional link to the course, prefer to use variant and bib to find course
         self.team = team
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         return self.leg == other.leg
 
-    def __gt__(self, other):
+    def __gt__(self, other) -> bool:
         return self.leg > other.leg
 
     def get_course(self):
@@ -2308,8 +2311,8 @@ class RelayLeg:
 class RelayTeam:
     def __init__(self, r):
         self.race = r
-        self.group = None  # type: Group
-        self.legs = []  # type: List[RelayLeg]
+        self.group: Optional[Group] = None
+        self.legs: List[RelayLeg] = []
         self.description = ''  # Name of team, optional
         self.bib_number = None  # bib
         self.last_finished_leg = 0
@@ -2317,14 +2320,14 @@ class RelayTeam:
         self.place = 0
         self.order = 0
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if self.get_is_status_ok() == other.get_is_status_ok():
             if self.get_correct_lap_count() == other.get_correct_lap_count():
                 if self.get_time() == other.get_time():
                     return True
         return False
 
-    def __gt__(self, other):
+    def __gt__(self, other) -> bool:
         if self.get_is_status_ok() and not other.get_is_status_ok():
             return False
 

@@ -66,7 +66,7 @@ class SportorgPrinter:
             # Printing of bib and penalty for Russian marked route with penalty laps
             self.print_penalty_laps(result)
 
-    def print_penalty_laps(self, result: Result):
+    def print_penalty_laps(self, result: Result) -> None:
         person = result.person
         if person is None:
             return
@@ -78,8 +78,8 @@ class SportorgPrinter:
             self.print_line('.', 'Arial', 1)  # empty vertical space
         self.print_penalty_line(result)
 
-    def print_bib_line(self, result: Result):
-        text = str(result.person.bib)
+    def print_bib_line(self, result: Result) -> None:
+        text = str(result.person.bib) if result.person else ''
 
         font_name = 'Arial Black'
         font_size = 50
@@ -93,11 +93,11 @@ class SportorgPrinter:
             }
         )
         self.dc.SelectObject(font)
-        self.dc.TextOut(self.x, self.y, str(text))
+        self.dc.TextOut(self.x, self.y, text)
 
         self.move_cursor(font_size * 1.3)
 
-    def print_penalty_line(self, result: Result):
+    def print_penalty_line(self, result: Result) -> None:
         laps = result.penalty_laps
         if not result.is_status_ok():
             laps = max(
