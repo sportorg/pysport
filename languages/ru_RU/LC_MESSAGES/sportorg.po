@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: SportOrg\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-04-12 11:13+0300\n"
-"PO-Revision-Date: 2023-08-27 15:09+0500\n"
+"PO-Revision-Date: 2023-12-17 19:16+0500\n"
 "Last-Translator: SportOrg\n"
 "Language-Team: SportOrg\n"
 "Language: ru_RU\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Loco-Source-Locale: ru_RU\n"
-"X-Generator: Poedit 3.3.2\n"
+"X-Generator: Poedit 3.4.1\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Loco-Parser: loco_parse_po\n"
 "X-Poedit-Basepath: ../../../sportorg\n"
@@ -1568,3 +1568,30 @@ msgstr "Ошибка открытия файла. Файл уже открыт �
 
 msgid "Multi day race"
 msgstr "Многодневная гонка"
+
+msgid "SportOrg HTML"
+msgstr "Файл HTML, SportOrg"
+
+msgid "SportOrg HTML report (*.html)"
+msgstr "Файл HTML, SportOrg (*.html)"
+
+msgid "Open SportOrg HTML file"
+msgstr "Открыть файл HTML, SportOrg"
+
+msgid "SportOrg SI log"
+msgstr "Файл лога чипов, SportOrg"
+
+msgid "SportOrg SI log (*.log)"
+msgstr "Файл лога чипов, SportOrg (*.log)"
+
+msgid "Open SportOrg SI log file"
+msgstr "Открыть файл лога чипов, SportOrg"
+
+msgid "SPORTident master station CSV"
+msgstr "Файл CSV мастер-станции SPORTident"
+
+msgid "CSV file (*.csv)"
+msgstr "Файл CSV (*.csv)"
+
+msgid "Open SPORTident master station backup file"
+msgstr "Открыть файл CSV мастер-станции SPORTident"

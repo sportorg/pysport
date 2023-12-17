@@ -16,7 +16,7 @@ from sportorg.modules.backup.json import get_races_from_file
 def recovery():
 
     file_name = get_open_file_name(
-        translate('Open SportOrg html file'), translate('SportOrg html report (*.html)'), False
+        translate('Open SportOrg HTML file'), translate('SportOrg HTML report (*.html)'), False
     )
 
     text_file = open(file_name, "r", encoding="utf-8")
