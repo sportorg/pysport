@@ -1,0 +1,12 @@
+{
+    "type": "record",
+    "name": "Organization",
+    "fields": [
+        { "name": "id", "type": "string" },
+        { "name": "name", "type": "string" },
+        { "name": "country", "type": "string" },
+        { "name": "region", "type": "string" },
+        { "name": "contact", "type": "string" },
+        { "name": "code", "type": "string" }
+    ]
+}

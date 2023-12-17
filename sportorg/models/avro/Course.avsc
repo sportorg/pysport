@@ -1,0 +1,26 @@
+{
+    "type": "record",
+    "name": "Course",
+    "fields": [
+        { "name": "id", "type": "string" },
+        { "name": "bib", "type": "int" },
+        { "name": "name", "type": "string" },
+        { "name": "lenght", "type": "int" },
+        { "name": "climb", "type": "int" },
+        { "name": "corridor", "type": "int" },
+        {
+            "name": "controls",
+            "type": {
+                "type": "array",
+                "items": {
+                    "type": "record",
+                    "name": "CourseControl",
+                    "fields": [
+                        { "name": "code", "type": "string" },
+                        { "name": "length", "type": "int" }
+                    ]
+                }
+            }
+        }
+    ]
+}

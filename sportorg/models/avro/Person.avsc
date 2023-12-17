@@ -1,0 +1,28 @@
+{
+    "type": "record",
+    "name": "Person",
+    "fields": [
+        { "name": "id", "type": "string" },
+        { "name": "name", "type": "string" },
+        { "name": "surname", "type": "string" },
+        { "name": "card_number", "type": "int" },
+        { "name": "bib", "type": "int" },
+        {
+            "name": "birth_date",
+            "type": ["null", { "type": "int", "logicalType": "date" }]
+        },
+        { "name": "year", "type": "int" },
+        { "name": "group_id", "type": ["null", "string"] },
+        { "name": "organization_id", "type": ["null", "string"] },
+        { "name": "world_code", "type": ["null", "string"] },
+        { "name": "national_code", "type": ["null", "int"] },
+        { "name": "qual", "type": "int" },
+        { "name": "is_out_of_competition", "type": "boolean" },
+        { "name": "is_paid", "type": "boolean" },
+        { "name": "is_rented_card", "type": "boolean" },
+        { "name": "is_personal", "type": "boolean" },
+        { "name": "comment", "type": "string" },
+        { "name": "start_time", "type": ["null", "int"] },
+        { "name": "start_group", "type": "int" }
+    ]
+}

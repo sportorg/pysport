@@ -1,0 +1,37 @@
+{
+    "type": "record",
+    "name": "Result",
+    "fields": [
+        { "name": "id", "type": "string" },
+        { "name": "bib", "type": "int" },
+        { "name": "system_type", "type": "int" },
+        { "name": "person_id", "type": ["null", "string"] },
+        { "name": "days", "type": "int" },
+        { "name": "start_time", "type": ["null", "int"] },
+        { "name": "finish_time", "type": ["null", "int"] },
+        { "name": "diff", "type": ["null", "int"] },
+        { "name": "diff_scores", "type": "int" },
+        { "name": "penalty_time", "type": ["null", "int"] },
+        { "name": "credit_time", "type": ["null", "int"] },
+        { "name": "status", "type": "int" },
+        { "name": "status_comment", "type": "string" },
+        { "name": "penalty_laps", "type": "int" },
+        { "name": "place", "type": "int" },
+        { "name": "assigned_rank", "type": "int" },
+        {
+            "name": "splits",
+            "type": {
+                "type": "array",
+                "items": {
+                    "type": "record",
+                    "name": "Split",
+                    "fields": []
+                }
+            }
+        },
+        { "name": "card_number", "type": "int" },
+        { "name": "can_win_count", "type": "int" },
+        { "name": "final_result_time", "type": ["null", "string"] },
+        { "name": "order", "type": "int" }
+    ]
+}

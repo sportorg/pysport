@@ -1,0 +1,36 @@
+{
+    "type": "record",
+    "name": "Group",
+    "fields": [
+        { "name": "id", "type": "string" },
+        { "name": "name", "type": "string" },
+        { "name": "course_id", "type": ["null", "string"] },
+        { "name": "is_any_course", "type": "boolean" },
+        { "name": "long_name", "type": "string" },
+        { "name": "price", "type": "int" },
+        { "name": "min_year", "type": "int" },
+        { "name": "max_year", "type": "int" },
+        { "name": "min_age", "type": "int" },
+        { "name": "max_age", "type": "int" },
+        { "name": "max_time", "type": "int" },
+        { "name": "start_interval", "type": "int" },
+        { "name": "start_corridor", "type": "int" },
+        { "name": "order_in_corridor", "type": "int" },
+        { "name": "first_number", "type": "int" },
+        { "name": "relay_legs", "type": "int" },
+        {
+            "name": "ranking",
+            "type": [
+                "null",
+                {
+                    "name": "Ranking",
+                    "type": "record",
+                    "fields": [
+                        { "name": "is_active", "type": "boolean" },
+                        { "name": "rank_scores", "type": "int" }
+                    ]
+                }
+            ]
+        }
+    ]
+}
