@@ -1,4 +1,5 @@
 from sportorg.common.otime import OTime
+
 DEF_START_TIME = OTime(hour=8)
 
 

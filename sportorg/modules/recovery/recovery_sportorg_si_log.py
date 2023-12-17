@@ -31,7 +31,7 @@ end
 from sportorg.common.otime import OTime
 from sportorg.gui.dialogs.file_dialog import get_open_file_name
 from sportorg.language import translate
-from sportorg.models.memory import race, ResultSportident, Split
+from sportorg.models.memory import ResultSportident, Split, race
 from sportorg.modules.sportident.fix_time_sicard_5 import fix_time
 from sportorg.utils.time import hhmmss_to_time
 
@@ -40,13 +40,17 @@ race = race()
 
 def recovery():
     zero_time_val = race.get_setting('system_zero_time', (8, 0, 0))
-    zero_time = OTime(hour=zero_time_val[0], minute=zero_time_val[1], sec=zero_time_val[2])
-
-    file_name = get_open_file_name(
-        translate('Open SportOrg SI log file'), translate('SportOrg SI log (*.log)'), False
+    zero_time = OTime(
+        hour=zero_time_val[0], minute=zero_time_val[1], sec=zero_time_val[2]
     )
 
-    text_file = open(file_name, "r")
+    file_name = get_open_file_name(
+        translate('Open SportOrg SI log file'),
+        translate('SportOrg SI log (*.log)'),
+        False,
+    )
+
+    text_file = open(file_name, 'r')
     lines = text_file.readlines()
 
     cur_res = ResultSportident()
@@ -81,6 +85,6 @@ def recovery():
             read_spl = False
         elif read_spl:
             spl = Split()
-            spl.code = line.split(" ")[0]
-            spl.time = hhmmss_to_time(line.split(" ")[1])
+            spl.code = line.split(' ')[0]
+            spl.time = hhmmss_to_time(line.split(' ')[1])
             cur_res.splits.append(spl)

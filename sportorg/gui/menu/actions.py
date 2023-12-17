@@ -59,7 +59,11 @@ from sportorg.modules.iof import iof_xml
 from sportorg.modules.live.live import live_client
 from sportorg.modules.ocad import ocad
 from sportorg.modules.ocad.ocad import OcadImportException
-from sportorg.modules.recovery import recovery_sportorg_html, recovery_sportorg_si_log, recovery_si_master_csv
+from sportorg.modules.recovery import (
+    recovery_si_master_csv,
+    recovery_sportorg_html,
+    recovery_sportorg_si_log,
+)
 from sportorg.modules.rfid_impinj.rfid_impinj import ImpinjClient
 from sportorg.modules.sfr.sfrreader import SFRReaderClient
 from sportorg.modules.sportident.sireader import SIReaderClient

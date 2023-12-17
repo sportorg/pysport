@@ -20,7 +20,7 @@ DOW;Finish_r time;Class;First name;Last name;Club;Country;Email;Date of birth;Se
 from sportorg.common.otime import OTime
 from sportorg.gui.dialogs.file_dialog import get_open_file_name
 from sportorg.language import translate
-from sportorg.models.memory import race, ResultSportident, Split
+from sportorg.models.memory import ResultSportident, Split, race
 from sportorg.modules.sportident.fix_time_sicard_5 import fix_time
 from sportorg.utils.time import hhmmss_to_time
 
@@ -32,24 +32,27 @@ race = race()
 
 
 def recovery():
-
     file_name = get_open_file_name(
-        translate('Open SPORTident master station backup file'), translate('CSV file (*.csv)'), False
+        translate('Open SPORTident master station backup file'),
+        translate('CSV file (*.csv)'),
+        False,
     )
 
-    text_file = open(file_name, "r")
+    text_file = open(file_name, 'r')
     lines = text_file.readlines()
 
-    separator = ";"
+    separator = ';'
 
     zero_time_val = race.get_setting('system_zero_time', (8, 0, 0))
-    zero_time = OTime(hour=zero_time_val[0], minute=zero_time_val[1], sec=zero_time_val[2])
+    zero_time = OTime(
+        hour=zero_time_val[0], minute=zero_time_val[1], sec=zero_time_val[2]
+    )
 
     for line in lines:
         print(line)
 
         tokens = line.split(separator)
-        if tokens[0] == "No" or len(tokens) < 45:
+        if tokens[0] == 'No' or len(tokens) < 45:
             continue
 
         res = ResultSportident()
