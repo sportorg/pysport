@@ -10,7 +10,6 @@ from tempfile import gettempdir
 
 
 def recovery(file_name):
-
     with open(file_name, 'r', encoding='utf-8') as f:
         for line in f.readlines():
             if line.find("var race = {\"courses\":") > -1:
