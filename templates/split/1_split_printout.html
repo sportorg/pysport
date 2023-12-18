@@ -176,7 +176,7 @@
         </table>
         <br> Финиш: {{result.finish_msec|tohhmmss}} {{result.speed}}
         {% if race['settings'].get('marked_route_mode', 'off') == 'laps' %}
-        <br> Штраф: {{result.penalty_laps}} круг{{result.penalty_laps|plural}}
+        <br> Штрафных кругов: {{result.penalty_laps}}
         {% elif race['settings'].get('marked_route_mode', 'off') == 'time' %}
         <br> Штраф: {{result.penalty_time|tohhmmss}}
         {% endif %}
