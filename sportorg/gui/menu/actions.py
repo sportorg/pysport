@@ -2,6 +2,7 @@ import logging
 import socket
 import time
 import uuid
+from os import remove
 from typing import Any, Dict, Type
 
 from PySide2 import QtCore
@@ -352,19 +353,38 @@ class IOFCompetitorListExportAction(Action, metaclass=ActionFactory):
 
 class RecoverySportorgHtmlAction(Action, metaclass=ActionFactory):
     def execute(self):
-        recovery_sportorg_html.recovery()
+        file_name = get_open_file_name(
+            translate('Open SportOrg HTML file'),
+            translate('SportOrg HTML report (*.html)'),
+            False,
+        )
+        tmp_filename = recovery_sportorg_html.recovery(file_name)
+        with open(tmp_filename) as f:
+            attr = get_races_from_file(f)
+        SportOrgImportDialog(*attr).exec_()
+        remove(tmp_filename)
         self.app.refresh()
 
 
 class RecoverySportorgSiLogAction(Action, metaclass=ActionFactory):
     def execute(self):
-        recovery_sportorg_si_log.recovery()
+        file_name = get_open_file_name(
+            translate('Open SportOrg SI log file'),
+            translate('SportOrg SI log (*.log)'),
+            False,
+        )
+        recovery_sportorg_si_log.recovery(file_name)
         self.app.refresh()
 
 
 class RecoverySportidentMasterCsvAction(Action, metaclass=ActionFactory):
     def execute(self):
-        recovery_si_master_csv.recovery()
+        file_name = get_open_file_name(
+            translate('Open SPORTident master station backup file'),
+            translate('CSV file (*.csv)'),
+            False,
+        )
+        recovery_si_master_csv.recovery(file_name)
         self.app.refresh()
 
 

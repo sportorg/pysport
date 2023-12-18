@@ -17,9 +17,9 @@ DOW;Finish_r time;Class;First name;Last name;Club;Country;Email;Date of birth;Se
 :03;47;Su; 14:39:54;37;Su; 14:47:02;90;Su; 14:49:21;
 
 """
+import csv
+
 from sportorg.common.otime import OTime
-from sportorg.gui.dialogs.file_dialog import get_open_file_name
-from sportorg.language import translate
 from sportorg.models.memory import ResultSportident, Split, race
 from sportorg.modules.sportident.fix_time_sicard_5 import fix_time
 from sportorg.utils.time import hhmmss_to_time
@@ -31,15 +31,7 @@ POS_COUNT = 44
 race = race()
 
 
-def recovery():
-    file_name = get_open_file_name(
-        translate('Open SPORTident master station backup file'),
-        translate('CSV file (*.csv)'),
-        False,
-    )
-
-    text_file = open(file_name, 'r')
-    lines = text_file.readlines()
+def recovery(file_name):
 
     separator = ';'
 
@@ -48,24 +40,25 @@ def recovery():
         hour=zero_time_val[0], minute=zero_time_val[1], sec=zero_time_val[2]
     )
 
-    for line in lines:
-        tokens = line.split(separator)
-        if tokens[0] == 'No' or len(tokens) < 45:
-            continue
+    with open(file_name, encoding='cp1251') as csv_file:
+        spam_reader = csv.reader(csv_file, delimiter=separator)
+        for tokens in spam_reader:
+            if tokens[0] == 'No' or len(tokens) < 45:
+                continue
 
-        res = ResultSportident()
-        res.card_number = int(tokens[POS_CARD])
-        res.start_time = hhmmss_to_time(tokens[POS_START])
-        res.finish_time = hhmmss_to_time(tokens[POS_FINISH])
+            res = ResultSportident()
+            res.card_number = int(tokens[POS_CARD])
+            res.start_time = hhmmss_to_time(tokens[POS_START])
+            res.finish_time = hhmmss_to_time(tokens[POS_FINISH])
 
-        punch_count = int(tokens[POS_COUNT])
-        existing_punches = (len(tokens) - POS_COUNT - 1) // 3
+            punch_count = int(tokens[POS_COUNT])
+            existing_punches = (len(tokens) - POS_COUNT - 1) // 3
 
-        for i in range(min(punch_count, existing_punches)):
-            punch = Split()
-            punch.code = tokens[POS_COUNT + 3 * i + 1]
-            punch.time = hhmmss_to_time(tokens[POS_COUNT + 3 * i + 3])
-            res.splits.append(punch)
+            for i in range(min(punch_count, existing_punches)):
+                punch = Split()
+                punch.code = tokens[POS_COUNT + 3 * i + 1]
+                punch.time = hhmmss_to_time(tokens[POS_COUNT + 3 * i + 3])
+                res.splits.append(punch)
 
-        fix_time(res, zero_time)
-        race.results.append(res)
+            fix_time(res, zero_time)
+            race.results.append(res)
