@@ -49,8 +49,6 @@ def recovery():
     )
 
     for line in lines:
-        print(line)
-
         tokens = line.split(separator)
         if tokens[0] == 'No' or len(tokens) < 45:
             continue

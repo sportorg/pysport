@@ -60,7 +60,6 @@ def recovery():
     read_finish = False
 
     for line in lines:
-        print(line)
         line = line.strip()
         if read_num:
             cur_res.card_number = int(line)
