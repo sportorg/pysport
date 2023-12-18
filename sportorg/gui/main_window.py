@@ -146,13 +146,16 @@ class MainWindow(QMainWindow):
             race().update_data(command.data)
             # logging.info(repr(command.data))
             # if 'object' in command.data and command.data['object'] in
-            # ['ResultManual', 'ResultSportident', 'ResultSFR', 'ResultSportiduino']:
+
+            # ['ResultManual', 'ResultSportident', 'ResultSFR', 'ResultSportiduino' etc.]:
             if command.header.obj_type in [
                 ObjectTypes.Result.value,
                 ObjectTypes.ResultManual.value,
                 ObjectTypes.ResultSportident.value,
                 ObjectTypes.ResultSFR.value,
                 ObjectTypes.ResultSportiduino.value,
+                ObjectTypes.ResultSrpid.value,
+                ObjectTypes.ResultRfidImpinj.value,
             ]:
                 self.deleyed_res_recalculate(1000)
             Broker().produce('teamwork_recieving', command.data)
