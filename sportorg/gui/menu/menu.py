@@ -81,6 +81,10 @@ def menu_list():
                             'action': 'RecoverySportorgSiLogAction',
                         },
                         {
+                            'title': translate('Orgeo.ru CSV'),
+                            'action': 'RecoveryOrgeoFinishCsvAction',
+                        },
+                        {
                             'title': translate('SportOrg HTML'),
                             'action': 'RecoverySportorgHtmlAction',
                         },

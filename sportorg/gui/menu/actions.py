@@ -61,6 +61,7 @@ from sportorg.modules.live.live import live_client
 from sportorg.modules.ocad import ocad
 from sportorg.modules.ocad.ocad import OcadImportException
 from sportorg.modules.recovery import (
+    recovery_orgeo_finish_csv,
     recovery_si_master_csv,
     recovery_sportorg_html,
     recovery_sportorg_si_log,
@@ -385,6 +386,17 @@ class RecoverySportidentMasterCsvAction(Action, metaclass=ActionFactory):
             False,
         )
         recovery_si_master_csv.recovery(file_name)
+        self.app.refresh()
+
+
+class RecoveryOrgeoFinishCsvAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        file_name = get_open_file_name(
+            translate('Open orgeo.ru finish CSV file'),
+            translate('CSV file (*.csv)'),
+            False,
+        )
+        recovery_orgeo_finish_csv.recovery(file_name)
         self.app.refresh()
 
 

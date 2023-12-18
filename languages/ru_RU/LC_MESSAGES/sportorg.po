@@ -1595,3 +1595,9 @@ msgstr "Файл CSV (*.csv)"
 
 msgid "Open SPORTident master station backup file"
 msgstr "Открыть файл CSV мастер-станции SPORTident"
+
+msgid "Orgeo.ru CSV"
+msgstr "Файл финиша orgeo.ru, CSV"
+
+msgid "Open orgeo.ru finish CSV file"
+msgstr "Открыть файл финиша orgeo.ru, CSV (https://orgeo.ru/event/export?event_id=XXX&sub_id=Y&format=excel_finish)"
