@@ -73,3 +73,15 @@ msgstr "Penalty legs"
 
 msgid "Mf"
 msgstr "MF"
+
+msgid "SPORTident (Sportiduino, ...) settings"
+msgstr "Control cards"
+
+msgid "Result processing"
+msgstr "Result"
+
+msgid "Penalty calculation"
+msgstr "Penalty"
+
+msgid "Time settings"
+msgstr "Time"

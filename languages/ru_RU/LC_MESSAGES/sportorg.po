@@ -712,10 +712,10 @@ msgid "> 24"
 msgstr "> 24 часов"
 
 msgid "SPORTident (Sportiduino, ...) settings"
-msgstr "Настройки  SPORTident (Sportiduino, ...)"
+msgstr "Чипы"
 
 msgid "Result processing"
-msgstr "Определение результата"
+msgstr "Результат"
 
 msgid "Team results"
 msgstr "Командные результаты"
@@ -724,10 +724,10 @@ msgid "Scores"
 msgstr "Очки"
 
 msgid "Penalty calculation"
-msgstr "Расчет штрафа из сплитов"
+msgstr "Штраф"
 
 msgid "Time settings"
-msgstr "Настройки времени"
+msgstr "Время"
 
 msgid "Save file before exit?"
 msgstr "Сохранить изменения в файле?"
