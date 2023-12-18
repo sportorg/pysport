@@ -205,21 +205,21 @@ class TimekeepingPropertiesDialog(QDialog):
         self.mr_layout.addRow(self.mr_laps_radio)
         self.mr_counting_lap_check = QCheckBox(translate('counting lap'))
         self.mr_counting_lap_check.setToolTip(
-            translate('Operating mode: evaluation point')
-            + '\n'
-            + translate('Print number of penalty laps instead of splits')
-            + '\n'
-            + translate('when competitor reads out his card')
+            translate(
+                'Operating mode: evaluation point\n'
+                'Print the number of penalty laps instead of splits\n'
+                'when a competitor reads out his card'
+            )
         )
         self.mr_counting_lap_check.stateChanged.connect(self.penalty_calculation_mode)
         self.mr_layout.addRow(self.mr_counting_lap_check)
         self.mr_lap_station_check = QCheckBox(translate('lap station'))
         self.mr_lap_station_check.setToolTip(
-            translate('Station number on the penalty lap')
-            + '\n'
-            + translate('Competitor must punch at station')
-            + '\n'
-            + translate('every time he/she passes a penalty lap')
+            translate(
+                'Station number on the penalty lap\n'
+                'A competitor must punch at the station\n'
+                'each time they pass the penalty lap'
+            )
         )
         self.mr_lap_station_check.stateChanged.connect(self.penalty_calculation_mode)
         self.mr_lap_station_edit = AdvSpinBox(max_width=50)

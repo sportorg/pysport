@@ -669,26 +669,26 @@ msgstr "Режим начисления штрафа: штрафные круг�
 msgid "counting lap"
 msgstr "оценочный круг"
 
-msgid "Operating mode: evaluation point"
-msgstr "Режим работы: оценочный круг"
-
-msgid "Print number of penalty laps instead of splits"
-msgstr "При считывании печатается распечатка"
-
-msgid "when competitor reads out his card"
-msgstr "с количеством штрафных кругов"
+msgid ""
+"Operating mode: evaluation point\n"
+"Print the number of penalty laps instead of splits\n"
+"when a competitor reads out his card"
+msgstr ""
+"Режим работы: оценочный круг\n"
+"При считывании печатать распечатку\n"
+"с количеством штрафных кругов"
 
 msgid "lap station"
 msgstr "станция на штрафном круге"
 
-msgid "Station number on the penalty lap"
-msgstr "Номер станции на штрафном круге"
-
-msgid "Competitor must punch at station"
-msgstr "Спортсмен должен отметиться на станции"
-
-msgid "every time he/she passes a penalty lap"
-msgstr "при каждом прохождении штрафного круга"
+msgid ""
+"Station number on the penalty lap\n"
+"A competitor must punch at the station\n"
+"each time they pass the penalty lap"
+msgstr ""
+"Номер станции на штрафном круге\n"
+"Спортсмен должен отметиться на станции\n"
+"при каждом прохождении штрафного круга"
 
 msgid "scores off"
 msgstr "очки не рассчитываются"
