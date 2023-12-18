@@ -19,7 +19,9 @@ def recovery(file_name):
                 # save json to tmp file and op[en with standard import action
                 tmp_filename = os.path.join(
                     gettempdir(),
-                    'sportorg_' + ''.join(choices(string.ascii_letters, k=10)) + '.json',
+                    'sportorg_'
+                    + ''.join(choices(string.ascii_letters, k=10))
+                    + '.json',
                 )
                 temp_file = open(tmp_filename, 'w')
                 temp_file.write(json)
