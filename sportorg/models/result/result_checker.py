@@ -255,9 +255,9 @@ class ResultChecker:
 
     @staticmethod
     def detach_penalty_laps2(splits, lap_station):
-        """Walkaround: извлекает отметки на штрафной станции.
-        Наивный метод, надо учитывать, что штрафные КП должны относиться
-        к пункту оценки, а не появляться из неочищенного чипа"""
+        '''Detaches penalty laps from the given list of splits
+        based on the provided lap station code.
+        '''
         if not splits:
             return [], []
         regular = [punch for punch in splits if int(punch.code) != lap_station]
