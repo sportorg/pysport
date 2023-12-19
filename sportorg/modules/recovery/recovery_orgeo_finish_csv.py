@@ -40,7 +40,7 @@ DSQ_STATUS = ['DSQ', 'непр.отмет.']
 race = race()
 
 
-def recovery(file_name):
+def recovery(file_name) -> None:
     encoding = 'cp1251'
     separator = ';'
     spl_separator = '|'
@@ -88,7 +88,7 @@ def recovery(file_name):
             res.person = person
             if tokens[POS_CARD].isdigit():
                 res.card_number = int(tokens[POS_CARD])
-            res.start_time = hhmmss_to_time(tokens[POS_START])
+            res.start_time = person.start_time
             result = tokens[POS_RES]
             if result.find(':') > 0:
                 result_value = hhmmss_to_time(result)

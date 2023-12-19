@@ -31,7 +31,7 @@ POS_COUNT = 44
 race = race()
 
 
-def recovery(file_name):
+def recovery(file_name) -> None:
     separator = ';'
 
     zero_time_val = race.get_setting('system_zero_time', (8, 0, 0))

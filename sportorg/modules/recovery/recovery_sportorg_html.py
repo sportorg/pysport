@@ -9,7 +9,7 @@ from random import choices
 from tempfile import gettempdir
 
 
-def recovery(file_name):
+def recovery(file_name) -> str:
     with open(file_name, 'r', encoding='utf-8') as f:
         for line in f.readlines():
             if line.find("var race = {\"courses\":") > -1:
@@ -18,12 +18,9 @@ def recovery(file_name):
                 # save json to tmp file and op[en with standard import action
                 tmp_filename = os.path.join(
                     gettempdir(),
-                    'sportorg_'
-                    + ''.join(choices(string.ascii_letters, k=10))
-                    + '.json',
+                    f"sportorg_{''.join(choices(string.ascii_letters, k=10))}.json",
                 )
-                temp_file = open(tmp_filename, 'w')
-                temp_file.write(json)
-                temp_file.close()
+                with open(tmp_filename, 'w') as temp_file:
+                    temp_file.write(json)
+
                 return tmp_filename
-    return None
