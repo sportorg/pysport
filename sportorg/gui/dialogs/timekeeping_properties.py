@@ -183,24 +183,52 @@ class TimekeepingPropertiesDialog(QDialog):
 
         self.result_proc_tab.setLayout(self.result_proc_layout)
 
-        # marked route settings
+        # marked route penalty calculation settings
         self.marked_route_tab = QWidget()
         self.mr_layout = QFormLayout()
         self.mr_off_radio = QRadioButton(translate('no penalty'))
+        self.mr_off_radio.setToolTip(translate('No penalty'))
+        self.mr_off_radio.toggled.connect(self.penalty_calculation_mode)
         self.mr_layout.addRow(self.mr_off_radio)
         self.mr_time_radio = QRadioButton(translate('penalty time'))
+        self.mr_time_radio.setToolTip(
+            translate('Penalty calculation mode: penalty time')
+        )
+        self.mr_time_radio.toggled.connect(self.penalty_calculation_mode)
         self.mr_time_edit = AdvTimeEdit(display_format=self.time_format)
         self.mr_layout.addRow(self.mr_time_radio, self.mr_time_edit)
         self.mr_laps_radio = QRadioButton(translate('penalty laps'))
+        self.mr_laps_radio.setToolTip(
+            translate('Penalty calculation mode: penalty laps')
+        )
+        self.mr_laps_radio.toggled.connect(self.penalty_calculation_mode)
         self.mr_layout.addRow(self.mr_laps_radio)
         self.mr_counting_lap_check = QCheckBox(translate('counting lap'))
+        self.mr_counting_lap_check.setToolTip(
+            translate(
+                'Operating mode: evaluation point\n'
+                'Print the number of penalty laps instead of splits\n'
+                'when a competitor reads out his card'
+            )
+        )
+        self.mr_counting_lap_check.stateChanged.connect(self.penalty_calculation_mode)
         self.mr_layout.addRow(self.mr_counting_lap_check)
         self.mr_lap_station_check = QCheckBox(translate('lap station'))
+        self.mr_lap_station_check.setToolTip(
+            translate(
+                'Station number on the penalty lap\n'
+                'A competitor must punch at the station\n'
+                'each time they pass the penalty lap'
+            )
+        )
+        self.mr_lap_station_check.stateChanged.connect(self.penalty_calculation_mode)
         self.mr_lap_station_edit = AdvSpinBox(max_width=50)
         self.mr_layout.addRow(self.mr_lap_station_check, self.mr_lap_station_edit)
         self.mr_dont_dqs_check = QCheckBox(translate("Don't disqualify"))
+        self.mr_dont_dqs_check.setToolTip(translate("Don't disqualify"))
         self.mr_layout.addRow(self.mr_dont_dqs_check)
         self.mr_max_penalty_by_cp = QCheckBox(translate('Max penalty = quantity of cp'))
+        self.mr_max_penalty_by_cp.setToolTip(translate('Max penalty = quantity of cp'))
         self.mr_layout.addRow(self.mr_max_penalty_by_cp)
         self.marked_route_tab.setLayout(self.mr_layout)
 
@@ -304,6 +332,32 @@ class TimekeepingPropertiesDialog(QDialog):
         self.finish_group_box.setDisabled(mode)
         self.chip_reading_box.setDisabled(mode)
         self.chip_duplicate_box.setDisabled(mode)
+
+    def penalty_calculation_mode(self):
+        self.mr_time_edit.setDisabled(not self.mr_time_radio.isChecked())
+        self.mr_counting_lap_check.setDisabled(
+            not (
+                self.mr_laps_radio.isChecked()
+                and not self.mr_lap_station_check.isChecked()
+            )
+        )
+        self.mr_lap_station_check.setDisabled(
+            not (
+                self.mr_laps_radio.isChecked()
+                and not self.mr_counting_lap_check.isChecked()
+            )
+        )
+        self.mr_lap_station_edit.setDisabled(
+            not (
+                self.mr_laps_radio.isChecked() and self.mr_lap_station_check.isChecked()
+            )
+        )
+        self.mr_dont_dqs_check.setDisabled(
+            not (self.mr_laps_radio.isChecked() or self.mr_time_radio.isChecked())
+        )
+        self.mr_max_penalty_by_cp.setDisabled(
+            not (self.mr_laps_radio.isChecked() or self.mr_time_radio.isChecked())
+        )
 
     def set_values_from_model(self):
         cur_race = race()
@@ -417,9 +471,9 @@ class TimekeepingPropertiesDialog(QDialog):
         mr_penalty_time = OTime(
             msec=obj.get_setting('marked_route_penalty_time', 60000)
         )
-        mr_if_counting_lap = obj.get_setting('marked_route_if_counting_lap', True)
+        mr_if_counting_lap = obj.get_setting('marked_route_if_counting_lap', False)
         mr_if_station_check = obj.get_setting('marked_route_if_station_check', False)
-        mr_station_code = obj.get_setting('marked_route_station_code', 80)
+        mr_station_code = obj.get_setting('marked_route_penalty_lap_station_code', 80)
         mr_if_dont_dsq_check = obj.get_setting('marked_route_dont_dsq', False)
         mr_if_max_penalty_by_cp = obj.get_setting(
             'marked_route_max_penalty_by_cp', False
@@ -596,7 +650,7 @@ class TimekeepingPropertiesDialog(QDialog):
         obj.set_setting('marked_route_penalty_time', mr_penalty_time)
         obj.set_setting('marked_route_if_counting_lap', mr_if_counting_lap)
         obj.set_setting('marked_route_if_station_check', mr_if_station_check)
-        obj.set_setting('marked_route_station_code', mr_station_code)
+        obj.set_setting('marked_route_penalty_lap_station_code', mr_station_code)
         obj.set_setting('marked_route_dont_dsq', mr_if_dont_dsq)
         obj.set_setting('marked_route_max_penalty_by_cp', mr_if_max_penalty_by_cp)
 

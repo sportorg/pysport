@@ -175,6 +175,11 @@
         {% endfor %}
         </table>
         <br> Финиш: {{result.finish_msec|tohhmmss}} {{result.speed}}
+        {% if race['settings'].get('marked_route_mode', 'off') == 'laps' %}
+        <br> Штрафных кругов: {{result.penalty_laps}}
+        {% elif race['settings'].get('marked_route_mode', 'off') == 'time' %}
+        <br> Штраф: {{result.penalty_time|tohhmmss}}
+        {% endif %}
         <br> Результат: {{result.result}}
         {% if result.place > 0 %}
             <br> Место: {{result.place}} из {{group.count_finished}} (всего {{group.count_person}})

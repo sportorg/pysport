@@ -354,6 +354,9 @@ msgstr "Финиш"
 msgid "Penalty"
 msgstr "Штраф"
 
+msgid "Penalty laps"
+msgstr "Штрафные круги"
+
 msgid "Penalty legs"
 msgstr "Штраф, круги"
 
@@ -648,17 +651,44 @@ msgstr "Штраф за каждую просроченную минуту"
 msgid "no penalty"
 msgstr "штраф не начисляется"
 
+msgid "No penalty"
+msgstr "Штраф не начисляется"
+
 msgid "penalty time"
 msgstr "штрафное время"
+
+msgid "Penalty calculation mode: penalty time"
+msgstr "Режим начисления штрафа: штрафное время"
 
 msgid "penalty laps"
 msgstr "штрафные круги"
 
+msgid "Penalty calculation mode: penalty laps"
+msgstr "Режим начисления штрафа: штрафные круги"
+
 msgid "counting lap"
 msgstr "оценочный круг"
 
+msgid ""
+"Operating mode: evaluation point\n"
+"Print the number of penalty laps instead of splits\n"
+"when a competitor reads out his card"
+msgstr ""
+"Режим работы: оценочный круг\n"
+"При считывании печатать распечатку\n"
+"с количеством штрафных кругов"
+
 msgid "lap station"
 msgstr "станция на штрафном круге"
+
+msgid ""
+"Station number on the penalty lap\n"
+"A competitor must punch at the station\n"
+"each time they pass the penalty lap"
+msgstr ""
+"Номер станции на штрафном круге\n"
+"Спортсмен должен отметиться на станции\n"
+"при каждом прохождении штрафного круга"
 
 msgid "scores off"
 msgstr "очки не рассчитываются"
@@ -1514,6 +1544,9 @@ msgstr "СОШЕЛ"
 
 msgid "Disqualified"
 msgstr "ДИСКВ."
+
+msgid "laps"
+msgstr "кр."
 
 msgid "contain"
 msgstr "содержит"

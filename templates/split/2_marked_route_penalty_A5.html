@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- A5 paper with portrait orientation -->
+<head>
+    <meta charset="UTF-8">
+    <title>{{name}} Split</title>
+    {% raw %}
+    <style>
+        p {
+            font-family: Arial, Helvetica, sans-serif;
+            font-weight: bold;
+            text-align: center;
+        }
+        .penalty-digit {
+            font-size: 150pt;
+        }
+        .penalty-text {
+            font-size: 90pt;
+        }
+        .penalty-outer {
+            font-size: 30pt;
+        }
+        hr {
+            width: 300%;
+            border: dashed;
+        }
+    </style>
+    {% endraw %}
+</head>
+
+<body>
+    <code>
+        <p class="penalty-outer">&nbsp;</p>
+        <p class="penalty-inner">
+            <span class="penalty-text">№</span>
+            <span class="penalty-digit">{{person.bib}}</span>
+        </p>
+        <p class="penalty-outer">&nbsp;</p>
+        <hr>
+        <p class="penalty-outer">&nbsp;</p>
+        <p class="penalty-inner">
+            <span class="penalty-digit">{{result.penalty_laps}}</span>
+            <span class="penalty-text">кр.</span>
+        </p>
+    </code>
+</body>
+
+</html>

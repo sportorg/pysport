@@ -151,6 +151,7 @@ class ResultSportidentGeneration:
             if existing_res.merge_with(self._result):
                 # existing result changed, recalculate group results and printout
                 self._result = existing_res
+                ResultChecker.checking(self._result)
                 ResultChecker.calculate_penalty(self._result)
                 ResultChecker.checking(self._result)
                 self.popup_result(self._result)
@@ -202,6 +203,7 @@ class ResultSportidentGeneration:
             try:
                 ResultChecker.checking(self._result)
                 ResultChecker.calculate_penalty(self._result)
+                ResultChecker.checking(self._result)
             except ResultCheckerException as e:
                 logging.error(str(e))
 
