@@ -20,7 +20,7 @@ DOW;Finish_r time;Class;First name;Last name;Club;Country;Email;Date of birth;Se
 import csv
 
 from sportorg.common.otime import OTime
-from sportorg.models.memory import ResultSportident, Split, race
+from sportorg.models.memory import ResultSportident, Split, Race
 from sportorg.modules.sportident.fix_time_sicard_5 import fix_time
 from sportorg.utils.time import hhmmss_to_time
 
@@ -28,10 +28,9 @@ POS_CARD = 2
 POS_START = 15
 POS_FINISH = 21
 POS_COUNT = 44
-race = race()
 
 
-def recovery(file_name) -> None:
+def recovery(file_name: str, race: Race) -> None:
     separator = ';'
 
     zero_time_val = race.get_setting('system_zero_time', (8, 0, 0))

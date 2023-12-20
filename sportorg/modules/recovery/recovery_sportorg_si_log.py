@@ -30,14 +30,12 @@ end
 """
 
 from sportorg.common.otime import OTime
-from sportorg.models.memory import ResultSportident, Split, race
+from sportorg.models.memory import ResultSportident, Split, Race
 from sportorg.modules.sportident.fix_time_sicard_5 import fix_time
 from sportorg.utils.time import hhmmss_to_time
 
-race = race()
 
-
-def recovery(file_name) -> None:
+def recovery(file_name: str, race: Race) -> None:
     zero_time_val = race.get_setting('system_zero_time', (8, 0, 0))
     zero_time = OTime(
         hour=zero_time_val[0], minute=zero_time_val[1], sec=zero_time_val[2]

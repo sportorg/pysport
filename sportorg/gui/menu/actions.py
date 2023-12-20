@@ -374,7 +374,7 @@ class RecoverySportorgSiLogAction(Action, metaclass=ActionFactory):
             translate('SportOrg SI log (*.log)'),
             False,
         )
-        recovery_sportorg_si_log.recovery(file_name)
+        recovery_sportorg_si_log.recovery(file_name, race())
         self.app.refresh()
 
 
@@ -385,7 +385,7 @@ class RecoverySportidentMasterCsvAction(Action, metaclass=ActionFactory):
             translate('CSV file (*.csv)'),
             False,
         )
-        recovery_si_master_csv.recovery(file_name)
+        recovery_si_master_csv.recovery(file_name, race())
         self.app.refresh()
 
 
@@ -396,7 +396,7 @@ class RecoveryOrgeoFinishCsvAction(Action, metaclass=ActionFactory):
             translate('CSV file (*.csv)'),
             False,
         )
-        recovery_orgeo_finish_csv.recovery(file_name)
+        recovery_orgeo_finish_csv.recovery(file_name, race())
         self.app.refresh()
 
 

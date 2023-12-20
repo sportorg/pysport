@@ -21,7 +21,7 @@ from sportorg.models.memory import (
     ResultSportident,
     ResultStatus,
     Split,
-    race,
+    Race,
 )
 from sportorg.utils.time import hhmmss_to_time
 
@@ -37,10 +37,8 @@ POS_SPLITS = -1
 DNS_STATUS = ['DNS', 'не старт']
 DSQ_STATUS = ['DSQ', 'непр.отмет.']
 
-race = race()
 
-
-def recovery(file_name) -> None:
+def recovery(file_name: str, race: Race) -> None:
     encoding = 'cp1251'
     separator = ';'
     spl_separator = '|'

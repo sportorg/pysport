@@ -9,7 +9,7 @@ from random import choices
 from tempfile import gettempdir
 
 
-def recovery(file_name) -> str:
+def recovery(file_name: str) -> str:
     with open(file_name, 'r', encoding='utf-8') as f:
         for line in f.readlines():
             if line.find("var race = {\"courses\":") > -1:
