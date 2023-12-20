@@ -18,10 +18,10 @@ from sportorg.models.memory import (
     Group,
     Organization,
     Person,
+    Race,
     ResultSportident,
     ResultStatus,
     Split,
-    Race,
 )
 from sportorg.utils.time import hhmmss_to_time
 

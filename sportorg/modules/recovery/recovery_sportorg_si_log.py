@@ -30,7 +30,7 @@ end
 """
 
 from sportorg.common.otime import OTime
-from sportorg.models.memory import ResultSportident, Split, Race
+from sportorg.models.memory import Race, ResultSportident, Split
 from sportorg.modules.sportident.fix_time_sicard_5 import fix_time
 from sportorg.utils.time import hhmmss_to_time
 
