@@ -72,6 +72,22 @@ def menu_list():
                             'title': translate('IOF xml'),
                             'action': 'IOFEntryListImportAction',
                         },
+                        {
+                            'title': translate('SPORTident master station CSV'),
+                            'action': 'RecoverySportidentMasterCsvAction',
+                        },
+                        {
+                            'title': translate('SportOrg SI log'),
+                            'action': 'RecoverySportorgSiLogAction',
+                        },
+                        {
+                            'title': translate('Orgeo.ru CSV'),
+                            'action': 'RecoveryOrgeoFinishCsvAction',
+                        },
+                        {
+                            'title': translate('SportOrg HTML'),
+                            'action': 'RecoverySportorgHtmlAction',
+                        },
                     ],
                 },
                 {

@@ -2,6 +2,7 @@ import logging
 import socket
 import time
 import uuid
+from os import remove
 from typing import Any, Dict, Type
 
 from PySide2 import QtCore
@@ -59,6 +60,12 @@ from sportorg.modules.iof import iof_xml
 from sportorg.modules.live.live import live_client
 from sportorg.modules.ocad import ocad
 from sportorg.modules.ocad.ocad import OcadImportException
+from sportorg.modules.recovery import (
+    recovery_orgeo_finish_csv,
+    recovery_si_master_csv,
+    recovery_sportorg_html,
+    recovery_sportorg_si_log,
+)
 from sportorg.modules.rfid_impinj.rfid_impinj import ImpinjClient
 from sportorg.modules.sfr.sfrreader import SFRReaderClient
 from sportorg.modules.sportident.sireader import SIReaderClient
@@ -343,6 +350,54 @@ class IOFCompetitorListExportAction(Action, metaclass=ActionFactory):
                     translate('Error'),
                     translate('Export error') + ': ' + file_name,
                 )
+
+
+class RecoverySportorgHtmlAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        file_name = get_open_file_name(
+            translate('Open SportOrg HTML file'),
+            translate('SportOrg HTML report (*.html)'),
+            False,
+        )
+        tmp_filename = recovery_sportorg_html.recovery(file_name)
+        with open(tmp_filename) as f:
+            attr = get_races_from_file(f)
+        SportOrgImportDialog(*attr).exec_()
+        remove(tmp_filename)
+        self.app.refresh()
+
+
+class RecoverySportorgSiLogAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        file_name = get_open_file_name(
+            translate('Open SportOrg SI log file'),
+            translate('SportOrg SI log (*.log)'),
+            False,
+        )
+        recovery_sportorg_si_log.recovery(file_name, race())
+        self.app.refresh()
+
+
+class RecoverySportidentMasterCsvAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        file_name = get_open_file_name(
+            translate('Open SPORTident master station backup file'),
+            translate('CSV file (*.csv)'),
+            False,
+        )
+        recovery_si_master_csv.recovery(file_name, race())
+        self.app.refresh()
+
+
+class RecoveryOrgeoFinishCsvAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        file_name = get_open_file_name(
+            translate('Open orgeo.ru finish CSV file'),
+            translate('CSV file (*.csv)'),
+            False,
+        )
+        recovery_orgeo_finish_csv.recovery(file_name, race())
+        self.app.refresh()
 
 
 class AddObjectAction(Action, metaclass=ActionFactory):
