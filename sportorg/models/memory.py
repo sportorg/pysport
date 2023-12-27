@@ -999,6 +999,7 @@ class ResultSportident(Result):
         return splits
 
     def check(self, course=None):
+        obj = race()
         if not course:
             return super().check()
         controls = course.controls
@@ -1016,9 +1017,18 @@ class ResultSportident(Result):
             i.has_penalty = True
             i.course_index = -1
 
+        ignore_punches_before_start = obj.get_setting(
+            'ignore_punches_before_start', False
+        )
+
         for i in range(len(self.splits)):
             try:
                 split = self.splits[i]
+
+                # ignore splits before start (not cleaned card or unintentional punches before start)
+                if ignore_punches_before_start and split.time < self.get_start_time():
+                    continue
+
                 template = str(controls[course_index].code)
                 cur_code = split.code
 
@@ -1789,10 +1799,10 @@ class Race(Model):
         return ret
 
     def add_new_result(self, result):
-        ignore_readout_before_start = self.get_setting(
-            'ignore_readout_before_start', False
+        ignore_punches_before_start = self.get_setting(
+            'ignore_punches_before_start', False
         )
-        if ignore_readout_before_start:
+        if ignore_punches_before_start:
             start = result.get_start_time()
             finish = result.get_finish_time()
 
