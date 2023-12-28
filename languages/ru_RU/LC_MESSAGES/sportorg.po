@@ -1533,8 +1533,8 @@ msgstr "КП из сплитов, укажите список КП"
 msgid "Finish as CP"
 msgstr "Использовать финиш как КП с кодом:"
 
-msgid "Ignore readout before start"
-msgstr "Игнорировать считывание до старта"
+msgid "Ignore punches before start"
+msgstr "Игнорировать отметки до старта"
 
 msgid "Did not start"
 msgstr "НЕ СТАРТ."
