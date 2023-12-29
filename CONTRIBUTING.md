@@ -2,7 +2,7 @@
 
 ## Get Started
 
-### Prepare
+### Preparation
 
 SportOrg runs on Python 3.8 for compatibility with Windows 7. Latest Python 3.8 release with binary installers is [Python 3.8.10](https://www.python.org/downloads/release/python-3810/).
 
