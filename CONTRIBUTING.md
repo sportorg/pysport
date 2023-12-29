@@ -2,17 +2,46 @@
 
 ## Get Started
 
-```
-python3.8 -m venv .venv
-```
+### Подготовка
+
+SportOrg runs on Python 3.8 for compatibility with Windows 7. Latest Python 3.8 release with binary installers is [Python 3.8.10](https://www.python.org/downloads/release/python-3810/).
+
+During development, the [poetry](https://python-poetry.org/) and [poe](https://poethepoet.natn.io/) tools are used. The preferred method for installing these utilities is [pipx](https://pipx.pypa.io/). 
+
+It may be necessary to restart the terminal window during the installation process to update the `PATH` environment variable.
 
 ```
-pip install poetry
+pip install pipx
+pipx ensurepath
+pipx install poetry
+pipx install poethepoet
+```
+
+### Create virtual environment
+
+Get pysport project.
+
+```
+git clone https://github.com/sportorg/pysport.git
+cd pysport
+```
+
+If multiple versions of Python are installed, it is necessary to specify the path to the Python 3.8 executable file.
+
+```
+poetry env use /full/path/to/python3.8
+```
+
+Install requirements.
+
+```
 poetry install
 poetry install -E win  # for Windows
 ```
 
 Add `DEBUG=True` to `.env` file or `cp .env.example .env`
+
+### Run SportOrg
 
 ```
 poe run
