@@ -1,5 +1,4 @@
 import logging
-from typing import Optional
 
 from sportorg.common.otime import OTime
 from sportorg.models.memory import (
@@ -20,7 +19,7 @@ class ResultChecker:
     def __init__(self, person: Person):
         self.person = person
 
-    def check_result(self, result: Optional[ResultSportident]):
+    def check_result(self, result: ResultSportident):
         if self.person is None:
             return True
         if self.person.group is None:
