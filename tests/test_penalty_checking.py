@@ -250,6 +250,81 @@ def test_penalty_calculation_function():
     # fmt: on
 
 
+def test_marked_route_dont_dsq():
+    """Whether to disqualify an athlete for missing controls
+    True - checked by penalty_calculation_free_order()
+
+    penalty_calculation_free_order()
+    :return quantity penalty, duplication checked
+    ```
+    origin: * ,* ,* ; athlete: 31,41,51; result:0
+    origin: * ,* ,* ; athlete: 31,31,51; result:1
+    origin: * ,* ,* ; athlete: 31,31,31; result:2
+    origin: * ,* ,* ; athlete: 31; result:2
+
+    support of first/last mandatory cp
+    origin: 40,* ,* ,90; athlete: 40,31,32,90; result:0
+    origin: 40,* ,* ,90; athlete: 40,31,40,90; result:1
+    origin: 40,* ,* ,90; athlete: 40,40,40,90; result:2
+    origin: 40,* ,* ,90; athlete: 40,90,90,90; result:2
+    origin: 40,* ,* ,90; athlete: 31,32,33,90; result:4
+    origin: 40,* ,* ,90; athlete: 31,40,31,90; result:1
+    origin: 40,* ,* ,90; athlete: 31,40,90,41; result:1
+    origin: 40,* ,* ,90; athlete: 31,40,31,32; result:1
+    origin: 40,* ,* ,90; athlete: 31,40,31,40; result:2
+    origin: 40,* ,* ,90; athlete: 40,40,90,90; result:2
+    origin: 40,* ,* ,90; athlete: 40,41,90,90; result:0 TODO:1 - only one incorrect case
+    ```
+    """
+    # fmt off
+    create_race()
+    race().set_setting('marked_route_mode', 'laps')
+    race().set_setting('marked_route_dont_dsq', True)
+
+    assert ok(course=['*', '*', '*'], splits=[31, 41, 51], penalty=0)
+
+    assert ok(course=['*', '*', '*'], splits=[31, 31, 51], penalty=1)
+
+    assert ok(course=['*', '*', '*'], splits=[31, 31, 31], penalty=2)
+
+    assert ok(course=['*', '*', '*'], splits=[31], penalty=2)
+
+    assert ok(course=[31, 41, 51], splits=[31, 41, 51], penalty=0)
+
+    # assert  ok(course=[31, 41, 51],
+    #            splits=[31, 42, 51], penalty=1)
+
+    # support of first/last mandatory cp
+    assert ok(course=[40, '*', '*', 90], splits=[40, 31, 32, 90], penalty=0)
+
+    # assert  ok(course=[40, '*', '*', 90],
+    #            splits=[40,  31,  40, 90], penalty=1)
+
+    # assert  ok(course=[40, '*', '*', 90],
+    #            splits=[40,  40,  40, 90], penalty=2)
+
+    assert ok(course=[40, '*', '*', 90], splits=[40, 90, 90, 90], penalty=2)
+
+    assert ok(course=[40, '*', '*', 90], splits=[31, 32, 33, 90], penalty=4)
+
+    assert ok(course=[40, '*', '*', 90], splits=[31, 40, 31, 90], penalty=1)
+
+    assert ok(course=[40, '*', '*', 90], splits=[31, 40, 90, 41], penalty=1)
+
+    assert ok(course=[40, '*', '*', 90], splits=[31, 40, 31, 32], penalty=1)
+
+    # assert  ok(course=[40, '*', '*', 90],
+    #            splits=[31,  40,  31, 40], penalty=2)
+
+    # assert  ok(course=[40, '*', '*', 90],
+    #            splits=[40,  40,  90, 90], penalty=2)
+
+    # assert  ok(course=[40, '*', '*', 90],
+    #            splits=[40,  41,  90, 90], penalty=0)
+
+    # fmt on
+
+
 def test_non_obvious_behavior():
     """Неочевидное поведение при проверке дистанции. Не всегда это некорректная работа
     алгоритма, иногда может возникать из-за недочётов при составлении курсов.
