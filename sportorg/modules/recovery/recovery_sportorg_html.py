@@ -24,4 +24,4 @@ def recovery(file_name: str) -> str:
                     temp_file.write(json)
 
                 return tmp_filename
-    return ""
+    return ''
