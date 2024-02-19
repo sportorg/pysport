@@ -47,15 +47,7 @@ class Widget(QtWidgets.QWidget):
     def move_rows(self):
         selected_indexes = self.person_table.selectionModel().selectedRows()
         if len(selected_indexes) == 2:
-            from_index = -1
-            to_index = -1
-            for index in selected_indexes:
-                if from_index == -1:
-                    from_index = index.row()
-                else:
-                    to_index = index.row()
-
-            self.person_table.model().move_rows(from_index, to_index)
+            self.person_table.model().move_rows(selected_indexes[0].row(), selected_indexes[1].row())
 
     def setup_ui(self):
         self.person_table.setObjectName('PersonTable')
