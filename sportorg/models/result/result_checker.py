@@ -137,7 +137,8 @@ class ResultChecker:
                     for cp in code_str.split('(')[1].split(','):
                         cp = cp.strip(')').strip()
                         if cp != correct and cp.isdigit():
-                            ret.append(cp)
+                            if cp not in ret:
+                                ret.append(cp)
         return ret
 
     @staticmethod
