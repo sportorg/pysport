@@ -1,6 +1,7 @@
 from re import subn
 from typing import Any, Dict
 
+from sportorg.common.otime import OTime
 from sportorg.utils.time import int_to_otime
 
 LOG_MSG = 'HTTP Status: %s, Msg: %s'
@@ -270,9 +271,11 @@ async def create_online_cp(url, data, race_data, log, *, session):
 
                     if card_number > 0:
                         code = race_data['settings']['live_cp_code']
-                        finish_time = int_to_otime(res['finish_time'] // 10).to_str()
+                        finish_time = OTime.now()
+                        if res['finish_time'] is not None :
+                            finish_time = int_to_otime(res['finish_time'] // 10).to_str()
                         resp = await o.send_online_cp(card_number, code, finish_time)
-
+                        print (f"card={card_number} code={str(code)} finish={finish_time}")
                         result_txt = make_nice(str(await resp.text()))
 
                         if resp.status != 200:
@@ -308,6 +311,7 @@ async def create_online_cp(url, data, race_data, log, *, session):
                         log.info(LOG_MSG, 401, 'Ignoring empty card number')
 
             except Exception as e:
+                log.exception(e)
                 log.error('Error: %s', str(e))
 
 
