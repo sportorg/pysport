@@ -152,8 +152,6 @@ class ResultSportidentGeneration:
                 # existing result changed, recalculate group results and printout
                 self._result = existing_res
                 ResultChecker.checking(self._result)
-                ResultChecker.calculate_penalty(self._result)
-                ResultChecker.checking(self._result)
                 self.popup_result(self._result)
 
             return True
@@ -201,8 +199,6 @@ class ResultSportidentGeneration:
         if isinstance(self._result.person, Person):
             self._find_person_by_result()
             try:
-                ResultChecker.checking(self._result)
-                ResultChecker.calculate_penalty(self._result)
                 ResultChecker.checking(self._result)
             except ResultCheckerException as e:
                 logging.error(str(e))

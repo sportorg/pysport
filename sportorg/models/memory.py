@@ -150,8 +150,8 @@ class CourseControl(Model):
     def __eq__(self, other):
         return self.code == other.code
 
-    def get_number_code(self):
-        """Get int code
+    def get_number_code(self) -> str:
+        """Get control code (number as string)
         31 933 -> 31
         31(31,32,33) 933 -> 31
         * -> 0
@@ -1806,12 +1806,8 @@ class Race(Model):
             start = result.get_start_time()
             finish = result.get_finish_time()
 
-            if finish < start and start.hour < 22:
-                logging.info(
-                    'Ignoring finish with time before start: {} for card {}'.format(
-                        finish, result.card_number
-                    )
-                )
+            if finish < start and start.hour < 22 and finish != OTime(0):
+                logging.info(f'Ignoring finish with time before start: {finish} for card {result.card_number}')
                 return
 
         self.results.insert(0, result)

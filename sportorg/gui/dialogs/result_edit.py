@@ -288,8 +288,6 @@ class ResultEditDialog(QDialog):
             result.clear()
             try:
                 ResultChecker.checking(result)
-                ResultChecker.calculate_penalty(result)
-                ResultChecker.checking(result)
                 if result.person and result.person.group:
                     GroupSplits(race(), result.person.group).generate(True)
             except ResultCheckerException as e:

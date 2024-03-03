@@ -52,12 +52,17 @@ class ResultChecker:
             ResultStatus.MISS_PENALTY_LAP,
         ]:
             result.status = ResultStatus.OK
+
+            ResultChecker.calculate_penalty(result)
+
             if not o.check_result(result):
                 result.status = ResultStatus.MISSING_PUNCH
                 result.status_comment = 'п.п.3.13.12.2'
 
             elif not cls.check_penalty_laps(result):
                 result.status = ResultStatus.MISS_PENALTY_LAP
+                result.status_comment = 'п.п.4.6.12.7'
+
             elif result.person.group and result.person.group.max_time.to_msec():
                 if result.get_result_otime() > result.person.group.max_time:
                     if race().get_setting('result_processing_mode', 'time') == 'time':
@@ -72,7 +77,6 @@ class ResultChecker:
         for result in race().results:
             if result.person:
                 ResultChecker.checking(result)
-                ResultChecker.calculate_penalty(result)
 
     @staticmethod
     def calculate_penalty(result: Result):
@@ -111,11 +115,11 @@ class ResultChecker:
             # limit the penalty by quantity of controls
             penalty = min(len(controls), penalty)
 
+        result.penalty_laps = 0
+        result.penalty_time = OTime()
+
         if mode == 'laps':
             result.penalty_laps = penalty
-            if result.status == ResultStatus.OK:
-                ResultChecker.marked_route_check_penalty_laps(result)
-
         elif mode == 'time':
             time_for_one_penalty = OTime(
                 msec=race().get_setting('marked_route_penalty_time', 60000)
@@ -178,7 +182,7 @@ class ResultChecker:
         origin_array = [i.get_number_code() for i in controls]
         res = 0
 
-        # может дать 0 штрафа при мусоре в чипе
+        # In theory can return less penalty for uncleaned card / может дать 0 штрафа при мусоре в чипе
         if check_existence and len(user_array) < len(origin_array):
             # add 1 penalty score for missing points
             res = len(origin_array) - len(user_array)
@@ -255,9 +259,9 @@ class ResultChecker:
 
     @staticmethod
     def detach_penalty_laps2(splits, lap_station):
-        '''Detaches penalty laps from the given list of splits
+        """Detaches penalty laps from the given list of splits
         based on the provided lap station code.
-        '''
+        """
         if not splits:
             return [], []
         regular = [punch for punch in splits if int(punch.code) != lap_station]

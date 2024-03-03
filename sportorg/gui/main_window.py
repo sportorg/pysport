@@ -2,6 +2,7 @@ import ast
 import logging
 import os
 import time
+from logging import exception
 from queue import Queue
 
 import pylocker
@@ -108,6 +109,7 @@ class MainWindow(QMainWindow):
         self.split_printer_thread = None
         self.split_printer_queue = None
 
+        logging.info('lock creating')
         self.file_locker = pylocker.FACTORY(
             key='sportorg_locker_key', password='str(uuid.uuid1())', autoconnect=False
         )
@@ -911,6 +913,7 @@ class MainWindow(QMainWindow):
         self.split_printer_queue = split_printer_app
 
     def lock_file(self, file_name: str):
+        logging.info('lock start')
         if self.file == file_name:
             # already locked by current process ('Save as' or 'Open' for the same file)
             return True
@@ -933,5 +936,6 @@ class MainWindow(QMainWindow):
         return True
 
     def unlock_file(self):
+        logging.info('unlock start')
         logging.info(translate('File lock released'))
         self.file_locker.release(self.file_lock_id)
