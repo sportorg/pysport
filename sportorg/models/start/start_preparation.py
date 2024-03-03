@@ -3,6 +3,7 @@ import math
 import random
 import uuid
 from copy import copy
+from random import shuffle, randint
 
 from sportorg.common.otime import OTime
 from sportorg.models.memory import Person, race
@@ -35,7 +36,7 @@ class ReserveManager:
             if count > 0:
                 for current_person in persons:
                     str_name = (
-                        '' + str(current_person.surname) + str(current_person.name)
+                            '' + str(current_person.surname) + str(current_person.name)
                     )
                     if str.find(str_name, reserve_prefix) > -1:
                         existing_reserves += 1
@@ -103,132 +104,347 @@ class DrawManager:
         current_race.persons = ret
 
     def process_array(
-        self, persons, split_start_groups, split_teams, split_regions, mix_groups=False
+            self, persons, split_start_groups, split_teams, split_regions, mix_groups=False
     ):
-        self.mix_groups = mix_groups
-        self.split_start_groups = split_start_groups
-        self.split_teams = split_teams
-        self.split_regions = split_regions
+        obj = race()
+        person_array = []
 
-        # create temporary array
-        self.set_array(persons)
-
-        # shuffle
-        random.shuffle(self.person_array)
-        random.shuffle(self.person_array)
-
-        # sort array by group and start_group
+        # toss by course
         if mix_groups:
-            if split_start_groups:
-                self.person_array = sorted(
-                    self.person_array, key=lambda item: str(item[2])
+            for cur_course in (obj.courses + [None]):
+                groups = []
+                for cur_group in obj.groups:
+                    if cur_group.course == cur_course:
+                        groups.append(cur_group)
+
+                if len(groups) < 1:
+                    continue
+
+                cur_array = []
+                for cur_person in persons:
+                    assert isinstance(cur_person, Person)
+                    if cur_person.group in groups:
+                        cur_array.append(cur_person)
+
+                if len(cur_array) < 1:
+                    continue
+
+                person_array += (
+                    self.process_array_start_group(cur_array, split_start_groups, split_teams, split_regions)
                 )
+
+        # toss by group
         else:
-            if split_start_groups:
-                self.person_array = sorted(
-                    self.person_array, key=lambda item: str(item[1]) + str(item[2])
-                )
-            else:
-                self.person_array = sorted(
-                    self.person_array, key=lambda item: str(item[1])
-                )
+            cur_group = None
+            cur_array = []
+            # sort all person by group
+            for cur_person in sorted(persons, key=lambda x: x.group.name):
+                if not cur_group:
+                    cur_group = cur_person.group
+                if cur_person.group != cur_group:
+                    # if group in sorted list changed, process current sub list
+                    person_array += (
+                        self.process_array_start_group(cur_array, split_start_groups, split_teams, split_regions)
+                    )
+                    cur_array = []
+                    cur_group = cur_person.group
+                cur_array.append(cur_person)
 
-        # process team and region conflicts in each start group
-        self.process_conflicts()
+            # last part outside loop
+            person_array += self.process_array_start_group(cur_array, split_start_groups, split_teams, split_regions)
 
-        # apply to initial list
-        return self.get_tossed_array(persons)
+        return person_array
 
-    def process_conflicts(self):
-        start = 0
-        while start < len(self.person_array):
-            if self.split_start_groups:
-                end = self.get_last_index_in_start_group(start)
-            else:
-                if self.mix_groups:
-                    end = len(self.person_array) - 1
-                else:
-                    end = self.get_last_index_in_group(start)
+    def process_array_start_group(self,
+                                  persons,
+                                  split_start_groups: bool,
+                                  split_teams: bool,
+                                  split_regions: bool
+                                  ):
+        if split_start_groups:
+            # split by start group, toss each group and then process conflicts on the boundaries
+            cur_start_group = -1
+            persons_sub_lists = []
+            cur_array = []
+            for cur_person in sorted(persons, key=lambda x: x.start_group):
+                if cur_start_group < 0:
+                    cur_start_group = cur_person.start_group
+                if cur_person.start_group != cur_start_group:
+                    # if start group in sorted list changed, process current sub list
+                    persons_sub_lists.append(self.process_array_impl(cur_array, split_teams, split_regions))
+                    cur_array = []
+                    cur_start_group = cur_person.start_group
+                cur_array.append(cur_person)
 
-            self.process_conflicts_interval(start, end)
-            start = end + 1
+            persons_sub_lists.append(self.process_array_impl(cur_array, split_teams, split_regions))
 
-    def process_conflicts_interval(self, start, end):
-        if self.split_teams or self.split_regions:
-            i = start
-            run = True
-            while run:
-                if i >= end:
-                    # no conflicts till the end!
-                    return True
+            ret_array = []
+            conflict_list = []
+            for i in range(len(persons_sub_lists)-1):
+                # first find any start group, that cannot be changed (max set >= (N+1)//2)
+                cur_list = persons_sub_lists[i]
+                next_list = persons_sub_lists[i+1]
 
-                if self.conflict(i, i + 1):
-                    j = i + 2
-                    while j != i:
-                        # boundary processing
-                        if j > end:
-                            # go to the beginning of array
-                            j = start
-                            if j == i:
-                                break
+                cur_prop = self.get_split_property(cur_list[-1], split_teams, split_regions)
+                next_prop = self.get_split_property(next_list[0], split_teams, split_regions)
+                if cur_prop == next_prop:
+                    # conflict detected
+                    conflict_list.append(i)
 
-                        if self.conflict(i, j):
-                            j += 1
-                        else:
-                            # j index is a solution to split conflicting pair
+            if len(conflict_list) > 0:
+                # conflict on boundaries found, try to process
+
+                fixed_list = []
+                incorrect_list = []
+                self.detect_fixed_sets(persons_sub_lists, incorrect_list, fixed_list, split_teams, split_regions)
+
+                while len(conflict_list) > 0:
+                    i = conflict_list.pop(0)
+                    if i in fixed_list and i+1 in fixed_list:
+                        # 2 sets are fixed or incorrect, cannot solve conflict
+                        # e.g. A,B,A and A,D,A,C,A
+                        logging.info(f'conflict on start group boundaries cannot be solved!'
+                                     f' group: {persons_sub_lists[i][0].group.name},'
+                                     f' start groups: {persons_sub_lists[i][0].start_group},'
+                                     f' {persons_sub_lists[i+1][0].start_group}')
+                        break
+
+                    if i + 1 not in fixed_list:
+                        self.direct_solving(persons_sub_lists,
+                                            conflict_list,
+                                            fixed_list,
+                                            i,
+                                            split_teams,
+                                            split_regions)
+                    elif i not in fixed_list:
+                        self.backward_solving(persons_sub_lists,
+                                              conflict_list,
+                                              fixed_list,
+                                              i,
+                                              split_teams,
+                                              split_regions)
+
+            for i in persons_sub_lists:
+                ret_array += i
+
+            return ret_array
+        else:
+            return self.process_array_impl(persons, split_teams, split_regions)
+
+    def detect_fixed_sets(self, persons_sub_lists, incorrect_list, fixed_list, split_teams, split_regions):
+        for i in range(len(persons_sub_lists)):
+            cur_list = persons_sub_lists[i]
+
+            is_fixed = False
+            is_correct = True
+
+            # check for correctness, neighbours should be different
+            for j in range(len(cur_list) - 1):
+                prop1 = self.get_split_property(cur_list[j], split_teams, split_regions)
+                prop2 = self.get_split_property(cur_list[j + 1], split_teams, split_regions)
+                if prop1 == prop2:
+                    is_correct = False
+                    break
+
+            # find fixed sets, that cannot change boundary elements
+            # (odd and each second is the same, e.g. A,B,A,C,A,D,A,F,A)
+            if is_correct and len(cur_list) % 2 == 1:
+                is_fixed = True
+                check_name = self.get_split_property(cur_list[0], split_teams, split_regions)
+                for j in range(len(cur_list)):
+                    if j % 2 == 0:
+                        if self.get_split_property(cur_list[j], split_teams, split_regions) != check_name:
+                            is_fixed = False
                             break
 
-                    if j == i:
-                        # no solution found
-                        print('no solution found for group ' + self.person_array[j][1])
-                        return False
-                    else:
-                        # insert j after checked_index i
-                        tmp = self.person_array.pop(j)
-                        if j < i:
-                            i -= 1
-                        self.person_array.insert(i + 1, tmp)
-                i += 1
+            if is_correct:
+                if is_fixed:
+                    fixed_list.append(i)
+            else:
+                incorrect_list.append(i)
+                fixed_list.append(i)
 
-    def conflict(self, i, j):
-        conflict = False
-        cur_team = self.person_array[i][3]
-        cur_region = self.person_array[i][4]
-        next_team = self.person_array[j][3]
-        next_region = self.person_array[j][4]
-        if self.split_teams and cur_team == next_team:
-            conflict = True
-        if self.split_regions and cur_region == next_region:
-            conflict = True
-        return conflict
+    def direct_solving(self, persons_sub_lists, conflict_list, fixed_list, i, split_teams, split_regions) -> bool:
+        # forward moving, till all conflicts are solved of fixed list meet
 
-    def get_first_index_in_group(self, search_index):
-        k = search_index
-        current_group = self.person_array[k][1]
-        while k >= 0 and self.person_array[k][1] == current_group:
-            k -= 1
-        return k + 1
+        if i >= len(persons_sub_lists) - 1:
+            # last element reached, solved successfully
+            return True
 
-    def get_last_index_in_group(self, search_index):
-        k = search_index
-        current_group = self.person_array[k][1]
-        while k < len(self.person_array) and self.person_array[k][1] == current_group:
-            k += 1
-        return k - 1
+        if i + 1 in fixed_list:
+            # fixed set found, cannot solve, register conflict for backward solution
+            if i not in conflict_list:
+                conflict_list.append(i)
+            return False
 
-    def get_first_index_in_start_group(self, search_index):
-        k = search_index
-        current_group = self.person_array[k][2]
-        while k >= 0 and self.person_array[k][2] == current_group:
-            k -= 1
-        return k + 1
+        person1 = persons_sub_lists[i][-1]
+        person2 = persons_sub_lists[i + 1][0]
+        prop1 = self.get_split_property(person1, split_teams, split_regions)
+        prop2 = self.get_split_property(person2, split_teams, split_regions)
+        if prop1 != prop2:
+            # solved at current position
+            return True
 
-    def get_last_index_in_start_group(self, search_index):
-        k = search_index
-        current_group = self.person_array[k][2]
-        while k < len(self.person_array) and self.person_array[k][2] == current_group:
-            k += 1
-        return k - 1
+        if i in conflict_list:
+            # remove from conflict list not to check again
+            conflict_list.remove(i)
+
+        if self.change_first(persons_sub_lists[i + 1], split_teams, split_regions):
+            # first element changed and conflict solved
+            return True
+
+        # recursive call for semi-fixed sets
+        return self.direct_solving(persons_sub_lists, conflict_list, fixed_list, i + 1, split_teams, split_regions)
+
+    def backward_solving(self, persons_sub_lists, conflict_list, fixed_list, i, split_teams, split_regions) -> bool:
+        # backward moving, till all conflicts are changed of fixed list meet
+        # note, it's activated only if direct solving is not possible
+
+        if i < 0:
+            # first element, solved successfully
+            return True
+
+        if i in fixed_list:
+            # cannot solve - 2 fixed sets connected with semi-fixed sets
+            logging.info(f'conflict on start group boundaries cannot be solved!'
+                         f'2 fixed sets connected with semi-fixed sets'
+                         f' group: {persons_sub_lists[i][0].group.name},'
+                         f' start groups: {persons_sub_lists[i][0].start_group},'
+                         f' {persons_sub_lists[i + 1][0].start_group}')
+            return False
+
+        person1 = persons_sub_lists[i][-1]
+        person2 = persons_sub_lists[i + 1][0]
+        prop1 = self.get_split_property(person1, split_teams, split_regions)
+        prop2 = self.get_split_property(person2, split_teams, split_regions)
+        if prop1 != prop2:
+            # solved at current position
+            return True
+
+        if self.change_last(persons_sub_lists[i], split_teams, split_regions):
+            # last element changed and conflict solved
+            return True
+
+        # recursive call for semi-fixed sets
+        return self.backward_solving(persons_sub_lists, conflict_list, fixed_list, i - 1, split_teams, split_regions)
+
+    def change_last(self, persons, split_teams, split_regions) -> bool:
+        # returns True if last element changed and first remain the same
+        # returns False if changing of last element forced first element change (A,B -> B,A)
+
+        last_prop = self.get_split_property(persons[-1], split_teams, split_regions)
+        for i in range(len(persons)-1):
+            prop1 = self.get_split_property(persons[i], split_teams, split_regions)
+            prop2 = self.get_split_property(persons[i+1], split_teams, split_regions)
+            if prop1 != last_prop and prop2 != last_prop:
+                person = persons.pop(-1)
+                persons.insert(i+1, person)
+                logging.info(f'Conflict at start group boundaries solving in group: {person.group.name}, '
+                             f'moving {person.full_name} to position {i+2}')
+                return True
+
+        # had to change first element, e.g. A,B,A,B -> B,A,B,A
+        # dangerous operation, need to check for conflicts again
+        if last_prop != self.get_split_property(persons[0], split_teams, split_regions):
+            persons.insert(0, persons.pop(-1))
+            return False
+
+        # cannot change last element
+        logging.debug(f'Cannot change last element, send file to developers!')
+        return False
+
+    def change_first(self, persons, split_teams, split_regions):
+        persons.reverse()
+        self.change_last(persons, split_teams, split_regions)
+        persons.reverse()
+
+    def process_array_impl(self, persons, split_teams: bool, split_regions: bool):
+        shuffle(persons)
+        separated_dict = {}
+        result_list = []
+
+        # separate all person to arrays by split property
+        for cur_person in persons:
+            prop = self.get_split_property(cur_person, split_teams, split_regions)
+            if prop not in separated_dict:
+                separated_dict[prop] = []
+            separated_dict[prop].append(cur_person)
+
+        rest_count = len(persons)
+        max_name, max_count, max_index = self.get_max_group_size(separated_dict, '')
+        duplicated_array = []
+
+        # limit = (N+1)//2 (e.g. 5 for 10 and 6 for 11)
+        limit = (rest_count + 1) // 2
+        if max_count > limit:
+            # impossible to split
+            duplicated_array = separated_dict[max_name][limit:]
+            separated_dict[max_name] = separated_dict[max_name][:limit]
+            rest_count -= len(duplicated_array)
+            logging.debug(f'Cannot toss, {max_count} elements from {len(persons)} have property: '
+                          f'{self.get_split_property(duplicated_array[0], split_teams, split_regions)}'
+                          f'in group {duplicated_array[0].group.name}')
+
+        cur_index = 0
+        while max_count > 0:
+            limit = (rest_count + 1) // 2
+            if max_count >= limit:
+                # take person from max set, otherwise they will be duplicated
+                cur_prop = max_name
+                cur_index = max_index
+            else:
+                # can take person from random set
+                len_dict = len(separated_dict)
+                # this guarantee selecting another index (not to coincide with last used set)
+                cur_index = (cur_index + randint(1, len_dict - 1)) % len_dict
+                cur_prop = list(separated_dict.keys())[cur_index]
+
+            # extract person from selected set
+            result_list.append(separated_dict[cur_prop].pop(0))
+            rest_count -= 1
+            if len(separated_dict[cur_prop]) < 1:
+                # remove set if it's empty
+                separated_dict.pop(cur_prop)
+
+            # recalculate max set for next loop
+            max_name, max_count, max_index = self.get_max_group_size(separated_dict, cur_prop)
+
+        # insert at random positions rest values, that are out of limit N/2 for max set
+        if len(duplicated_array) > 0:
+            for i in duplicated_array:
+                result_list.insert(randint(0, len(result_list) - 1), i)
+        if cur_prop in separated_dict.keys():
+            for i in separated_dict.get(cur_prop):
+                result_list.insert(randint(0, len(result_list) - 1), i)
+
+        return result_list
+
+    def get_split_property(self, person, split_teams, split_regions) -> str:
+        if person.organization is None:
+            return 's'
+
+        if split_regions:
+            return person.organization.region
+        elif split_teams:
+            return person.organization.name
+        else:
+            return 's'
+
+    def get_max_group_size(self, separated_dict: dict, ignore_name):
+        max_count = 0
+        max_index = 0
+        max_group = None
+        i = -1
+        for k in separated_dict.keys():
+            i += 1
+            if ignore_name == k:
+                continue
+            if len(separated_dict[k]) > max_count:
+                max_count = len(separated_dict[k])
+                max_group = k
+                max_index = i
+
+        return max_group, max_count, max_index
 
 
 class StartNumberManager:
@@ -238,7 +454,7 @@ class StartNumberManager:
         self.race = r
 
     def process(
-        self, mode='interval', first_number=None, interval=None, mix_groups=False
+            self, mode='interval', first_number=None, interval=None, mix_groups=False
     ):
         if mode == 'interval':
             cur_num = first_number
@@ -311,12 +527,12 @@ class StartTimeManager:
         self.race = r
 
     def process(
-        self,
-        corridor_first_start,
-        is_group_start_interval,
-        fixed_start_interval=None,
-        one_minute_qty=1,
-        mix_groups=False,
+            self,
+            corridor_first_start,
+            is_group_start_interval,
+            fixed_start_interval=None,
+            one_minute_qty=1,
+            mix_groups=False,
     ):
         corridors = get_corridors()
         for cur_corridor in corridors:

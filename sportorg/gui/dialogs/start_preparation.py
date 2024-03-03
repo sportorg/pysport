@@ -366,7 +366,7 @@ class StartPreparationDialog(QDialog):
 
             self.save_state()
         except Exception as e:
-            logging.error(str(e))
+            logging.exception(e)
         super().accept(*args, **kwargs)
 
     def save_state(self):
