@@ -265,8 +265,8 @@ class ResultChecker:
         """
         if not splits:
             return [], []
-        regular = [punch for punch in splits if int(punch.code) != lap_station]
-        penalty = [punch for punch in splits if int(punch.code) == lap_station]
+        regular = [punch for punch in splits if (punch.is_correct or int(punch.code) != lap_station)]
+        penalty = [punch for punch in splits if (int(punch.code) == lap_station and not punch.is_correct)]
         return regular, penalty
 
     @staticmethod
