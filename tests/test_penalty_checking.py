@@ -363,7 +363,6 @@ def check(
     result = race().results[0]
     result.splits = make_splits(splits)
     ResultChecker.checking(result)
-    ResultChecker.calculate_penalty(result)
     result_penalty = get_penalty(result)
 
     check_result = result.status == result_status, result_penalty == penalty

@@ -726,8 +726,21 @@ class Result:
         ret_ms = (
             self.get_finish_time().to_msec() - self.get_start_time_relay().to_msec()
         )
+
+        # accumulate penalty for all legs
         ret_ms += self.get_penalty_time().to_msec()
         ret_ms -= self.get_credit_time().to_msec()
+
+        if self.person:
+            cur_bib = self.person.bib - 1000
+            while cur_bib > 1000:
+                prev_person = find(race().persons, bib=cur_bib)
+                res = race().find_person_result(prev_person)
+                if res:
+                    ret_ms += res.get_penalty_time().to_msec()
+                    ret_ms -= res.get_credit_time().to_msec()
+                cur_bib -= 1000
+
         return OTime(msec=ret_ms).round(time_accuracy, TimeRounding[time_rounding])
 
     def get_result_otime_multi_day(self):
@@ -2290,7 +2303,12 @@ class RelayTeam:
             if last_correct_leg > 0:
                 last_finish = self.get_leg(last_correct_leg).get_finish_time()
                 start = self.get_leg(1).get_start_time()
-                return last_finish - start
+                time = last_finish - start
+                for i in range(last_correct_leg):
+                    time += self.get_leg(i + 1).result.get_penalty_time()
+                    time -= self.get_leg(i + 1).result.get_credit_time()
+                return time
+
         return OTime()
 
     def get_lap_finished(self):
