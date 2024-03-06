@@ -915,6 +915,9 @@ class MainWindow(QMainWindow):
             # already locked by current process ('Save as' or 'Open' for the same file)
             return True
 
+        # unlock previously locked file (e.g. in case of 'save as' operation)
+        self.unlock_file(self.file)
+
         # try to acquire the lock on a single file path
         lockfile = file_name + '.lock'
         if exists(lockfile):
@@ -939,6 +942,7 @@ class MainWindow(QMainWindow):
         return True
 
     def unlock_file(self, file_name):
-        lockfile = file_name + '.lock'
-        if exists(lockfile):
-            remove(lockfile)
+        if file_name:
+            lockfile = file_name + '.lock'
+            if exists(lockfile):
+                remove(lockfile)
