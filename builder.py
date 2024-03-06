@@ -30,6 +30,7 @@ options = {
         "include_files": include_files,
         "zip_include_packages": ["PySide2"],
         "optimize": 2,
+        'include_msvcr': True,
     }
 }
 
