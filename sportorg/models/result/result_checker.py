@@ -53,9 +53,9 @@ class ResultChecker:
         ]:
             result.status = ResultStatus.OK
 
+            check_flag = o.check_result(result)
             ResultChecker.calculate_penalty(result)
-
-            if not o.check_result(result):
+            if not check_flag:
                 result.status = ResultStatus.MISSING_PUNCH
                 result.status_comment = 'п.п.3.13.12.2'
 
