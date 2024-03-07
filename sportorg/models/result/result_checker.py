@@ -98,6 +98,13 @@ class ResultChecker:
         controls = course.controls
         splits = result.splits
 
+        # use prefixes _min and _lap in group name to force non-standard penalty
+        # TODO move setting to group properties
+        if person.group.name.lower().find('_min') > -1:
+            mode = 'time'
+        if person.group.name.lower().find('_lap') > -1:
+            mode = 'laps'
+
         if mode == 'laps' and race().get_setting('marked_route_if_station_check'):
             lap_station = race().get_setting('marked_route_penalty_lap_station_code')
             splits, _ = ResultChecker.detach_penalty_laps2(splits, lap_station)
