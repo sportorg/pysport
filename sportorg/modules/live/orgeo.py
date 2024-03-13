@@ -23,7 +23,9 @@ RESULT_STATUS = [
     'DID_NOT_START',
     'DID_NOT_ENTER',
     'CANCELLED',
-]  # 'RESTORED' is 'OK'
+    'OK',  # 'RESTORED' is 'OK'
+    'DISQUALIFIED',  # MISSED_PENALTY_LAP
+]
 
 
 class Orgeo:
