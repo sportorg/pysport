@@ -2,7 +2,7 @@ from re import subn
 from typing import Any, Dict
 
 from sportorg.common.otime import OTime
-from sportorg.utils.time import int_to_otime
+from sportorg.utils.time import int_to_otime, time_to_hhmmss
 
 LOG_MSG = 'HTTP Status: %s, Msg: %s'
 
@@ -162,6 +162,12 @@ def _get_person_obj(data, race_data, result=None):
                 'time': round((end_time - start_time) / 1000),
             }
             obj['splits'].append(current_split)
+
+            # add info about penalty (as string(20))
+            if result['penalty_laps'] > 0:
+                obj['penalty'] = str(result['penalty_laps'])
+            if result['penalty_time'] > 0:
+                obj['penalty'] = time_to_hhmmss(OTime(msec=result['penalty_time']))
 
     return obj
 
