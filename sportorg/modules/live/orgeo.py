@@ -182,7 +182,7 @@ def make_nice(s):
     out: b'{"response":"OK: «кросс-спринт» - Стартовый успешно загружен | Start list loaded"}'
     """
     return subn(
-        '(\\\\\\\\u[0-9a-f]{4})', lambda cp: chr(int(cp.groups()[0][3:], 16)), s
+        '(\\\\u[0-9a-f]{4})', lambda cp: chr(int(cp.groups()[0][3:], 16)), s
     )[0]
 
 
