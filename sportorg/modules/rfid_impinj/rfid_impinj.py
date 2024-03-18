@@ -184,7 +184,7 @@ class ResultThread(QThread):
     def _get_result(card_data):
         result = memory.race().new_result(memory.ResultRfidImpinj)
 
-        limit = 10**8
+        limit = 10 ** 8
         hex_offset = 5000000
         epc = str(card_data['epc']).replace(' ', '')
 
