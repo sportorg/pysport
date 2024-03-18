@@ -3,6 +3,7 @@ import math
 import uuid
 from copy import copy
 from random import randint, shuffle
+from typing import List, Dict
 
 from sportorg.common.otime import OTime
 from sportorg.models.memory import Person, race
@@ -163,7 +164,7 @@ class DrawManager:
             # split by start group, toss each group and then process conflicts on the boundaries
             cur_start_group = -1
             persons_sub_lists = []
-            cur_array = []
+            cur_array: List[Person] = []
             for cur_person in sorted(persons, key=lambda x: x.start_group):
                 if cur_start_group < 0:
                     cur_start_group = cur_person.start_group
@@ -172,7 +173,7 @@ class DrawManager:
                     persons_sub_lists.append(
                         self.process_array_impl(cur_array, split_teams, split_regions)
                     )
-                    cur_array = []
+                    cur_array: List[Person] = []
                     cur_start_group = cur_person.start_group
                 cur_array.append(cur_person)
 
@@ -180,8 +181,8 @@ class DrawManager:
                 self.process_array_impl(cur_array, split_teams, split_regions)
             )
 
-            ret_array = []
-            conflict_list = []
+            ret_array: List[int] = []
+            conflict_list: List[int] = []
             for i in range(len(persons_sub_lists) - 1):
                 # first find any start group, that cannot be changed (max set >= (N+1)//2)
                 cur_list = persons_sub_lists[i]
@@ -423,8 +424,8 @@ class DrawManager:
 
     def process_array_impl(self, persons, split_teams: bool, split_regions: bool):
         shuffle(persons)
-        separated_dict = {}
-        result_list = []
+        separated_dict: Dict[str, List[Person]] = {}
+        result_list: List[Person] = []
 
         # separate all person to arrays by split property
         for cur_person in persons:
@@ -435,7 +436,7 @@ class DrawManager:
 
         rest_count = len(persons)
         max_name, max_count, max_index = self.get_max_group_size(separated_dict, '')
-        duplicated_array = []
+        duplicated_array: List[Person] = []
 
         # limit = (N+1)//2 (e.g. 5 for 10 and 6 for 11)
         limit = (rest_count + 1) // 2
