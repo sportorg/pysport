@@ -2,16 +2,15 @@ import ast
 import logging
 import os
 import time
-
 from os import remove
 from os.path import exists
 from queue import Queue
 
 import psutil
+from psutil import Process
 from PySide2 import QtCore, QtGui, QtWidgets
 from PySide2.QtCore import QTimer
 from PySide2.QtWidgets import QMainWindow, QMessageBox
-from psutil import Process
 
 from sportorg import config
 from sportorg.common.broker import Broker
@@ -932,7 +931,9 @@ class MainWindow(QMainWindow):
                     QMessageBox.warning(
                         self,
                         translate('Error'),
-                        translate('Cannot open file, already locked') + ': ' + file_name,
+                        translate('Cannot open file, already locked')
+                        + ': '
+                        + file_name,
                     )
                     return False
 

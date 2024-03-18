@@ -1,9 +1,8 @@
 import logging
 import math
-import random
 import uuid
 from copy import copy
-from random import shuffle, randint
+from random import randint, shuffle
 
 from sportorg.common.otime import OTime
 from sportorg.models.memory import Person, race
@@ -36,7 +35,7 @@ class ReserveManager:
             if count > 0:
                 for current_person in persons:
                     str_name = (
-                            '' + str(current_person.surname) + str(current_person.name)
+                        '' + str(current_person.surname) + str(current_person.name)
                     )
                     if str.find(str_name, reserve_prefix) > -1:
                         existing_reserves += 1
@@ -104,14 +103,14 @@ class DrawManager:
         current_race.persons = ret
 
     def process_array(
-            self, persons, split_start_groups, split_teams, split_regions, mix_groups=False
+        self, persons, split_start_groups, split_teams, split_regions, mix_groups=False
     ):
         obj = race()
         person_array = []
 
         # toss by course
         if mix_groups:
-            for cur_course in (obj.courses + [None]):
+            for cur_course in obj.courses + [None]:
                 groups = []
                 for cur_group in obj.groups:
                     if cur_group.course == cur_course:
@@ -129,8 +128,8 @@ class DrawManager:
                 if len(cur_array) < 1:
                     continue
 
-                person_array += (
-                    self.process_array_start_group(cur_array, split_start_groups, split_teams, split_regions)
+                person_array += self.process_array_start_group(
+                    cur_array, split_start_groups, split_teams, split_regions
                 )
 
         # toss by group
@@ -143,24 +142,23 @@ class DrawManager:
                     cur_group = cur_person.group
                 if cur_person.group != cur_group:
                     # if group in sorted list changed, process current sub list
-                    person_array += (
-                        self.process_array_start_group(cur_array, split_start_groups, split_teams, split_regions)
+                    person_array += self.process_array_start_group(
+                        cur_array, split_start_groups, split_teams, split_regions
                     )
                     cur_array = []
                     cur_group = cur_person.group
                 cur_array.append(cur_person)
 
             # last part outside loop
-            person_array += self.process_array_start_group(cur_array, split_start_groups, split_teams, split_regions)
+            person_array += self.process_array_start_group(
+                cur_array, split_start_groups, split_teams, split_regions
+            )
 
         return person_array
 
-    def process_array_start_group(self,
-                                  persons,
-                                  split_start_groups: bool,
-                                  split_teams: bool,
-                                  split_regions: bool
-                                  ):
+    def process_array_start_group(
+        self, persons, split_start_groups: bool, split_teams: bool, split_regions: bool
+    ):
         if split_start_groups:
             # split by start group, toss each group and then process conflicts on the boundaries
             cur_start_group = -1
@@ -171,22 +169,30 @@ class DrawManager:
                     cur_start_group = cur_person.start_group
                 if cur_person.start_group != cur_start_group:
                     # if start group in sorted list changed, process current sub list
-                    persons_sub_lists.append(self.process_array_impl(cur_array, split_teams, split_regions))
+                    persons_sub_lists.append(
+                        self.process_array_impl(cur_array, split_teams, split_regions)
+                    )
                     cur_array = []
                     cur_start_group = cur_person.start_group
                 cur_array.append(cur_person)
 
-            persons_sub_lists.append(self.process_array_impl(cur_array, split_teams, split_regions))
+            persons_sub_lists.append(
+                self.process_array_impl(cur_array, split_teams, split_regions)
+            )
 
             ret_array = []
             conflict_list = []
-            for i in range(len(persons_sub_lists)-1):
+            for i in range(len(persons_sub_lists) - 1):
                 # first find any start group, that cannot be changed (max set >= (N+1)//2)
                 cur_list = persons_sub_lists[i]
-                next_list = persons_sub_lists[i+1]
+                next_list = persons_sub_lists[i + 1]
 
-                cur_prop = self.get_split_property(cur_list[-1], split_teams, split_regions)
-                next_prop = self.get_split_property(next_list[0], split_teams, split_regions)
+                cur_prop = self.get_split_property(
+                    cur_list[-1], split_teams, split_regions
+                )
+                next_prop = self.get_split_property(
+                    next_list[0], split_teams, split_regions
+                )
                 if cur_prop == next_prop:
                     # conflict detected
                     conflict_list.append(i)
@@ -196,33 +202,45 @@ class DrawManager:
 
                 fixed_list = []
                 incorrect_list = []
-                self.detect_fixed_sets(persons_sub_lists, incorrect_list, fixed_list, split_teams, split_regions)
+                self.detect_fixed_sets(
+                    persons_sub_lists,
+                    incorrect_list,
+                    fixed_list,
+                    split_teams,
+                    split_regions,
+                )
 
                 while len(conflict_list) > 0:
                     i = conflict_list.pop(0)
-                    if i in fixed_list and i+1 in fixed_list:
+                    if i in fixed_list and i + 1 in fixed_list:
                         # 2 sets are fixed or incorrect, cannot solve conflict
                         # e.g. A,B,A and A,D,A,C,A
-                        logging.info(f'conflict on start group boundaries cannot be solved!'
-                                     f' group: {persons_sub_lists[i][0].group.name},'
-                                     f' start groups: {persons_sub_lists[i][0].start_group},'
-                                     f' {persons_sub_lists[i+1][0].start_group}')
+                        logging.info(
+                            f'conflict on start group boundaries cannot be solved!'
+                            f' group: {persons_sub_lists[i][0].group.name},'
+                            f' start groups: {persons_sub_lists[i][0].start_group},'
+                            f' {persons_sub_lists[i+1][0].start_group}'
+                        )
                         break
 
                     if i + 1 not in fixed_list:
-                        self.direct_solving(persons_sub_lists,
-                                            conflict_list,
-                                            fixed_list,
-                                            i,
-                                            split_teams,
-                                            split_regions)
+                        self.direct_solving(
+                            persons_sub_lists,
+                            conflict_list,
+                            fixed_list,
+                            i,
+                            split_teams,
+                            split_regions,
+                        )
                     elif i not in fixed_list:
-                        self.backward_solving(persons_sub_lists,
-                                              conflict_list,
-                                              fixed_list,
-                                              i,
-                                              split_teams,
-                                              split_regions)
+                        self.backward_solving(
+                            persons_sub_lists,
+                            conflict_list,
+                            fixed_list,
+                            i,
+                            split_teams,
+                            split_regions,
+                        )
 
             for i in persons_sub_lists:
                 ret_array += i
@@ -231,7 +249,9 @@ class DrawManager:
         else:
             return self.process_array_impl(persons, split_teams, split_regions)
 
-    def detect_fixed_sets(self, persons_sub_lists, incorrect_list, fixed_list, split_teams, split_regions):
+    def detect_fixed_sets(
+        self, persons_sub_lists, incorrect_list, fixed_list, split_teams, split_regions
+    ):
         for i in range(len(persons_sub_lists)):
             cur_list = persons_sub_lists[i]
 
@@ -241,7 +261,9 @@ class DrawManager:
             # check for correctness, neighbours should be different
             for j in range(len(cur_list) - 1):
                 prop1 = self.get_split_property(cur_list[j], split_teams, split_regions)
-                prop2 = self.get_split_property(cur_list[j + 1], split_teams, split_regions)
+                prop2 = self.get_split_property(
+                    cur_list[j + 1], split_teams, split_regions
+                )
                 if prop1 == prop2:
                     is_correct = False
                     break
@@ -250,10 +272,17 @@ class DrawManager:
             # (odd and each second is the same, e.g. A,B,A,C,A,D,A,F,A)
             if is_correct and len(cur_list) % 2 == 1:
                 is_fixed = True
-                check_name = self.get_split_property(cur_list[0], split_teams, split_regions)
+                check_name = self.get_split_property(
+                    cur_list[0], split_teams, split_regions
+                )
                 for j in range(len(cur_list)):
                     if j % 2 == 0:
-                        if self.get_split_property(cur_list[j], split_teams, split_regions) != check_name:
+                        if (
+                            self.get_split_property(
+                                cur_list[j], split_teams, split_regions
+                            )
+                            != check_name
+                        ):
                             is_fixed = False
                             break
 
@@ -264,7 +293,15 @@ class DrawManager:
                 incorrect_list.append(i)
                 fixed_list.append(i)
 
-    def direct_solving(self, persons_sub_lists, conflict_list, fixed_list, i, split_teams, split_regions) -> bool:
+    def direct_solving(
+        self,
+        persons_sub_lists,
+        conflict_list,
+        fixed_list,
+        i,
+        split_teams,
+        split_regions,
+    ) -> bool:
         # forward moving, till all conflicts are solved of fixed list meet
 
         if i >= len(persons_sub_lists) - 1:
@@ -294,9 +331,24 @@ class DrawManager:
             return True
 
         # recursive call for semi-fixed sets
-        return self.direct_solving(persons_sub_lists, conflict_list, fixed_list, i + 1, split_teams, split_regions)
+        return self.direct_solving(
+            persons_sub_lists,
+            conflict_list,
+            fixed_list,
+            i + 1,
+            split_teams,
+            split_regions,
+        )
 
-    def backward_solving(self, persons_sub_lists, conflict_list, fixed_list, i, split_teams, split_regions) -> bool:
+    def backward_solving(
+        self,
+        persons_sub_lists,
+        conflict_list,
+        fixed_list,
+        i,
+        split_teams,
+        split_regions,
+    ) -> bool:
         # backward moving, till all conflicts are changed of fixed list meet
         # note, it's activated only if direct solving is not possible
 
@@ -306,11 +358,13 @@ class DrawManager:
 
         if i in fixed_list:
             # cannot solve - 2 fixed sets connected with semi-fixed sets
-            logging.info(f'conflict on start group boundaries cannot be solved!'
-                         f'2 fixed sets connected with semi-fixed sets'
-                         f' group: {persons_sub_lists[i][0].group.name},'
-                         f' start groups: {persons_sub_lists[i][0].start_group},'
-                         f' {persons_sub_lists[i + 1][0].start_group}')
+            logging.info(
+                f'conflict on start group boundaries cannot be solved!'
+                f'2 fixed sets connected with semi-fixed sets'
+                f' group: {persons_sub_lists[i][0].group.name},'
+                f' start groups: {persons_sub_lists[i][0].start_group},'
+                f' {persons_sub_lists[i + 1][0].start_group}'
+            )
             return False
 
         person1 = persons_sub_lists[i][-1]
@@ -326,21 +380,30 @@ class DrawManager:
             return True
 
         # recursive call for semi-fixed sets
-        return self.backward_solving(persons_sub_lists, conflict_list, fixed_list, i - 1, split_teams, split_regions)
+        return self.backward_solving(
+            persons_sub_lists,
+            conflict_list,
+            fixed_list,
+            i - 1,
+            split_teams,
+            split_regions,
+        )
 
     def change_last(self, persons, split_teams, split_regions) -> bool:
         # returns True if last element changed and first remain the same
         # returns False if changing of last element forced first element change (A,B -> B,A)
 
         last_prop = self.get_split_property(persons[-1], split_teams, split_regions)
-        for i in range(len(persons)-1):
+        for i in range(len(persons) - 1):
             prop1 = self.get_split_property(persons[i], split_teams, split_regions)
-            prop2 = self.get_split_property(persons[i+1], split_teams, split_regions)
+            prop2 = self.get_split_property(persons[i + 1], split_teams, split_regions)
             if prop1 != last_prop and prop2 != last_prop:
                 person = persons.pop(-1)
-                persons.insert(i+1, person)
-                logging.info(f'Conflict at start group boundaries solving in group: {person.group.name}, '
-                             f'moving {person.full_name} to position {i+2}')
+                persons.insert(i + 1, person)
+                logging.info(
+                    f'Conflict at start group boundaries solving in group: {person.group.name}, '
+                    f'moving {person.full_name} to position {i+2}'
+                )
                 return True
 
         # had to change first element, e.g. A,B,A,B -> B,A,B,A
@@ -381,9 +444,11 @@ class DrawManager:
             duplicated_array = separated_dict[max_name][limit:]
             separated_dict[max_name] = separated_dict[max_name][:limit]
             rest_count -= len(duplicated_array)
-            logging.debug(f'Cannot toss, {max_count} elements from {len(persons)} have property: '
-                          f'{self.get_split_property(duplicated_array[0], split_teams, split_regions)}'
-                          f'in group {duplicated_array[0].group.name}')
+            logging.debug(
+                f'Cannot toss, {max_count} elements from {len(persons)} have property: '
+                f'{self.get_split_property(duplicated_array[0], split_teams, split_regions)}'
+                f'in group {duplicated_array[0].group.name}'
+            )
 
         cur_index = 0
         while max_count > 0:
@@ -407,7 +472,9 @@ class DrawManager:
                 separated_dict.pop(cur_prop)
 
             # recalculate max set for next loop
-            max_name, max_count, max_index = self.get_max_group_size(separated_dict, cur_prop)
+            max_name, max_count, max_index = self.get_max_group_size(
+                separated_dict, cur_prop
+            )
 
         # insert at random positions rest values, that are out of limit N/2 for max set
         if len(duplicated_array) > 0:
@@ -454,7 +521,7 @@ class StartNumberManager:
         self.race = r
 
     def process(
-            self, mode='interval', first_number=None, interval=None, mix_groups=False
+        self, mode='interval', first_number=None, interval=None, mix_groups=False
     ):
         if mode == 'interval':
             cur_num = first_number
@@ -527,12 +594,12 @@ class StartTimeManager:
         self.race = r
 
     def process(
-            self,
-            corridor_first_start,
-            is_group_start_interval,
-            fixed_start_interval=None,
-            one_minute_qty=1,
-            mix_groups=False,
+        self,
+        corridor_first_start,
+        is_group_start_interval,
+        fixed_start_interval=None,
+        one_minute_qty=1,
+        mix_groups=False,
     ):
         corridors = get_corridors()
         for cur_corridor in corridors:

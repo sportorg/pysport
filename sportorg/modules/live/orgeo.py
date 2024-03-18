@@ -181,9 +181,7 @@ def make_nice(s):
     in: b'{"response":"OK: \\u00ab\\u043a\\u0440\\u043e\\u0441\\u0441-\\u0441\\u043f\\ ...
     out: b'{"response":"OK: «кросс-спринт» - Стартовый успешно загружен | Start list loaded"}'
     """
-    return subn(
-        '(\\\\u[0-9a-f]{4})', lambda cp: chr(int(cp.groups()[0][3:], 16)), s
-    )[0]
+    return subn('(\\\\u[0-9a-f]{4})', lambda cp: chr(int(cp.groups()[0][3:], 16)), s)[0]
 
 
 async def create(url, data, race_data, log, *, session):
@@ -280,10 +278,14 @@ async def create_online_cp(url, data, race_data, log, *, session):
                     if card_number > 0:
                         code = race_data['settings']['live_cp_code']
                         finish_time = OTime.now()
-                        if res['finish_time'] is not None :
-                            finish_time = int_to_otime(res['finish_time'] // 10).to_str()
+                        if res['finish_time'] is not None:
+                            finish_time = int_to_otime(
+                                res['finish_time'] // 10
+                            ).to_str()
                         resp = await o.send_online_cp(card_number, code, finish_time)
-                        print (f"card={card_number} code={str(code)} finish={finish_time}")
+                        print(
+                            f'card={card_number} code={str(code)} finish={finish_time}'
+                        )
                         result_txt = make_nice(str(await resp.text()))
 
                         if resp.status != 200:

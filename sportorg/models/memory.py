@@ -1820,7 +1820,9 @@ class Race(Model):
             finish = result.get_finish_time()
 
             if finish < start and start.hour < 22 and finish != OTime(0):
-                logging.info(f'Ignoring finish with time before start: {finish} for card {result.card_number}')
+                logging.info(
+                    f'Ignoring finish with time before start: {finish} for card {result.card_number}'
+                )
                 return
 
         self.results.insert(0, result)
