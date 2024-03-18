@@ -67,9 +67,11 @@ def course_data(tree, ns):
             course = {
                 'name': course_el.find('CourseName').text.strip(),
                 'length': int(course_variation_el.find('CourseLength').text),
-                'climb': int(course_variation_el.find('CourseClimb').text.strip())
-                if course_variation_el.find('CourseClimb').text.strip().isdigit()
-                else 0,
+                'climb': (
+                    int(course_variation_el.find('CourseClimb').text.strip())
+                    if course_variation_el.find('CourseClimb').text.strip().isdigit()
+                    else 0
+                ),
                 'controls': [],
             }
 
@@ -224,9 +226,9 @@ def entry_list(tree, ns):
                     {
                         'person': person,
                         'organization': organization,
-                        'group': groups[group['id']]
-                        if group['id'] in groups
-                        else group,
+                        'group': (
+                            groups[group['id']] if group['id'] in groups else group
+                        ),
                         'control_card': control_card,
                         'race_numbers': race_numbers,
                     }
@@ -250,9 +252,11 @@ def start_list(tree, ns):
         groups[group_id] = {
             'id': group_id,
             'name': group_el.find('iof:Name', ns).text,
-            'short_name': group_el.find('iof:ShortName', ns).text
-            if group_el.find('iof:ShortName', ns)
-            else '',
+            'short_name': (
+                group_el.find('iof:ShortName', ns).text
+                if group_el.find('iof:ShortName', ns)
+                else ''
+            ),
         }
 
         if class_start.find('iof:PersonStart', ns):
@@ -404,9 +408,11 @@ def result_list(tree, ns):
         groups[group_id] = {
             'id': group_id,
             'name': group_el.find('iof:Name', ns).text,
-            'short_name': group_el.find('iof:ShortName', ns).text
-            if group_el.find('iof:ShortName', ns)
-            else '',
+            'short_name': (
+                group_el.find('iof:ShortName', ns).text
+                if group_el.find('iof:ShortName', ns)
+                else ''
+            ),
         }
 
         if class_result.find('iof:PersonResult', ns):
@@ -460,17 +466,19 @@ def result_list(tree, ns):
                         splits.append(split_obj)
 
                 result = {
-                    'bib': result_el.find('iof:BibNumber', ns).text
-                    if bib_el is not None
-                    else '',
+                    'bib': (
+                        result_el.find('iof:BibNumber', ns).text
+                        if bib_el is not None
+                        else ''
+                    ),
                     'start_time': result_el.find('iof:StartTime', ns).text,
-                    'finish_time': finish_time_el.text
-                    if finish_time_el is not None
-                    else '',
+                    'finish_time': (
+                        finish_time_el.text if finish_time_el is not None else ''
+                    ),
                     'status': result_el.find('iof:Status', ns).text,
-                    'control_card': control_card_el.text
-                    if control_card_el is not None
-                    else '',
+                    'control_card': (
+                        control_card_el.text if control_card_el is not None else ''
+                    ),
                     'splits': splits,
                 }
                 person_results.append(
@@ -553,13 +561,13 @@ def result_list(tree, ns):
                     result = {
                         'bib': final_bib,
                         'start_time': result_el.find('iof:StartTime', ns).text,
-                        'finish_time': finish_time_el.text
-                        if finish_time_el is not None
-                        else '',
+                        'finish_time': (
+                            finish_time_el.text if finish_time_el is not None else ''
+                        ),
                         'status': result_el.find('iof:Status', ns).text,
-                        'control_card': control_card_el.text
-                        if control_card_el is not None
-                        else '',
+                        'control_card': (
+                            control_card_el.text if control_card_el is not None else ''
+                        ),
                         'splits': splits,
                     }
                     person_results.append(
@@ -592,9 +600,11 @@ def event(tree, ns):
     if event_el is not None:
         for race_el in event_el.findall('iof:Race', ns):
             race_obj = {
-                'name': race_el.find('iof:Name', ns).text
-                if race_el.find('iof:Name', ns) is not None
-                else ''
+                'name': (
+                    race_el.find('iof:Name', ns).text
+                    if race_el.find('iof:Name', ns) is not None
+                    else ''
+                )
             }
             start_time_el = race_el.find('iof:StartTime', ns)
             if start_time_el:

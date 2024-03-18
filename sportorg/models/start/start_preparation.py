@@ -3,7 +3,7 @@ import math
 import uuid
 from copy import copy
 from random import randint, shuffle
-from typing import List, Dict
+from typing import Dict, List
 
 from sportorg.common.otime import OTime
 from sportorg.models.memory import Person, race

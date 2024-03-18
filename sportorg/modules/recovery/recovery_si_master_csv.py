@@ -17,6 +17,7 @@ DOW;Finish_r time;Class;First name;Last name;Club;Country;Email;Date of birth;Se
 :03;47;Su; 14:39:54;37;Su; 14:47:02;90;Su; 14:49:21;
 
 """
+
 import csv
 
 from sportorg.common.otime import OTime

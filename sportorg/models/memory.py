@@ -118,9 +118,11 @@ class Organization(Model):
             'id': str(self.id),
             'name': self.name,
             'country': self.country,
-            'region': self.region[3:]
-            if self.region and len(self.region) > 3 and self.region[2] == '_'
-            else self.region,
+            'region': (
+                self.region[3:]
+                if self.region and len(self.region) > 3 and self.region[2] == '_'
+                else self.region
+            ),
             'contact': self.contact,
             'code': self.code,
             'count_person': self.count_person,  # readonly
@@ -414,9 +416,9 @@ class Split(Model):
             'index': self.index,  # readonly
             'course_index': self.course_index + 1,  # readonly
             'leg_time': self.leg_time.to_msec() if self.leg_time else None,  # readonly
-            'relative_time': self.relative_time.to_msec()
-            if self.relative_time
-            else None,  # readonly
+            'relative_time': (
+                self.relative_time.to_msec() if self.relative_time else None
+            ),  # readonly
             'leg_place': self.leg_place,  # readonly
             'relative_place': self.relative_place,  # readonly
             'is_correct': self.is_correct,
@@ -566,18 +568,20 @@ class Result:
             'created_at': self.created_at,  # readonly
             'result': self.get_result(),  # readonly
             'result_relay': self.get_result_relay(),
-            'result_current': self.get_result_otime_current_day().to_str()
-            if self.is_status_ok()
-            else self.get_result(),
+            'result_current': (
+                self.get_result_otime_current_day().to_str()
+                if self.is_status_ok()
+                else self.get_result()
+            ),
             'start_msec': self.get_start_time().to_msec(),  # readonly
             'finish_msec': self.get_finish_time().to_msec(),  # readonly
             'result_msec': self.get_result_otime().to_msec(),  # readonly
             'result_relay_msec': self.get_result_otime_relay().to_msec(),  # readonly
             'result_current_msec': self.get_result_otime_current_day().to_msec(),  # readonly
             'can_win_count': self.can_win_count,
-            'final_result_time': self.final_result_time.to_str()
-            if self.final_result_time
-            else None,
+            'final_result_time': (
+                self.final_result_time.to_str() if self.final_result_time else None
+            ),
             'order': self.order,
             'multi_day_results': self.get_multi_day_result_str(),
         }
@@ -1303,9 +1307,9 @@ class Person(Model):
             'card_number': self.card_number,
             'bib': self.bib,
             'birth_date': str(self.birth_date) if self.birth_date else None,
-            'year': self.get_year()
-            if self.get_year()
-            else 0,  # back compatibility with 1.0
+            'year': (
+                self.get_year() if self.get_year() else 0
+            ),  # back compatibility with 1.0
             'group_id': str(self.group.id) if self.group else None,
             'organization_id': str(self.organization.id) if self.organization else None,
             'world_code': self.world_code,
