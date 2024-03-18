@@ -3,7 +3,7 @@ import math
 import uuid
 from copy import copy
 from random import randint, shuffle
-from typing import List, Dict
+from typing import Dict, List
 
 from sportorg.common.otime import OTime
 from sportorg.models.memory import Person, race
@@ -173,7 +173,7 @@ class DrawManager:
                     persons_sub_lists.append(
                         self.process_array_impl(cur_array, split_teams, split_regions)
                     )
-                    cur_array: List[Person] = []
+                    cur_array = []
                     cur_start_group = cur_person.start_group
                 cur_array.append(cur_person)
 
@@ -201,8 +201,8 @@ class DrawManager:
             if len(conflict_list) > 0:
                 # conflict on boundaries found, try to process
 
-                fixed_list = []
-                incorrect_list = []
+                fixed_list: List[int] = []
+                incorrect_list: List[int] = []
                 self.detect_fixed_sets(
                     persons_sub_lists,
                     incorrect_list,
@@ -243,8 +243,8 @@ class DrawManager:
                             split_regions,
                         )
 
-            for i in persons_sub_lists:
-                ret_array += i
+            for i in range(len(persons_sub_lists)):
+                ret_array += persons_sub_lists[i]
 
             return ret_array
         else:
@@ -482,8 +482,10 @@ class DrawManager:
             for i in duplicated_array:
                 result_list.insert(randint(0, len(result_list) - 1), i)
         if cur_prop in separated_dict.keys():
-            for i in separated_dict.get(cur_prop):
-                result_list.insert(randint(0, len(result_list) - 1), i)
+            array_tmp = separated_dict.get(cur_prop)
+            if array_tmp:
+                for i in array_tmp:
+                    result_list.insert(randint(0, len(result_list) - 1), i)
 
         return result_list
 
