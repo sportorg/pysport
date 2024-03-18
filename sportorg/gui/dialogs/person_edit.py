@@ -65,20 +65,22 @@ class PersonEditDialog(BaseDialog):
                 id='organization',
                 items=get_race_teams(),
             ),
-            DateField(
-                title=translate('Birthday'),
-                object=person,
-                key='birth_date',
-                maximum=date.today(),
-            )
-            if Config().configuration.get('use_birthday', False)
-            else NumberField(
-                title=translate('Year of birth'),
-                object=person,
-                key='year',
-                id='year',
-                minimum=0,
-                maximum=date.today().year,
+            (
+                DateField(
+                    title=translate('Birthday'),
+                    object=person,
+                    key='birth_date',
+                    maximum=date.today(),
+                )
+                if Config().configuration.get('use_birthday', False)
+                else NumberField(
+                    title=translate('Year of birth'),
+                    object=person,
+                    key='year',
+                    id='year',
+                    minimum=0,
+                    maximum=date.today().year,
+                )
             ),
             AdvComboBoxField(
                 title=translate('Qualification'),
