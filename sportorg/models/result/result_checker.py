@@ -2,7 +2,7 @@ import logging
 
 from sportorg.common.otime import OTime
 from sportorg.models.constant import StatusComments
-from sportorg.models.memory import Person, Result, ResultStatus, find, race
+from sportorg.models.memory import Person, Result, ResultStatus, find, race, ResultSportident
 
 
 class ResultCheckerException(Exception):
