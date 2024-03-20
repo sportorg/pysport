@@ -874,12 +874,12 @@ class WDBInfo:
             if len(dsq_reason) > i:
                 dsq_reason = self.dsq_reason[i]
                 dsq_text = self.dsq_text[i]
-            ret[1137 + i * obj_size : 1137 + (i + 1) * obj_size] = (
-                format_string_to_bytes(dsq_reason, obj_size)
-            )
-            ret[1245 + i * obj_size : 1245 + (i + 1) * obj_size] = (
-                format_string_to_bytes(dsq_text, obj_size)
-            )
+            ret[
+                1137 + i * obj_size : 1137 + (i + 1) * obj_size
+            ] = format_string_to_bytes(dsq_reason, obj_size)
+            ret[
+                1245 + i * obj_size : 1245 + (i + 1) * obj_size
+            ] = format_string_to_bytes(dsq_text, obj_size)
         ret[1353:1453] = format_string_to_bytes(self.note, 100)
         ret[1453:1454] = self.is_print_note.to_bytes(1, byteorder)
         ret[1454:1455] = self.is_print_event_code.to_bytes(1, byteorder)

@@ -5,7 +5,7 @@ from enum import Enum
 from sportorg.common.otime import OTime
 from sportorg.gui.dialogs.bib_dialog import BibDialog
 from sportorg.language import translate
-from sportorg.models.memory import Person, ResultSportident, ResultStatus, find, race
+from sportorg.models.memory import Person, ResultSportident, ResultStatus, race
 from sportorg.models.result.result_checker import ResultChecker, ResultCheckerException
 
 

@@ -31,7 +31,6 @@ def dump(file):
 
 
 def load(file):
-
     # clear current race, here we'll have index data after loading
     tmp_obj = Race()
     new_event([tmp_obj])

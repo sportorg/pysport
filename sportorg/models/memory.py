@@ -1469,7 +1469,6 @@ class Race(Model):
         self.organization_index = {}  # type: Dict[str, Result]
         self.course_index = {}  # type: Dict[str, Result]
 
-
     def __repr__(self):
         return repr(self.data)
 
