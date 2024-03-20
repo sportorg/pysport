@@ -6,7 +6,7 @@ import uuid
 from abc import abstractmethod
 from datetime import date
 from enum import Enum, IntEnum
-from typing import Optional
+from typing import List, Optional
 
 import dateutil.parser
 
@@ -207,7 +207,7 @@ class Course(Model):
         self.bib = 0
         self.length = 0
         self.climb = 0
-        self.controls = []  # type: List[CourseControl]
+        self.controls: List[CourseControl] = []
 
         self.count_person = 0
         self.count_group = 0
@@ -217,7 +217,7 @@ class Course(Model):
         self.count_finished = 0
 
     def __repr__(self):
-        return 'Course {}'.format(self.name)
+        return 'Course {} {}'.format(self.name, repr(self.controls))
 
     def __eq__(self, other):
         if len(self.controls) != len(other.controls):
@@ -389,6 +389,9 @@ class Split(Model):
         self.has_penalty = False
         self.speed = ''
         self.length_leg = 0
+
+    def __repr__(self) -> str:
+        return self.code
 
     @property
     def time(self):

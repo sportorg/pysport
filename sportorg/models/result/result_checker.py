@@ -13,7 +13,7 @@ class ResultChecker:
     def __init__(self, person: Person):
         self.person = person
 
-    def check_result(self, result):
+    def check_result(self, result: ResultSportident):
         if self.person is None:
             return True
         if self.person.group is None:
