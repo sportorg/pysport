@@ -50,7 +50,6 @@ class ReserveManager:
                 current_race.add_person(new_person)
 
 
-
 class DrawManager:
     """Execute draw in each group.
 

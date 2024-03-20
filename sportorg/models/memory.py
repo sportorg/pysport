@@ -1724,12 +1724,12 @@ class Race(Model):
                 return i
         return None
 
-    def find_person_by_bib(self, bib: int) -> [Person, None]:
+    def find_person_by_bib(self, bib: int) -> [Person]:
         if bib in self.person_index_bib:
             return self.person_index_bib[bib]
         return None
 
-    def find_person_by_card(self, card: int) -> [Person, None]:
+    def find_person_by_card(self, card: int) -> [Person]:
         if card in self.person_index_card:
             return self.person_index_card[card]
         return None
