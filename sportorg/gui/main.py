@@ -45,6 +45,10 @@ class Application(metaclass=Singleton):
             with open(config.STATUS_COMMENTS_FILE, encoding='utf-8') as f:
                 content = f.readlines()
             StatusComments().set([x.strip() for x in content])
+
+            with open(config.STATUS_DEFAULT_COMMENTS_FILE, encoding='utf-8') as f:
+                content = f.readlines()
+            StatusComments().set_default_statuses(content)
         except Exception as e:
             print(str(e))
 

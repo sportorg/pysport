@@ -926,7 +926,7 @@ class MainWindow(QMainWindow):
                     # already locked = opened in another process, avoid parallel opening
 
                     p = Process(int(pid))
-                    logging.info(f'found process {p}')
+                    logging.info('found process %s', str(p))
 
                     QMessageBox.warning(
                         self,

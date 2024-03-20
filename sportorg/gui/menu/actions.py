@@ -870,7 +870,7 @@ class AssignResultByBibAction(Action, metaclass=ActionFactory):
     def execute(self):
         for result in race().results:
             if result.person is None and result.bib:
-                result.person = find(race().persons, bib=result.bib)
+                result.person = race().find_person_by_bib(result.bib)
         self.app.refresh()
 
 
@@ -878,7 +878,7 @@ class AssignResultByCardNumberAction(Action, metaclass=ActionFactory):
     def execute(self):
         for result in race().results:
             if result.person is None and result.card_number:
-                result.person = find(race().persons, card_number=result.card_number)
+                result.person = race().find_person_by_card(result.card_number)
         self.app.refresh()
 
 

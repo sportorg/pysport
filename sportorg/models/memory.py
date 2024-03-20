@@ -686,7 +686,7 @@ class Result:
         ):
             cur_bib = self.person.bib - 1000
             while cur_bib > 1000:
-                prev_person = find(race().persons, bib=cur_bib)
+                prev_person = race().find_person_by_bib(cur_bib)
                 res = race().find_person_result(prev_person)
                 if res and not res.is_status_ok():
                     return res.status.get_title()
@@ -738,7 +738,7 @@ class Result:
         if self.person:
             cur_bib = self.person.bib - 1000
             while cur_bib > 1000:
-                prev_person = find(race().persons, bib=cur_bib)
+                prev_person = race().find_person_by_bib(cur_bib)
                 res = race().find_person_result(prev_person)
                 if res:
                     ret_ms += res.get_penalty_time().to_msec()
@@ -785,7 +785,7 @@ class Result:
                 and self.person.group.is_relay()
             ):
                 bib_to_find = 1000 + self.person.bib % 1000
-                first_leg_person = find(race().persons, bib=bib_to_find)
+                first_leg_person = race().find_person_by_bib(bib_to_find)
             if first_leg_person:
                 if (
                     first_leg_person.start_time
@@ -1328,8 +1328,8 @@ class Person(Model):
     def update_data(self, data):
         self.name = str(data['name'])
         self.surname = str(data['surname'])
-        self.card_number = int(data['card_number'])
-        self.bib = int(data['bib'])
+        self.change_card(data['card_number'])
+        self.change_bib(int(data['bib']))
         self.contact = []
         if data['world_code']:
             self.world_code = str(data['world_code'])
@@ -1348,6 +1348,26 @@ class Person(Model):
             self.birth_date = dateutil.parser.parse(data['birth_date']).date()
         elif 'year' in data and data['year']:  # back compatibility with v 1.0.0
             self.set_year(int(data['year']))
+
+    def change_bib(self, new_bib: int):
+        if self.bib == new_bib:
+            return
+
+        r = race()
+        if self.bib in r.person_index_bib:
+            r.person_index_bib.pop(self.bib)
+        self.bib = new_bib
+        r.index_person(self)
+
+    def change_card(self, new_card: int):
+        if self.card_number == new_card:
+            return
+
+        r = race()
+        if self.card_number in r.person_index_card:
+            r.person_index_card.pop(self.card_number)
+        self.card_number = new_card
+        r.index_person(self)
 
 
 class RaceData(Model):
@@ -1439,6 +1459,8 @@ class Race(Model):
         self.settings = {}  # type: Dict[str, Any]
         self.controls = []  # type: List[ControlPoint]
         self.result_index = {}  # type: Dict[str, Result]
+        self.person_index_bib = {}  # type: Dict[int, Person]
+        self.person_index_card = {}  # type: Dict[int, Person]
 
     def __repr__(self):
         return repr(self.data)
@@ -1628,7 +1650,7 @@ class Race(Model):
         return self.data.get_days(date_)
 
     def person_card_number(self, person, number=0):
-        person.card_number = number
+        person.change_card(number)
         for p in self.persons:
             if p.card_number == number and p != person:
                 p.card_number = 0
@@ -1702,6 +1724,16 @@ class Race(Model):
                 return i
         return None
 
+    def find_person_by_bib(self, bib: int) -> [Person, None]:
+        if bib in self.person_index_bib:
+            return self.person_index_bib[bib]
+        return None
+
+    def find_person_by_card(self, card: int) -> [Person, None]:
+        if card in self.person_index_card:
+            return self.person_index_card[card]
+        return None
+
     def find_course(self, result):
         # first get course by number
         person = result.person
@@ -1751,8 +1783,19 @@ class Race(Model):
     def add_new_person(self, append_to_race=False):
         new_person = Person()
         if append_to_race:
-            self.persons.insert(0, new_person)
+            self.add_person(new_person)
         return new_person
+
+    def add_person(self, new_person: Person):
+        self.persons.insert(0, new_person)
+        self.index_person(new_person)
+
+    def index_person(self, person: Person):
+        # update index
+        if person.bib > 0:
+            self.person_index_bib[person.bib] = person
+        if person.card_number > 0:
+            self.person_index_card[person.card_number] = person
 
     def add_new_group(self, append_to_race=False):
         new_group = Group()
@@ -2187,7 +2230,7 @@ class RelayLeg:
 
     def set_bib(self):
         if self.person:
-            self.person.bib = self.get_bib()
+            self.person.change_bib(self.get_bib())
 
     def set_person(self, person):
         self.person = person

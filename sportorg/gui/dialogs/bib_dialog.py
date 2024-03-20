@@ -70,7 +70,7 @@ class BibDialog(QDialog):
         person = None
         if bib_or_name:
             if bib_or_name.isdigit():
-                person = memory.find(memory.race().persons, bib=int(bib_or_name))
+                person = memory.race().find_person_by_bib(int(bib_or_name))
             else:
                 for p in memory.race().persons:
                     if bib_or_name.lower() in p.full_name.lower():
