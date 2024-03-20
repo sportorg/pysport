@@ -67,7 +67,9 @@ class ResultChecker:
                     if race().get_setting('result_processing_mode', 'time') == 'time':
                         result.status = ResultStatus.OVERTIME
 
-            result.status_comment = StatusComments().get_status_default_comment(result.status)
+            result.status_comment = StatusComments().get_status_default_comment(
+                result.status
+            )
 
         return o
 
