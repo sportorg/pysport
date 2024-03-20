@@ -93,9 +93,9 @@ class MergeResultsDialog(QDialog):
 
             result_list.sort(key=lambda c: c.finish_time)
             final_result = ResultSportident()
-            final_result.bib = cur_bib
+            final_result.change_bib(cur_bib)
             final_result.person = result_list[0].person
-            final_result.card_number = result_list[0].card_number
+            final_result.change_card(result_list[0].card_number)
             cur_cp = first_cp
 
             for i in result_list:

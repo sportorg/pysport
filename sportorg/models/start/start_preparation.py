@@ -47,7 +47,8 @@ class ReserveManager:
                 new_person = Person()
                 new_person.surname = reserve_prefix
                 new_person.group = current_group
-                current_race.persons.append(new_person)
+                current_race.add_person(new_person)
+
 
 
 class DrawManager:
@@ -173,7 +174,7 @@ class DrawManager:
                     persons_sub_lists.append(
                         self.process_array_impl(cur_array, split_teams, split_regions)
                     )
-                    cur_array: List[Person] = []
+                    cur_array = []
                     cur_start_group = cur_person.start_group
                 cur_array.append(cur_person)
 
@@ -201,8 +202,8 @@ class DrawManager:
             if len(conflict_list) > 0:
                 # conflict on boundaries found, try to process
 
-                fixed_list = []
-                incorrect_list = []
+                fixed_list: List[int] = []
+                incorrect_list: List[int] = []
                 self.detect_fixed_sets(
                     persons_sub_lists,
                     incorrect_list,
@@ -243,8 +244,8 @@ class DrawManager:
                             split_regions,
                         )
 
-            for i in persons_sub_lists:
-                ret_array += i
+            for i in range(len(persons_sub_lists)):
+                ret_array += persons_sub_lists[i]
 
             return ret_array
         else:
@@ -482,8 +483,10 @@ class DrawManager:
             for i in duplicated_array:
                 result_list.insert(randint(0, len(result_list) - 1), i)
         if cur_prop in separated_dict.keys():
-            for i in separated_dict.get(cur_prop):
-                result_list.insert(randint(0, len(result_list) - 1), i)
+            array_tmp = separated_dict.get(cur_prop)
+            if array_tmp:
+                for i in array_tmp:
+                    result_list.insert(randint(0, len(result_list) - 1), i)
 
         return result_list
 
@@ -570,10 +573,10 @@ class StartNumberManager:
                 if current_person.start_time:
                     start_time = current_person.start_time
                     delta = (start_time - first_start).to_minute()
-                    current_person.bib = int(min_num + delta)
+                    current_person.change_bib(int(min_num + delta))
                     max_assigned_num = max(max_assigned_num, current_person.bib)
                 else:
-                    current_person.bib = 0
+                    current_person.change_bib(0)
 
         if max_assigned_num > first_number:
             return max_assigned_num + 1
@@ -583,7 +586,7 @@ class StartNumberManager:
         cur_number = first_number
         if persons and len(persons) > 0:
             for current_person in persons:
-                current_person.bib = cur_number
+                current_person.change_bib(cur_number)
                 cur_number += interval
         return cur_number
 
@@ -818,14 +821,14 @@ def copy_bib_to_card_number():
     obj = race()
     for person in obj.persons:
         if person.bib:
-            person.card_number = person.bib
+            person.change_card(person.bib)
 
 
 def copy_card_number_to_bib():
     obj = race()
     for person in obj.persons:
         if person.card_number:
-            person.bib = person.card_number
+            person.change_bib(person.card_number)
 
 
 def clone_relay_legs(min_bib, max_bib, increment):
@@ -838,6 +841,6 @@ def clone_relay_legs(min_bib, max_bib, increment):
         if person.bib and min_bib <= person.bib <= max_bib:
             new_person = copy(person)
             new_person.id = uuid.uuid4()
-            new_person.bib = person.bib + increment
+            new_person.change_bib(person.bib + increment)
             new_person.card_number = 0
             obj.persons.append(new_person)

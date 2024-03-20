@@ -384,7 +384,7 @@ def set_property(person, key, value, **options):
     elif key == translate('Bib'):
         if value.isdigit():
             new_bib = int(value)
-            person.bib = new_bib
+            person.change_bib(new_bib)
     elif key == translate('Comment'):
         person.comment = value
     elif key == translate('IOF id'):

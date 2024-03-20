@@ -60,11 +60,10 @@ class SportorgPrinter:
             race().get_setting('marked_route_if_counting_lap', False)
             and race().get_setting('marked_route_mode', 'laps') == 'laps'
         ):
-            # Normal split printout / Обычный сплит
+            # Normal split printout
             self.print_split_normal(result)
         else:
             # Printing of bib and penalty for Russian marked route with penalty laps
-            # Печать штрафа на пункте оценки: сверху номер, снизу штраф
             self.print_penalty_laps(result)
 
     def print_penalty_laps(self, result: Result):

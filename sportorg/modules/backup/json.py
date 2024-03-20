@@ -31,10 +31,20 @@ def dump(file):
 
 
 def load(file):
+
+    # clear current race, here we'll have index data after loading
+    tmp_obj = Race()
+    new_event([tmp_obj])
+
     event, current_race = get_races_from_file(file)
     new_event(event)
     set_current_race_index(current_race)
     obj = race()
+
+    # while parsing of data index is created in old object, available as race()
+    obj.person_index_card = tmp_obj.person_index_card
+    obj.person_index_bib = tmp_obj.person_index_bib
+
     ResultChecker.check_all()
     ResultCalculation(obj).process_results()
     RaceSplits(obj).generate()

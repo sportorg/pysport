@@ -751,9 +751,8 @@ class TeamworkEnableAction(Action, metaclass=ActionFactory):
         port = race().get_setting('teamwork_port', 50010)
         token = race().get_setting('teamwork_token', str(uuid.uuid4())[:8])
         connection_type = race().get_setting('teamwork_type_connection', 'client')
-        if connection_type == 'server' and host in {'localhost', '127.0.0.1'}:
-            host = socket.gethostbyname(socket.gethostname())
-            logging.debug('Server socket address = ' + str(host))
+        if connection_type == 'server':
+            host = '0.0.0.0'
         Teamwork().set_options(host, port, token, connection_type)
         Teamwork().toggle()
 
@@ -871,7 +870,7 @@ class AssignResultByBibAction(Action, metaclass=ActionFactory):
     def execute(self):
         for result in race().results:
             if result.person is None and result.bib:
-                result.person = find(race().persons, bib=result.bib)
+                result.person = race().find_person_by_bib(result.bib)
         self.app.refresh()
 
 
@@ -879,7 +878,7 @@ class AssignResultByCardNumberAction(Action, metaclass=ActionFactory):
     def execute(self):
         for result in race().results:
             if result.person is None and result.card_number:
-                result.person = find(race().persons, card_number=result.card_number)
+                result.person = race().find_person_by_card(result.card_number)
         self.app.refresh()
 
 

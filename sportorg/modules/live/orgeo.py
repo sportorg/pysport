@@ -239,7 +239,7 @@ async def create(url, data, race_data, log, *, session):
                 log.info(LOG_MSG, resp.status, result_txt)
 
         except Exception as e:
-            log.error('Error: %s', str(e))
+            log.exception(e)
 
 
 async def create_online_cp(url, data, race_data, log, *, session):
@@ -322,7 +322,6 @@ async def create_online_cp(url, data, race_data, log, *, session):
 
             except Exception as e:
                 log.exception(e)
-                log.error('Error: %s', str(e))
 
 
 async def delete(url, data, race_data, log, *, session):

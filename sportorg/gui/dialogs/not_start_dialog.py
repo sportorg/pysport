@@ -78,7 +78,7 @@ class NotStartDialog(QDialog):
         obj = race()
         for number in numbers:
             if number not in old_numbers:
-                person = find(obj.persons, bib=number)
+                person = race().find_person_by_bib(number)
                 if person:
                     result = race().new_result(ResultManual)
                     result.person = person
