@@ -1628,7 +1628,6 @@ class Race(Model):
         cur_dict = self.index_obj[obj_name]
         if obj_id in cur_dict:
             return cur_dict[obj_id]
-        return None
 
     def update_obj(self, obj, dict_obj):
         obj.update_data(dict_obj)
