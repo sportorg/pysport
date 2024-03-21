@@ -464,7 +464,7 @@ class DrawManager:
                 shuffle_indexes = []
                 for i in range(len(separated_dict)):
                     if cur_index == i:
-                        continue   # skip previous value not to duplicate
+                        continue  # skip previous value not to duplicate
                     i_prop = list(separated_dict.keys())[i]
                     for j in range(len(separated_dict[i_prop])):
                         shuffle_indexes.append(i)
