@@ -485,13 +485,13 @@ class DrawManager:
 
         # insert at random positions rest values, that are out of limit N/2 for max set
         if len(duplicated_array) > 0:
-            for i in duplicated_array:
-                result_list.insert(randint(0, len(result_list) - 1), i)
+            for cur_person in duplicated_array:
+                result_list.insert(randint(0, len(result_list) - 1), cur_person)
         if cur_prop in separated_dict.keys():
             array_tmp = separated_dict.get(cur_prop)
             if array_tmp:
-                for i in array_tmp:
-                    result_list.insert(randint(0, len(result_list) - 1), i)
+                for cur_person in array_tmp:
+                    result_list.insert(randint(0, len(result_list) - 1), cur_person)
 
         return result_list
 
