@@ -120,4 +120,7 @@ cmd = "python -m sportorg.language"
 
 [tool.poe.tasks.run]
 help = "Run"
-cmd = "python SportOrg.pyw"
+sequence = [
+    {ref = "generate-mo"},
+    {cmd = "python SportOrg.pyw"}
+]

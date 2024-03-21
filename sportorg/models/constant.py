@@ -1,9 +1,9 @@
 import logging
 import operator
-from typing import List, Set, Dict
+from typing import Dict, List, Set
 
 from sportorg.common.singleton import singleton
-from sportorg.models.memory import Qualification, race, ResultStatus
+from sportorg.models.memory import Qualification, ResultStatus, race
 
 
 def get_countries():

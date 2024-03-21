@@ -53,7 +53,7 @@ class ReserveManager:
 class DrawManager:
     """Execute draw in each group.
 
-    Now effect on all groups, but in future we'll possible implement working
+    Now effect on all groups, but in future we'll possibly implement working
     with filtered persons.
     """
 

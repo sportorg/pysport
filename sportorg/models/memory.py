@@ -6,7 +6,7 @@ import uuid
 from abc import abstractmethod
 from datetime import date
 from enum import Enum, IntEnum
-from typing import Optional
+from typing import List, Optional
 
 import dateutil.parser
 
@@ -207,7 +207,7 @@ class Course(Model):
         self.bib = 0
         self.length = 0
         self.climb = 0
-        self.controls = []  # type: List[CourseControl]
+        self.controls: List[CourseControl] = []
 
         self.count_person = 0
         self.count_group = 0
@@ -217,7 +217,7 @@ class Course(Model):
         self.count_finished = 0
 
     def __repr__(self):
-        return 'Course {}'.format(self.name)
+        return 'Course {} {}'.format(self.name, repr(self.controls))
 
     def __eq__(self, other):
         if len(self.controls) != len(other.controls):
@@ -389,6 +389,9 @@ class Split(Model):
         self.has_penalty = False
         self.speed = ''
         self.length_leg = 0
+
+    def __repr__(self) -> str:
+        return self.code
 
     @property
     def time(self):
@@ -1461,6 +1464,10 @@ class Race(Model):
         self.result_index = {}  # type: Dict[str, Result]
         self.person_index_bib = {}  # type: Dict[int, Person]
         self.person_index_card = {}  # type: Dict[int, Person]
+        self.person_index = {}  # type: Dict[str, Result]
+        self.group_index = {}  # type: Dict[str, Result]
+        self.organization_index = {}  # type: Dict[str, Result]
+        self.course_index = {}  # type: Dict[str, Result]
 
     def __repr__(self):
         return repr(self.data)
@@ -1479,6 +1486,22 @@ class Race(Model):
             'Group': self.groups,
             'Course': self.courses,
             'Organization': self.organizations,
+        }
+
+    @property
+    def index_obj(self):
+        return {
+            'Person': self.person_index,
+            'Result': self.result_index,
+            'ResultManual': self.result_index,
+            'ResultSportident': self.result_index,
+            'ResultSFR': self.result_index,
+            'ResultSportiduino': self.result_index,
+            'ResultRfidImpinj': self.result_index,
+            'ResultSrpid': self.result_index,
+            'Group': self.group_index,
+            'Course': self.course_index,
+            'Organization': self.organization_index,
         }
 
     def to_dict(self):
@@ -1604,9 +1627,9 @@ class Race(Model):
             self.update_obj(obj, dict_obj)
 
     def get_obj(self, obj_name, obj_id):
-        for item in self.list_obj[obj_name]:
-            if str(item.id) == obj_id:
-                return item
+        cur_dict = self.index_obj[obj_name]
+        if obj_id in cur_dict:
+            return cur_dict[obj_id]
 
     def update_obj(self, obj, dict_obj):
         obj.update_data(dict_obj)
@@ -1631,6 +1654,7 @@ class Race(Model):
         obj.id = uuid.UUID(dict_obj['id'])
         self.update_obj(obj, dict_obj)
         self.list_obj[dict_obj['object']].insert(0, obj)
+        self.index_obj[dict_obj['object']][dict_obj['id']] = obj
 
     def get_type(self, group: Group):
         if group.get_type():

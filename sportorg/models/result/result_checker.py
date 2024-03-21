@@ -2,7 +2,14 @@ import logging
 
 from sportorg.common.otime import OTime
 from sportorg.models.constant import StatusComments
-from sportorg.models.memory import Person, Result, ResultStatus, find, race
+from sportorg.models.memory import (
+    Person,
+    Result,
+    ResultSportident,
+    ResultStatus,
+    find,
+    race,
+)
 
 
 class ResultCheckerException(Exception):
@@ -13,7 +20,7 @@ class ResultChecker:
     def __init__(self, person: Person):
         self.person = person
 
-    def check_result(self, result):
+    def check_result(self, result: ResultSportident):
         if self.person is None:
             return True
         if self.person.group is None:

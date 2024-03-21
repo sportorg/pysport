@@ -1,5 +1,4 @@
 import logging
-import socket
 import time
 import uuid
 from os import remove
@@ -46,7 +45,7 @@ from sportorg.gui.menu.action import Action
 from sportorg.gui.utils.custom_controls import messageBoxQuestion
 from sportorg.language import translate
 from sportorg.libs.winorient.wdb import write_wdb
-from sportorg.models.memory import ResultManual, ResultStatus, find, race
+from sportorg.models.memory import ResultManual, ResultStatus, race
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.result_checker import ResultChecker
 from sportorg.models.start.start_preparation import (
