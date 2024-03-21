@@ -460,9 +460,15 @@ class DrawManager:
                 cur_index = max_index
             else:
                 # can take person from random set
-                len_dict = len(separated_dict)
-                # this guarantee selecting another index (not to coincide with last used set)
-                cur_index = (cur_index + randint(1, len_dict - 1)) % len_dict
+                # add one index of list for each element of list to have proportional shuffle
+                shuffle_indexes = []
+                for i in range(len(separated_dict)):
+                    if cur_index == i:
+                        continue   # skip previous value not to duplicate
+                    i_prop = list(separated_dict.keys())[i]
+                    for j in range(len(separated_dict[i_prop])):
+                        shuffle_indexes.append(i)
+                cur_index = shuffle_indexes[randint(0, len(shuffle_indexes) - 1)]
                 cur_prop = list(separated_dict.keys())[cur_index]
 
             # extract person from selected set
