@@ -118,9 +118,11 @@ class Organization(Model):
             'id': str(self.id),
             'name': self.name,
             'country': self.country,
-            'region': self.region[3:]
-            if self.region and len(self.region) > 3 and self.region[2] == '_'
-            else self.region,
+            'region': (
+                self.region[3:]
+                if self.region and len(self.region) > 3 and self.region[2] == '_'
+                else self.region
+            ),
             'contact': self.contact,
             'code': self.code,
             'count_person': self.count_person,  # readonly
@@ -150,8 +152,8 @@ class CourseControl(Model):
     def __eq__(self, other):
         return self.code == other.code
 
-    def get_number_code(self):
-        """Get int code
+    def get_number_code(self) -> str:
+        """Get control code (number as string)
         31 933 -> 31
         31(31,32,33) 933 -> 31
         * -> 0
@@ -417,9 +419,9 @@ class Split(Model):
             'index': self.index,  # readonly
             'course_index': self.course_index + 1,  # readonly
             'leg_time': self.leg_time.to_msec() if self.leg_time else None,  # readonly
-            'relative_time': self.relative_time.to_msec()
-            if self.relative_time
-            else None,  # readonly
+            'relative_time': (
+                self.relative_time.to_msec() if self.relative_time else None
+            ),  # readonly
             'leg_place': self.leg_place,  # readonly
             'relative_place': self.relative_place,  # readonly
             'is_correct': self.is_correct,
@@ -569,18 +571,20 @@ class Result:
             'created_at': self.created_at,  # readonly
             'result': self.get_result(),  # readonly
             'result_relay': self.get_result_relay(),
-            'result_current': self.get_result_otime_current_day().to_str()
-            if self.is_status_ok()
-            else self.get_result(),
+            'result_current': (
+                self.get_result_otime_current_day().to_str()
+                if self.is_status_ok()
+                else self.get_result()
+            ),
             'start_msec': self.get_start_time().to_msec(),  # readonly
             'finish_msec': self.get_finish_time().to_msec(),  # readonly
             'result_msec': self.get_result_otime().to_msec(),  # readonly
             'result_relay_msec': self.get_result_otime_relay().to_msec(),  # readonly
             'result_current_msec': self.get_result_otime_current_day().to_msec(),  # readonly
             'can_win_count': self.can_win_count,
-            'final_result_time': self.final_result_time.to_str()
-            if self.final_result_time
-            else None,
+            'final_result_time': (
+                self.final_result_time.to_str() if self.final_result_time else None
+            ),
             'order': self.order,
             'multi_day_results': self.get_multi_day_result_str(),
         }
@@ -685,7 +689,7 @@ class Result:
         ):
             cur_bib = self.person.bib - 1000
             while cur_bib > 1000:
-                prev_person = find(race().persons, bib=cur_bib)
+                prev_person = race().find_person_by_bib(cur_bib)
                 res = race().find_person_result(prev_person)
                 if res and not res.is_status_ok():
                     return res.status.get_title()
@@ -729,8 +733,21 @@ class Result:
         ret_ms = (
             self.get_finish_time().to_msec() - self.get_start_time_relay().to_msec()
         )
+
+        # accumulate penalty for all legs
         ret_ms += self.get_penalty_time().to_msec()
         ret_ms -= self.get_credit_time().to_msec()
+
+        if self.person:
+            cur_bib = self.person.bib - 1000
+            while cur_bib > 1000:
+                prev_person = race().find_person_by_bib(cur_bib)
+                res = race().find_person_result(prev_person)
+                if res:
+                    ret_ms += res.get_penalty_time().to_msec()
+                    ret_ms -= res.get_credit_time().to_msec()
+                cur_bib -= 1000
+
         return OTime(msec=ret_ms).round(time_accuracy, TimeRounding[time_rounding])
 
     def get_result_otime_multi_day(self):
@@ -771,7 +788,7 @@ class Result:
                 and self.person.group.is_relay()
             ):
                 bib_to_find = 1000 + self.person.bib % 1000
-                first_leg_person = find(race().persons, bib=bib_to_find)
+                first_leg_person = race().find_person_by_bib(bib_to_find)
             if first_leg_person:
                 if (
                     first_leg_person.start_time
@@ -1293,9 +1310,9 @@ class Person(Model):
             'card_number': self.card_number,
             'bib': self.bib,
             'birth_date': str(self.birth_date) if self.birth_date else None,
-            'year': self.get_year()
-            if self.get_year()
-            else 0,  # back compatibility with 1.0
+            'year': (
+                self.get_year() if self.get_year() else 0
+            ),  # back compatibility with 1.0
             'group_id': str(self.group.id) if self.group else None,
             'organization_id': str(self.organization.id) if self.organization else None,
             'world_code': self.world_code,
@@ -1314,8 +1331,8 @@ class Person(Model):
     def update_data(self, data):
         self.name = str(data['name'])
         self.surname = str(data['surname'])
-        self.card_number = int(data['card_number'])
-        self.bib = int(data['bib'])
+        self.change_card(data['card_number'])
+        self.change_bib(int(data['bib']))
         self.contact = []
         if data['world_code']:
             self.world_code = str(data['world_code'])
@@ -1334,6 +1351,26 @@ class Person(Model):
             self.birth_date = dateutil.parser.parse(data['birth_date']).date()
         elif 'year' in data and data['year']:  # back compatibility with v 1.0.0
             self.set_year(int(data['year']))
+
+    def change_bib(self, new_bib: int):
+        if self.bib == new_bib:
+            return
+
+        r = race()
+        if self.bib in r.person_index_bib:
+            r.person_index_bib.pop(self.bib)
+        self.bib = new_bib
+        r.index_person(self)
+
+    def change_card(self, new_card: int):
+        if self.card_number == new_card:
+            return
+
+        r = race()
+        if self.card_number in r.person_index_card:
+            r.person_index_card.pop(self.card_number)
+        self.card_number = new_card
+        r.index_person(self)
 
 
 class RaceData(Model):
@@ -1425,6 +1462,12 @@ class Race(Model):
         self.settings = {}  # type: Dict[str, Any]
         self.controls = []  # type: List[ControlPoint]
         self.result_index = {}  # type: Dict[str, Result]
+        self.person_index_bib = {}  # type: Dict[int, Person]
+        self.person_index_card = {}  # type: Dict[int, Person]
+        self.person_index = {}  # type: Dict[str, Result]
+        self.group_index = {}  # type: Dict[str, Result]
+        self.organization_index = {}  # type: Dict[str, Result]
+        self.course_index = {}  # type: Dict[str, Result]
 
     def __repr__(self):
         return repr(self.data)
@@ -1443,6 +1486,22 @@ class Race(Model):
             'Group': self.groups,
             'Course': self.courses,
             'Organization': self.organizations,
+        }
+
+    @property
+    def index_obj(self):
+        return {
+            'Person': self.person_index,
+            'Result': self.result_index,
+            'ResultManual': self.result_index,
+            'ResultSportident': self.result_index,
+            'ResultSFR': self.result_index,
+            'ResultSportiduino': self.result_index,
+            'ResultRfidImpinj': self.result_index,
+            'ResultSrpid': self.result_index,
+            'Group': self.group_index,
+            'Course': self.course_index,
+            'Organization': self.organization_index,
         }
 
     def to_dict(self):
@@ -1568,9 +1627,9 @@ class Race(Model):
             self.update_obj(obj, dict_obj)
 
     def get_obj(self, obj_name, obj_id):
-        for item in self.list_obj[obj_name]:
-            if str(item.id) == obj_id:
-                return item
+        cur_dict = self.index_obj[obj_name]
+        if obj_id in cur_dict:
+            return cur_dict[obj_id]
 
     def update_obj(self, obj, dict_obj):
         obj.update_data(dict_obj)
@@ -1595,6 +1654,7 @@ class Race(Model):
         obj.id = uuid.UUID(dict_obj['id'])
         self.update_obj(obj, dict_obj)
         self.list_obj[dict_obj['object']].insert(0, obj)
+        self.index_obj[dict_obj['object']][dict_obj['id']] = obj
 
     def get_type(self, group: Group):
         if group.get_type():
@@ -1614,7 +1674,7 @@ class Race(Model):
         return self.data.get_days(date_)
 
     def person_card_number(self, person, number=0):
-        person.card_number = number
+        person.change_card(number)
         for p in self.persons:
             if p.card_number == number and p != person:
                 p.card_number = 0
@@ -1688,6 +1748,16 @@ class Race(Model):
                 return i
         return None
 
+    def find_person_by_bib(self, bib: int):
+        if bib in self.person_index_bib:
+            return self.person_index_bib[bib]
+        return None
+
+    def find_person_by_card(self, card: int):
+        if card in self.person_index_card:
+            return self.person_index_card[card]
+        return None
+
     def find_course(self, result):
         # first get course by number
         person = result.person
@@ -1737,8 +1807,19 @@ class Race(Model):
     def add_new_person(self, append_to_race=False):
         new_person = Person()
         if append_to_race:
-            self.persons.insert(0, new_person)
+            self.add_person(new_person)
         return new_person
+
+    def add_person(self, new_person: Person):
+        self.persons.insert(0, new_person)
+        self.index_person(new_person)
+
+    def index_person(self, person: Person):
+        # update index
+        if person.bib > 0:
+            self.person_index_bib[person.bib] = person
+        if person.card_number > 0:
+            self.person_index_card[person.card_number] = person
 
     def add_new_group(self, append_to_race=False):
         new_group = Group()
@@ -1809,11 +1890,9 @@ class Race(Model):
             start = result.get_start_time()
             finish = result.get_finish_time()
 
-            if finish < start and start.hour < 22:
+            if finish < start and start.hour < 22 and finish != OTime(0):
                 logging.info(
-                    'Ignoring finish with time before start: {} for card {}'.format(
-                        finish, result.card_number
-                    )
+                    f'Ignoring finish with time before start: {finish} for card {result.card_number}'
                 )
                 return
 
@@ -2175,7 +2254,7 @@ class RelayLeg:
 
     def set_bib(self):
         if self.person:
-            self.person.bib = self.get_bib()
+            self.person.change_bib(self.get_bib())
 
     def set_person(self, person):
         self.person = person
@@ -2297,7 +2376,12 @@ class RelayTeam:
             if last_correct_leg > 0:
                 last_finish = self.get_leg(last_correct_leg).get_finish_time()
                 start = self.get_leg(1).get_start_time()
-                return last_finish - start
+                time = last_finish - start
+                for i in range(last_correct_leg):
+                    time += self.get_leg(i + 1).result.get_penalty_time()
+                    time -= self.get_leg(i + 1).result.get_credit_time()
+                return time
+
         return OTime()
 
     def get_lap_finished(self):

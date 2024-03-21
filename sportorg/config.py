@@ -100,6 +100,8 @@ REGIONS_FILE = base_dir('configs', 'regions.txt')
 
 STATUS_COMMENTS_FILE = base_dir('configs', 'status_comments.txt')
 
+STATUS_DEFAULT_COMMENTS_FILE = base_dir('configs', 'status_default.txt')
+
 RANKING_SCORE_FILE = base_dir('configs', 'ranking.txt')
 
 DIRS = [

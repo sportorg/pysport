@@ -334,6 +334,12 @@ class TimekeepingPropertiesDialog(QDialog):
         self.chip_duplicate_box.setDisabled(mode)
 
     def penalty_calculation_mode(self):
+        if (
+            self.mr_lap_station_check.isChecked()
+            and self.mr_counting_lap_check.isChecked()
+        ):
+            self.mr_counting_lap_check.setChecked(False)
+
         self.mr_time_edit.setDisabled(not self.mr_time_radio.isChecked())
         self.mr_counting_lap_check.setDisabled(
             not (

@@ -24,7 +24,7 @@ from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox, AdvSpinBox, AdvTimeEdit
 from sportorg.language import translate
 from sportorg.models.constant import StatusComments
-from sportorg.models.memory import Limit, ResultStatus, Split, find, race
+from sportorg.models.memory import Limit, ResultStatus, Split, race
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.result_checker import ResultChecker, ResultCheckerException
 from sportorg.models.result.split_calculation import GroupSplits
@@ -164,7 +164,7 @@ class ResultEditDialog(QDialog):
         bib = self.item_bib.value()
         self.label_person_info.setText('')
         if bib:
-            person = find(race().persons, bib=bib)
+            person = race().find_person_by_bib(bib)
             if person:
                 info = person.full_name
                 if person.group:
@@ -260,14 +260,14 @@ class ResultEditDialog(QDialog):
         if new_bib == 0:
             if result.person and result.is_punch():
                 if result.person.card_number == result.card_number:
-                    result.person.card_number = 0
+                    result.person.change_card(0)
             result.person = None
         elif cur_bib != new_bib:
-            new_person = find(race().persons, bib=new_bib)
+            new_person = race().find_person_by_bib(new_bib)
             if new_person:
                 if result.person:
                     if result.is_punch():
-                        result.person.card_number = 0
+                        result.person.change_card(0)
                 result.person = new_person
                 if result.is_punch():
                     race().person_card_number(result.person, result.card_number)
@@ -287,8 +287,6 @@ class ResultEditDialog(QDialog):
         if result.is_punch():
             result.clear()
             try:
-                ResultChecker.checking(result)
-                ResultChecker.calculate_penalty(result)
                 ResultChecker.checking(result)
                 if result.person and result.person.group:
                     GroupSplits(race(), result.person.group).generate(True)

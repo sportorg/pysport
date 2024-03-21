@@ -1634,3 +1634,6 @@ msgstr "Файл финиша orgeo.ru, CSV"
 
 msgid "Open orgeo.ru finish CSV file"
 msgstr "Открыть файл финиша orgeo.ru, CSV (https://orgeo.ru/event/export?event_id=XXX&sub_id=Y&format=excel_finish)"
+
+msgid "Miss penalty lap"
+msgstr "Пропущен штрафной круг"

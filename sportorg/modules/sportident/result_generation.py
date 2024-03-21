@@ -5,7 +5,7 @@ from enum import Enum
 from sportorg.common.otime import OTime
 from sportorg.gui.dialogs.bib_dialog import BibDialog
 from sportorg.language import translate
-from sportorg.models.memory import Person, ResultSportident, ResultStatus, find, race
+from sportorg.models.memory import Person, ResultSportident, ResultStatus, race
 from sportorg.models.result.result_checker import ResultChecker, ResultCheckerException
 
 
@@ -120,7 +120,7 @@ class ResultSportidentGeneration:
 
             while True:
                 bib += 1000
-                next_leg = find(race().persons, bib=bib)
+                next_leg = race().find_person_by_bib(bib)
                 if next_leg:
                     next_leg_res = race().find_person_result(next_leg)
                     if not next_leg_res:
@@ -142,7 +142,7 @@ class ResultSportidentGeneration:
 
     def _merge_punches(self):
         card_number = self._result.card_number
-        existing_res = find(race().results, card_number=card_number)
+        existing_res = race().find_person_by_card(card_number)
 
         if not existing_res:
             self._add_result()
@@ -151,8 +151,6 @@ class ResultSportidentGeneration:
             if existing_res.merge_with(self._result):
                 # existing result changed, recalculate group results and printout
                 self._result = existing_res
-                ResultChecker.checking(self._result)
-                ResultChecker.calculate_penalty(self._result)
                 ResultChecker.checking(self._result)
                 self.popup_result(self._result)
 
@@ -202,8 +200,6 @@ class ResultSportidentGeneration:
             self._find_person_by_result()
             try:
                 ResultChecker.checking(self._result)
-                ResultChecker.calculate_penalty(self._result)
-                ResultChecker.checking(self._result)
             except ResultCheckerException as e:
                 logging.error(str(e))
 
@@ -222,12 +218,12 @@ class ResultSportidentGeneration:
 
     def _create_person(self):
         new_person = Person()
-        new_person.bib = self._get_max_bib() + 1
-        existing_person = find(race().persons, card_number=self._result.card_number)
+        new_person.change_bib(self._get_max_bib() + 1)
+        existing_person = race().find_person_by_card(self._result.card_number)
         if existing_person:
             new_person_copy = deepcopy(existing_person)
             new_person_copy.id = new_person.id
-            new_person_copy.bib = new_person.bib
+            new_person_copy.change_bib(new_person.bib)
             new_person = new_person_copy
             new_person.card_number = 0
         else:

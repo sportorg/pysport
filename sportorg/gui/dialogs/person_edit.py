@@ -65,20 +65,22 @@ class PersonEditDialog(BaseDialog):
                 id='organization',
                 items=get_race_teams(),
             ),
-            DateField(
-                title=translate('Birthday'),
-                object=person,
-                key='birth_date',
-                maximum=date.today(),
-            )
-            if Config().configuration.get('use_birthday', False)
-            else NumberField(
-                title=translate('Year of birth'),
-                object=person,
-                key='year',
-                id='year',
-                minimum=0,
-                maximum=date.today().year,
+            (
+                DateField(
+                    title=translate('Birthday'),
+                    object=person,
+                    key='birth_date',
+                    maximum=date.today(),
+                )
+                if Config().configuration.get('use_birthday', False)
+                else NumberField(
+                    title=translate('Year of birth'),
+                    object=person,
+                    key='year',
+                    id='year',
+                    minimum=0,
+                    maximum=date.today().year,
+                )
             ),
             AdvComboBoxField(
                 title=translate('Qualification'),
@@ -222,7 +224,7 @@ class PersonEditDialog(BaseDialog):
         bib_info = self.fields['bib_info']
         bib_info.set_text('')
         if bib:
-            person = find(race().persons, bib=bib)
+            person = race().find_person_by_bib(bib)
             if not person:
                 bib_info.set_text(translate('Number is unique'))
             elif person is not self.current_object:
@@ -243,7 +245,7 @@ class PersonEditDialog(BaseDialog):
         card_info = self.fields['card_info']
         card_info.set_text('')
         if number:
-            person = find(race().persons, card_number=number)
+            person = race().find_person_by_card(number)
             if not person:
                 card_info.set_text(translate('Card number is unique'))
             elif person is not self.current_object:
@@ -263,7 +265,7 @@ class PersonEditDialog(BaseDialog):
     def apply(self):
         person = self.current_object
         if self.is_new:
-            race().persons.insert(0, person)
+            race().add_person(person)
 
         ResultCalculation(race()).process_results()
         live_client.send(person)

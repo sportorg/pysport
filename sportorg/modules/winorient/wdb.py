@@ -120,7 +120,7 @@ class WinOrientBinary:
             index_of_first_space = str(man.name.strip()).find(' ')
             if index_of_first_space > 0:
                 new_person.name = man.name.strip()[index_of_first_space + 1 :].strip()
-            new_person.bib = man.number
+            new_person.change_bib(man.number)
             if man.qualification:
                 if man.qualification == 10:
                     man.qualification = Qualification.MSMK.value  # Convert ZMS to MSMK
@@ -153,7 +153,7 @@ class WinOrientBinary:
             result.finish_time = int_to_otime(fin.time)
             result.bib = fin.number
 
-            person = find(my_race.persons, bib=result.bib)
+            person = race().find_person_by_bib(result.bib)
             if person:
                 result.person = person
                 wdb_person = find(self.wdb_object.man, number=result.bib)
@@ -165,7 +165,7 @@ class WinOrientBinary:
 
         # punches
         for chip in self.wdb_object.chip:
-            person = find(my_race.persons, card_number=chip.id)
+            person = my_race.find_person_by_card(chip.id)
             if person:
                 result = find(my_race.results, person=person)
                 if not result:

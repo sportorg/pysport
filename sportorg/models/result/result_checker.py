@@ -1,6 +1,7 @@
 import logging
 
 from sportorg.common.otime import OTime
+from sportorg.models.constant import StatusComments
 from sportorg.models.memory import (
     Person,
     Result,
@@ -59,17 +60,23 @@ class ResultChecker:
             ResultStatus.MISS_PENALTY_LAP,
         ]:
             result.status = ResultStatus.OK
-            if not o.check_result(result):
+
+            check_flag = o.check_result(result)
+            ResultChecker.calculate_penalty(result)
+            if not check_flag:
                 result.status = ResultStatus.MISSING_PUNCH
-                result.status_comment = 'п.п.3.13.12.2'
 
             elif not cls.check_penalty_laps(result):
                 result.status = ResultStatus.MISS_PENALTY_LAP
+
             elif result.person.group and result.person.group.max_time.to_msec():
                 if result.get_result_otime() > result.person.group.max_time:
                     if race().get_setting('result_processing_mode', 'time') == 'time':
                         result.status = ResultStatus.OVERTIME
-                        result.status_comment = 'п.п.5.4.7'
+
+            result.status_comment = StatusComments().get_status_default_comment(
+                result.status
+            )
 
         return o
 
@@ -79,7 +86,6 @@ class ResultChecker:
         for result in race().results:
             if result.person:
                 ResultChecker.checking(result)
-                ResultChecker.calculate_penalty(result)
 
     @staticmethod
     def calculate_penalty(result: Result):
@@ -101,6 +107,13 @@ class ResultChecker:
         controls = course.controls
         splits = result.splits
 
+        # use prefixes _min and _lap in group name to force non-standard penalty
+        # TODO move setting to group properties
+        if person.group.name.lower().find('_min') > -1:
+            mode = 'time'
+        if person.group.name.lower().find('_lap') > -1:
+            mode = 'laps'
+
         if mode == 'laps' and race().get_setting('marked_route_if_station_check'):
             lap_station = race().get_setting('marked_route_penalty_lap_station_code')
             splits, _ = ResultChecker.detach_penalty_laps2(splits, lap_station)
@@ -118,11 +131,11 @@ class ResultChecker:
             # limit the penalty by quantity of controls
             penalty = min(len(controls), penalty)
 
+        result.penalty_laps = 0
+        result.penalty_time = OTime()
+
         if mode == 'laps':
             result.penalty_laps = penalty
-            if result.status == ResultStatus.OK:
-                ResultChecker.marked_route_check_penalty_laps(result)
-
         elif mode == 'time':
             time_for_one_penalty = OTime(
                 msec=race().get_setting('marked_route_penalty_time', 60000)
@@ -140,7 +153,8 @@ class ResultChecker:
                     for cp in code_str.split('(')[1].split(','):
                         cp = cp.strip(')').strip()
                         if cp != correct and cp.isdigit():
-                            ret.append(cp)
+                            if cp not in ret:
+                                ret.append(cp)
         return ret
 
     @staticmethod
@@ -185,7 +199,7 @@ class ResultChecker:
         origin_array = [i.get_number_code() for i in controls]
         res = 0
 
-        # может дать 0 штрафа при мусоре в чипе
+        # In theory can return less penalty for uncleaned card / может дать 0 штрафа при мусоре в чипе
         if check_existence and len(user_array) < len(origin_array):
             # add 1 penalty score for missing points
             res = len(origin_array) - len(user_array)
@@ -262,13 +276,21 @@ class ResultChecker:
 
     @staticmethod
     def detach_penalty_laps2(splits, lap_station):
-        '''Detaches penalty laps from the given list of splits
+        """Detaches penalty laps from the given list of splits
         based on the provided lap station code.
-        '''
+        """
         if not splits:
             return [], []
-        regular = [punch for punch in splits if int(punch.code) != lap_station]
-        penalty = [punch for punch in splits if int(punch.code) == lap_station]
+        regular = [
+            punch
+            for punch in splits
+            if (punch.is_correct or int(punch.code) != lap_station)
+        ]
+        penalty = [
+            punch
+            for punch in splits
+            if (int(punch.code) == lap_station and not punch.is_correct)
+        ]
         return regular, penalty
 
     @staticmethod
@@ -332,24 +354,3 @@ class ResultChecker:
         if ret < 0:
             ret = 0
         return ret
-
-    @staticmethod
-    def marked_route_check_penalty_laps(result: Result):
-        obj = race()
-
-        mr_if_counting_lap = obj.get_setting('marked_route_if_counting_lap', False)
-        mr_if_station_check = obj.get_setting('marked_route_if_station_check', False)
-        mr_station_code = obj.get_setting('marked_route_penalty_lap_station_code', 0)
-
-        if mr_if_station_check and int(mr_station_code) > 0:
-            count_laps = 0
-            if mr_if_counting_lap:
-                count_laps = -1
-
-            for split in result.splits:
-                if str(split.code) == str(mr_station_code):
-                    count_laps += 1
-
-            if count_laps < result.penalty_laps:
-                result.status = ResultStatus.MISSING_PUNCH
-                result.status_comment = 'п.п.4.6.12.7'

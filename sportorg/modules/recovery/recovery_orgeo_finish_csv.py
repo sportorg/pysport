@@ -12,6 +12,7 @@ SPLITS: [hh:mm:ss|code|]*
 18;Ж10;Радченко Милана;72_СШ №2 Кобелева;37;9111137;;не старт;;12:37:00;
 33;Ж12;Аристова Надежда;55_Омская обл.;162;8517947;;непр.отмет.;;13:09:00;00:03:00|70|
 """
+
 import csv
 
 from sportorg.models.memory import (
@@ -61,7 +62,7 @@ def recovery(file_name: str, race: Race) -> None:
                 person.name = name[spl_pos + 1 :]
             else:
                 person.name = name
-            person.bib = int(bib)
+            person.change_bib(int(bib))
 
             team_name = tokens[POS_TEAM]
             team = race.find_team(team_name)

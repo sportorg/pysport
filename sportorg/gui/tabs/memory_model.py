@@ -410,9 +410,11 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
             i.penalty_laps,
             str(i.system_type),
             rented_card,
-            time_to_hhmmss(i.get_result_otime_current_day())
-            if i.is_status_ok()
-            else i.get_result(),
+            (
+                time_to_hhmmss(i.get_result_otime_current_day())
+                if i.is_status_ok()
+                else i.get_result()
+            ),
         ]
         return ret
 

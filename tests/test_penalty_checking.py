@@ -363,7 +363,6 @@ def check(
     result = race().results[0]
     result.splits = make_splits(splits)
     ResultChecker.checking(result)
-    ResultChecker.calculate_penalty(result)
     result_penalty = get_penalty(result)
 
     check_result = result.status == result_status, result_penalty == penalty
@@ -489,6 +488,6 @@ def split_and_course_repr(course: List[Union[int, str]], splits: List[int]) -> s
     str
         Строка со сравнением отметок и дистанции
     """
-    spl = ['Spl'] + splits
-    crs = ['Crs'] + course
+    spl = splits
+    crs = course
     return '\n'.join([f'{s:3}  {c}' for s, c in zip_longest(spl, crs, fillvalue='')])

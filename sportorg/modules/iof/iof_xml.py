@@ -156,14 +156,14 @@ def create_person(person_entry):
     if 'race_numbers' in person_entry and len(person_entry['race_numbers']):
         person.comment = 'C:' + ''.join(person_entry['race_numbers'])
     if 'control_card' in person_entry and person_entry['control_card']:
-        person.card_number = int(person_entry['control_card'])
+        person.change_card(int(person_entry['control_card']))
     if 'bib' in person_entry['person'] and person_entry['person']['bib']:
-        person.bib = int(person_entry['person']['bib'])
+        person.change_bib(int(person_entry['person']['bib']))
     elif (
         'bib' in person_entry['person']['extensions']
         and person_entry['person']['extensions']['bib']
     ):
-        person.bib = int(person_entry['person']['extensions']['bib'])
+        person.change_bib(int(person_entry['person']['extensions']['bib']))
     if (
         'qual' in person_entry['person']['extensions']
         and person_entry['person']['extensions']['qual']
@@ -260,9 +260,9 @@ def import_from_result_list(results) -> None:
         if card > 0:
             new_result.card_number = card
         if person.card_number == 0:
-            person.card_number = new_result.card_number
+            person.change_card(new_result.card_number)
 
-        person.bib = int(bib)
+        person.change_bib(int(bib))
         person.start_time = start
         new_result.person = person
 

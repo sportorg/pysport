@@ -39,9 +39,9 @@ def import_csv(source):
         person = memory.Person()
         person.name = person_dict['name']
         person.surname = person_dict['surname']
-        person.bib = person_dict['bib']
+        person.change_bib(person_dict['bib'])
         person.set_year(person_dict['year'])
-        person.card_number = int(person_dict['sportident_card'])
+        person.change_card(int(person_dict['sportident_card']))
         person.group = memory.find(obj.groups, name=person_dict['group_name'])
         person.organization = person_org
         person.qual = Qualification(qual_id)

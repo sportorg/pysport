@@ -2,9 +2,12 @@ import ast
 import logging
 import os
 import time
+from os import remove
+from os.path import exists
 from queue import Queue
 
-import pylocker
+import psutil
+from psutil import Process
 from PySide2 import QtCore, QtGui, QtWidgets
 from PySide2.QtCore import QTimer
 from PySide2.QtWidgets import QMainWindow, QMessageBox
@@ -107,11 +110,6 @@ class MainWindow(QMainWindow):
         self.relay_number_assign = False
         self.split_printer_thread = None
         self.split_printer_queue = None
-
-        self.file_locker = pylocker.FACTORY(
-            key='sportorg_locker_key', password='str(uuid.uuid1())', autoconnect=False
-        )
-        self.file_lock_id = None
 
     def _set_style(self):
         try:
@@ -221,7 +219,7 @@ class MainWindow(QMainWindow):
 
     def close(self):
         self.conf_write()
-        self.unlock_file()
+        self.unlock_file(self.file)
 
     def close_split_printer(self):
         if self.split_printer_thread:
@@ -911,27 +909,41 @@ class MainWindow(QMainWindow):
         self.split_printer_queue = split_printer_app
 
     def lock_file(self, file_name: str):
+        logging.info('lock start')
         if self.file == file_name:
             # already locked by current process ('Save as' or 'Open' for the same file)
             return True
 
-        # try to acquire the lock a single file path
-        acquired, lock_id = self.file_locker.acquire_lock(file_name, timeout=0.5)
-        if acquired:
-            # new lock created, release previous lock if exists
-            self.unlock_file()
-            self.file_lock_id = lock_id
-            logging.info(translate('File lock created') + ': ' + file_name)
-        else:
-            # already locked = opened in another process, avoid parallel opening
-            QMessageBox.warning(
-                self,
-                translate('Error'),
-                translate('Cannot open file, already locked') + ': ' + file_name,
-            )
-            return False
+        # unlock previously locked file (e.g. in case of 'save as' operation)
+        self.unlock_file(self.file)
+
+        # try to acquire the lock on a single file path
+        lockfile = file_name + '.lock'
+        if exists(lockfile):
+            with open(lockfile) as f:
+                pid = f.read()
+                if pid.isdigit() and psutil.pid_exists(int(pid)):
+                    # already locked = opened in another process, avoid parallel opening
+
+                    p = Process(int(pid))
+                    logging.info('found process %s', str(p))
+
+                    QMessageBox.warning(
+                        self,
+                        translate('Error'),
+                        translate('Cannot open file, already locked')
+                        + ': '
+                        + file_name,
+                    )
+                    return False
+
+        # new lock creating
+        with open(lockfile, 'w') as f:
+            f.write(str(os.getpid()))
         return True
 
-    def unlock_file(self):
-        logging.info(translate('File lock released'))
-        self.file_locker.release(self.file_lock_id)
+    def unlock_file(self, file_name):
+        if file_name:
+            lockfile = file_name + '.lock'
+            if exists(lockfile):
+                remove(lockfile)

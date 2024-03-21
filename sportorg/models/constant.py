@@ -1,9 +1,9 @@
 import logging
 import operator
-from typing import List, Set
+from typing import Dict, List, Set
 
 from sportorg.common.singleton import singleton
-from sportorg.models.memory import Qualification, race
+from sportorg.models.memory import Qualification, ResultStatus, race
 
 
 def get_countries():
@@ -271,6 +271,7 @@ class Regions:
 @singleton
 class StatusComments:
     STATUS_COMMENTS: List[str] = []
+    DEFAULT_STATUSES: Dict[str, str] = {}
 
     def get_all(self):
         return self.STATUS_COMMENTS
@@ -289,6 +290,17 @@ class StatusComments:
     @staticmethod
     def remove_hint(full_str):
         return str(full_str).split('#')[0].strip()
+
+    def set_default_statuses(self, items):
+        for cur_item in items:
+            code = cur_item.split('=')[0].strip()
+            value = cur_item.split('=')[1].strip()
+            self.DEFAULT_STATUSES[code] = value
+
+    def get_status_default_comment(self, status: ResultStatus) -> str:
+        if status.name in self.DEFAULT_STATUSES:
+            return self.DEFAULT_STATUSES[status.name]
+        return ''
 
 
 @singleton
