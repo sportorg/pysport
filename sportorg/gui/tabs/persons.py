@@ -1,6 +1,7 @@
 import logging
 
 from PySide2 import QtWidgets
+from PySide2.QtCore import Qt
 
 from sportorg.gui.dialogs.person_edit import PersonEditDialog
 from sportorg.gui.global_access import GlobalAccess, NumberClicker
@@ -29,6 +30,9 @@ class Widget(QtWidgets.QWidget):
         self.setup_ui()
 
     def keyPressEvent(self, e):
+        if e.key() == Qt.Key_Space:
+            self.move_rows()
+        
         key_numbers = [i for i in range(48, 58)]
         key = e.key()
         try:
@@ -39,6 +43,11 @@ class Widget(QtWidgets.QWidget):
                 GlobalAccess().get_main_window().refresh()
         except Exception as e:
             print(str(e))
+
+    def move_rows(self):
+        selected_indexes = self.person_table.selectionModel().selectedRows()
+        if len(selected_indexes) == 2:
+            self.person_table.model().move_rows(selected_indexes[0].row(), selected_indexes[1].row())
 
     def setup_ui(self):
         self.person_table.setObjectName('PersonTable')
@@ -68,6 +77,8 @@ class Widget(QtWidgets.QWidget):
         self.person_table.activated.connect(entry_double_clicked)
         self.person_table.clicked.connect(entry_single_clicked)
         self.entry_layout.addWidget(self.person_table)
+
+        self.person_table.keyPressEvent = self.keyPressEvent
 
     def get_table(self):
         return self.person_table
