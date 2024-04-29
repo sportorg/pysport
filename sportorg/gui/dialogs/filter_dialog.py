@@ -32,9 +32,14 @@ class DialogFilter(QDialog):
             self.label.setText(headers[i])
             self.label.setObjectName('filter_label_' + str(i))
             self.label.setMaximumWidth(120)
-            self.combo_action = AdvComboBox(
-                self, {translate('contain'), translate('equal to')}, max_width=90
-            )
+            actions = [
+                translate('equal to'),
+                translate('contain'),
+                translate("doesn't contain"),
+            ]
+            default_action = actions[0]
+            self.combo_action = AdvComboBox(self, actions, max_width=90)
+            self.combo_action.setCurrentText(default_action)
             self.combo_action.setObjectName('filter_action_' + str(i))
             self.combo_value = AdvComboBox(self)
             self.combo_value.setMinimumWidth(150)
