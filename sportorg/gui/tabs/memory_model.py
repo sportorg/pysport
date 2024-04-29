@@ -108,18 +108,15 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
         current_array.extend(self.filter_backup)
         self.filter_backup.clear()
         for column in self.filter.keys():
-            check_regexp = re.escape(self.filter.get(column)[0])
-            action = self.filter.get(column)[1]
+            filter_action = self.filter.get(column)[1]
+            filter_value = self.filter.get(column)[0]
 
-            check = re.compile('.*' + check_regexp + '.*')
-
-            if action == translate('equal to'):
-                check = re.compile(check_regexp + '$')
+            check = self.compile_regex(filter_action, filter_value)
 
             i = 0
             while i < len(current_array):
                 value = self.get_item(current_array[i], column)
-                if not check.match(str(value)):
+                if not self.match_value(check, str(value)):
                     self.filter_backup.append(current_array.pop(i))
                     i -= 1
                 i += 1
@@ -128,6 +125,29 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
         # note, unfiltered items are in filter_backup
         self.set_source_array(current_array)
         self.init_cache()
+
+    @staticmethod
+    def compile_regex(action: str, raw_value: str) -> re.Pattern:
+        """Compiles a regular expression pattern based on filter action filter value.
+
+        Args:
+            action (str): The action to perform (contain, equal to, doesn't contain).
+            raw_value (str): The filter value to match against.
+
+        Returns:
+            Pattern[str]: The compiled regular expression pattern.
+        """
+        value = re.escape(raw_value)
+        regex_string = {
+            translate('contain'): f'.*{value}.*',
+            translate('equal to'): f'{value}$',
+            translate("doesn't contain"): f'^((?!{value}).)*$',
+        }.get(action, '.*')
+        return re.compile(regex_string)
+
+    @staticmethod
+    def match_value(check: re.Pattern, value: str) -> bool:
+        return bool(check.match(value))
 
     def apply_search(self):
         if not self.search:
