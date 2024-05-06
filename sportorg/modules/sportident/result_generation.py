@@ -108,7 +108,7 @@ class ResultSportidentGeneration:
             bib_dialog = BibDialog('{}'.format(self._result.card_number))
             bib_dialog.exec_()
             self._person = bib_dialog.get_person()
-            if not self._person:
+            if self._person != None:
                 self.assign_chip_reading = 'off'
                 self.card_read_repeated = False
         except Exception as e:

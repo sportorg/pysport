@@ -865,21 +865,24 @@ class Result:
             who_can_win_count = 0
             max_unfinished_start_time = OTime()
 
-            for cur_person in race().get_persons_by_group(self.person.group):
-                if cur_person.result_count == 0:
-                    if not cur_person.is_out_of_competition:
-                        if cur_person.start_time and self.person.start_time:
-                            if cur_person.start_time > self.person.start_time:
-                                if (
-                                    self.get_result_otime()
-                                    > OTime.now() - cur_person.start_time
-                                ):
-                                    who_can_win_count += 1
-                                    max_unfinished_start_time = max(
-                                        cur_person.start_time, max_unfinished_start_time
-                                    )
-                        else:
-                            who_can_win_count += 1
+            persons_by_group = race().get_persons_by_group(self.person.group)
+
+            if(persons_by_group != None):
+                for cur_person in persons_by_group:
+                    if cur_person.result_count == 0:
+                        if not cur_person.is_out_of_competition:
+                            if cur_person.start_time and self.person.start_time:
+                                if cur_person.start_time > self.person.start_time:
+                                    if (
+                                        self.get_result_otime()
+                                        > OTime.now() - cur_person.start_time
+                                    ):
+                                        who_can_win_count += 1
+                                        max_unfinished_start_time = max(
+                                            cur_person.start_time, max_unfinished_start_time
+                                        )
+                            else:
+                                who_can_win_count += 1
 
             self.can_win_count = who_can_win_count
             self.final_result_time = max_unfinished_start_time + self.get_result_otime()
@@ -1687,11 +1690,12 @@ class Race(Model):
         for i in indexes:
             person = self.persons[i]
             persons.append(person)
-            for result in self.results:
-                if result.person is person:
-                    result.person = None
-                    result.bib = person.bib
+            self.remove_index_person(person)
             del self.persons[i]
+        for result in self.results:
+            if result.person in persons:
+                result.person = None
+                result.bib = person.bib
         return persons
 
     def delete_results(self, indexes):
@@ -1815,11 +1819,20 @@ class Race(Model):
         self.index_person(new_person)
 
     def index_person(self, person: Person):
+        logging.info("indexing person: " + person.full_name)
+        # print_stack()
         # update index
         if person.bib > 0:
             self.person_index_bib[person.bib] = person
         if person.card_number > 0:
             self.person_index_card[person.card_number] = person
+
+    def remove_index_person(self, person: Person, remove_bib: bool = True, remove_card: bool = True):
+        if person.bib > 0 and remove_bib and person.bib in self.person_index_bib:
+            self.person_index_bib.pop(person.bib)
+        if person.card_number > 0 and remove_card and person.card_number in self.person_index_card:
+            self.person_index_card.pop(person.card_number)
+        self.person_index.pop(person, 'not found')
 
     def add_new_group(self, append_to_race=False):
         new_group = Group()
@@ -1897,6 +1910,10 @@ class Race(Model):
                 return
 
         self.results.insert(0, result)
+
+        if result.person:
+            id = result.person.multi_day_id
+            self.result_index[id] = result
 
     def add_result(self, result):
         add = True

@@ -35,6 +35,8 @@ class PersonEditDialog(BaseDialog):
         if race().get_setting('time_accuracy', 0):
             time_format = 'hh:mm:ss.zzz'
 
+        race().remove_index_person(person)
+
         self.title = translate('Entry properties')
         self.size = (450, 670)
         self.form = [
@@ -270,3 +272,7 @@ class PersonEditDialog(BaseDialog):
         ResultCalculation(race()).process_results()
         live_client.send(person)
         Teamwork().send(person.to_dict())
+
+    def close(self) -> bool:
+        race().index_person(self.current_object)
+        return super().close()

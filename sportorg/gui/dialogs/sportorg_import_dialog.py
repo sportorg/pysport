@@ -98,9 +98,8 @@ class SportOrgImportDialog(QDialog):
         if unique_id == 'id' and action == 'overwrite':
             import_race.id = obj.id
             obj.update_data(import_race.to_dict())
-            return
 
-        if unique_id == 'id' and action == 'add':
+        elif unique_id == 'id' and action == 'add':
             organizations = []
             for org in import_race.organizations:
                 old_org = find(obj.organizations, id=org.id)
@@ -152,7 +151,9 @@ class SportOrgImportDialog(QDialog):
                         result.person = find(obj.persons, id=result.person.id)
                     results.append(result)
             obj.results.extend(results)
-            return
+
+        for person in obj.persons:
+            obj.index_person(person)
 
     def fill_race_list(self):
         race_list = []

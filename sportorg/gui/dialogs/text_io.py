@@ -26,6 +26,7 @@ def get_value_options():
         translate('Start group'),
         translate('IOF id'),
         translate('National id'),
+        translate('Year'),
     ]
 
 
@@ -331,6 +332,8 @@ def get_property(person, key):
         return str(person.national_code)
     elif key == translate('Start group'):
         return str(person.start_group)
+    elif key == translate('Year'):
+        return str(person.get_year())
 
     return ''
 
@@ -396,3 +399,6 @@ def set_property(person, key, value, **options):
     elif key == translate('Start group'):
         if str(value).isdigit():
             person.start_group = int(value)
+    elif key == translate('Year'):
+        if str(value).isdigit():
+            person.set_year(int(value))

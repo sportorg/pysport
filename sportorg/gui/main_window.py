@@ -480,6 +480,9 @@ class MainWindow(QMainWindow):
             table = self.get_organization_table()
             table.setModel(OrganizationMemoryModel())
 
+            # for person in race().persons:
+            #     race().index_person(person)
+
             Broker().produce('init_model')
         except Exception as e:
             logging.error(str(e))
