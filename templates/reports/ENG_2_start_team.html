@@ -81,7 +81,7 @@
             {key: 'card_number', title: 'Card1', size: 11},
 			{key: 'comment', title: 'Card2', size: 11},
             {key: 'start', title: 'Start time', size: 13},
-           
+
         ],
         active: function (key, val) {
             for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
@@ -134,13 +134,6 @@
                 }
             });
             var infoBlock = document.createElement('div');
-           /* if (price) {
-                infoBlock.appendChild(document.createTextNode('Стартовый взнос: ' + price + (paid ? ' - ' + paid + ' = ' + (price - paid) : '')));
-                infoBlock.appendChild(document.createElement('br'));
-            }
-            if (rentedSportidentCards) {
-                infoBlock.appendChild(document.createTextNode('Арендованных ЧИПов: ' + rentedSportidentCards));
-            }*/
             return infoBlock;
         };
 
@@ -184,7 +177,7 @@
     render();
     new SettingsGenerator([
         {
-            title: 'Табличный вид',
+            title: 'Table view',
             value: !!store.tableView,
             change: function (checked) {
                 store.tableView = checked;
@@ -192,7 +185,7 @@
             }
         },
         {
-            title: 'Номер',
+            title: 'Bib',
             value: Fields.isActive('bib'),
             change: function (checked) {
                 Fields.active('bib', checked);
@@ -200,7 +193,7 @@
             }
         },
         {
-            title: 'Номер чипа',
+            title: 'Card number',
             value: Fields.isActive('card_number'),
             change: function (checked) {
                 Fields.active('card_number', checked);
@@ -208,15 +201,7 @@
             }
         },
         {
-            title: 'Стартовый взнос',
-            value: Fields.isActive('price_show'),
-            change: function (checked) {
-                Fields.active('price_show', checked);
-                render()
-            }
-        },
-        {
-            title: 'Комментарий',
+            title: 'Comment',
             value: Fields.isActive('comment'),
             change: function (checked) {
                 Fields.active('comment', checked);
@@ -224,18 +209,18 @@
             }
         },
         {
-            title: 'Объединить по коллективам',
+            title: 'By team',
             value: true,
             change: function (checked) {
                 render(null, !checked)
             }
         },
         {
-            title: 'Сортировать участников по: ',
+            title: 'Sort by: ',
             value: [
-                {text: 'имени', value: 'name'},
-                {text: 'номеру', value: 'bib'},
-                {text: 'группе', value: 'group'}
+                {text: 'name', value: 'name'},
+                {text: 'bib', value: 'bib'},
+                {text: 'class', value: 'group'}
             ],
             change: function (arr) {
                 render(arr[0]);

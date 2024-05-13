@@ -13,20 +13,22 @@
     <h2>START LIST</h2>
 </div>
 <div id="start-list-tables"></div>
+<!--
 <div>
     <table class="empty-table">
         <tr>
-            <td><b>Главный судья:</b></td>
+            <td><b>Chief referee:</b></td>
             <td width="150px"></td>
             <td><b>{{ race.data.chief_referee }}</b></td>
         </tr>
         <tr>
-            <td><b>Главный секретарь:</b></td>
+            <td><b>Secretary:</b></td>
             <td width="150px"></td>
             <td><b>{{ race.data.secretary }}</b></td>
         </tr>
     </table>
 </div>
+-->
 {% raw %}
 <script>
     var race = {% endraw %}{{race|tojson}}{%raw %};
@@ -95,7 +97,6 @@
             {key: 'name', title: 'Name', size: 30},
             {key: 'org', title: 'Fed', size: 20},
             {key: 'year', title: 'Year', size: 5},
-            //{key: 'qual', title: 'Разряд', size: 7},
             {key: 'bib', title: 'Bib', size: 6},
             {key: 'card_number', title: 'Card1', size: 11},
 			{key: 'comment', title: 'Card2', size: 11},
@@ -191,7 +192,7 @@
 
     new SettingsGenerator([
         {
-            title: 'Табличный вид',
+            title: 'Table view',
             value: !!store.tableView,
             change: function (checked) {
                 store.tableView = checked;
@@ -199,7 +200,7 @@
             }
         },
         {
-            title: 'Номер',
+            title: 'Bib',
             value: Fields.isActive('bib'),
             change: function (checked) {
                 Fields.active('bib', checked);
@@ -207,7 +208,7 @@
             }
         },
         {
-            title: 'Номер чипа',
+            title: 'Card number',
             value: Fields.isActive('card_number'),
             change: function (checked) {
                 Fields.active('card_number', checked);
@@ -215,7 +216,7 @@
             }
         },
         {
-            title: 'Автоскролл',
+            title: 'Autoscroll',
             value: Scrolling.enabled,
             change: function (checked) {
                 Scrolling.enabled = checked;
