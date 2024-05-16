@@ -998,7 +998,8 @@ class ResultSportident(Result):
             if len(self.splits):
                 finish_cp_number = obj.get_setting('system_finish_cp_number', 90)
                 if finish_cp_number == -1:
-                    self.__finish_time = self.splits[-1].time
+                    # return time of last correct split
+                    self.__finish_time = self.get_last_correct_time()
                     return self.__finish_time
                 for split in reversed(self.splits):
                     if split.code == str(finish_cp_number):
@@ -1008,6 +1009,12 @@ class ResultSportident(Result):
             pass
 
         # return 0 to avoid incorrect results
+        return OTime()
+
+    def get_last_correct_time(self):
+        for i in self.splits.__reversed__():
+            if i.is_correct:
+                return i.time
         return OTime()
 
     def clear(self):

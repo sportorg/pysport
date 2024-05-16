@@ -193,7 +193,13 @@ class ResultSportidentGeneration:
             self._add_result_to_race()
         elif self.assign_chip_reading == 'only_unknown_members':
             self._bib_dialog()
-            self._add_result()
+            if self._person:
+                self._result.person = self._person
+                self._add_result()
+            else:
+                self._add_result_to_race()
+        else:
+            self._add_result_to_race()
 
     def _add_result(self):
         if isinstance(self._result.person, Person):
