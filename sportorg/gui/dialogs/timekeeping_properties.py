@@ -104,6 +104,11 @@ class TimekeepingPropertiesDialog(QDialog):
         )
         self.tk_layout.addRow(self.ignore_punches_before_start)
 
+        self.dont_merge_extra_punches = QCheckBox(
+            translate('Do not merge extra punches')
+        )
+        self.tk_layout.addRow(self.dont_merge_extra_punches)
+
         self.timekeeping_tab.setLayout(self.tk_layout)
 
         # result processing tab
@@ -381,6 +386,9 @@ class TimekeepingPropertiesDialog(QDialog):
         ignore_punches_before_start = cur_race.get_setting(
             'ignore_punches_before_start', False
         )
+        dont_merge_extra_punches = cur_race.get_setting(
+            'dont_merge_extra_punches', False
+        )
         si_port = cur_race.get_setting('system_port', '')
         readout_duplicate_timeout = OTime(
             msec=cur_race.get_setting('readout_duplicate_timeout', 15000)
@@ -442,6 +450,8 @@ class TimekeepingPropertiesDialog(QDialog):
         self.assignment_mode.setChecked(assignment_mode)
 
         self.ignore_punches_before_start.setChecked(ignore_punches_before_start)
+        self.dont_merge_extra_punches.setChecked(dont_merge_extra_punches)
+
 
         # result processing
         obj = cur_race
@@ -582,6 +592,7 @@ class TimekeepingPropertiesDialog(QDialog):
         readout_duplicate_timeout = self.item_duplicate_timeout.getOTime().to_msec()
 
         ignore_punches_before_start = self.ignore_punches_before_start.isChecked()
+        dont_merge_extra_punches = self.dont_merge_extra_punches.isChecked()
 
         start_cp_number = self.item_start_cp_value.value()
         finish_cp_number = self.item_finish_cp_value.value()
@@ -612,6 +623,7 @@ class TimekeepingPropertiesDialog(QDialog):
         obj.set_setting('readout_duplicate_timeout', readout_duplicate_timeout)
 
         obj.set_setting('ignore_punches_before_start', ignore_punches_before_start)
+        obj.set_setting('dont_merge_extra_punches', dont_merge_extra_punches)
 
         # result processing
         rp_mode = 'time'

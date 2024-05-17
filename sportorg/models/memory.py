@@ -1164,6 +1164,14 @@ class ResultSportident(Result):
 
         is_changed = False
 
+        dont_merge_extra_punches = race().get_setting(
+            'dont_merge_extra_punches', False
+        )
+
+        if dont_merge_extra_punches and self.check(race().find_course(self)):
+            logging.info('Ignoring punch, result is complete for card ' + str(self.card_number))
+            return
+
         # backup old start as punch
         if self.start_time and new_result.start_time and self.start_time > OTime():
             if (
@@ -1753,11 +1761,12 @@ class Race(Model):
             del self.organizations[i]
         return organizations
 
-    def find_person_result(self, person):
-        for i in self.results:
-            if i.person is person:
-                return i
-        return None
+    def find_person_result(self, person: Person):
+        # for i in self.results:
+        #     if i.person is person:
+        #         return i
+        # return None
+        return self.find_result_by_person_id(person.multi_day_id)
 
     def find_person_by_bib(self, bib: int):
         if bib in self.person_index_bib:
@@ -1841,6 +1850,16 @@ class Race(Model):
             self.person_index_card.pop(person.card_number)
         self.person_index.pop(person, 'not found')
 
+    def index_result(self, result):
+        if result.person:
+            id = result.person.multi_day_id
+            self.result_index[id] = result
+
+    def remove_index_result(self, result):
+        if result.person:
+            id = result.person.multi_day_id
+            self.result_index.pop(id)
+
     def add_new_group(self, append_to_race=False):
         new_group = Group()
         if append_to_race:
@@ -1918,9 +1937,7 @@ class Race(Model):
 
         self.results.insert(0, result)
 
-        if result.person:
-            id = result.person.multi_day_id
-            self.result_index[id] = result
+        self.index_result(result)
 
     def add_result(self, result):
         add = True
@@ -1982,9 +1999,7 @@ class Race(Model):
     def find_result_by_person_id(self, person_id) -> Optional[Result]:
         if len(self.result_index) < 1:
             for res in self.results:
-                if res.person:
-                    id = res.person.multi_day_id
-                    self.result_index[id] = res
+                self.index_result(res)
 
         if person_id in self.result_index:
             return self.result_index[person_id]
