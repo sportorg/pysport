@@ -65,6 +65,10 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
     def duplicate(self, position):
         pass
 
+    @abstractmethod
+    def move_rows(self, from_index, to_index):
+        pass
+
     def columnCount(self, parent=None, *args, **kwargs):
         return self.c_count
 
@@ -331,6 +335,29 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
 
     def set_source_array(self, array):
         self.race.persons = array
+
+    def move_rows(self, from_index, to_index):
+        if (
+            from_index < 0
+            or to_index < 0
+            or from_index >= len(self.race.persons)
+            or to_index >= len(self.race.persons)
+            or from_index == to_index
+        ):
+            return False
+
+        if from_index > to_index:
+            from_index, to_index = to_index, from_index
+
+        self.layoutAboutToBeChanged.emit()
+        person = self.race.persons.pop(from_index)
+        self.race.persons.insert(to_index, person)
+        person = self.race.persons.pop(to_index - 1)
+        self.race.persons.insert(from_index, person)
+        self.init_cache()
+        self.layoutChanged.emit()
+
+        return True
 
 
 class ResultMemoryModel(AbstractSportOrgMemoryModel):
