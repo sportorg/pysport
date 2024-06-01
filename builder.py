@@ -28,7 +28,7 @@ options = {
         "excludes": excludes,
         "packages": ["idna", "requests", "encodings", "asyncio", "pywinusb"],
         "include_files": include_files,
-        "zip_include_packages": ["PySide2"],
+        "zip_include_packages": ["PySide6"],
         "optimize": 2,
         'include_msvcr': True,
     }

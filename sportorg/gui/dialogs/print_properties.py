@@ -1,9 +1,9 @@
 import logging
 
-from PySide2 import QtPrintSupport
-from PySide2.QtGui import QIcon
-from PySide2.QtPrintSupport import QAbstractPrintDialog, QPrintDialog, QPrinter
-from PySide2.QtWidgets import (
+from PySide6 import QtPrintSupport
+from PySide6.QtGui import QIcon
+from PySide6.QtPrintSupport import QAbstractPrintDialog, QPrintDialog, QPrinter
+from PySide6.QtWidgets import (
     QCheckBox,
     QDialog,
     QDialogButtonBox,

@@ -2,8 +2,8 @@ import logging
 import re
 from typing import List
 
-from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import (
+from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import (
     QCheckBox,
     QDialog,
     QDialogButtonBox,

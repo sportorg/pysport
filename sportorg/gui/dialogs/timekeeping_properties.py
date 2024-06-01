@@ -1,7 +1,7 @@
 import logging
 
-from PySide2.QtCore import QTime
-from PySide2.QtWidgets import (
+from PySide6.QtCore import QTime
+from PySide6.QtWidgets import (
     QCheckBox,
     QDialog,
     QDialogButtonBox,

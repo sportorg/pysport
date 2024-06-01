@@ -1,7 +1,7 @@
 import logging
 import uuid
 
-from PySide2.QtWidgets import (
+from PySide6.QtWidgets import (
     QDialog,
     QDialogButtonBox,
     QFormLayout,

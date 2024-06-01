@@ -1,9 +1,9 @@
 import datetime
 import logging
 
-from PySide2 import QtCore, QtWidgets
-from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QDialog, QDialogButtonBox, QFormLayout
+from PySide6 import QtCore, QtWidgets
+from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import QDialog, QDialogButtonBox, QFormLayout
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess

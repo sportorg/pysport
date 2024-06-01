@@ -4,7 +4,7 @@ import time
 from queue import Empty, Queue
 from threading import Event, main_thread
 
-from PySide2.QtCore import QThread, Signal
+from PySide6.QtCore import QThread, Signal
 
 from sportorg.common.singleton import singleton
 from sportorg.language import translate

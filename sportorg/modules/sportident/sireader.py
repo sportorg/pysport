@@ -8,7 +8,7 @@ from queue import Empty, Queue
 from threading import Event, main_thread
 
 import serial
-from PySide2.QtCore import QThread, Signal
+from PySide6.QtCore import QThread, Signal
 from sportident import (
     SIReader,
     SIReaderCardChanged,
@@ -260,6 +260,7 @@ class SIReaderClient:
     @staticmethod
     def get_ports():
         ports = []
+        scan_ports = []
         if platform.system() == 'Linux':
             scan_ports = [
                 os.path.join('/dev', f)
