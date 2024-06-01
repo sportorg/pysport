@@ -5,7 +5,7 @@ from abc import abstractmethod
 from copy import copy, deepcopy
 from typing import List
 
-from PySide2.QtCore import QAbstractTableModel, Qt
+from PySide6.QtCore import QAbstractTableModel, Qt
 
 from sportorg.language import translate
 from sportorg.models.constant import RentCards

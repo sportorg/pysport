@@ -1,6 +1,6 @@
-from PySide2 import QtCore, QtWidgets
-from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QDialog
+from PySide6 import QtCore, QtWidgets
+from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import QDialog
 
 from sportorg import config
 from sportorg.gui.utils.custom_controls import AdvSpinBox

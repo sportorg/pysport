@@ -1,9 +1,9 @@
 import logging
 from time import sleep
 
-from PySide2 import QtCore, QtGui, QtWidgets
-from PySide2.QtCore import QTime
-from PySide2.QtWidgets import QDialog
+from PySide6 import QtCore, QtGui, QtWidgets
+from PySide6.QtCore import QTime
+from PySide6.QtWidgets import QDialog
 
 from sportorg import config
 from sportorg.common.otime import OTime

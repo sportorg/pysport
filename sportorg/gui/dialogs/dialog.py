@@ -2,8 +2,8 @@ from dataclasses import dataclass, field
 from datetime import date
 from typing import Any, List, Optional
 
-from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import (
+from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import (
     QCheckBox,
     QDateEdit,
     QDialog,

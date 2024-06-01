@@ -1,6 +1,6 @@
-from PySide2 import QtCore
-from PySide2.QtCore import QSortFilterProxyModel, QTime
-from PySide2.QtWidgets import QComboBox, QCompleter, QMessageBox, QSpinBox, QTimeEdit
+from PySide6 import QtCore
+from PySide6.QtCore import QSortFilterProxyModel, QTime
+from PySide6.QtWidgets import QComboBox, QCompleter, QMessageBox, QSpinBox, QTimeEdit
 
 from sportorg.common.otime import OTime
 from sportorg.language import translate

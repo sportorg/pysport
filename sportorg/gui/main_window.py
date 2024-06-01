@@ -8,9 +8,10 @@ from queue import Queue
 
 import psutil
 from psutil import Process
-from PySide2 import QtCore, QtGui, QtWidgets
-from PySide2.QtCore import QTimer
-from PySide2.QtWidgets import QMainWindow, QMessageBox
+from PySide6 import QtCore, QtGui, QtWidgets
+from PySide6.QtCore import QTimer
+from PySide6.QtGui import QAction
+from PySide6.QtWidgets import QMainWindow, QMessageBox
 
 from sportorg import config
 from sportorg.common.broker import Broker
@@ -326,7 +327,7 @@ class MainWindow(QMainWindow):
                 if action_item['type'] == 'separator':
                     parent.addSeparator()
             elif 'action' in action_item:
-                action = QtWidgets.QAction(self)
+                action = QAction(self)
                 action.setText(action_item['title'])
                 action.triggered.connect(
                     self.menu_factory.get_action(action_item['action'])
@@ -369,7 +370,7 @@ class MainWindow(QMainWindow):
     def _setup_toolbar(self):
         self.toolbar = self.addToolBar(translate('Toolbar'))
         for tb in toolbar_list():
-            tb_action = QtWidgets.QAction(QtGui.QIcon(tb[0]), tb[1], self)
+            tb_action = QAction(QtGui.QIcon(tb[0]), tb[1], self)
             tb_action.triggered.connect(self.menu_factory.get_action(tb[2]))
             if len(tb) == 4:
                 self.toolbar_property[tb[3]] = tb_action
