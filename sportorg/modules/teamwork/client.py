@@ -17,7 +17,7 @@ class ClientSender:
     def __call__(self, conn: socket.socket) -> None:
         try:
             while True:
-                cmd = self._in_queue.get_nowait()
+                cmd = self._in_queue.get(timeout=0.1)
                 conn.sendall(cmd.get_packet())
         except queue.Empty:
             return

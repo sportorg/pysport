@@ -80,7 +80,7 @@ class ServerSender:
     def __call__(self, socks: List[socket.socket]) -> None:
         try:
             while True:
-                command = self._in_queue.get_nowait()
+                command = self._in_queue.get(timeout=0.1)
                 for sock in socks:
                     if command.is_sender(sock):
                         continue
