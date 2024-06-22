@@ -164,9 +164,9 @@ def _get_person_obj(data, race_data, result=None):
             obj['splits'].append(current_split)
 
             # add info about penalty (as string(20))
-            if result['penalty_laps'] > 0:
+            if result['penalty_laps'] and result['penalty_laps'] > 0:
                 obj['penalty'] = str(result['penalty_laps'])
-            if result['penalty_time'] > 0:
+            if result['penalty_time'] and result['penalty_time'] > 0:
                 obj['penalty'] = time_to_hhmmss(OTime(msec=result['penalty_time']))
 
     return obj
