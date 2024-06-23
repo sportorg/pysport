@@ -22,7 +22,7 @@ def get_version():
     return VERSION
 
 
-def check_version(version):
+def check_version(version: str) -> bool:
     if not get_version():
         return True
     return str(version) == get_version()

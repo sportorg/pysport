@@ -4,8 +4,6 @@ import sys
 
 from pydantic import BaseSettings
 
-from sportorg.common.version import Version
-
 
 class Env(BaseSettings):
     DEBUG: bool = False
@@ -15,7 +13,8 @@ class Env(BaseSettings):
 
 
 NAME = 'SportOrg'
-VERSION = Version(1, 6, 0, 0, 'v')
+VERSION = 'v1.6.0'
+VERSION_FULL = '1.6.0.0'
 
 
 def is_executable() -> bool:

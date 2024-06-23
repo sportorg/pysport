@@ -20,7 +20,7 @@ from sportorg.models.result.split_calculation import RaceSplits
 
 def dump(file):
     data = {
-        'version': config.VERSION.file,
+        'version': config.VERSION_FULL,
         'current_race': get_current_race_index(),
         'races': [race_downgrade(r.to_dict()) for r in races()],
     }
