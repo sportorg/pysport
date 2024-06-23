@@ -47,6 +47,8 @@ class SearchDialog(QDialog):
         self.layout.addWidget(self.item_serach)
         self.layout.addWidget(button_box)
 
+        QtCore.QTimer.singleShot(0, self.item_serach.setFocus)
+
         self.retranslate_ui()
 
         self.show()

@@ -1,5 +1,6 @@
 import logging
 
+from PySide6 import QtCore
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QDialog, QDialogButtonBox, QFormLayout, QLabel, QTextEdit
 
@@ -51,6 +52,8 @@ class RentCardsDialog(QDialog):
         self.button_cancel.setText(translate('Cancel'))
         self.button_cancel.clicked.connect(cancel_changes)
         self.layout.addRow(button_box)
+
+        QtCore.QTimer.singleShot(0, self.item_cards.setFocus)
 
         self.show()
 
