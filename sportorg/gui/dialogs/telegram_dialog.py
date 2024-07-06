@@ -44,6 +44,10 @@ class TelegramDialog(QDialog):
         self.item_chat_id = QLineEdit()
         self.layout.addRow(self.label_chat_id, self.item_chat_id)
 
+        self.label_thread_id = QLabel(translate('Thread id'))
+        self.item_thread_id = QLineEdit()
+        self.layout.addRow(self.label_thread_id, self.item_thread_id)
+
         self.label_template = QLabel(translate('Template'))
         self.item_template = QTextEdit()
         self.item_template.setMinimumHeight(150)
@@ -89,6 +93,7 @@ class TelegramDialog(QDialog):
         obj = race()
         token = obj.get_setting('telegram_token', '')
         url = obj.get_setting('telegram_chat_id', '')
+        thread_id = obj.get_setting('telegram_thread_id', '')
         parse_mode = obj.get_setting('telegram_parse_mode', '')
         template = obj.get_setting(
             'telegram_template', '{group} {name} {bib} {result} {place}'
@@ -96,6 +101,7 @@ class TelegramDialog(QDialog):
         telegram_enabled = obj.get_setting('telegram_enabled', False)
 
         self.item_chat_id.setText(url)
+        self.item_thread_id.setText(thread_id)
         self.item_token.setText(token)
         self.item_template.setText(template)
         self.item_enabled.setChecked(telegram_enabled)
@@ -117,6 +123,7 @@ class TelegramDialog(QDialog):
         obj = race()
         obj.set_setting('telegram_token', self.item_token.text())
         obj.set_setting('telegram_chat_id', self.item_chat_id.text())
+        obj.set_setting('telegram_thread_id', self.item_thread_id.text())
         obj.set_setting('telegram_enabled', self.item_enabled.isChecked())
         obj.set_setting('telegram_parse_mode', parse_mode)
         obj.set_setting('telegram_template', self.item_template.toPlainText())
