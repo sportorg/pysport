@@ -153,6 +153,7 @@ class ResultCalculation:
             if rank > 0:
                 is_score_processing_mode = (
                     self.race.get_setting('result_processing_mode', 'time') == 'scores'
+                    or self.race.get_setting('result_processing_mode', 'time') == 'ardf'
                 )
                 leader_time = OTime(0)
                 leader_scores = 0

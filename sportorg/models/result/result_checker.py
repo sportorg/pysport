@@ -26,7 +26,10 @@ class ResultChecker:
         if self.person.group is None:
             return True
 
-        if race().get_setting('result_processing_mode', 'time') == 'scores':
+        if race().get_setting('result_processing_mode', 'time') == 'ardf':
+            result.scores_ardf = self.calculate_scores_ardf(result)
+            return True
+        elif race().get_setting('result_processing_mode', 'time') == 'scores':
             # process by score (rogain)
             result.scores_rogain = self.calculate_scores_rogain(result)
             return True
@@ -72,6 +75,8 @@ class ResultChecker:
             elif result.person.group and result.person.group.max_time.to_msec():
                 if result.get_result_otime() > result.person.group.max_time:
                     if race().get_setting('result_processing_mode', 'time') == 'time':
+                        result.status = ResultStatus.OVERTIME
+                    elif race().get_setting('result_processing_mode', 'time') == 'ardf':
                         result.status = ResultStatus.OVERTIME
 
             result.status_comment = StatusComments().get_status_default_comment(
@@ -353,4 +358,62 @@ class ResultChecker:
                 ret -= minutes_diff * penalty_step
         if ret < 0:
             ret = 0
+        return ret
+
+    @staticmethod
+    def calculate_scores_ardf(result):
+        user_array = []
+        ret = 0
+
+        course = race().find_course(result)
+        if not course:
+            return ret
+
+        correct_order = [str(control.code) for control in course.controls]
+
+        index_in_order = 0
+
+        for cur_split in result.splits:
+            code = str(cur_split.code)
+
+            initial_index = index_in_order
+
+            while index_in_order < len(correct_order):
+                current_cp = correct_order[index_in_order]
+
+                if '?' in current_cp:
+                    if '(' in current_cp and ')' in current_cp:
+                        options = current_cp.strip('?()').split(',')
+                        if code in options and code not in user_array:
+                            user_array.append(code)
+                            ret += 1
+                            index_in_order = initial_index + 1
+                            break
+                    else:
+                        if code not in user_array:
+                            user_array.append(code)
+                            ret += 1
+                            index_in_order = initial_index + 1
+                            break
+
+                    index_in_order += 1
+                    continue
+
+                if code == current_cp:
+                    if code not in user_array:
+                        user_array.append(code)
+                        ret += 1
+                    index_in_order += 1
+                    break
+
+                index_in_order = initial_index
+                break
+
+        if result.person and result.person.group:
+            user_time = result.get_result_otime()
+            max_time = result.person.group.max_time
+            if OTime() < max_time < user_time:
+                result.status = ResultStatus.DISQUALIFIED
+                return 0
+
         return ret

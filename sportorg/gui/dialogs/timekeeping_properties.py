@@ -111,6 +111,8 @@ class TimekeepingPropertiesDialog(QDialog):
         self.result_proc_layout = QFormLayout()
         self.rp_time_radio = QRadioButton(translate('by time'))
         self.result_proc_layout.addRow(self.rp_time_radio)
+        self.rp_ardf_radio = QRadioButton(translate('ardf'))
+        self.result_proc_layout.addRow(self.rp_ardf_radio)
         self.rp_scores_radio = QRadioButton(translate('by scores'))
         self.result_proc_layout.addRow(self.rp_scores_radio)
 
@@ -459,6 +461,8 @@ class TimekeepingPropertiesDialog(QDialog):
 
         if rp_mode == 'time':
             self.rp_time_radio.setChecked(True)
+        elif rp_mode == 'ardf':
+            self.rp_ardf_radio.setChecked(True)
         else:
             self.rp_scores_radio.setChecked(True)
 
@@ -615,7 +619,9 @@ class TimekeepingPropertiesDialog(QDialog):
 
         # result processing
         rp_mode = 'time'
-        if self.rp_scores_radio.isChecked():
+        if self.rp_ardf_radio.isChecked():
+            rp_mode = 'ardf'
+        elif self.rp_scores_radio.isChecked():
             rp_mode = 'scores'
 
         rp_score_mode = 'rogain'

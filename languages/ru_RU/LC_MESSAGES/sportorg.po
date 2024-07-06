@@ -639,6 +639,9 @@ msgstr "по времени"
 msgid "by scores"
 msgstr "по баллам"
 
+msgid "ardf"
+msgstr "ADRF"
+
 msgid "rogain scores"
 msgstr "рогейн (45КП = 4балла, 78КП = 7баллов)"
 

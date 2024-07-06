@@ -52,10 +52,11 @@
                     year: result.person.birth_date ? (new Date(result.person.birth_date)).getFullYear() : '',
                     penalty_time: toHHMMSS(result.penalty_time),
                     penalty_laps: result.penalty_laps,
+                    scores_ardf: result.scores_ardf,
                     result: result.result_current,
                     result_relay: result.result_relay,
                     result_msec: result.result_msec,
-                    diff: race.settings.result_processing_mode === 'scores' ? result.diff_scores : toHHMMSS(result.diff),
+                    diff: race.settings.result_processing_mode === 'scores' || race.settings.result_processing_mode === 'ardf' ? result.diff_scores : toHHMMSS(result.diff),
                     place: result.place,
                     status: result.status,
                     scores: result.scores,
@@ -163,7 +164,7 @@
                     return -1
                 }
                 if (a.is_out_of_competition || b.is_out_of_competition) {
-                    if (race.settings.result_processing_mode === 'scores' && a.scores !== b.scores) {
+                    if ((race.settings.result_processing_mode === 'scores' || race.settings.result_processing_mode === 'ardf') && a.scores !== b.scores) {
                         return a.scores - b.scores;
                     }
                     return a.result_msec - b.result_msec;
@@ -222,9 +223,10 @@
                     year: result.person.birth_date ? (new Date(result.person.birth_date)).getFullYear() : '',
                     penalty_time: toHHMMSS(result.penalty_time),
                     penalty_laps: result.penalty_laps,
+                    scores_ardf: result.scores_ardf,
                     result: result.result,
                     result_msec: result.result_msec,
-                    diff: race.settings.result_processing_mode === 'scores' ? result.diff_scores : toHHMMSS(result.diff),
+                    diff: race.settings.result_processing_mode === 'scores' || race.settings.result_processing_mode === 'ardf' ? result.diff_scores : toHHMMSS(result.diff),
                     place: result.place,
                     status: result.status,
                     scores: result.scores,
@@ -307,7 +309,7 @@
                     return -1
                 }
                 if (a.is_out_of_competition || b.is_out_of_competition) {
-                    if (race.settings.result_processing_mode === 'scores' && a.scores !== b.scores) {
+                    if ((race.settings.result_processing_mode === 'scores' || race.settings.result_processing_mode === 'ardf') && a.scores !== b.scores) {
                         return a.scores - b.scores;
                     }
                     return a.result_msec - b.result_msec;
@@ -378,7 +380,7 @@
 					} else {
 						doubleplace++;
 					}
-					elem.diff = race.settings.result_processing_mode === 'scores' ? elem.diff_scores : toHHMMSS(elem.result_msec - best_result_msec);
+					elem.diff = race.settings.result_processing_mode === 'scores' || race.settings.result_processing_mode === 'ardf' ? elem.diff_scores : toHHMMSS(elem.result_msec - best_result_msec);
 					elem.place = newplace;
 					elem.place_show = newplace;
                 }
@@ -482,9 +484,10 @@
             {key: 'bib', title: 'Номер', size: 6},
             {key: 'penalty_time', title: 'Штраф', size: 9, active: false},
             {key: 'penalty_laps', title: 'Штраф', size: 9, active: false},
+            {key: 'scores_ardf', title: 'КП', size: 3, active: race.settings.result_processing_mode === 'ardf'},
             {key: 'result', title: 'Результат', size: 17},
             {key: 'result_relay', title: 'Ком. рез-т', size: 14},
-            {key: 'diff', title: 'Отставание', size: 11},
+            {key: 'diff', title: 'Отставание', size: 11, active: race.settings.result_processing_mode !== 'ardf'},
             {key: 'speed', title: 'Темп', size: 8, active: false},
             {key: 'speed_kmh', title: 'Скорость', size: 8, active: false},
             {key: 'place_show', title: 'Место', size: 6},
@@ -720,6 +723,14 @@
             value: Fields.isActive('penalty_laps'),
             change: function (checked) {
                 Fields.active('penalty_laps', checked);
+                render()
+            }
+        },
+        {
+            title: 'КП',
+            value: Fields.isActive('scores_ardf'),
+            change: function (checked) {
+                Fields.active('scores_ardf', checked);
                 render()
             }
         },
