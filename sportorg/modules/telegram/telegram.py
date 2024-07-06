@@ -8,11 +8,12 @@ from sportorg.models.memory import race
 
 
 class TelegramSendThread(Thread):
-    def __init__(self, token, chat_id, text, parse_mode=''):
+    def __init__(self, token, chat_id, text, parse_mode='', thread_id=''):
         super().__init__(daemon=True)
         self.setName('TelegramSendThread')
         self.token = token
         self.chat_id = chat_id
+        self.thread_id = thread_id
         self.text = text
         self.parse_mode = parse_mode
 
@@ -20,15 +21,18 @@ class TelegramSendThread(Thread):
         try:
             sys.stdout = FakeStd()
             sys.stderr = FakeStd()
-            Telegram(self.token).send_message(self.chat_id, self.text, self.parse_mode)
+            Telegram(self.token).send_message(
+                self.chat_id, self.text, self.parse_mode, self.thread_id
+            )
         except Exception as e:
             logging.error(str(e))
 
 
 class BotOption:
-    def __init__(self, token, chat_id, template, parse_mode, enabled=False):
+    def __init__(self, token, chat_id, template, parse_mode, thread_id, enabled=False):
         self.token = token
         self.chat_id = chat_id
+        self.thread_id = thread_id
         self.template = template
         self.parse_mode = parse_mode
         self.enabled = enabled
@@ -43,6 +47,7 @@ class TelegramClient:
             obj.get_setting('telegram_chat_id', ''),
             obj.get_setting('telegram_template', ''),
             obj.get_setting('telegram_parse_mode', ''),
+            obj.get_setting('telegram_thread_id', ''),
             obj.get_setting('telegram_enabled', False),
         )
 
@@ -72,7 +77,7 @@ class TelegramClient:
             logging.error(str(e))
         logging.info('Telegram {}'.format(text))
         TelegramSendThread(
-            options.token, options.chat_id, text, options.parse_mode
+            options.token, options.chat_id, text, options.parse_mode, options.thread_id
         ).start()
 
 
