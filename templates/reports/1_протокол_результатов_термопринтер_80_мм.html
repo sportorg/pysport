@@ -54,7 +54,7 @@
                     penalty_laps: result.penalty_laps,
                     result: result.result,
                     result_msec: result.result_msec,
-                    diff: race.settings.result_processing_mode === 'scores' ? result.diff_scores : toHHMMSS(result.diff),
+                    diff: race.settings.result_processing_mode === 'scores' || race.settings.result_processing_mode === 'ardf' ? result.diff_scores : toHHMMSS(result.diff),
                     place: result.place,
                     status: result.status,
                     scores: result.scores,
@@ -166,7 +166,7 @@
                     return -1
                 }
                 if (a.is_out_of_competition || b.is_out_of_competition) {
-                    if (race.settings.result_processing_mode === 'scores' && a.scores !== b.scores) {
+                    if ((race.settings.result_processing_mode === 'scores' || race.settings.result_processing_mode === 'ardf') && a.scores !== b.scores) {
                         return a.scores - b.scores;
                     }
                     return a.result_msec - b.result_msec;

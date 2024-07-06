@@ -468,6 +468,7 @@ class Result:
         self.place = 0
         self.scores = 0
         self.scores_rogain = 0
+        self.scores_ardf = 0
         self.assigned_rank = Qualification.NOT_QUALIFIED
         self.diff: Optional[OTime] = None  # readonly
         self.diff_scores = 0  # readonly
@@ -504,6 +505,14 @@ class Result:
                 eq = eq and self.get_finish_time() == other.get_finish_time()
             else:
                 return False
+        elif race().get_setting('result_processing_mode', 'time') == 'ardf':
+            eq = eq and self.scores_ardf == other.scores_ardf
+            if eq and self.get_start_time() and other.get_start_time():
+                eq = eq and self.get_start_time() == other.get_start_time()
+            if eq and self.get_finish_time() and other.get_finish_time():
+                eq = eq and self.get_finish_time() == other.get_finish_time()
+            else:
+                return False
         else:  # process by score (rogain)
             eq = eq and self.scores_rogain == other.scores_rogain
             if eq and self.get_start_time() and other.get_start_time():
@@ -533,6 +542,11 @@ class Result:
             ):
                 return False
             return self.get_result_otime() > other.get_result_otime()
+        elif race().get_setting('result_processing_mode', 'time') == 'ardf':
+            if self.scores_ardf == other.scores_ardf:
+                return self.get_result_otime() > other.get_result_otime()
+            else:
+                return self.scores_ardf < other.scores_ardf
         else:  # process by score (rogain)
             if self.scores_rogain == other.scores_rogain:
                 return self.get_result_otime() > other.get_result_otime()
@@ -568,6 +582,7 @@ class Result:
             'speed': self.speed,  # readonly
             'scores': self.scores,  # readonly
             'scores_rogain': self.scores_rogain,  # readonly
+            'scores_ardf': self.scores_ardf,  # readonly
             'created_at': self.created_at,  # readonly
             'result': self.get_result(),  # readonly
             'result_relay': self.get_result_relay(),
@@ -593,6 +608,8 @@ class Result:
         self.status = ResultStatus(int(data['status']))
         self.penalty_laps = int(data['penalty_laps'])
         self.scores = data['scores']
+        if 'scores_ardf' in data and data['scores_ardf'] is not None:
+            self.scores_ardf = data['scores_ardf']
         if 'scores_rogain' in data and data['scores_rogain'] is not None:
             self.scores_rogain = data['scores_rogain']
         if str(data['place']).isdigit():
@@ -645,7 +662,9 @@ class Result:
             return ''
 
         ret = ''
-        if race().get_setting('result_processing_mode', 'time') == 'scores':
+        if race().get_setting('result_processing_mode', 'time') == 'ardf':
+            ret += f"{self.scores_ardf} {translate('points')} "
+        elif race().get_setting('result_processing_mode', 'time') == 'scores':
             ret += f"{self.scores_rogain} {translate('points')} "
 
         time_accuracy = race().get_setting('time_accuracy', 0)
@@ -662,7 +681,9 @@ class Result:
             return ''
 
         ret = ''
-        if race().get_setting('result_processing_mode', 'time') == 'scores':
+        if race().get_setting('result_processing_mode', 'time') == 'ardf':
+            ret += f"{self.scores_ardf} {translate('points')} "
+        elif race().get_setting('result_processing_mode', 'time') == 'scores':
             ret += f"{self.scores_rogain} {translate('points')} "
 
         # time_accuracy = race().get_setting('time_accuracy', 0)
@@ -696,7 +717,9 @@ class Result:
                 cur_bib -= 1000
 
         ret = ''
-        if race().get_setting('result_processing_mode', 'time') == 'scores':
+        if race().get_setting('result_processing_mode', 'time') == 'ardf':
+            ret += f"{self.scores_ardf} {translate('points')} "
+        elif race().get_setting('result_processing_mode', 'time') == 'scores':
             ret += f"{self.scores_rogain} {translate('points')} "
 
         time_accuracy = race().get_setting('time_accuracy', 0)
@@ -1047,6 +1070,8 @@ class ResultSportident(Result):
             'ignore_punches_before_start', False
         )
 
+        optional_controls_taken = set()
+
         for i in range(len(self.splits)):
             try:
                 split = self.splits[i]
@@ -1117,6 +1142,19 @@ class ResultSportident(Result):
                         recognized_indexes.append(i)
                         split.course_index = course_index
                         course_index += 1
+
+                elif template.find('?') > -1:
+                    # optional control '?' or '?(31,32,33)' or '31?'
+                    if cur_code in optional_controls_taken:
+                        continue
+
+                    if not list_exists or list_contains:
+                        # any control '?' or '?(31,32,33)' or '31?'
+                        split.is_correct = True
+                        split.has_penalty = False
+                        recognized_indexes.append(i)
+                        optional_controls_taken.add(cur_code)
+                        split.course_index = course_index
 
                 else:
                     # simple pre-ordered control '31 989' or '31(31,32,33) 989'

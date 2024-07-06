@@ -122,6 +122,9 @@ def _get_person_obj(data, race_data, result=None):
                 result['result_msec'] / 10
             )  # 1/100 sec - proprietary format
 
+        if race_data['settings']['result_processing_mode'] == 'ardf':
+            obj['score'] = result['scores_ardf']
+
         obj['result_status'] = (
             RESULT_STATUS[int(result['status'])]
             if -1 < int(result['status']) < len(RESULT_STATUS)
