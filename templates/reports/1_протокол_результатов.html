@@ -36,6 +36,9 @@
     var selected = {% endraw %}{{selected|tojson}}{%raw %};
     racePreparation(race);
 
+    var isRogaine = race.settings.result_processing_mode === 'scores';
+    var isArdf =  race.settings.result_processing_mode === 'ardf';
+
     function getResultsByGroup(group, count) {
         count = +count || 0;
         var isRelay = group.__type ? group.__type === 3 : race.data.race_type === 3;
@@ -53,10 +56,13 @@
                     penalty_time: toHHMMSS(result.penalty_time),
                     penalty_laps: result.penalty_laps,
                     scores_ardf: result.scores_ardf,
+                    rogaine_score: result.rogaine_score,
+                    rogaine_penalty: result.rogaine_penalty,
+                    rogaine_points_earned: result.rogaine_score + result.rogaine_penalty,
                     result: result.result_current,
                     result_relay: result.result_relay,
                     result_msec: result.result_msec,
-                    diff: race.settings.result_processing_mode === 'scores' || race.settings.result_processing_mode === 'ardf' ? result.diff_scores : toHHMMSS(result.diff),
+                    diff: isRogaine || isArdf ? result.diff_scores : toHHMMSS(result.diff),
                     place: result.place,
                     status: result.status,
                     scores: result.scores,
@@ -73,6 +79,9 @@
                     r.speed = '';
                     r.speed_kmh = '';
                     r.scores = '';
+                    r.rogaine_points_earned = '';
+                    r.rogaine_penalty = '';
+                    r.rogaine_score = '';
                 }
 
                 // SPLITS
@@ -164,8 +173,11 @@
                     return -1
                 }
                 if (a.is_out_of_competition || b.is_out_of_competition) {
-                    if ((race.settings.result_processing_mode === 'scores' || race.settings.result_processing_mode === 'ardf') && a.scores !== b.scores) {
-                        return a.scores - b.scores;
+                    if (isRogaine && a.rogaine_score != b.rogaine_score) {
+                        return -(a.rogaine_score - b.rogaine_score);
+                    }
+                    if (isArdf && a.scores_ardf != b.scores_ardf) {
+                        return -(a.scores_ardf - b.scores_ardf);
                     }
                     return a.result_msec - b.result_msec;
                 }
@@ -224,9 +236,12 @@
                     penalty_time: toHHMMSS(result.penalty_time),
                     penalty_laps: result.penalty_laps,
                     scores_ardf: result.scores_ardf,
-                    result: result.result,
+                    rogaine_score: result.rogaine_score,
+                    rogaine_penalty: result.rogaine_penalty,
+                    rogaine_points_earned: result.rogaine_score + result.rogaine_penalty,
+                    result: result.result_current,
                     result_msec: result.result_msec,
-                    diff: race.settings.result_processing_mode === 'scores' || race.settings.result_processing_mode === 'ardf' ? result.diff_scores : toHHMMSS(result.diff),
+                    diff: isRogaine || isArdf ? result.diff_scores : toHHMMSS(result.diff),
                     place: result.place,
                     status: result.status,
                     scores: result.scores,
@@ -243,6 +258,9 @@
                     r.speed = '';
                     r.speed_kmh = '';
                     r.scores = '';
+                    r.rogaine_points_earned = '';
+                    r.rogaine_penalty = '';
+                    r.rogaine_score = '';
                 }
 
                 // SPLITS
@@ -309,8 +327,11 @@
                     return -1
                 }
                 if (a.is_out_of_competition || b.is_out_of_competition) {
-                    if ((race.settings.result_processing_mode === 'scores' || race.settings.result_processing_mode === 'ardf') && a.scores !== b.scores) {
-                        return a.scores - b.scores;
+                    if (isRogaine && a.rogaine_score != b.rogaine_score) {
+                        return -(a.rogaine_score - b.rogaine_score);
+                    }
+                    if (isArdf && a.scores_ardf != b.scores_ardf) {
+                        return -(a.scores_ardf - b.scores_ardf);
                     }
                     return a.result_msec - b.result_msec;
                 }
@@ -319,6 +340,12 @@
                 }
                 if (b.place < 1) {
                     return -1
+                }
+                if (isRogaine && a.rogaine_score != b.rogaine_score) {
+                    return -(a.rogaine_score - b.rogaine_score);
+                }
+                if (isArdf && a.scores_ardf != b.scores_ardf) {
+                    return -(a.scores_ardf - b.scores_ardf);
                 }
                 return a.result_msec - b.result_msec;
             }
@@ -346,10 +373,16 @@
                 results.push(r);
             }
         } else {
+            var get_score = function(res){
+                if (isRogaine) return res.rogaine_score;
+                if (isArdf) return res.scores_ardf;
+                return 0
+            }
 			var newplace = 1;
 			var doubleplace = -1;
 			var best_result_msec = results[0] ? results[0].result_msec : 0;
 			var last_result_msec = results[0] ? results[0].result_msec : 0;
+            var best_score = results[0] ? get_score(results[0]) : 0;
             var binary_search = function(arr,required){
 				if (!arr){
 					return 0;
@@ -373,14 +406,14 @@
                 index++;
                 elem.index = index;
 				if (!elem.data.person.is_out_of_competition && elem.place !== 0 && elem.place !== -1) {
-					if (last_result_msec < elem.result_msec){
+					if (isRogaine || isArdf || last_result_msec < elem.result_msec){
 						newplace += 1 + doubleplace;
 						doubleplace = 0;
 						last_result_msec = elem.result_msec;
 					} else {
 						doubleplace++;
 					}
-					elem.diff = race.settings.result_processing_mode === 'scores' || race.settings.result_processing_mode === 'ardf' ? elem.diff_scores : toHHMMSS(elem.result_msec - best_result_msec);
+					elem.diff = isRogaine || isArdf ? best_score - get_score(elem) : toHHMMSS(elem.result_msec - best_result_msec);
 					elem.place = newplace;
 					elem.place_show = newplace;
                 }
@@ -484,10 +517,13 @@
             {key: 'bib', title: 'Номер', size: 6},
             {key: 'penalty_time', title: 'Штраф', size: 9, active: false},
             {key: 'penalty_laps', title: 'Штраф', size: 9, active: false},
-            {key: 'scores_ardf', title: 'КП', size: 3, active: race.settings.result_processing_mode === 'ardf'},
+            {key: 'scores_ardf', title: 'КП', size: 3, active: isArdf},
+            {key: 'rogaine_points_earned', title: 'Очки', size: 4, active: isRogaine},
+            {key: 'rogaine_penalty', title: 'Штр.', size: 4, active: isRogaine},
+            {key: 'rogaine_score', title: 'Итог', size: 4, active: isRogaine},
             {key: 'result', title: 'Результат', size: 17},
             {key: 'result_relay', title: 'Ком. рез-т', size: 14},
-            {key: 'diff', title: 'Отставание', size: 11, active: race.settings.result_processing_mode !== 'ardf'},
+            {key: 'diff', title: 'Отставание', size: 11, active: !isArdf && !isRogaine},
             {key: 'speed', title: 'Темп', size: 8, active: false},
             {key: 'speed_kmh', title: 'Скорость', size: 8, active: false},
             {key: 'place_show', title: 'Место', size: 6},
@@ -727,7 +763,7 @@
             }
         },
         {
-            title: 'КП',
+            title: 'ARDF КП',
             value: Fields.isActive('scores_ardf'),
             change: function (checked) {
                 Fields.active('scores_ardf', checked);

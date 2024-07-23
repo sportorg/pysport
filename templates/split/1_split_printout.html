@@ -13,7 +13,7 @@
         }
 
         .small-text {
-            font-size: 75%;
+            font-size: small;
         }
 
         p,
@@ -175,6 +175,10 @@
         {% endfor %}
         </table>
         <br> Финиш: {{result.finish_msec|tohhmmss}} {{result.speed}}
+        {% if race['settings'].get('result_processing_mode', 'time') == 'scores' and result.rogaine_penalty > 0 %}
+        <br> Набрано очков: {{result.rogaine_score + result.rogaine_penalty}}
+        <br> Штраф за превышение: {{result.rogaine_penalty}}
+        {% endif%}
         {% if race['settings'].get('marked_route_mode', 'off') == 'laps' %}
         <br> Штрафных кругов: {{result.penalty_laps}}
         {% elif race['settings'].get('marked_route_mode', 'off') == 'time' %}
@@ -191,9 +195,7 @@
                     <br>Вас уже никто не обгонит!
                 {% endif %}
             {% endif %}
-        <br>
         {% endif %}
-        <br>
         {% if result.status != 1 %}
             {% for control in course.controls %}
                 {{control.code}}
@@ -202,7 +204,7 @@
 		{% else %}
 			<h1>ОТМЕТКА - OK</h1>
         {% endif %}
-        <table>
+        <table class="small-text">
             {% for item in items %}
                 {% if item.result.place|int < 11 and item.result.place|int > 0 %}
                     <tr>

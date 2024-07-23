@@ -3,8 +3,8 @@ import sys
 import time
 from multiprocessing import Process, Queue
 
-from PySide6.QtCore import QSizeF
-from PySide6.QtGui import QTextDocument
+from PySide6.QtCore import QMarginsF, QSizeF
+from PySide6.QtGui import QPageLayout, QTextDocument
 from PySide6.QtPrintSupport import QPrinter
 from PySide6.QtWidgets import QApplication
 
@@ -63,11 +63,13 @@ class PrintProcess(Process):
 
             printer.setFullPage(True)
             printer.setPageMargins(
-                self.margin_left,
-                self.margin_top,
-                self.margin_right,
-                self.margin_bottom,
-                QPrinter.Millimeter,
+                QMarginsF(
+                    self.margin_left,
+                    self.margin_top,
+                    self.margin_right,
+                    self.margin_bottom,
+                ),
+                QPageLayout.Unit.Millimeter,
             )
 
             page_size = QSizeF()
