@@ -636,8 +636,8 @@ msgstr "Режим присвоения"
 msgid "by time"
 msgstr "по времени"
 
-msgid "by scores"
-msgstr "по баллам"
+msgid "by scores (rogaine)"
+msgstr "по баллам (рогейн)"
 
 msgid "ardf"
 msgstr "ADRF"
@@ -650,6 +650,9 @@ msgstr "фиксированные баллы за КП"
 
 msgid "minute penalty"
 msgstr "Штраф за каждую просроченную минуту"
+
+msgid "maximum overrun time"
+msgstr "Макс. превышение контрольного времени"
 
 msgid "no penalty"
 msgstr "штраф не начисляется"
@@ -755,6 +758,12 @@ msgstr "Командные результаты"
 
 msgid "Scores"
 msgstr "Очки"
+
+msgid "Points gained"
+msgstr "Набрано очков"
+
+msgid "Penalty for finishing late"
+msgstr "Штраф за превышение"
 
 msgid "Penalty calculation"
 msgstr "Штраф"

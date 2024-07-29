@@ -1,13 +1,22 @@
 from itertools import zip_longest
 from typing import List, Union
 
+import pytest
+
+from sportorg.common.otime import OTime
 from sportorg.models.memory import (
     Course,
     CourseControl,
+    Group,
     Person,
+    Race,
     ResultSportident,
     Split,
+    create,
+    new_event,
+    race,
 )
+from sportorg.models.result.result_checker import ResultChecker
 
 
 def test_controls_as_int():
@@ -241,14 +250,7 @@ def test_course_free_order():
     assert dsq(c, [31, 32, 32, 70])
     assert dsq(c, [32, 33, 70])
     assert dsq(c, [31, 32, 70])
-    assert dsq(
-        c,
-        [
-            31,
-            32,
-            33,
-        ],
-    )
+    assert dsq(c, [31, 32, 33])
 
     # Выбор + заданные КП
     c = ['*(31,32,33)', '55', '*(31,32,33)']
@@ -360,6 +362,92 @@ def test_course_butterfly():
     assert dsq(c, [70, 32, 41, 42, 33, 32, 51, 33, 39])
     assert dsq(c, [31, 32, 41, 42, 70, 32, 51, 33, 39])
     assert dsq(c, [31, 32, 41, 42, 33, 32, 51, 33, 70])
+
+
+@pytest.mark.parametrize(
+    'controls, expected',
+    [
+        ([], 0),
+        ([31, 32, 33, 34], 12),
+        ([11, 22, 33, 44], 10),
+        ([31, 999, 34], 105),
+        ([31, 31, 33, 31, 33], 6),
+    ],
+)
+def test_calculate_rogaine_score(controls, expected):
+    create_race()
+    race().set_setting('result_processing_score_mode', 'rogain')  # wrong spelling
+    res = make_result(controls)
+    assert ResultChecker.calculate_rogaine_score(res) == expected
+
+
+@pytest.mark.parametrize(
+    'fixed_value, controls, expected',
+    [
+        (1, [], 0),
+        (1, [31, 32, 33, 34], 4),
+        (2, [31, 32, 33, 34], 8),
+        (1, [11, 22, 33, 44], 4),
+        (1, [31, 999, 34], 3),
+        (1, [31, 31, 33, 31, 33], 2),
+    ],
+)
+def test_calculate_fixed_score(fixed_value, controls, expected):
+    create_race()
+    race().set_setting('result_processing_score_mode', 'fixed')
+    race().set_setting('result_processing_fixed_score_value', fixed_value)
+    res = make_result(controls)
+    assert ResultChecker.calculate_rogaine_score(res) == expected
+
+
+@pytest.mark.parametrize(
+    'score_mode, controls, expected',
+    [
+        ('rogain', [], 0),
+        ('rogain', [31, 31], 6),
+        ('rogain', [31, 32, 33, 34], 12),
+        ('rogain', [31, 31, 33, 31, 33], 15),
+        ('rogain', [11, 22, 33, 44], 10),
+        ('rogain', [11, 22, 33, 22, 44], 12),
+        ('fixed', [], 0),
+        ('fixed', [31, 31], 2),
+        ('fixed', [31, 32, 33, 34], 4),
+        ('fixed', [31, 31, 33, 31, 33], 5),
+        ('fixed', [11, 22, 33, 44], 4),
+        ('fixed', [11, 22, 33, 22, 44], 5),
+    ],
+)
+def test_calculate_score_allow_duplicates(score_mode, controls, expected):
+    create_race()
+    race().set_setting('result_processing_score_mode', score_mode)
+    race().set_setting('result_processing_fixed_score_value', 1)
+    res = make_result(controls)
+    assert ResultChecker.calculate_rogaine_score(res, allow_duplicates=True) == expected
+
+
+# fmt: off
+@pytest.mark.parametrize(
+    'step, score, max_time, finish, expected',
+    [
+        (1, 5, (0, 1, 0, 0), (0, 0, 59, 59), 0),
+        (1, 5, (0, 1, 0, 0), (0, 1,  0,  0), 0),
+        (1, 5, (0, 1, 0, 0), (0, 1,  0,  1), 1),
+        (1, 5, (0, 1, 0, 0), (0, 1,  0, 30), 1),
+        (1, 5, (0, 1, 0, 0), (0, 1,  1,  0), 1),
+        (1, 5, (0, 1, 0, 0), (0, 1,  1,  1), 2),
+        (1, 5, (0, 1, 0, 0), (0, 1,  5,  1), 5),
+        (1, 5, (0, 1, 0, 0), (0, 1,  6,  1), 5), # penalty does not exceed total score
+        (1, 5, (0, 1, 0, 0), (0, 1, 15,  1), 5), # penalty does not exceed total score
+    ],
+)
+# fmt: on
+def test_calculate_rogaine_penalty(step, score, max_time, finish, expected):
+    create_race()
+    race().set_setting('result_processing_scores_minute_penalty', 1)
+    race().groups[0].max_time = OTime(*max_time)
+    result = race().results[0]
+    result.finish_time = OTime(*finish)
+    assert ResultChecker.calculate_rogaine_penalty(result, score, step) == expected
 
 
 def test_non_obvious_behavior():
@@ -493,6 +581,19 @@ def check(
         raise ValueError(message)
 
     return check_result
+
+
+def create_race():
+    course = create(Course)
+    group = create(Group, course=course)
+    person = create(Person, group=group)
+    result = ResultSportident()
+    result.person = person
+    new_event([create(Race)])
+    race().courses.append(course)
+    race().groups.append(group)
+    race().persons.append(person)
+    race().results.append(result)
 
 
 def make_course(course: List[Union[int, str]]) -> Course:

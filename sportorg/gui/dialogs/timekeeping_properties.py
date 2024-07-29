@@ -109,12 +109,19 @@ class TimekeepingPropertiesDialog(QDialog):
         # result processing tab
         self.result_proc_tab = QWidget()
         self.result_proc_layout = QFormLayout()
+        self.result_processing_group = QGroupBox(translate('Result processing'))
+        self.result_processing_layout = QFormLayout()
         self.rp_time_radio = QRadioButton(translate('by time'))
-        self.result_proc_layout.addRow(self.rp_time_radio)
+        self.rp_time_radio.toggled.connect(self.rp_result_calculation_mode)
+        self.result_processing_layout.addRow(self.rp_time_radio)
         self.rp_ardf_radio = QRadioButton(translate('ardf'))
-        self.result_proc_layout.addRow(self.rp_ardf_radio)
-        self.rp_scores_radio = QRadioButton(translate('by scores'))
-        self.result_proc_layout.addRow(self.rp_scores_radio)
+        self.rp_ardf_radio.toggled.connect(self.rp_result_calculation_mode)
+        self.result_processing_layout.addRow(self.rp_ardf_radio)
+        self.rp_scores_radio = QRadioButton(translate('by scores (rogaine)'))
+        self.rp_scores_radio.toggled.connect(self.rp_result_calculation_mode)
+        self.result_processing_layout.addRow(self.rp_scores_radio)
+        self.result_processing_group.setLayout(self.result_processing_layout)
+        self.result_proc_layout.addRow(self.result_processing_group)
 
         self.rp_scores_group = QGroupBox()
         self.rp_scores_layout = QFormLayout(self.rp_scores_group)
@@ -129,6 +136,15 @@ class TimekeepingPropertiesDialog(QDialog):
         self.rp_scores_minute_penalty_edit = AdvSpinBox(max_width=50)
         self.rp_scores_layout.addRow(
             self.rp_scores_minute_penalty_label, self.rp_scores_minute_penalty_edit
+        )
+        self.rp_scores_max_overrun_time_label = QLabel(
+            translate('maximum overrun time')
+        )
+        self.rp_scores_max_overrun_time = AdvTimeEdit(
+            max_width=80, display_format='HH:mm:ss'
+        )
+        self.rp_scores_layout.addRow(
+            self.rp_scores_max_overrun_time_label, self.rp_scores_max_overrun_time
         )
         self.rp_scores_allow_duplicates = QCheckBox(translate('allow duplicates'))
         self.rp_scores_allow_duplicates.setToolTip(
@@ -335,6 +351,12 @@ class TimekeepingPropertiesDialog(QDialog):
         self.chip_reading_box.setDisabled(mode)
         self.chip_duplicate_box.setDisabled(mode)
 
+    def rp_result_calculation_mode(self):
+        if self.rp_scores_radio.isChecked():
+            self.rp_scores_group.show()
+        else:
+            self.rp_scores_group.hide()
+
     def penalty_calculation_mode(self):
         if (
             self.mr_lap_station_check.isChecked()
@@ -455,6 +477,12 @@ class TimekeepingPropertiesDialog(QDialog):
         rp_scores_minute_penalty = obj.get_setting(
             'result_processing_scores_minute_penalty', 1
         )
+        rp_scores_max_overrun_time = OTime(
+            msec=obj.get_setting(
+                'result_processing_scores_max_overrun_time', 30 * 60 * 1000
+            )
+        )
+
         rp_scores_allow_duplicates = obj.get_setting(
             'result_processing_scores_allow_duplicates', False
         )
@@ -473,6 +501,7 @@ class TimekeepingPropertiesDialog(QDialog):
 
         self.rp_fixed_scores_edit.setValue(rp_fixed_scores_value)
         self.rp_scores_minute_penalty_edit.setValue(rp_scores_minute_penalty)
+        self.rp_scores_max_overrun_time.setTime(rp_scores_max_overrun_time.to_time())
         self.rp_scores_allow_duplicates.setChecked(rp_scores_allow_duplicates)
 
         # penalty calculation
@@ -631,6 +660,10 @@ class TimekeepingPropertiesDialog(QDialog):
         rp_fixed_scores_value = self.rp_fixed_scores_edit.value()
 
         rp_scores_minute_penalty = self.rp_scores_minute_penalty_edit.value()
+        rp_scores_max_overrun_time = (
+            self.rp_scores_max_overrun_time.getOTime().to_msec()
+        )
+
         rp_scores_allow_duplicates = self.rp_scores_allow_duplicates.isChecked()
 
         obj.set_setting('result_processing_mode', rp_mode)
@@ -638,6 +671,9 @@ class TimekeepingPropertiesDialog(QDialog):
         obj.set_setting('result_processing_fixed_score_value', rp_fixed_scores_value)
         obj.set_setting(
             'result_processing_scores_minute_penalty', rp_scores_minute_penalty
+        )
+        obj.set_setting(
+            'result_processing_scores_max_overrun_time', rp_scores_max_overrun_time
         )
         obj.set_setting(
             'result_processing_scores_allow_duplicates', rp_scores_allow_duplicates

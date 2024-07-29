@@ -467,7 +467,8 @@ class Result:
         self.penalty_laps = 0  # count of penalty legs (marked route)
         self.place = 0
         self.scores = 0
-        self.scores_rogain = 0
+        self.rogaine_score = 0
+        self.rogaine_penalty = 0
         self.scores_ardf = 0
         self.assigned_rank = Qualification.NOT_QUALIFIED
         self.diff: Optional[OTime] = None  # readonly
@@ -514,7 +515,7 @@ class Result:
             else:
                 return False
         else:  # process by score (rogain)
-            eq = eq and self.scores_rogain == other.scores_rogain
+            eq = eq and self.rogaine_score == other.rogaine_score
             if eq and self.get_start_time() and other.get_start_time():
                 eq = eq and self.get_start_time() == other.get_start_time()
             if eq and self.get_finish_time() and other.get_finish_time():
@@ -548,10 +549,10 @@ class Result:
             else:
                 return self.scores_ardf < other.scores_ardf
         else:  # process by score (rogain)
-            if self.scores_rogain == other.scores_rogain:
+            if self.rogaine_score == other.rogaine_score:
                 return self.get_result_otime() > other.get_result_otime()
             else:
-                return self.scores_rogain < other.scores_rogain
+                return self.rogaine_score < other.rogaine_score
 
     @property
     @abstractmethod
@@ -581,7 +582,8 @@ class Result:
             'card_number': self.card_number,
             'speed': self.speed,  # readonly
             'scores': self.scores,  # readonly
-            'scores_rogain': self.scores_rogain,  # readonly
+            'rogaine_score': self.rogaine_score,  # readonly
+            'rogaine_penalty': self.rogaine_penalty,  # readonly
             'scores_ardf': self.scores_ardf,  # readonly
             'created_at': self.created_at,  # readonly
             'result': self.get_result(),  # readonly
@@ -610,8 +612,10 @@ class Result:
         self.scores = data['scores']
         if 'scores_ardf' in data and data['scores_ardf'] is not None:
             self.scores_ardf = data['scores_ardf']
-        if 'scores_rogain' in data and data['scores_rogain'] is not None:
-            self.scores_rogain = data['scores_rogain']
+        if 'rogaine_score' in data and data['rogaine_score'] is not None:
+            self.rogaine_score = data['rogaine_score']
+        if 'rogaine_penalty' in data and data['rogaine_penalty'] is not None:
+            self.rogaine_penalty = data['rogaine_penalty']
         if str(data['place']).isdigit():
             self.place = int(data['place'])
         self.assigned_rank = Qualification.get_qual_by_code(data['assigned_rank'])
@@ -665,7 +669,7 @@ class Result:
         if race().get_setting('result_processing_mode', 'time') == 'ardf':
             ret += f"{self.scores_ardf} {translate('points')} "
         elif race().get_setting('result_processing_mode', 'time') == 'scores':
-            ret += f"{self.scores_rogain} {translate('points')} "
+            ret += f"{self.rogaine_score} {translate('points')} "
 
         time_accuracy = race().get_setting('time_accuracy', 0)
         ret += self.get_result_otime().to_str(time_accuracy)
@@ -684,7 +688,7 @@ class Result:
         if race().get_setting('result_processing_mode', 'time') == 'ardf':
             ret += f"{self.scores_ardf} {translate('points')} "
         elif race().get_setting('result_processing_mode', 'time') == 'scores':
-            ret += f"{self.scores_rogain} {translate('points')} "
+            ret += f"{self.rogaine_score} {translate('points')} "
 
         # time_accuracy = race().get_setting('time_accuracy', 0)
         start = hhmmss_to_time(self.person.comment)
@@ -720,7 +724,7 @@ class Result:
         if race().get_setting('result_processing_mode', 'time') == 'ardf':
             ret += f"{self.scores_ardf} {translate('points')} "
         elif race().get_setting('result_processing_mode', 'time') == 'scores':
-            ret += f"{self.scores_rogain} {translate('points')} "
+            ret += f"{self.rogaine_score} {translate('points')} "
 
         time_accuracy = race().get_setting('time_accuracy', 0)
         ret += self.get_result_otime_relay().to_str(time_accuracy)

@@ -73,8 +73,9 @@ class ResultCalculation:
         self._group_persons[group] = ret
         return ret
 
-    @staticmethod
-    def set_places(array):
+    def set_places(self, array):
+        is_rogaine = self.race.get_setting('result_processing_mode', 'time') == 'scores'
+        is_ardf = self.race.get_setting('result_processing_mode', 'time') == 'ardf'
         current_place = 1
         last_place = 1
         last_result = 0
@@ -86,7 +87,10 @@ class ResultCalculation:
             if res.is_status_ok():
                 current_result = res.get_result_otime()
                 res.diff = current_result - array[0].get_result_otime()
-                res.diff_scores = array[0].scores - res.scores
+                if is_rogaine:
+                    res.diff_scores = array[0].rogaine_score - res.rogaine_score
+                elif is_ardf:
+                    res.diff_scores = array[0].scores_ardf - res.scores_ardf
 
                 # skip if out of competition
                 if res.person.is_out_of_competition:
