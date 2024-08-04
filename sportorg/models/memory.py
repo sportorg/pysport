@@ -1282,8 +1282,8 @@ class Person(Model):
         self.name = ''
         self.surname = ''
 
-        self.card_number = 0
-        self.bib = 0
+        self._card_number = 0
+        self._bib = 0
 
         self.birth_date: Optional[date] = None
         self.organization: Optional[Organization] = None
@@ -1372,8 +1372,8 @@ class Person(Model):
     def update_data(self, data):
         self.name = str(data['name'])
         self.surname = str(data['surname'])
-        self.change_card(data['card_number'])
-        self.change_bib(int(data['bib']))
+        self.card_number = int(data['card_number'])
+        self.bib = int(data['bib'])
         self.contact = []
         if data['world_code']:
             self.world_code = str(data['world_code'])
@@ -1393,25 +1393,47 @@ class Person(Model):
         elif 'year' in data and data['year']:  # back compatibility with v 1.0.0
             self.set_year(int(data['year']))
 
-    def change_bib(self, new_bib: int):
-        if self.bib == new_bib:
+    @property
+    def bib(self):
+        return self._bib
+
+    @bib.setter
+    def bib(self, new_bib: int):
+        if self._bib == new_bib:
             return
 
         r = race()
-        if self.bib in r.person_index_bib:
+        if self._bib in r.person_index_bib:
             r.person_index_bib.pop(self.bib)
-        self.bib = new_bib
-        r.index_person(self)
+        if new_bib > 0 and new_bib in r.person_index_bib:
+            other_person = r.person_index_bib[new_bib]
+            if not other_person is self:
+                logging.info(
+                    f'Duplicate bib {new_bib} (do nothing): {self} | {other_person}'
+                )
+        r.person_index_bib[new_bib] = self
+        self._bib = new_bib
 
-    def change_card(self, new_card: int):
-        if self.card_number == new_card:
+    @property
+    def card_number(self):
+        return self._card_number
+
+    @card_number.setter
+    def card_number(self, new_card: int):
+        if self._card_number == new_card:
             return
 
         r = race()
-        if self.card_number in r.person_index_card:
-            r.person_index_card.pop(self.card_number)
-        self.card_number = new_card
-        r.index_person(self)
+        if self._card_number in r.person_index_card:
+            r.person_index_card.pop(self._card_number)
+        if new_card > 0 and new_card in r.person_index_card:
+            other_person = r.person_index_card[new_card]
+            if not other_person is self:
+                logging.info(
+                    f'Duplicate card {new_card} (do nothing): {self} | {other_person}'
+                )
+        r.person_index_card[new_card] = self
+        self._card_number = new_card
 
 
 class RaceData(Model):
@@ -1714,8 +1736,8 @@ class Race(Model):
     def get_days(self, date_=None):
         return self.data.get_days(date_)
 
-    def person_card_number(self, person, number=0):
-        person.change_card(number)
+    def person_card_number(self, person: Person, number=0):
+        person.card_number = number
         for p in self.persons:
             if p.card_number == number and p != person:
                 p.card_number = 0
@@ -1728,12 +1750,27 @@ class Race(Model):
         for i in indexes:
             person = self.persons[i]
             persons.append(person)
-            for result in self.results:
-                if result.person is person:
-                    result.person = None
-                    result.bib = person.bib
+            self.clear_person_from_caches(person)
             del self.persons[i]
         return persons
+
+    def clear_person_from_caches(self, person: Person):
+        for result in self.results:
+            if result.person is person:
+                result.person = None
+                result.bib = person.bib
+        if (
+            person.bib
+            and person.bib in self.person_index_bib
+            and self.person_index_bib[person.bib] is person
+        ):
+            del self.person_index_bib[person.bib]
+        if (
+            person.card_number
+            and person.card_number in self.person_index_card
+            and self.person_index_card[person.card_number] is person
+        ):
+            del self.person_index_card[person.card_number]
 
     def delete_results(self, indexes):
         indexes = sorted(indexes, reverse=True)
@@ -1789,12 +1826,12 @@ class Race(Model):
                 return i
         return None
 
-    def find_person_by_bib(self, bib: int):
+    def find_person_by_bib(self, bib: int) -> Person:
         if bib in self.person_index_bib:
             return self.person_index_bib[bib]
         return None
 
-    def find_person_by_card(self, card: int):
+    def find_person_by_card(self, card: int) -> Person:
         if card in self.person_index_card:
             return self.person_index_card[card]
         return None
@@ -2295,7 +2332,7 @@ class RelayLeg:
 
     def set_bib(self):
         if self.person:
-            self.person.change_bib(self.get_bib())
+            self.person.bib = self.get_bib()
 
     def set_person(self, person):
         self.person = person

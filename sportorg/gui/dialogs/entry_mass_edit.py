@@ -201,7 +201,7 @@ class MassEditDialog(QDialog):
                             cur_person.qual = change_qual
 
                         if self.bib_checkbox.isChecked():
-                            cur_person.change_bib(change_bib)
+                            cur_person.bib = change_bib
 
                         if self.world_code_checkbox.isChecked():
                             cur_person.world_code = change_world_code
@@ -210,7 +210,7 @@ class MassEditDialog(QDialog):
                             cur_person.national_code = change_national_code
 
                         if self.card_checkbox.isChecked():
-                            cur_person.change_card(change_card_number)
+                            cur_person.card_number = change_card_number
 
                         if self.start_time_checkbox.isChecked():
                             cur_person.start_time = change_start_time

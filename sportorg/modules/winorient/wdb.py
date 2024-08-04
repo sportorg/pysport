@@ -120,7 +120,7 @@ class WinOrientBinary:
             index_of_first_space = str(man.name.strip()).find(' ')
             if index_of_first_space > 0:
                 new_person.name = man.name.strip()[index_of_first_space + 1 :].strip()
-            new_person.change_bib(man.number)
+            new_person.bib = man.number
             if man.qualification:
                 if man.qualification == 10:
                     man.qualification = Qualification.MSMK.value  # Convert ZMS to MSMK

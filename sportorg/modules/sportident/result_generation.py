@@ -218,12 +218,12 @@ class ResultSportidentGeneration:
 
     def _create_person(self):
         new_person = Person()
-        new_person.change_bib(self._get_max_bib() + 1)
+        new_person.bib = self._get_max_bib() + 1
         existing_person = race().find_person_by_card(self._result.card_number)
         if existing_person:
             new_person_copy = deepcopy(existing_person)
             new_person_copy.id = new_person.id
-            new_person_copy.change_bib(new_person.bib)
+            new_person_copy.bib = new_person.bib
             new_person = new_person_copy
             new_person.card_number = 0
         else:

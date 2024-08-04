@@ -43,6 +43,8 @@ def load(file):
     # while parsing of data index is created in old object, available as race()
     obj.person_index_card = tmp_obj.person_index_card
     obj.person_index_bib = tmp_obj.person_index_bib
+    tmp_obj.person_index_card = {}
+    tmp_obj.person_index_bib = {}
 
     ResultChecker.check_all()
     ResultCalculation(obj).process_results()
