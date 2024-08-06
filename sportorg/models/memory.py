@@ -1402,8 +1402,12 @@ class Person(Model):
         if self._bib == new_bib:
             return
 
+        self._index_bib(new_bib)
+        self._bib = new_bib
+
+    def _index_bib(self, new_bib: int) -> None:
         r = race()
-        if self._bib in r.person_index_bib:
+        if self._bib != new_bib and self._bib in r.person_index_bib:
             r.person_index_bib.pop(self.bib)
         if new_bib > 0 and new_bib in r.person_index_bib:
             other_person = r.person_index_bib[new_bib]
@@ -1412,7 +1416,9 @@ class Person(Model):
                     f'Duplicate bib {new_bib} (do nothing): {self} | {other_person}'
                 )
         r.person_index_bib[new_bib] = self
-        self._bib = new_bib
+
+    def index_bib(self) -> None:
+        self._index_bib(self.bib)
 
     @property
     def card_number(self):
@@ -1423,8 +1429,12 @@ class Person(Model):
         if self._card_number == new_card:
             return
 
+        self._index_card(new_card)
+        self._card_number = new_card
+
+    def _index_card(self, new_card):
         r = race()
-        if self._card_number in r.person_index_card:
+        if self._card_number != new_card and self._card_number in r.person_index_card:
             r.person_index_card.pop(self._card_number)
         if new_card > 0 and new_card in r.person_index_card:
             other_person = r.person_index_card[new_card]
@@ -1433,7 +1443,9 @@ class Person(Model):
                     f'Duplicate card {new_card} (do nothing): {self} | {other_person}'
                 )
         r.person_index_card[new_card] = self
-        self._card_number = new_card
+
+    def index_card(self):
+        self._index_card(self._card_number)
 
 
 class RaceData(Model):
@@ -1744,17 +1756,24 @@ class Race(Model):
                 p.is_rented_card = False
                 return p
 
+    def rebuild_indexes(self):
+        self.person_index_bib = {}
+        self.person_index_card = {}
+        for person in self.persons:
+            person.index_bib()
+            person.index_card()
+
     def delete_persons(self, indexes):
         indexes = sorted(indexes, reverse=True)
         persons = []
         for i in indexes:
             person = self.persons[i]
             persons.append(person)
-            self.clear_person_from_caches(person)
+            self.remove_person_from_indexes(person)
             del self.persons[i]
         return persons
 
-    def clear_person_from_caches(self, person: Person):
+    def remove_person_from_indexes(self, person: Person):
         for result in self.results:
             if result.person is person:
                 result.person = None
