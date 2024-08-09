@@ -279,8 +279,8 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
         person = self.race.persons[position]
         new_person = copy(person)
         new_person.id = uuid.uuid4()
-        new_person.bib = 0
-        new_person.card_number = 0
+        new_person.set_bib(0)
+        new_person.set_card_number(0)
         self.race.persons.insert(position, new_person)
 
     def get_values_from_object(self, obj):

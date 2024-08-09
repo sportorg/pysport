@@ -62,7 +62,7 @@ def recovery(file_name: str, race: Race) -> None:
                 person.name = name[spl_pos + 1 :]
             else:
                 person.name = name
-            person.bib = int(bib)
+            person.set_bib(int(bib))
 
             team_name = tokens[POS_TEAM]
             team = race.find_team(team_name)

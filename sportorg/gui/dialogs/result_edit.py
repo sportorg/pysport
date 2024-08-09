@@ -260,14 +260,14 @@ class ResultEditDialog(QDialog):
         if new_bib == 0:
             if result.person and result.is_punch():
                 if result.person.card_number == result.card_number:
-                    result.person.card_number = 0
+                    result.person.set_card_number(0)
             result.person = None
         elif cur_bib != new_bib:
             new_person = race().find_person_by_bib(new_bib)
             if new_person:
                 if result.person:
                     if result.is_punch():
-                        result.person.card_number = 0
+                        result.person.pset_card_number(0)
                 result.person = new_person
                 if result.is_punch():
                     race().person_card_number(result.person, result.card_number)

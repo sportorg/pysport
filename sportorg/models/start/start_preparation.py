@@ -573,10 +573,10 @@ class StartNumberManager:
                 if current_person.start_time:
                     start_time = current_person.start_time
                     delta = (start_time - first_start).to_minute()
-                    current_person.bib = int(min_num + delta)
+                    current_person.set_bib(int(min_num + delta))
                     max_assigned_num = max(max_assigned_num, current_person.bib)
                 else:
-                    current_person.bib = 0
+                    current_person.set_bib(0)
 
         if max_assigned_num > first_number:
             return max_assigned_num + 1
@@ -586,7 +586,7 @@ class StartNumberManager:
         cur_number = first_number
         if persons and len(persons) > 0:
             for current_person in persons:
-                current_person.bib = cur_number
+                current_person.set_bib(cur_number)
                 cur_number += interval
         return cur_number
 
@@ -821,14 +821,14 @@ def copy_bib_to_card_number():
     obj = race()
     for person in obj.persons:
         if person.bib:
-            person.card_number = person.bib
+            person.set_card_number(person.bib)
 
 
 def copy_card_number_to_bib():
     obj = race()
     for person in obj.persons:
         if person.card_number:
-            person.bib = person.card_number
+            person.set_bib(person.card_number)
 
 
 def clone_relay_legs(min_bib, max_bib, increment):
@@ -841,6 +841,6 @@ def clone_relay_legs(min_bib, max_bib, increment):
         if person.bib and min_bib <= person.bib <= max_bib:
             new_person = copy(person)
             new_person.id = uuid.uuid4()
-            new_person.bib = person.bib + increment
-            new_person.card_number = 0
+            new_person.set_bib(person.bib + increment)
+            new_person.set_card_number(0)
             obj.persons.append(new_person)

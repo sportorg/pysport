@@ -1372,8 +1372,8 @@ class Person(Model):
     def update_data(self, data):
         self.name = str(data['name'])
         self.surname = str(data['surname'])
-        self.card_number = int(data['card_number'])
-        self.bib = int(data['bib'])
+        self.set_card_number(int(data['card_number']))
+        self.set_bib(int(data['bib']))
         self.contact = []
         if data['world_code']:
             self.world_code = str(data['world_code'])
@@ -1399,9 +1399,11 @@ class Person(Model):
 
     @bib.setter
     def bib(self, new_bib: int):
+        raise NotImplementedError('Please, use set_bib()')
+
+    def set_bib(self, new_bib: int) -> None:
         if self._bib == new_bib:
             return
-
         self._index_bib(new_bib)
         self._bib = new_bib
 
@@ -1426,6 +1428,9 @@ class Person(Model):
 
     @card_number.setter
     def card_number(self, new_card: int):
+        raise NotImplementedError('Please, use set_card_number()')
+
+    def set_card_number(self, new_card: int):
         if self._card_number == new_card:
             return
 
@@ -1749,10 +1754,10 @@ class Race(Model):
         return self.data.get_days(date_)
 
     def person_card_number(self, person: Person, number=0):
-        person.card_number = number
+        person.set_card_number(number)
         for p in self.persons:
             if p.card_number == number and p != person:
-                p.card_number = 0
+                p.set_card_number(0)
                 p.is_rented_card = False
                 return p
 
@@ -2351,7 +2356,7 @@ class RelayLeg:
 
     def set_bib(self):
         if self.person:
-            self.person.bib = self.get_bib()
+            self.person.set_bib(self.get_bib())
 
     def set_person(self, person):
         self.person = person
