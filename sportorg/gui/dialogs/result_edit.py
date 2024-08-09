@@ -267,7 +267,7 @@ class ResultEditDialog(QDialog):
             if new_person:
                 if result.person:
                     if result.is_punch():
-                        result.person.pset_card_number(0)
+                        result.person.set_card_number(0)
                 result.person = new_person
                 if result.is_punch():
                     race().person_card_number(result.person, result.card_number)
