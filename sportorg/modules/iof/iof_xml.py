@@ -156,14 +156,14 @@ def create_person(person_entry):
     if 'race_numbers' in person_entry and len(person_entry['race_numbers']):
         person.comment = 'C:' + ''.join(person_entry['race_numbers'])
     if 'control_card' in person_entry and person_entry['control_card']:
-        person.change_card(int(person_entry['control_card']))
+        person.set_card_number(int(person_entry['control_card']))
     if 'bib' in person_entry['person'] and person_entry['person']['bib']:
-        person.change_bib(int(person_entry['person']['bib']))
+        person.set_bib(int(person_entry['person']['bib']))
     elif (
         'bib' in person_entry['person']['extensions']
         and person_entry['person']['extensions']['bib']
     ):
-        person.change_bib(int(person_entry['person']['extensions']['bib']))
+        person.set_bib(int(person_entry['person']['extensions']['bib']))
     if (
         'qual' in person_entry['person']['extensions']
         and person_entry['person']['extensions']['qual']
@@ -199,11 +199,10 @@ def import_from_entry_list(entries) -> None:
                     person.card_number,
                 )
             )
-            person.card_number = 0
+            person.set_card_number(0)
     if len(persons_dupl_names):
         logging.info('{}'.format(translate('Duplicate names')))
         for person in sorted(persons_dupl_names, key=lambda x: x.full_name):
-            person.card_number = 0
             logging.info(
                 '{} {} {} {}'.format(
                     person.full_name,
@@ -260,9 +259,9 @@ def import_from_result_list(results) -> None:
         if card > 0:
             new_result.card_number = card
         if person.card_number == 0:
-            person.change_card(new_result.card_number)
+            person.set_card_number(new_result.card_number)
 
-        person.change_bib(int(bib))
+        person.set_bib(int(bib))
         person.start_time = start
         new_result.person = person
 

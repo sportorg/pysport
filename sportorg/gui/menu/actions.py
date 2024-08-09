@@ -619,6 +619,7 @@ class RecheckingAction(Action, metaclass=ActionFactory):
     def execute(self):
         ResultChecker.check_all()
         ResultCalculation(race()).process_results()
+        race().rebuild_indexes()
         self.app.refresh()
 
 

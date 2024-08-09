@@ -40,10 +40,6 @@ def load(file):
     set_current_race_index(current_race)
     obj = race()
 
-    # while parsing of data index is created in old object, available as race()
-    obj.person_index_card = tmp_obj.person_index_card
-    obj.person_index_bib = tmp_obj.person_index_bib
-
     ResultChecker.check_all()
     ResultCalculation(obj).process_results()
     RaceSplits(obj).generate()
@@ -66,11 +62,20 @@ def get_races_from_file(file):
         obj = Race()
         obj.id = uuid.UUID(str(race_dict['id']))
         obj.update_data(race_dict)
+        # while parsing of data index is created in old object, available as race()
+        move_indexes_to_new_race(obj)
         event.append(obj)
     current_race = 0
     if 'current_race' in data:
         current_race = int(data['current_race'])
     return event, current_race
+
+
+def move_indexes_to_new_race(obj):
+    obj.person_index_bib = race().person_index_bib
+    race().person_index_bib = {}
+    obj.person_index_card = race().person_index_card
+    race().person_index_card = {}
 
 
 def race_migrate(data):
