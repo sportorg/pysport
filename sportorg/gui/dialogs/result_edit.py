@@ -24,7 +24,7 @@ from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox, AdvSpinBox, AdvTimeEdit
 from sportorg.language import translate
 from sportorg.models.constant import StatusComments
-from sportorg.models.memory import Limit, ResultStatus, Split, race
+from sportorg.models.memory import Limit, Result, ResultStatus, Split, race
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.result_checker import ResultChecker, ResultCheckerException
 from sportorg.models.result.split_calculation import GroupSplits
@@ -36,7 +36,7 @@ from sportorg.utils.time import hhmmss_to_time
 class ResultEditDialog(QDialog):
     def __init__(self, result, is_new=False):
         super().__init__(GlobalAccess().get_main_window())
-        self.current_object = result
+        self.current_object: Result = result
         self.is_new = is_new
 
         self.time_format = 'hh:mm:ss'
@@ -260,14 +260,14 @@ class ResultEditDialog(QDialog):
         if new_bib == 0:
             if result.person and result.is_punch():
                 if result.person.card_number == result.card_number:
-                    result.person.change_card(0)
+                    result.person.set_card_number(0)
             result.person = None
         elif cur_bib != new_bib:
             new_person = race().find_person_by_bib(new_bib)
             if new_person:
                 if result.person:
                     if result.is_punch():
-                        result.person.change_card(0)
+                        result.person.set_card_number(0)
                 result.person = new_person
                 if result.is_punch():
                     race().person_card_number(result.person, result.card_number)

@@ -14,7 +14,14 @@ from sportorg.gui.dialogs.dialog import (
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import translate
 from sportorg.models.constant import get_names, get_race_groups, get_race_teams
-from sportorg.models.memory import Limit, Organization, Qualification, find, race
+from sportorg.models.memory import (
+    Limit,
+    Organization,
+    Person,
+    Qualification,
+    find,
+    race,
+)
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.modules.configs.configs import Config
 from sportorg.modules.live.live import live_client
@@ -25,11 +32,13 @@ class PersonEditDialog(BaseDialog):
     GROUP_NAME = ''
     ORGANIZATION_NAME = ''
 
-    def __init__(self, person, is_new=False):
+    def __init__(self, person: Person, is_new=False):
         super().__init__(GlobalAccess().get_main_window())
         self.current_object = person
         self.is_new = is_new
         self.is_item_valid = {}
+        self.bib = person.bib
+        self.card_number = person.card_number
 
         time_format = 'hh:mm:ss'
         if race().get_setting('time_accuracy', 0):
@@ -91,7 +100,7 @@ class PersonEditDialog(BaseDialog):
             ),
             NumberField(
                 title=translate('Bib'),
-                object=person,
+                object=self,
                 key='bib',
                 id='bib',
                 minimum=0,
@@ -123,7 +132,7 @@ class PersonEditDialog(BaseDialog):
             ),
             NumberField(
                 title=translate('Punch card #'),
-                object=person,
+                object=self,
                 key='card_number',
                 id='card_number',
                 minimum=0,
@@ -264,6 +273,10 @@ class PersonEditDialog(BaseDialog):
 
     def apply(self):
         person = self.current_object
+        if self.bib != person.bib:
+            person.set_bib(self.bib)
+        if self.card_number != person.card_number:
+            person.set_card_number(self.card_number)
         if self.is_new:
             race().add_person(person)
 

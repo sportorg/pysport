@@ -24,6 +24,7 @@ from sportorg.models.memory import (
     get_current_race_index,
     move_down_race,
     move_up_race,
+    race,
     races,
     set_current_race_index,
 )
