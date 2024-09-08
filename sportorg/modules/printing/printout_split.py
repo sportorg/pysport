@@ -141,7 +141,7 @@ class SportorgPrinter:
         self.move_cursor(font_size * 1.3)
         self.end_page()
 
-    def print_split_normal(self, result):
+    def print_split_normal(self, result: Result):
         obj = race()
 
         person = result.person
@@ -164,6 +164,7 @@ class SportorgPrinter:
         is_relay = group.is_relay()
 
         fn = 'Lucida Console'
+        fs_small = 2.5
         fs_main = 3
         fs_large = 4
 
@@ -284,6 +285,21 @@ class SportorgPrinter:
                     fs_main,
                 )
 
+        is_rogaine = race().get_setting('result_processing_mode', 'time') == 'scores'
+        if is_rogaine and result.rogaine_penalty > 0:
+            penalty = result.rogaine_penalty
+            total_score = result.rogaine_score + penalty
+            self.print_line(
+                translate('Points gained') + ': ' + str(total_score),
+                fn,
+                fs_main,
+            )
+            self.print_line(
+                translate('Penalty for finishing late') + ': ' + str(penalty),
+                fn,
+                fs_main,
+            )
+
         if result.is_status_ok():
             self.print_line(
                 translate('Result')
@@ -325,7 +341,12 @@ class SportorgPrinter:
             self.print_line(place, fn, fs_main)
 
         # Info about competitors, who can win current person
-        if result.is_status_ok() and not is_relay and is_group_existed:
+        if (
+            result.is_status_ok()
+            and not is_relay
+            and not is_rogaine
+            and is_group_existed
+        ):
             if obj.get_setting('system_start_source', 'protocol') == 'protocol':
                 if hasattr(result, 'can_win_count'):
                     if result.can_win_count > 0:
@@ -376,7 +397,7 @@ class SportorgPrinter:
                         + ' '
                         + cur_res.get_result(),
                         fn,
-                        fs_main,
+                        fs_main if not is_rogaine else fs_small,
                     )
 
         self.print_line(obj.data.url, fn, fs_main)

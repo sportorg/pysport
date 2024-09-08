@@ -30,8 +30,18 @@ class ResultChecker:
             result.scores_ardf = self.calculate_scores_ardf(result)
             return True
         elif race().get_setting('result_processing_mode', 'time') == 'scores':
-            # process by score (rogain)
-            result.scores_rogain = self.calculate_scores_rogain(result)
+            # process by score (rogaine)
+            allow_duplicates = race().get_setting(
+                'result_processing_scores_allow_duplicates', False
+            )
+            penalty_step = race().get_setting(
+                'result_processing_scores_minute_penalty', 1
+            )
+
+            score = self.calculate_rogaine_score(result, allow_duplicates)
+            penalty = self.calculate_rogaine_penalty(result, score, penalty_step)
+            result.rogaine_score = score - penalty
+            result.rogaine_penalty = penalty
             return True
 
         course = race().find_course(result)
@@ -73,10 +83,22 @@ class ResultChecker:
                 result.status = ResultStatus.MISS_PENALTY_LAP
 
             elif result.person.group and result.person.group.max_time.to_msec():
-                if result.get_result_otime() > result.person.group.max_time:
-                    if race().get_setting('result_processing_mode', 'time') == 'time':
+                rp_mode = race().get_setting('result_processing_mode', 'time')
+                result_time = result.get_result_otime()
+                max_time = result.person.group.max_time
+                if rp_mode in ('time', 'ardf'):
+                    if result_time > max_time:
                         result.status = ResultStatus.OVERTIME
-                    elif race().get_setting('result_processing_mode', 'time') == 'ardf':
+                elif rp_mode == 'scores':
+                    max_overrun_time = OTime(
+                        msec=race().get_setting(
+                            'result_processing_scores_max_overrun_time', 0
+                        )
+                    )
+                    if (
+                        max_overrun_time.to_msec() > 0
+                        and result_time > max_time + max_overrun_time
+                    ):
                         result.status = ResultStatus.OVERTIME
 
             result.status_comment = StatusComments().get_status_default_comment(
@@ -332,19 +354,48 @@ class ResultChecker:
             return int(code) // 10  # score = code / 10
 
     @staticmethod
-    def calculate_scores_rogain(result):
-        user_array = []
-        ret = 0
+    def calculate_rogaine_score(result: Result, allow_duplicates: bool = False) -> int:
+        """
+        Calculates the rogaine score for a given result.
 
-        allow_duplicates = race().get_setting(
-            'result_processing_scores_allow_duplicates', False
-        )
+        Parameters:
+            result (Result): The result for which the rogaine score needs to be calculated.
+            allow_duplicates (bool, optional): Whether to allow duplicate control points. Defaults to False.
+
+        Returns:
+            int: The calculated rogaine score.
+
+        If `allow_duplicates` flag is `True`, the function allows duplicate control points
+        to be included in the score calculation.
+        """
+        user_array = []
+        score = 0
 
         for cur_split in result.splits:
             code = str(cur_split.code)
             if code not in user_array or allow_duplicates:
                 user_array.append(code)
-                ret += ResultChecker.get_control_score(code)
+                score += ResultChecker.get_control_score(code)
+
+        return score
+
+    @staticmethod
+    def calculate_rogaine_penalty(
+        result: Result, score: int, penalty_step: int = 1
+    ) -> int:
+        """
+        Calculates the penalty for a given result based on the participant's excess of a race time.
+
+        Parameters:
+            result (Result): The result for which the penalty needs to be calculated.
+            score (int): The competitor's score.
+            penalty_step (int, optional): The penalty points for each minute late. Defaults to 1.
+
+        Returns:
+            int: The calculated penalty for the result.
+
+        """
+        penalty = 0
         if result.person and result.person.group:
             user_time = result.get_result_otime()
             max_time = result.person.group.max_time
@@ -352,13 +403,12 @@ class ResultChecker:
                 time_diff = user_time - max_time
                 seconds_diff = time_diff.to_sec()
                 minutes_diff = (seconds_diff + 59) // 60  # note, 1:01 = 2 minutes
-                penalty_step = race().get_setting(
-                    'result_processing_scores_minute_penalty', 1.0
-                )
-                ret -= minutes_diff * penalty_step
-        if ret < 0:
-            ret = 0
-        return ret
+                penalty = minutes_diff * penalty_step
+
+        # result = score - penalty >= 0
+        penalty = min(penalty, score)
+
+        return penalty
 
     @staticmethod
     def calculate_scores_ardf(result):
