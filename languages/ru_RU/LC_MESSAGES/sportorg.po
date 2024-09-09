@@ -640,7 +640,7 @@ msgid "by scores (rogaine)"
 msgstr "по баллам (рогейн)"
 
 msgid "ardf"
-msgstr "ADRF"
+msgstr "ARDF"
 
 msgid "rogain scores"
 msgstr "рогейн (45КП = 4балла, 78КП = 7баллов)"
@@ -1532,6 +1532,9 @@ msgstr "Первый КП"
 
 msgid "CP increment"
 msgstr "Инкремент КП"
+
+msgid "Sending the entire contents of the chip"
+msgstr "Отправка всего содержимого чипа"
 
 msgid "Online results sending"
 msgstr "Отправка онлайн результатов"
