@@ -58,6 +58,12 @@ class LiveDialog(QDialog):
         self.item_live_enabled = QCheckBox(translate('Enabled'))
         self.layout.addRow(self.item_live_enabled)
 
+        self.item_sending_all_controls = QCheckBox(
+            translate('Sending the entire contents of the chip')
+        )
+        self.item_sending_all_controls.setChecked(True)
+        self.layout.addRow(self.item_sending_all_controls)
+
         self.item_result_sending = QCheckBox(translate('Online results sending'))
         self.item_result_sending.setChecked(True)
         self.layout.addRow(self.item_result_sending)
@@ -128,6 +134,7 @@ class LiveDialog(QDialog):
 
     def on_enable_checkbox_state_changed(self):
         state = self.item_live_enabled.isChecked()
+        self.item_sending_all_controls.setEnabled(state)
         self.item_result_sending.setEnabled(state)
         self.item_cp_sending.setEnabled(state)
         self.online_cp_box.setEnabled(state)
@@ -151,6 +158,7 @@ class LiveDialog(QDialog):
             urls = [url]
         live_enabled = obj.get_setting('live_enabled', False)
 
+        live_sending_all_controls = obj.get_setting('live_sending_all_controls', False)
         live_results_enabled = obj.get_setting('live_results_enabled', True)
         live_cp_enabled = obj.get_setting('live_cp_enabled', False)
         live_cp_code = obj.get_setting('live_cp_code', '10')
@@ -160,6 +168,7 @@ class LiveDialog(QDialog):
 
         self.item_url.setText(encode_urls(urls))
         self.item_live_enabled.setChecked(live_enabled)
+        self.item_sending_all_controls.setChecked(live_sending_all_controls)
         self.item_result_sending.setChecked(live_results_enabled)
         self.item_cp_sending.setChecked(live_cp_enabled)
         self.online_cp_from_finish_code.setValue(int(live_cp_code))
@@ -173,6 +182,9 @@ class LiveDialog(QDialog):
         obj = race()
         obj.set_setting('live_urls', decode_urls(self.item_url.text()))
         obj.set_setting('live_enabled', self.item_live_enabled.isChecked())
+        obj.set_setting(
+            'live_sending_all_controls', self.item_sending_all_controls.isChecked()
+        )
         obj.set_setting('live_results_enabled', self.item_result_sending.isChecked())
         obj.set_setting('live_cp_enabled', self.item_cp_sending.isChecked())
         obj.set_setting(

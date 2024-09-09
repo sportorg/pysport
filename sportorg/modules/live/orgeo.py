@@ -139,7 +139,10 @@ def _get_person_obj(data, race_data, result=None):
             obj['splits'] = []
             splits = []
             for split in result['splits']:
-                if split['is_correct']:
+                if (
+                    split['is_correct']
+                    or race_data['settings']['live_sending_all_controls'] == True
+                ):
                     splits.append(split)
             for i in range(len(splits)):
                 # fmt: off
