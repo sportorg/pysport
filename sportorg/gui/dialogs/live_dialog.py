@@ -58,7 +58,9 @@ class LiveDialog(QDialog):
         self.item_live_enabled = QCheckBox(translate('Enabled'))
         self.layout.addRow(self.item_live_enabled)
 
-        self.item_sending_all_controls = QCheckBox(translate('Sending the entire contents of the chip'))
+        self.item_sending_all_controls = QCheckBox(
+            translate('Sending the entire contents of the chip')
+        )
         self.item_sending_all_controls.setChecked(True)
         self.layout.addRow(self.item_sending_all_controls)
 
@@ -180,7 +182,9 @@ class LiveDialog(QDialog):
         obj = race()
         obj.set_setting('live_urls', decode_urls(self.item_url.text()))
         obj.set_setting('live_enabled', self.item_live_enabled.isChecked())
-        obj.set_setting('live_sending_all_controls', self.item_sending_all_controls.isChecked())
+        obj.set_setting(
+            'live_sending_all_controls', self.item_sending_all_controls.isChecked()
+        )
         obj.set_setting('live_results_enabled', self.item_result_sending.isChecked())
         obj.set_setting('live_cp_enabled', self.item_cp_sending.isChecked())
         obj.set_setting(
