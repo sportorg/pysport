@@ -1521,6 +1521,9 @@ msgstr "Первый КП"
 msgid "CP increment"
 msgstr "Инкремент КП"
 
+msgid "Sending the entire contents of the chip"
+msgstr "Отправка всего содержимого чипа"
+
 msgid "Online results sending"
 msgstr "Отправка онлайн результатов"
 
