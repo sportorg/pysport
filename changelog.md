@@ -1,16 +1,21 @@
 # Changelog
 
-# 2022-09-01 v1.6.0
+## 2024-10-04 v1.7.0
+
+- Fix teamwork
+- The program is faster
+
+## 2022-09-01 v1.6.0
 
 + RFID Impinj equipment support
 + Sum results by places and time
 + Split removing
-+ Labyrinth mode - clone existing person, found by card number 
++ Labyrinth mode - clone existing person, found by card number
 + Group start
 + New formats of export, IOF XML v.3
 + Split printout for DSQ persons in "any course" mode
 + Sending intermediate times to online (orgeo.ru)
-+ Enhanced bulk edit 
++ Enhanced bulk edit
 + Result merging
 + Printing several split printouts into single document
 + Naming of report by template name
@@ -29,7 +34,7 @@
 - Last control code increased from 99 to 999
 - Checking of score list
 
-# 2019-08-07 v1.5.0
+## 2019-08-07 v1.5.0
 
 + Table refresh speed increased (comfortable work with >1000 rows)
 + Fast split printout (predefined standard template) with scaling
@@ -46,17 +51,17 @@
 - Fixing in *.docx template for relays (last teams was missed)
 * Data model was changed. Use exchange formats to downgrade (xml, wdb)
 
-# 2019-01-18 v1.4.0
+## 2019-01-18 v1.4.0
 
-+ Added import of CourseData (courses) for IOF xml 
-+ New status "Forced OK" to recover 
++ Added import of CourseData (courses) for IOF xml
++ New status "Forced OK" to recover
 + Mass edit possibility for selected athletes
 - Calculating scores from leader time - ignoring mispunched athletes
 - Team work data exchange format changed. Previous: `0{}1`, now: `{}`
 - Search window freezing was fixed
- 
 
-# 2018-10-08 v1.3.0
+
+## 2018-10-08 v1.3.0
 + Added MSP (mispunch) status, calculated by punches automatically
 + List or electronic cards to rent
 + Reduced row height in tables
@@ -70,17 +75,17 @@
 + Show quantity of results for each athlete
 + Jinja2 templates .docx (MS Word)
 - Safe file saving (first write to file.sportorg.tmp, if it written correctly, rename to file.sportorg)
-* Introduced custom scripts for online sending 
+* Introduced custom scripts for online sending
 
-# 2018-06-13 v1.2.0
+## 2018-06-13 v1.2.0
 
 + New JavaScript-based templates
 + Added new template (results_live) to manage DNF persons
 + "Rent" field it result table
-+ Labyrinth mode, auto-define correct course  
++ Labyrinth mode, auto-define correct course
 + Handicap. Calculation of start time from results
 + Multi day support
-+ Dictionary of regions (file `regions.txt`) 
++ Dictionary of regions (file `regions.txt`)
 + Dictionary of given names (file `names.txt`)
 - Fixed error with last record in SFR card readout
 - Fixed error with mixed toss (all athletes of course)
