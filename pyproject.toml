@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "sportorg"
-version = "1.6.0"
+version = "1.7.0"
 description = "SportOrg, python, sportident, orienteering"
 authors = ["Danil Akhtarov <daxartio@gmail.com>"]
 
