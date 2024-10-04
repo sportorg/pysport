@@ -46,7 +46,7 @@ executables = [
 
 setup(
     name=config.NAME,
-    version=config.VERSION.file,
+    version=config.VERSION,
     description=config.NAME,
     options=options,
     executables=executables,
