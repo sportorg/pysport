@@ -412,6 +412,7 @@ class DeleteAction(Action, metaclass=ActionFactory):
 class TextExchangeAction(Action, metaclass=ActionFactory):
     def execute(self):
         TextExchangeDialog().exec_()
+        race().rebuild_indexes()
         self.app.refresh()
 
 
@@ -419,6 +420,7 @@ class MassEditAction(Action, metaclass=ActionFactory):
     def execute(self):
         if self.app.current_tab == 0:
             MassEditDialog().exec_()
+            race().rebuild_indexes()
             self.app.refresh()
 
         if self.app.current_tab == 2:

@@ -857,6 +857,7 @@ class MainWindow(QMainWindow):
             res = race().delete_persons(indexes)
             ResultCalculation(race()).process_results()
             live_client.delete(res)
+            race().rebuild_indexes()
         elif tab == 1:
             res = race().delete_results(indexes)
             ResultCalculation(race()).process_results()
