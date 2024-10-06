@@ -1419,7 +1419,7 @@ class Person(Model):
             other_person = r.person_index_bib[new_bib]
             if not other_person is self:
                 logging.info(
-                    'Duplicate bib %s (do nothing): %s | %s',
+                    'Duplicate bib %s: %s (indexed) | %s (not indexed)',
                     new_bib,
                     self,
                     other_person,
@@ -1452,7 +1452,7 @@ class Person(Model):
             other_person = r.person_index_card[new_card]
             if not other_person is self:
                 logging.info(
-                    'Duplicate card %s (do nothing): %s | %s',
+                    'Duplicate card %s: %s (indexed) | %s (not indexed)',
                     new_card,
                     self,
                     other_person,
