@@ -13,7 +13,7 @@ class Env(BaseSettings):
 
 
 NAME = 'SportOrg'
-VERSION = 'v1.7.0'
+VERSION = 'v1.7.1'
 
 
 def is_executable() -> bool:
