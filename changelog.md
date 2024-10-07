@@ -1,6 +1,12 @@
 # Changelog
 
+## 2024-10-07 v1.7.1
+
+- Rebuild indexes after major changing/deleting bibs and cards operations
+
 ## 2024-10-04 v1.7.0
+
+- New features
 
 - Fix teamwork
 - The program is faster
