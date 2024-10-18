@@ -141,12 +141,17 @@ class EventPropertiesDialog(QDialog):
         obj.data.start_datetime = start_date
         obj.data.end_datetime = end_date
 
-        t = RaceType.get_by_name(self.item_type.currentText())
-        if t:
-            obj.data.race_type = t
+        old_race_type = obj.data.race_type
+        new_race_type = RaceType.get_by_name(self.item_type.currentText())
+        if new_race_type and new_race_type != old_race_type:
+            obj.data.race_type = new_race_type
+            for group in obj.groups:
+                group.race_type = new_race_type
+
         obj.data.relay_leg_count = self.item_relay_legs.value()
 
         obj.set_setting('system_zero_time', (start_date.hour, start_date.minute, 0))
 
         ResultCalculation(race()).process_results()
         GlobalAccess().get_main_window().set_title()
+        GlobalAccess().get_main_window().refresh()

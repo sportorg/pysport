@@ -228,6 +228,9 @@ msgstr "Стартовый взнос"
 msgid "Type"
 msgstr "Тип"
 
+msgid "Best team placing"
+msgstr "Международный принцип"
+
 msgid "Rank calculation"
 msgstr "Выполнение разрядов"
 
