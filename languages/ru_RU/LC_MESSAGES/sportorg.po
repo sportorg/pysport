@@ -600,8 +600,8 @@ msgstr "Из протокола"
 msgid "Start station"
 msgstr "Стартовая станция"
 
-msgid "Control point"
-msgstr "Контрольный пункт"
+msgid "Control point (0 – any)"
+msgstr "Контрольный пункт (0 – любой)"
 
 msgid "Start gate"
 msgstr "Стартовая калитка"

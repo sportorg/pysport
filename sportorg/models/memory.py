@@ -1004,7 +1004,7 @@ class ResultSportident(Result):
                 return self.__start_time
             if len(self.splits):
                 start_cp_number = obj.get_setting('system_start_cp_number', 31)
-                if start_cp_number == 0:
+                if start_cp_number in (0, -1):
                     self.__start_time = self.splits[0].time
                     return self.__start_time
                 for split in self.splits:
@@ -1027,7 +1027,7 @@ class ResultSportident(Result):
                 return self.__finish_time
             if len(self.splits):
                 finish_cp_number = obj.get_setting('system_finish_cp_number', 90)
-                if finish_cp_number == -1:
+                if finish_cp_number in (0, -1):
                     self.__finish_time = self.splits[-1].time
                     return self.__finish_time
                 for split in reversed(self.splits):
