@@ -19,16 +19,16 @@ include_files = [
     config.base_dir('configs'),
     config.STYLE_DIR,
 ]
-includes = ["atexit", "codecs", "playsound", "pyImpinj"]
-excludes = ["Tkinter", "unittest", "test", "pydoc"]
+includes = ['atexit', 'codecs', 'playsound', 'pyImpinj']
+excludes = ['Tkinter', 'unittest', 'test', 'pydoc']
 
 build_exe_options = {
-    "includes": includes,
-    "excludes": excludes,
-    "packages": ["idna", "requests", "encodings", "asyncio", "pywinusb"],
-    "include_files": include_files,
-    "zip_include_packages": ["PySide6"],
-    "optimize": 2,
+    'includes': includes,
+    'excludes': excludes,
+    'packages': ['idna', 'requests', 'encodings', 'asyncio', 'pywinusb'],
+    'include_files': include_files,
+    'zip_include_packages': ['PySide6'],
+    'optimize': 2,
     'include_msvcr': True,
     'silent': 1,
 }
