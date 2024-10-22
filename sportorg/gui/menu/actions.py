@@ -844,6 +844,9 @@ class OnlineSendAction(Action, metaclass=ActionFactory):
                 if index >= len(items):
                     pass
                 selected_items.append(items[index])
+            if self.app.current_tab == 1:
+                # Most recent results are sent last
+                selected_items = selected_items[::-1]
             live_client.send(selected_items)
         except Exception as e:
             logging.exception(e)
