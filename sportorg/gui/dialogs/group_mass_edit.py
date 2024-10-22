@@ -87,8 +87,16 @@ class GroupMassEditDialog(QDialog):
 
         course_types = RaceType.get_titles()
         self.type_checkbox = QtWidgets.QCheckBox(self)
+        self.type_checkbox.stateChanged.connect(self.on_race_type_changed)
         self.type_combobox = AdvComboBox(self, val_list=course_types)
+        self.type_combobox.currentIndexChanged.connect(self.on_race_type_changed)
         self.layout.addRow(self.type_checkbox, self.type_combobox)
+
+        self.relay_type_checkbox = QtWidgets.QCheckBox(self)
+        self.relay_type_combobox = AdvComboBox(self, val_list={yes, no}, max_width=50)
+        self.relay_type_combobox.setEditable(False)
+
+        self.layout.addRow(self.relay_type_checkbox, self.relay_type_combobox)
 
         self.ranking_checkbox = QtWidgets.QCheckBox(self)
         self.ranking_combobox = AdvComboBox(self, val_list={yes, no}, max_width=50)
@@ -103,9 +111,18 @@ class GroupMassEditDialog(QDialog):
 
         self.layout.addRow(button_box)
 
+        self.on_race_type_changed()
         self.translate_ui()
 
         self.show()
+
+    def on_race_type_changed(self):
+        text = self.type_combobox.currentText()
+        is_relay = RaceType.get_by_name(text) == RaceType.RELAY
+        is_relay_type_enabled = self.type_checkbox.isChecked() and is_relay
+
+        self.relay_type_checkbox.setEnabled(is_relay_type_enabled)
+        self.relay_type_combobox.setEnabled(is_relay_type_enabled)
 
     def accept(self, *args, **kwargs):
         yes = translate('Yes')
@@ -128,6 +145,7 @@ class GroupMassEditDialog(QDialog):
                 change_start_interval = self.start_interval_edit.getOTime()
                 change_fee = int(self.fee_spinbox.value())
                 change_type = RaceType.get_by_name(self.type_combobox.currentText())
+                change_relay_type = self.relay_type_combobox.currentText() == yes
                 change_ranking = self.ranking_combobox.currentText() == yes
 
                 for i in selection:
@@ -164,6 +182,9 @@ class GroupMassEditDialog(QDialog):
                         if self.type_checkbox.isChecked():
                             cur_group.set_type(change_type)
 
+                        if self.relay_type_checkbox.isChecked():
+                            cur_group.is_best_team_placing_mode = change_relay_type
+
                         if self.ranking_checkbox.isChecked():
                             cur_group.ranking.is_active = change_ranking
 
@@ -184,6 +205,7 @@ class GroupMassEditDialog(QDialog):
         self.start_interval_checkbox.setText(translate('Start interval'))
         self.fee_checkbox.setText(translate('Start fee'))
         self.type_checkbox.setText(translate('Type'))
+        self.relay_type_checkbox.setText(translate('Best team placing'))
         self.ranking_checkbox.setText(translate('Rank calculation'))
 
         self.button_ok.setText(translate('OK'))

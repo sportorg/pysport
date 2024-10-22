@@ -1,11 +1,15 @@
 import logging
+from typing import Dict, List
 
 from sportorg.common.otime import OTime
 from sportorg.models.constant import RankingTable
 from sportorg.models.memory import (
+    Group,
     Qualification,
+    Race,
     RaceType,
     RelayTeam,
+    Result,
     ResultStatus,
     find,
 )
@@ -13,7 +17,7 @@ from sportorg.modules.configs.configs import Config
 
 
 class ResultCalculation:
-    def __init__(self, r):
+    def __init__(self, r: Race):
         self.race = r
         self._group_finishes = {}
         self._group_persons = {}
@@ -47,7 +51,7 @@ class ResultCalculation:
                     self.race.relay_teams.append(a)
             self.set_rank(i)
 
-    def get_group_finishes(self, group):
+    def get_group_finishes(self, group: Group) -> Result:
         if group in self._group_finishes:
             return self._group_finishes[group]
         ret = []
@@ -108,10 +112,10 @@ class ResultCalculation:
             else:
                 res.current_result = res.get_result()
 
-    def process_relay_results(self, group):
+    def process_relay_results(self, group: Group) -> List[RelayTeam]:
         results = self.get_group_finishes(group)
 
-        relay_teams = {}
+        relay_teams: Dict[str, RelayTeam] = {}
         for res in results:
             bib = res.person.bib
 
@@ -120,11 +124,17 @@ class ResultCalculation:
                 new_team = RelayTeam(self.race)
                 new_team.group = group
                 new_team.bib_number = team_number
+                if res.person.organization:
+                    new_team.description = res.person.organization.name
                 relay_teams[str(team_number)] = new_team
 
             team = relay_teams[str(team_number)]
             team.add_result(res)
         teams_sorted = sorted(relay_teams.values())
+
+        if group.is_best_team_placing_mode:
+            teams_sorted = self.sort_best_relay_team_placing(teams_sorted)
+
         place = 1  # place to show
         order = 1  # order for templates
         for cur_team in teams_sorted:
@@ -139,6 +149,42 @@ class ResultCalculation:
 
             cur_team.set_start_times()
         return relay_teams.values()
+
+    def sort_best_relay_team_placing(self, teams_sorted_by_result: List[RelayTeam]):
+        '''If a Federation is represented by more than one team in a relay class,
+        one team with the best result from each Federation shall be placed first
+
+        The remaining teams from the federations are placed next
+
+        Teams composed of competitors from more than one Federation are considered
+        if they are to be out of competition. Teams participating outside
+        the competition are placed after the teams participating in the competition
+
+        Teams with fewer competitors are placed next'''
+
+        if not teams_sorted_by_result:
+            return teams_sorted_by_result
+
+        processed_teams = set()
+        sorted_teams: List[RelayTeam] = []
+        skipped_teams: List[RelayTeam] = []
+        best_team = teams_sorted_by_result[0]
+        is_placed_flag = best_team.get_is_team_placed()
+
+        for team in teams_sorted_by_result:
+            if is_placed_flag and not team.get_is_team_placed():
+                is_placed_flag = False
+                sorted_teams.extend(skipped_teams)
+            if is_placed_flag:
+                if team.description and team.description not in processed_teams:
+                    sorted_teams.append(team)
+                    processed_teams.add(team.description)
+                else:
+                    skipped_teams.append(team)
+            else:
+                sorted_teams.append(team)
+
+        return sorted_teams
 
     def set_rank(self, group):
         ranking = group.ranking

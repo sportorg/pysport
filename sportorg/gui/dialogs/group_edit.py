@@ -106,6 +106,12 @@ class GroupEditDialog(BaseDialog):
                 items=RaceType.get_titles(),
             ),
             CheckBoxField(
+                label=translate('Best team placing'),
+                object=group,
+                key='is_best_team_placing_mode',
+                id='is_best_team_placing_mode',
+            ),
+            CheckBoxField(
                 label=translate('Rank calculation'),
                 object=group.ranking,
                 key='is_active',
@@ -117,6 +123,7 @@ class GroupEditDialog(BaseDialog):
     def before_showing(self) -> None:
         self.on_is_any_course_changed()
         self.on_is_ranking_active_changed()
+        self.on_race_type_changed()
 
     def convert_course(self, course) -> str:
         if not course:
@@ -130,10 +137,11 @@ class GroupEditDialog(BaseDialog):
         return find(race().courses, name=text)
 
     def parse_race_type(self, text: str):
-        selected = RaceType.get_by_name(text)
-        if selected != race().data.race_type:
-            return selected
-        return None
+        return RaceType.get_by_name(text)
+
+    def is_relay_type_selected(self):
+        race_type_text = self.fields['race_type'].q_item.currentText()
+        return self.parse_race_type(race_type_text) == RaceType.RELAY
 
     def on_name_changed(self):
         name = self.fields['name'].q_item.text()
@@ -157,6 +165,13 @@ class GroupEditDialog(BaseDialog):
         self.fields['ranking'].q_item.setEnabled(
             self.fields['is_ranking_active'].q_item.isChecked()
         )
+
+    def on_race_type_changed(self):
+        relay_type_item = self.fields['is_best_team_placing_mode'].q_item
+        if self.is_relay_type_selected():
+            relay_type_item.show()
+        else:
+            relay_type_item.hide()
 
     def on_min_year_finished(self):
         self.change_year()
