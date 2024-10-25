@@ -1,12 +1,14 @@
 import logging.config
 import os
 import sys
+from typing import Optional
 
 from pydantic import BaseSettings
 
 
 class Env(BaseSettings):
     DEBUG: bool = False
+    TEMPLATES_PATH: Optional[str]
 
     class Config:
         env_file = '.env'
@@ -34,6 +36,8 @@ def base_dir(*paths) -> str:
     return os.path.join(BASE_DIR, *paths)
 
 
+env = Env(_env_file=base_dir('.env'))  # type:ignore
+DEBUG = env.DEBUG
 IMG_DIR = base_dir('img')
 
 
@@ -62,7 +66,7 @@ def data_dir(*paths) -> str:
     return os.path.join(DATA_DIR, *paths)
 
 
-TEMPLATE_DIR = base_dir('templates')
+TEMPLATE_DIR = env.TEMPLATES_PATH or base_dir('templates')
 
 
 def template_dir(*paths) -> str:
@@ -82,9 +86,6 @@ STYLE_DIR = base_dir('styles')
 def style_dir(*paths) -> str:
     return os.path.join(STYLE_DIR, *paths)
 
-
-env = Env(_env_file=base_dir('.env'))  # type:ignore
-DEBUG = env.DEBUG
 
 ICON = icon_dir('sportorg.svg')
 
