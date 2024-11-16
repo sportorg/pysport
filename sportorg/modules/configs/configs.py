@@ -16,6 +16,7 @@ class ConfigFile:
     SOUND = 'sound'
     PRINTER = 'printer'
     RANKING = 'ranking'
+    TEMPLATES = 'templates'
 
 
 class Parser:
@@ -122,6 +123,7 @@ class Config(metaclass=Singleton):
                 }
             ),
             ConfigFile.GEOMETRY: Configurations({'x': 0, 'y': 0}),
+            ConfigFile.TEMPLATES: Configurations({'directory': ''}),
         }
 
     @property
@@ -147,6 +149,10 @@ class Config(metaclass=Singleton):
     @property
     def geometry(self):
         return self._configurations[ConfigFile.GEOMETRY]
+
+    @property
+    def templates(self):
+        return self._configurations[ConfigFile.TEMPLATES]
 
     def read(self):
         self.parser.read(sportorg_config.CONFIG_INI)

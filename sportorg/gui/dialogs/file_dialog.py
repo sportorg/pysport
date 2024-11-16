@@ -7,6 +7,11 @@ from PySide6.QtWidgets import QFileDialog
 from sportorg.modules.configs.configs import Config, ConfigFile
 
 
+def get_existing_directory(caption='', dir=''):
+    result = QFileDialog.getExistingDirectory(None, caption, dir)
+    return result
+
+
 def get_open_file_name(caption='', filter_text='', set_dir=True):
     result = QFileDialog.getOpenFileName(None, caption, get_default_dir(), filter_text)[
         0

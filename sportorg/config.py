@@ -69,6 +69,11 @@ def data_dir(*paths) -> str:
 TEMPLATE_DIR = env.TEMPLATES_PATH or base_dir('templates')
 
 
+def set_template_dir(dirpath: str) -> None:
+    global TEMPLATE_DIR
+    TEMPLATE_DIR = dirpath
+
+
 def template_dir(*paths) -> str:
     return os.path.join(TEMPLATE_DIR, *paths)
 

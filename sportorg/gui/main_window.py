@@ -268,7 +268,12 @@ class MainWindow(QMainWindow):
             except Exception as e:
                 logging.error(str(e))
 
-        self._handler.setLevel(Configuration().configuration.get('logging_level'))
+        level: str = Configuration().configuration.get('logging_level', 'INFO')
+        self._handler.setLevel(level)
+
+        dirpath = Configuration().templates.get('directory')
+        if dirpath:
+            config.set_template_dir(dirpath)
 
     def conf_write(self):
         Configuration().save()
