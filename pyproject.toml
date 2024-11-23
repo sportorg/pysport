@@ -29,7 +29,7 @@ sportident = "^1"
 [tool.poetry.group.dev.dependencies]
 cx_Freeze = "^6"
 mypy = "^1.4"
-poethepoet = "^0.22.0"
+poethepoet = ">=0.22,<0.31"
 pytest = "^7.4"
 pytest-cov = "*"
 pytest-deadfixtures = "*"
