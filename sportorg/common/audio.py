@@ -61,5 +61,5 @@ class Audio:
             try:
                 play(sound)
             except Exception as e:
-                self._logger.error('Can not play {}'.format(sound))
+                self._logger.error("Can not play {}".format(sound))
                 print(e)

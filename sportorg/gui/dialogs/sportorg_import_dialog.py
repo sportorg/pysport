@@ -29,7 +29,7 @@ class SportOrgImportDialog(QDialog):
         return super().exec_()
 
     def init_ui(self):
-        self.setWindowTitle(translate('Import'))
+        self.setWindowTitle(translate("Import"))
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(True)
@@ -37,24 +37,24 @@ class SportOrgImportDialog(QDialog):
         self.layout = QFormLayout(self)
 
         self.item_races = AdvComboBox()
-        self.layout.addRow(QLabel(translate('Choose race')), self.item_races)
+        self.layout.addRow(QLabel(translate("Choose race")), self.item_races)
 
-        self.unique_id_box = QGroupBox(translate('Unique id'))
+        self.unique_id_box = QGroupBox(translate("Unique id"))
         self.unique_id_box_layout = QFormLayout()
-        self.unique_id_item_id = QRadioButton(translate('Id'))
+        self.unique_id_item_id = QRadioButton(translate("Id"))
         self.unique_id_item_id.setChecked(True)
         self.unique_id_box_layout.addRow(self.unique_id_item_id)
-        self.unique_id_item_name = QRadioButton(translate('Name'))
+        self.unique_id_item_name = QRadioButton(translate("Name"))
         self.unique_id_item_name.setDisabled(True)
         self.unique_id_box_layout.addRow(self.unique_id_item_name)
         self.unique_id_box.setLayout(self.unique_id_box_layout)
         self.layout.addRow(self.unique_id_box)
 
-        self.import_action_box = QGroupBox(translate('Action'))
+        self.import_action_box = QGroupBox(translate("Action"))
         self.import_action_box_layout = QFormLayout()
-        self.import_action_item_add = QRadioButton(translate('Add'))
+        self.import_action_item_add = QRadioButton(translate("Add"))
         self.import_action_box_layout.addRow(self.import_action_item_add)
-        self.import_action_item_overwrite = QRadioButton(translate('Overwrite'))
+        self.import_action_item_overwrite = QRadioButton(translate("Overwrite"))
         self.import_action_item_overwrite.setChecked(True)
         self.import_action_box_layout.addRow(self.import_action_item_overwrite)
         self.import_action_box.setLayout(self.import_action_box_layout)
@@ -72,10 +72,10 @@ class SportOrgImportDialog(QDialog):
 
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         self.button_ok = button_box.button(QDialogButtonBox.Ok)
-        self.button_ok.setText(translate('OK'))
+        self.button_ok.setText(translate("OK"))
         self.button_ok.clicked.connect(apply_changes)
         self.button_cancel = button_box.button(QDialogButtonBox.Cancel)
-        self.button_cancel.setText(translate('Cancel'))
+        self.button_cancel.setText(translate("Cancel"))
         self.button_cancel.clicked.connect(cancel_changes)
         self.layout.addRow(button_box)
 
@@ -86,28 +86,28 @@ class SportOrgImportDialog(QDialog):
 
     def apply_changes_impl(self):
         import_race = self.races[self.item_races.currentIndex()]
-        unique_id = 'id'
+        unique_id = "id"
         if self.unique_id_item_name.isChecked():
-            unique_id = 'name'
-        action = 'add'
+            unique_id = "name"
+        action = "add"
         if self.import_action_item_overwrite.isChecked():
-            action = 'overwrite'
+            action = "overwrite"
 
         obj = race()
 
-        if unique_id == 'id' and action == 'overwrite':
+        if unique_id == "id" and action == "overwrite":
             import_race.id = obj.id
             obj.update_data(import_race.to_dict())
             return
 
-        if unique_id == 'id' and action == 'add':
+        if unique_id == "id" and action == "add":
             organizations = []
             for org in import_race.organizations:
                 old_org = find(obj.organizations, id=org.id)
                 old_org_by_name = find(obj.organizations, name=org.name)
                 if old_org is None:
                     if old_org_by_name:
-                        org.name = '_' + org.name
+                        org.name = "_" + org.name
                     organizations.append(org)
             obj.organizations.extend(organizations)
 
@@ -117,7 +117,7 @@ class SportOrgImportDialog(QDialog):
                 old_course_by_name = find(obj.courses, name=course.name)
                 if old_course is None:
                     if old_course_by_name:
-                        course.name = '_' + course.name
+                        course.name = "_" + course.name
                     courses.append(course)
             obj.courses.extend(courses)
 
@@ -127,7 +127,7 @@ class SportOrgImportDialog(QDialog):
                 old_group_by_name = find(obj.groups, name=group.name)
                 if old_group is None:
                     if old_group_by_name:
-                        group.name = '_' + group.name
+                        group.name = "_" + group.name
                     if group.course:
                         group.course = find(obj.courses, id=group.course.id)
                     groups.append(group)

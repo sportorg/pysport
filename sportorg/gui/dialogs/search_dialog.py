@@ -65,8 +65,8 @@ class SearchDialog(QDialog):
                 if offset == -1 and proxy_model.search:
                     QMessageBox.warning(
                         self,
-                        translate('Search'),
-                        translate('The search has not given any results'),
+                        translate("Search"),
+                        translate("The search has not given any results"),
                     )
                 self.table.selectRow(offset)
         except Exception as e:
@@ -76,6 +76,6 @@ class SearchDialog(QDialog):
         self.close()
 
     def retranslate_ui(self):
-        self.setWindowTitle(translate('Search'))
-        self.button_ok.setText(translate('OK'))
-        self.button_cancel.setText(translate('Cancel'))
+        self.setWindowTitle(translate("Search"))
+        self.button_ok.setText(translate("OK"))
+        self.button_cancel.setText(translate("Cancel"))

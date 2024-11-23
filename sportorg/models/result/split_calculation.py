@@ -11,9 +11,9 @@ class PersonSplits:
         self.result = result
         self._course = None
 
-        self.assigned_rank = ''
+        self.assigned_rank = ""
         if (
-            hasattr(self.result, 'assigned_rank')
+            hasattr(self.result, "assigned_rank")
             and self.result.assigned_rank != Qualification.NOT_QUALIFIED
         ):
             self.assigned_rank = self.result.assigned_rank.get_title()
@@ -109,9 +109,9 @@ class PersonSplits:
 
     def to_dict(self):
         return {
-            'person': self.person.to_dict(),
-            'result': self.result.to_dict(),
-            'course': self.course.to_dict(),
+            "person": self.person.to_dict(),
+            "result": self.result.to_dict(),
+            "course": self.course.to_dict(),
         }
 
 
@@ -127,7 +127,7 @@ class GroupSplits:
 
     def generate(self, logged=False):
         if logged:
-            logging.debug('Group splits generate for ' + self.group.name)
+            logging.debug("Group splits generate for " + self.group.name)
         # to have group count
         ResultCalculation(self.race).get_group_persons(self.group)
 
@@ -192,8 +192,8 @@ class GroupSplits:
         self.person_splits = sorted(
             self.person_splits,
             key=lambda item: (
-                item.result.get_place() is None or item.result.get_place() == '',
-                ('0000' + str(item.result.get_place()))[-4:],
+                item.result.get_place() is None or item.result.get_place() == "",
+                ("0000" + str(item.result.get_place()))[-4:],
                 int(item.relay_leg),
             ),
         )
@@ -245,7 +245,7 @@ class GroupSplits:
     def get_leg_leader(self, index):
         if str(index) in self.leader.keys():
             return self.leader[str(index)]
-        return '', ''
+        return "", ""
 
     def set_places_relative(self):
         for i in range(self.cp_count):
@@ -261,7 +261,7 @@ class RaceSplits:
         self.race = r
 
     def generate(self):
-        logging.debug('Race splits generate')
+        logging.debug("Race splits generate")
         for group in self.race.groups:
             GroupSplits(self.race, group).generate()
         return self

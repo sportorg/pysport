@@ -97,24 +97,24 @@ class AdvTimeEdit(QTimeEdit):
 
 
 def messageBoxQuestion(
-    parent=None, title='', text='', buttons=(QMessageBox.Yes | QMessageBox.No)
+    parent=None, title="", text="", buttons=(QMessageBox.Yes | QMessageBox.No)
 ):
     messageBox = QMessageBox(QMessageBox.Question, title, text, buttons, parent)
 
     button_yes = messageBox.button(QMessageBox.Yes)
     if button_yes:
-        button_yes.setText(translate('Yes'))
+        button_yes.setText(translate("Yes"))
 
     button_no = messageBox.button(QMessageBox.No)
     if button_no:
-        button_no.setText(translate('No'))
+        button_no.setText(translate("No"))
 
     button_save = messageBox.button(QMessageBox.Save)
     if button_save:
-        button_save.setText(translate('Save'))
+        button_save.setText(translate("Save"))
 
     button_cancel = messageBox.button(QMessageBox.Cancel)
     if button_cancel:
-        button_cancel.setText(translate('Cancel'))
+        button_cancel.setText(translate("Cancel"))
 
     return messageBox.exec_()

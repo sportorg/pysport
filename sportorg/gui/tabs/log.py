@@ -21,7 +21,7 @@ class Widget(QtWidgets.QWidget):
         self.textEdit.setLineWrapMode(QtWidgets.QPlainTextEdit.NoWrap)
         self.textEdit.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
         self.textEdit.setMaximumBlockCount(
-            Configuration().configuration.get('log_window_row_count')
+            Configuration().configuration.get("log_window_row_count")
         )
         self.layout.addWidget(self.textEdit)
 

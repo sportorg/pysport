@@ -18,7 +18,6 @@ def _fix_time(time, zero_time):
     22:15:18 (10:00:00) -> 10:15:18
     22:15:18 (11:00:00) -> 22:15:18
     """
-    origin_time = time
 
     if time == OTime(0):
         return time

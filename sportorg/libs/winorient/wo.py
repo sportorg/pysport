@@ -10,8 +10,8 @@ class CSVReader:
         self._cards = set()
 
     def parse(self, source):
-        with open(source, encoding='cp1251') as csv_file:
-            spam_reader = csv.reader(csv_file, delimiter=';')
+        with open(source, encoding="cp1251") as csv_file:
+            spam_reader = csv.reader(csv_file, delimiter=";")
             for row in spam_reader:
                 self.append(row)
 
@@ -27,35 +27,35 @@ class CSVReader:
 
         if str(person[3]).isdigit():
             # support of old WO format, without representative, emulate it
-            person.insert(3, '')
+            person.insert(3, "")
 
         person_dict = {
-            'group_name': person[0],
-            'team_name': person[2],
-            'representative': person[3],
-            'qual_id': person[4],
-            'bib': int(person[5]) if len(person[5]) else 0,
-            'year': int(person[6]) if len(person[6]) else 0,
-            'sportident_card': int(person[7]) if str(person[7]).isdigit() else 0,
-            'comment': person[8],
+            "group_name": person[0],
+            "team_name": person[2],
+            "representative": person[3],
+            "qual_id": person[4],
+            "bib": int(person[5]) if len(person[5]) else 0,
+            "year": int(person[6]) if len(person[6]) else 0,
+            "sportident_card": int(person[7]) if str(person[7]).isdigit() else 0,
+            "comment": person[8],
         }
 
-        if len(str(person[1]).split(' ')) == 2:
-            person_dict['name'] = str(person[1]).split(' ')[1]
-            person_dict['surname'] = str(person[1]).split(' ')[0]
-        elif len(str(person[1]).split(' ')) > 2:
-            person_dict['name'] = str(person[1]).split(' ', 1)[1]
-            person_dict['surname'] = str(person[1]).split(' ', 1)[0]
+        if len(str(person[1]).split(" ")) == 2:
+            person_dict["name"] = str(person[1]).split(" ")[1]
+            person_dict["surname"] = str(person[1]).split(" ")[0]
+        elif len(str(person[1]).split(" ")) > 2:
+            person_dict["name"] = str(person[1]).split(" ", 1)[1]
+            person_dict["surname"] = str(person[1]).split(" ", 1)[0]
         else:
-            person_dict['name'] = person[1]
-            person_dict['surname'] = ''
+            person_dict["name"] = person[1]
+            person_dict["surname"] = ""
         self._data.append(person_dict)
 
     @property
     def groups(self):
         if not len(self._groups):
             for row in self.data:
-                self._groups.add(row['group_name'])
+                self._groups.add(row["group_name"])
 
         return self._groups
 
@@ -63,7 +63,7 @@ class CSVReader:
     def cards(self):
         if not len(self._cards):
             for row in self.data:
-                self._cards.add(row['sportident_card'])
+                self._cards.add(row["sportident_card"])
 
         return self._cards
 
@@ -71,7 +71,7 @@ class CSVReader:
     def teams(self):
         if not len(self._teams):
             for row in self.data:
-                self._teams.add(row['team_name'])
+                self._teams.add(row["team_name"])
 
         return self._teams
 

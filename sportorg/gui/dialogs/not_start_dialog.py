@@ -23,7 +23,7 @@ class NotStartDialog(QDialog):
         return super().exec_()
 
     def init_ui(self):
-        self.setWindowTitle(translate('Not started numbers'))
+        self.setWindowTitle(translate("Not started numbers"))
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(True)
@@ -35,7 +35,7 @@ class NotStartDialog(QDialog):
 
         self.layout.addRow(self.item_status_comment)
 
-        self.label_controls = QLabel('\n\n1 4 15 25\n58 32\n33\n34\n...\n150')
+        self.label_controls = QLabel("\n\n1 4 15 25\n58 32\n33\n34\n...\n150")
         self.item_numbers = QTextEdit()
 
         self.layout.addRow(self.label_controls, self.item_numbers)
@@ -53,10 +53,10 @@ class NotStartDialog(QDialog):
 
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         self.button_ok = button_box.button(QDialogButtonBox.Ok)
-        self.button_ok.setText(translate('OK'))
+        self.button_ok.setText(translate("OK"))
         self.button_ok.clicked.connect(apply_changes)
         self.button_cancel = button_box.button(QDialogButtonBox.Cancel)
-        self.button_cancel.setText(translate('Cancel'))
+        self.button_cancel.setText(translate("Cancel"))
         self.button_cancel.clicked.connect(cancel_changes)
         self.layout.addRow(button_box)
 
@@ -68,7 +68,7 @@ class NotStartDialog(QDialog):
         )
         text = self.item_numbers.toPlainText()
         numbers = []
-        for item in text.split('\n'):
+        for item in text.split("\n"):
             if not len(item):
                 continue
             for n_item in item.split():
@@ -88,6 +88,6 @@ class NotStartDialog(QDialog):
                     Teamwork().send(result.to_dict())
                     obj.add_new_result(result)
                 else:
-                    logging.info('{} not found'.format(number))
+                    logging.info("{} not found".format(number))
                 old_numbers.append(number)
         ResultCalculation(race()).process_results()

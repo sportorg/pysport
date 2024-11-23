@@ -41,15 +41,15 @@ from sportorg.models.result.result_checker import ResultChecker
 def test_basic_syntax():
     create_race()
 
-    race().set_setting('marked_route_mode', 'laps')
-    assert ok(course=[31, '41', '51(51,52)'], splits=[31, 41, 51], penalty=0)
-    assert ok(course=[31, '41', '51(51,52)'], splits=[31, 41, 52], penalty=1)
-    assert dsq(course=[31, '41', '51(51,52)'], splits=[31, 41, 59], penalty=0)
+    race().set_setting("marked_route_mode", "laps")
+    assert ok(course=[31, "41", "51(51,52)"], splits=[31, 41, 51], penalty=0)
+    assert ok(course=[31, "41", "51(51,52)"], splits=[31, 41, 52], penalty=1)
+    assert dsq(course=[31, "41", "51(51,52)"], splits=[31, 41, 59], penalty=0)
 
-    race().set_setting('marked_route_mode', 'time')
-    assert ok(course=[31, '41', '51(51,52)'], splits=[31, 41, 51], penalty=0)
-    assert ok(course=[31, '41', '51(51,52)'], splits=[31, 41, 52], penalty=1)
-    assert dsq(course=[31, '41', '51(51,52)'], splits=[31, 41, 59], penalty=0)
+    race().set_setting("marked_route_mode", "time")
+    assert ok(course=[31, "41", "51(51,52)"], splits=[31, 41, 51], penalty=0)
+    assert ok(course=[31, "41", "51(51,52)"], splits=[31, 41, 52], penalty=1)
+    assert dsq(course=[31, "41", "51(51,52)"], splits=[31, 41, 59], penalty=0)
 
 
 def test_marked_route_yes_no():
@@ -255,7 +255,7 @@ def test_non_obvious_behavior():
     алгоритма, иногда может возникать из-за недочётов при составлении курсов.
     """
     create_race()
-    race().set_setting('marked_route_mode', 'laps')
+    race().set_setting("marked_route_mode", "laps")
 
     # Различие в обработке двух случаев. Тестовый случай:
     # 1) Спортсмен пропустил нужный КП -> получает штраф
@@ -264,15 +264,15 @@ def test_non_obvious_behavior():
     # Но лишние отметки в чипе не должны уменьшать количество штрафа.
     # Да, по результатам проверки спортсмен снят. Но его могут восстановить
     # решением судьи, а штрафные круги он уже пробежал.
-    assert dsq(course=['31', '41(41,42)'], splits=[31], penalty=1)
-    assert dsq(course=['31', '41(41,42)'], splits=[41], penalty=1)
-    assert dsq(course=['31', '41(41,42)'], splits=[39, 41], penalty=0)
-    assert dsq(course=['31', '41(41,42)'], splits=[31, 49], penalty=0)
+    assert dsq(course=["31", "41(41,42)"], splits=[31], penalty=1)
+    assert dsq(course=["31", "41(41,42)"], splits=[41], penalty=1)
+    assert dsq(course=["31", "41(41,42)"], splits=[39, 41], penalty=0)
+    assert dsq(course=["31", "41(41,42)"], splits=[31, 49], penalty=0)
 
     # Различные способы задания дистанции приводят к различному
     # начислению штрафа за лишние отметки
-    assert ok(course=['31', '41'], splits=[31, 77, 41], penalty=1)
-    assert ok(course=['31', '41(41,42)'], splits=[31, 77, 41], penalty=0)
+    assert ok(course=["31", "41"], splits=[31, 77, 41], penalty=1)
+    assert ok(course=["31", "41(41,42)"], splits=[31, 77, 41], penalty=0)
 
 
 def ok(
@@ -406,7 +406,7 @@ def make_course_controls(course: List[Union[int, str]]) -> List[CourseControl]:
 
 def make_course_control(code: Union[int, str]) -> CourseControl:
     control = CourseControl()
-    control.update_data({'code': code, 'length': 0})
+    control.update_data({"code": code, "length": 0})
     return control
 
 
@@ -415,11 +415,11 @@ def make_splits(splits: List[int]) -> List[Split]:
 
 
 def get_penalty(result: ResultSportident) -> int:
-    marked_route_mode = race().get_setting('marked_route_mode', 'off')
-    if marked_route_mode == 'laps':
+    marked_route_mode = race().get_setting("marked_route_mode", "off")
+    if marked_route_mode == "laps":
         return result.penalty_laps
-    elif marked_route_mode == 'time':
-        penalty_time = race().get_setting('marked_route_penalty_time', 60000)
+    elif marked_route_mode == "time":
+        penalty_time = race().get_setting("marked_route_penalty_time", 60000)
         if result.penalty_time:
             return result.penalty_time.to_msec() / penalty_time
 
@@ -457,16 +457,16 @@ def exception_message(
     str
         Строка отладочного сообщения
     """
-    message = 'Check failed'
-    message += '\n' + split_and_course_repr(course, splits)
+    message = "Check failed"
+    message += "\n" + split_and_course_repr(course, splits)
     if result_status_expected != result_status_received:
-        message += '\n' + f'Result status failed!'
-        message += '\n' + f'Expected: {result_status_expected}'
-        message += '\n' + f'Received: {result_status_received}'
+        message += "\n" + "Result status failed!"
+        message += "\n" + f"Expected: {result_status_expected}"
+        message += "\n" + f"Received: {result_status_received}"
     if penalty_expected != penalty_received:
-        message += '\n' + f'Penalty failed!'
-        message += '\n' + f'Expected: {penalty_expected}'
-        message += '\n' + f'Received: {penalty_received}'
+        message += "\n" + "Penalty failed!"
+        message += "\n" + f"Expected: {penalty_expected}"
+        message += "\n" + f"Received: {penalty_received}"
     return message
 
 
@@ -491,4 +491,4 @@ def split_and_course_repr(course: List[Union[int, str]], splits: List[int]) -> s
     """
     spl = splits
     crs = course
-    return '\n'.join([f'{s:3}  {c}' for s, c in zip_longest(spl, crs, fillvalue='')])
+    return "\n".join([f"{s:3}  {c}" for s, c in zip_longest(spl, crs, fillvalue="")])

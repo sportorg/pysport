@@ -22,7 +22,7 @@ class ResultThread(QThread):
         self._logger = logger
 
     def run(self):
-        self._logger.debug('Teamwork result start')
+        self._logger.debug("Teamwork result start")
         while True:
             try:
                 cmd = self._queue.get(timeout=5)
@@ -33,7 +33,7 @@ class ResultThread(QThread):
                     break
             except Exception as e:
                 self._logger.debug(str(e))
-        self._logger.debug('Teamwork result shutdown')
+        self._logger.debug("Teamwork result shutdown")
 
 
 @singleton
@@ -42,16 +42,16 @@ class Teamwork:
         self._in_queue = Queue()
         self._out_queue = Queue()
         self._stop_event = Event()
-        self.factory = {'client': ClientThread, 'server': ServerThread}
+        self.factory = {"client": ClientThread, "server": ServerThread}
         self._thread = None
         self._result_thread = None
         self._call_back = None
         self._logger = logging.root
 
-        self.host = ''
+        self.host = ""
         self.port = 50010
-        self.token = ''
-        self.connection_type = 'client'
+        self.token = ""
+        self.connection_type = "client"
 
     def set_call(self, value):
         if self._call_back is None:
@@ -115,15 +115,15 @@ class Teamwork:
     def toggle(self):
         if self.is_alive():
             self.stop()
-            self._logger.info('{} stopping'.format(self.connection_type.upper()))
+            self._logger.info("{} stopping".format(self.connection_type.upper()))
         else:
             self.start()
-            self._logger.info('{} starting'.format(self.connection_type.upper()))
+            self._logger.info("{} starting".format(self.connection_type.upper()))
 
     def send(self, data, op=Operations.Update.name):
         """data is Dict or List[Dict]"""
         if self.is_alive():
-            Broker().produce('teamwork_sending', data)
+            Broker().produce("teamwork_sending", data)
             if isinstance(data, list):
                 for item in data:
                     self._in_queue.put(Command(item, op))
@@ -133,6 +133,6 @@ class Teamwork:
 
     def delete(self, data):
         """data is Dict or List[Dict]"""
-        Broker().produce('teamwork_deleting', data)
+        Broker().produce("teamwork_deleting", data)
         if self.is_alive():
             pass

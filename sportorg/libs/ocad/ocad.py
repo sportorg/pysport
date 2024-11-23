@@ -19,16 +19,16 @@ class CourseControlDict(dict):
 
 @dataclass
 class CourseControl:
-    order: str = ''
-    code: str = ''
-    length: str = ''
+    order: str = ""
+    code: str = ""
+    length: str = ""
 
 
 @dataclass
 class Course:
-    group: str = ''
-    course: str = ''
-    bib: str = ''
+    group: str = ""
+    course: str = ""
+    bib: str = ""
     climb: int = 0
     length: int = 0
     controls: CourseControlDict = field(default_factory=CourseControlDict)

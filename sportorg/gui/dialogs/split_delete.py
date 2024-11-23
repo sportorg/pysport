@@ -22,7 +22,7 @@ class SplitDeleteDialog(QDialog):
         return super().exec_()
 
     def init_ui(self):
-        self.setWindowTitle(translate('Delete split'))
+        self.setWindowTitle(translate("Delete split"))
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(True)
@@ -31,17 +31,17 @@ class SplitDeleteDialog(QDialog):
 
         self.item_start_cp = QSpinBox()
         self.item_start_cp.setMaximum(999)
-        self.layout.addRow(QLabel(translate('Start CP')), self.item_start_cp)
+        self.layout.addRow(QLabel(translate("Start CP")), self.item_start_cp)
 
         self.item_end_cp = QSpinBox()
         self.item_end_cp.setMaximum(999)
-        self.layout.addRow(QLabel(translate('End CP')), self.item_end_cp)
+        self.layout.addRow(QLabel(translate("End CP")), self.item_end_cp)
 
         self.item_max_intermediate = QSpinBox()
         self.item_max_intermediate.setValue(5)
         self.item_max_intermediate.setMaximum(999)
         self.layout.addRow(
-            QLabel(translate('Max intermediate CP')), self.item_max_intermediate
+            QLabel(translate("Max intermediate CP")), self.item_max_intermediate
         )
 
         def cancel_changes():
@@ -56,10 +56,10 @@ class SplitDeleteDialog(QDialog):
 
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         self.button_ok = button_box.button(QDialogButtonBox.Ok)
-        self.button_ok.setText(translate('Ok'))
+        self.button_ok.setText(translate("Ok"))
         self.button_ok.clicked.connect(apply_changes)
         self.button_cancel = button_box.button(QDialogButtonBox.Cancel)
-        self.button_cancel.setText(translate('Cancel'))
+        self.button_cancel.setText(translate("Cancel"))
         self.button_cancel.clicked.connect(cancel_changes)
         self.layout.addRow(button_box)
 

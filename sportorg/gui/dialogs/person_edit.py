@@ -29,8 +29,8 @@ from sportorg.modules.teamwork.teamwork import Teamwork
 
 
 class PersonEditDialog(BaseDialog):
-    GROUP_NAME = ''
-    ORGANIZATION_NAME = ''
+    GROUP_NAME = ""
+    ORGANIZATION_NAME = ""
 
     def __init__(self, person: Person, is_new=False):
         super().__init__(GlobalAccess().get_main_window())
@@ -40,129 +40,129 @@ class PersonEditDialog(BaseDialog):
         self.bib = person.bib
         self.card_number = person.card_number
 
-        time_format = 'hh:mm:ss'
-        if race().get_setting('time_accuracy', 0):
-            time_format = 'hh:mm:ss.zzz'
+        time_format = "hh:mm:ss"
+        if race().get_setting("time_accuracy", 0):
+            time_format = "hh:mm:ss.zzz"
 
-        self.title = translate('Entry properties')
+        self.title = translate("Entry properties")
         self.size = (450, 670)
         self.form = [
             LineField(
-                title=translate('Last name'),
+                title=translate("Last name"),
                 object=person,
-                key='surname',
+                key="surname",
                 select_all=True,
             ),
             AdvComboBoxField(
-                title=translate('First name'),
+                title=translate("First name"),
                 object=person,
-                key='name',
+                key="name",
                 items=get_names(),
             ),
             AdvComboBoxField(
-                title=translate('Group'),
+                title=translate("Group"),
                 object=person,
-                key='group',
-                id='group',
+                key="group",
+                id="group",
                 items=get_race_groups(),
             ),
-            LabelField(id='group_info'),
+            LabelField(id="group_info"),
             AdvComboBoxField(
-                title=translate('Team'),
+                title=translate("Team"),
                 object=person,
-                key='organization',
-                id='organization',
+                key="organization",
+                id="organization",
                 items=get_race_teams(),
             ),
             (
                 DateField(
-                    title=translate('Birthday'),
+                    title=translate("Birthday"),
                     object=person,
-                    key='birth_date',
+                    key="birth_date",
                     maximum=date.today(),
                 )
-                if Config().configuration.get('use_birthday', False)
+                if Config().configuration.get("use_birthday", False)
                 else NumberField(
-                    title=translate('Year of birth'),
+                    title=translate("Year of birth"),
                     object=person,
-                    key='year',
-                    id='year',
+                    key="year",
+                    id="year",
                     minimum=0,
                     maximum=date.today().year,
                 )
             ),
             AdvComboBoxField(
-                title=translate('Qualification'),
+                title=translate("Qualification"),
                 object=person,
-                key='qual',
-                id='qual',
+                key="qual",
+                id="qual",
                 items=[qual.get_title() for qual in Qualification],
             ),
             NumberField(
-                title=translate('Bib'),
+                title=translate("Bib"),
                 object=self,
-                key='bib',
-                id='bib',
+                key="bib",
+                id="bib",
                 minimum=0,
                 maximum=Limit.BIB,
             ),
-            LabelField(id='bib_info'),
+            LabelField(id="bib_info"),
             LineField(
-                title=translate('World code'),
+                title=translate("World code"),
                 object=person,
-                key='world_code',
+                key="world_code",
             ),
             LineField(
-                title=translate('National code'),
+                title=translate("National code"),
                 object=person,
-                key='national_code',
+                key="national_code",
             ),
             TimeField(
-                title=translate('Start time'),
+                title=translate("Start time"),
                 object=person,
-                key='start_time',
+                key="start_time",
                 format=time_format,
             ),
             NumberField(
-                title=translate('Start group'),
+                title=translate("Start group"),
                 object=person,
-                key='start_group',
+                key="start_group",
                 minimum=0,
                 maximum=99,
             ),
             NumberField(
-                title=translate('Punch card #'),
+                title=translate("Punch card #"),
                 object=self,
-                key='card_number',
-                id='card_number',
+                key="card_number",
+                id="card_number",
                 minimum=0,
                 maximum=9999999,
             ),
-            LabelField(id='card_info'),
+            LabelField(id="card_info"),
             CheckBoxField(
-                label=translate('rented card'),
+                label=translate("rented card"),
                 object=person,
-                key='is_rented_card',
+                key="is_rented_card",
             ),
             CheckBoxField(
-                label=translate('is paid'),
+                label=translate("is paid"),
                 object=person,
-                key='is_paid',
+                key="is_paid",
             ),
             CheckBoxField(
-                label=translate('personal participation'),
+                label=translate("personal participation"),
                 object=person,
-                key='is_personal',
+                key="is_personal",
             ),
             CheckBoxField(
-                label=translate('out of competition'),
+                label=translate("out of competition"),
                 object=person,
-                key='is_out_of_competition',
+                key="is_out_of_competition",
             ),
             TextField(
-                title=translate('Comment'),
+                title=translate("Comment"),
                 object=person,
-                key='comment',
+                key="comment",
             ),
         ]
 
@@ -217,57 +217,57 @@ class PersonEditDialog(BaseDialog):
         return sum(values) == len(values)
 
     def on_group_changed(self):
-        self.is_item_valid['group'] = True
-        group_name = self.fields['group'].q_item.currentText()
-        group_info = self.fields['group_info']
-        group_info.set_text('')
+        self.is_item_valid["group"] = True
+        group_name = self.fields["group"].q_item.currentText()
+        group_info = self.fields["group_info"]
+        group_info.set_text("")
         if group_name and not find(race().groups, name=group_name):
-            self.is_item_valid['group'] = False
-            group_info.set_text(translate('Group not found'))
+            self.is_item_valid["group"] = False
+            group_info.set_text(translate("Group not found"))
 
         self.button_ok.setEnabled(self.is_items_ok())
 
     def on_bib_changed(self):
-        self.is_item_valid['bib'] = True
-        bib = self.fields['bib'].q_item.value()
-        bib_info = self.fields['bib_info']
-        bib_info.set_text('')
+        self.is_item_valid["bib"] = True
+        bib = self.fields["bib"].q_item.value()
+        bib_info = self.fields["bib_info"]
+        bib_info.set_text("")
         if bib:
             person = race().find_person_by_bib(bib)
             if not person:
-                bib_info.set_text(translate('Number is unique'))
+                bib_info.set_text(translate("Number is unique"))
             elif person is not self.current_object:
-                self.is_item_valid['bib'] = False
-                info = '{}\n{}'.format(
-                    translate('Number already exists'), person.full_name
+                self.is_item_valid["bib"] = False
+                info = "{}\n{}".format(
+                    translate("Number already exists"), person.full_name
                 )
                 if person.group:
-                    info = '{}\n{}: {}'.format(
-                        info, translate('Group'), person.group.name
+                    info = "{}\n{}: {}".format(
+                        info, translate("Group"), person.group.name
                     )
                 bib_info.set_text(info)
         self.button_ok.setEnabled(self.is_items_ok())
 
     def on_card_number_changed(self):
-        self.is_item_valid['card_number'] = True
-        number = self.fields['card_number'].q_item.value()
-        card_info = self.fields['card_info']
-        card_info.set_text('')
+        self.is_item_valid["card_number"] = True
+        number = self.fields["card_number"].q_item.value()
+        card_info = self.fields["card_info"]
+        card_info.set_text("")
         if number:
             person = race().find_person_by_card(number)
             if not person:
-                card_info.set_text(translate('Card number is unique'))
+                card_info.set_text(translate("Card number is unique"))
             elif person is not self.current_object:
-                self.is_item_valid['card_number'] = False
-                info = '{}\n{}'.format(
-                    translate('Card number already exists'), person.full_name
+                self.is_item_valid["card_number"] = False
+                info = "{}\n{}".format(
+                    translate("Card number already exists"), person.full_name
                 )
                 if person.group:
-                    info = '{}\n{}: {}'.format(
-                        info, translate('Group'), person.group.name
+                    info = "{}\n{}: {}".format(
+                        info, translate("Group"), person.group.name
                     )
                 if person.bib:
-                    info = '{}\n{}: {}'.format(info, translate('Bib'), person.bib)
+                    info = "{}\n{}: {}".format(info, translate("Bib"), person.bib)
                 card_info.set_text(info)
         self.button_ok.setEnabled(self.is_items_ok())
 

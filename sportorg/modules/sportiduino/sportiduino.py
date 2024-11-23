@@ -43,10 +43,10 @@ class SportiduinoThread(QThread):
                     time.sleep(0.5)
                     if not main_thread().is_alive() or self._stop_event.is_set():
                         sduino.disconnect()
-                        self._logger.debug('Stop sportiduino reader')
+                        self._logger.debug("Stop sportiduino reader")
                         return
                 card_data = sduino.card_data
-                self._queue.put(SportiduinoCommand('card_data', card_data), timeout=1)
+                self._queue.put(SportiduinoCommand("card_data", card_data), timeout=1)
                 sduino.beep_ok()
             except sportiduino.SportiduinoException as e:
                 self._logger.error(str(e))
@@ -72,7 +72,7 @@ class ResultThread(QThread):
         while True:
             try:
                 cmd = self._queue.get(timeout=5)
-                if cmd.command == 'card_data':
+                if cmd.command == "card_data":
                     result = self._get_result(cmd.data)
                     self.data_sender.emit(result)
                     backup.backup_data(cmd.data)
@@ -82,26 +82,26 @@ class ResultThread(QThread):
             except Exception as e:
                 self._logger.error(str(e))
                 raise e
-        self._logger.debug('Stop adder result')
+        self._logger.debug("Stop adder result")
 
     @staticmethod
     def _get_result(card_data):
         result = memory.race().new_result(memory.ResultSportiduino)
-        result.card_number = int(card_data['card_number'])
+        result.card_number = int(card_data["card_number"])
 
-        for i in range(len(card_data['punches'])):
-            t = card_data['punches'][i][1]
+        for i in range(len(card_data["punches"])):
+            t = card_data["punches"][i][1]
             if t:
                 split = memory.Split()
-                split.code = str(card_data['punches'][i][0])
+                split.code = str(card_data["punches"][i][0])
                 split.time = time_to_otime(t)
                 split.days = memory.race().get_days(t)
                 result.splits.append(split)
 
-        if 'start' in card_data and card_data['start']:
-            result.start_time = time_to_otime(card_data['start'])
-        if 'finish' in card_data and card_data['finish']:
-            result.finish_time = time_to_otime(card_data['finish'])
+        if "start" in card_data and card_data["start"]:
+            result.start_time = time_to_otime(card_data["start"])
+        if "finish" in card_data and card_data["finish"]:
+            result.finish_time = time_to_otime(card_data["finish"])
 
         return result
 
@@ -185,4 +185,4 @@ class SportiduinoClient:
         self.start()
 
     def choose_port(self):
-        return memory.race().get_setting('system_port', None)
+        return memory.race().get_setting("system_port", None)

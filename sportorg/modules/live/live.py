@@ -10,7 +10,7 @@ import aiohttp
 from sportorg.models.memory import race
 from sportorg.modules.live import orgeo
 
-LIVE_TIMEOUT = int(os.getenv('SPORTORG_LIVE_TIMEOUT', '10'))
+LIVE_TIMEOUT = int(os.getenv("SPORTORG_LIVE_TIMEOUT", "10"))
 
 
 async def create_session(timeout: int) -> aiohttp.ClientSession:
@@ -19,7 +19,7 @@ async def create_session(timeout: int) -> aiohttp.ClientSession:
 
 class LiveThread(Thread):
     def __init__(self):
-        super().__init__(name='LiveThread', daemon=True)
+        super().__init__(name="LiveThread", daemon=True)
         self._queue = Queue()
         self._stop_event = Event()
         self._delay = 0.5
@@ -47,13 +47,13 @@ class LiveThread(Thread):
                     loop.run_until_complete(
                         asyncio.gather(
                             *[func(session=session) for func in funcs],
-                            return_exceptions=True
+                            return_exceptions=True,
                         )
                     )
                 else:
                     self._stop_event.wait(self._delay)
             except Exception as e:
-                logging.error('Error: %s', str(e))
+                logging.error("Error: %s", str(e))
 
 
 class LiveClient:
@@ -66,18 +66,18 @@ class LiveClient:
     @staticmethod
     def is_enabled():
         obj = race()
-        live_enabled = obj.get_setting('live_enabled', False)
-        urls = obj.get_setting('live_urls', [])
+        live_enabled = obj.get_setting("live_enabled", False)
+        urls = obj.get_setting("live_urls", [])
         return live_enabled and urls
 
     @staticmethod
     def get_urls():
         obj = race()
-        urls = obj.get_setting('live_urls', [])
+        urls = obj.get_setting("live_urls", [])
         return urls
 
     def send(self, data):
-        logging.debug('LiveClient.send started, data = %s', str(data))
+        logging.debug("LiveClient.send started, data = %s", str(data))
         if not self.is_enabled():
             return
 
@@ -93,11 +93,11 @@ class LiveClient:
         urls = self.get_urls()
         race_data = race().to_dict()
         for url in urls:
-            if race().get_setting('live_results_enabled', False):
+            if race().get_setting("live_results_enabled", False):
                 func = partial(orgeo.create, url, items, race_data, logging.root)
                 self._thread.send(func)
 
-            if race().get_setting('live_cp_enabled', False):
+            if race().get_setting("live_cp_enabled", False):
                 func = partial(
                     orgeo.create_online_cp,
                     url,

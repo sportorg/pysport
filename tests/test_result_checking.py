@@ -28,57 +28,57 @@ def test_controls_as_int():
 
 def test_controls_as_str():
     # Номера КП заданы строкой
-    assert ok(course=['31', '32', '33'], splits=[31, 32, 33])
+    assert ok(course=["31", "32", "33"], splits=[31, 32, 33])
 
-    assert dsq(course=['31', '32', '33'], splits=[])
+    assert dsq(course=["31", "32", "33"], splits=[])
 
 
 def test_controls_with_optional_codes():
     # Возможность задать номера контрольных пунктов,
     # которые будут приняты как правильные
-    assert ok(course=['31(31,32,33)'], splits=[31])
-    assert ok(course=['31(31,32,33)'], splits=[32])
-    assert dsq(course=['31(31,32,33)'], splits=[70])
+    assert ok(course=["31(31,32,33)"], splits=[31])
+    assert ok(course=["31(31,32,33)"], splits=[32])
+    assert dsq(course=["31(31,32,33)"], splits=[70])
 
     # Правильными считаются только КП, указанные в скобках
-    assert dsq(course=['31(41,42,43)'], splits=[31])
-    assert ok(course=['31(41,42,43)'], splits=[41])
+    assert dsq(course=["31(41,42,43)"], splits=[31])
+    assert ok(course=["31(41,42,43)"], splits=[41])
 
     # КП31 — отметка ок, штрафа нет
-    course_object = make_course(['31(31,32,33)'])
+    course_object = make_course(["31(31,32,33)"])
     result = make_result([31])
-    assert result.check(course_object) == True
-    assert result.splits[0].code == '31'
-    assert result.splits[0].is_correct == True
-    assert result.splits[0].has_penalty == False
+    assert result.check(course_object)
+    assert result.splits[0].code == "31"
+    assert result.splits[0].is_correct
+    assert not result.splits[0].has_penalty
 
     # КП32 — отметка ок, штраф есть
-    course_object = make_course(['31(31,32,33)'])
+    course_object = make_course(["31(31,32,33)"])
     result = make_result([32])
-    assert result.check(course_object) == True
-    assert result.splits[0].code == '32'
-    assert result.splits[0].is_correct == True
-    assert result.splits[0].has_penalty == True
+    assert result.check(course_object)
+    assert result.splits[0].code == "32"
+    assert result.splits[0].is_correct
+    assert result.splits[0].has_penalty
 
     # Другой КП — плохая отметка, штраф есть
-    course_object = make_course(['31(31,32,33)'])
+    course_object = make_course(["31(31,32,33)"])
     result = make_result([70])
-    assert result.check(course_object) == False
-    assert result.splits[0].code == '70'
-    assert result.splits[0].is_correct == False
-    assert result.splits[0].has_penalty == True
+    assert not result.check(course_object)
+    assert result.splits[0].code == "70"
+    assert not result.splits[0].is_correct
+    assert result.splits[0].has_penalty
 
 
 def test_controls_with_optional_code_ranges():
     # Возможность задать номера контрольных пунктов, используя диапазон
-    course = ['31(31-33)']
+    course = ["31(31-33)"]
     assert ok(course, splits=[31])
     assert ok(course, splits=[32])
     assert ok(course, splits=[33])
     assert dsq(course, splits=[34])
 
     # Возможность комбинировать отдельные КП и диапазоны
-    course = ['31(31,41-43,51,61-64)']
+    course = ["31(31,41-43,51,61-64)"]
     assert ok(course, splits=[31])
     assert ok(course, splits=[41])
     assert ok(course, splits=[42])
@@ -99,14 +99,14 @@ def test_free_course_order_unique_controls():
     Такие контрольные пункты будут приняты как правильные.
     Осуществляется проверка на уникальность.
     """
-    assert ok(course=['*'], splits=[31])
-    assert ok(course=['*'], splits=[71])
+    assert ok(course=["*"], splits=[31])
+    assert ok(course=["*"], splits=[71])
 
-    assert ok(course=['*(31,32,33)'], splits=[31])
-    assert ok(course=['*(31,32,33)'], splits=[32])
-    assert dsq(course=['*(31,32,33)'], splits=[34])
+    assert ok(course=["*(31,32,33)"], splits=[31])
+    assert ok(course=["*(31,32,33)"], splits=[32])
+    assert dsq(course=["*(31,32,33)"], splits=[34])
 
-    course = ['*', '*', '*']
+    course = ["*", "*", "*"]
     assert ok(course, splits=[31, 32, 33])
     assert ok(course, splits=[31, 32, 33, 34])
     assert ok(course, splits=[31, 32, 31, 33])
@@ -114,12 +114,12 @@ def test_free_course_order_unique_controls():
     assert dsq(course, splits=[31, 32])
 
     # Возможно комбинировать способы задания «любых» контрольных пунктов
-    course = ['*(31-33)', '*(41-43)', '*(51-53)', '*']
+    course = ["*(31-33)", "*(41-43)", "*(51-53)", "*"]
     assert ok(course, splits=[31, 41, 51, 32])
     assert ok(course, splits=[31, 42, 53, 32])
     assert dsq(course, splits=[31, 42, 53, 31])
 
-    course = [31, '*', '*(31-33)']
+    course = [31, "*", "*(31-33)"]
     # Возможно комбинировать заданные контрольные пункты и «любые»
     assert ok(course, splits=[31, 32, 33])
     # Проверка уникальности производится только среди «любых»
@@ -132,14 +132,14 @@ def test_free_course_order_any_controls():
     # «любой контрольный пункт из списка» ['%(31,32,33)'].
     # Такие контрольные пункты будут приняты как правильные.
     # Проверка на уникальность не осуществляется.
-    assert ok(course=['%'], splits=[31])
-    assert ok(course=['%'], splits=[71])
+    assert ok(course=["%"], splits=[31])
+    assert ok(course=["%"], splits=[71])
 
-    assert ok(course=['%(31,32,33)'], splits=[31])
-    assert ok(course=['%(31,32,33)'], splits=[32])
-    assert dsq(course=['%(31,32,33)'], splits=[34])
+    assert ok(course=["%(31,32,33)"], splits=[31])
+    assert ok(course=["%(31,32,33)"], splits=[32])
+    assert dsq(course=["%(31,32,33)"], splits=[34])
 
-    course = ['%', '%', '%']
+    course = ["%", "%", "%"]
     assert ok(course, splits=[31, 32, 33])
     assert ok(course, splits=[31, 32, 33, 34])
     assert ok(course, splits=[31, 32, 31, 33])
@@ -148,22 +148,22 @@ def test_free_course_order_any_controls():
     assert dsq(course, splits=[31, 32])
 
     # Возможно комбинировать способы задания «любых» контрольных пунктов
-    course = (['%(31-33)', '%(41-43)', '%(51-53)', '%'],)
+    course = (["%(31-33)", "%(41-43)", "%(51-53)", "%"],)
     assert ok(course, splits=[31, 41, 51, 32])
     assert ok(course, splits=[31, 42, 53, 32])
     assert ok(course, splits=[31, 42, 53, 31])
 
     # Возможно комбинировать заданные контрольные пункты и «любые»
-    course = [31, '%', '%(31-33)']
+    course = [31, "%", "%(31-33)"]
     assert ok(course, splits=[31, 32, 33])
     assert ok(course, splits=[31, 31, 31])
 
     # Возможно комбинировать «любые уникальные» и «любые не уникальные»
-    course = [31, '*', '*', '%', '%']
+    course = [31, "*", "*", "%", "%"]
     assert ok(course, splits=[31, 32, 33, 34, 35])
     assert ok(course, splits=[31, 31, 32, 31, 31])
     assert dsq(course, splits=[31, 32, 32, 34, 35])
-    course = [31, '%', '%', '*', '*']
+    course = [31, "%", "%", "*", "*"]
     assert ok(course, splits=[31, 31, 31, 31, 32])
 
 
@@ -206,7 +206,7 @@ def test_course_free_order():
     """
 
     # Выбор — 3 различных КП
-    c = ['*', '*', '*']
+    c = ["*", "*", "*"]
     assert ok(c, [31, 32, 33])
     assert ok(c, [71, 72, 73])
     assert ok(c, [31, 32, 33, 34])
@@ -216,7 +216,7 @@ def test_course_free_order():
     assert dsq(c, [31, 32, 31])
 
     # Выбор: заданные номера КП
-    c = ['*(31,32,33,34)', '*(31,32,33,34)', '*(31,32,33,34)']
+    c = ["*(31,32,33,34)", "*(31,32,33,34)", "*(31,32,33,34)"]
     assert ok(c, [31, 32, 33])
     assert ok(c, [31, 31, 32, 33])
 
@@ -225,7 +225,7 @@ def test_course_free_order():
     assert dsq(c, [31, 32])
 
     # Выбор: заданные номера КП со сменой карты
-    c = ['*(31,32,33,34)', '*(31,32,33,34)', '*(71,72,73,74)', '*(71,72,73,74)']
+    c = ["*(31,32,33,34)", "*(31,32,33,34)", "*(71,72,73,74)", "*(71,72,73,74)"]
     assert ok(c, [31, 34, 71, 74])
     assert ok(c, [31, 31, 34, 71, 74])
     assert ok(c, [31, 47, 34, 71, 74])
@@ -238,7 +238,7 @@ def test_course_free_order():
     assert dsq(c, [31, 34, 41, 74])
 
     # Выбор + заданные КП
-    c = ['31', '*(32,33,34)', '*(32,33,34)', '70']
+    c = ["31", "*(32,33,34)", "*(32,33,34)", "70"]
     assert ok(c, [31, 32, 33, 70])
     assert ok(c, [31, 31, 32, 33, 70])
     assert ok(c, [31, 32, 33, 70, 71])
@@ -253,7 +253,7 @@ def test_course_free_order():
     assert dsq(c, [31, 32, 33])
 
     # Выбор + заданные КП
-    c = ['*(31,32,33)', '55', '*(31,32,33)']
+    c = ["*(31,32,33)", "55", "*(31,32,33)"]
     assert ok(c, [31, 55, 33])
     assert ok(c, [31, 32, 55, 33])
     assert ok(c, [31, 55, 33, 31])
@@ -268,7 +268,7 @@ def test_course_free_order():
     assert dsq(c, [31, 55])
 
     # Выбор + переворот карты + обязательные первый и последний КП на каждом круге
-    c = [31, '*(33,34,35)', '*(33,34,35)', 39, 41, '*(43,44,45)', '*(43,44,45)', 49]
+    c = [31, "*(33,34,35)", "*(33,34,35)", 39, 41, "*(43,44,45)", "*(43,44,45)", 49]
     assert ok(c, [31, 33, 34, 39, 41, 45, 43, 49])
     assert ok(c, [31, 33, 34, 39, 71, 41, 45, 43, 49])
 
@@ -276,7 +276,7 @@ def test_course_free_order():
 def test_course_butterfly():
     """Рассев «бабочка» — спортсмен сначала пробегает одно крыло бабочки, затем другое"""
     # Классическая бабочка — центральный КП32 необходимо взять три раза
-    c = [31, 32, '*(41,51)', '*(42,52)', 32, '*(51,41)', '*(52,42)', 32, 39]
+    c = [31, 32, "*(41,51)", "*(42,52)", 32, "*(51,41)", "*(52,42)", 32, 39]
     assert ok(c, [31, 32, 41, 42, 32, 51, 52, 32, 39])
     assert ok(c, [31, 32, 51, 52, 32, 41, 42, 32, 39])
 
@@ -296,7 +296,7 @@ def test_course_butterfly():
     assert dsq(c, [31, 32, 41, 42, 70, 51, 52, 32, 39])
 
     # Модифицированная бабочка — есть возвратный перегон; КП32 и КП33 надо взять по два раза
-    c = [31, 32, '*(41,51)', 33, 32, '*(51,41)', 33, 39]
+    c = [31, 32, "*(41,51)", 33, 32, "*(51,41)", 33, 39]
     assert ok(c, [31, 32, 41, 33, 32, 51, 33, 39])
     assert ok(c, [31, 32, 51, 33, 32, 41, 33, 39])
 
@@ -318,12 +318,12 @@ def test_course_butterfly():
     c = [
         31,
         32,
-        '*(41,51)',
-        '*(42,52)',
-        '*(43,32)',
-        '*(32,41)',
-        '*(51,42)',
-        '*(52,43)',
+        "*(41,51)",
+        "*(42,52)",
+        "*(43,32)",
+        "*(32,41)",
+        "*(51,42)",
+        "*(52,43)",
         32,
         39,
     ]
@@ -346,7 +346,7 @@ def test_course_butterfly():
     assert dsq(c, [31, 32, 41, 42, 43, 32, 51, 52, 32, 70])
 
     # Модифицированная бабочка с неравными крыльями
-    c = [31, 32, '*(41,51)', '*(42,33)', '*(33,32)', '*(32,41)', '*(51,42)', 33, 39]
+    c = [31, 32, "*(41,51)", "*(42,33)", "*(33,32)", "*(32,41)", "*(51,42)", 33, 39]
     assert ok(c, [31, 32, 41, 42, 33, 32, 51, 33, 39])
     assert ok(c, [31, 32, 51, 33, 32, 41, 42, 33, 39])
 
@@ -365,7 +365,7 @@ def test_course_butterfly():
 
 
 @pytest.mark.parametrize(
-    'controls, expected',
+    "controls, expected",
     [
         ([], 0),
         ([31, 32, 33, 34], 12),
@@ -376,13 +376,13 @@ def test_course_butterfly():
 )
 def test_calculate_rogaine_score(controls, expected):
     create_race()
-    race().set_setting('result_processing_score_mode', 'rogain')  # wrong spelling
+    race().set_setting("result_processing_score_mode", "rogain")  # wrong spelling
     res = make_result(controls)
     assert ResultChecker.calculate_rogaine_score(res) == expected
 
 
 @pytest.mark.parametrize(
-    'fixed_value, controls, expected',
+    "fixed_value, controls, expected",
     [
         (1, [], 0),
         (1, [31, 32, 33, 34], 4),
@@ -394,33 +394,33 @@ def test_calculate_rogaine_score(controls, expected):
 )
 def test_calculate_fixed_score(fixed_value, controls, expected):
     create_race()
-    race().set_setting('result_processing_score_mode', 'fixed')
-    race().set_setting('result_processing_fixed_score_value', fixed_value)
+    race().set_setting("result_processing_score_mode", "fixed")
+    race().set_setting("result_processing_fixed_score_value", fixed_value)
     res = make_result(controls)
     assert ResultChecker.calculate_rogaine_score(res) == expected
 
 
 @pytest.mark.parametrize(
-    'score_mode, controls, expected',
+    "score_mode, controls, expected",
     [
-        ('rogain', [], 0),
-        ('rogain', [31, 31], 6),
-        ('rogain', [31, 32, 33, 34], 12),
-        ('rogain', [31, 31, 33, 31, 33], 15),
-        ('rogain', [11, 22, 33, 44], 10),
-        ('rogain', [11, 22, 33, 22, 44], 12),
-        ('fixed', [], 0),
-        ('fixed', [31, 31], 2),
-        ('fixed', [31, 32, 33, 34], 4),
-        ('fixed', [31, 31, 33, 31, 33], 5),
-        ('fixed', [11, 22, 33, 44], 4),
-        ('fixed', [11, 22, 33, 22, 44], 5),
+        ("rogain", [], 0),
+        ("rogain", [31, 31], 6),
+        ("rogain", [31, 32, 33, 34], 12),
+        ("rogain", [31, 31, 33, 31, 33], 15),
+        ("rogain", [11, 22, 33, 44], 10),
+        ("rogain", [11, 22, 33, 22, 44], 12),
+        ("fixed", [], 0),
+        ("fixed", [31, 31], 2),
+        ("fixed", [31, 32, 33, 34], 4),
+        ("fixed", [31, 31, 33, 31, 33], 5),
+        ("fixed", [11, 22, 33, 44], 4),
+        ("fixed", [11, 22, 33, 22, 44], 5),
     ],
 )
 def test_calculate_score_allow_duplicates(score_mode, controls, expected):
     create_race()
-    race().set_setting('result_processing_score_mode', score_mode)
-    race().set_setting('result_processing_fixed_score_value', 1)
+    race().set_setting("result_processing_score_mode", score_mode)
+    race().set_setting("result_processing_fixed_score_value", 1)
     res = make_result(controls)
     assert ResultChecker.calculate_rogaine_score(res, allow_duplicates=True) == expected
 
@@ -500,16 +500,16 @@ def test_non_obvious_behavior():
     assert ok(course, splits=[41])
 
     result = make_result([31])
-    assert result.check(make_course(course)) == False
-    assert result.splits[0].is_correct == False
+    assert not result.check(make_course(course))
+    assert not result.splits[0].is_correct
     assert (
-        result.splits[0].has_penalty == True
+        result.splits[0].has_penalty
     )  # Должно быть False так как 31 «правильный» КП
 
     result = make_result([41])
-    assert result.check(make_course(course)) == True
-    assert result.splits[0].is_correct == True
-    assert result.splits[0].has_penalty == True
+    assert result.check(make_course(course))
+    assert result.splits[0].is_correct
+    assert result.splits[0].has_penalty
 
 
 def ok(course: List[Union[int, str]], splits: List[int]) -> bool:
@@ -653,7 +653,7 @@ def exception_message(
     message = 'Check failed'
     message += '\n' + split_and_course_repr(course, splits)
     if check_result_expected != check_result_received:
-        message += '\n' + f'Result status failed!'
+        message += '\n' + 'Result status failed!'
         message += '\n' + f'Expected: {check_result_expected}'
         message += '\n' + f'Received: {check_result_received}'
     return message

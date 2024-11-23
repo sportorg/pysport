@@ -79,20 +79,20 @@ class Header:
     ```
     """
 
-    header_struck = '=2s2H36sLQ'
+    header_struck = "=2s2H36sLQ"
     header_size = struct.calcsize(header_struck)
 
     def __init__(self, obj_data=None, op_type=Operations.Update.name):
-        self.pack_tag = b'SO'
+        self.pack_tag = b"SO"
         if obj_data:
             try:
-                obj_type = obj_data['object']
+                obj_type = obj_data["object"]
                 # obj_ver = obj_data['version']
-                obj_uuid = obj_data['id']
+                obj_uuid = obj_data["id"]
             except AttributeError:
                 raise ValueError
             logging.debug(
-                'Header Init: obj_type: {}, op_type: {}, uuid: {}'.format(
+                "Header Init: obj_type: {}, op_type: {}, uuid: {}".format(
                     obj_type, op_type, obj_uuid
                 )
             )
@@ -104,7 +104,7 @@ class Header:
         else:
             self.op_type = Operations[op_type].value
             self.obj_type = 0
-            self.uuid = ''
+            self.uuid = ""
             self.version = 0  # int(obj_ver)
             self.size = 0
 
@@ -120,9 +120,9 @@ class Header:
 
     def prepare_header(self, obj_data, op_type):
         try:
-            obj_type = obj_data['object']
+            obj_type = obj_data["object"]
             # obj_ver = obj_data['version']
-            obj_uuid = obj_data['id']
+            obj_uuid = obj_data["id"]
         except AttributeError:
             return False
         self.op_type = Operations[op_type].value
@@ -144,7 +144,7 @@ class Header:
             self.pack_tag,
             self.op_type,
             self.obj_type,
-            bytes(self.uuid, 'ascii'),
+            bytes(self.uuid, "ascii"),
             self.version,
             self.size,
         )

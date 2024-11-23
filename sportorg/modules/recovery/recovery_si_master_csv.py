@@ -32,17 +32,17 @@ POS_COUNT = 44
 
 
 def recovery(file_name: str, race: Race) -> None:
-    separator = ';'
+    separator = ";"
 
-    zero_time_val = race.get_setting('system_zero_time', (8, 0, 0))
+    zero_time_val = race.get_setting("system_zero_time", (8, 0, 0))
     zero_time = OTime(
         hour=zero_time_val[0], minute=zero_time_val[1], sec=zero_time_val[2]
     )
 
-    with open(file_name, encoding='cp1251') as csv_file:
+    with open(file_name, encoding="cp1251") as csv_file:
         spam_reader = csv.reader(csv_file, delimiter=separator)
         for tokens in spam_reader:
-            if tokens[0] == 'No' or len(tokens) < 45:
+            if tokens[0] == "No" or len(tokens) < 45:
                 continue
 
             res = ResultSportident()

@@ -8,21 +8,21 @@ from sportorg.gui.global_access import GlobalAccess
 
 
 class ConfigFile:
-    GEOMETRY = 'geometry'
-    CONFIGURATION = 'configuration'
-    LOCALE = 'locale'
-    DIRECTORY = 'directory'
-    PATH = 'path'
-    SOUND = 'sound'
-    PRINTER = 'printer'
-    RANKING = 'ranking'
-    TEMPLATES = 'templates'
+    GEOMETRY = "geometry"
+    CONFIGURATION = "configuration"
+    LOCALE = "locale"
+    DIRECTORY = "directory"
+    PATH = "path"
+    SOUND = "sound"
+    PRINTER = "printer"
+    RANKING = "ranking"
+    TEMPLATES = "templates"
 
 
 class Parser:
     @staticmethod
     def is_bool(val):
-        return val in ['True', 'False', '0', '1', True, False, 0, 1, 'true', 'false']
+        return val in ["True", "False", "0", "1", True, False, 0, 1, "true", "false"]
 
     @staticmethod
     def is_int(s):
@@ -61,7 +61,7 @@ class Configurations:
 
     def set_parse(self, option, param):
         if Parser.is_bool(param):
-            param = param in ['True', '1', True, 1, 'true']
+            param = param in ["True", "1", True, 1, "true"]
         elif Parser.is_int(param):
             param = int(param)
         elif Parser.is_float(param):
@@ -75,55 +75,55 @@ class Config(metaclass=Singleton):
         self._configurations = {
             ConfigFile.CONFIGURATION: Configurations(
                 {
-                    'current_locale': 'ru_RU',
-                    'show_toolbar': True,
-                    'autoconnect': False,
-                    'open_recent_file': False,
-                    'use_birthday': False,
-                    'check_updates': True,
-                    'autosave_interval': 0,
-                    'logging_level': 'INFO',
-                    'log_window_row_count': 1000,
+                    "current_locale": "ru_RU",
+                    "show_toolbar": True,
+                    "autoconnect": False,
+                    "open_recent_file": False,
+                    "use_birthday": False,
+                    "check_updates": True,
+                    "autosave_interval": 0,
+                    "logging_level": "INFO",
+                    "log_window_row_count": 1000,
                 }
             ),
             ConfigFile.SOUND: Configurations(
                 {
-                    'enabled': False,
-                    'successful': '',
-                    'unsuccessful': '',
+                    "enabled": False,
+                    "successful": "",
+                    "unsuccessful": "",
                 }
             ),
             ConfigFile.PRINTER: Configurations(
                 {
-                    'main': '',
-                    'split': '',
+                    "main": "",
+                    "split": "",
                 }
             ),
             ConfigFile.RANKING: Configurations(
                 {
-                    'not_qualified': 0,
-                    'iii_y': 1,
-                    'ii_y': 2,
-                    'i_y': 3,
-                    'iii': 6,
-                    'ii': 25,
-                    'i': 50,
-                    'kms': 80,
-                    'ms': 100,
-                    'msmk': 100,
-                    'zms': 100,
-                    'start_limit': 10,
-                    'finish_limit': 6,
-                    'start_limit_relay': 6,
-                    'finish_limit_relay': 6,
-                    'sum_count': 10,
-                    'sum_count_relay': 10,
-                    'individual_ranking_method': 'best',  # 'best' or 'first'
-                    'relay_ranking_method': 'personal',  # 'personal', 'average', 'first'
+                    "not_qualified": 0,
+                    "iii_y": 1,
+                    "ii_y": 2,
+                    "i_y": 3,
+                    "iii": 6,
+                    "ii": 25,
+                    "i": 50,
+                    "kms": 80,
+                    "ms": 100,
+                    "msmk": 100,
+                    "zms": 100,
+                    "start_limit": 10,
+                    "finish_limit": 6,
+                    "start_limit_relay": 6,
+                    "finish_limit_relay": 6,
+                    "sum_count": 10,
+                    "sum_count_relay": 10,
+                    "individual_ranking_method": "best",  # 'best' or 'first'
+                    "relay_ranking_method": "personal",  # 'personal', 'average', 'first'
                 }
             ),
-            ConfigFile.GEOMETRY: Configurations({'x': 0, 'y': 0}),
-            ConfigFile.TEMPLATES: Configurations({'directory': ''}),
+            ConfigFile.GEOMETRY: Configurations({"x": 0, "y": 0}),
+            ConfigFile.TEMPLATES: Configurations({"directory": ""}),
         }
 
     @property
@@ -171,8 +171,8 @@ class Config(metaclass=Singleton):
                         )
 
             self.configuration.set(
-                'current_locale',
-                self.parser.get(ConfigFile.LOCALE, 'current', fallback='ru_RU'),
+                "current_locale",
+                self.parser.get(ConfigFile.LOCALE, "current", fallback="ru_RU"),
             )
         except Exception as e:
             logging.exception(e)
@@ -185,11 +185,11 @@ class Config(metaclass=Singleton):
             self.parser[config_name] = self._configurations[config_name].get_all()
 
         self.parser[ConfigFile.LOCALE] = {
-            'current': self.configuration.get('current_locale')
+            "current": self.configuration.get("current_locale")
         }
-        self.parser[ConfigFile.GEOMETRY]['main'] = bytes(
+        self.parser[ConfigFile.GEOMETRY]["main"] = bytes(
             GlobalAccess().get_main_window().saveGeometry().toHex()
         ).decode()
 
-        with open(sportorg_config.CONFIG_INI, 'w') as configfile:
+        with open(sportorg_config.CONFIG_INI, "w") as configfile:
             self.parser.write(configfile)

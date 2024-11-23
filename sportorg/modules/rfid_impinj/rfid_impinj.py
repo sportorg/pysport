@@ -39,7 +39,7 @@ class ImpinjThread(QThread):
         self._debug = debug
 
         self.timeout_list = {}
-        self.timeout = race().get_setting('readout_duplicate_timeout', 15000)
+        self.timeout = race().get_setting("readout_duplicate_timeout", 15000)
 
     def run(self):
         if not ImpinjR2KReader or not ImpinjR2KFastSwitchInventory:
@@ -64,7 +64,7 @@ class ImpinjThread(QThread):
         while True:
             if not main_thread().is_alive() or self._stop_event.is_set():
                 impinj_reader.worker_close()
-                self._logger.debug('Stop Impinj reader')
+                self._logger.debug("Stop Impinj reader")
                 return
 
             try:
@@ -87,24 +87,24 @@ class ImpinjThread(QThread):
                 continue
 
             try:
-                self._logger.debug('Impinj RFID data: {}'.format(data))
+                self._logger.debug("Impinj RFID data: {}".format(data))
                 card_data = data
-                card_data['time'] = OTime.now()
+                card_data["time"] = OTime.now()
 
                 # don't create new result if we already have fresh result for this tag (timeout, default 15s)
-                card_id = data['epc']
-                card_time = card_data['time']
+                card_id = data["epc"]
+                card_time = card_data["time"]
                 if card_id in self.timeout_list:
                     old_time = self.timeout_list[card_id]
                     if card_time - old_time < OTime(msec=self.timeout):
                         self._logger.debug(
-                            'Duplicated result for tag {}, ignoring'.format(card_id)
+                            "Duplicated result for tag {}, ignoring".format(card_id)
                         )
                         continue
 
                 self.timeout_list[card_id] = card_time
 
-                self._queue.put(ImpinjCommand('card_data', card_data), timeout=1)
+                self._queue.put(ImpinjCommand("card_data", card_data), timeout=1)
 
             except serial.serialutil.SerialException as e:
                 self._logger.error(str(e))
@@ -115,20 +115,20 @@ class ImpinjThread(QThread):
     def run_test(self):
         while True:
             if not main_thread().is_alive() or self._stop_event.is_set():
-                self._logger.debug('Stop Impinj reader')
+                self._logger.debug("Stop Impinj reader")
                 return
             try:
                 sleep(1)
                 card_data = {}
-                card_data['time'] = OTime.now()
+                card_data["time"] = OTime.now()
                 epc_list = [
-                    '00 00 00 01',
-                    '00 00 00 14',
-                    '00 00 00 0E',
-                    'BFACACACACACACACACA',
+                    "00 00 00 01",
+                    "00 00 00 14",
+                    "00 00 00 0E",
+                    "BFACACACACACACACACA",
                 ]
-                card_data['epc'] = epc_list[randint(0, 3)]
-                self._queue.put(ImpinjCommand('card_data', card_data), timeout=1)
+                card_data["epc"] = epc_list[randint(0, 3)]
+                self._queue.put(ImpinjCommand("card_data", card_data), timeout=1)
 
             except Exception as e:
                 self._logger.error(str(e))
@@ -169,7 +169,7 @@ class ResultThread(QThread):
                 #     self.data_sender.emit(result)
 
                 cmd = self._queue.get(timeout=5)
-                if cmd.command == 'card_data':
+                if cmd.command == "card_data":
                     result = self._get_result(cmd.data)
                     self.data_sender.emit(result)
 
@@ -178,7 +178,7 @@ class ResultThread(QThread):
                     break
             except Exception as e:
                 self._logger.exception(e)
-        self._logger.debug('Stop adder result')
+        self._logger.debug("Stop adder result")
 
     @staticmethod
     def _get_result(card_data):
@@ -186,7 +186,7 @@ class ResultThread(QThread):
 
         limit = 10**8
         hex_offset = 5000000
-        epc = str(card_data['epc']).replace(' ', '')
+        epc = str(card_data["epc"]).replace(" ", "")
 
         # if epc contains only digits, use it directly
         # otherwise convert hex -> dec + add offset
@@ -197,7 +197,7 @@ class ResultThread(QThread):
         else:
             result.card_number = (int(epc, 16) + hex_offset) % limit
 
-        result.finish_time = card_data['time']
+        result.finish_time = card_data["time"]
         return result
 
 
@@ -267,4 +267,4 @@ class ImpinjClient:
         self.start()
 
     def choose_port(self):
-        return memory.race().get_setting('system_port', None)
+        return memory.race().get_setting("system_port", None)

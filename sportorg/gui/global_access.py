@@ -21,7 +21,7 @@ class GlobalAccess:
 @singleton
 class NumberClicker:
     def __init__(self):
-        self.key = ''
+        self.key = ""
         self.time = time.time()
 
     def click(self, number):

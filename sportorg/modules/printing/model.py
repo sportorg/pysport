@@ -21,22 +21,22 @@ class NoPrinterSelectedException(Exception):
 def split_printout(results):
     isDirectMode = False
 
-    printer = Config().printer.get('split')
+    printer = Config().printer.get("split")
     obj = race()
     template_path = obj.get_setting(
-        'split_template', template_dir('split', '1_split_printout.html')
+        "split_template", template_dir("split", "1_split_printout.html")
     )
 
     # don't process results in one group several times while bulk printing, track processed groups
     processed_groups = []
 
-    if not str(template_path).endswith('.html') and platform.system() == 'Windows':
+    if not str(template_path).endswith(".html") and platform.system() == "Windows":
         # Internal split printout, pure python. Works faster, than jinja2 template + pdf
         isDirectMode = True
 
         size = 60  # base scale factor is 60, used win32con.MM_TWIPS MapMode (unit = 1/20 of dot, 72dpi)
 
-        array = str(template_path).split(translate('scale') + '=')
+        array = str(template_path).split(translate("scale") + "=")
         if len(array) > 1:
             scale = array[1]
             if scale.isdecimal():
@@ -45,8 +45,8 @@ def split_printout(results):
         pr = SportorgPrinter(
             printer,
             size,
-            int(obj.get_setting('print_margin_left', 5.0)),
-            int(obj.get_setting('print_margin_top', 5.0)),
+            int(obj.get_setting("print_margin_left", 5.0)),
+            int(obj.get_setting("print_margin_top", 5.0)),
         )
 
     for result in results:
@@ -83,14 +83,14 @@ def split_printout(results):
                     items=s.to_dict(),
                 )
                 if not printer:
-                    raise NoPrinterSelectedException('No printer selected')
+                    raise NoPrinterSelectedException("No printer selected")
                 print_html(
                     printer,
                     template,
-                    obj.get_setting('print_margin_left', 5.0),
-                    obj.get_setting('print_margin_top', 5.0),
-                    obj.get_setting('print_margin_right', 5.0),
-                    obj.get_setting('print_margin_bottom', 5.0),
+                    obj.get_setting("print_margin_left", 5.0),
+                    obj.get_setting("print_margin_top", 5.0),
+                    obj.get_setting("print_margin_right", 5.0),
+                    obj.get_setting("print_margin_bottom", 5.0),
                 )
         else:
             # no group or course - just print all splits
@@ -101,4 +101,4 @@ def split_printout(results):
 
 
 def split_printout_close():
-    print_html('NO_PRINTER', 'CLOSE_SPLIT_PRN')
+    print_html("NO_PRINTER", "CLOSE_SPLIT_PRN")

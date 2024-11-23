@@ -16,7 +16,7 @@ class AboutDialog(QDialog):
         return super().exec_()
 
     def init_ui(self):
-        self.setWindowTitle(translate('About'))
+        self.setWindowTitle(translate("About"))
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(True)
@@ -24,9 +24,9 @@ class AboutDialog(QDialog):
         self.setMaximumWidth(640)
         self.layout = QFormLayout(self)
 
-        title_font = QFont('Times', 24)
+        title_font = QFont("Times", 24)
         title_text = QLabel()
-        title_text.setText('{} {}'.format(config.NAME, config.VERSION))
+        title_text.setText("{} {}".format(config.NAME, config.VERSION))
         title_text.setFont(title_font)
         title_icon = QLabel()
         title_icon.setPixmap(QPixmap(config.ICON).scaled(75, 75))
@@ -34,13 +34,13 @@ class AboutDialog(QDialog):
 
         contributors_text = QLabel()
         contributors_text.setText(
-            '\n{}:\n{}'.format(
-                translate('Contributors'),
+            "\n{}:\n{}".format(
+                translate("Contributors"),
                 (
-                    '\t- Danil Akhtarov,\n'
-                    '\t- Sergei Kobelev,\n'
-                    '\t- Semyon Yakimov,\n'
-                    '\t- Konstantin Bats.'
+                    "\t- Danil Akhtarov,\n"
+                    "\t- Sergei Kobelev,\n"
+                    "\t- Semyon Yakimov,\n"
+                    "\t- Konstantin Bats."
                 ),
             )
         )
@@ -49,7 +49,7 @@ class AboutDialog(QDialog):
         home_page_text = QLabel()
         home_page_text.setText(
             '\n{0}: <a href="{1}">{1}</a>'.format(
-                translate('Home page'), 'https://sportorg.github.io/pysport/'
+                translate("Home page"), "https://sportorg.github.io/pysport/"
             )
         )
         home_page_text.setOpenExternalLinks(True)
@@ -57,12 +57,12 @@ class AboutDialog(QDialog):
         self.layout.addRow(home_page_text)
 
         licence_title = QLabel()
-        licence_title.setText('\nGPL v3 License')
+        licence_title.setText("\nGPL v3 License")
         licence_title.setAlignment(Qt.AlignCenter)
         self.layout.addRow(licence_title)
 
         licence_text = QTextEdit()
-        licence_text.setStyleSheet('QScrollBar:vertical {background: #bfbfbf}')
+        licence_text.setStyleSheet("QScrollBar:vertical {background: #bfbfbf}")
         licence_text.setMinimumHeight(220)
         licence_text.setMaximumHeight(220)
         licence_text.setReadOnly(True)

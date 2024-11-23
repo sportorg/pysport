@@ -36,15 +36,15 @@ class PrintProcess(Process):
         try:
             sys.stdout = FakeStd()
             sys.stderr = FakeStd()
-            logging.debug('print_html: RUN')
+            logging.debug("print_html: RUN")
             app = QApplication.instance()
             if app is None:
-                app = QApplication(['--platform', 'minimal'])
+                app = QApplication(["--platform", "minimal"])
                 # we need this call to correctly render images...
             app.processEvents()
 
             logging.debug(
-                'print_html: App instance is ready done: {}'.format(
+                "print_html: App instance is ready done: {}".format(
                     time.process_time() - t
                 )
             )
@@ -54,7 +54,7 @@ class PrintProcess(Process):
                 printer.setPrinterName(self.printer_name)
 
             logging.debug(
-                'print_html: got Printer done: {}'.format(time.process_time() - t)
+                "print_html: got Printer done: {}".format(time.process_time() - t)
             )
 
             # printer.setResolution(96)
@@ -81,23 +81,23 @@ class PrintProcess(Process):
             while True:
                 t = time.process_time()
                 html = self.queue.get()
-                if html == 'CLOSE_SPLIT_PRN':
+                if html == "CLOSE_SPLIT_PRN":
                     app.quit()
                     logging.debug(
-                        'print_html: printing thread termination: {}'.format(
+                        "print_html: printing thread termination: {}".format(
                             time.process_time() - t
                         )
                     )
                     break
 
                 logging.debug(
-                    'print_html: New task received: {}'.format(time.process_time() - t)
+                    "print_html: New task received: {}".format(time.process_time() - t)
                 )
 
                 text_document.setHtml(html)
 
                 logging.debug(
-                    'print_html: text_document setHtml: {}'.format(
+                    "print_html: text_document setHtml: {}".format(
                         time.process_time() - t
                     )
                 )
@@ -108,7 +108,7 @@ class PrintProcess(Process):
                 time.sleep(0.25)
 
                 logging.debug(
-                    'print_html: text_document printing done: {}'.format(
+                    "print_html: text_document printing done: {}".format(
                         time.process_time() - t
                     )
                 )
@@ -119,18 +119,18 @@ class PrintProcess(Process):
 def print_html(
     printer_name, html, left=5.0, top=5.0, right=5.0, bottom=5.0, scale=100.0
 ):
-    logging.info('print_html: Starting printing process')
+    logging.info("print_html: Starting printing process")
     thread = GlobalAccess().get_main_window().get_split_printer_thread()
     queue = GlobalAccess().get_main_window().get_split_printer_queue()
     if not queue:
         queue = Queue()
         GlobalAccess().get_main_window().set_split_printer_queue(queue)
-        logging.info('print_html:  Queue created')
+        logging.info("print_html:  Queue created")
     if not thread:
         thread = PrintProcess(queue, printer_name, html, left, top, right, bottom)
         thread.start()
         GlobalAccess().get_main_window().set_split_printer_thread(thread)
-        logging.info('print_html:  Process initialized and started')
+        logging.info("print_html:  Process initialized and started")
 
     queue.put(html)
-    logging.info('print_html: Task has been put to queue')
+    logging.info("print_html: Task has been put to queue")

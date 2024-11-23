@@ -36,7 +36,7 @@ class ReserveManager:
             if count > 0:
                 for current_person in persons:
                     str_name = (
-                        '' + str(current_person.surname) + str(current_person.name)
+                        "" + str(current_person.surname) + str(current_person.name)
                     )
                     if str.find(str_name, reserve_prefix) > -1:
                         existing_reserves += 1
@@ -71,18 +71,18 @@ class DrawManager:
         for i in range(len(persons)):
             current_person = persons[i]
             index = i
-            group = ''
+            group = ""
             if current_person.group:
                 group = current_person.group.name
             start_group = current_person.start_group
-            team = ''
-            region = ''
+            team = ""
+            region = ""
             if current_person.organization:
                 team = current_person.organization.name
                 region = current_person.organization.region
 
             self.person_array.append(
-                [index, group, '{:03}'.format(start_group), team, region]
+                [index, group, "{:03}".format(start_group), team, region]
             )
 
     def get_tossed_array(self, persons):
@@ -217,10 +217,10 @@ class DrawManager:
                         # 2 sets are fixed or incorrect, cannot solve conflict
                         # e.g. A,B,A and A,D,A,C,A
                         logging.info(
-                            f'conflict on start group boundaries cannot be solved!'
-                            f' group: {persons_sub_lists[i][0].group.name},'
-                            f' start groups: {persons_sub_lists[i][0].start_group},'
-                            f' {persons_sub_lists[i+1][0].start_group}'
+                            f"conflict on start group boundaries cannot be solved!"
+                            f" group: {persons_sub_lists[i][0].group.name},"
+                            f" start groups: {persons_sub_lists[i][0].start_group},"
+                            f" {persons_sub_lists[i+1][0].start_group}"
                         )
                         break
 
@@ -360,11 +360,11 @@ class DrawManager:
         if i in fixed_list:
             # cannot solve - 2 fixed sets connected with semi-fixed sets
             logging.info(
-                f'conflict on start group boundaries cannot be solved!'
-                f'2 fixed sets connected with semi-fixed sets'
-                f' group: {persons_sub_lists[i][0].group.name},'
-                f' start groups: {persons_sub_lists[i][0].start_group},'
-                f' {persons_sub_lists[i + 1][0].start_group}'
+                f"conflict on start group boundaries cannot be solved!"
+                f"2 fixed sets connected with semi-fixed sets"
+                f" group: {persons_sub_lists[i][0].group.name},"
+                f" start groups: {persons_sub_lists[i][0].start_group},"
+                f" {persons_sub_lists[i + 1][0].start_group}"
             )
             return False
 
@@ -402,8 +402,8 @@ class DrawManager:
                 person = persons.pop(-1)
                 persons.insert(i + 1, person)
                 logging.info(
-                    f'Conflict at start group boundaries solving in group: {person.group.name}, '
-                    f'moving {person.full_name} to position {i+2}'
+                    f"Conflict at start group boundaries solving in group: {person.group.name}, "
+                    f"moving {person.full_name} to position {i+2}"
                 )
                 return True
 
@@ -414,7 +414,7 @@ class DrawManager:
             return False
 
         # cannot change last element
-        logging.debug(f'Cannot change last element, send file to developers!')
+        logging.debug("Cannot change last element, send file to developers!")
         return False
 
     def change_first(self, persons, split_teams, split_regions):
@@ -435,7 +435,7 @@ class DrawManager:
             separated_dict[prop].append(cur_person)
 
         rest_count = len(persons)
-        max_name, max_count, max_index = self.get_max_group_size(separated_dict, '')
+        max_name, max_count, max_index = self.get_max_group_size(separated_dict, "")
         duplicated_array: List[Person] = []
 
         # limit = (N+1)//2 (e.g. 5 for 10 and 6 for 11)
@@ -492,14 +492,14 @@ class DrawManager:
 
     def get_split_property(self, person, split_teams, split_regions) -> str:
         if person.organization is None:
-            return 's'
+            return "s"
 
         if split_regions:
             return person.organization.region
         elif split_teams:
             return person.organization.name
         else:
-            return 's'
+            return "s"
 
     def get_max_group_size(self, separated_dict: dict, ignore_name):
         max_count = 0
@@ -525,9 +525,9 @@ class StartNumberManager:
         self.race = r
 
     def process(
-        self, mode='interval', first_number=None, interval=None, mix_groups=False
+        self, mode="interval", first_number=None, interval=None, mix_groups=False
     ):
-        if mode == 'interval':
+        if mode == "interval":
             cur_num = first_number
             for cur_corridor in get_corridors():
                 cur_num = self.process_corridor_by_order(
@@ -537,9 +537,9 @@ class StartNumberManager:
             first_number = 1
             cur_num = first_number
             for cur_corridor in get_corridors():
-                if mode == 'corridor_minute':
+                if mode == "corridor_minute":
                     cur_num = self.process_corridor_by_minute(cur_corridor, cur_num)
-                elif mode == 'corridor_order':
+                elif mode == "corridor_order":
                     cur_num = self.process_corridor_by_order(cur_corridor, cur_num)
                 cur_num = cur_num - (cur_num % 100) + 101
 
@@ -692,9 +692,9 @@ def guess_courses_for_groups():
                 if str(course_name).find(group_name) > -1:
                     cur_group.course = cur_course
                     logging.debug(
-                        'Connecting: group '
+                        "Connecting: group "
                         + group_name
-                        + ' with course '
+                        + " with course "
                         + course_name
                     )
                     break
@@ -726,18 +726,18 @@ def change_start_time(if_add, time_offset):
 def handicap_start_time():
     obj = race()
     handicap_start = OTime(
-        msec=obj.get_setting('handicap_start', OTime(hour=11).to_msec())
+        msec=obj.get_setting("handicap_start", OTime(hour=11).to_msec())
     )
     handicap_max_gap = OTime(
-        msec=obj.get_setting('handicap_max_gap', OTime(minute=30).to_msec())
+        msec=obj.get_setting("handicap_max_gap", OTime(minute=30).to_msec())
     )
     handicap_second_start = OTime(
         msec=obj.get_setting(
-            'handicap_second_start', OTime(hour=11, minute=30).to_msec()
+            "handicap_second_start", OTime(hour=11, minute=30).to_msec()
         )
     )
     handicap_interval = OTime(
-        msec=obj.get_setting('handicap_interval', OTime(minute=30).to_msec())
+        msec=obj.get_setting("handicap_interval", OTime(minute=30).to_msec())
     )
 
     rc = ResultCalculation(obj)
@@ -773,13 +773,13 @@ def handicap_start_time():
 def reverse_start_time():
     obj = race()
     handicap_start = OTime(
-        msec=obj.get_setting('handicap_start', OTime(hour=11).to_msec())
+        msec=obj.get_setting("handicap_start", OTime(hour=11).to_msec())
     )
     handicap_interval = OTime(
-        msec=obj.get_setting('handicap_interval', OTime(minute=30).to_msec())
+        msec=obj.get_setting("handicap_interval", OTime(minute=30).to_msec())
     )
     handicap_dsq_offset = OTime(
-        msec=obj.get_setting('handicap_dsq_offset', OTime(minute=10).to_msec())
+        msec=obj.get_setting("handicap_dsq_offset", OTime(minute=10).to_msec())
     )
 
     rc = ResultCalculation(obj)

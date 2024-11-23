@@ -41,7 +41,7 @@ class Widget(QtWidgets.QWidget):
             print(str(e))
 
     def setup_ui(self):
-        self.person_table.setObjectName('PersonTable')
+        self.person_table.setObjectName("PersonTable")
         self.person_table.setModel(PersonMemoryModel())
 
         def entry_double_clicked(index):

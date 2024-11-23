@@ -10,7 +10,7 @@ def import_txt_v8(source):
     try:
         classes_v8 = ocad.parse_txt_v8(source)
         for course in classes_v8.courses:
-            if course.bib and course.bib != '0':
+            if course.bib and course.bib != "0":
                 name = course.bib
             elif course.group:
                 name = course.group

@@ -24,15 +24,15 @@ class ResultSportidentGeneration:
         self._result = result
         self._person = None
         self.assign_chip_reading = race().get_setting(
-            'system_assign_chip_reading', 'off'
+            "system_assign_chip_reading", "off"
         )
         self.duplicate_chip_processing = race().get_setting(
-            'system_duplicate_chip_processing', 'several_results'
+            "system_duplicate_chip_processing", "several_results"
         )
-        self.card_read_repeated = self.duplicate_chip_processing == 'bib_request'
-        self.missed_finish = race().get_setting('system_missed_finish', 'zero')
+        self.card_read_repeated = self.duplicate_chip_processing == "bib_request"
+        self.missed_finish = race().get_setting("system_missed_finish", "zero")
         self.finish_source = FinishSource[
-            race().get_setting('system_finish_source', 'station')
+            race().get_setting("system_finish_source", "station")
         ]
         self._process_missed_finish()
 
@@ -50,7 +50,7 @@ class ResultSportidentGeneration:
                     if len(self._result.splits) > 0:
                         last_cp_time = self._result.splits[-1].time
                         penalty_time = OTime(
-                            msec=race().get_setting('marked_route_penalty_time', 60000)
+                            msec=race().get_setting("marked_route_penalty_time", 60000)
                         )
                         self._result.finish_time = last_cp_time + penalty_time
                     else:
@@ -105,11 +105,11 @@ class ResultSportidentGeneration:
 
     def _bib_dialog(self):
         try:
-            bib_dialog = BibDialog('{}'.format(self._result.card_number))
+            bib_dialog = BibDialog("{}".format(self._result.card_number))
             bib_dialog.exec_()
             self._person = bib_dialog.get_person()
             if not self._person:
-                self.assign_chip_reading = 'off'
+                self.assign_chip_reading = "off"
                 self.card_read_repeated = False
         except Exception as e:
             logging.error(str(e))
@@ -127,7 +127,7 @@ class ResultSportidentGeneration:
                         self._person = next_leg
                         self._result.person = next_leg
                         logging.info(
-                            'Relay: Card {} assigned to bib {}'.format(
+                            "Relay: Card {} assigned to bib {}".format(
                                 self._result.card_number, bib
                             )
                         )
@@ -137,7 +137,7 @@ class ResultSportidentGeneration:
                     break
 
         if not self._person:
-            self.assign_chip_reading = 'off'
+            self.assign_chip_reading = "off"
             self.card_read_repeated = False
 
     def _merge_punches(self):
@@ -163,23 +163,23 @@ class ResultSportidentGeneration:
 
     def add_result(self):
         if self._has_result():
-            logging.info('Result already exist')
+            logging.info("Result already exist")
             # Comment next line to allow duplicates during readout
             return False
 
-        if self.assign_chip_reading == 'autocreate':
+        if self.assign_chip_reading == "autocreate":
             # generate new person
             self._create_person()
-        elif self.assign_chip_reading == 'always':
+        elif self.assign_chip_reading == "always":
             self._bib_dialog()
         elif self._has_sportident_card():
-            if self.duplicate_chip_processing == 'bib_request':
+            if self.duplicate_chip_processing == "bib_request":
                 self._bib_dialog()
             elif (
-                self.duplicate_chip_processing == 'relay_find_leg' and race().is_relay()
+                self.duplicate_chip_processing == "relay_find_leg" and race().is_relay()
             ):
                 self._relay_find_leg()  # assign chip to the next unfinished leg of a relay team
-            elif self.duplicate_chip_processing == 'merge':
+            elif self.duplicate_chip_processing == "merge":
                 return self._merge_punches()
 
         self._add_result()
@@ -189,9 +189,9 @@ class ResultSportidentGeneration:
         return self._result
 
     def _no_person(self):
-        if self.assign_chip_reading == 'off':
+        if self.assign_chip_reading == "off":
             self._add_result_to_race()
-        elif self.assign_chip_reading == 'only_unknown_members':
+        elif self.assign_chip_reading == "only_unknown_members":
             self._bib_dialog()
             self._add_result()
 
@@ -206,7 +206,7 @@ class ResultSportidentGeneration:
             self._add_result_to_race()
 
             logging.info(
-                '{} {}'.format(self._result.system_type, self._result.card_number)
+                "{} {}".format(self._result.system_type, self._result.card_number)
             )
         else:
             if self._find_person_by_result():
@@ -227,7 +227,7 @@ class ResultSportidentGeneration:
             new_person = new_person_copy
             new_person.set_card_number(0)
         else:
-            new_person.surname = translate('Competitor') + ' #' + str(new_person.bib)
+            new_person.surname = translate("Competitor") + " #" + str(new_person.bib)
 
         new_person.group = self._find_group_by_punches()
         self._result.person = new_person

@@ -36,7 +36,7 @@ from sportorg.utils.time import hhmmss_to_time
 
 
 def recovery(file_name: str, race: Race) -> None:
-    zero_time_val = race.get_setting('system_zero_time', (8, 0, 0))
+    zero_time_val = race.get_setting("system_zero_time", (8, 0, 0))
     zero_time = OTime(
         hour=zero_time_val[0], minute=zero_time_val[1], sec=zero_time_val[2]
     )
@@ -61,18 +61,18 @@ def recovery(file_name: str, race: Race) -> None:
             elif read_finish:
                 cur_res.finish_time = hhmmss_to_time(line)
                 read_finish = False
-            elif line == 'end':
+            elif line == "end":
                 fix_time(cur_res, zero_time)
                 race.results.append(cur_res)
                 cur_res = ResultSportident()
-            elif line == 'start':
+            elif line == "start":
                 read_num = True
-            elif line == 'split_start':
+            elif line == "split_start":
                 read_spl = True
-            elif line == 'split_end':
+            elif line == "split_end":
                 read_spl = False
             elif read_spl:
                 spl = Split()
-                spl.code = line.split(' ')[0]
-                spl.time = hhmmss_to_time(line.split(' ')[1])
+                spl.code = line.split(" ")[0]
+                spl.time = hhmmss_to_time(line.split(" ")[1])
                 cur_res.splits.append(spl)

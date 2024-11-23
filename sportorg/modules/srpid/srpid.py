@@ -42,10 +42,10 @@ class SrpidThread(QThread):
                     time.sleep(0.5)
                     if not main_thread().is_alive() or self._stop_event.is_set():
                         srpid.disconnect()
-                        self._logger.debug('Stop srpid reader')
+                        self._logger.debug("Stop srpid reader")
                         return
                 card_data = srpid.chip_data
-                self._queue.put(SrpidCommand('card_data', card_data), timeout=1)
+                self._queue.put(SrpidCommand("card_data", card_data), timeout=1)
                 srpid.beep_ok()
             except SRPidException as e:
                 self._logger.exception(e)
@@ -71,7 +71,7 @@ class ResultThread(QThread):
         while True:
             try:
                 cmd = self._queue.get(timeout=5)
-                if cmd.command == 'card_data':
+                if cmd.command == "card_data":
                     result = self._get_result(cmd.data)
                     self.data_sender.emit(result)
                     backup.backup_data(convert_data(cmd.data))
@@ -81,15 +81,15 @@ class ResultThread(QThread):
             except Exception as e:
                 self._logger.exception(e)
                 raise e
-        self._logger.debug('Stop adder result')
+        self._logger.debug("Stop adder result")
 
     @staticmethod
     def _get_result(card_data):
         result = memory.race().new_result(memory.ResultSrpid)
-        result.card_number = int(card_data['ChipNum'])
+        result.card_number = int(card_data["ChipNum"])
 
-        for i in range(len(card_data['CP'])):
-            t = card_data['CP'][i][1]
+        for i in range(len(card_data["CP"])):
+            t = card_data["CP"][i][1]
             if t:
                 # !
                 # НОМЕРА СТАНЦИЙ SRPid
@@ -101,13 +101,13 @@ class ResultThread(QThread):
                 # !
 
                 split = memory.Split()
-                split.code = str(card_data['CP'][i][0])
+                split.code = str(card_data["CP"][i][0])
                 split.time = time_to_otime(t)
                 split.days = memory.race().get_days(t)
 
-                if split.code == '241':
+                if split.code == "241":
                     result.start_time = time_to_otime(t)
-                elif split.code == '242':
+                elif split.code == "242":
                     result.finish_time = time_to_otime(t)
                 else:
                     result.splits.append(split)
@@ -181,7 +181,7 @@ class SrpidClient:
         self.start()
 
     def choose_port(self):
-        return memory.race().get_setting('system_port', None)
+        return memory.race().get_setting("system_port", None)
 
 
 def convert_data(data):
@@ -189,12 +189,12 @@ def convert_data(data):
     # ChipNum -> card_number
     # CP -> punches
 
-    new_data = {'card_number': '0', 'punches': {}}
+    new_data = {"card_number": "0", "punches": {}}
     if not data:
         return new_data
 
-    if 'ChipNum' in data:
-        new_data['card_number'] = data['ChipNum']
-    if 'CP' in data:
-        new_data['punches'] = data['CP']
+    if "ChipNum" in data:
+        new_data["card_number"] = data["ChipNum"]
+    if "CP" in data:
+        new_data["punches"] = data["CP"]
     return new_data

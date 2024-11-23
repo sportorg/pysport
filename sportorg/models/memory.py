@@ -3,7 +3,7 @@ import logging
 import re
 import time
 import uuid
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from datetime import date
 from enum import Enum, IntEnum
 from typing import Any, Dict, List, Optional
@@ -50,7 +50,7 @@ class _TitleType(Enum):
         return self.__str__()
 
     def get_title(self):
-        return translate(str(self).lower().capitalize().replace('_', ' '))
+        return translate(str(self).lower().capitalize().replace("_", " "))
 
     @classmethod
     def get_titles(cls):
@@ -98,11 +98,11 @@ class ResultStatus(_TitleType):
 class Organization(Model):
     def __init__(self):
         self.id = uuid.uuid4()
-        self.name = ''
-        self.country = ''
-        self.region = ''
-        self.contact = ''
-        self.code = ''
+        self.name = ""
+        self.country = ""
+        self.region = ""
+        self.contact = ""
+        self.code = ""
         self.count_person = 0
         self.count_finished = 0
 
@@ -110,41 +110,41 @@ class Organization(Model):
         return self.name
 
     def __repr__(self) -> str:
-        return 'Organization {}'.format(self.name)
+        return "Organization {}".format(self.name)
 
     def to_dict(self) -> Dict[str, Any]:
         return {
-            'object': self.__class__.__name__,
-            'id': str(self.id),
-            'name': self.name,
-            'country': self.country,
-            'region': (
+            "object": self.__class__.__name__,
+            "id": str(self.id),
+            "name": self.name,
+            "country": self.country,
+            "region": (
                 self.region[3:]
-                if self.region and len(self.region) > 3 and self.region[2] == '_'
+                if self.region and len(self.region) > 3 and self.region[2] == "_"
                 else self.region
             ),
-            'contact': self.contact,
-            'code': self.code,
-            'count_person': self.count_person,  # readonly
-            'sex': 0,
+            "contact": self.contact,
+            "code": self.code,
+            "count_person": self.count_person,  # readonly
+            "sex": 0,
         }
 
     def update_data(self, data: Dict[str, Any]) -> None:
-        self.name = str(data['name']) if 'name' in data else ''
-        self.country = str(data['country']) if 'country' in data else ''
-        self.region = str(data['region']) if 'region' in data else ''
-        self.code = str(data['code']) if 'code' in data else ''
-        self.contact = str(data['contact']) if 'contact' in data else ''
+        self.name = str(data["name"]) if "name" in data else ""
+        self.country = str(data["country"]) if "country" in data else ""
+        self.region = str(data["region"]) if "region" in data else ""
+        self.code = str(data["code"]) if "code" in data else ""
+        self.contact = str(data["contact"]) if "contact" in data else ""
 
 
 class CourseControl(Model):
     def __init__(self):
-        self.code = ''
+        self.code = ""
         self.length = 0
         self.order = 0
 
     def __str__(self) -> str:
-        return '{} {}'.format(self.code, self.length)
+        return "{} {}".format(self.code, self.length)
 
     def __repr__(self) -> str:
         return self.__str__()
@@ -160,13 +160,13 @@ class CourseControl(Model):
         % -> 0
         """
         if not self.code:
-            return '0'
+            return "0"
 
         tmp = str(self.code)
         char = tmp[0]
-        if char == '*' or char == '%':
-            return '0'
-        res = ''
+        if char == "*" or char == "%":
+            return "0"
+        res = ""
 
         index = 0
         while char.isdigit() and index <= len(tmp) - 1:
@@ -178,22 +178,22 @@ class CourseControl(Model):
 
     def to_dict(self):
         return {
-            'object': self.__class__.__name__,
-            'code': self.code,
-            'length': self.length,
+            "object": self.__class__.__name__,
+            "code": self.code,
+            "length": self.length,
         }
 
     def update_data(self, data):
-        self.code = str(data['code'])
-        self.length = int(data['length'])
+        self.code = str(data["code"])
+        self.length = int(data["length"])
 
 
 class ControlPoint(Model):
     """Description of independent control point. Used for score calculation in rogain"""
 
     def __init__(self):
-        self.code = ''
-        self.description = ''
+        self.code = ""
+        self.description = ""
         self.score = 1.0
         self.x = 0.0
         self.y = 0.0
@@ -203,7 +203,7 @@ class ControlPoint(Model):
 class Course(Model):
     def __init__(self):
         self.id = uuid.uuid4()
-        self.name = ''
+        self.name = ""
         self.bib = 0
         self.length = 0
         self.climb = 0
@@ -217,7 +217,7 @@ class Course(Model):
         self.count_finished = 0
 
     def __repr__(self) -> str:
-        return 'Course {} {}'.format(self.name, repr(self.controls))
+        return "Course {} {}".format(self.name, repr(self.controls))
 
     def __eq__(self, other) -> bool:
         if len(self.controls) != len(other.controls):
@@ -230,7 +230,7 @@ class Course(Model):
 
     def is_unknown(self):
         for control in self.controls:
-            if '*' in control.code or '%' in control.code or '(' in control.code:
+            if "*" in control.code or "%" in control.code or "(" in control.code:
                 return True
 
         return False
@@ -244,24 +244,24 @@ class Course(Model):
     def to_dict(self):
         controls = [control.to_dict() for control in self.controls]
         return {
-            'object': self.__class__.__name__,
-            'id': str(self.id),
-            'controls': controls,
-            'bib': self.bib,
-            'name': self.name,
-            'length': self.length,
-            'climb': self.climb,
-            'corridor': self.corridor,
+            "object": self.__class__.__name__,
+            "id": str(self.id),
+            "controls": controls,
+            "bib": self.bib,
+            "name": self.name,
+            "length": self.length,
+            "climb": self.climb,
+            "corridor": self.corridor,
         }
 
     def update_data(self, data):
-        self.name = str(data['name'])
-        self.bib = int(data['bib'])
-        self.length = int(data['length'])
-        self.climb = int(data['climb'])
-        self.corridor = int(data['corridor'])
+        self.name = str(data["name"])
+        self.bib = int(data["bib"])
+        self.length = int(data["length"])
+        self.climb = int(data["climb"])
+        self.corridor = int(data["corridor"])
         self.controls = []
-        for item in data['controls']:
+        for item in data["controls"]:
             control = CourseControl()
             control.update_data(item)
             self.controls.append(control)
@@ -270,11 +270,11 @@ class Course(Model):
 class Group(Model):
     def __init__(self):
         self.id = uuid.uuid4()
-        self.name = ''
+        self.name = ""
         self.course: Optional[Course] = None
         self.is_any_course = False
         self.price = 0
-        self.long_name = ''
+        self.long_name = ""
 
         self.min_year = 0
         self.max_year = 0
@@ -298,7 +298,7 @@ class Group(Model):
         self.relay_legs = 0
 
     def __repr__(self) -> str:
-        return 'Group {}'.format(self.name)
+        return "Group {}".format(self.name)
 
     def get_count_finished(self):
         return self.count_finished
@@ -329,55 +329,55 @@ class Group(Model):
 
     def to_dict(self):
         return {
-            'object': self.__class__.__name__,
-            'id': str(self.id),
-            'name': self.name,
-            'course_id': str(self.course.id) if self.course else None,
-            'is_any_course': self.is_any_course,
-            'long_name': self.long_name,
-            'price': self.price,
-            'min_year': self.min_year,
-            'max_year': self.max_year,
-            'min_age': self.min_age,
-            'max_age': self.max_age,
-            'max_time': self.max_time.to_msec(),
-            'start_interval': self.start_interval.to_msec(),
-            'start_corridor': self.start_corridor,
-            'order_in_corridor': self.order_in_corridor,
-            'first_number': self.first_number,
-            'count_person': self.count_person,  # readonly
-            'count_finished': self.count_finished,  # readonly
-            'ranking': self.ranking.to_dict() if self.ranking else None,
-            '__type': self.__type.value if self.__type is not None else None,
-            'is_best_team_placing_mode': self.is_best_team_placing_mode,
-            'relay_legs': self.relay_legs,
-            'sex': 0,
+            "object": self.__class__.__name__,
+            "id": str(self.id),
+            "name": self.name,
+            "course_id": str(self.course.id) if self.course else None,
+            "is_any_course": self.is_any_course,
+            "long_name": self.long_name,
+            "price": self.price,
+            "min_year": self.min_year,
+            "max_year": self.max_year,
+            "min_age": self.min_age,
+            "max_age": self.max_age,
+            "max_time": self.max_time.to_msec(),
+            "start_interval": self.start_interval.to_msec(),
+            "start_corridor": self.start_corridor,
+            "order_in_corridor": self.order_in_corridor,
+            "first_number": self.first_number,
+            "count_person": self.count_person,  # readonly
+            "count_finished": self.count_finished,  # readonly
+            "ranking": self.ranking.to_dict() if self.ranking else None,
+            "__type": self.__type.value if self.__type is not None else None,
+            "is_best_team_placing_mode": self.is_best_team_placing_mode,
+            "relay_legs": self.relay_legs,
+            "sex": 0,
         }
 
     def update_data(self, data):
-        self.name = str(data['name'])
-        self.long_name = str(data['long_name'])
-        self.price = int(data['price'])
-        self.min_year = int(data['min_year'])
-        self.max_year = int(data['max_year'])
-        self.min_age = int(data['min_age'])
-        self.max_age = int(data['max_age'])
-        self.max_time = OTime(msec=int(data['max_time']))
-        self.start_interval = OTime(msec=int(data['start_interval']))
-        self.start_corridor = int(data['start_corridor'])
-        self.order_in_corridor = int(data['order_in_corridor'])
-        self.first_number = int(data['first_number'])
-        self.relay_legs = int(data['relay_legs'])
-        if 'ranking' in data:
-            if data['ranking']:
+        self.name = str(data["name"])
+        self.long_name = str(data["long_name"])
+        self.price = int(data["price"])
+        self.min_year = int(data["min_year"])
+        self.max_year = int(data["max_year"])
+        self.min_age = int(data["min_age"])
+        self.max_age = int(data["max_age"])
+        self.max_time = OTime(msec=int(data["max_time"]))
+        self.start_interval = OTime(msec=int(data["start_interval"]))
+        self.start_corridor = int(data["start_corridor"])
+        self.order_in_corridor = int(data["order_in_corridor"])
+        self.first_number = int(data["first_number"])
+        self.relay_legs = int(data["relay_legs"])
+        if "ranking" in data:
+            if data["ranking"]:
                 self.ranking = Ranking()
-                self.ranking.update_data(data['ranking'])
-        if 'is_any_course' in data:
-            self.is_any_course = bool(data['is_any_course'])
-        if data['__type'] is not None:
-            self.__type = RaceType(int(data['__type']))
+                self.ranking.update_data(data["ranking"])
+        if "is_any_course" in data:
+            self.is_any_course = bool(data["is_any_course"])
+        if data["__type"] is not None:
+            self.__type = RaceType(int(data["__type"]))
         self.is_best_team_placing_mode = bool(
-            data.get('is_best_team_placing_mode', False)
+            data.get("is_best_team_placing_mode", False)
         )
 
 
@@ -385,7 +385,7 @@ class Split(Model):
     def __init__(self):
         self.index = 0
         self.course_index = -1
-        self.code = ''
+        self.code = ""
         self.days = 0
         self._time: OTime = OTime()
         self.leg_time: OTime = OTime()
@@ -394,7 +394,7 @@ class Split(Model):
         self.relative_place = 0
         self.is_correct = True
         self.has_penalty = False
-        self.speed = ''
+        self.speed = ""
         self.length_leg = 0
 
     def __repr__(self) -> str:
@@ -419,48 +419,46 @@ class Split(Model):
 
     def to_dict(self):
         return {
-            'object': self.__class__.__name__,
-            'days': self.days,
-            'code': self.code,
-            'time': self.time.to_msec() if self.time else None,
-            'index': self.index,  # readonly
-            'course_index': self.course_index + 1,  # readonly
-            'leg_time': self.leg_time.to_msec() if self.leg_time else None,  # readonly
-            'relative_time': (
+            "object": self.__class__.__name__,
+            "days": self.days,
+            "code": self.code,
+            "time": self.time.to_msec() if self.time else None,
+            "index": self.index,  # readonly
+            "course_index": self.course_index + 1,  # readonly
+            "leg_time": self.leg_time.to_msec() if self.leg_time else None,  # readonly
+            "relative_time": (
                 self.relative_time.to_msec() if self.relative_time else None
             ),  # readonly
-            'leg_place': self.leg_place,  # readonly
-            'relative_place': self.relative_place,  # readonly
-            'is_correct': self.is_correct,
-            'speed': self.speed,  # readonly
-            'length_leg': self.length_leg,
+            "leg_place": self.leg_place,  # readonly
+            "relative_place": self.relative_place,  # readonly
+            "is_correct": self.is_correct,
+            "speed": self.speed,  # readonly
+            "length_leg": self.length_leg,
         }
 
     def update_data(self, data):
-        self.code = str(data['code'])
-        if data['time']:
-            self._time = OTime(msec=data['time'])
-        if 'days' in data:
-            self.days = int(data['days'])
+        self.code = str(data["code"])
+        if data["time"]:
+            self._time = OTime(msec=data["time"])
+        if "days" in data:
+            self.days = int(data["days"])
 
 
 def format_result(result, length):
     # Format result string, appending with spaces to have specified length
     # used in multi day result string filling
     # e.g. 12:00:12, 14 -> '12:00:12      '
-    ret = ''
+    ret = ""
     if result is not None:
         if result.is_status_ok():
             ret = result.get_result_otime_current_day().to_str()
         else:
             ret = result.status_comment
-    return (ret + ' ' * length)[0:length]
+    return (ret + " " * length)[0:length]
 
 
-class Result:
+class Result(ABC):
     def __init__(self):
-        if type(self) == Result:
-            raise Exception('<Result> is abstracted')
         self.id = uuid.uuid4()
         self.days = 0
         self.bib = 0
@@ -468,7 +466,7 @@ class Result:
         self.finish_time: OTime = OTime.now()
         self.person: Optional[Person] = None
         self.status = ResultStatus.OK
-        self.status_comment = ''
+        self.status_comment = ""
         self.penalty_time: Optional[OTime] = None
         self.credit_time: Optional[OTime] = None
         self.penalty_laps = 0  # count of penalty legs (marked route)
@@ -481,7 +479,7 @@ class Result:
         self.diff: Optional[OTime] = None  # readonly
         self.diff_scores = 0  # readonly
         self.created_at = time.time()
-        self.speed = ''
+        self.speed = ""
         self.can_win_count = 0  # quantity of athletes who can win at current time
         self.final_result_time: Optional[OTime] = None  # real time, when nobody can win
 
@@ -501,19 +499,19 @@ class Result:
         return str(self.system_type)
 
     def __repr__(self) -> str:
-        return f'Result {self.system_type} {self.status}'
+        return f"Result {self.system_type} {self.status}"
 
     def __eq__(self, other) -> bool:
         eq = self.system_type and other.system_type
 
-        if race().get_setting('result_processing_mode', 'time') == 'time':
+        if race().get_setting("result_processing_mode", "time") == "time":
             if self.get_start_time() and other.get_start_time():
                 eq = eq and self.get_start_time() == other.get_start_time()
             if self.get_finish_time() and other.get_finish_time():
                 eq = eq and self.get_finish_time() == other.get_finish_time()
             else:
                 return False
-        elif race().get_setting('result_processing_mode', 'time') == 'ardf':
+        elif race().get_setting("result_processing_mode", "time") == "ardf":
             eq = eq and self.scores_ardf == other.scores_ardf
             if eq and self.get_start_time() and other.get_start_time():
                 eq = eq and self.get_start_time() == other.get_start_time()
@@ -538,7 +536,7 @@ class Result:
             # incorrect statuses sort
             return self.status.value > other.status.value
 
-        if race().get_setting('result_processing_mode', 'time') == 'time':
+        if race().get_setting("result_processing_mode", "time") == "time":
             if (
                 self.get_result_otime() == OTime()
                 and other.get_result_otime() > OTime()
@@ -550,7 +548,7 @@ class Result:
             ):
                 return False
             return self.get_result_otime() > other.get_result_otime()
-        elif race().get_setting('result_processing_mode', 'time') == 'ardf':
+        elif race().get_setting("result_processing_mode", "time") == "ardf":
             if self.scores_ardf == other.scores_ardf:
                 return self.get_result_otime() > other.get_result_otime()
             else:
@@ -568,89 +566,89 @@ class Result:
 
     def to_dict(self):
         return {
-            'object': self.__class__.__name__,
-            'id': str(self.id),
-            'bib': self.bib,
-            'system_type': self.system_type.value,
-            'person_id': str(self.person.id) if self.person else None,
-            'days': self.days,
-            'start_time': self.start_time.to_msec() if self.start_time else None,
-            'finish_time': self.finish_time.to_msec() if self.finish_time else None,
-            'diff': self.diff.to_msec() if self.diff else None,
-            'diff_scores': self.diff_scores,
-            'penalty_time': self.penalty_time.to_msec() if self.penalty_time else None,
-            'credit_time': self.credit_time.to_msec() if self.credit_time else None,
-            'status': self.status.value,
-            'status_comment': self.status_comment,
-            'penalty_laps': self.penalty_laps,
-            'place': self.place,
-            'assigned_rank': self.assigned_rank.value,
-            'splits': [split.to_dict() for split in self.splits],
-            'card_number': self.card_number,
-            'speed': self.speed,  # readonly
-            'scores': self.scores,  # readonly
-            'rogaine_score': self.rogaine_score,  # readonly
-            'rogaine_penalty': self.rogaine_penalty,  # readonly
-            'scores_ardf': self.scores_ardf,  # readonly
-            'created_at': self.created_at,  # readonly
-            'result': self.get_result(),  # readonly
-            'result_relay': self.get_result_relay(),
-            'result_current': (
+            "object": self.__class__.__name__,
+            "id": str(self.id),
+            "bib": self.bib,
+            "system_type": self.system_type.value,
+            "person_id": str(self.person.id) if self.person else None,
+            "days": self.days,
+            "start_time": self.start_time.to_msec() if self.start_time else None,
+            "finish_time": self.finish_time.to_msec() if self.finish_time else None,
+            "diff": self.diff.to_msec() if self.diff else None,
+            "diff_scores": self.diff_scores,
+            "penalty_time": self.penalty_time.to_msec() if self.penalty_time else None,
+            "credit_time": self.credit_time.to_msec() if self.credit_time else None,
+            "status": self.status.value,
+            "status_comment": self.status_comment,
+            "penalty_laps": self.penalty_laps,
+            "place": self.place,
+            "assigned_rank": self.assigned_rank.value,
+            "splits": [split.to_dict() for split in self.splits],
+            "card_number": self.card_number,
+            "speed": self.speed,  # readonly
+            "scores": self.scores,  # readonly
+            "rogaine_score": self.rogaine_score,  # readonly
+            "rogaine_penalty": self.rogaine_penalty,  # readonly
+            "scores_ardf": self.scores_ardf,  # readonly
+            "created_at": self.created_at,  # readonly
+            "result": self.get_result(),  # readonly
+            "result_relay": self.get_result_relay(),
+            "result_current": (
                 self.get_result_otime_current_day().to_str()
                 if self.is_status_ok()
                 else self.get_result()
             ),
-            'start_msec': self.get_start_time().to_msec(),  # readonly
-            'finish_msec': self.get_finish_time().to_msec(),  # readonly
-            'result_msec': self.get_result_otime().to_msec(),  # readonly
-            'result_relay_msec': self.get_result_otime_relay().to_msec(),  # readonly
-            'result_current_msec': self.get_result_otime_current_day().to_msec(),  # readonly
-            'can_win_count': self.can_win_count,
-            'final_result_time': (
+            "start_msec": self.get_start_time().to_msec(),  # readonly
+            "finish_msec": self.get_finish_time().to_msec(),  # readonly
+            "result_msec": self.get_result_otime().to_msec(),  # readonly
+            "result_relay_msec": self.get_result_otime_relay().to_msec(),  # readonly
+            "result_current_msec": self.get_result_otime_current_day().to_msec(),  # readonly
+            "can_win_count": self.can_win_count,
+            "final_result_time": (
                 self.final_result_time.to_str() if self.final_result_time else None
             ),
-            'order': self.order,
-            'multi_day_results': self.get_multi_day_result_str(),
+            "order": self.order,
+            "multi_day_results": self.get_multi_day_result_str(),
         }
 
     def update_data(self, data):
-        self.status = ResultStatus(int(data['status']))
-        self.penalty_laps = int(data['penalty_laps'])
-        self.scores = data['scores']
-        if 'scores_ardf' in data and data['scores_ardf'] is not None:
-            self.scores_ardf = data['scores_ardf']
-        if 'rogaine_score' in data and data['rogaine_score'] is not None:
-            self.rogaine_score = data['rogaine_score']
-        if 'rogaine_penalty' in data and data['rogaine_penalty'] is not None:
-            self.rogaine_penalty = data['rogaine_penalty']
-        if str(data['place']).isdigit():
-            self.place = int(data['place'])
-        self.assigned_rank = Qualification.get_qual_by_code(data['assigned_rank'])
-        if data['start_time'] is not None:
-            self.start_time = OTime(msec=data['start_time'])
-        if data['finish_time'] is not None:
-            self.finish_time = OTime(msec=data['finish_time'])
-        if data['penalty_time']:
-            self.penalty_time = OTime(msec=data['penalty_time'])
-        if 'credit_time' in data and data['credit_time'] is not None:
-            self.credit_time = OTime(msec=data['credit_time'])
-        if 'status_comment' in data:
-            self.status_comment = data['status_comment']
-        if 'days' in data:
-            self.days = int(data['days'])
-        if 'created_at' in data:
-            self.created_at = float(data['created_at'])
+        self.status = ResultStatus(int(data["status"]))
+        self.penalty_laps = int(data["penalty_laps"])
+        self.scores = data["scores"]
+        if "scores_ardf" in data and data["scores_ardf"] is not None:
+            self.scores_ardf = data["scores_ardf"]
+        if "rogaine_score" in data and data["rogaine_score"] is not None:
+            self.rogaine_score = data["rogaine_score"]
+        if "rogaine_penalty" in data and data["rogaine_penalty"] is not None:
+            self.rogaine_penalty = data["rogaine_penalty"]
+        if str(data["place"]).isdigit():
+            self.place = int(data["place"])
+        self.assigned_rank = Qualification.get_qual_by_code(data["assigned_rank"])
+        if data["start_time"] is not None:
+            self.start_time = OTime(msec=data["start_time"])
+        if data["finish_time"] is not None:
+            self.finish_time = OTime(msec=data["finish_time"])
+        if data["penalty_time"]:
+            self.penalty_time = OTime(msec=data["penalty_time"])
+        if "credit_time" in data and data["credit_time"] is not None:
+            self.credit_time = OTime(msec=data["credit_time"])
+        if "status_comment" in data:
+            self.status_comment = data["status_comment"]
+        if "days" in data:
+            self.days = int(data["days"])
+        if "created_at" in data:
+            self.created_at = float(data["created_at"])
         else:
             self.created_at = time.time()
 
-        if 'bib' in data:
-            self.bib = int(data['bib'])
+        if "bib" in data:
+            self.bib = int(data["bib"])
 
-        if 'card_number' in data:
-            self.card_number = int(data['card_number'])
-        if 'splits' in data:
+        if "card_number" in data:
+            self.card_number = int(data["card_number"])
+        if "splits" in data:
             self.splits = []
-            for item in data['splits']:
+            for item in data["splits"]:
                 split = Split()
                 split.update_data(item)
                 self.splits.append(split)
@@ -670,15 +668,15 @@ class Result:
             return self.status.get_title()
 
         if not self.person:
-            return ''
+            return ""
 
-        ret = ''
-        if race().get_setting('result_processing_mode', 'time') == 'ardf':
+        ret = ""
+        if race().get_setting("result_processing_mode", "time") == "ardf":
             ret += f"{self.scores_ardf} {translate('points')} "
-        elif race().get_setting('result_processing_mode', 'time') == 'scores':
+        elif race().get_setting("result_processing_mode", "time") == "scores":
             ret += f"{self.rogaine_score} {translate('points')} "
 
-        time_accuracy = race().get_setting('time_accuracy', 0)
+        time_accuracy = race().get_setting("time_accuracy", 0)
         ret += self.get_result_otime().to_str(time_accuracy)
         return ret
 
@@ -689,12 +687,12 @@ class Result:
             return self.status.get_title()
 
         if not self.person:
-            return ''
+            return ""
 
-        ret = ''
-        if race().get_setting('result_processing_mode', 'time') == 'ardf':
+        ret = ""
+        if race().get_setting("result_processing_mode", "time") == "ardf":
             ret += f"{self.scores_ardf} {translate('points')} "
-        elif race().get_setting('result_processing_mode', 'time') == 'scores':
+        elif race().get_setting("result_processing_mode", "time") == "scores":
             ret += f"{self.rogaine_score} {translate('points')} "
 
         # time_accuracy = race().get_setting('time_accuracy', 0)
@@ -711,7 +709,7 @@ class Result:
             return self.status.get_title()
 
         if not self.person:
-            return ''
+            return ""
 
         # Check previous legs not to be disqualified
         if (
@@ -727,13 +725,13 @@ class Result:
                     return res.status.get_title()
                 cur_bib -= 1000
 
-        ret = ''
-        if race().get_setting('result_processing_mode', 'time') == 'ardf':
+        ret = ""
+        if race().get_setting("result_processing_mode", "time") == "ardf":
             ret += f"{self.scores_ardf} {translate('points')} "
-        elif race().get_setting('result_processing_mode', 'time') == 'scores':
+        elif race().get_setting("result_processing_mode", "time") == "scores":
             ret += f"{self.rogaine_score} {translate('points')} "
 
-        time_accuracy = race().get_setting('time_accuracy', 0)
+        time_accuracy = race().get_setting("time_accuracy", 0)
         ret += self.get_result_otime_relay().to_str(time_accuracy)
         return ret
 
@@ -754,16 +752,16 @@ class Result:
             return self.get_result_otime_relay()
 
     def get_result_otime_current_day(self):
-        time_accuracy = race().get_setting('time_accuracy', 0)
-        time_rounding = race().get_setting('time_rounding', 'math')
+        time_accuracy = race().get_setting("time_accuracy", 0)
+        time_rounding = race().get_setting("time_rounding", "math")
         ret_ms = self.get_finish_time().to_msec() - self.get_start_time().to_msec()
         ret_ms += self.get_penalty_time().to_msec()
         ret_ms -= self.get_credit_time().to_msec()
         return OTime(msec=ret_ms).round(time_accuracy, TimeRounding[time_rounding])
 
     def get_result_otime_relay(self):
-        time_accuracy = race().get_setting('time_accuracy', 0)
-        time_rounding = race().get_setting('time_rounding', 'math')
+        time_accuracy = race().get_setting("time_accuracy", 0)
+        time_rounding = race().get_setting("time_rounding", "math")
         ret_ms = (
             self.get_finish_time().to_msec() - self.get_start_time_relay().to_msec()
         )
@@ -852,8 +850,8 @@ class Result:
         if self.place > 0:
             return self.place
         if self.person and self.person.is_out_of_competition:
-            return translate('o/c')
-        return ''
+            return translate("o/c")
+        return ""
 
     def get_course_splits(self, course=None):
         return []
@@ -919,12 +917,12 @@ class Result:
             self.final_result_time = max_unfinished_start_time + self.get_result_otime()
 
     def get_multi_day_result_str(self):
-        ret = ''
+        ret = ""
         for cur_res in self.get_multi_days():
             ret += format_result(cur_res, 14)
         return ret
 
-    def get_multi_days(self) -> List['Result']:
+    def get_multi_days(self) -> List["Result"]:
         """
         Get list of multi day results, None if group type not Multi Day
         Returns:
@@ -957,18 +955,18 @@ class ResultSportident(Result):
         self.__finish_time = None
 
     def __repr__(self) -> str:
-        splits = '\n'.join(
-            f'{split.code} — {split.length_leg}' for split in self.splits
+        splits = "\n".join(
+            f"{split.code} — {split.length_leg}" for split in self.splits
         )
 
-        person = self.person.full_name if self.person else ''
+        person = self.person.full_name if self.person else ""
         return (
-            f'Card: {self.card_number}\n'
-            f'Start: {self.start_time}\n'
-            f'Finish: {self.finish_time}\n'
-            f'Person: {person}\n'
-            'Splits:\n'
-            f'{splits}'
+            f"Card: {self.card_number}\n"
+            f"Start: {self.start_time}\n"
+            f"Finish: {self.finish_time}\n"
+            f"Person: {person}\n"
+            "Splits:\n"
+            f"{splits}"
         )
 
     def __eq__(self, other) -> bool:
@@ -989,15 +987,15 @@ class ResultSportident(Result):
             if group.get_type() == RaceType.PURSUIT:
                 return group.pursuit_start_time
 
-        start_source = obj.get_setting('system_start_source', 'protocol')
-        if start_source == 'protocol':
+        start_source = obj.get_setting("system_start_source", "protocol")
+        if start_source == "protocol":
             if (
                 self.person
                 and self.person.start_time
                 and self.person.start_time.to_msec()
             ):
                 return self.person.start_time
-        elif start_source == 'station':
+        elif start_source == "station":
             if self.start_time and self.start_time.to_msec():
                 return self.start_time
             elif (
@@ -1006,11 +1004,11 @@ class ResultSportident(Result):
                 and self.person.start_time.to_msec()
             ):
                 return self.person.start_time
-        elif start_source == 'cp':
+        elif start_source == "cp":
             if self.__start_time:
                 return self.__start_time
             if len(self.splits):
-                start_cp_number = obj.get_setting('system_start_cp_number', 31)
+                start_cp_number = obj.get_setting("system_start_cp_number", 31)
                 if start_cp_number in (0, -1):
                     self.__start_time = self.splits[0].time
                     return self.__start_time
@@ -1018,22 +1016,22 @@ class ResultSportident(Result):
                     if split.code == str(start_cp_number):
                         self.__start_time = split.time
                         return self.__start_time
-        elif start_source == 'gate':
+        elif start_source == "gate":
             pass
 
         return OTime()
 
     def get_finish_time(self) -> OTime:
         obj = race()
-        finish_source = obj.get_setting('system_finish_source', 'station')
-        if finish_source == 'station':
+        finish_source = obj.get_setting("system_finish_source", "station")
+        if finish_source == "station":
             if self.finish_time:
                 return self.finish_time
-        elif finish_source == 'cp':
+        elif finish_source == "cp":
             if self.__finish_time:
                 return self.__finish_time
             if len(self.splits):
-                finish_cp_number = obj.get_setting('system_finish_cp_number', 90)
+                finish_cp_number = obj.get_setting("system_finish_cp_number", 90)
                 if finish_cp_number in (0, -1):
                     self.__finish_time = self.splits[-1].time
                     return self.__finish_time
@@ -1041,7 +1039,7 @@ class ResultSportident(Result):
                     if split.code == str(finish_cp_number):
                         self.__finish_time = split.time
                         return self.__finish_time
-        elif finish_source == 'beam':
+        elif finish_source == "beam":
             pass
 
         # return 0 to avoid incorrect results
@@ -1078,7 +1076,7 @@ class ResultSportident(Result):
             i.course_index = -1
 
         ignore_punches_before_start = obj.get_setting(
-            'ignore_punches_before_start', False
+            "ignore_punches_before_start", False
         )
 
         optional_controls_taken = set()
@@ -1096,14 +1094,14 @@ class ResultSportident(Result):
 
                 list_exists = False
                 list_contains = False
-                ind_begin = template.find('(')
-                ind_end = template.find(')')
+                ind_begin = template.find("(")
+                ind_end = template.find(")")
                 if ind_begin > 0 and ind_end > 0:
                     list_exists = True
                     # any control from the list e.g. '%(31,32,35-45)'
-                    arr = re.split(r'\s*,\s*', template[ind_begin + 1 : ind_end])
+                    arr = re.split(r"\s*,\s*", template[ind_begin + 1 : ind_end])
                     for cp in arr:
-                        cp_range = re.split(r'\s*-\s*', cp)
+                        cp_range = re.split(r"\s*-\s*", cp)
                         if int(cur_code) == int(cp_range[0]):
                             list_contains = True
                         elif len(cp_range) > 1:
@@ -1112,7 +1110,7 @@ class ResultSportident(Result):
                             ) <= int(cp_range[len(cp_range) - 1]):
                                 list_contains = True
 
-                if template.find('%') > -1:
+                if template.find("%") > -1:
                     # non-unique control
                     if not list_exists or list_contains:
                         # any control '%' or '%(31,32,33)' or '31%'
@@ -1122,7 +1120,7 @@ class ResultSportident(Result):
                         split.course_index = course_index
                         course_index += 1
 
-                elif template.find('*') > -1:
+                elif template.find("*") > -1:
                     # unique control '*' or '*(31,32,33)' or '31*'
                     if list_exists and not list_contains:
                         # not in list
@@ -1139,7 +1137,7 @@ class ResultSportident(Result):
                         if prev_split.code == cur_code and j in recognized_indexes:
                             if (
                                 course_index_current < 0
-                                or str(controls[course_index_current].code).find('*')
+                                or str(controls[course_index_current].code).find("*")
                                 < 0
                             ):
                                 # check only free order controls to be duplicated
@@ -1154,7 +1152,7 @@ class ResultSportident(Result):
                         split.course_index = course_index
                         course_index += 1
 
-                elif template.find('?') > -1:
+                elif template.find("?") > -1:
                     # optional control '?' or '?(31,32,33)' or '31?'
                     if cur_code in optional_controls_taken:
                         continue
@@ -1176,7 +1174,7 @@ class ResultSportident(Result):
                             recognized_indexes.append(i)
 
                             correct_code = (
-                                str(controls[course_index].code).split('(')[0].strip()
+                                str(controls[course_index].code).split("(")[0].strip()
                             )
                             if split.code == correct_code:
                                 split.has_penalty = False
@@ -1204,8 +1202,8 @@ class ResultSportident(Result):
     def merge_with(self, new_result):
         # Merge with new result (merge splits, backup old finish/start, use new finish/start as finish/start)
         tolerance_sec = 10
-        start_code = '10'
-        finish_code = '20'
+        start_code = "10"
+        finish_code = "20"
 
         is_changed = False
 
@@ -1290,8 +1288,8 @@ class ResultSrpid(ResultSportident):
 class Person(Model):
     def __init__(self):
         self.id = uuid.uuid4()
-        self.name = ''
-        self.surname = ''
+        self.name = ""
+        self.surname = ""
 
         self._card_number = 0
         self._bib = 0
@@ -1299,21 +1297,21 @@ class Person(Model):
         self.birth_date: Optional[date] = None
         self.organization: Optional[Organization] = None
         self.group: Optional[Group] = None
-        self.world_code = ''  # WRE ID for orienteering and the same
+        self.world_code = ""  # WRE ID for orienteering and the same
         self.national_code = 0
         self.qual: Qualification = Qualification.NOT_QUALIFIED
         self.is_out_of_competition = False  # e.g. 20-years old person, running in M12
         self.is_paid = False
         self.is_rented_card = False
         self.is_personal = False
-        self.comment = ''
+        self.comment = ""
 
         self.start_time: OTime = OTime(0)
         self.start_group = 0
         self.result_count = 0
 
     def __repr__(self) -> str:
-        return f'{self.full_name} {self.bib} {self.group}'
+        return f"{self.full_name} {self.bib} {self.group}"
 
     @property
     def year(self):
@@ -1343,66 +1341,66 @@ class Person(Model):
     @property
     def full_name(self):
         if self.surname:
-            return f'{self.surname} {self.name}'
+            return f"{self.surname} {self.name}"
         return self.name
 
     @property
     def multi_day_id(self):
         if self.group:
-            return f'{self.full_name} {self.group.name}'
+            return f"{self.full_name} {self.group.name}"
         else:
             return self.full_name
 
     def to_dict(self):
         return {
-            'object': self.__class__.__name__,
-            'id': str(self.id),
-            'name': self.name,
-            'surname': self.surname,
-            'card_number': self.card_number,
-            'bib': self.bib,
-            'birth_date': str(self.birth_date) if self.birth_date else None,
-            'year': (
+            "object": self.__class__.__name__,
+            "id": str(self.id),
+            "name": self.name,
+            "surname": self.surname,
+            "card_number": self.card_number,
+            "bib": self.bib,
+            "birth_date": str(self.birth_date) if self.birth_date else None,
+            "year": (
                 self.get_year() if self.get_year() else 0
             ),  # back compatibility with 1.0
-            'group_id': str(self.group.id) if self.group else None,
-            'organization_id': str(self.organization.id) if self.organization else None,
-            'world_code': self.world_code,
-            'national_code': self.national_code,
-            'qual': self.qual.value,
-            'is_out_of_competition': self.is_out_of_competition,
-            'is_paid': self.is_paid,
-            'is_rented_card': self.is_rented_card,
-            'is_personal': self.is_personal,
-            'comment': self.comment,
-            'start_time': self.start_time.to_msec() if self.start_time else None,
-            'start_group': self.start_group,
-            'sex': 0,  # back compatibility with 1.5
+            "group_id": str(self.group.id) if self.group else None,
+            "organization_id": str(self.organization.id) if self.organization else None,
+            "world_code": self.world_code,
+            "national_code": self.national_code,
+            "qual": self.qual.value,
+            "is_out_of_competition": self.is_out_of_competition,
+            "is_paid": self.is_paid,
+            "is_rented_card": self.is_rented_card,
+            "is_personal": self.is_personal,
+            "comment": self.comment,
+            "start_time": self.start_time.to_msec() if self.start_time else None,
+            "start_group": self.start_group,
+            "sex": 0,  # back compatibility with 1.5
         }
 
     def update_data(self, data):
-        self.name = str(data['name'])
-        self.surname = str(data['surname'])
-        self.set_card_number(int(data['card_number']))
-        self.set_bib(int(data['bib']))
+        self.name = str(data["name"])
+        self.surname = str(data["surname"])
+        self.set_card_number(int(data["card_number"]))
+        self.set_bib(int(data["bib"]))
         self.contact = []
-        if data['world_code']:
-            self.world_code = str(data['world_code'])
-        if data['national_code']:
-            self.national_code = data['national_code']
-        self.qual = Qualification.get_qual_by_code(data['qual'])
-        self.is_out_of_competition = bool(data['is_out_of_competition'])
-        self.is_paid = bool(data['is_paid'])
-        self.is_rented_card = bool(data['is_rented_card'])
-        self.is_personal = bool(data['is_personal'])
-        self.comment = str(data['comment'])
-        self.start_group = int(data['start_group'])
-        if data['start_time']:
-            self.start_time = OTime(msec=int(data['start_time']))
-        if data['birth_date']:
-            self.birth_date = dateutil.parser.parse(data['birth_date']).date()
-        elif 'year' in data and data['year']:  # back compatibility with v 1.0.0
-            self.set_year(int(data['year']))
+        if data["world_code"]:
+            self.world_code = str(data["world_code"])
+        if data["national_code"]:
+            self.national_code = data["national_code"]
+        self.qual = Qualification.get_qual_by_code(data["qual"])
+        self.is_out_of_competition = bool(data["is_out_of_competition"])
+        self.is_paid = bool(data["is_paid"])
+        self.is_rented_card = bool(data["is_rented_card"])
+        self.is_personal = bool(data["is_personal"])
+        self.comment = str(data["comment"])
+        self.start_group = int(data["start_group"])
+        if data["start_time"]:
+            self.start_time = OTime(msec=int(data["start_time"]))
+        if data["birth_date"]:
+            self.birth_date = dateutil.parser.parse(data["birth_date"]).date()
+        elif "year" in data and data["year"]:  # back compatibility with v 1.0.0
+            self.set_year(int(data["year"]))
 
     @property
     def bib(self):
@@ -1410,7 +1408,7 @@ class Person(Model):
 
     @bib.setter
     def bib(self, new_bib: int):
-        raise NotImplementedError('Please, use set_bib()')
+        raise NotImplementedError("Please, use set_bib()")
 
     def set_bib(self, new_bib: int) -> None:
         if self._bib == new_bib:
@@ -1424,9 +1422,9 @@ class Person(Model):
             r.person_index_bib.pop(self.bib)
         if new_bib > 0 and new_bib in r.person_index_bib:
             other_person = r.person_index_bib[new_bib]
-            if not other_person is self:
+            if other_person is not self:
                 logging.info(
-                    'Duplicate bib %s: %s (indexed) | %s (not indexed)',
+                    "Duplicate bib %s: %s (indexed) | %s (not indexed)",
                     new_bib,
                     self,
                     other_person,
@@ -1442,7 +1440,7 @@ class Person(Model):
 
     @card_number.setter
     def card_number(self, new_card: int):
-        raise NotImplementedError('Please, use set_card_number()')
+        raise NotImplementedError("Please, use set_card_number()")
 
     def set_card_number(self, new_card: int):
         if self._card_number == new_card:
@@ -1457,9 +1455,9 @@ class Person(Model):
             r.person_index_card.pop(self._card_number)
         if new_card > 0 and new_card in r.person_index_card:
             other_person = r.person_index_card[new_card]
-            if not other_person is self:
+            if other_person is not self:
                 logging.info(
-                    'Duplicate card %s: %s (indexed) | %s (not indexed)',
+                    "Duplicate card %s: %s (indexed) | %s (not indexed)",
                     new_card,
                     self,
                     other_person,
@@ -1472,19 +1470,19 @@ class Person(Model):
 
 class RaceData(Model):
     def __init__(self):
-        self.title = ''
-        self.description = ''
-        self.location = ''
-        self.chief_referee = ''
-        self.secretary = ''
-        self.url = ''
+        self.title = ""
+        self.description = ""
+        self.location = ""
+        self.chief_referee = ""
+        self.secretary = ""
+        self.url = ""
         self.race_type = RaceType.INDIVIDUAL_RACE
         self.start_datetime: Optional[datetime.datetime] = None
         self.end_datetime: Optional[datetime.datetime] = None
         self.relay_leg_count = 3
 
     def __repr__(self) -> str:
-        return 'Race {}'.format(self.title)
+        return "Race {}".format(self.title)
 
     def get_start_datetime(self):
         if self.start_datetime is None:
@@ -1505,46 +1503,46 @@ class RaceData(Model):
 
     def to_dict(self):
         return {
-            'title': self.title,
-            'description': self.description,
-            'location': self.location,
-            'chief_referee': self.chief_referee,
-            'secretary': self.secretary,
-            'url': self.url,
-            'race_type': self.race_type.value,
-            'start_datetime': str(self.start_datetime) if self.start_datetime else None,
-            'end_datetime': str(self.end_datetime) if self.end_datetime else None,
-            'relay_leg_count': self.relay_leg_count,
+            "title": self.title,
+            "description": self.description,
+            "location": self.location,
+            "chief_referee": self.chief_referee,
+            "secretary": self.secretary,
+            "url": self.url,
+            "race_type": self.race_type.value,
+            "start_datetime": str(self.start_datetime) if self.start_datetime else None,
+            "end_datetime": str(self.end_datetime) if self.end_datetime else None,
+            "relay_leg_count": self.relay_leg_count,
         }
 
     def update_data(self, data):
-        self.title = str(data['title'])
-        self.description = str(data['description'])
-        self.location = str(data['location'])
-        self.chief_referee = str(data['chief_referee'])
-        self.secretary = str(data['secretary'])
-        self.url = str(data['url'])
-        self.race_type = RaceType(int(data['race_type']))
-        self.relay_leg_count = int(data['relay_leg_count'])
-        if data['start_datetime']:
-            self.start_datetime = dateutil.parser.parse(data['start_datetime'])
-        if data['end_datetime']:
-            self.end_datetime = dateutil.parser.parse(data['end_datetime'])
+        self.title = str(data["title"])
+        self.description = str(data["description"])
+        self.location = str(data["location"])
+        self.chief_referee = str(data["chief_referee"])
+        self.secretary = str(data["secretary"])
+        self.url = str(data["url"])
+        self.race_type = RaceType(int(data["race_type"]))
+        self.relay_leg_count = int(data["relay_leg_count"])
+        if data["start_datetime"]:
+            self.start_datetime = dateutil.parser.parse(data["start_datetime"])
+        if data["end_datetime"]:
+            self.end_datetime = dateutil.parser.parse(data["end_datetime"])
 
 
 class Race(Model):
     support_obj = {
-        'Person': Person,
-        'Result': Result,
-        'ResultManual': ResultManual,
-        'ResultSportident': ResultSportident,
-        'ResultSFR': ResultSFR,
-        'ResultSportiduino': ResultSportiduino,
-        'ResultRfidImpinj': ResultRfidImpinj,
-        'ResultSrpid': ResultSrpid,
-        'Group': Group,
-        'Course': Course,
-        'Organization': Organization,
+        "Person": Person,
+        "Result": Result,
+        "ResultManual": ResultManual,
+        "ResultSportident": ResultSportident,
+        "ResultSFR": ResultSFR,
+        "ResultSportiduino": ResultSportiduino,
+        "ResultRfidImpinj": ResultRfidImpinj,
+        "ResultSrpid": ResultSrpid,
+        "Group": Group,
+        "Course": Course,
+        "Organization": Organization,
     }
 
     def __init__(self):
@@ -1572,46 +1570,46 @@ class Race(Model):
     @property
     def list_obj(self):
         return {
-            'Person': self.persons,
-            'Result': self.results,
-            'ResultManual': self.results,
-            'ResultSportident': self.results,
-            'ResultSFR': self.results,
-            'ResultSportiduino': self.results,
-            'ResultRfidImpinj': self.results,
-            'ResultSrpid': self.results,
-            'Group': self.groups,
-            'Course': self.courses,
-            'Organization': self.organizations,
+            "Person": self.persons,
+            "Result": self.results,
+            "ResultManual": self.results,
+            "ResultSportident": self.results,
+            "ResultSFR": self.results,
+            "ResultSportiduino": self.results,
+            "ResultRfidImpinj": self.results,
+            "ResultSrpid": self.results,
+            "Group": self.groups,
+            "Course": self.courses,
+            "Organization": self.organizations,
         }
 
     @property
     def index_obj(self):
         return {
-            'Person': self.person_index,
-            'Result': self.result_index,
-            'ResultManual': self.result_index,
-            'ResultSportident': self.result_index,
-            'ResultSFR': self.result_index,
-            'ResultSportiduino': self.result_index,
-            'ResultRfidImpinj': self.result_index,
-            'ResultSrpid': self.result_index,
-            'Group': self.group_index,
-            'Course': self.course_index,
-            'Organization': self.organization_index,
+            "Person": self.person_index,
+            "Result": self.result_index,
+            "ResultManual": self.result_index,
+            "ResultSportident": self.result_index,
+            "ResultSFR": self.result_index,
+            "ResultSportiduino": self.result_index,
+            "ResultRfidImpinj": self.result_index,
+            "ResultSrpid": self.result_index,
+            "Group": self.group_index,
+            "Course": self.course_index,
+            "Organization": self.organization_index,
         }
 
     def to_dict(self):
         return {
-            'object': self.__class__.__name__,
-            'id': str(self.id),
-            'data': self.data.to_dict(),
-            'settings': self.settings,
-            'organizations': [item.to_dict() for item in self.organizations],
-            'courses': [item.to_dict() for item in self.courses],
-            'groups': [item.to_dict() for item in self.groups],
-            'results': [item.to_dict() for item in self.results],
-            'persons': [item.to_dict() for item in self.persons],
+            "object": self.__class__.__name__,
+            "id": str(self.id),
+            "data": self.data.to_dict(),
+            "settings": self.settings,
+            "organizations": [item.to_dict() for item in self.organizations],
+            "courses": [item.to_dict() for item in self.courses],
+            "groups": [item.to_dict() for item in self.groups],
+            "results": [item.to_dict() for item in self.results],
+            "persons": [item.to_dict() for item in self.persons],
         }
 
     def to_dict_partial(
@@ -1688,36 +1686,36 @@ class Race(Model):
                     return_results.append(result)
 
             return {
-                'object': self.__class__.__name__,
-                'id': str(self.id),
-                'data': self.data.to_dict(),
-                'settings': self.settings,
-                'organizations': [item.to_dict() for item in return_orgs],
-                'courses': [item.to_dict() for item in return_courses],
-                'groups': [item.to_dict() for item in return_groups],
-                'results': [item.to_dict() for item in return_results],
-                'persons': [item.to_dict() for item in person_list],
+                "object": self.__class__.__name__,
+                "id": str(self.id),
+                "data": self.data.to_dict(),
+                "settings": self.settings,
+                "organizations": [item.to_dict() for item in return_orgs],
+                "courses": [item.to_dict() for item in return_courses],
+                "groups": [item.to_dict() for item in return_groups],
+                "results": [item.to_dict() for item in return_results],
+                "persons": [item.to_dict() for item in person_list],
             }
         return None
 
     def update_data(self, dict_obj):
-        if 'object' not in dict_obj:
+        if "object" not in dict_obj:
             return
-        if dict_obj['object'] == 'Race' and dict_obj['id'] == str(self.id):
-            if 'data' in dict_obj:
-                self.data.update_data(dict_obj['data'])
-            if 'settings' in dict_obj:
-                self.settings = dict_obj['settings']
-            key_list = ['organizations', 'courses', 'groups', 'persons', 'results']
+        if dict_obj["object"] == "Race" and dict_obj["id"] == str(self.id):
+            if "data" in dict_obj:
+                self.data.update_data(dict_obj["data"])
+            if "settings" in dict_obj:
+                self.settings = dict_obj["settings"]
+            key_list = ["organizations", "courses", "groups", "persons", "results"]
             for key in key_list:
                 if key in dict_obj:
                     for item_obj in dict_obj[key]:
                         self.update_data(item_obj)
             return
-        elif dict_obj['object'] not in self.support_obj:
+        elif dict_obj["object"] not in self.support_obj:
             return
 
-        obj = self.get_obj(dict_obj['object'], dict_obj['id'])
+        obj = self.get_obj(dict_obj["object"], dict_obj["id"])
         if obj is None:
             self.create_obj(dict_obj)
         else:
@@ -1730,28 +1728,28 @@ class Race(Model):
 
     def update_obj(self, obj, dict_obj):
         obj.update_data(dict_obj)
-        if dict_obj['object'] == 'Person':
-            obj.group = self.get_obj('Group', dict_obj['group_id'])
-            obj.organization = self.get_obj('Organization', dict_obj['organization_id'])
-        elif dict_obj['object'] in [
-            'Result',
-            'ResultManual',
-            'ResultSportident',
-            'ResultSFR',
-            'ResultSportiduino',
-            'ResultRfidImpinj',
-            'ResultSrpid',
+        if dict_obj["object"] == "Person":
+            obj.group = self.get_obj("Group", dict_obj["group_id"])
+            obj.organization = self.get_obj("Organization", dict_obj["organization_id"])
+        elif dict_obj["object"] in [
+            "Result",
+            "ResultManual",
+            "ResultSportident",
+            "ResultSFR",
+            "ResultSportiduino",
+            "ResultRfidImpinj",
+            "ResultSrpid",
         ]:
-            obj.person = self.get_obj('Person', dict_obj['person_id'])
-        elif dict_obj['object'] == 'Group':
-            obj.course = self.get_obj('Course', dict_obj['course_id'])
+            obj.person = self.get_obj("Person", dict_obj["person_id"])
+        elif dict_obj["object"] == "Group":
+            obj.course = self.get_obj("Course", dict_obj["course_id"])
 
     def create_obj(self, dict_obj):
-        obj = self.support_obj[dict_obj['object']]()
-        obj.id = uuid.UUID(dict_obj['id'])
+        obj = self.support_obj[dict_obj["object"]]()
+        obj.id = uuid.UUID(dict_obj["id"])
         self.update_obj(obj, dict_obj)
-        self.list_obj[dict_obj['object']].insert(0, obj)
-        self.index_obj[dict_obj['object']][dict_obj['id']] = obj
+        self.list_obj[dict_obj["object"]].insert(0, obj)
+        self.index_obj[dict_obj["object"]][dict_obj["id"]] = obj
 
     def get_type(self, group: Group):
         if group.get_type():
@@ -1827,7 +1825,7 @@ class Race(Model):
         for i in indexes:
             group = self.groups[i]
             if group.count_person > 0:
-                raise NotEmptyException('Cannot remove group')
+                raise NotEmptyException("Cannot remove group")
             groups.append(group)
 
         indexes = sorted(indexes, reverse=True)
@@ -1840,7 +1838,7 @@ class Race(Model):
         for i in indexes:
             course = self.courses[i]
             if course.count_group > 0:
-                raise NotEmptyException('Cannot remove course')
+                raise NotEmptyException("Cannot remove course")
             courses.append(course)
 
         indexes = sorted(indexes, reverse=True)
@@ -1853,7 +1851,7 @@ class Race(Model):
         for i in indexes:
             organization = self.organizations[i]
             if organization.count_person > 0:
-                raise NotEmptyException('Cannot remove organization')
+                raise NotEmptyException("Cannot remove organization")
             organizations.append(organization)
         indexes = sorted(indexes, reverse=True)
 
@@ -1886,7 +1884,7 @@ class Race(Model):
         bib = person.bib
         ret = find(self.courses, name=str(bib))
         if not ret and bib > 1000:
-            course_name = '{}.{}'.format(bib % 1000, bib // 1000)
+            course_name = "{}.{}".format(bib % 1000, bib // 1000)
             ret = find(self.courses, name=course_name)
         # usual connection via group
         if not ret and person.group:
@@ -2005,7 +2003,7 @@ class Race(Model):
 
     def add_new_result(self, result):
         ignore_punches_before_start = self.get_setting(
-            'ignore_punches_before_start', False
+            "ignore_punches_before_start", False
         )
         if ignore_punches_before_start:
             start = result.get_start_time()
@@ -2013,7 +2011,7 @@ class Race(Model):
 
             if finish < start and start.hour < 22 and finish != OTime(0):
                 logging.info(
-                    f'Ignoring finish with time before start: {finish} for card {result.card_number}'
+                    f"Ignoring finish with time before start: {finish} for card {result.card_number}"
                 )
                 return
 
@@ -2061,7 +2059,7 @@ class Race(Model):
 
     def get_duplicate_names(self):
         ret = []
-        current_name = ''
+        current_name = ""
         previous_person = None
         for person in sorted(self.persons, key=lambda x: x.full_name):
             if person.full_name and person.full_name == current_name:
@@ -2092,7 +2090,7 @@ class Qualification(IntEnum):
     I_Y = 1
     II_Y = 2
     III_Y = 3
-    I = 4
+    I = 4  # noqa
     II = 5
     III = 6
     KMS = 7
@@ -2106,19 +2104,19 @@ class Qualification(IntEnum):
     @classmethod
     def get_qual_by_name(cls, name):
         qual_reverse = {
-            '': 0,
-            ' ': 0,
-            'б/р': 0,
-            'IIIю': 3,
-            'IIю': 2,
-            'Iю': 1,
-            'III': 6,
-            'II': 5,
-            'I': 4,
-            'КМС': 7,
-            'МС': 8,
-            'МСМК': 9,
-            'ЗМС': 9,
+            "": 0,
+            " ": 0,
+            "б/р": 0,
+            "IIIю": 3,
+            "IIю": 2,
+            "Iю": 1,
+            "III": 6,
+            "II": 5,
+            "I": 4,
+            "КМС": 7,
+            "МС": 8,
+            "МСМК": 9,
+            "ЗМС": 9,
         }
         if name not in qual_reverse:
             return cls(0)
@@ -2127,17 +2125,17 @@ class Qualification(IntEnum):
 
     def get_title(self):
         qual = {
-            '': 'б/р',
-            0: 'б/р',
-            3: 'IIIю',
-            2: 'IIю',
-            1: 'Iю',
-            6: 'III',
-            5: 'II',
-            4: 'I',
-            7: 'КМС',
-            8: 'МС',
-            9: 'МСМК',
+            "": "б/р",
+            0: "б/р",
+            3: "IIIю",
+            2: "IIю",
+            1: "Iю",
+            6: "III",
+            5: "II",
+            4: "I",
+            7: "КМС",
+            8: "МС",
+            9: "МСМК",
         }
         return qual[self.value]
 
@@ -2171,34 +2169,34 @@ class RankingItem:
 
     def get_dict_data(self):
         ret = {}
-        ret['qual'] = self.qual.get_title()
-        ret['max_place'] = self.max_place
-        ret['max_time'] = str(self.max_time)
-        ret['min_scores'] = str(self.min_scores) if self.min_scores else None
-        ret['percent'] = self.percent
+        ret["qual"] = self.qual.get_title()
+        ret["max_place"] = self.max_place
+        ret["max_time"] = str(self.max_time)
+        ret["min_scores"] = str(self.min_scores) if self.min_scores else None
+        ret["percent"] = self.percent
         return ret
 
     def to_dict(self):
         ret = {}
-        ret['qual'] = self.qual.value
-        ret['use_scores'] = self.use_scores
-        ret['max_place'] = str(self.max_place)
-        ret['max_time'] = self.max_time.to_msec() if self.max_time else None
-        ret['min_scores'] = str(self.min_scores) if self.min_scores else None
-        ret['is_active'] = self.is_active
-        ret['percent'] = self.percent
+        ret["qual"] = self.qual.value
+        ret["use_scores"] = self.use_scores
+        ret["max_place"] = str(self.max_place)
+        ret["max_time"] = self.max_time.to_msec() if self.max_time else None
+        ret["min_scores"] = str(self.min_scores) if self.min_scores else None
+        ret["is_active"] = self.is_active
+        ret["percent"] = self.percent
         return ret
 
     def update_data(self, data):
-        self.qual = Qualification.get_qual_by_code(int(data['qual']))
-        self.use_scores = bool(data['use_scores'])
-        self.max_place = int(data['max_place'])
-        if data['max_time']:
-            self.max_time = OTime(msec=int(data['max_time']))
-        if 'min_scores' in data and data['min_scores']:
-            self.min_scores = data['min_scores']
-        self.is_active = bool(data['is_active'])
-        self.percent = int(data['percent'])
+        self.qual = Qualification.get_qual_by_code(int(data["qual"]))
+        self.use_scores = bool(data["use_scores"])
+        self.max_place = int(data["max_place"])
+        if data["max_time"]:
+            self.max_time = OTime(msec=int(data["max_time"]))
+        if "min_scores" in data and data["min_scores"]:
+            self.min_scores = data["min_scores"]
+        self.is_active = bool(data["is_active"])
+        self.percent = int(data["percent"])
 
 
 class Ranking:
@@ -2230,10 +2228,10 @@ class Ranking:
 
     def get_dict_data(self):
         ret = {}
-        ret['is_active'] = self.is_active
+        ret["is_active"] = self.is_active
         if self.is_active:
-            ret['rank_scores'] = self.rank_scores
-            ret['max_qual'] = self.get_max_qual().get_title()
+            ret["rank_scores"] = self.rank_scores
+            ret["max_qual"] = self.get_max_qual().get_title()
             rank_array = []
 
             for i in self.rank.values():
@@ -2241,25 +2239,25 @@ class Ranking:
                     if i.max_place or (i.max_time and i.max_time.to_msec() > 0):
                         rank_array.append(i.get_dict_data())
 
-            ret['rank'] = rank_array
+            ret["rank"] = rank_array
         return ret
 
     def to_dict(self):
         ret = {}
-        ret['is_active'] = self.is_active
-        ret['rank_scores'] = self.rank_scores
-        ret['rank'] = []
+        ret["is_active"] = self.is_active
+        ret["rank_scores"] = self.rank_scores
+        ret["rank"] = []
         for i in self.rank:
             obj = self.rank[i]
             rank = obj.to_dict()
-            ret['rank'].append(rank)
+            ret["rank"].append(rank)
         return ret
 
     def update_data(self, data):
-        self.is_active = bool(data['is_active'])
-        if 'rank_scores' in data:
-            self.rank_scores = int(data['rank_scores'])
-        for i in data['rank']:
+        self.is_active = bool(data["is_active"])
+        if "rank_scores" in data:
+            self.rank_scores = int(data["rank_scores"])
+        for i in data["rank"]:
             rank = RankingItem()
             rank.update_data(i)
             self.rank[rank.qual] = rank
@@ -2278,7 +2276,7 @@ class RelayLeg:
     def __init__(self, team):
         self.number = 0
         self.leg = 0
-        self.variant = ''
+        self.variant = ""
         self.person: Person = None
         self.result: Result = None
         self.course = None  # optional link to the course, prefer to use variant and bib to find course
@@ -2331,7 +2329,7 @@ class RelayLeg:
         """:return person bib, e.g. 1.1 or 1001 depending on settings"""
         if self.number < 1000:
             return 1000 * self.leg + self.number
-        return '{}.{}'.format(self.number, self.leg)
+        return "{}.{}".format(self.number, self.leg)
 
     def get_variant(self):
         """:return person distribution variant e.g. ABCA"""
@@ -2339,9 +2337,9 @@ class RelayLeg:
 
     def parse_variant_text(self, text):
         """parse text like '101.1: CB'"""
-        arr = str(text).split(':')
+        arr = str(text).split(":")
         if len(arr) == 2:
-            bib_array = arr[0].split('.')
+            bib_array = arr[0].split(".")
             if len(bib_array) == 2:
                 if bib_array[0].strip().isdigit() and bib_array[1].strip().isdigit():
                     self.variant = arr[1].strip()
@@ -2351,7 +2349,7 @@ class RelayLeg:
         return 0
 
     def get_variant_text(self):
-        return '{}.{}: {}'.format(self.number, self.leg, self.variant)
+        return "{}.{}: {}".format(self.number, self.leg, self.variant)
 
     def is_finished(self):
         res = self.get_result()
@@ -2429,7 +2427,7 @@ class RelayTeam:
         self.race = r
         self.group: Group = None
         self.legs: List[RelayLeg] = []
-        self.description = ''  # Name of team, optional
+        self.description = ""  # Name of team, optional
         self.bib_number = None  # bib
         self.last_finished_leg = 0
         self.last_correct_leg = 0
@@ -2444,7 +2442,7 @@ class RelayTeam:
         return False
 
     def __gt__(self, other) -> bool:
-        '''"Greater" means worse, ranks lower on the result list'''
+        """ "Greater" means worse, ranks lower on the result list"""
 
         if self.get_is_status_ok() and not other.get_is_status_ok():
             return False
@@ -2476,7 +2474,7 @@ class RelayTeam:
         # Reset relay team name if athletes are from different organizations
         if result.person and result.person.organization:
             if self.description != result.person.organization.name:
-                self.description = ''
+                self.description = ""
 
         self.legs.append(leg)
 
@@ -2586,7 +2584,7 @@ def update(obj, **kwargs):
 def find(iterable: list, **kwargs):
     if len(kwargs.items()) == 0:
         return None
-    return_all = kwargs.pop('return_all', False)
+    return_all = kwargs.pop("return_all", False)
     results = []
     for item in iterable:
         f = True
@@ -2622,7 +2620,7 @@ def copy_race():
     cur_race = race()
     copy = Race()
     obj = cur_race.to_dict()
-    obj['id'] = str(copy.id)
+    obj["id"] = str(copy.id)
     copy.update_data(obj)
     _event.append(copy)
 
