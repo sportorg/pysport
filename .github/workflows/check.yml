@@ -3,12 +3,14 @@ name: CI Tests/Lints
 on:
   push:
     paths:
+      - ".github/workflows/**"
       - "sportorg/**"
       - "tests/**"
       - "poetry.lock"
     branches: [ master ]
   pull_request:
     paths:
+      - ".github/workflows/**"
       - "sportorg/**"
       - "tests/**"
       - "poetry.lock"
@@ -17,32 +19,64 @@ on:
 
 jobs:
   lint:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        architecture: [x64]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.8'
+          architecture: ${{ matrix.architecture }}
 
       - name: Install python dependencies
-        run: pip install poetry && poetry install
+        run: pip install poetry && poetry install -E win
 
       - name: Run linters
         run: poetry run poe lint
 
   test:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        architecture: [x64]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.8'
+          architecture: ${{ matrix.architecture }}
 
       - name: Init .env
         run: cp .env.example .env
 
       - name: Install python dependencies
-        run: pip install poetry && poetry install
+        run: pip install poetry && poetry install -E win
 
       - name: Run test
         run: poetry run poe test
+
+  build:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        architecture: [x64]
+    name: Build on Windows ${{ matrix.architecture }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        id: set_up_python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.8'
+          architecture: ${{ matrix.architecture }}
+      - name: Install python dependencies
+        run: pip install poetry && poetry install -E win
+      - name: Generate mo files
+        run: poetry run poe generate-mo
+      - name: Build
+        run: poetry run python builder.py build
+      - name: Generate installer
+        run: poetry run python builder.py bdist_msi
