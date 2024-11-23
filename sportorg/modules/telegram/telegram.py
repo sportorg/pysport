@@ -8,9 +8,9 @@ from sportorg.models.memory import race
 
 
 class TelegramSendThread(Thread):
-    def __init__(self, token, chat_id, text, parse_mode='', thread_id=''):
+    def __init__(self, token, chat_id, text, parse_mode="", thread_id=""):
         super().__init__(daemon=True)
-        self.setName('TelegramSendThread')
+        self.setName("TelegramSendThread")
         self.token = token
         self.chat_id = chat_id
         self.thread_id = thread_id
@@ -43,25 +43,25 @@ class TelegramClient:
     def get_options():
         obj = race()
         return BotOption(
-            obj.get_setting('telegram_token', ''),
-            obj.get_setting('telegram_chat_id', ''),
-            obj.get_setting('telegram_template', ''),
-            obj.get_setting('telegram_parse_mode', ''),
-            obj.get_setting('telegram_thread_id', ''),
-            obj.get_setting('telegram_enabled', False),
+            obj.get_setting("telegram_token", ""),
+            obj.get_setting("telegram_chat_id", ""),
+            obj.get_setting("telegram_template", ""),
+            obj.get_setting("telegram_parse_mode", ""),
+            obj.get_setting("telegram_thread_id", ""),
+            obj.get_setting("telegram_enabled", False),
         )
 
     def send_result(self, result):
         if result.person:
             self.send(
                 {
-                    'group': result.person.group.name if result.person.group else '',
-                    'name': result.person.full_name,
-                    'bib': result.person.bib,
-                    'result': result.get_result(),
-                    'place': result.place,
-                    'penalty_time': result.penalty_time,
-                    'penalty_laps': result.penalty_laps,
+                    "group": result.person.group.name if result.person.group else "",
+                    "name": result.person.full_name,
+                    "bib": result.person.bib,
+                    "result": result.get_result(),
+                    "place": result.place,
+                    "penalty_time": result.penalty_time,
+                    "penalty_laps": result.penalty_laps,
                 }
             )
 
@@ -72,10 +72,10 @@ class TelegramClient:
         text = options.template
         try:
             for key, val in data_dict.items():
-                text = text.replace('{' + str(key) + '}', str(val))
+                text = text.replace("{" + str(key) + "}", str(val))
         except Exception as e:
             logging.error(str(e))
-        logging.info('Telegram {}'.format(text))
+        logging.info("Telegram {}".format(text))
         TelegramSendThread(
             options.token, options.chat_id, text, options.parse_mode, options.thread_id
         ).start()

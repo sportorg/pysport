@@ -32,11 +32,11 @@ from sportorg.models.result.split_calculation import RaceSplits
 from sportorg.modules.configs.configs import Config
 
 _settings = {
-    'last_template': None,
-    'open_in_browser': True,
-    'last_file': None,
-    'save_to_last_file': False,
-    'selected': False,
+    "last_template": None,
+    "open_in_browser": True,
+    "last_file": None,
+    "save_to_last_file": False,
+    "selected": False,
 }
 
 
@@ -49,37 +49,37 @@ class ReportDialog(QDialog):
         return super().exec_()
 
     def init_ui(self):
-        self.setWindowTitle(translate('Report creating'))
+        self.setWindowTitle(translate("Report creating"))
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(True)
 
         self.layout = QFormLayout(self)
 
-        self.label_template = QLabel(translate('Template'))
+        self.label_template = QLabel(translate("Template"))
         self.item_template = AdvComboBox()
         self.item_template.addItems(
-            sorted(get_templates(config.template_dir('reports')))
+            sorted(get_templates(config.template_dir("reports")))
         )
         self.layout.addRow(self.label_template, self.item_template)
-        if _settings['last_template']:
-            self.item_template.setCurrentText(_settings['last_template'])
+        if _settings["last_template"]:
+            self.item_template.setCurrentText(_settings["last_template"])
 
-        self.item_custom_dir = QPushButton(translate('Select the templates directory'))
+        self.item_custom_dir = QPushButton(translate("Select the templates directory"))
 
         def select_custom_dir() -> None:
             dirpath = get_existing_directory(
-                translate('Open the templates directory'), config.template_dir()
+                translate("Open the templates directory"), config.template_dir()
             )
             if not dirpath:
                 return
 
             self.item_custom_dirpath.setText(dirpath)
-            Config().templates.set('directory', dirpath)
+            Config().templates.set("directory", dirpath)
             config.set_template_dir(dirpath)
             self.item_template.clear()
             self.item_template.addItems(
-                sorted(get_templates(config.template_dir('reports')))
+                sorted(get_templates(config.template_dir("reports")))
             )
 
         self.item_custom_dir.clicked.connect(select_custom_dir)
@@ -89,29 +89,29 @@ class ReportDialog(QDialog):
         self.item_custom_dirpath.setText(config.template_dir())
         self.layout.addRow(self.item_custom_dirpath)
 
-        self.item_custom_path = QPushButton(translate('Choose template'))
+        self.item_custom_path = QPushButton(translate("Choose template"))
 
         def select_custom_path() -> None:
             file_name = get_open_file_name(
-                translate('Open HTML template'), translate('HTML file (*.html)')
+                translate("Open HTML template"), translate("HTML file (*.html)")
             )
             self.item_template.setCurrentText(file_name)
 
         self.item_custom_path.clicked.connect(select_custom_path)
         self.layout.addRow(self.item_custom_path)
 
-        self.item_open_in_browser = QCheckBox(translate('Open in browser'))
-        self.item_open_in_browser.setChecked(_settings['open_in_browser'])
+        self.item_open_in_browser = QCheckBox(translate("Open in browser"))
+        self.item_open_in_browser.setChecked(_settings["open_in_browser"])
         self.layout.addRow(self.item_open_in_browser)
 
-        self.item_save_to_last_file = QCheckBox(translate('Save to last file'))
-        self.item_save_to_last_file.setChecked(_settings['save_to_last_file'])
+        self.item_save_to_last_file = QCheckBox(translate("Save to last file"))
+        self.item_save_to_last_file.setChecked(_settings["save_to_last_file"])
         self.layout.addRow(self.item_save_to_last_file)
-        if _settings['last_file'] is None:
+        if _settings["last_file"] is None:
             self.item_save_to_last_file.setDisabled(True)
 
-        self.item_selected = QCheckBox(translate('Send selected'))
-        self.item_selected.setChecked(_settings['selected'])
+        self.item_selected = QCheckBox(translate("Send selected"))
+        self.item_selected.setChecked(_settings["selected"])
         self.layout.addRow(self.item_selected)
 
         def cancel_changes():
@@ -129,10 +129,10 @@ class ReportDialog(QDialog):
 
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         self.button_ok = button_box.button(QDialogButtonBox.Ok)
-        self.button_ok.setText(translate('OK'))
+        self.button_ok.setText(translate("OK"))
         self.button_ok.clicked.connect(apply_changes)
         self.button_cancel = button_box.button(QDialogButtonBox.Cancel)
-        self.button_cancel.setText(translate('Cancel'))
+        self.button_cancel.setText(translate("Cancel"))
         self.button_cancel.clicked.connect(cancel_changes)
         self.layout.addRow(button_box)
 
@@ -145,17 +145,17 @@ class ReportDialog(QDialog):
 
         template_path = self.item_template.currentText()
 
-        _settings['last_template'] = template_path
-        _settings['open_in_browser'] = self.item_open_in_browser.isChecked()
-        _settings['save_to_last_file'] = self.item_save_to_last_file.isChecked()
-        _settings['selected'] = self.item_selected.isChecked()
+        _settings["last_template"] = template_path
+        _settings["open_in_browser"] = self.item_open_in_browser.isChecked()
+        _settings["save_to_last_file"] = self.item_save_to_last_file.isChecked()
+        _settings["selected"] = self.item_selected.isChecked()
 
         ResultCalculation(obj).process_results()
         RaceSplits(obj).generate()
         ScoreCalculation(obj).calculate_scores()
 
         races_dict = []
-        if _settings['selected']:
+        if _settings["selected"]:
             if mw.current_tab == 0:
                 person_list = []
                 for i in mw.get_selected_rows():
@@ -229,33 +229,33 @@ class ReportDialog(QDialog):
         else:
             races_dict = [r.to_dict() for r in races()]
 
-        template_path_items = template_path.split('/')[-1]
-        template_path_items = '.'.join(template_path_items.split('.')[:-1]).split('_')
+        template_path_items = template_path.split("/")[-1]
+        template_path_items = ".".join(template_path_items.split(".")[:-1]).split("_")
 
         # remove tokens, containing only digits
         for i in template_path_items:
             if str(i).isdigit():
                 template_path_items.remove(i)
-        report_suffix = '_'.join(template_path_items)
+        report_suffix = "_".join(template_path_items)
 
-        if template_path.endswith('.docx'):
+        if template_path.endswith(".docx"):
             # DOCX template processing
             full_path = config.template_dir() + template_path
             doc = DocxTemplate(full_path)
             context = {}
-            context['race'] = races_dict[get_current_race_index()]
-            context['name'] = config.NAME
-            context['version'] = str(config.VERSION)
+            context["race"] = races_dict[get_current_race_index()]
+            context["name"] = config.NAME
+            context["version"] = str(config.VERSION)
             doc.render(context)
 
-            if _settings['save_to_last_file']:
-                file_name = _settings['last_file']
+            if _settings["save_to_last_file"]:
+                file_name = _settings["last_file"]
             else:
                 file_name = get_save_file_name(
-                    translate('Save As MS Word file'),
-                    translate('MS Word file (*.docx)'),
-                    '{}_{}'.format(
-                        obj.data.get_start_datetime().strftime('%Y%m%d'), report_suffix
+                    translate("Save As MS Word file"),
+                    translate("MS Word file (*.docx)"),
+                    "{}_{}".format(
+                        obj.data.get_start_datetime().strftime("%Y%m%d"), report_suffix
                     ),
                 )
             if file_name:
@@ -295,25 +295,25 @@ class ReportDialog(QDialog):
                 races=races_dict,
                 rent_cards=list(RentCards().get()),
                 current_race=get_current_race_index(),
-                selected={'persons': []},  # leave here for back compatibility
+                selected={"persons": []},  # leave here for back compatibility
             )
 
-            if _settings['save_to_last_file']:
-                file_name = _settings['last_file']
+            if _settings["save_to_last_file"]:
+                file_name = _settings["last_file"]
             else:
                 file_name = get_save_file_name(
-                    translate('Save As HTML file'),
-                    translate('HTML file (*.html)'),
-                    '{}_{}'.format(
-                        obj.data.get_start_datetime().strftime('%Y%m%d'), report_suffix
+                    translate("Save As HTML file"),
+                    translate("HTML file (*.html)"),
+                    "{}_{}".format(
+                        obj.data.get_start_datetime().strftime("%Y%m%d"), report_suffix
                     ),
                 )
             if len(file_name):
-                _settings['last_file'] = file_name
-                with codecs.open(file_name, 'w', 'utf-8') as file:
+                _settings["last_file"] = file_name
+                with codecs.open(file_name, "w", "utf-8") as file:
                     file.write(template)
                     file.close()
 
                 # Open file in your browser
-                if _settings['open_in_browser']:
-                    webbrowser.open('file://' + file_name, new=2)
+                if _settings["open_in_browser"]:
+                    webbrowser.open("file://" + file_name, new=2)

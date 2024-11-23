@@ -69,7 +69,7 @@ class OrganizationMassEditDialog(QDialog):
         try:
             # apply mass edit here
             mv = GlobalAccess().get_main_window()
-            selection = mv.get_selected_rows(mv.get_table_by_name('OrganizationTable'))
+            selection = mv.get_selected_rows(mv.get_table_by_name("OrganizationTable"))
             if selection:
                 obj = race()
 
@@ -107,11 +107,11 @@ class OrganizationMassEditDialog(QDialog):
         super().accept(*args, **kwargs)
 
     def translate_ui(self):
-        self.setWindowTitle(translate('Mass Edit Dialog'))
-        self.orzanization_checkbox.setText(translate('Team'))
-        self.code_checkbox.setText(translate('Code'))
-        self.country_checkbox.setText(translate('Country'))
-        self.region_checkbox.setText(translate('Region'))
+        self.setWindowTitle(translate("Mass Edit Dialog"))
+        self.orzanization_checkbox.setText(translate("Team"))
+        self.code_checkbox.setText(translate("Code"))
+        self.country_checkbox.setText(translate("Country"))
+        self.region_checkbox.setText(translate("Region"))
 
-        self.button_ok.setText(translate('OK'))
-        self.button_cancel.setText(translate('Cancel'))
+        self.button_ok.setText(translate("OK"))
+        self.button_cancel.setText(translate("Cancel"))

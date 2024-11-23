@@ -86,11 +86,11 @@ class OTime:
         return self.__str__()
 
     @classmethod
-    def now(cls) -> 'OTime':
+    def now(cls) -> "OTime":
         now = datetime.datetime.now()
         return OTime(0, now.hour, now.minute, now.second, round(now.microsecond / 1000))
 
-    def replace(self, day=None, hour=None, minute=None, sec=None, msec=None) -> 'OTime':
+    def replace(self, day=None, hour=None, minute=None, sec=None, msec=None) -> "OTime":
         return OTime(
             self.if_none(day, self.day),
             self.if_none(hour, self.hour),
@@ -99,7 +99,7 @@ class OTime:
             self.if_none(msec, self.msec),
         )
 
-    def copy(self) -> 'OTime':
+    def copy(self) -> "OTime":
         return OTime(msec=self.to_msec())
 
     def to_minute(self):
@@ -119,9 +119,9 @@ class OTime:
 
     def to_minute_str(self):
         minute = int(self.to_msec() / (1000 * 60))
-        return '{}:{}'.format(
-            minute if minute > 9 else '0' + str(minute),
-            self.sec if self.sec > 9 else '0' + str(self.sec),
+        return "{}:{}".format(
+            minute if minute > 9 else "0" + str(minute),
+            self.sec if self.sec > 9 else "0" + str(self.sec),
         )
 
     @staticmethod
@@ -141,18 +141,18 @@ class OTime:
     def to_str(self, time_accuracy: int = 0) -> str:
         hour = self.hour + self.day * 24
         if time_accuracy == 0:
-            return f'{hour:02}:{self.minute:02}:{self.sec:02}'
+            return f"{hour:02}:{self.minute:02}:{self.sec:02}"
         elif time_accuracy == 3:
-            return f'{hour:02}:{self.minute:02}:{self.sec:02}.{self.msec:003}'
+            return f"{hour:02}:{self.minute:02}:{self.sec:02}.{self.msec:003}"
         elif time_accuracy == 2:
-            return f'{hour:02}:{self.minute:02}:{self.sec:02}.{self.msec // 10:02}'
+            return f"{hour:02}:{self.minute:02}:{self.sec:02}.{self.msec // 10:02}"
         elif time_accuracy == 1:
-            return f'{hour:02}:{self.minute:02}:{self.sec:02}.{self.msec // 100}'
-        raise ValueError('time_accuracy is invalid')
+            return f"{hour:02}:{self.minute:02}:{self.sec:02}.{self.msec // 100}"
+        raise ValueError("time_accuracy is invalid")
 
     def round(
         self, time_accuracy: int = 0, time_rounding: TimeRounding = TimeRounding.math
-    ) -> 'OTime':
+    ) -> "OTime":
         ms = self.to_msec()
         multiplier = 10 ** (3 - time_accuracy)
         if time_rounding == TimeRounding.math:

@@ -29,8 +29,8 @@ class GroupMassEditDialog(QDialog):
 
         self.layout = QFormLayout(self)
 
-        yes = translate('Yes')
-        no = translate('No')
+        yes = translate("Yes")
+        no = translate("No")
         cur_year = datetime.datetime.now().year
 
         max_field_width = 80
@@ -59,7 +59,7 @@ class GroupMassEditDialog(QDialog):
 
         self.time_limit_checkbox = QtWidgets.QCheckBox(self)
         self.time_limit_edit = AdvTimeEdit(
-            display_format='hh:mm:ss', max_width=max_field_width
+            display_format="hh:mm:ss", max_width=max_field_width
         )
         self.layout.addRow(self.time_limit_checkbox, self.time_limit_edit)
 
@@ -77,7 +77,7 @@ class GroupMassEditDialog(QDialog):
 
         self.start_interval_checkbox = QtWidgets.QCheckBox(self)
         self.start_interval_edit = AdvTimeEdit(
-            display_format='hh:mm:ss', max_width=max_field_width
+            display_format="hh:mm:ss", max_width=max_field_width
         )
         self.layout.addRow(self.start_interval_checkbox, self.start_interval_edit)
 
@@ -125,11 +125,11 @@ class GroupMassEditDialog(QDialog):
         self.relay_type_combobox.setEnabled(is_relay_type_enabled)
 
     def accept(self, *args, **kwargs):
-        yes = translate('Yes')
+        yes = translate("Yes")
         try:
             # apply mass edit here
             mv = GlobalAccess().get_main_window()
-            selection = mv.get_selected_rows(mv.get_table_by_name('GroupTable'))
+            selection = mv.get_selected_rows(mv.get_table_by_name("GroupTable"))
             if selection:
                 obj = race()
 
@@ -194,19 +194,19 @@ class GroupMassEditDialog(QDialog):
         super().accept(*args, **kwargs)
 
     def translate_ui(self):
-        self.setWindowTitle(translate('Mass Edit Dialog'))
-        self.course_checkbox.setText(translate('Course'))
-        self.any_course_checkbox.setText(translate('Is any course'))
-        self.min_year_checkbox.setText(translate('Min year'))
-        self.max_year_checkbox.setText(translate('Max year'))
-        self.time_limit_checkbox.setText(translate('Max time'))
-        self.start_corridor_checkbox.setText(translate('Start corridor'))
-        self.order_in_corridor_checkbox.setText(translate('Order in corridor'))
-        self.start_interval_checkbox.setText(translate('Start interval'))
-        self.fee_checkbox.setText(translate('Start fee'))
-        self.type_checkbox.setText(translate('Type'))
-        self.relay_type_checkbox.setText(translate('Best team placing'))
-        self.ranking_checkbox.setText(translate('Rank calculation'))
+        self.setWindowTitle(translate("Mass Edit Dialog"))
+        self.course_checkbox.setText(translate("Course"))
+        self.any_course_checkbox.setText(translate("Is any course"))
+        self.min_year_checkbox.setText(translate("Min year"))
+        self.max_year_checkbox.setText(translate("Max year"))
+        self.time_limit_checkbox.setText(translate("Max time"))
+        self.start_corridor_checkbox.setText(translate("Start corridor"))
+        self.order_in_corridor_checkbox.setText(translate("Order in corridor"))
+        self.start_interval_checkbox.setText(translate("Start interval"))
+        self.fee_checkbox.setText(translate("Start fee"))
+        self.type_checkbox.setText(translate("Type"))
+        self.relay_type_checkbox.setText(translate("Best team placing"))
+        self.ranking_checkbox.setText(translate("Rank calculation"))
 
-        self.button_ok.setText(translate('OK'))
-        self.button_cancel.setText(translate('Cancel'))
+        self.button_ok.setText(translate("OK"))
+        self.button_cancel.setText(translate("Cancel"))

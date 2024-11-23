@@ -69,17 +69,17 @@ class SIReaderThread(QThread):
                     time.sleep(0.2)
                     if not main_thread().is_alive() or self._stop_event.is_set():
                         si.disconnect()
-                        self._logger.debug('Stop sireader')
+                        self._logger.debug("Stop sireader")
                         return
                 card_data = si.read_sicard()
-                card_data['card_type'] = si.cardtype
+                card_data["card_type"] = si.cardtype
                 if (
-                    str(card_data['card_number']).isdigit()
-                    and int(card_data['card_number']) > 0
+                    str(card_data["card_number"]).isdigit()
+                    and int(card_data["card_number"]) > 0
                 ):
-                    self._queue.put(SIReaderCommand('card_data', card_data), timeout=1)
+                    self._queue.put(SIReaderCommand("card_data", card_data), timeout=1)
                 else:
-                    self._logger.debug('sireader error: got 0 card number')
+                    self._logger.debug("sireader error: got 0 card number")
                 si.ack_sicard()
             except SIReaderException as e:
                 error_count += 1
@@ -112,7 +112,7 @@ class ResultThread(QThread):
         while True:
             try:
                 cmd = self._queue.get(timeout=5)
-                if cmd.command == 'card_data':
+                if cmd.command == "card_data":
                     result = self._get_result(self._check_data(cmd.data))
                     self.data_sender.emit(result)
                     backup.backup_data(cmd.data)
@@ -121,50 +121,50 @@ class ResultThread(QThread):
                     break
             except Exception as e:
                 self._logger.error(str(e))
-        self._logger.debug('Stop adder result')
+        self._logger.debug("Stop adder result")
 
     def _check_data(self, card_data):
         # TODO requires more complex checking for long starts > 12 hours
-        if self.start_time and card_data['card_type'] == 'SI5':
+        if self.start_time and card_data["card_type"] == "SI5":
             start_time = self.time_to_sec(self.start_time)
-            for i in range(len(card_data['punches'])):
-                if self.time_to_sec(card_data['punches'][i][1]) < start_time:
-                    new_datetime = card_data['punches'][i][1].replace(
-                        hour=(card_data['punches'][i][1].hour + 12) % 24
+            for i in range(len(card_data["punches"])):
+                if self.time_to_sec(card_data["punches"][i][1]) < start_time:
+                    new_datetime = card_data["punches"][i][1].replace(
+                        hour=(card_data["punches"][i][1].hour + 12) % 24
                     )
-                    card_data['punches'][i] = (card_data['punches'][i][0], new_datetime)
+                    card_data["punches"][i] = (card_data["punches"][i][0], new_datetime)
 
                 # simple check for morning starts (10:00 a.m. was 22:00 in splits)
                 if (
-                    self.time_to_sec(card_data['punches'][i][1]) - 12 * 3600
+                    self.time_to_sec(card_data["punches"][i][1]) - 12 * 3600
                     > start_time
                 ):
-                    new_datetime = card_data['punches'][i][1].replace(
-                        hour=card_data['punches'][i][1].hour - 12
+                    new_datetime = card_data["punches"][i][1].replace(
+                        hour=card_data["punches"][i][1].hour - 12
                     )
-                    card_data['punches'][i] = (card_data['punches'][i][0], new_datetime)
+                    card_data["punches"][i] = (card_data["punches"][i][0], new_datetime)
 
         return card_data
 
     @staticmethod
     def _get_result(card_data):
         result = memory.race().new_result()
-        result.card_number = int(card_data['card_number'])
+        result.card_number = int(card_data["card_number"])
 
-        for i in range(len(card_data['punches'])):
-            t = card_data['punches'][i][1]
+        for i in range(len(card_data["punches"])):
+            t = card_data["punches"][i][1]
             if t:
                 split = memory.Split()
-                split.code = str(card_data['punches'][i][0])
+                split.code = str(card_data["punches"][i][0])
                 split.time = time_to_otime(t)
                 split.days = memory.race().get_days(t)
                 result.splits.append(split)
 
-        if card_data['start']:
-            result.start_time = time_to_otime(card_data['start'])
+        if card_data["start"]:
+            result.start_time = time_to_otime(card_data["start"])
 
-        if card_data['finish']:
-            result.finish_time = time_to_otime(card_data['finish'])
+        if card_data["finish"]:
+            result.finish_time = time_to_otime(card_data["finish"])
         else:
             # no finish punch, process
             result.finish_time = None
@@ -243,13 +243,13 @@ class SIReaderClient:
             self._stop_event.clear()
             self._start_si_reader_thread()
             self._start_result_thread()
-            self._logger.info(translate('Opening port') + ' ' + self.port)
+            self._logger.info(translate("Opening port") + " " + self.port)
         else:
-            self._logger.info(translate('Cannot open port'))
+            self._logger.info(translate("Cannot open port"))
 
     def stop(self):
         self._stop_event.set()
-        self._logger.info(translate('Closing port'))
+        self._logger.info(translate("Closing port"))
 
     def toggle(self):
         if self.is_alive():
@@ -261,14 +261,14 @@ class SIReaderClient:
     def get_ports():
         ports = []
         scan_ports = []
-        if platform.system() == 'Linux':
+        if platform.system() == "Linux":
             scan_ports = [
-                os.path.join('/dev', f)
-                for f in os.listdir('/dev')
-                if re.match('ttyS.*|ttyUSB.*', f)
+                os.path.join("/dev", f)
+                for f in os.listdir("/dev")
+                if re.match("ttyS.*|ttyUSB.*", f)
             ]
-        elif platform.system() == 'Windows':
-            scan_ports = ['COM' + str(i) for i in range(48)]
+        elif platform.system() == "Windows":
+            scan_ports = ["COM" + str(i) for i in range(48)]
 
         for p in scan_ports:
             try:
@@ -281,22 +281,22 @@ class SIReaderClient:
         return ports
 
     def choose_port(self):
-        si_port = memory.race().get_setting('system_port', '')
+        si_port = memory.race().get_setting("system_port", "")
         if si_port:
             return si_port
         ports = self.get_ports()
         if len(ports):
-            self._logger.info(translate('Available Ports'))
+            self._logger.info(translate("Available Ports"))
             for i, p in enumerate(ports):
-                self._logger.info('{} - {}'.format(i, p))
+                self._logger.info("{} - {}".format(i, p))
             return ports[0]
         else:
-            self._logger.info('No ports available')
+            self._logger.info("No ports available")
             return None
 
     @staticmethod
     def get_start_time():
-        start_time = memory.race().get_setting('system_zero_time', (8, 0, 0))
+        start_time = memory.race().get_setting("system_zero_time", (8, 0, 0))
         return datetime.datetime.today().replace(
             hour=start_time[0],
             minute=start_time[1],

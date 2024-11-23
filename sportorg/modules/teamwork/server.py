@@ -24,7 +24,7 @@ class ServerReceiver:
         self._in_queue = in_queue
         self._out_queue = out_queue
         self._logger = logger
-        self._full_data = b''
+        self._full_data = b""
         self._hdr = Header()
         self._is_new_pack = True
 
@@ -128,7 +128,7 @@ class ServerThread(Thread):
         logger,
     ):
         super().__init__(daemon=True)
-        self.setName('Teamwork Server')
+        self.setName("Teamwork Server")
         self.addr = addr
         self._in_queue = in_queue
         self._out_queue = out_queue
@@ -146,7 +146,7 @@ class ServerThread(Thread):
             try:
                 s.bind(self.addr)
             except Exception as e:
-                self._logger.error('Server start error')
+                self._logger.error("Server start error")
                 self._logger.debug(str(e))
                 self._stop_event.set()
                 return
@@ -162,7 +162,7 @@ class ServerThread(Thread):
                 ),
             )
 
-            self._logger.info('Server started')
+            self._logger.info("Server started")
 
             sender = ServerSender(selector, self._in_queue, self._logger)
             self._started.set()
@@ -192,4 +192,4 @@ class ServerThread(Thread):
                     self._logger.exception(str(e))
 
             selector.close()
-        self._logger.info('Server stopped')
+        self._logger.info("Server stopped")

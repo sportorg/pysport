@@ -23,7 +23,7 @@ class Widget(QtWidgets.QWidget):
         self.setup_ui()
 
     def setup_ui(self):
-        self.organization_table.setObjectName('OrganizationTable')
+        self.organization_table.setObjectName("OrganizationTable")
         self.organization_table.setModel(OrganizationMemoryModel())
 
         def team_double_clicked(index):

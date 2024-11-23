@@ -24,7 +24,7 @@ class MergeResultsDialog(QDialog):
         return super().exec_()
 
     def init_ui(self):
-        self.setWindowTitle(translate('Merge results'))
+        self.setWindowTitle(translate("Merge results"))
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(True)
@@ -33,14 +33,14 @@ class MergeResultsDialog(QDialog):
 
         self.item_min_time_interval = AdvTimeEdit(time=OTime(minute=1))
         self.layout.addRow(
-            QLabel(translate('Min. time interval')), self.item_min_time_interval
+            QLabel(translate("Min. time interval")), self.item_min_time_interval
         )
 
         self.item_first_cp = AdvSpinBox(value=101, minimum=1, maximum=1024)
-        self.layout.addRow(QLabel(translate('First CP')), self.item_first_cp)
+        self.layout.addRow(QLabel(translate("First CP")), self.item_first_cp)
 
         self.item_cp_increment = AdvSpinBox(value=1, minimum=0, maximum=100)
-        self.layout.addRow(QLabel(translate('CP increment')), self.item_cp_increment)
+        self.layout.addRow(QLabel(translate("CP increment")), self.item_cp_increment)
 
         def cancel_changes():
             self.close()
@@ -54,10 +54,10 @@ class MergeResultsDialog(QDialog):
 
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         self.button_ok = button_box.button(QDialogButtonBox.Ok)
-        self.button_ok.setText(translate('Ok'))
+        self.button_ok.setText(translate("Ok"))
         self.button_ok.clicked.connect(apply_changes)
         self.button_cancel = button_box.button(QDialogButtonBox.Cancel)
-        self.button_cancel.setText(translate('Cancel'))
+        self.button_cancel.setText(translate("Cancel"))
         self.button_cancel.clicked.connect(cancel_changes)
         self.layout.addRow(button_box)
 
@@ -111,7 +111,7 @@ class MergeResultsDialog(QDialog):
                     cur_cp += cp_increment
                 else:
                     logging.debug(
-                        'skip time: ' + str(i.finish_time) + ' for bib ' + str(cur_bib)
+                        "skip time: " + str(i.finish_time) + " for bib " + str(cur_bib)
                     )
 
             # append splits from existing objects

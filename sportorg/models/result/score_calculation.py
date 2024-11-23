@@ -11,20 +11,20 @@ class ScoreCalculation:
         self.race = r
         self.formula = None
         self.wrong_formula = False
-        if self.race.get_setting('scores_mode', 'off') == 'formula':
-            self.formula = str(self.race.get_setting('scores_formula', '0'))
+        if self.race.get_setting("scores_mode", "off") == "formula":
+            self.formula = str(self.race.get_setting("scores_formula", "0"))
 
     def get_scores_by_formula(self, leader, time):
         if self.formula and not self.wrong_formula:
             try:
-                return max(eval(self.formula, {}, {'leader': leader, 'time': time}), 0)
+                return max(eval(self.formula, {}, {"leader": leader, "time": time}), 0)
             except Exception as e:
                 logging.error(str(e))
                 self.wrong_formula = True
         return 0
 
     def calculate_scores(self):
-        logging.debug('Score calculation')
+        logging.debug("Score calculation")
         for i in self.race.results:
             self.calculate_scores_result(i)
 
@@ -36,11 +36,11 @@ class ScoreCalculation:
             ) == RaceType.RELAY and get_team_result(result.person) == OTime(0):
                 place = 0
             if place > 0:
-                scores_type = self.race.get_setting('scores_mode', 'off')
-                if scores_type == 'array':
+                scores_type = self.race.get_setting("scores_mode", "off")
+                if scores_type == "array":
                     scores_array = str(
-                        self.race.get_setting('scores_array', '0')
-                    ).split(',')
+                        self.race.get_setting("scores_array", "0")
+                    ).split(",")
                     if len(scores_array):
                         if place > len(scores_array):
                             if scores_array[-1].isdigit():
@@ -50,7 +50,7 @@ class ScoreCalculation:
                                 result.scores = int(scores_array[place - 1])
                     else:
                         result.scores = 0
-                elif scores_type == 'formula':
+                elif scores_type == "formula":
                     if self.race.get_type(result.person.group) == RaceType.RELAY:
                         time_value = get_team_result(result.person).to_msec()
                     else:

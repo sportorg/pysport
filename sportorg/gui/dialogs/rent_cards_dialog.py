@@ -19,7 +19,7 @@ class RentCardsDialog(QDialog):
         return super().exec_()
 
     def init_ui(self):
-        self.setWindowTitle(translate('Rent cards'))
+        self.setWindowTitle(translate("Rent cards"))
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(True)
@@ -27,7 +27,7 @@ class RentCardsDialog(QDialog):
         self.layout = QFormLayout(self)
 
         self.label_cards = QLabel(
-            '\n\n8654842\n8654844\n8654815\n8654825\n...\n1654815'
+            "\n\n8654842\n8654844\n8654815\n8654825\n...\n1654815"
         )
         self.item_cards = QTextEdit()
         self.item_cards.setPlainText(RentCards().to_text())
@@ -46,10 +46,10 @@ class RentCardsDialog(QDialog):
 
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         self.button_ok = button_box.button(QDialogButtonBox.Ok)
-        self.button_ok.setText(translate('OK'))
+        self.button_ok.setText(translate("OK"))
         self.button_ok.clicked.connect(apply_changes)
         self.button_cancel = button_box.button(QDialogButtonBox.Cancel)
-        self.button_cancel.setText(translate('Cancel'))
+        self.button_cancel.setText(translate("Cancel"))
         self.button_cancel.clicked.connect(cancel_changes)
         self.layout.addRow(button_box)
 
@@ -60,5 +60,5 @@ class RentCardsDialog(QDialog):
     def apply_changes_impl(self):
         text = self.item_cards.toPlainText()
         RentCards().set_from_text(text)
-        with open(config.data_dir('rent_cards.txt'), 'w', encoding='utf-8') as f:
+        with open(config.data_dir("rent_cards.txt"), "w", encoding="utf-8") as f:
             f.write(RentCards().to_text())

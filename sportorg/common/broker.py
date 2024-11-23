@@ -53,7 +53,7 @@ class Broker:
                     r = method(*args, **kwargs)
                 except AttributeError:
                     self._logger.error(
-                        'Class `%s` does not implement `%s`',
+                        "Class `%s` does not implement `%s`",
                         cls.__class__.__name__,
                         method_name,
                     )

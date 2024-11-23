@@ -32,9 +32,9 @@ class MassEditDialog(QDialog):
         self.group_checkbox = QtWidgets.QCheckBox(self)
         self.group_combo = AdvComboBox(self)
 
-        empty_value = ''
-        yes = translate('Yes')
-        no = translate('No')
+        empty_value = ""
+        yes = translate("Yes")
+        no = translate("No")
 
         max_field_width = 80
 
@@ -91,7 +91,7 @@ class MassEditDialog(QDialog):
 
         self.start_time_checkbox = QtWidgets.QCheckBox(self)
         self.start_time_edit = AdvTimeEdit(
-            display_format='hh:mm:ss', max_width=max_field_width
+            display_format="hh:mm:ss", max_width=max_field_width
         )
         self.layout.addRow(self.start_time_checkbox, self.start_time_edit)
 
@@ -154,11 +154,11 @@ class MassEditDialog(QDialog):
         self.show()
 
     def accept(self, *args, **kwargs):
-        yes = translate('Yes')
+        yes = translate("Yes")
         try:
             # apply mass edit here
             mv = GlobalAccess().get_main_window()
-            selection = mv.get_selected_rows(mv.get_table_by_name('PersonTable'))
+            selection = mv.get_selected_rows(mv.get_table_by_name("PersonTable"))
             if selection:
                 obj = race()
 
@@ -239,22 +239,22 @@ class MassEditDialog(QDialog):
         super().accept(*args, **kwargs)
 
     def translate_ui(self):
-        self.setWindowTitle(translate('Mass Edit Dialog'))
-        self.group_checkbox.setText(translate('Group'))
-        self.team_checkbox.setText(translate('Team'))
-        self.year_checkbox.setText(translate('Year'))
-        self.qual_checkbox.setText(translate('Qualification'))
-        self.bib_checkbox.setText(translate('Bib'))
-        self.world_code_checkbox.setText(translate('World code'))
-        self.national_code_checkbox.setText(translate('National code'))
-        self.card_checkbox.setText(translate('Card'))
-        self.start_time_checkbox.setText(translate('Start time'))
-        self.start_group_checkbox.setText(translate('Start group'))
-        self.comment_checkbox.setText(translate('Comment'))
-        self.rented_checkbox.setText(translate('rented card'))
-        self.paid_checkbox.setText(translate('is paid'))
-        self.out_of_competition_checkbox.setText(translate('out of competition'))
-        self.personal_checkbox.setText(translate('personal participation'))
+        self.setWindowTitle(translate("Mass Edit Dialog"))
+        self.group_checkbox.setText(translate("Group"))
+        self.team_checkbox.setText(translate("Team"))
+        self.year_checkbox.setText(translate("Year"))
+        self.qual_checkbox.setText(translate("Qualification"))
+        self.bib_checkbox.setText(translate("Bib"))
+        self.world_code_checkbox.setText(translate("World code"))
+        self.national_code_checkbox.setText(translate("National code"))
+        self.card_checkbox.setText(translate("Card"))
+        self.start_time_checkbox.setText(translate("Start time"))
+        self.start_group_checkbox.setText(translate("Start group"))
+        self.comment_checkbox.setText(translate("Comment"))
+        self.rented_checkbox.setText(translate("rented card"))
+        self.paid_checkbox.setText(translate("is paid"))
+        self.out_of_competition_checkbox.setText(translate("out of competition"))
+        self.personal_checkbox.setText(translate("personal participation"))
 
-        self.button_ok.setText(translate('OK'))
-        self.button_cancel.setText(translate('Cancel'))
+        self.button_ok.setText(translate("OK"))
+        self.button_cancel.setText(translate("Cancel"))

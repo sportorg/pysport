@@ -15,14 +15,14 @@ class File:
         self._file_name = file_name
 
     @staticmethod
-    def backup(file_name: str, func, mode: str = 'r') -> None:
-        use_utf8 = Config().configuration.get('save_in_utf8', False)
+    def backup(file_name: str, func, mode: str = "r") -> None:
+        use_utf8 = Config().configuration.get("save_in_utf8", False)
         # if user set UTF-8 usage, first try to open file in UTF-8,
         # then in system locale (1251 for RU Windows)
         try:
             def_encoding = None
             if use_utf8:
-                def_encoding = 'utf-8'
+                def_encoding = "utf-8"
 
             with open(file_name, mode, encoding=def_encoding) as f:
                 func(f)
@@ -30,7 +30,7 @@ class File:
         except UnicodeDecodeError:
             f.close()
 
-            alt_encoding: Optional[str] = 'utf-8'
+            alt_encoding: Optional[str] = "utf-8"
             if use_utf8:
                 alt_encoding = None
 
@@ -38,27 +38,27 @@ class File:
                 func(f)
 
     def create(self) -> None:
-        logger.info('Create ' + self._file_name)
+        logger.info("Create " + self._file_name)
         self.backup(
-            self._file_name + '.tmp',
+            self._file_name + ".tmp",
             json.dump,
-            'w',
+            "w",
         )
-        atomic_rename(self._file_name + '.tmp', self._file_name, overwrite=True)
+        atomic_rename(self._file_name + ".tmp", self._file_name, overwrite=True)
 
     def save(self) -> None:
-        logger.info('Save ' + self._file_name)
+        logger.info("Save " + self._file_name)
         self.backup(
-            self._file_name + '.tmp',
+            self._file_name + ".tmp",
             json.dump,
-            'w',
+            "w",
         )
-        atomic_rename(self._file_name + '.tmp', self._file_name, overwrite=True)
+        atomic_rename(self._file_name + ".tmp", self._file_name, overwrite=True)
 
     def open(self) -> None:
-        logger.info('Open ' + self._file_name)
+        logger.info("Open " + self._file_name)
         self.backup(
             self._file_name,
             json.load,
-            'r',
+            "r",
         )

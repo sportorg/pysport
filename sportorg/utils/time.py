@@ -13,11 +13,11 @@ def timeit(method):
         ts = time.time()
         result = method(*args, **kw)
         te = time.time()
-        if 'log_time' in kw:
-            name = kw.get('log_name', method.__name__.upper())
-            kw['log_time'][name] = int((te - ts) * 1000)
+        if "log_time" in kw:
+            name = kw.get("log_name", method.__name__.upper())
+            kw["log_time"][name] = int((te - ts) * 1000)
         else:
-            print('%r  %2.2f ms' % (method.__name__, (te - ts) * 1000))
+            print("%r  %2.2f ms" % (method.__name__, (te - ts) * 1000))
         return result
 
     return timed
@@ -37,10 +37,10 @@ def time_to_otime(t) -> OTime:
 
 def time_iof_to_otime(t) -> OTime:
     str_t = str(t)
-    if str_t.find('T') > 0:
-        time_part = str_t[str_t.find('T') + 1 :]
-        if time_part.find('+') > 0:
-            time_part = time_part[: time_part.find('+')]
+    if str_t.find("T") > 0:
+        time_part = str_t[str_t.find("T") + 1 :]
+        if time_part.find("+") > 0:
+            time_part = time_part[: time_part.find("+")]
         return hhmmss_to_time(time_part)
     return OTime()
 
@@ -94,19 +94,19 @@ def time_to_int(value):
 
 def time_to_mmss(value):
     time_ = time_to_datetime(value)
-    return str(time_.strftime('%M:%S'))
+    return str(time_.strftime("%M:%S"))
 
 
 def time_to_hhmmss(value):
     time_ = time_to_datetime(value)
-    return time_.strftime('%H:%M:%S')
+    return time_.strftime("%H:%M:%S")
 
 
 def hhmmss_to_time(value):
-    arr = str(value).split(':')
+    arr = str(value).split(":")
     if len(arr) == 3:
         msec = 0
-        secs = arr[2].split('.')
+        secs = arr[2].split(".")
         sec = int(secs[0])
         if len(secs) == 2:
             msec = int(secs[1])
@@ -164,7 +164,7 @@ def time_to_minutes(value, max_val=24 * 60):
 
 def get_speed_min_per_km(time, length_m):
     time_km = time / (length_m / 1000)
-    return time_to_mmss(time_km) + '/km'
+    return time_to_mmss(time_km) + "/km"
 
 
 def qdate_to_date(value):
@@ -175,11 +175,11 @@ def date_to_qdate(value):
     return QDate(value.year, value.month, value.day)
 
 
-def str_to_date(value, separator='-'):
+def str_to_date(value, separator="-"):
     day, month, year = str(value).split(separator)
     return date(int(year), int(month), int(day))
 
 
-def yyyymmdd_to_date(value, separator='-'):
+def yyyymmdd_to_date(value, separator="-"):
     year, month, day = str(value).split(separator)
     return date(int(year), int(month), int(day))

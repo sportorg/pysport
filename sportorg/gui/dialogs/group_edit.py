@@ -24,100 +24,100 @@ class GroupEditDialog(BaseDialog):
         super().__init__(GlobalAccess().get_main_window())
         self.current_object = group
         self.is_new = is_new
-        time_format = 'hh:mm:ss'
-        self.title = translate('Group properties')
+        time_format = "hh:mm:ss"
+        self.title = translate("Group properties")
         self.size = (450, 540)
         self.form = [
             LineField(
-                title=translate('Name'),
+                title=translate("Name"),
                 object=group,
-                key='name',
-                id='name',
+                key="name",
+                id="name",
                 select_all=True,
             ),
             LineField(
-                title=translate('Full name'),
+                title=translate("Full name"),
                 object=group,
-                key='long_name',
+                key="long_name",
             ),
             AdvComboBoxField(
-                title=translate('Course'),
+                title=translate("Course"),
                 object=group,
-                key='course',
-                id='course',
+                key="course",
+                id="course",
                 items=get_race_courses(),
             ),
             CheckBoxField(
-                label=translate('Is any course'),
+                label=translate("Is any course"),
                 object=group,
-                key='is_any_course',
-                id='is_any_course',
+                key="is_any_course",
+                id="is_any_course",
             ),
             NumberField(
-                title=translate('Min year'),
+                title=translate("Min year"),
                 object=group,
-                key='min_year',
-                id='min_year',
+                key="min_year",
+                id="min_year",
                 minimum=0,
                 maximum=date.today().year,
             ),
             NumberField(
-                title=translate('Max year'),
+                title=translate("Max year"),
                 object=group,
-                key='max_year',
-                id='max_year',
+                key="max_year",
+                id="max_year",
                 minimum=0,
                 maximum=date.today().year,
             ),
             TimeField(
-                title=translate('Max time'),
+                title=translate("Max time"),
                 object=group,
-                key='max_time',
+                key="max_time",
                 format=time_format,
             ),
             NumberField(
-                title=translate('Start corridor'),
+                title=translate("Start corridor"),
                 object=group,
-                key='start_corridor',
+                key="start_corridor",
             ),
             NumberField(
-                title=translate('Order in corridor'),
+                title=translate("Order in corridor"),
                 object=group,
-                key='order_in_corridor',
+                key="order_in_corridor",
             ),
             TimeField(
-                title=translate('Start interval'),
+                title=translate("Start interval"),
                 object=group,
-                key='start_interval',
+                key="start_interval",
                 format=time_format,
             ),
             NumberField(
-                title=translate('Start fee'),
+                title=translate("Start fee"),
                 object=group,
-                key='price',
+                key="price",
                 single_step=50,
                 maximum=Limit.PRICE,
             ),
             AdvComboBoxField(
-                title=translate('Type'),
+                title=translate("Type"),
                 object=group,
-                key='race_type',
-                id='race_type',
+                key="race_type",
+                id="race_type",
                 items=RaceType.get_titles(),
             ),
             CheckBoxField(
-                label=translate('Best team placing'),
+                label=translate("Best team placing"),
                 object=group,
-                key='is_best_team_placing_mode',
-                id='is_best_team_placing_mode',
+                key="is_best_team_placing_mode",
+                id="is_best_team_placing_mode",
             ),
             CheckBoxField(
-                label=translate('Rank calculation'),
+                label=translate("Rank calculation"),
                 object=group.ranking,
-                key='is_active',
-                id='is_ranking_active',
+                key="is_active",
+                id="is_ranking_active",
             ),
-            ButtonField(text=translate('Configuration'), id='ranking'),
+            ButtonField(text=translate("Configuration"), id="ranking"),
         ]
 
     def before_showing(self) -> None:
@@ -127,7 +127,7 @@ class GroupEditDialog(BaseDialog):
 
     def convert_course(self, course) -> str:
         if not course:
-            return ''
+            return ""
         return course.name
 
     def convert_race_type(self, _) -> str:
@@ -140,11 +140,11 @@ class GroupEditDialog(BaseDialog):
         return RaceType.get_by_name(text)
 
     def is_relay_type_selected(self):
-        race_type_text = self.fields['race_type'].q_item.currentText()
+        race_type_text = self.fields["race_type"].q_item.currentText()
         return self.parse_race_type(race_type_text) == RaceType.RELAY
 
     def on_name_changed(self):
-        name = self.fields['name'].q_item.text()
+        name = self.fields["name"].q_item.text()
         self.button_ok.setDisabled(False)
         if name and name != self.current_object.name:
             group = find(race().groups, name=name)
@@ -157,17 +157,17 @@ class GroupEditDialog(BaseDialog):
         self.show()
 
     def on_is_any_course_changed(self):
-        self.fields['course'].q_item.setDisabled(
-            self.fields['is_any_course'].q_item.isChecked()
+        self.fields["course"].q_item.setDisabled(
+            self.fields["is_any_course"].q_item.isChecked()
         )
 
     def on_is_ranking_active_changed(self):
-        self.fields['ranking'].q_item.setEnabled(
-            self.fields['is_ranking_active'].q_item.isChecked()
+        self.fields["ranking"].q_item.setEnabled(
+            self.fields["is_ranking_active"].q_item.isChecked()
         )
 
     def on_race_type_changed(self):
-        relay_type_item = self.fields['is_best_team_placing_mode'].q_item
+        relay_type_item = self.fields["is_best_team_placing_mode"].q_item
         if self.is_relay_type_selected():
             relay_type_item.show()
         else:

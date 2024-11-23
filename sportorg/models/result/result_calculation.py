@@ -23,7 +23,7 @@ class ResultCalculation:
         self._group_persons = {}
 
     def process_results(self):
-        logging.debug('Process results')
+        logging.debug("Process results")
         self.race.relay_teams.clear()
         self.race.result_index = {}
         for person in self.race.persons:
@@ -78,8 +78,8 @@ class ResultCalculation:
         return ret
 
     def set_places(self, array):
-        is_rogaine = self.race.get_setting('result_processing_mode', 'time') == 'scores'
-        is_ardf = self.race.get_setting('result_processing_mode', 'time') == 'ardf'
+        is_rogaine = self.race.get_setting("result_processing_mode", "time") == "scores"
+        is_ardf = self.race.get_setting("result_processing_mode", "time") == "ardf"
         current_place = 1
         last_place = 1
         last_result = 0
@@ -151,7 +151,7 @@ class ResultCalculation:
         return relay_teams.values()
 
     def sort_best_relay_team_placing(self, teams_sorted_by_result: List[RelayTeam]):
-        '''If a Federation is represented by more than one team in a relay class,
+        """If a Federation is represented by more than one team in a relay class,
         one team with the best result from each Federation shall be placed first
 
         The remaining teams from the federations are placed next
@@ -160,7 +160,7 @@ class ResultCalculation:
         if they are to be out of competition. Teams participating outside
         the competition are placed after the teams participating in the competition
 
-        Teams with fewer competitors are placed next'''
+        Teams with fewer competitors are placed next"""
 
         if not teams_sorted_by_result:
             return teams_sorted_by_result
@@ -202,8 +202,8 @@ class ResultCalculation:
             ranking.rank_scores = rank
             if rank > 0:
                 is_score_processing_mode = (
-                    self.race.get_setting('result_processing_mode', 'time') == 'scores'
-                    or self.race.get_setting('result_processing_mode', 'time') == 'ardf'
+                    self.race.get_setting("result_processing_mode", "time") == "scores"
+                    or self.race.get_setting("result_processing_mode", "time") == "ardf"
                 )
                 leader_time = OTime(0)
                 leader_scores = 0
@@ -282,11 +282,11 @@ class ResultCalculation:
         scores = []
         array = self.get_group_finishes(group)
 
-        start_limit = Config().ranking.get('start_limit', 10)
-        finish_limit = Config().ranking.get('finish_limit', 5)
-        sum_count = Config().ranking.get('sum_count', 10)
+        start_limit = Config().ranking.get("start_limit", 10)
+        finish_limit = Config().ranking.get("finish_limit", 5)
+        sum_count = Config().ranking.get("sum_count", 10)
         individual_ranking_method = Config().ranking.get(
-            'individual_ranking_method', 'best'
+            "individual_ranking_method", "best"
         )
 
         started_count = 0
@@ -312,7 +312,7 @@ class ResultCalculation:
             # get rank sum of X (default=10) best finished
             return sum(scores)
 
-        if individual_ranking_method == 'best':
+        if individual_ranking_method == "best":
             scores = sorted(scores)
         else:
             # Use points of first N in protocol,
@@ -330,10 +330,10 @@ class ResultCalculation:
         teams = find(self.race.relay_teams, group=group, return_all=True)
         success_teams = []
 
-        start_limit = Config().ranking.get('start_limit_relay', 6)
-        finish_limit = Config().ranking.get('finish_limit_relay', 4)
-        sum_count = Config().ranking.get('sum_count_relay', 10)
-        relay_ranking_method = Config().ranking.get('relay_ranking_method', 'personal')
+        start_limit = Config().ranking.get("start_limit_relay", 6)
+        finish_limit = Config().ranking.get("finish_limit_relay", 4)
+        sum_count = Config().ranking.get("sum_count_relay", 10)
+        relay_ranking_method = Config().ranking.get("relay_ranking_method", "personal")
 
         started_teams = 0
         if teams:
@@ -354,7 +354,7 @@ class ResultCalculation:
             # less than X (default=4) teams successfully finished in relay
             return -1
 
-        if relay_ranking_method in ['personal', 'first']:
+        if relay_ranking_method in ["personal", "first"]:
             scores = []
             for cur_team in success_teams:
                 for cur_leg in cur_team.legs:
@@ -368,7 +368,7 @@ class ResultCalculation:
                 # (by qualification, ignoring places) finished
                 return sum(scores)
 
-            if relay_ranking_method == 'personal':
+            if relay_ranking_method == "personal":
                 scores = sorted(scores)
             else:
                 # get rank sum of X (default=10), taken from first in protocol teams

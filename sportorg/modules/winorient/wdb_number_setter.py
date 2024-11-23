@@ -24,19 +24,19 @@ def set_numbers(wdb_target, wdb_source):
     return changed
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app = QApplication(sys.argv)
     file1 = get_open_file_name(
-        translate('Open target WDB file'), translate('WDB file (*.wdb)')
+        translate("Open target WDB file"), translate("WDB file (*.wdb)")
     )
     file2 = get_open_file_name(
-        translate('Open source WDB file'), translate('WDB file (*.wdb)')
+        translate("Open source WDB file"), translate("WDB file (*.wdb)")
     )
     wb1 = WinOrientBinary(file1).wdb_object
     wb2 = WinOrientBinary(file2).wdb_object
 
     if set_numbers(wb1, wb2):
         file3 = get_save_file_name(
-            translate('Save WDB file'), translate('WDB file (*.wdb)')
+            translate("Save WDB file"), translate("WDB file (*.wdb)")
         )
         write_wdb(wb1, file3)

@@ -26,16 +26,16 @@ class ResultChecker:
         if self.person.group is None:
             return True
 
-        if race().get_setting('result_processing_mode', 'time') == 'ardf':
+        if race().get_setting("result_processing_mode", "time") == "ardf":
             result.scores_ardf = self.calculate_scores_ardf(result)
             return True
-        elif race().get_setting('result_processing_mode', 'time') == 'scores':
+        elif race().get_setting("result_processing_mode", "time") == "scores":
             # process by score (rogaine)
             allow_duplicates = race().get_setting(
-                'result_processing_scores_allow_duplicates', False
+                "result_processing_scores_allow_duplicates", False
             )
             penalty_step = race().get_setting(
-                'result_processing_scores_minute_penalty', 1
+                "result_processing_scores_minute_penalty", 1
             )
 
             score = self.calculate_rogaine_score(result, allow_duplicates)
@@ -46,7 +46,7 @@ class ResultChecker:
 
         course = race().find_course(result)
 
-        if race().get_setting('marked_route_dont_dsq', False):
+        if race().get_setting("marked_route_dont_dsq", False):
             # mode: competition without disqualification for mispunching (add penalty for missing cp)
             result.check(course)
             return True
@@ -64,7 +64,7 @@ class ResultChecker:
     @classmethod
     def checking(cls, result):
         if result.person is None:
-            raise ResultCheckerException('Not person')
+            raise ResultCheckerException("Not person")
         o = cls(result.person)
         if result.status in [
             ResultStatus.OK,
@@ -83,16 +83,16 @@ class ResultChecker:
                 result.status = ResultStatus.MISS_PENALTY_LAP
 
             elif result.person.group and result.person.group.max_time.to_msec():
-                rp_mode = race().get_setting('result_processing_mode', 'time')
+                rp_mode = race().get_setting("result_processing_mode", "time")
                 result_time = result.get_result_otime()
                 max_time = result.person.group.max_time
-                if rp_mode in ('time', 'ardf'):
+                if rp_mode in ("time", "ardf"):
                     if result_time > max_time:
                         result.status = ResultStatus.OVERTIME
-                elif rp_mode == 'scores':
+                elif rp_mode == "scores":
                     max_overrun_time = OTime(
                         msec=race().get_setting(
-                            'result_processing_scores_max_overrun_time', 0
+                            "result_processing_scores_max_overrun_time", 0
                         )
                     )
                     if (
@@ -109,15 +109,15 @@ class ResultChecker:
 
     @staticmethod
     def check_all():
-        logging.debug('Checking all results')
+        logging.debug("Checking all results")
         for result in race().results:
             if result.person:
                 ResultChecker.checking(result)
 
     @staticmethod
     def calculate_penalty(result: Result):
-        mode = race().get_setting('marked_route_mode', 'off')
-        if mode == 'off':
+        mode = race().get_setting("marked_route_mode", "off")
+        if mode == "off":
             return
 
         person = result.person
@@ -136,16 +136,16 @@ class ResultChecker:
 
         # use prefixes _min and _lap in group name to force non-standard penalty
         # TODO move setting to group properties
-        if person.group.name.lower().find('_min') > -1:
-            mode = 'time'
-        if person.group.name.lower().find('_lap') > -1:
-            mode = 'laps'
+        if person.group.name.lower().find("_min") > -1:
+            mode = "time"
+        if person.group.name.lower().find("_lap") > -1:
+            mode = "laps"
 
-        if mode == 'laps' and race().get_setting('marked_route_if_station_check'):
-            lap_station = race().get_setting('marked_route_penalty_lap_station_code')
+        if mode == "laps" and race().get_setting("marked_route_if_station_check"):
+            lap_station = race().get_setting("marked_route_penalty_lap_station_code")
             splits, _ = ResultChecker.detach_penalty_laps2(splits, lap_station)
 
-        if race().get_setting('marked_route_dont_dsq', False):
+        if race().get_setting("marked_route_dont_dsq", False):
             # free order, don't penalty for extra cp
             penalty = ResultChecker.penalty_calculation_free_order(splits, controls)
         else:
@@ -154,18 +154,18 @@ class ResultChecker:
                 splits, controls, check_existence=True
             )
 
-        if race().get_setting('marked_route_max_penalty_by_cp', False):
+        if race().get_setting("marked_route_max_penalty_by_cp", False):
             # limit the penalty by quantity of controls
             penalty = min(len(controls), penalty)
 
         result.penalty_laps = 0
         result.penalty_time = OTime()
 
-        if mode == 'laps':
+        if mode == "laps":
             result.penalty_laps = penalty
-        elif mode == 'time':
+        elif mode == "time":
             time_for_one_penalty = OTime(
-                msec=race().get_setting('marked_route_penalty_time', 60000)
+                msec=race().get_setting("marked_route_penalty_time", 60000)
             )
             result.penalty_time = time_for_one_penalty * penalty
 
@@ -174,11 +174,11 @@ class ResultChecker:
         ret = []
         for i in controls:
             code_str = str(i.code)
-            if code_str and '(' in code_str:
-                correct = code_str.split('(')[0].strip()
+            if code_str and "(" in code_str:
+                correct = code_str.split("(")[0].strip()
                 if correct.isdigit():
-                    for cp in code_str.split('(')[1].split(','):
-                        cp = cp.strip(')').strip()
+                    for cp in code_str.split("(")[1].split(","):
+                        cp = cp.strip(")").strip()
                         if cp != correct and cp.isdigit():
                             if cp not in ret:
                                 ret.append(cp)
@@ -245,7 +245,7 @@ class ResultChecker:
             # used for orientathlon, corridor training with choice
             for i in origin_array:
                 # remove correct points (only one object per loop)
-                if i == '0' and len(user_array):
+                if i == "0" and len(user_array):
                     del user_array[0]
 
                 elif i in user_array:
@@ -324,11 +324,11 @@ class ResultChecker:
     def check_penalty_laps(result):
         assert isinstance(result, Result)
 
-        mode = race().get_setting('marked_route_mode', 'off')
-        check_laps = race().get_setting('marked_route_if_station_check')
+        mode = race().get_setting("marked_route_mode", "off")
+        check_laps = race().get_setting("marked_route_if_station_check")
 
-        if mode == 'laps' and check_laps:
-            lap_station = race().get_setting('marked_route_penalty_lap_station_code')
+        if mode == "laps" and check_laps:
+            lap_station = race().get_setting("marked_route_penalty_lap_station_code")
             _, penalty_laps = ResultChecker.detach_penalty_laps2(
                 result.splits, lap_station
             )
@@ -346,9 +346,9 @@ class ResultChecker:
         if control and control.score:
             return control.score
 
-        if obj.get_setting('result_processing_score_mode', 'fixed') == 'fixed':
+        if obj.get_setting("result_processing_score_mode", "fixed") == "fixed":
             return obj.get_setting(
-                'result_processing_fixed_score_value', 1.0
+                "result_processing_fixed_score_value", 1.0
             )  # fixed score per control
         else:
             return int(code) // 10  # score = code / 10
@@ -431,9 +431,9 @@ class ResultChecker:
             while index_in_order < len(correct_order):
                 current_cp = correct_order[index_in_order]
 
-                if '?' in current_cp:
-                    if '(' in current_cp and ')' in current_cp:
-                        options = current_cp.strip('?()').split(',')
+                if "?" in current_cp:
+                    if "(" in current_cp and ")" in current_cp:
+                        options = current_cp.strip("?()").split(",")
                         if code in options and code not in user_array:
                             user_array.append(code)
                             ret += 1

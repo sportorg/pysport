@@ -17,7 +17,7 @@ def _get_conf_locale() -> str:
         logger.exception(e)
         # remove incorrect config
         os.remove(config.CONFIG_INI)
-    return conf.get('locale', 'current', fallback='ru_RU')
+    return conf.get("locale", "current", fallback="ru_RU")
 
 
 locale_current = _get_conf_locale()
@@ -27,17 +27,17 @@ def generate_mo() -> None:
     import polib
 
     name = config.NAME.lower()
-    path = config.base_dir(config.LOCALE_DIR, locale_current, 'LC_MESSAGES', name)
+    path = config.base_dir(config.LOCALE_DIR, locale_current, "LC_MESSAGES", name)
     try:
-        po = polib.pofile(path + '.po')
-        po.save_as_mofile(path + '.mo')
+        po = polib.pofile(path + ".po")
+        po.save_as_mofile(path + ".mo")
     except Exception as e:
         logger.error(str(e))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # FIXME move to another file
-    logger.info('Generate mo files')
+    logger.info("Generate mo files")
     generate_mo()
 
 

@@ -6,7 +6,7 @@ def get_wdb_encoding():
     Get standard encoding, used in WinOrient files - Windows-1251 (Cyrillic)
     :return:
     """
-    return 'windows-1251'
+    return "windows-1251"
 
 
 def get_wdb_byteorder():
@@ -14,7 +14,7 @@ def get_wdb_byteorder():
     Get standard byteorder for WinOrient files, on Windows it's little-endian.
     :return:
     """
-    return 'little'
+    return "little"
 
 
 def format_string_to_bytes(string, length):
@@ -26,8 +26,8 @@ def format_string_to_bytes(string, length):
     :return:
     """
     if string is None:
-        string = ''
-    ret = bytearray(string, get_wdb_encoding(), 'replace')
+        string = ""
+    ret = bytearray(string, get_wdb_encoding(), "replace")
     if len(string) > length:
         return ret[0:length]
     for i in range(len(string), length):
@@ -63,10 +63,10 @@ def bytes_compare(obj1, obj2):
         return False
 
     if len(obj1) != len(obj2):
-        print('COMPARE: different length: %d and %d' % (len(obj1), len(obj2)))
+        print("COMPARE: different length: %d and %d" % (len(obj1), len(obj2)))
 
     if str(bytearray(obj1)) != str(bytearray(obj2)):
-        print('COMPARE: different strings')
+        print("COMPARE: different strings")
         print(str(bytearray(obj1)))
         print(str(bytearray(obj2)))
         for i in range(len(obj1)):
@@ -194,8 +194,8 @@ class WDBChip:
 class WDBTeam:
     def __init__(self):
         self.id = 0
-        self.name = '_'
-        self.refferent = ''
+        self.name = "_"
+        self.refferent = ""
         self.country = 0
         self.region = 0
         self.people_in_base = 0
@@ -242,8 +242,8 @@ class WDBTeam:
 class WDBDistance:
     def __init__(self):
         self.id = 0
-        self.name = '_'
-        self.biathlon_columns = ''
+        self.name = "_"
+        self.biathlon_columns = ""
         self.point = [100]
         self.leg = [100]
         self.length = 0
@@ -317,7 +317,7 @@ class WDBDistance:
         ret += self.people_finished.to_bytes(2, byteorder)
         ret += self.people_selected.to_bytes(2, byteorder)
         ret += self.is_selected.to_bytes(1, byteorder)
-        ret += format_string_to_bytes('~', 1)
+        ret += format_string_to_bytes("~", 1)
 
         return ret
 
@@ -325,7 +325,7 @@ class WDBDistance:
 class WDBGroup:
     def __init__(self):
         self.id = 0
-        self.name = '_'
+        self.name = "_"
         self.qual_kms = 0
         self.qual_ms = 0
         self.distance_id = 0
@@ -391,8 +391,8 @@ class WDBGroup:
 
 class WDBMan:
     def __init__(self, wdb):
-        self.name = '_'
-        self.comment = '_'
+        self.name = "_"
+        self.comment = "_"
         self.year = 0
         self.qualification = 0
         self.group = 0
@@ -526,13 +526,11 @@ class WDBMan:
 
 class WDBInfo:
     def __init__(self):
-        self.title = (
-            []
-        )  # Name of competition, sponsors, organizers. 10 lines * 80 chars
-        self.place = ''  # Competition venue, 25 chars
-        self.referee = ''  # Name of responsible referee - senior event adviser
-        self.secretary = ''  # Name of secretary
-        self.date_str = ''  # Date of competition, as string
+        self.title = []  # Name of competition, sponsors, organizers. 10 lines * 80 chars
+        self.place = ""  # Competition venue, 25 chars
+        self.referee = ""  # Name of responsible referee - senior event adviser
+        self.secretary = ""  # Name of secretary
+        self.date_str = ""  # Date of competition, as string
         self.type = 0  # Type of competition
         self.relay_type = 0  # Type of relay
         self.distance_service = []  # Course setters, advisers
@@ -618,13 +616,13 @@ class WDBInfo:
         self.is_get_score_personally = False
         self.dsq_reason = []
         self.dsq_text = []
-        self.note = ''
+        self.note = ""
         self.is_print_note = False
         self.is_print_event_code = False
         self.is_print_comment = False
         self.reserve = []  # Reserve block, not used
-        self.online_url = ''  # URL of online sending. Up to 59 chars
-        self.server_name = ''  # Name of server for client-server mode. Up to 14 chars
+        self.online_url = ""  # URL of online sending. Up to 59 chars
+        self.server_name = ""  # Name of server for client-server mode. Up to 14 chars
         self.server_sending_mode = (
             0  # Mode of client-server work: background, si reading, manual
         )
@@ -765,7 +763,7 @@ class WDBInfo:
             ret.append(0)
 
         for i in range(10):
-            string = ''
+            string = ""
             if len(self.title) > i:
                 string = self.title[i]
             ret[i * 80 : (i + 1) * 80] = format_string_to_bytes(string, 80)
@@ -777,7 +775,7 @@ class WDBInfo:
         ret[897:898] = self.relay_type.to_bytes(1, byteorder)
         obj_size = 25
         for i in range(4):
-            string = ''
+            string = ""
             if len(self.distance_service) > i:
                 string = self.distance_service[i]
             ret[898 + i * obj_size : 898 + (i + 1) * obj_size] = format_string_to_bytes(
@@ -869,8 +867,8 @@ class WDBInfo:
         ret[1136:1137] = self.is_get_score_personally.to_bytes(1, byteorder)
         obj_size = 12
         for i in range(9):
-            dsq_reason = ''
-            dsq_text = ''
+            dsq_reason = ""
+            dsq_text = ""
             if len(dsq_reason) > i:
                 dsq_reason = self.dsq_reason[i]
                 dsq_text = self.dsq_text[i]
@@ -904,7 +902,7 @@ class WDBAdventure:
         self.y = 0
         self.scores = 0
         self.mode = 0
-        self.description = ''
+        self.description = ""
         self.ideal_time = 0
         self.ideal_scores = 0
         self.min = 0
@@ -1007,7 +1005,7 @@ class WDB:
             self.man.append(new_object)
 
             if bytes_compare(new_object.get_bytes(), byte_array[start_pos:end_pos]):
-                print('Error in Man')
+                print("Error in Man")
 
         # reading of team objects - int (4 bytes) of quantity + set of 56 byte blocks
         object_size = 56
@@ -1024,7 +1022,7 @@ class WDB:
             self.team.append(new_object)
 
             if bytes_compare(new_object.get_bytes(), byte_array[start_pos:end_pos]):
-                print('Error in Team')
+                print("Error in Team")
 
         # reading of group objects - int (4 bytes) of quantity + set of 36 byte blocks
         object_size = 36
@@ -1042,7 +1040,7 @@ class WDB:
             self.group.append(new_object)
 
             if bytes_compare(new_object.get_bytes(), byte_array[start_pos:end_pos]):
-                print('Error in Group')
+                print("Error in Group")
 
         # reading of course objects - int (4 bytes) of quantity + set of 352 byte blocks
         object_size = 352
@@ -1059,7 +1057,7 @@ class WDB:
             self.dist.append(new_object)
 
             if bytes_compare(new_object.get_bytes(), byte_array[start_pos:end_pos]):
-                print('Error in Distance')
+                print("Error in Distance")
 
         # reading of info block - 1556 bytes
         object_size = 1556
@@ -1069,7 +1067,7 @@ class WDB:
         self.info.parse_bytes(byte_array[start_pos:end_pos])
 
         if bytes_compare(self.info.get_bytes(), byte_array[start_pos:end_pos]):
-            print('Error in Info')
+            print("Error in Info")
 
         #  reading of finish objects - int (4 bytes) of quantity + set of 12 byte blocks
         object_size = 12
@@ -1086,7 +1084,7 @@ class WDB:
             self.fin.append(new_object)
 
             if bytes_compare(new_object.get_bytes(), byte_array[start_pos:end_pos]):
-                print('Error in Finish')
+                print("Error in Finish")
 
         initial_start = end_pos
         si_punch_count = 64  # format changing of 2009/03-2010/09: 64 -> 200 punches + added Adventure block
@@ -1115,7 +1113,7 @@ class WDB:
                     if bytes_compare(
                         new_object.get_bytes(), byte_array[start_pos:end_pos]
                     ):
-                        print('Error in Adventure object')
+                        print("Error in Adventure object")
 
                 initial_start = end_pos
             qty = int.from_bytes(
@@ -1134,7 +1132,7 @@ class WDB:
             self.chip.append(new_object)
 
             if bytes_compare(new_object.get_bytes(), byte_array[start_pos:end_pos]):
-                print('Error in Chip object')
+                print("Error in Chip object")
 
     def get_bytes(self, is_new_format=True):
         if len(self.adv) < 1:  # fictive 257 adventure objects
@@ -1168,9 +1166,7 @@ class WDB:
         for i in self.fin:
             ret += i.get_bytes()
 
-        if (
-            is_new_format
-        ):  # format changing of 2009/03-2010/09: 64 -> 200 punches + added Adventure block
+        if is_new_format:  # format changing of 2009/03-2010/09: 64 -> 200 punches + added Adventure block
             # ret += len(self.chip).to_bytes(4, byteorder)
             ret += int(0).to_bytes(4, byteorder)
             # ret += int(257).to_bytes(4, byteorder)
@@ -1248,7 +1244,7 @@ class WDB:
 
 
 def parse_wdb(file_path):
-    wdb_file = open(file_path, 'rb')
+    wdb_file = open(file_path, "rb")
     byte_array = wdb_file.read()
     wdb_object = WDB()
     wdb_object.parse_bytes(byte_array)
@@ -1257,7 +1253,7 @@ def parse_wdb(file_path):
 
 
 def write_wdb(wdb_object, file_path):
-    wdb_file = open(file_path, 'wb')
+    wdb_file = open(file_path, "wb")
     b_object = wdb_object.get_bytes()
     wdb_file.write(b_object)
     wdb_file.close()

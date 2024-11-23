@@ -27,41 +27,20 @@ requests = "^2"
 sportident = "^1"
 
 [tool.poetry.group.dev.dependencies]
-autoflake = "*"
-black = ">=23"
-commitizen = "^3.12.0"
 cx_Freeze = "^6"
-flake8 = "^6"
-flake8-annotations-complexity = "*"
-flake8-bandit = "*"
-flake8-breakpoint = "*"
-flake8-bugbear = "*"
-flake8-builtins = "*"
-flake8-comprehensions = "*"
-flake8-eradicate = "*"
-flake8-if-expr = "*"
-flake8-isort = "*"
-flake8-logging-format = "*"
-flake8-print = "*"
-flake8-pytest = "*"
-flake8-pytest-style = "*"
-flake8-requirements = "*"
-flake8-return = "*"
 mypy = "^1.4"
-pep8-naming = "*"
 poethepoet = "^0.22.0"
-pylint = "^2.17"
 pytest = "^7.4"
 pytest-cov = "*"
 pytest-deadfixtures = "*"
 pytest-mock = "*"
+ruff = "^0.8.0"
 toml = "*"
 types-playsound = "^1.3.1.3"
 types-polib = "^1.2.0.1"
 types-python-dateutil = "^2.8.19.14"
 types-requests = "^2.31.0.2"
 types-six = "^1.16.21.9"
-unify = "*"
 
 [tool.poetry.extras]
 win = ["pywin32", "pyImpinj", "playsound"]
@@ -96,10 +75,9 @@ cmd = "pytest -vv --last-failed"
 [tool.poe.tasks.lint]
 help = "Check code"
 sequence = [
+    {cmd = "poetry check"},
     {ref = "generate-mo"},
-    # {cmd = "flake8 --jobs 4 --statistics --show-source ${CODE}"},
-    # {cmd = "pylint --jobs 1 --rcfile=setup.cfg ${CODE}"},
-    {cmd = "black --skip-string-normalization --line-length=88 --check ${CODE}"},
+    {cmd = "ruff check ${CODE}"},
     {cmd = "pytest --dead-fixtures --dup-fixtures"},
     # {cmd = "mypy ${CODE}"},
 ]
@@ -108,10 +86,7 @@ sequence = [
 help = "Formating code"
 sequence = [
     {ref = "generate-mo"},
-	{cmd = "autoflake --recursive --in-place --remove-all-unused-imports ${CODE}"},
-	{cmd = "isort ${CODE}"},
-	{cmd = "black --skip-string-normalization --line-length=88 ${CODE}"},
-	{cmd = "unify --in-place --recursive ${CODE}"},
+	{cmd = "ruff format ${CODE}"},
 ]
 
 [tool.poe.tasks.generate-mo]

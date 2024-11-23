@@ -30,22 +30,22 @@ class DialogFilter(QDialog):
         for i in range(len(headers)):
             self.label = QtWidgets.QLabel(self)
             self.label.setText(headers[i])
-            self.label.setObjectName('filter_label_' + str(i))
+            self.label.setObjectName("filter_label_" + str(i))
             self.label.setMaximumWidth(120)
             actions = [
-                translate('equal to'),
-                translate('contain'),
+                translate("equal to"),
+                translate("contain"),
                 translate("doesn't contain"),
             ]
             default_action = actions[0]
             self.combo_action = AdvComboBox(self, actions, max_width=90)
             self.combo_action.setCurrentText(default_action)
-            self.combo_action.setObjectName('filter_action_' + str(i))
+            self.combo_action.setObjectName("filter_action_" + str(i))
             self.combo_value = AdvComboBox(self)
             self.combo_value.setMinimumWidth(150)
-            self.combo_value.addItem('')
+            self.combo_value.addItem("")
             self.combo_value.addItems(model.get_column_unique_values(i))
-            self.combo_value.setObjectName('filter_value_' + str(i))
+            self.combo_value.setObjectName("filter_value_" + str(i))
 
             self.layout.addWidget(self.label, i, 0, alignment=Qt.AlignRight)
             self.layout.addWidget(self.combo_action, i, 1)
@@ -67,7 +67,7 @@ class DialogFilter(QDialog):
 
         self.layout.addWidget(button_box, len(headers) + 1, 0)
 
-        self.button_clear = QPushButton(text=translate('Clear'))
+        self.button_clear = QPushButton(text=translate("Clear"))
         self.button_clear.clicked.connect(self.clear_filter)
         self.layout.addWidget(self.button_clear, len(headers) + 1, 1)
 
@@ -87,19 +87,19 @@ class DialogFilter(QDialog):
 
                 headers = proxy_model.get_headers()
                 for i in range(len(headers)):
-                    value_combo = self.findChild(AdvComboBox, 'filter_value_' + str(i))
+                    value_combo = self.findChild(AdvComboBox, "filter_value_" + str(i))
                     assert isinstance(value_combo, AdvComboBox)
                     value = value_combo.currentText()
                     action_combo = self.findChild(
-                        AdvComboBox, 'filter_action_' + str(i)
+                        AdvComboBox, "filter_action_" + str(i)
                     )
                     assert isinstance(action_combo, AdvComboBox)
                     action = action_combo.currentText()
                     if len(value):
                         proxy_model.set_filter_for_column(i, value, action)
-                        if headers[i] == translate('Group'):
+                        if headers[i] == translate("Group"):
                             PersonEditDialog.GROUP_NAME = value
-                        elif headers[i] == translate('Team'):
+                        elif headers[i] == translate("Team"):
                             PersonEditDialog.ORGANIZATION_NAME = value
 
                 proxy_model.apply_filter()
@@ -114,11 +114,11 @@ class DialogFilter(QDialog):
         for filter_key in self.table.model().filter.keys():
             value = self.table.model().filter.get(filter_key)[0]
             action = self.table.model().filter.get(filter_key)[1]
-            value_combo = self.findChild(AdvComboBox, 'filter_value_' + str(filter_key))
+            value_combo = self.findChild(AdvComboBox, "filter_value_" + str(filter_key))
             assert isinstance(value_combo, AdvComboBox)
             value_combo.setCurrentText(value)
             action_combo = self.findChild(
-                AdvComboBox, 'filter_action_' + str(filter_key)
+                AdvComboBox, "filter_action_" + str(filter_key)
             )
             assert isinstance(action_combo, AdvComboBox)
             action_combo.setCurrentText(action)
@@ -126,12 +126,12 @@ class DialogFilter(QDialog):
     def clear_filter(self):
         headers = self.table.model().get_headers()
         for i in range(len(headers)):
-            action_combo = self.findChild(AdvComboBox, 'filter_value_' + str(i))
+            action_combo = self.findChild(AdvComboBox, "filter_value_" + str(i))
             assert isinstance(action_combo, AdvComboBox)
-            action_combo.setCurrentText('')
+            action_combo.setCurrentText("")
 
     def translate_ui(self):
-        self.setWindowTitle(translate('Filter Dialog'))
-        self.max_rows_count_label.setText(translate('Max rows count'))
-        self.button_ok.setText(translate('OK'))
-        self.button_cancel.setText(translate('Cancel'))
+        self.setWindowTitle(translate("Filter Dialog"))
+        self.max_rows_count_label.setText(translate("Max rows count"))
+        self.button_ok.setText(translate("OK"))
+        self.button_cancel.setText(translate("Cancel"))

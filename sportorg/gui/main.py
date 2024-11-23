@@ -42,11 +42,11 @@ class Application(metaclass=Singleton):
     @staticmethod
     def set_status_comments():
         try:
-            with open(config.STATUS_COMMENTS_FILE, encoding='utf-8') as f:
+            with open(config.STATUS_COMMENTS_FILE, encoding="utf-8") as f:
                 content = f.readlines()
             StatusComments().set([x.strip() for x in content])
 
-            with open(config.STATUS_DEFAULT_COMMENTS_FILE, encoding='utf-8') as f:
+            with open(config.STATUS_DEFAULT_COMMENTS_FILE, encoding="utf-8") as f:
                 content = f.readlines()
             StatusComments().set_default_statuses(content)
         except Exception as e:
@@ -55,7 +55,7 @@ class Application(metaclass=Singleton):
     @staticmethod
     def set_names():
         try:
-            with open(config.NAMES_FILE, encoding='utf-8') as f:
+            with open(config.NAMES_FILE, encoding="utf-8") as f:
                 content = f.readlines()
             PersonNames().set([x.strip() for x in content])
         except Exception as e:
@@ -64,7 +64,7 @@ class Application(metaclass=Singleton):
     @staticmethod
     def set_regions():
         try:
-            with open(config.REGIONS_FILE, encoding='utf-8') as f:
+            with open(config.REGIONS_FILE, encoding="utf-8") as f:
                 content = f.readlines()
             Regions().set([x.strip() for x in content])
         except Exception as e:
@@ -73,16 +73,16 @@ class Application(metaclass=Singleton):
     @staticmethod
     def set_ranking():
         try:
-            with open(config.RANKING_SCORE_FILE, encoding='utf-8') as f:
+            with open(config.RANKING_SCORE_FILE, encoding="utf-8") as f:
                 content = f.readlines()
-            RankingTable().set([x.strip().split(';') for x in content])
+            RankingTable().set([x.strip().split(";") for x in content])
         except Exception as e:
             print(str(e))
 
     @staticmethod
     def set_rent_cards():
         try:
-            with open(config.data_dir('rent_cards.txt'), encoding='utf-8') as f:
+            with open(config.data_dir("rent_cards.txt"), encoding="utf-8") as f:
                 content = f.read()
             RentCards().set_from_text(content)
         except FileNotFoundError:

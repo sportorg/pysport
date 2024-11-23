@@ -68,13 +68,13 @@ from sportorg.modules.telegram.telegram import telegram_client
 class ConsolePanelHandler(logging.Handler):
     def __init__(self, parent):
         logging.Handler.__init__(self)
-        self.setFormatter(logging.Formatter('%(asctime)-15s %(levelname)s %(message)s'))
-        self.setLevel('INFO')
+        self.setFormatter(logging.Formatter("%(asctime)-15s %(levelname)s %(message)s"))
+        self.setLevel("INFO")
         self.parent = parent
 
     def emit(self, record):
         self.parent.logging(
-            dict({'text': self.format(record), 'level': record.levelno})
+            dict({"text": self.format(record), "level": record.levelno})
         )
 
 
@@ -114,7 +114,7 @@ class MainWindow(QMainWindow):
 
     def _set_style(self):
         try:
-            with open(config.style_dir('default.qss')) as s:
+            with open(config.style_dir("default.qss")) as s:
                 self.setStyleSheet(s.read())
         except FileNotFoundError:
             pass
@@ -127,7 +127,7 @@ class MainWindow(QMainWindow):
         self._set_style()
         self._setup_ui()
         self._setup_menu()
-        if Configuration().configuration.get('show_toolbar'):
+        if Configuration().configuration.get("show_toolbar"):
             self._setup_toolbar()
         self._setup_tab()
         self._setup_statusbar()
@@ -136,8 +136,8 @@ class MainWindow(QMainWindow):
 
     sportident_status = False
     sportident_icon = {
-        True: 'sportident-on.png',
-        False: 'sportident.png',
+        True: "sportident-on.png",
+        False: "sportident.png",
     }
 
     def teamwork(self, command):
@@ -157,7 +157,7 @@ class MainWindow(QMainWindow):
                 ObjectTypes.ResultRfidImpinj.value,
             ]:
                 self.deleyed_res_recalculate(1000)
-            Broker().produce('teamwork_recieving', command.data)
+            Broker().produce("teamwork_recieving", command.data)
             self.deleyed_refresh(1000)
 
         except Exception as e:
@@ -165,34 +165,34 @@ class MainWindow(QMainWindow):
 
     teamwork_status = False
     teamwork_icon = {
-        True: 'network.svg',
-        False: 'network-off.svg',
+        True: "network.svg",
+        False: "network-off.svg",
     }
 
     def interval(self):
-        if is_reading_active() != self.sportident_status and hasattr(self, 'toolbar'):
+        if is_reading_active() != self.sportident_status and hasattr(self, "toolbar"):
             self.sportident_status = is_reading_active()
 
-            self.toolbar_property['sportident'].setIcon(
+            self.toolbar_property["sportident"].setIcon(
                 QtGui.QIcon(
                     config.icon_dir(self.sportident_icon[self.sportident_status])
                 )
             )
 
         if Teamwork().is_alive() != self.teamwork_status:
-            self.toolbar_property['teamwork'].setIcon(
+            self.toolbar_property["teamwork"].setIcon(
                 QtGui.QIcon(config.icon_dir(self.teamwork_icon[Teamwork().is_alive()]))
             )
             self.teamwork_status = Teamwork().is_alive()
 
         try:
-            if self.get_configuration().get('autosave_interval'):
+            if self.get_configuration().get("autosave_interval"):
                 if self.file:
                     if time.time() - self.last_update > int(
-                        self.get_configuration().get('autosave_interval')
+                        self.get_configuration().get("autosave_interval")
                     ):
                         self.save_file()
-                        logging.info(translate('Auto save'))
+                        logging.info(translate("Auto save"))
                 else:
                     pass
                     # logging.debug(translate('No file to auto save'))
@@ -201,10 +201,10 @@ class MainWindow(QMainWindow):
 
         while not self.log_queue.empty():
             rec = self.log_queue.get()
-            text = rec['text']
-            lvl = int(rec['level'])
+            text = rec["text"]
+            lvl = int(rec["level"])
             self.statusbar_message(text)
-            if hasattr(self, 'logging_tab'):
+            if hasattr(self, "logging_tab"):
                 self.logging_tab.write(text)
                 if (
                     lvl >= logging.ERROR
@@ -232,10 +232,10 @@ class MainWindow(QMainWindow):
             self.set_split_printer_queue(None)
 
     def closeEvent(self, _event):
-        quit_msg = translate('Save file before exit?')
+        quit_msg = translate("Save file before exit?")
         reply = messageBoxQuestion(
             self,
-            translate('Question'),
+            translate("Question"),
             quit_msg,
             QMessageBox.Save | QMessageBox.No | QMessageBox.Cancel,
         )
@@ -252,7 +252,7 @@ class MainWindow(QMainWindow):
             _event.ignore()
 
     def resizeEvent(self, e):
-        Broker().produce('resize', self.get_size())
+        Broker().produce("resize", self.get_size())
 
     def conf_read(self):
         Configuration().read()
@@ -260,7 +260,7 @@ class MainWindow(QMainWindow):
             try:
                 recent_files = ast.literal_eval(
                     Configuration().parser.get(
-                        ConfigFile.PATH, 'recent_files', fallback='[]'
+                        ConfigFile.PATH, "recent_files", fallback="[]"
                     )
                 )
                 if isinstance(recent_files, list):
@@ -268,10 +268,10 @@ class MainWindow(QMainWindow):
             except Exception as e:
                 logging.error(str(e))
 
-        level: str = Configuration().configuration.get('logging_level', 'INFO')
+        level: str = Configuration().configuration.get("logging_level", "INFO")
         self._handler.setLevel(level)
 
-        dirpath = Configuration().templates.get('directory')
+        dirpath = Configuration().templates.get("directory")
         if dirpath:
             config.set_template_dir(dirpath)
 
@@ -281,7 +281,7 @@ class MainWindow(QMainWindow):
     def post_show(self):
         if self.file:
             self.open_file(self.file)
-        elif Configuration().configuration.get('open_recent_file'):
+        elif Configuration().configuration.get("open_recent_file"):
             if len(self.recent_files):
                 self.open_file(self.recent_files[0])
 
@@ -309,7 +309,7 @@ class MainWindow(QMainWindow):
         geometry = ConfigFile.GEOMETRY
 
         geom = bytearray.fromhex(
-            Configuration().parser.get(geometry, 'main', fallback='01')
+            Configuration().parser.get(geometry, "main", fallback="01")
         )
         self.restoreGeometry(geom)
 
@@ -326,44 +326,44 @@ class MainWindow(QMainWindow):
 
     def _create_menu(self, parent, actions_list):
         for action_item in actions_list:
-            if 'show' in action_item and not action_item['show']:
+            if "show" in action_item and not action_item["show"]:
                 return
-            if 'type' in action_item:
-                if action_item['type'] == 'separator':
+            if "type" in action_item:
+                if action_item["type"] == "separator":
                     parent.addSeparator()
-            elif 'action' in action_item:
+            elif "action" in action_item:
                 action = QAction(self)
-                action.setText(action_item['title'])
+                action.setText(action_item["title"])
                 action.triggered.connect(
-                    self.menu_factory.get_action(action_item['action'])
+                    self.menu_factory.get_action(action_item["action"])
                 )
-                if 'shortcut' in action_item:
+                if "shortcut" in action_item:
                     shortcuts = (
-                        [action_item['shortcut']]
-                        if isinstance(action_item['shortcut'], str)
-                        else action_item['shortcut']
+                        [action_item["shortcut"]]
+                        if isinstance(action_item["shortcut"], str)
+                        else action_item["shortcut"]
                     )
                     action.setShortcuts(shortcuts)
-                if 'icon' in action_item:
-                    action.setIcon(QtGui.QIcon(action_item['icon']))
-                if 'status_tip' in action_item:
-                    action.setStatusTip(action_item['status_tip'])
-                if 'tabs' in action_item:
-                    self.menu_list_for_disabled.append((action, action_item['tabs']))
-                if 'property' in action_item:
-                    self.menu_property[action_item['property']] = action
+                if "icon" in action_item:
+                    action.setIcon(QtGui.QIcon(action_item["icon"]))
+                if "status_tip" in action_item:
+                    action.setStatusTip(action_item["status_tip"])
+                if "tabs" in action_item:
+                    self.menu_list_for_disabled.append((action, action_item["tabs"]))
+                if "property" in action_item:
+                    self.menu_property[action_item["property"]] = action
                 if (
-                    'debug' in action_item and action_item['debug']
-                ) or 'debug' not in action_item:
+                    "debug" in action_item and action_item["debug"]
+                ) or "debug" not in action_item:
                     parent.addAction(action)
             else:
                 menu = QtWidgets.QMenu(parent)
-                menu.setTitle(action_item['title'])
-                if 'icon' in action_item:
-                    menu.setIcon(QtGui.QIcon(action_item['icon']))
-                if 'tabs' in action_item:
-                    self.menu_list_for_disabled.append((menu, action_item['tabs']))
-                self._create_menu(menu, action_item['actions'])
+                menu.setTitle(action_item["title"])
+                if "icon" in action_item:
+                    menu.setIcon(QtGui.QIcon(action_item["icon"]))
+                if "tabs" in action_item:
+                    self.menu_list_for_disabled.append((menu, action_item["tabs"]))
+                self._create_menu(menu, action_item["actions"])
                 parent.addAction(menu.menuAction())
 
     def _setup_menu(self):
@@ -373,7 +373,7 @@ class MainWindow(QMainWindow):
         self._create_menu(self.menubar, menu_list())
 
     def _setup_toolbar(self):
-        self.toolbar = self.addToolBar(translate('Toolbar'))
+        self.toolbar = self.addToolBar(translate("Toolbar"))
         for tb in toolbar_list():
             tb_action = QAction(QtGui.QIcon(tb[0]), tb[1], self)
             tb_action.triggered.connect(self.menu_factory.get_action(tb[2]))
@@ -392,13 +392,13 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.tabwidget)
         self.setCentralWidget(self.centralwidget)
 
-        self.tabwidget.addTab(persons.Widget(), translate('Competitors'))
-        self.tabwidget.addTab(results.Widget(), translate('Race Results'))
-        self.tabwidget.addTab(groups.Widget(), translate('Groups'))
-        self.tabwidget.addTab(courses.Widget(), translate('Courses'))
-        self.tabwidget.addTab(organizations.Widget(), translate('Teams'))
+        self.tabwidget.addTab(persons.Widget(), translate("Competitors"))
+        self.tabwidget.addTab(results.Widget(), translate("Race Results"))
+        self.tabwidget.addTab(groups.Widget(), translate("Groups"))
+        self.tabwidget.addTab(courses.Widget(), translate("Courses"))
+        self.tabwidget.addTab(organizations.Widget(), translate("Teams"))
         self.logging_tab = log.Widget()
-        self.tabwidget.addTab(self.logging_tab, translate('Logs'))
+        self.tabwidget.addTab(self.logging_tab, translate("Logs"))
         self.tabbar = self.tabwidget.tabBar()
 
         self.tabwidget.currentChanged.connect(self._menu_disable)
@@ -423,27 +423,27 @@ class MainWindow(QMainWindow):
     def get_size(self):
         return {
             # 'x': self.x() + 8,
-            'x': self.geometry().x(),
+            "x": self.geometry().x(),
             # 'y': self.y() + 30,
-            'y': self.geometry().y(),
-            'width': self.width(),
-            'height': self.height(),
+            "y": self.geometry().y(),
+            "width": self.width(),
+            "height": self.height(),
         }
 
     def set_title(self, title=None):
-        main_title = '{} {}'.format(config.NAME, config.VERSION)
+        main_title = "{} {}".format(config.NAME, config.VERSION)
         if title:
-            self.setWindowTitle('{} - {}'.format(title, main_title))
+            self.setWindowTitle("{} - {}".format(title, main_title))
         elif self.file:
             self.set_title(
-                '{} [{}]'.format(race().data.get_start_datetime(), self.file)
+                "{} [{}]".format(race().data.get_start_datetime(), self.file)
             )
         else:
             self.setWindowTitle(main_title)
 
     def statusbar_message(self, msg, msecs=5000):
-        if hasattr(self, 'statusbar'):
-            self.statusbar.showMessage('', 0)
+        if hasattr(self, "statusbar"):
+            self.statusbar.showMessage("", 0)
             self.statusbar.showMessage(msg, msecs)
 
     def logging(self, text):
@@ -461,7 +461,7 @@ class MainWindow(QMainWindow):
         if index < self.tabwidget.count():
             self.tabwidget.setCurrentIndex(index)
         else:
-            logging.error('{} {}'.format(index, translate("Tab doesn't exist")))
+            logging.error("{} {}".format(index, translate("Tab doesn't exist")))
 
     @staticmethod
     def get_configuration():
@@ -486,7 +486,7 @@ class MainWindow(QMainWindow):
             table = self.get_organization_table()
             table.setModel(OrganizationMemoryModel())
 
-            Broker().produce('init_model')
+            Broker().produce("init_model")
         except Exception as e:
             logging.error(str(e))
 
@@ -505,7 +505,7 @@ class MainWindow(QMainWindow):
         self.res_recalculate.start(delay)
 
     def refresh(self):
-        logging.debug('Refreshing interface')
+        logging.debug("Refreshing interface")
         try:
             t = time.time()
             table = self.get_person_table()
@@ -529,8 +529,8 @@ class MainWindow(QMainWindow):
             table.model().layoutChanged.emit()
             self.set_title()
 
-            print('Refresh in {:.3f} seconds.'.format(time.time() - t))
-            Broker().produce('refresh')
+            print("Refresh in {:.3f} seconds.".format(time.time() - t))
+            Broker().produce("refresh")
         except Exception as e:
             logging.error(str(e))
 
@@ -553,7 +553,7 @@ class MainWindow(QMainWindow):
     def add_recent_file(self, file):
         self.delete_from_recent_files(file)
         self.recent_files.insert(0, file)
-        Configuration().parser[ConfigFile.PATH] = {'recent_files': self.recent_files}
+        Configuration().parser[ConfigFile.PATH] = {"recent_files": self.recent_files}
 
     def delete_from_recent_files(self, file):
         if file in self.recent_files:
@@ -563,27 +563,27 @@ class MainWindow(QMainWindow):
         return self.findChild(QtWidgets.QTableView, name)
 
     def get_person_table(self):
-        return self.get_table_by_name('PersonTable')
+        return self.get_table_by_name("PersonTable")
 
     def get_result_table(self):
-        return self.get_table_by_name('ResultTable')
+        return self.get_table_by_name("ResultTable")
 
     def get_group_table(self):
-        return self.get_table_by_name('GroupTable')
+        return self.get_table_by_name("GroupTable")
 
     def get_course_table(self):
-        return self.get_table_by_name('CourseTable')
+        return self.get_table_by_name("CourseTable")
 
     def get_organization_table(self):
-        return self.get_table_by_name('OrganizationTable')
+        return self.get_table_by_name("OrganizationTable")
 
     def get_current_table(self):
         map_ = [
-            'PersonTable',
-            'ResultTable',
-            'GroupTable',
-            'CourseTable',
-            'OrganizationTable',
+            "PersonTable",
+            "ResultTable",
+            "GroupTable",
+            "CourseTable",
+            "OrganizationTable",
         ]
         idx = self.current_tab
         if idx < len(map_):
@@ -608,14 +608,14 @@ class MainWindow(QMainWindow):
 
     def add_sportident_result_from_sireader(self, result):
         try:
-            assignment_mode = race().get_setting('system_assignment_mode', False)
+            assignment_mode = race().get_setting("system_assignment_mode", False)
             if not assignment_mode:
                 self.clear_filters(remove_condition=False)
                 rg = ResultSportidentGeneration(result)
                 if rg.add_result():
                     result = rg.get_result()
                     ResultCalculation(race()).process_results()
-                    if race().get_setting('split_printout', False):
+                    if race().get_setting("split_printout", False):
                         try:
                             split_printout([result])
                         except NoResultToPrintException as e:
@@ -640,7 +640,7 @@ class MainWindow(QMainWindow):
                             Sound().rented_card()
             else:
                 mv = GlobalAccess().get_main_window()
-                selection = mv.get_selected_rows(mv.get_table_by_name('PersonTable'))
+                selection = mv.get_selected_rows(mv.get_table_by_name("PersonTable"))
                 if selection:
                     for i in selection:
                         if i < len(race().persons):
@@ -648,9 +648,9 @@ class MainWindow(QMainWindow):
                             if cur_person.card_number:
                                 confirm = messageBoxQuestion(
                                     self,
-                                    translate('Question'),
+                                    translate("Question"),
                                     translate(
-                                        'Are you sure you want to reassign the chip number'
+                                        "Are you sure you want to reassign the chip number"
                                     ),
                                     QMessageBox.Yes | QMessageBox.No,
                                 )
@@ -689,9 +689,9 @@ class MainWindow(QMainWindow):
     # Actions
     def create_file(self, *args, update_data=True, is_new=False):
         file_name = get_save_file_name(
-            translate('Create SportOrg file'),
-            translate('SportOrg file (*.json)'),
-            time.strftime('%Y%m%d'),
+            translate("Create SportOrg file"),
+            translate("SportOrg file (*.json)"),
+            time.strftime("%Y%m%d"),
         )
         if file_name:
             try:
@@ -700,9 +700,9 @@ class MainWindow(QMainWindow):
                     if os.path.getsize(file_name) > 1000:
                         QMessageBox.warning(
                             self,
-                            translate('Error'),
-                            translate('Cannot overwrite existing file with new')
-                            + ': '
+                            translate("Error"),
+                            translate("Cannot overwrite existing file with new")
+                            + ": "
                             + file_name,
                         )
                         return
@@ -725,8 +725,8 @@ class MainWindow(QMainWindow):
                 logging.exception(e)
                 QMessageBox.warning(
                     self,
-                    translate('Error'),
-                    translate('Cannot create file') + ': ' + file_name,
+                    translate("Error"),
+                    translate("Cannot create file") + ": " + file_name,
                 )
             self.refresh()
 
@@ -762,13 +762,13 @@ class MainWindow(QMainWindow):
                 self.delete_from_recent_files(file_name)
                 QMessageBox.warning(
                     self,
-                    translate('Error'),
-                    translate('Cannot read file, format unknown') + ': ' + file_name,
+                    translate("Error"),
+                    translate("Cannot read file, format unknown") + ": " + file_name,
                 )
 
     def split_printout_selected(self):
         if self.current_tab != 1:
-            logging.warning(translate('No result selected'))
+            logging.warning(translate("No result selected"))
             return
         try:
             indexes = self.get_selected_rows()
@@ -786,8 +786,8 @@ class MainWindow(QMainWindow):
             if len(print_results) > 1:
                 confirm = messageBoxQuestion(
                     self,
-                    translate('Question'),
-                    translate('Please confirm'),
+                    translate("Question"),
+                    translate("Please confirm"),
                     QMessageBox.Yes | QMessageBox.No,
                 )
                 confirm_printing = confirm == QMessageBox.Yes
@@ -803,12 +803,12 @@ class MainWindow(QMainWindow):
         except NoResultToPrintException as e:
             logging.warning(str(e))
             mes = QMessageBox(self)
-            mes.setText(translate('No results to print'))
+            mes.setText(translate("No results to print"))
             mes.exec_()
         except NoPrinterSelectedException as e:
             logging.warning(str(e))
             mes = QMessageBox(self)
-            mes.setText(translate('No printer selected'))
+            mes.setText(translate("No printer selected"))
             mes.exec_()
 
     def add_object(self):
@@ -819,7 +819,7 @@ class MainWindow(QMainWindow):
                 PersonEditDialog(p, True).exec_()
                 self.refresh()
             elif tab == 1:
-                self.menu_factory.execute('ManualFinishAction')
+                self.menu_factory.execute("ManualFinishAction")
             elif tab == 2:
                 g = race().add_new_group()
                 GroupEditDialog(g, True).exec_()
@@ -850,8 +850,8 @@ class MainWindow(QMainWindow):
 
         confirm = messageBoxQuestion(
             self,
-            translate('Question'),
-            translate('Please confirm'),
+            translate("Question"),
+            translate("Please confirm"),
             QMessageBox.Yes | QMessageBox.No,
         )
         if confirm == QMessageBox.No:
@@ -874,8 +874,8 @@ class MainWindow(QMainWindow):
                 logging.warning(str(e))
                 QMessageBox.question(
                     self.get_group_table(),
-                    translate('Error'),
-                    translate('Cannot remove group'),
+                    translate("Error"),
+                    translate("Cannot remove group"),
                 )
         elif tab == 3:
             try:
@@ -884,8 +884,8 @@ class MainWindow(QMainWindow):
                 logging.warning(str(e))
                 QMessageBox.question(
                     self.get_course_table(),
-                    translate('Error'),
-                    translate('Cannot remove course'),
+                    translate("Error"),
+                    translate("Cannot remove course"),
                 )
         elif tab == 4:
             try:
@@ -894,8 +894,8 @@ class MainWindow(QMainWindow):
                 logging.warning(str(e))
                 QMessageBox.question(
                     self.get_organization_table(),
-                    translate('Error'),
-                    translate('Cannot remove organization'),
+                    translate("Error"),
+                    translate("Cannot remove organization"),
                 )
 
         self.clear_selection()
@@ -916,7 +916,7 @@ class MainWindow(QMainWindow):
         self.split_printer_queue = split_printer_app
 
     def lock_file(self, file_name: str):
-        logging.info('lock start')
+        logging.info("lock start")
         if self.file == file_name:
             # already locked by current process ('Save as' or 'Open' for the same file)
             return True
@@ -925,7 +925,7 @@ class MainWindow(QMainWindow):
         self.unlock_file(self.file)
 
         # try to acquire the lock on a single file path
-        lockfile = file_name + '.lock'
+        lockfile = file_name + ".lock"
         if exists(lockfile):
             with open(lockfile) as f:
                 pid = f.read()
@@ -933,24 +933,24 @@ class MainWindow(QMainWindow):
                     # already locked = opened in another process, avoid parallel opening
 
                     p = Process(int(pid))
-                    logging.info('found process %s', str(p))
+                    logging.info("found process %s", str(p))
 
                     QMessageBox.warning(
                         self,
-                        translate('Error'),
-                        translate('Cannot open file, already locked')
-                        + ': '
+                        translate("Error"),
+                        translate("Cannot open file, already locked")
+                        + ": "
                         + file_name,
                     )
                     return False
 
         # new lock creating
-        with open(lockfile, 'w') as f:
+        with open(lockfile, "w") as f:
             f.write(str(os.getpid()))
         return True
 
     def unlock_file(self, file_name):
         if file_name:
-            lockfile = file_name + '.lock'
+            lockfile = file_name + ".lock"
             if exists(lockfile):
                 remove(lockfile)

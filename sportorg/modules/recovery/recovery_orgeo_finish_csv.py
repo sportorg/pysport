@@ -35,14 +35,14 @@ POS_RES = 7
 POS_START = 9
 POS_SPLITS = -1
 
-DNS_STATUS = ['DNS', 'не старт']
-DSQ_STATUS = ['DSQ', 'непр.отмет.']
+DNS_STATUS = ["DNS", "не старт"]
+DSQ_STATUS = ["DSQ", "непр.отмет."]
 
 
 def recovery(file_name: str, race: Race) -> None:
-    encoding = 'cp1251'
-    separator = ';'
-    spl_separator = '|'
+    encoding = "cp1251"
+    separator = ";"
+    spl_separator = "|"
 
     with open(file_name, encoding=encoding) as csv_file:
         spam_reader = csv.reader(csv_file, delimiter=separator)
@@ -51,12 +51,12 @@ def recovery(file_name: str, race: Race) -> None:
                 continue
 
             bib = tokens[POS_BIB]
-            if bib == '' or not bib.isdigit():
+            if bib == "" or not bib.isdigit():
                 continue
 
             name = tokens[POS_NAME]
             person = Person()
-            spl_pos = name.find(' ')
+            spl_pos = name.find(" ")
             if spl_pos > 0:
                 person.surname = name[:spl_pos]
                 person.name = name[spl_pos + 1 :]
@@ -89,7 +89,7 @@ def recovery(file_name: str, race: Race) -> None:
                 res.card_number = int(tokens[POS_CARD])
             res.start_time = person.start_time
             result = tokens[POS_RES]
-            if result.find(':') > 0:
+            if result.find(":") > 0:
                 result_value = hhmmss_to_time(result)
                 res.finish_time = res.start_time + result_value
             else:

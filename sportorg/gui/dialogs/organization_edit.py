@@ -12,42 +12,42 @@ class OrganizationEditDialog(BaseDialog):
         super().__init__(GlobalAccess().get_main_window())
         self.current_object = organization
         self.is_new = is_new
-        self.title = translate('Team properties')
+        self.title = translate("Team properties")
         self.size = (600, 250)
         self.form = [
             LineField(
-                title=translate('Name'),
+                title=translate("Name"),
                 object=organization,
-                key='name',
-                id='name',
+                key="name",
+                id="name",
                 select_all=True,
             ),
             LineField(
-                title=translate('Code'),
+                title=translate("Code"),
                 object=organization,
-                key='code',
+                key="code",
             ),
             AdvComboBoxField(
-                title=translate('Country'),
+                title=translate("Country"),
                 object=organization,
-                key='country',
+                key="country",
                 items=get_countries(),
             ),
             AdvComboBoxField(
-                title=translate('Region'),
+                title=translate("Region"),
                 object=organization,
-                key='region',
+                key="region",
                 items=get_regions(),
             ),
             LineField(
-                title=translate('Contact'),
+                title=translate("Contact"),
                 object=organization,
-                key='contact',
+                key="contact",
             ),
         ]
 
     def on_name_changed(self):
-        name = self.fields['name'].q_item.text()
+        name = self.fields["name"].q_item.text()
         self.button_ok.setDisabled(False)
         if name and name != self.current_object.name:
             org = find(race().organizations, name=name)

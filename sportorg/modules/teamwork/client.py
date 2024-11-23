@@ -28,7 +28,7 @@ class ClientReceiver:
 
     def __init__(self, out_queue: queue.Queue):
         self._out_queue = out_queue
-        self._full_data = b''
+        self._full_data = b""
         self._hdr = Header()
         self._is_new_pack = True
 
@@ -70,7 +70,7 @@ class ClientThread(Thread):
         logger,
     ):
         super().__init__()
-        self.setName('Teamwork Client')
+        self.setName("Teamwork Client")
         self._addr = addr
         self._in_queue = in_queue
         self._out_queue = out_queue
@@ -89,7 +89,7 @@ class ClientThread(Thread):
                 s.settimeout(5)
                 s.setblocking(False)
                 selector.register(s, selectors.EVENT_READ | selectors.EVENT_WRITE)
-                self._logger.info('Client started')
+                self._logger.info("Client started")
                 self._started.set()
                 sender = ClientSender(self._in_queue)
                 receiver = ClientReceiver(self._out_queue)
@@ -109,4 +109,4 @@ class ClientThread(Thread):
                 self._stop_event.set()
             finally:
                 selector.close()
-        self._logger.info('Client stopped')
+        self._logger.info("Client stopped")
