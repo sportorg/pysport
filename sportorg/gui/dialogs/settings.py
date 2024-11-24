@@ -78,6 +78,12 @@ class MainTab(Tab):
         )
         self.layout.addRow(self.item_save_in_utf8)
 
+        self.item_save_in_gzip = QCheckBox(translate("Compress files to gzip"))
+        self.item_save_in_gzip.setChecked(
+            Config().configuration.get("save_in_gzip", False)
+        )
+        self.layout.addRow(self.item_save_in_gzip)
+
         self.widget.setLayout(self.layout)
 
     def save(self):
@@ -104,6 +110,7 @@ class MainTab(Tab):
         Config().configuration.set("use_birthday", self.item_use_birthday.isChecked())
         Config().configuration.set("check_updates", self.item_check_updates.isChecked())
         Config().configuration.set("save_in_utf8", self.item_save_in_utf8.isChecked())
+        Config().configuration.set("save_in_gzip", self.item_save_in_gzip.isChecked())
 
 
 class SoundTab(Tab):

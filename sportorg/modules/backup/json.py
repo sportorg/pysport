@@ -1,3 +1,4 @@
+import gzip
 import os
 import uuid
 
@@ -18,24 +19,27 @@ from sportorg.models.result.score_calculation import ScoreCalculation
 from sportorg.models.result.split_calculation import RaceSplits
 
 
-def dump(file):
+def dump(file, *, compress=False):
     data = {
         "version": config.VERSION,
         "current_race": get_current_race_index(),
-        "races": [race_downgrade(r.to_dict()) for r in races()],
+        "races": [r.to_dict() for r in races()],
     }
     raw = orjson.dumps(data, option=orjson.OPT_INDENT_2)
-    file.write(raw.decode())
+    if compress:
+        file.write(gzip.compress(raw))
+    else:
+        file.write(raw.decode())
     file.flush()
     os.fsync(file.fileno())
 
 
-def load(file):
+def load(file, *, compress=False):
     # clear current race, here we'll have index data after loading
     tmp_obj = Race()
     new_event([tmp_obj])
 
-    event, current_race = get_races_from_file(file)
+    event, current_race = get_races_from_file(file, compress=compress)
     new_event(event)
     set_current_race_index(current_race)
     obj = race()
@@ -49,8 +53,11 @@ def load(file):
     )  # force user to activate Live broadcast manually (not to lose live results)
 
 
-def get_races_from_file(file):
-    data = orjson.loads(file.read())
+def get_races_from_file(file, *, compress=False):
+    if compress:
+        data = orjson.loads(gzip.decompress(file.read()))
+    else:
+        data = orjson.loads(file.read())
     if "races" not in data:
         data = {
             "races": [data] if not isinstance(data, list) else data,
@@ -58,12 +65,12 @@ def get_races_from_file(file):
         }
     event = []
     for race_dict in data["races"]:
-        race_migrate(race_dict)
+        _race_migrate(race_dict)
         obj = Race()
         obj.id = uuid.UUID(str(race_dict["id"]))
         obj.update_data(race_dict)
         # while parsing of data index is created in old object, available as race()
-        move_indexes_to_new_race(obj)
+        _move_indexes_to_new_race(obj)
         event.append(obj)
     current_race = 0
     if "current_race" in data:
@@ -71,14 +78,14 @@ def get_races_from_file(file):
     return event, current_race
 
 
-def move_indexes_to_new_race(obj):
+def _move_indexes_to_new_race(obj):
     obj.person_index_bib = race().person_index_bib
     race().person_index_bib = {}
     obj.person_index_card = race().person_index_card
     race().person_index_card = {}
 
 
-def race_migrate(data):
+def _race_migrate(data):
     for person in data["persons"]:
         if "sportident_card" in person:
             person["card_number"] = person["sportident_card"]
@@ -117,8 +124,4 @@ def race_migrate(data):
         settings["system_assignment_mode"] = settings["sportident_assignment_mode"]
     if "sportident_port" in settings:
         settings["system_port"] = settings["sportident_port"]
-    return data
-
-
-def race_downgrade(data):
     return data
