@@ -13,7 +13,7 @@ def use_gzip():
     Config().configuration.set("save_in_gzip", old_value)
 
 
-@pytest.mark.usefixtures('use_gzip')
+@pytest.mark.usefixtures("use_gzip")
 def test_save_and_open_gzip():
     File("tests/data/test.json").open()
     File("tests/data/test.json.tmp").save()
