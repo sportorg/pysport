@@ -912,14 +912,14 @@ class ImportSportOrgAction(Action, metaclass=ActionFactory):
 
         try:
             with open(file_name, mode=mode, encoding=def_encoding) as f:
-                attr = get_races_from_file(f)
+                attr = get_races_from_file(f, compress=use_gzip)
         except UnicodeDecodeError:
             f.close()
 
             alt_encoding = None if use_utf8 or use_gzip else "utf-8"
 
             with open(file_name, mode=mode, encoding=alt_encoding) as f:
-                attr = get_races_from_file(f)
+                attr = get_races_from_file(f, compress=use_gzip)
 
         SportOrgImportDialog(*attr).exec_()
         self.app.refresh()
