@@ -53,6 +53,7 @@ from sportorg.models.start.start_preparation import (
     copy_card_number_to_bib,
     guess_corridors_for_groups,
 )
+from sportorg.modules.backup.file import is_gzip_file
 from sportorg.modules.backup.json import get_races_from_file
 from sportorg.modules.configs.configs import Config
 from sportorg.modules.iof import iof_xml
@@ -892,28 +893,36 @@ class ImportSportOrgAction(Action, metaclass=ActionFactory):
         file_name = get_open_file_name(
             translate("Open SportOrg json"), translate("SportOrg (*.json)")
         )
-        if file_name != "":
-            use_utf8 = Config().configuration.get("save_in_utf8", False)
-            # if user set UTF-8 usage, first try to open file in UTF-8, then in system locale (1251 for RU Windows)
-            try:
-                def_encoding = None
-                if use_utf8:
-                    def_encoding = "utf-8"
+        if file_name == "":
+            return
 
-                with open(file_name, encoding=def_encoding) as f:
-                    attr = get_races_from_file(f)
-            except UnicodeDecodeError:
-                f.close()
+        mode = "r"
 
-                alt_encoding = "utf-8"
-                if use_utf8:
-                    alt_encoding = None
+        # if user set UTF-8 usage, first try to open file in UTF-8,
+        # then in system locale (1251 for RU Windows)
+        use_utf8 = Config().configuration.get("save_in_utf8", False)
+        use_gzip = Config().configuration.get("save_in_gzip", False)
 
-                with open(file_name, encoding=alt_encoding) as f:
-                    attr = get_races_from_file(f)
+        if mode == "r":
+            use_gzip = is_gzip_file(file_name)
 
-            SportOrgImportDialog(*attr).exec_()
-            self.app.refresh()
+        def_encoding = "utf-8" if use_utf8 and not use_gzip else None
+        if use_gzip:
+            mode = f"{mode}+b"
+
+        try:
+            with open(file_name, mode=mode, encoding=def_encoding) as f:
+                attr = get_races_from_file(f)
+        except UnicodeDecodeError:
+            f.close()
+
+            alt_encoding = None if use_utf8 or use_gzip else "utf-8"
+
+            with open(file_name, mode=mode, encoding=alt_encoding) as f:
+                attr = get_races_from_file(f)
+
+        SportOrgImportDialog(*attr).exec_()
+        self.app.refresh()
 
 
 class RentCardsAction(Action, metaclass=ActionFactory):

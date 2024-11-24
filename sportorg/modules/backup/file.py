@@ -11,6 +11,15 @@ from . import json
 logger = logging.getLogger(__name__)
 
 
+def is_gzip_file(file_name: str) -> bool:
+    try:
+        with gzip.open(file_name) as f:
+            f.read(1)
+        return True
+    except gzip.BadGzipFile:
+        return False
+
+
 class File:
     def __init__(self, file_name: str):
         self._file_name = file_name
@@ -18,18 +27,13 @@ class File:
         self.use_gzip = Config().configuration.get("save_in_gzip", False)
 
     def _backup(self, file_name: str, func, mode: str = "r") -> None:
-        use_utf8 = self.use_utf8
-        use_gzip = self.use_gzip
         # if user set UTF-8 usage, first try to open file in UTF-8,
         # then in system locale (1251 for RU Windows)
+        use_utf8 = Config().configuration.get("save_in_utf8", False)
+        use_gzip = Config().configuration.get("save_in_gzip", False)
 
         if mode == "r":
-            try:
-                with gzip.open(file_name) as f:
-                    f.read(1)
-                use_gzip = True
-            except gzip.BadGzipFile:
-                use_gzip = False
+            use_gzip = is_gzip_file(file_name)
 
         def_encoding = "utf-8" if use_utf8 and not use_gzip else None
         if use_gzip:
