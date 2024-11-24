@@ -31,7 +31,7 @@ class File:
             except gzip.BadGzipFile:
                 use_gzip = False
 
-        def_encoding = "utf-8" if use_utf8 else None
+        def_encoding = "utf-8" if use_utf8 and not use_gzip else None
         if use_gzip:
             mode = f"{mode}+b"
 
@@ -42,7 +42,7 @@ class File:
         except UnicodeDecodeError:
             f.close()
 
-            alt_encoding: Optional[str] = "utf-8" if use_utf8 else None
+            alt_encoding: Optional[str] = None if use_utf8 or use_gzip else "utf-8"
 
             with open(file_name, mode, encoding=alt_encoding) as f:
                 func(f, compress=use_gzip)
