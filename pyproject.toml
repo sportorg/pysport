@@ -27,7 +27,7 @@ requests = "^2"
 sportident = "^1"
 
 [tool.poetry.group.dev.dependencies]
-cx_Freeze = "^6"
+cx_Freeze = ">=6,<8"
 mypy = "^1.4"
 poethepoet = ">=0.22,<0.31"
 pytest = ">=7.4,<9.0"
