@@ -1428,12 +1428,12 @@ test = ["importlib-metadata", "pytest"]
 
 [[package]]
 name = "playsound"
-version = "1.2.2"
+version = "1.3.0"
 description = "Pure Python, cross platform, single function module with no dependencies for playing sounds."
 optional = true
 python-versions = "*"
 files = [
-    {file = "playsound-1.2.2-py2.py3-none-any.whl", hash = "sha256:1e83750a5325cbccee03d6e751ba3e78c037ac95b95a3ba1f38d0c5aca9e1a34"},
+    {file = "playsound-1.3.0.tar.gz", hash = "sha256:cc6ed11d773034b0ef624e6bb4bf50f4b76b8414a59ce6d38afb89b423297ced"},
 ]
 
 [[package]]
@@ -2320,4 +2320,4 @@ win = ["playsound", "pyImpinj", "pywin32"]
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.8.1"
-content-hash = "43cf5ad9bc106225574882fd10215d69a4a0284deedb6d68b3f3be216741de1d"
+content-hash = "e0f429ec3dc783e2d6271300b2e9c097114d7661a8744abdec2321586514e04e"
