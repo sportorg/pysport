@@ -6,7 +6,7 @@ authors = ["Danil Akhtarov <daxartio@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "~3.8.1"
-pywin32 = {version="^228", optional = true}
+pywin32 = {version=">=228,<309", optional = true}
 pyImpinj = {version="^1.2", optional = true}
 playsound = {version="=1.2.2", optional = true}
 aiohttp = "^3.9.0"
