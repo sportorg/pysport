@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - "v*"
+      - "nightly"
   workflow_dispatch:
 
 jobs:
@@ -39,5 +40,6 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
+          make_latest: ${{ github.ref_name == 'nightly' }}
           files: |
             dist/*.msi
