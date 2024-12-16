@@ -26,7 +26,9 @@ jobs:
       - name: Install python dependencies
         run: pip install poetry && poetry install -E win
       - name: Generate mo files
-        run: poetry run poe generate-mo generate-version
+        run: poetry run poe generate-mo
+      - name: Generate version file
+        run: poetry run poe generate-version
       - name: Build
         run: poetry run python builder.py build
       - name: Generate installer
