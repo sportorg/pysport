@@ -1,6 +1,7 @@
 import logging.config
 import os
 import sys
+from pathlib import Path
 from typing import Optional
 
 from pydantic import BaseSettings
@@ -90,6 +91,17 @@ STYLE_DIR = base_dir("styles")
 
 def style_dir(*paths) -> str:
     return os.path.join(STYLE_DIR, *paths)
+
+
+COMMIT_VERSION_FILE = base_dir("version")
+
+
+def commit_version() -> str:
+    path = Path(COMMIT_VERSION_FILE)
+    if not path.exists():
+        return ""
+
+    return path.read_text(encoding="utf-8")
 
 
 ICON = icon_dir("sportorg.svg")

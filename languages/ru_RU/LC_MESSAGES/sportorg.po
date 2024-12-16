@@ -21,6 +21,9 @@ msgstr ""
 msgid "About"
 msgstr "О нас"
 
+msgid "Version"
+msgstr "Версия"
+
 msgid "Contributors"
 msgstr "Разработчики"
 

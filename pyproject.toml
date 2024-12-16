@@ -93,6 +93,10 @@ sequence = [
 help = "Generate mo files"
 cmd = "python -m sportorg.language"
 
+[tool.poe.tasks.generate-version]
+help = "Generate version file"
+cmd = "python .github/scripts/version.py"
+
 [tool.poe.tasks.run]
 help = "Run"
 sequence = [

@@ -4,7 +4,7 @@
 #define MyAppName "SportOrg"
 #define MyAppVersion "v1.7.1"
 #define MyVersionInfoVersion "1.7.1.0"
-#define MyAppPublisher "Danil Akhtarov, Alexei Zhulev, Semyon Yakimov, Konstantin Bats, Sergei Kobelev"
+#define MyAppPublisher "SportOrg Team"
 #define MyAppURL "https://sportorg.readthedocs.io"
 #define MyAppExeName "SportOrg.exe"
 

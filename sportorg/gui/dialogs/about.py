@@ -39,6 +39,8 @@ class AboutDialog(QDialog):
                 (
                     "\t- Danil Akhtarov,\n"
                     "\t- Sergei Kobelev,\n"
+                    "\t- Alexander Karpov,\n"
+                    "\t- Alexei Zhulev,\n"
                     "\t- Semyon Yakimov,\n"
                     "\t- Konstantin Bats."
                 ),
@@ -53,8 +55,16 @@ class AboutDialog(QDialog):
             )
         )
         home_page_text.setOpenExternalLinks(True)
-
         self.layout.addRow(home_page_text)
+
+        commit_version_text = QLabel()
+        commit_version_text.setTextInteractionFlags(
+            Qt.TextInteractionFlag.TextSelectableByMouse
+        )
+        commit_version_text.setText(
+            "{}: {}".format(translate("Version"), config.commit_version())
+        )
+        self.layout.addRow(commit_version_text)
 
         licence_title = QLabel()
         licence_title.setText("\nGPL v3 License")
