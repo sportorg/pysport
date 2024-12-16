@@ -18,6 +18,7 @@ include_files = [
     config.base_dir("changelog_ru.md"),
     config.base_dir("configs"),
     config.STYLE_DIR,
+    config.COMMIT_VERSION_FILE,
 ]
 includes = ["atexit", "codecs", "playsound", "pyImpinj"]
 excludes = ["Tkinter", "unittest", "test", "pydoc"]
