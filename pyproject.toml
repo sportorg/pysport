@@ -47,6 +47,44 @@ win = ["pywin32", "pyImpinj", "playsound"]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
+[tool.mypy]
+check_untyped_defs = true
+disallow_any_generics = true
+disallow_incomplete_defs = true
+disallow_untyped_defs = true
+ignore_missing_imports = true
+no_implicit_optional = true
+
+[[tool.mypy.overrides]]
+module = ["tests.*"]
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+
+[[tool.mypy.overrides]]
+module = [".venv.*"]
+ignore_errors = true
+
+[tool.coverage.run]
+omit = ["tests/*", "**/__main__.py", "**/.venv/*", "**/site-packages/*"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+fail_under = 42
+
+[tool.pytest.ini_options]
+addopts = "--strict-markers --showlocals --verbosity 2"
+log_level = "DEBUG"
+
+[tool.ruff.lint]
+select = []
+ignore = []
+exclude = []
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101"]
+
 [tool.poe.env]
 CODE = "tests sportorg builder.py"
 SPORTORG_DEBUG = "true"

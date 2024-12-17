@@ -1,6 +1,9 @@
+from typing import Any, Dict
+
+
 class Model:
     @classmethod
-    def create(cls, **kwargs):
+    def create(cls, **kwargs: Dict[str, Any]) -> Any:
         o = cls()
         for key, value in kwargs.items():
             if hasattr(o, key):
@@ -9,14 +12,7 @@ class Model:
         return o
 
     @classmethod
-    def update(cls, **kwargs):
+    def update(cls, **kwargs: Dict[str, Any]) -> None:
         for key, value in kwargs.items():
             if hasattr(cls, key):
                 setattr(cls, key, value)
-
-    def __getitem__(self, key):
-        return getattr(self, key)
-
-    def __setitem__(self, key, val):
-        if hasattr(self, key):
-            setattr(self, key, val)
