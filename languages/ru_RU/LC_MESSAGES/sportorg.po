@@ -1667,3 +1667,6 @@ msgstr "Выбрать директорию с шаблонами"
 
 msgid "Open the templates directory"
 msgstr "Открыть директорию с шаблонами"
+
+msgid "Compress files to gzip"
+msgstr "Сохранять файлы в формате gzip"
