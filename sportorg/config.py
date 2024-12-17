@@ -2,21 +2,13 @@ import logging.config
 import os
 import sys
 from pathlib import Path
-from typing import Optional
-
-from pydantic import BaseSettings
-
-
-class Env(BaseSettings):
-    DEBUG: bool = False
-    TEMPLATES_PATH: Optional[str]
-
-    class Config:
-        env_file = ".env"
-
 
 NAME = "SportOrg"
 VERSION = "v1.7.1"
+
+ENV_PREFIX = "SPORTORG_"
+DEBUG = os.getenv(f"{ENV_PREFIX}DEBUG", "false").lower() in ["1", "yes", "true"]
+TEMPLATES_PATH = os.getenv(f"{ENV_PREFIX}TEMPLATES_PATH", "")
 
 
 def is_executable() -> bool:
@@ -37,8 +29,6 @@ def base_dir(*paths) -> str:
     return os.path.join(BASE_DIR, *paths)
 
 
-env = Env(_env_file=base_dir(".env"))  # type:ignore
-DEBUG = env.DEBUG
 IMG_DIR = base_dir("img")
 
 
@@ -67,7 +57,7 @@ def data_dir(*paths) -> str:
     return os.path.join(DATA_DIR, *paths)
 
 
-TEMPLATE_DIR = env.TEMPLATES_PATH or base_dir("templates")
+TEMPLATE_DIR = TEMPLATES_PATH or base_dir("templates")
 
 
 def set_template_dir(dirpath: str) -> None:
