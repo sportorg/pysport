@@ -1,5 +1,6 @@
 import logging
 from copy import deepcopy
+from datetime import datetime
 from enum import Enum
 
 from sportorg.common.otime import OTime
@@ -7,6 +8,7 @@ from sportorg.gui.dialogs.bib_dialog import BibDialog
 from sportorg.language import translate
 from sportorg.models.memory import Person, ResultSportident, ResultStatus, race
 from sportorg.models.result.result_checker import ResultChecker, ResultCheckerException
+from sportorg.utils.time import time_to_otime
 
 
 class FinishSource(Enum):
@@ -30,7 +32,9 @@ class ResultSportidentGeneration:
             "system_duplicate_chip_processing", "several_results"
         )
         self.card_read_repeated = self.duplicate_chip_processing == "bib_request"
-        self.missed_finish = race().get_setting("system_missed_finish", "zero")
+        self.missed_finish = FinishSource[
+            race().get_setting("system_missed_finish", "zero")
+        ]
         self.finish_source = FinishSource[
             race().get_setting("system_finish_source", "station")
         ]
@@ -40,7 +44,7 @@ class ResultSportidentGeneration:
         if self._result and self._result.finish_time is None:
             if self.finish_source == FinishSource.station:
                 if self.missed_finish == FinishSource.readout:
-                    self._result.finish_time = self._result.created_at
+                    self._result.finish_time = time_to_otime(datetime.fromtimestamp(self._result.created_at))
                 elif self.missed_finish == FinishSource.zero:
                     self._result.finish_time = OTime(msec=0)
                 elif self.missed_finish == FinishSource.dsq:
