@@ -1,7 +1,14 @@
 import logging
 
 from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import QDialog, QDialogButtonBox, QFormLayout, QLabel, QTextEdit
+from PySide6.QtWidgets import (
+    QDialog,
+    QDialogButtonBox,
+    QFormLayout,
+    QLabel,
+    QTextEdit,
+    QMessageBox,
+)
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
@@ -14,26 +21,35 @@ from sportorg.modules.live.live import live_client
 from sportorg.modules.teamwork.teamwork import Teamwork
 
 
-class NotStartDialog(QDialog):
+class InputStartNumbersDialog(QDialog):
     def __init__(self):
         super().__init__(GlobalAccess().get_main_window())
+        self.STARTED_NUMBERS = translate("Set started numbers")
+        self.NOT_STARTED_NUMBERS = translate("Set not started numbers")
 
     def exec_(self):
         self.init_ui()
         return super().exec_()
 
     def init_ui(self):
-        self.setWindowTitle(translate("Not started numbers"))
+        self.setWindowTitle(translate("Set DNS numbers"))
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(True)
 
         self.layout = QFormLayout(self)
 
+        self.input_start_list = AdvComboBox()
+        self.input_start_list.addItems([self.STARTED_NUMBERS, self.NOT_STARTED_NUMBERS])
+
+        self.layout.addRow(self.input_start_list)
+
         self.item_status_comment = AdvComboBox()
         self.item_status_comment.addItems(StatusComments().get_all())
 
-        self.layout.addRow(self.item_status_comment)
+        self.layout.addRow(
+            translate("Label status not started"), self.item_status_comment
+        )
 
         self.label_controls = QLabel("\n\n1 4 15 25\n58 32\n33\n34\n...\n150")
         self.item_numbers = QTextEdit()
@@ -63,17 +79,33 @@ class NotStartDialog(QDialog):
         self.show()
 
     def apply_changes_impl(self):
+        if self.input_start_list.currentText() == self.NOT_STARTED_NUMBERS:
+            not_started_numbers = self.parse_input_numbers()
+            self.apply_not_started_list_changes_impl(not_started_numbers)
+        else:
+            self.apply_started_list_changes_impl()
+
+    def apply_started_list_changes_impl(self):
+        started_numbers = self.parse_input_numbers()
+        all_numbers = list(race().person_index_bib.keys())
+        not_started_numbers = list(all_numbers)
+        for number in started_numbers:
+            not_started_numbers.remove(number)
+
+        if len(not_started_numbers) <= len(all_numbers) / 2:
+            self.apply_not_started_list_changes_impl(not_started_numbers)
+        else:
+            QMessageBox.warning(
+                self,
+                translate("Set started numbers"),
+                translate("Count started numbers less half"),
+            )
+
+    def apply_not_started_list_changes_impl(self, not_started_numbers):
         status_comment = StatusComments().remove_hint(
             self.item_status_comment.currentText()
         )
-        text = self.item_numbers.toPlainText()
-        numbers = []
-        for item in text.split("\n"):
-            if not len(item):
-                continue
-            for n_item in item.split():
-                if n_item.isdigit():
-                    numbers.append(int(n_item))
+        numbers = not_started_numbers
         old_numbers = []
         obj = race()
         for number in numbers:
@@ -91,3 +123,14 @@ class NotStartDialog(QDialog):
                     logging.info("{} not found".format(number))
                 old_numbers.append(number)
         ResultCalculation(race()).process_results()
+
+    def parse_input_numbers(self):
+        text = self.item_numbers.toPlainText()
+        numbers = []
+        for item in text.split("\n"):
+            if not len(item):
+                continue
+            for n_item in item.split():
+                if n_item.isdigit():
+                    numbers.append(int(n_item))
+        return numbers

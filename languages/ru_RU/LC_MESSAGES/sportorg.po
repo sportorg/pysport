@@ -261,8 +261,17 @@ msgstr "Включить"
 msgid "URL not valid"
 msgstr "URL недействителен"
 
-msgid "Not started numbers"
-msgstr "Не стартовавшие участники"
+msgid "Set started numbers"
+msgstr "Ввод стартовавших участников"
+
+msgid "Set not started numbers"
+msgstr "Ввод нестартовавших участников"
+
+msgid "Count started numbers less half"
+msgstr "Операция неприменима, количество стартовавших меньше половины"
+
+msgid "Label status not started"
+msgstr "Cтатус для нестартовавших"
 
 msgid "Dialog"
 msgstr "Диалог"
@@ -982,7 +991,7 @@ msgid "Change status"
 msgstr "Изменить статус"
 
 msgid "Set DNS numbers"
-msgstr "Ввести номера со статусом DNS"
+msgstr "Ввести Шахматку"
 
 msgid "Service"
 msgstr "Сервис"
