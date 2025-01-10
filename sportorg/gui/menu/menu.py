@@ -88,6 +88,10 @@ def menu_list():
                             "title": translate("SportOrg HTML"),
                             "action": "RecoverySportorgHtmlAction",
                         },
+                        {
+                            "title": translate("Import persons from table"),
+                            "action": "ImportPersonsAction",
+                        },
                     ],
                 },
                 {
