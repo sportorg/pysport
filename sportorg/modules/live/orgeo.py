@@ -122,9 +122,9 @@ def _get_person_obj(data, race_data, result=None):
                 result["result_msec"] / 10
             )  # 1/100 sec - proprietary format
 
-        if race_data["settings"]["result_processing_mode"] == "ardf":
+        if race_data["settings"].get("result_processing_mode", "time") == "ardf":
             obj["score"] = result["scores_ardf"]
-        elif race_data["settings"]["result_processing_mode"] == "scores":
+        elif race_data["settings"].get("result_processing_mode", "time") == "scores":
             obj["score"] = result["rogaine_score"]
             if result["rogaine_penalty"] > 0:
                 obj["penalty"] = str(result["rogaine_penalty"])
@@ -139,9 +139,8 @@ def _get_person_obj(data, race_data, result=None):
             obj["splits"] = []
             splits = []
             for split in result["splits"]:
-                if (
-                    split["is_correct"]
-                    or race_data["settings"]["live_sending_all_controls"]
+                if split["is_correct"] or race_data["settings"].get(
+                    "live_sending_all_controls", False
                 ):
                     splits.append(split)
             for i in range(len(splits)):
@@ -258,7 +257,7 @@ async def create_online_cp(url, data, race_data, log, *, session):
     race_data is Dict: Race
     """
 
-    if not race_data["settings"]["live_cp_enabled"]:
+    if not race_data["settings"].get("live_cp_enabled", False):
         return
 
     o = Orgeo(session, url)
@@ -276,7 +275,7 @@ async def create_online_cp(url, data, race_data, log, *, session):
             try:
                 res = _get_result_by_id(item, race_data)
 
-                if res and race_data["settings"]["live_cp_finish_enabled"]:
+                if res and race_data["settings"].get("live_cp_finish_enabled", True):
                     # send finish time as cp with specified code
 
                     card_number = res["card_number"]
@@ -286,7 +285,7 @@ async def create_online_cp(url, data, race_data, log, *, session):
                             card_number = person["card_number"]
 
                     if card_number > 0:
-                        code = race_data["settings"]["live_cp_code"]
+                        code = race_data["settings"].get("live_cp_code", "10")
                         finish_time = OTime.now()
                         if res["finish_time"] is not None:
                             finish_time = int_to_otime(
@@ -305,7 +304,7 @@ async def create_online_cp(url, data, race_data, log, *, session):
                     else:
                         log.info(LOG_MSG, 401, "Ignoring empty card number")
 
-                if res and race_data["settings"]["live_cp_splits_enabled"]:
+                if res and race_data["settings"].get("live_cp_splits_enabled", True):
                     # send split as cp, codes of cp to send are set by the list
 
                     card_number = res["card_number"]
@@ -315,7 +314,11 @@ async def create_online_cp(url, data, race_data, log, *, session):
                             card_number = person["card_number"]
 
                     if card_number > 0:
-                        codes = race_data["settings"]["live_cp_split_codes"].split(",")
+                        codes = (
+                            race_data["settings"]
+                            .get("live_cp_split_codes", "91,91,92")
+                            .split(",")
+                        )
                         for split in res["splits"]:
                             if split["code"] in codes:
                                 split_time = int_to_otime(split["time"] // 10).to_str()
