@@ -1,5 +1,9 @@
 # Changelog
 
+## next
+
+* Fix not working online results when the settings responsible for timing are missing
+
 ## 2024-10-07 v1.7.1
 
 - Rebuild indexes after major changing/deleting bibs and cards operations
