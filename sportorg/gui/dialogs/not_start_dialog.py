@@ -87,8 +87,8 @@ class InputStartNumbersDialog(QDialog):
 
     def apply_started_list_changes_impl(self):
         started_numbers = self.parse_input_numbers()
-        all_numbers = list(race().person_index_bib.keys())
-        not_started_numbers = list(all_numbers)
+        all_numbers = set(race().person_index_bib.keys())
+        not_started_numbers = set(all_numbers)
         for number in started_numbers:
             not_started_numbers.remove(number)
 
@@ -127,9 +127,7 @@ class InputStartNumbersDialog(QDialog):
     def parse_input_numbers(self):
         text = self.item_numbers.toPlainText()
         numbers = []
-        for item in text.split("\n"):
-            if not len(item):
-                continue
+        for item in filter(None, text.splitlines()):
             for n_item in item.split():
                 if n_item.isdigit():
                     numbers.append(int(n_item))
