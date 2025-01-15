@@ -669,6 +669,12 @@ msgstr "Штраф за каждую просроченную минуту"
 msgid "maximum overrun time"
 msgstr "Макс. превышение контрольного времени"
 
+msgid "no credit time"
+msgstr "Без отсечки"
+
+msgid "credit time control point"
+msgstr "Номер станции отсечки"
+
 msgid "no penalty"
 msgstr "штраф не начисляется"
 

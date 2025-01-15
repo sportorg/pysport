@@ -38,7 +38,7 @@ class TimekeepingPropertiesDialog(QDialog):
         # self.setWindowIcon(QIcon(icon_dir('sportident.png')))
         self.setSizeGripEnabled(False)
         self.setModal(True)
-
+        self.setMinimumWidth(400)
         self.tab_widget = QTabWidget()
 
         # timekeeping tab
@@ -308,6 +308,27 @@ class TimekeepingPropertiesDialog(QDialog):
 
         self.time_settings_tab.setLayout(self.time_settings_layout)
 
+        self.credit_time_settings_tab = QWidget()
+        self.credit_time_settings_settings_layout = QFormLayout()
+        self.credit_time_group_box = QGroupBox(translate("Credit"))
+        self.credit_time_group_box_layout = QFormLayout()
+
+        self.credit_time_off_radio = QRadioButton(translate("no credit time"))
+        self.credit_time_off_radio.setToolTip(translate("no credit time"))
+        self.credit_time_group_box_layout.addRow(self.credit_time_off_radio)
+
+        self.credit_time_cp = QRadioButton(translate("credit time control point"))
+        self.credit_time_cp_value = AdvSpinBox(minimum=-1, maximum=999, max_width=60)
+        self.credit_time_group_box_layout.addRow(
+            self.credit_time_cp, self.credit_time_cp_value
+        )
+
+        self.credit_time_group_box.setLayout(self.credit_time_group_box_layout)
+        self.credit_time_settings_settings_layout.addRow(self.credit_time_group_box)
+        self.credit_time_settings_tab.setLayout(
+            self.credit_time_settings_settings_layout
+        )
+
         self.tab_widget.addTab(
             self.timekeeping_tab, translate("SPORTident (Sportiduino, ...) settings")
         )
@@ -315,6 +336,7 @@ class TimekeepingPropertiesDialog(QDialog):
         self.tab_widget.addTab(self.scores_tab, translate("Scores"))
         self.tab_widget.addTab(self.marked_route_tab, translate("Penalty calculation"))
         self.tab_widget.addTab(self.time_settings_tab, translate("Time settings"))
+        self.tab_widget.addTab(self.credit_time_settings_tab, translate("Credit"))
 
         def cancel_changes():
             self.close()
@@ -571,6 +593,14 @@ class TimekeepingPropertiesDialog(QDialog):
         elif time_format_24 == "more24":
             self.time_settings_format_more.setChecked(True)
 
+        # credit settings
+        credit_time_enabled = obj.get_setting("credit_time_enabled", False)
+        self.credit_time_off_radio.setChecked(not credit_time_enabled)
+        self.credit_time_cp.setChecked(credit_time_enabled)
+
+        credit_time_cp = obj.get_setting("credit_time_cp", 250)
+        self.credit_time_cp_value.setValue(credit_time_cp)
+
     def apply_changes_impl(self):
         obj = race()
 
@@ -732,5 +762,10 @@ class TimekeepingPropertiesDialog(QDialog):
         obj.set_setting("time_accuracy", time_accuracy)
         obj.set_setting("time_rounding", time_rounding)
         obj.set_setting("time_format_24", time_format_24)
+
+        # credit settings
+        credit_time_disabled = self.credit_time_off_radio.isChecked()
+        obj.set_setting("credit_time_enabled", not credit_time_disabled)
+        obj.set_setting("credit_time_cp", self.credit_time_cp_value.value())
 
         ResultCalculation(race()).process_results()
