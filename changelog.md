@@ -3,6 +3,7 @@
 ## next
 
 * Fix not working online results when the settings responsible for timing are missing
+* Add credit time calculation
 
 ## 2024-10-07 v1.7.1
 
