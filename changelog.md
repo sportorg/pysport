@@ -3,6 +3,8 @@
 ## next
 
 * Fix not working online results when the settings responsible for timing are missing
+* Added the ability to enter started numbers
+* Added the ability to import participants from the table (For example Excel)
 * Add credit time calculation
 
 ## 2024-10-07 v1.7.1
