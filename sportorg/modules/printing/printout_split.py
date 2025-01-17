@@ -162,6 +162,7 @@ class SportorgPrinter:
 
         is_penalty_used = obj.get_setting("marked_route_mode", "off") != "off"
         is_relay = group.is_relay()
+        is_credit_time_used = race().get_setting("credit_time_enabled", False)
 
         fn = "Lucida Console"
         fs_small = 2.5
@@ -284,6 +285,13 @@ class SportorgPrinter:
                     fn,
                     fs_main,
                 )
+
+        if is_credit_time_used:
+            self.print_line(
+                translate("Credit") + ": " + result.get_credit_time().to_str(),
+                fn,
+                fs_main,
+            )
 
         is_rogaine = race().get_setting("result_processing_mode", "time") == "scores"
         if is_rogaine and result.rogaine_penalty > 0:
