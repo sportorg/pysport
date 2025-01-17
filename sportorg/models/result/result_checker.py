@@ -76,6 +76,7 @@ class ResultChecker:
 
             check_flag = o.check_result(result)
             ResultChecker.calculate_penalty(result)
+            ResultChecker.calculate_credit_time(result)
             if not check_flag:
                 result.status = ResultStatus.MISSING_PUNCH
 
@@ -113,6 +114,17 @@ class ResultChecker:
         for result in race().results:
             if result.person:
                 ResultChecker.checking(result)
+
+    @staticmethod
+    def calculate_credit_time(result: Result):
+        credit_time_enabled = race().get_setting("credit_time_enabled", False)
+        if not credit_time_enabled:
+            return
+
+        credit_cp = race().get_setting("credit_time_cp", 250)
+        splits = result.splits
+
+        result.credit_time = ResultChecker.credit_calculation(splits, credit_cp)
 
     @staticmethod
     def calculate_penalty(result: Result):
@@ -183,6 +195,15 @@ class ResultChecker:
                             if cp not in ret:
                                 ret.append(cp)
         return ret
+
+    @staticmethod
+    def credit_calculation(splits, credit_cp):
+        result_credit_time = OTime()
+        for idx, split in enumerate(splits):
+            if int(split.code) == credit_cp and idx > 0:
+                result_credit_time += split.time - splits[idx - 1].time
+
+        return result_credit_time
 
     @staticmethod
     def penalty_calculation(splits, controls, check_existence=False):
