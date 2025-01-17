@@ -261,6 +261,9 @@ msgstr "Включить"
 msgid "URL not valid"
 msgstr "URL недействителен"
 
+msgid "Import persons from table"
+msgstr "Импорт участников из таблицы"
+
 msgid "Set started numbers"
 msgstr "Ввод стартовавших участников"
 
@@ -293,6 +296,15 @@ msgstr "Удалять исходный номер"
 
 msgid "Replace source with reserve"
 msgstr "Создать резервного участника для исходного номера"
+
+msgid "Replacement by bib"
+msgstr "Замена по стартовому номеру"
+
+msgid "Replacement by name"
+msgstr "Замена по имени и фамилии"
+
+msgid "Insert new records"
+msgstr "Вставка новых записей"
 
 msgid "Team properties"
 msgstr "Свойства коллектива"
@@ -1214,6 +1226,18 @@ msgstr "Люди"
 
 msgid "Duplicate card numbers (card numbers are reset)"
 msgstr "Дублирующиеся чипы (номера чипов обнулены)"
+
+msgid "Bib header not found"
+msgstr "Cтолбец Номер не найден"
+
+msgid "Name header not found"
+msgstr "Cтолбец c именем или фамилией не найден"
+
+msgid "Person not found"
+msgstr "Участник не найден"
+
+msgid "Bib not found"
+msgstr "Номер не найден"
 
 msgid "Duplicate names"
 msgstr "Повторяющиеся имена"
