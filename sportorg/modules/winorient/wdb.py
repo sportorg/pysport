@@ -83,6 +83,7 @@ class WinOrientBinary:
         for team in self.wdb_object.team:
             new_team = Organization()
             new_team.name = team.name
+            new_team.contact = team.contact
             my_race.organizations.append(new_team)
 
         for course in self.wdb_object.dist:
