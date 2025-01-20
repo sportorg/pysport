@@ -195,14 +195,15 @@ class WDBTeam:
     def __init__(self):
         self.id = 0
         self.name = "_"
-        self.refferent = ""
+        self.contact = ""
         self.country = 0
         self.region = 0
         self.people_in_base = 0
         self.people_finished = 0
         self.people_selected = 0
         self.is_selected = False
-        self.unused = 0  # most likely it's region code
+
+    #  self.unused = 0  # most likely it's region code
 
     def parse_bytes(self, byte_array):
         """
@@ -213,28 +214,29 @@ class WDBTeam:
 
         self.id = int.from_bytes(byte_array[0:4], byteorder)
         self.name = encode(byte_array[4:25])
-        self.refferent = encode(byte_array[25:44])
-        self.country = int.from_bytes(byte_array[44:45], byteorder)
-        self.region = int.from_bytes(byte_array[45:46], byteorder)
-        self.people_in_base = int.from_bytes(byte_array[46:48], byteorder)
-        self.people_finished = int.from_bytes(byte_array[48:50], byteorder)
-        self.people_selected = int.from_bytes(byte_array[50:52], byteorder)
-        self.is_selected = byte_array[52] == 0x01
-        self.unused = int.from_bytes(byte_array[54:56], byteorder)
+        self.contact = encode(byte_array[25:46])
+        self.country = int.from_bytes(byte_array[46:47], byteorder)
+        self.region = int.from_bytes(byte_array[47:48], byteorder)
+        self.people_in_base = int.from_bytes(byte_array[48:50], byteorder)
+        self.people_finished = int.from_bytes(byte_array[50:52], byteorder)
+        self.people_selected = int.from_bytes(byte_array[52:54], byteorder)
+        self.is_selected = byte_array[54] == 0x01
+
+    #  self.unused = int.from_bytes(byte_array[54:56], byteorder)
 
     def get_bytes(self):
         byteorder = get_wdb_byteorder()
 
         ret = int(self.id).to_bytes(4, byteorder)
         ret += format_string_to_bytes(self.name, 21)
-        ret += format_string_to_bytes(self.refferent, 19)
+        ret += format_string_to_bytes(self.contact, 21)
         ret += int(self.country).to_bytes(1, byteorder)
         ret += int(self.region).to_bytes(1, byteorder)
         ret += int(self.people_in_base).to_bytes(2, byteorder)
         ret += int(self.people_finished).to_bytes(2, byteorder)
         ret += int(self.people_selected).to_bytes(2, byteorder)
         ret += bool(self.is_selected).to_bytes(2, byteorder)
-        ret += int(self.unused).to_bytes(2, byteorder)
+        #    ret += int(self.unused).to_bytes(2, byteorder)
 
         return ret
 
