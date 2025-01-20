@@ -3,13 +3,18 @@ import os
 from queue import Queue
 from threading import Thread
 
-from playsound import playsound
+try:
+    from playsound import playsound
+except ModuleNotFoundError:
+    playsound = None
 
 from sportorg import config
 from sportorg.common.singleton import singleton
 
 
 def play(sound):
+    if not playsound:
+        return None
     playsound(sound)
 
 
@@ -30,7 +35,7 @@ def get_sounds(path=None):
 
 
 @singleton
-class Audio(object):
+class Audio:
     def __init__(self):
         self._queue = Queue()
         self._thread = None
@@ -42,7 +47,9 @@ class Audio(object):
 
     def _start(self):
         if self._thread is None:
-            self._thread = Thread(target=self._run, name=self.__class__.__name__)
+            self._thread = Thread(
+                target=self._run, name=self.__class__.__name__, daemon=True
+            )
             self._thread.start()
         elif not self._thread.is_alive():
             self._thread = None
@@ -54,5 +61,5 @@ class Audio(object):
             try:
                 play(sound)
             except Exception as e:
-                self._logger.error('Can not play {}'.format(sound))
+                self._logger.error("Can not play {}".format(sound))
                 print(e)

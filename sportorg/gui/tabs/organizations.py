@@ -1,6 +1,6 @@
 import logging
 
-from PySide2 import QtWidgets
+from PySide6 import QtWidgets
 
 from sportorg.gui.dialogs.organization_edit import OrganizationEditDialog
 from sportorg.gui.global_access import GlobalAccess
@@ -23,8 +23,7 @@ class Widget(QtWidgets.QWidget):
         self.setup_ui()
 
     def setup_ui(self):
-
-        self.organization_table.setObjectName('OrganizationTable')
+        self.organization_table.setObjectName("OrganizationTable")
         self.organization_table.setModel(OrganizationMemoryModel())
 
         def team_double_clicked(index):

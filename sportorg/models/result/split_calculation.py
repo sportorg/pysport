@@ -5,16 +5,15 @@ from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.utils.time import get_speed_min_per_km
 
 
-class PersonSplits(object):
+class PersonSplits:
     def __init__(self, r, result):
-
         self.race = r
         self.result = result
         self._course = None
 
-        self.assigned_rank = ''
+        self.assigned_rank = ""
         if (
-            hasattr(self.result, 'assigned_rank')
+            hasattr(self.result, "assigned_rank")
             and self.result.assigned_rank != Qualification.NOT_QUALIFIED
         ):
             self.assigned_rank = self.result.assigned_rank.get_title()
@@ -45,12 +44,14 @@ class PersonSplits(object):
                 self.result.get_result_otime(), self.course.length
             )
 
+        for split in self.result.splits:
+            split.relative_time = split.time - start_time
+
         if not len(self.course.controls):
             prev_split = start_time
             for i, split in enumerate(self.result.splits):
                 split.index = i
                 split.course_index = i
-                split.relative_time = split.time - start_time
                 split.leg_time = split.time - prev_split
                 prev_split = split.time
 
@@ -60,7 +61,6 @@ class PersonSplits(object):
             cur_split = self.result.splits[split_index]
 
             cur_split.index = split_index
-            cur_split.relative_time = cur_split.time - start_time
 
             if cur_split.is_correct:
                 cur_split.leg_time = cur_split.time - leg_start_time
@@ -109,13 +109,13 @@ class PersonSplits(object):
 
     def to_dict(self):
         return {
-            'person': self.person.to_dict(),
-            'result': self.result.to_dict(),
-            'course': self.course.to_dict(),
+            "person": self.person.to_dict(),
+            "result": self.result.to_dict(),
+            "course": self.course.to_dict(),
         }
 
 
-class GroupSplits(object):
+class GroupSplits:
     def __init__(self, r, group):
         self.race = r
         self.group = group
@@ -127,7 +127,7 @@ class GroupSplits(object):
 
     def generate(self, logged=False):
         if logged:
-            logging.debug('Group splits generate for ' + self.group.name)
+            logging.debug("Group splits generate for " + self.group.name)
         # to have group count
         ResultCalculation(self.race).get_group_persons(self.group)
 
@@ -192,8 +192,8 @@ class GroupSplits(object):
         self.person_splits = sorted(
             self.person_splits,
             key=lambda item: (
-                item.result.get_place() is None or item.result.get_place() == '',
-                ('0000' + str(item.result.get_place()))[-4:],
+                item.result.get_place() is None or item.result.get_place() == "",
+                ("0000" + str(item.result.get_place()))[-4:],
                 int(item.relay_leg),
             ),
         )
@@ -245,7 +245,7 @@ class GroupSplits(object):
     def get_leg_leader(self, index):
         if str(index) in self.leader.keys():
             return self.leader[str(index)]
-        return '', ''
+        return "", ""
 
     def set_places_relative(self):
         for i in range(self.cp_count):
@@ -256,12 +256,12 @@ class GroupSplits(object):
         return [ps.to_dict() for ps in self.person_splits]
 
 
-class RaceSplits(object):
+class RaceSplits:
     def __init__(self, r):
         self.race = r
 
     def generate(self):
-        logging.debug('Race splits generate')
+        logging.debug("Race splits generate")
         for group in self.race.groups:
             GroupSplits(self.race, group).generate()
         return self

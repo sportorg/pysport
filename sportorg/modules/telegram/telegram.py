@@ -8,11 +8,12 @@ from sportorg.models.memory import race
 
 
 class TelegramSendThread(Thread):
-    def __init__(self, token, chat_id, text, parse_mode=''):
-        super().__init__()
-        self.setName(TelegramSendThread.__class__.__name__)
+    def __init__(self, token, chat_id, text, parse_mode="", thread_id=""):
+        super().__init__(daemon=True)
+        self.setName("TelegramSendThread")
         self.token = token
         self.chat_id = chat_id
+        self.thread_id = thread_id
         self.text = text
         self.parse_mode = parse_mode
 
@@ -20,15 +21,18 @@ class TelegramSendThread(Thread):
         try:
             sys.stdout = FakeStd()
             sys.stderr = FakeStd()
-            Telegram(self.token).send_message(self.chat_id, self.text, self.parse_mode)
+            Telegram(self.token).send_message(
+                self.chat_id, self.text, self.parse_mode, self.thread_id
+            )
         except Exception as e:
             logging.error(str(e))
 
 
 class BotOption:
-    def __init__(self, token, chat_id, template, parse_mode, enabled=False):
+    def __init__(self, token, chat_id, template, parse_mode, thread_id, enabled=False):
         self.token = token
         self.chat_id = chat_id
+        self.thread_id = thread_id
         self.template = template
         self.parse_mode = parse_mode
         self.enabled = enabled
@@ -39,24 +43,25 @@ class TelegramClient:
     def get_options():
         obj = race()
         return BotOption(
-            obj.get_setting('telegram_token', ''),
-            obj.get_setting('telegram_chat_id', ''),
-            obj.get_setting('telegram_template', ''),
-            obj.get_setting('telegram_parse_mode', ''),
-            obj.get_setting('telegram_enabled', False),
+            obj.get_setting("telegram_token", ""),
+            obj.get_setting("telegram_chat_id", ""),
+            obj.get_setting("telegram_template", ""),
+            obj.get_setting("telegram_parse_mode", ""),
+            obj.get_setting("telegram_thread_id", ""),
+            obj.get_setting("telegram_enabled", False),
         )
 
     def send_result(self, result):
         if result.person:
             self.send(
                 {
-                    'group': result.person.group.name if result.person.group else '',
-                    'name': result.person.full_name,
-                    'bib': result.person.bib,
-                    'result': result.get_result(),
-                    'place': result.place,
-                    'penalty_time': result.penalty_time,
-                    'penalty_laps': result.penalty_laps,
+                    "group": result.person.group.name if result.person.group else "",
+                    "name": result.person.full_name,
+                    "bib": result.person.bib,
+                    "result": result.get_result(),
+                    "place": result.place,
+                    "penalty_time": result.penalty_time,
+                    "penalty_laps": result.penalty_laps,
                 }
             )
 
@@ -67,12 +72,12 @@ class TelegramClient:
         text = options.template
         try:
             for key, val in data_dict.items():
-                text = text.replace('{' + str(key) + '}', str(val))
+                text = text.replace("{" + str(key) + "}", str(val))
         except Exception as e:
             logging.error(str(e))
-        logging.info('Telegram {}'.format(text))
+        logging.info("Telegram {}".format(text))
         TelegramSendThread(
-            options.token, options.chat_id, text, options.parse_mode
+            options.token, options.chat_id, text, options.parse_mode, options.thread_id
         ).start()
 
 

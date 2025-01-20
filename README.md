@@ -1,4 +1,3 @@
-[![Build Status](https://api.travis-ci.com/sportorg/pysport.svg?branch=develop)](https://travis-ci.com/sportorg/pysport)
 [![Python 3.8](https://img.shields.io/badge/python-v3.8-blue.svg?logo=pythonlang)](https://www.python.org/downloads/)
 [![License: GPL v3](https://img.shields.io/badge/license-GPLv3-blue.svg)](https://github.com/sportorg/pysport/blob/develop/LICENSE)
 [![Orienteering](https://img.shields.io/badge/sport-orienteering-blue.svg)](https://github.com/sportorg)
@@ -7,34 +6,16 @@
 
 # SportOrg
 
-```commandline
-pip install poetry
-poetry install
-poetry install -E win  # for Windows
-```
+Sportorg is a comprehensive software solution developed in Python that streamlines the organization and execution of orienteering competitions. Orienteering is a sport that challenges participants to navigate through unfamiliar terrain using only a map and compass, testing their navigation and decision-making skills. This software aims to enhance the experience for both event organizers and participants by providing a user-friendly platform to manage various aspects of orienteering competitions.
 
-Run
+## Run from source
 
-Add `DEBUG=True` to `.env` file or `cp .env.example .env`
+See [CONTRIBUTING.md](CONTRIBUTING.md)
 
-```commandline
-poetry run python SportOrg.pyw
-```
+## Screenshots
 
 ![Mainwindow sportorg](img/mainwindow.png)
 
 ![Dialogedit sportorg](img/dialogedit.png)
+
 ![Bibprintout sportorg](img/bibprintout.png)
-
-
-## build
-
-### cx_Freeze
-
-`python setup_.py build`
-
-
-## Roadmap
-
-- [ ] Publish to pypi
-- [ ] Deploy to telegram

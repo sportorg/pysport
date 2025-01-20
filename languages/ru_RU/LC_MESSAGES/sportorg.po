@@ -3,17 +3,16 @@ msgstr ""
 "Project-Id-Version: SportOrg\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-04-12 11:13+0300\n"
-"PO-Revision-Date: 2019-08-03 09:39+0500\n"
+"PO-Revision-Date: 2023-12-17 19:16+0500\n"
 "Last-Translator: SportOrg\n"
 "Language-Team: SportOrg\n"
 "Language: ru_RU\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Loco-Source-Locale: ru_RU\n"
-"X-Generator: Poedit 2.2.1\n"
+"X-Generator: Poedit 3.4.1\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Loco-Parser: loco_parse_po\n"
 "X-Poedit-Basepath: ../../../sportorg\n"
@@ -21,6 +20,9 @@ msgstr ""
 
 msgid "About"
 msgstr "О нас"
+
+msgid "Version"
+msgstr "Версия"
 
 msgid "Contributors"
 msgstr "Разработчики"
@@ -229,6 +231,9 @@ msgstr "Стартовый взнос"
 msgid "Type"
 msgstr "Тип"
 
+msgid "Best team placing"
+msgstr "Международный принцип"
+
 msgid "Rank calculation"
 msgstr "Выполнение разрядов"
 
@@ -256,8 +261,20 @@ msgstr "Включить"
 msgid "URL not valid"
 msgstr "URL недействителен"
 
-msgid "Not started numbers"
-msgstr "Не стартовавшие участники"
+msgid "Import persons from table"
+msgstr "Импорт участников из таблицы"
+
+msgid "Set started numbers"
+msgstr "Ввод стартовавших участников"
+
+msgid "Set not started numbers"
+msgstr "Ввод нестартовавших участников"
+
+msgid "Count started numbers less half"
+msgstr "Операция неприменима, количество стартовавших меньше половины"
+
+msgid "Label status not started"
+msgstr "Cтатус для нестартовавших"
 
 msgid "Dialog"
 msgstr "Диалог"
@@ -279,6 +296,15 @@ msgstr "Удалять исходный номер"
 
 msgid "Replace source with reserve"
 msgstr "Создать резервного участника для исходного номера"
+
+msgid "Replacement by bib"
+msgstr "Замена по стартовому номеру"
+
+msgid "Replacement by name"
+msgstr "Замена по имени и фамилии"
+
+msgid "Insert new records"
+msgstr "Вставка новых записей"
 
 msgid "Team properties"
 msgstr "Свойства коллектива"
@@ -334,22 +360,13 @@ msgstr "Результат"
 msgid "DNS"
 msgstr "НЕ СТАРТ."
 
-msgid "Did not start"
-msgstr "НЕ СТАРТ."
-
 msgid "DNF"
-msgstr "СОШЕЛ"
-
-msgid "Did not finish"
 msgstr "СОШЕЛ"
 
 msgid "Overtime"
 msgstr "ПРЕВЫШЕНО КВ"
 
 msgid "DSQ"
-msgstr "ДИСКВ."
-
-msgid "Disqualified"
 msgstr "ДИСКВ."
 
 msgid "Days"
@@ -363,6 +380,9 @@ msgstr "Финиш"
 
 msgid "Penalty"
 msgstr "Штраф"
+
+msgid "Penalty laps"
+msgstr "Штрафные круги"
 
 msgid "Penalty legs"
 msgstr "Штраф, круги"
@@ -391,6 +411,9 @@ msgstr "Поиск не дал результатов"
 msgid "Languages"
 msgstr "Язык интерфейса"
 
+msgid "Show toolbar"
+msgstr "Показать панель инструментов"
+
 msgid "Auto save"
 msgstr "Автосохранение"
 
@@ -414,6 +437,9 @@ msgstr "Включить звук при аренде чипа"
 
 msgid "Rented card sound"
 msgstr "Звук при аренде чипа"
+
+msgid "Enter number sound"
+msgstr "Звук при запросе номера"
 
 msgid "Main settings"
 msgstr "Основные настройки"
@@ -601,8 +627,8 @@ msgstr "Из протокола"
 msgid "Start station"
 msgstr "Стартовая станция"
 
-msgid "Control point"
-msgstr "Контрольный пункт"
+msgid "Control point (0 – any)"
+msgstr "Контрольный пункт (0 – любой)"
 
 msgid "Start gate"
 msgstr "Стартовая калитка"
@@ -637,8 +663,11 @@ msgstr "Режим присвоения"
 msgid "by time"
 msgstr "по времени"
 
-msgid "by scores"
-msgstr "по баллам"
+msgid "by scores (rogaine)"
+msgstr "по баллам (рогейн)"
+
+msgid "ardf"
+msgstr "ARDF"
 
 msgid "rogain scores"
 msgstr "рогейн (45КП = 4балла, 78КП = 7баллов)"
@@ -649,20 +678,56 @@ msgstr "фиксированные баллы за КП"
 msgid "minute penalty"
 msgstr "Штраф за каждую просроченную минуту"
 
+msgid "maximum overrun time"
+msgstr "Макс. превышение контрольного времени"
+
+msgid "no credit time"
+msgstr "Без отсечки"
+
+msgid "credit time control point"
+msgstr "Номер станции отсечки"
+
 msgid "no penalty"
 msgstr "штраф не начисляется"
+
+msgid "No penalty"
+msgstr "Штраф не начисляется"
 
 msgid "penalty time"
 msgstr "штрафное время"
 
+msgid "Penalty calculation mode: penalty time"
+msgstr "Режим начисления штрафа: штрафное время"
+
 msgid "penalty laps"
 msgstr "штрафные круги"
+
+msgid "Penalty calculation mode: penalty laps"
+msgstr "Режим начисления штрафа: штрафные круги"
 
 msgid "counting lap"
 msgstr "оценочный круг"
 
+msgid ""
+"Operating mode: evaluation point\n"
+"Print the number of penalty laps instead of splits\n"
+"when a competitor reads out his card"
+msgstr ""
+"Режим работы: оценочный круг\n"
+"При считывании печатать распечатку\n"
+"с количеством штрафных кругов"
+
 msgid "lap station"
 msgstr "станция на штрафном круге"
+
+msgid ""
+"Station number on the penalty lap\n"
+"A competitor must punch at the station\n"
+"each time they pass the penalty lap"
+msgstr ""
+"Номер станции на штрафном круге\n"
+"Спортсмен должен отметиться на станции\n"
+"при каждом прохождении штрафного круга"
 
 msgid "scores off"
 msgstr "очки не рассчитываются"
@@ -716,10 +781,10 @@ msgid "> 24"
 msgstr "> 24 часов"
 
 msgid "SPORTident (Sportiduino, ...) settings"
-msgstr "Настройки  SPORTident (Sportiduino, ...)"
+msgstr "Чипы"
 
 msgid "Result processing"
-msgstr "Определение результата"
+msgstr "Результат"
 
 msgid "Team results"
 msgstr "Командные результаты"
@@ -727,11 +792,17 @@ msgstr "Командные результаты"
 msgid "Scores"
 msgstr "Очки"
 
+msgid "Points gained"
+msgstr "Набрано очков"
+
+msgid "Penalty for finishing late"
+msgstr "Штраф за превышение"
+
 msgid "Penalty calculation"
-msgstr "Расчет штрафа из сплитов"
+msgstr "Штраф"
 
 msgid "Time settings"
-msgstr "Настройки времени"
+msgstr "Время"
 
 msgid "Save file before exit?"
 msgstr "Сохранить изменения в файле?"
@@ -895,6 +966,9 @@ msgstr "Обновить"
 msgid "Filter"
 msgstr "Фильтрация"
 
+msgid "Filter reset"
+msgstr "Сбросить фильтры"
+
 msgid "Guess courses"
 msgstr "Подбор дистанций для групп"
 
@@ -935,7 +1009,7 @@ msgid "Change status"
 msgstr "Изменить статус"
 
 msgid "Set DNS numbers"
-msgstr "Ввести номера со статусом DNS"
+msgstr "Ввести Шахматку"
 
 msgid "Service"
 msgstr "Сервис"
@@ -1015,7 +1089,7 @@ msgstr "Да"
 msgid "No"
 msgstr "Нет"
 
-msgid "Mf"
+msgid "MF"
 msgstr "МЖ"
 
 msgid "M"
@@ -1158,6 +1232,18 @@ msgstr "Люди"
 
 msgid "Duplicate card numbers (card numbers are reset)"
 msgstr "Дублирующиеся чипы (номера чипов обнулены)"
+
+msgid "Bib header not found"
+msgstr "Cтолбец Номер не найден"
+
+msgid "Name header not found"
+msgstr "Cтолбец c именем или фамилией не найден"
+
+msgid "Person not found"
+msgstr "Участник не найден"
+
+msgid "Bib not found"
+msgstr "Номер не найден"
 
 msgid "Duplicate names"
 msgstr "Повторяющиеся имена"
@@ -1381,6 +1467,18 @@ msgstr "Ctrl+K на группах - отправка стартового пр�
 msgid "Several athletes on one minute"
 msgstr "Несколько участников на 1 минуте"
 
+msgid "Duplicate timeout"
+msgstr "Таймаут повторного чтения"
+
+msgid "on/off RFID Impinj readout"
+msgstr "Запустить/остановить чтение чипов RFID Impinj"
+
+msgid "allow duplicates"
+msgstr "считать все повторные отметки"
+
+msgid "Use this option to count one punch several times, e.g. in trails with ring punching"
+msgstr "Используйте эту опцию для учета всех повторяющихся отметок. Пример использования: трейл-забег в несколько кругов с отметкой на каждом круге"
+
 msgid "Group not found"
 msgstr "Такой группы нет"
 
@@ -1404,3 +1502,210 @@ msgstr "Округление вниз"
 
 msgid "Rounding up"
 msgstr "Округление вверх"
+
+msgid "IOF id"
+msgstr "Код IOF Id"
+
+msgid "National id"
+msgstr "Национальный Id"
+
+msgid "Id"
+msgstr "Код"
+
+msgid "Code"
+msgstr "Код"
+
+msgid "Delete split"
+msgstr "Удаление перегона"
+
+msgid "Delete Split"
+msgstr "Удаление перегона"
+
+msgid "Start CP"
+msgstr "Начальный КП"
+
+msgid "End CP"
+msgstr "Конечный КП"
+
+msgid "Max intermediate CP"
+msgstr "Максимум промежуточных КП"
+
+msgid "IOF xml"
+msgstr "Файл IOF XML v.3"
+
+msgid "EntrytList"
+msgstr "EntrytList (заявки)"
+
+msgid "ResultList"
+msgstr "ResultList (результаты, только правильные отметки)"
+
+msgid "ResultListAllSplits"
+msgstr "ResultList (результаты, все отметки)"
+
+msgid "StartList"
+msgstr "StartList (протокол старта)"
+
+msgid "CompetitorList"
+msgstr "CompetitorList (список участников)"
+
+msgid "Online"
+msgstr "Онлайн"
+
+msgid "Save As MS Word file"
+msgstr "Сохранить в файл Word"
+
+msgid "SportOrg (*.json)"
+msgstr "Файл SportOrg (*.json)"
+
+msgid "MS Word file (*.docx)"
+msgstr "Файл MS Word (*.docx)"
+
+msgid "Save in UTF-8 encoding"
+msgstr "Сохранять в UTF-8"
+
+msgid "Merge results"
+msgstr "Объединение результатов по номеру"
+
+msgid "Min. time interval"
+msgstr "Мин. интервал между КП"
+
+msgid "First CP"
+msgstr "Первый КП"
+
+msgid "CP increment"
+msgstr "Инкремент КП"
+
+msgid "Sending the entire contents of the chip"
+msgstr "Отправка всего содержимого чипа"
+
+msgid "Online results sending"
+msgstr "Отправка онлайн результатов"
+
+msgid "Online CP sending"
+msgstr "Отправка промежуточных КП"
+
+msgid "Online CP settings"
+msgstr "Настройки онлайн КП"
+
+msgid "CP from splits"
+msgstr "КП из сплитов, укажите список КП"
+
+msgid "Finish as CP"
+msgstr "Использовать финиш как КП с кодом:"
+
+msgid "Ignore punches before start"
+msgstr "Игнорировать отметки до старта"
+
+msgid "Did not start"
+msgstr "НЕ СТАРТ."
+
+msgid "Did not finish"
+msgstr "СОШЕЛ"
+
+msgid "Disqualified"
+msgstr "ДИСКВ."
+
+msgid "laps"
+msgstr "кр."
+
+msgid "contain"
+msgstr "содержит"
+
+msgid "doesn't contain"
+msgstr "не содержит"
+
+msgid "equal to"
+msgstr "равно"
+
+msgid "Clear"
+msgstr "Очистить"
+
+msgid "Count of person"
+msgstr "Кол-во человек"
+
+msgid "Count of groups"
+msgstr "Кол-во групп"
+
+msgid "Count of finished"
+msgstr "Финишировали"
+
+msgid "Count of not finished"
+msgstr "Не финишировали"
+
+msgid "Diff"
+msgstr "Отставание"
+
+msgid "Result day/leg"
+msgstr "Текущий день/этап"
+
+msgid "Marked route course generation"
+msgstr "Изменение дистанций для маркировки"
+
+msgid "Specify in each row all control codes separated by comma, e.g. '31,32'"
+msgstr ""
+"Укажите в каждой строке через запятую все номера станций точки принятия решения, например, '31,32'. \n"
+" В дистанциях будут проведены замены: 31 -> 31(31,32) и 32 -> (31,32). \n"
+" Если указать в каждой строке только один номер, будет восстановлено исходное состяние дистанций."
+
+msgid "on/off SRPid readout"
+msgstr "Запустить/остановить чтение чипов SRPid"
+
+msgid "Cannot overwrite existing file with new"
+msgstr "Вы пытаетесь переписать существующий файл пустым новым файлом. Действие отменено."
+
+msgid "File lock created"
+msgstr "Файл заблокирован"
+
+msgid "File lock released"
+msgstr "Файл разблокирован"
+
+msgid "Cannot open file, already locked"
+msgstr "Ошибка открытия файла. Файл уже открыт в другом окне\""
+
+msgid "Multi day race"
+msgstr "Многодневная гонка"
+
+msgid "SportOrg HTML"
+msgstr "Файл HTML, SportOrg"
+
+msgid "SportOrg HTML report (*.html)"
+msgstr "Файл HTML, SportOrg (*.html)"
+
+msgid "Open SportOrg HTML file"
+msgstr "Открыть файл HTML, SportOrg"
+
+msgid "SportOrg SI log"
+msgstr "Файл лога чипов, SportOrg"
+
+msgid "SportOrg SI log (*.log)"
+msgstr "Файл лога чипов, SportOrg (*.log)"
+
+msgid "Open SportOrg SI log file"
+msgstr "Открыть файл лога чипов, SportOrg"
+
+msgid "SPORTident master station CSV"
+msgstr "Файл CSV мастер-станции SPORTident"
+
+msgid "CSV file (*.csv)"
+msgstr "Файл CSV (*.csv)"
+
+msgid "Open SPORTident master station backup file"
+msgstr "Открыть файл CSV мастер-станции SPORTident"
+
+msgid "Orgeo.ru CSV"
+msgstr "Файл финиша orgeo.ru, CSV"
+
+msgid "Open orgeo.ru finish CSV file"
+msgstr "Открыть файл финиша orgeo.ru, CSV (https://orgeo.ru/event/export?event_id=XXX&sub_id=Y&format=excel_finish)"
+
+msgid "Miss penalty lap"
+msgstr "Пропущен штрафной круг"
+
+msgid "Select the templates directory"
+msgstr "Выбрать директорию с шаблонами"
+
+msgid "Open the templates directory"
+msgstr "Открыть директорию с шаблонами"
+
+msgid "Compress files to gzip"
+msgstr "Сохранять файлы в формате gzip"

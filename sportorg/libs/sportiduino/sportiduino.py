@@ -39,13 +39,15 @@ if PY3:
             return x
 
 
-class Sportiduino(object):
+class Sportiduino:
     """Protocol functions and constants to interact with Sportiduino master station."""
 
-    _translate = lambda _, s: s
+    @staticmethod
+    def _translate(_, s):
+        return s
 
     # Constants
-    START_BYTE = b'\xFE'
+    START_BYTE = b"\xfe"
 
     START_STATION = 240
     FINISH_STATION = 245
@@ -53,57 +55,57 @@ class Sportiduino(object):
     CLEAR_STATION = 249
 
     # Protocol commands
-    CMD_INIT_TIMECARD = b'\x41'
-    CMD_INIT_CP_NUM_CARD = b'\x42'
-    CMD_INIT_PASSWDCARD = b'\x43'  # deprecated
-    CMD_INIT_CARD = b'\x44'
-    CMD_WRITE_PAGES6_7 = b'\x45'
-    CMD_READ_VERS = b'\x46'
-    CMD_INIT_BACKUPREADER = b'\x47'
-    CMD_READ_BACKUPREADER = b'\x48'
-    CMD_SET_READ_MODE = b'\x49'  # deprecated
-    CMD_WRITE_SETTINGS = b'\x4a'
-    CMD_READ_CARD = b'\x4b'
-    CMD_READ_RAW = b'\x4c'
-    CMD_READ_SETTINGS = b'\x4d'
-    CMD_INIT_SLEEPCARD = b'\x4e'
-    CMD_APPLY_PWD = b'\x4f'
-    CMD_INIT_STATECARD = b'\x50'
-    CMD_READ_CARD_TYPE = b'\x51'
-    CMD_BEEP_ERROR = b'\x58'
-    CMD_BEEP_OK = b'\x59'
-    CMD_INIT_CONFIG_CARD = b'\x5a'
+    CMD_INIT_TIMECARD = b"\x41"
+    CMD_INIT_CP_NUM_CARD = b"\x42"
+    CMD_INIT_PASSWDCARD = b"\x43"  # deprecated
+    CMD_INIT_CARD = b"\x44"
+    CMD_WRITE_PAGES6_7 = b"\x45"
+    CMD_READ_VERS = b"\x46"
+    CMD_INIT_BACKUPREADER = b"\x47"
+    CMD_READ_BACKUPREADER = b"\x48"
+    CMD_SET_READ_MODE = b"\x49"  # deprecated
+    CMD_WRITE_SETTINGS = b"\x4a"
+    CMD_READ_CARD = b"\x4b"
+    CMD_READ_RAW = b"\x4c"
+    CMD_READ_SETTINGS = b"\x4d"
+    CMD_INIT_SLEEPCARD = b"\x4e"
+    CMD_APPLY_PWD = b"\x4f"
+    CMD_INIT_STATECARD = b"\x50"
+    CMD_READ_CARD_TYPE = b"\x51"
+    CMD_BEEP_ERROR = b"\x58"
+    CMD_BEEP_OK = b"\x59"
+    CMD_INIT_CONFIG_CARD = b"\x5a"
 
     # Protocol responses
-    RESP_BACKUP = b'\x61'
-    RESP_CARD_DATA = b'\x63'
-    RESP_CARD_RAW = b'\x65'
-    RESP_VERS = b'\x66'
-    RESP_SETTINGS = b'\x67'
-    RESP_MODE = b'\x69'  # deprecated
-    RESP_CARD_TYPE = b'\x70'
-    RESP_ERROR = b'\x78'
-    RESP_OK = b'\x79'
+    RESP_BACKUP = b"\x61"
+    RESP_CARD_DATA = b"\x63"
+    RESP_CARD_RAW = b"\x65"
+    RESP_VERS = b"\x66"
+    RESP_SETTINGS = b"\x67"
+    RESP_MODE = b"\x69"  # deprecated
+    RESP_CARD_TYPE = b"\x70"
+    RESP_ERROR = b"\x78"
+    RESP_OK = b"\x79"
 
     # Protocol error codes
-    ERR_COM = b'\x01'
-    ERR_WRITE_CARD = b'\x02'
-    ERR_READ_CARD = b'\x03'
-    ERR_READ_EEPROM = b'\x04'
-    ERR_CARD_NOT_FOUND = b'\x05'
-    ERR_UNKNOWN_CMD = b'\x06'
+    ERR_COM = b"\x01"
+    ERR_WRITE_CARD = b"\x02"
+    ERR_READ_CARD = b"\x03"
+    ERR_READ_EEPROM = b"\x04"
+    ERR_CARD_NOT_FOUND = b"\x05"
+    ERR_UNKNOWN_CMD = b"\x06"
 
-    MASTER_CARD_GET_STATE = b'\xF9'
-    MASTER_CARD_SET_TIME = b'\xFA'
-    MASTER_CARD_SET_NUMBER = b'\xFB'
-    MASTER_CARD_SLEEP = b'\xFC'
-    MASTER_CARD_READ_BACKUP = b'\xFD'
-    MASTER_CARD_SET_PASS = b'\xFE'
+    MASTER_CARD_GET_STATE = b"\xf9"
+    MASTER_CARD_SET_TIME = b"\xfa"
+    MASTER_CARD_SET_NUMBER = b"\xfb"
+    MASTER_CARD_SLEEP = b"\xfc"
+    MASTER_CARD_READ_BACKUP = b"\xfd"
+    MASTER_CARD_SET_PASS = b"\xfe"
 
     MIN_CARD_NUM = 1
     MAX_CARD_NUM = 65000
 
-    class Version(object):
+    class Version:
         """Sportiduino version."""
 
         def __init__(self, major, minor=None, patch=None):
@@ -133,16 +135,16 @@ class Sportiduino(object):
             """Override __str__ method.
             @return: User friendly version string.
             """
-            vers_suffix = 'x'
+            vers_suffix = "x"
             if self.patch is not None:
                 vers_suffix = str(self.patch)
                 max_patch_version = 239
                 if self.patch > max_patch_version:
-                    vers_suffix = '0-beta.%d' % (self.patch - max_patch_version)
-            int(self.patch) if self.patch is not None else 'x'
-            return 'v%d.%d.%s' % (self.major, self.minor, vers_suffix)
+                    vers_suffix = "0-beta.%d" % (self.patch - max_patch_version)
+            int(self.patch) if self.patch is not None else "x"
+            return "v%d.%d.%s" % (self.major, self.minor, vers_suffix)
 
-    class Config(object):
+    class Config:
         def __init__(self, antenna_gain=0, timezone=0):
             self.antenna_gain = antenna_gain
             self.timezone = timezone
@@ -155,13 +157,13 @@ class Sportiduino(object):
             )
 
         def pack(self):
-            config_data = b''
+            config_data = b""
             config_data += int2byte(self.antenna_gain)
             print(self.timezone.total_seconds())
             config_data += int2byte(int(self.timezone.total_seconds() / 60 / 15))
             return config_data
 
-    class SerialProtocol(object):
+    class SerialProtocol:
         OFFSET = 0x1E
         MAX_DATA_LEN = 28
 
@@ -173,16 +175,16 @@ class Sportiduino(object):
             self, serial, code, parameters=None, wait_response=True, timeout=None
         ):
             if parameters is None:
-                parameters = b''
+                parameters = b""
             data_len = len(parameters)
             if data_len > self.MAX_DATA_LEN:
-                raise SportiduinoException('Command too long: %d' % data_len)
+                raise SportiduinoException("Command too long: %d" % data_len)
             cmd_string = code + int2byte(data_len) + parameters
 
             cs = self._checsum(cmd_string)
             cmd = self._start_byte + cmd_string + cs
 
-            self._log_debug('=> 0x %s' % ' '.join(('%02x' % byte2int(c)) for c in cmd))
+            self._log_debug("=> 0x %s" % " ".join(("%02x" % byte2int(c)) for c in cmd))
 
             serial.flushInput()
             serial.write(cmd)
@@ -201,9 +203,9 @@ class Sportiduino(object):
                 # Skip any bytes before start byte
                 while True:
                     byte = serial.read()
-                    if byte == b'':
+                    if byte == b"":
                         raise SportiduinoTimeout(
-                            Sportiduino._translate('sportiduino', 'No response')
+                            Sportiduino._translate("sportiduino", "No response")
                         )
                     elif byte == self._start_byte:
                         break
@@ -222,7 +224,7 @@ class Sportiduino(object):
                     if fragment_num > 0 and (wait_fragment is not None):
                         if fragment_num != wait_fragment:
                             raise SportiduinoException(
-                                'Waiting fragment %d, receive %d'
+                                "Waiting fragment %d, receive %d"
                                 % (wait_fragment, fragment_num)
                             )
                     length = self.MAX_DATA_LEN
@@ -233,20 +235,20 @@ class Sportiduino(object):
                     % (
                         byte2int(code),
                         length,
-                        ' '.join(('%02x' % byte2int(c)) for c in data),
+                        " ".join(("%02x" % byte2int(c)) for c in data),
                         byte2int(checksum),
                     )
                 )
 
                 if not self._cs_check(code + length_byte + data, checksum):
                     raise SportiduinoException(
-                        Sportiduino._translate('sportiduino', 'Checksum mismatch')
+                        Sportiduino._translate("sportiduino", "Checksum mismatch")
                     )
 
             except (SerialException, OSError) as msg:
                 raise SportiduinoException(
                     Sportiduino._translate(
-                        'sportiduino', 'Error reading response: {}'
+                        "sportiduino", "Error reading response: {}"
                     ).format(msg)
                 )
 
@@ -304,39 +306,39 @@ class Sportiduino(object):
 
         self.version = None
 
-        errors = ''
+        errors = ""
         if port:
             self._connect_master_station(port)
             return
         else:
-            if platform.system() == 'Linux':
+            if platform.system() == "Linux":
                 scan_ports = [
-                    os.path.join('/dev', f)
-                    for f in os.listdir('/dev')
-                    if re.match('ttyUSB.*', f)
+                    os.path.join("/dev", f)
+                    for f in os.listdir("/dev")
+                    if re.match("ttyUSB.*", f)
                 ]
                 scan_ports.sort(reverse=True)
-            elif platform.system() == 'Windows':
-                scan_ports = ['COM' + str(i) for i in range(32)]
+            elif platform.system() == "Windows":
+                scan_ports = ["COM" + str(i) for i in range(32)]
             else:
                 raise SportiduinoException(
-                    'Unsupported platform: %s' % platform.system()
+                    "Unsupported platform: %s" % platform.system()
                 )
 
             if len(scan_ports) == 0:
-                errors = 'no serial ports found'
+                errors = "no serial ports found"
 
             for port in scan_ports:
                 try:
                     self._connect_master_station(port)
                     return
                 except SportiduinoException as msg:
-                    errors += 'port %s: %s\n' % (port, msg)
+                    errors += "port %s: %s\n" % (port, msg)
 
         raise SportiduinoException(
             Sportiduino._translate(
-                'sportiduino',
-                'No Sportiduino master station found. Possible reasons: {}',
+                "sportiduino",
+                "No Sportiduino master station found. Possible reasons: {}",
             ).format(errors)
         )
 
@@ -387,7 +389,7 @@ class Sportiduino(object):
         else:
             raise SportiduinoException(
                 Sportiduino._translate(
-                    'sportiduino', 'Unknown error during card reading'
+                    "sportiduino", "Unknown error during card reading"
                 )
             )
 
@@ -401,7 +403,7 @@ class Sportiduino(object):
         except SportiduinoTimeout:
             pass
         except SportiduinoException as msg:
-            self._log_debug('Warning: %s' % msg)
+            self._log_debug("Warning: %s" % msg)
         return False
 
     def read_card_raw(self):
@@ -412,7 +414,7 @@ class Sportiduino(object):
         if code == Sportiduino.RESP_CARD_RAW:
             return self._parse_card_raw_data(data, self._log_debug)
         else:
-            raise SportiduinoException('Read raw data failed')
+            raise SportiduinoException("Read raw data failed")
 
     def read_backup(self):
         """Read backup from backupreader card.
@@ -422,7 +424,7 @@ class Sportiduino(object):
         if code == Sportiduino.RESP_BACKUP:
             return self._parse_backup(data)
         else:
-            raise SportiduinoException('Read backup failed')
+            raise SportiduinoException("Read backup failed")
 
     def init_card(self, card_number, page6=None, page7=None):
         """Initialize card. Set card number, init time and additional pages.
@@ -432,11 +434,11 @@ class Sportiduino(object):
         """
         # TODO: check page6 and page7 length
         if page6 is None:
-            page6 = b'\x00\x00\x00\x00'
+            page6 = b"\x00\x00\x00\x00"
         if page7 is None:
-            page7 = b'\x00\x00\x00\x00'
+            page7 = b"\x00\x00\x00\x00"
 
-        params = b''
+        params = b""
         params += Sportiduino._to_str(card_number, 2)
         t = int(time.time())
         params += Sportiduino._to_str(t, 4)
@@ -450,7 +452,7 @@ class Sportiduino(object):
 
     def init_sleepcard(self, wakeuptime):
         """Initialize sleep card."""
-        params = b''
+        params = b""
         params += int2byte(wakeuptime.date().year() - 2000)
         params += int2byte(wakeuptime.date().month())
         params += int2byte(wakeuptime.date().day())
@@ -470,7 +472,7 @@ class Sportiduino(object):
         """Initialize card for writing time to base station.
         @param time: Time for base station (default current time).
         """
-        params = b''
+        params = b""
         params += int2byte(time.year - 2000)
         params += int2byte(time.month)
         params += int2byte(time.day)
@@ -486,7 +488,7 @@ class Sportiduino(object):
         )
 
     def init_state_card(self):
-        params = b''
+        params = b""
         self._send_command(Sportiduino.CMD_INIT_STATECARD, params, wait_response=True)
 
     def read_state_card(self):
@@ -496,25 +498,25 @@ class Sportiduino(object):
             Sportiduino.MASTER_CARD_GET_STATE
         ):
             raise SportiduinoException(
-                Sportiduino._translate('sportiduino', 'The state-card not found')
+                Sportiduino._translate("sportiduino", "The state-card not found")
             )
 
         state = {}
-        state['version'] = pageData[8][0:3]
-        state['config'] = pageData[9]
-        state['battery'] = byte2int(pageData[10][0])
-        state['mode'] = byte2int(pageData[10][1])
-        state['timestamp'] = datetime.fromtimestamp(
+        state["version"] = pageData[8][0:3]
+        state["config"] = pageData[9]
+        state["battery"] = byte2int(pageData[10][0])
+        state["mode"] = byte2int(pageData[10][1])
+        state["timestamp"] = datetime.fromtimestamp(
             Sportiduino._to_int(pageData[11][0:4])
         )
-        state['wakeuptime'] = datetime.fromtimestamp(
+        state["wakeuptime"] = datetime.fromtimestamp(
             Sportiduino._to_int(pageData[12][0:4])
         )
 
         return state
 
     def apply_pwd(self, pwd=(0, 0, 0), flags=0):
-        params = b''
+        params = b""
         params += int2byte(pwd[0])
         params += int2byte(pwd[1])
         params += int2byte(pwd[2])
@@ -526,7 +528,7 @@ class Sportiduino(object):
         if code == Sportiduino.RESP_SETTINGS:
             return Sportiduino.Config.unpack(data)
         else:
-            raise SportiduinoException('Read settings failed')
+            raise SportiduinoException("Read settings failed")
 
     def write_settings(self, antenna_gain, timezone):
         params = Sportiduino.Config(antenna_gain, timezone).pack()
@@ -534,55 +536,55 @@ class Sportiduino(object):
 
     def write_pages6_7(self, page6, page7):
         """Write additional pages."""
-        params = b''
+        params = b""
         params += page6[:5]
         params += page7[:5]
         self._send_command(Sportiduino.CMD_WRITE_PAGES6_7, params, wait_response=False)
 
     def enable_continuous_read(self):
         """Enable continuous card read. Deprecated."""
-        self._set_mode(b'\x01')
+        self._set_mode(b"\x01")
 
     def disable_continuous_read(self):
         """Disable continuous card read. Deprecated"""
-        self._set_mode(b'\x00')
+        self._set_mode(b"\x00")
 
     @staticmethod
     def card_name(card_type):
         if card_type == 1:
             return Sportiduino._translate(
-                'sportiduino', 'Compliant with ISO/IEC 14443-4'
+                "sportiduino", "Compliant with ISO/IEC 14443-4"
             )
         elif card_type == 2:
             return Sportiduino._translate(
-                'sportiduino', 'Compliant with ISO/IEC 18092 (NFC)'
+                "sportiduino", "Compliant with ISO/IEC 18092 (NFC)"
             )
         elif card_type == 3:
-            return 'MIFARE Classic Mini'
+            return "MIFARE Classic Mini"
         elif card_type == 4:
-            return 'MIFARE Classic 1K'
+            return "MIFARE Classic 1K"
         elif card_type == 5:
-            return 'MIFARE Classic 4K'
+            return "MIFARE Classic 4K"
         elif card_type == 6:
-            return 'MIFARE Ultralight'
+            return "MIFARE Ultralight"
         elif card_type == 7:
-            return 'MIFARE Plus'
+            return "MIFARE Plus"
         elif card_type == 8:
-            return 'TNP3XXX'
+            return "TNP3XXX"
         elif card_type == 9:
-            return 'NTAG213'
+            return "NTAG213"
         elif card_type == 10:
-            return 'NTAG215'
+            return "NTAG215"
         elif card_type == 11:
-            return 'NTAG216'
+            return "NTAG216"
         elif card_type is None or card_type == 0 or card_type == 0xFF:
-            return Sportiduino._translate('sportiduino', 'Not detected')
+            return Sportiduino._translate("sportiduino", "Not detected")
         else:
             return Sportiduino._translate(
-                'sportiduino', 'Unknown card type: {}'
+                "sportiduino", "Unknown card type: {}"
             ).format(card_type)
 
-        return Sportiduino._translate('sportiduino', 'Unknown type')
+        return Sportiduino._translate("sportiduino", "Unknown type")
 
     def _set_mode(self, mode):
         """Set master station read mode. Deprecated."""
@@ -593,7 +595,7 @@ class Sportiduino(object):
             self._serial = Serial(port, baudrate=38400, timeout=3)
         except (SerialException, OSError):
             raise SportiduinoException(
-                Sportiduino._translate('sportiduino', 'Could not open port {}').format(
+                Sportiduino._translate("sportiduino", "Could not open port {}").format(
                     port
                 )
             )
@@ -602,7 +604,7 @@ class Sportiduino(object):
             self._serial.reset_input_buffer()
         except (SerialException, OSError):
             raise SportiduinoException(
-                Sportiduino._translate('sportiduino', 'Could not flush port {}').format(
+                Sportiduino._translate("sportiduino", "Could not flush port {}").format(
                     port
                 )
             )
@@ -618,12 +620,12 @@ class Sportiduino(object):
                 )
                 self.version = self.read_version(timeout=2)
             except SportiduinoTimeout:
-                self._log_debug('No response')
+                self._log_debug("No response")
             else:
                 break
 
         if self.version is None:
-            raise SportiduinoTimeout('No response')
+            raise SportiduinoTimeout("No response")
 
         self.port = port
         self.baudrate = self._serial.baudrate
@@ -640,7 +642,7 @@ class Sportiduino(object):
 
     def __del__(self):
         if self._serial is not None:
-            self._log_info('Disconnect master station')
+            self._log_info("Disconnect master station")
             self._serial.close()
 
     @staticmethod
@@ -659,10 +661,10 @@ class Sportiduino(object):
         @return:    string representation of i (MSB first)
         """
         if PY3:
-            return i.to_bytes(len, 'big')
+            return i.to_bytes(len, "big")
         if i >> len * 8 != 0:
-            raise OverflowError('%i too big to convert to %i bytes' % (i, len))
-        string = b''
+            raise OverflowError("%i too big to convert to %i bytes" % (i, len))
+        string = b""
         for offset in range(len - 1, -1, -1):
             string += int2byte((i >> offset * 8) & 0xFF)
         return string
@@ -674,53 +676,52 @@ class Sportiduino(object):
 
         err_code = int2byte(data[0])
         if func == Sportiduino.RESP_ERROR:
-
             card_type = data[1]
             card = Sportiduino.card_name(data[1])
 
             if err_code == Sportiduino.ERR_COM:
                 raise SportiduinoException(
-                    Sportiduino._translate('sportiduino', 'COM error')
+                    Sportiduino._translate("sportiduino", "COM error")
                 )
             elif err_code == Sportiduino.ERR_WRITE_CARD:
                 raise SportiduinoException(
                     Sportiduino._translate(
-                        'sportiduino', "Can't write the card ({})"
+                        "sportiduino", "Can't write the card ({})"
                     ).format(card)
                 )
             elif err_code == Sportiduino.ERR_READ_CARD:
                 raise SportiduinoException(
                     Sportiduino._translate(
-                        'sportiduino', "Can't read the card ({})"
+                        "sportiduino", "Can't read the card ({})"
                     ).format(card)
                 )
             elif err_code == Sportiduino.ERR_READ_EEPROM:
                 raise SportiduinoException(
-                    Sportiduino._translate('sportiduino', "Can't read EEPROM")
+                    Sportiduino._translate("sportiduino", "Can't read EEPROM")
                 )
             elif err_code == Sportiduino.ERR_CARD_NOT_FOUND:
                 if card_type == 0 or card_type == 0xFF:
                     raise SportiduinoException(
-                        Sportiduino._translate('sportiduino', 'Card is not found')
+                        Sportiduino._translate("sportiduino", "Card is not found")
                     )
                 else:
                     raise SportiduinoException(
                         Sportiduino._translate(
-                            'sportiduino', 'Unsupported card type = {}'
+                            "sportiduino", "Unsupported card type = {}"
                         ).format(card_type)
                     )
             elif err_code == Sportiduino.ERR_UNKNOWN_CMD:
                 raise SportiduinoException(
-                    Sportiduino._translate('sportiduino', 'Unknown command')
+                    Sportiduino._translate("sportiduino", "Unknown command")
                 )
             else:
                 raise SportiduinoException(
-                    Sportiduino._translate('sportiduino', 'Error code {}').format(
+                    Sportiduino._translate("sportiduino", "Error code {}").format(
                         hex(byte2int(err_code))
                     )
                 )
         elif func == Sportiduino.RESP_OK:
-            log_debug('Ok received')
+            log_debug("Ok received")
 
         return func, data
 
@@ -728,19 +729,19 @@ class Sportiduino(object):
     def _parse_card_data(data):
         # TODO check data length
         ret = {}
-        ret['card_number'] = Sportiduino._to_int(data[0:2])
-        ret['page6'] = data[2:6]
-        ret['page7'] = data[6:10]
-        ret['punches'] = []
+        ret["card_number"] = Sportiduino._to_int(data[0:2])
+        ret["page6"] = data[2:6]
+        ret["page7"] = data[6:10]
+        ret["punches"] = []
         for i in range(10, len(data), 5):
             cp = byte2int(data[i])
             time = datetime.fromtimestamp(Sportiduino._to_int(data[i + 1 : i + 5]))
             if cp == Sportiduino.START_STATION:
-                ret['start'] = time
+                ret["start"] = time
             elif cp == Sportiduino.FINISH_STATION:
-                ret['finish'] = time
+                ret["finish"] = time
             else:
-                ret['punches'].append((cp, time))
+                ret["punches"].append((cp, time))
 
         return ret
 
@@ -749,15 +750,15 @@ class Sportiduino(object):
         ret = {}
         master_card_byte = byte2int(data[4][2])
         if master_card_byte == 0xFF:
-            ret['master_card_flag'] = True
-        ret['master_card_type'] = data[4][1]
-        ret['card_number'] = Sportiduino._to_int(data[4][0:2])
-        ret['init_timestamp'] = Sportiduino._to_int(data[5][0:4])
-        ret['page6'] = data[6][0:4]
-        ret['page7'] = data[7][0:4]
-        ret['punches'] = []
+            ret["master_card_flag"] = True
+        ret["master_card_type"] = data[4][1]
+        ret["card_number"] = Sportiduino._to_int(data[4][0:2])
+        ret["init_timestamp"] = Sportiduino._to_int(data[5][0:4])
+        ret["page6"] = data[6][0:4]
+        ret["page7"] = data[7][0:4]
+        ret["punches"] = []
 
-        if 'master_card_flag' in ret:
+        if "master_card_flag" in ret:
             return ret
 
         init_time_low = Sportiduino._to_int(data[5][1:4])
@@ -783,11 +784,11 @@ class Sportiduino(object):
             time = datetime.fromtimestamp(cp_timestamp)
 
             if cp == Sportiduino.START_STATION:
-                ret['start'] = time
+                ret["start"] = time
             elif cp == Sportiduino.FINISH_STATION:
-                ret['finish'] = time
+                ret["finish"] = time
             else:
-                ret['punches'].append((cp, time))
+                ret["punches"].append((cp, time))
 
         return ret
 
@@ -798,11 +799,11 @@ class Sportiduino(object):
             page_num = byte2int(data[i])
             ret[page_num] = data[i + 1 : i + 5]
 
-        log_debug('Card raw data:')
+        log_debug("Card raw data:")
         for p in ret:
             log_debug(
-                '\tpage %02i: 0x %s'
-                % (p, ' '.join('%02x' % byte2int(c) for c in ret[p]))
+                "\tpage %02i: 0x %s"
+                % (p, " ".join("%02x" % byte2int(c) for c in ret[p]))
             )
 
         return ret
@@ -813,8 +814,8 @@ class Sportiduino(object):
             return None
 
         ret = {}
-        ret['cp'] = byte2int(data[0])
-        ret['cards'] = []
+        ret["cp"] = byte2int(data[0])
+        ret["cards"] = []
 
         if len(data) > 1:
             if data[1] == 0xFF:  # with timestamps
@@ -823,10 +824,10 @@ class Sportiduino(object):
                     time = datetime.fromtimestamp(
                         Sportiduino._to_int(data[i + 2 : i + 6])
                     )
-                    ret['cards'].append((card_number, time))
+                    ret["cards"].append((card_number, time))
             else:
                 for i in range(1, len(data), 2):
-                    ret['cards'].append(Sportiduino._to_int(data[i : i + 2]))
+                    ret["cards"].append(Sportiduino._to_int(data[i : i + 2]))
 
         return ret
 

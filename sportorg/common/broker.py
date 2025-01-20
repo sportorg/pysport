@@ -21,7 +21,7 @@ class Consumer:
 
 
 @singleton
-class Broker(object):
+class Broker:
     def __init__(self):
         self._consumers = {}
         self._logger = logging.root
@@ -53,13 +53,12 @@ class Broker(object):
                     r = method(*args, **kwargs)
                 except AttributeError:
                     self._logger.error(
-                        'Class `{}` does not implement `{}`'.format(
-                            cls.__class__.__name__, method_name
-                        )
+                        "Class `%s` does not implement `%s`",
+                        cls.__class__.__name__,
+                        method_name,
                     )
                     r = None
 
             if r:
                 result.append(r)
-
         return result if len(result) else None

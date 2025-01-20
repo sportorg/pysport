@@ -1,6 +1,6 @@
-from PySide2 import QtCore, QtWidgets
-from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QDialog
+from PySide6 import QtCore, QtWidgets
+from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import QDialog
 
 from sportorg import config
 from sportorg.gui.utils.custom_controls import AdvSpinBox
@@ -55,11 +55,11 @@ class NumberChangeDialog(QDialog):
         QtCore.QMetaObject.connectSlotsByName(self)
 
     def retranslateUi(self):
-        self.setWindowTitle(translate('Dialog'))
+        self.setWindowTitle(translate("Dialog"))
         self.setWindowIcon(QIcon(config.ICON))
-        self.source_num_label.setText(translate('Source number'))
-        self.source_info_label.setText(translate('Ivan Churakoff M21 11:09:00'))
-        self.target_num_label.setText(translate('Target number'))
-        self.target_info_label.setText(translate('Reserve M60 11:40:00'))
-        self.remove_radio_button.setText(translate('Remove source'))
-        self.replace_radio_button.setText(translate('Replace source with reserve'))
+        self.source_num_label.setText(translate("Source number"))
+        self.source_info_label.setText(translate("Ivan Churakoff M21 11:09:00"))
+        self.target_num_label.setText(translate("Target number"))
+        self.target_info_label.setText(translate("Reserve M60 11:40:00"))
+        self.remove_radio_button.setText(translate("Remove source"))
+        self.replace_radio_button.setText(translate("Replace source with reserve"))

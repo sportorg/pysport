@@ -1,6 +1,6 @@
 import logging
 
-from PySide2 import QtWidgets
+from PySide6 import QtWidgets
 
 from sportorg.gui.dialogs.group_edit import GroupEditDialog
 from sportorg.gui.global_access import GlobalAccess
@@ -23,8 +23,7 @@ class Widget(QtWidgets.QWidget):
         self.setup_ui()
 
     def setup_ui(self):
-
-        self.group_table.setObjectName('GroupTable')
+        self.group_table.setObjectName("GroupTable")
         self.group_table.setModel(GroupMemoryModel())
 
         def group_double_clicked(index):

@@ -1,8 +1,8 @@
 import logging
 
-from PySide2 import QtCore
-from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import (
+from PySide6 import QtCore
+from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import (
     QDialog,
     QDialogButtonBox,
     QLineEdit,
@@ -47,6 +47,8 @@ class SearchDialog(QDialog):
         self.layout.addWidget(self.item_serach)
         self.layout.addWidget(button_box)
 
+        QtCore.QTimer.singleShot(0, self.item_serach.setFocus)
+
         self.retranslate_ui()
 
         self.show()
@@ -63,8 +65,8 @@ class SearchDialog(QDialog):
                 if offset == -1 and proxy_model.search:
                     QMessageBox.warning(
                         self,
-                        translate('Search'),
-                        translate('The search has not given any results'),
+                        translate("Search"),
+                        translate("The search has not given any results"),
                     )
                 self.table.selectRow(offset)
         except Exception as e:
@@ -74,6 +76,6 @@ class SearchDialog(QDialog):
         self.close()
 
     def retranslate_ui(self):
-        self.setWindowTitle(translate('Search'))
-        self.button_ok.setText(translate('OK'))
-        self.button_cancel.setText(translate('Cancel'))
+        self.setWindowTitle(translate("Search"))
+        self.button_ok.setText(translate("OK"))
+        self.button_cancel.setText(translate("Cancel"))

@@ -1,10 +1,10 @@
-from PySide2 import QtCore
-from PySide2.QtCore import QSortFilterProxyModel, QTime
-from PySide2.QtWidgets import QComboBox, QCompleter, QMessageBox, QSpinBox, QTimeEdit
+from PySide6 import QtCore
+from PySide6.QtCore import QSortFilterProxyModel, QTime
+from PySide6.QtWidgets import QComboBox, QCompleter, QMessageBox, QSpinBox, QTimeEdit
 
 from sportorg.common.otime import OTime
 from sportorg.language import translate
-from sportorg.utils.time import time_to_qtime, time_to_otime
+from sportorg.utils.time import time_to_otime, time_to_qtime
 
 
 class AdvComboBox(QComboBox):
@@ -13,7 +13,7 @@ class AdvComboBox(QComboBox):
     Found in Internet by Sergei
     """
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, val_list=None, max_width=0):
         super(AdvComboBox, self).__init__(parent)
 
         self.setFocusPolicy(QtCore.Qt.StrongFocus)
@@ -39,10 +39,15 @@ class AdvComboBox(QComboBox):
         self.lineEdit().textEdited.connect(filter_function)
         self.completer.activated.connect(self.on_completer_activated)
 
+        if val_list:
+            self.addItems(val_list)
+
+        if max_width > 0:
+            self.setMaximumWidth(max_width)
+
     def wheelEvent(self, ev):
         if ev.type() == QtCore.QEvent.Wheel:
             ev.ignore()
-
 
     # on selection of an item from the completer, select the corresponding item from combobox
     def on_completer_activated(self, text):
@@ -90,25 +95,26 @@ class AdvTimeEdit(QTimeEdit):
         if ev.type() == QtCore.QEvent.Wheel:
             ev.ignore()
 
+
 def messageBoxQuestion(
-    parent=None, title='', text='', buttons=(QMessageBox.Yes | QMessageBox.No)
+    parent=None, title="", text="", buttons=(QMessageBox.Yes | QMessageBox.No)
 ):
     messageBox = QMessageBox(QMessageBox.Question, title, text, buttons, parent)
 
     button_yes = messageBox.button(QMessageBox.Yes)
     if button_yes:
-        button_yes.setText(translate('Yes'))
+        button_yes.setText(translate("Yes"))
 
     button_no = messageBox.button(QMessageBox.No)
     if button_no:
-        button_no.setText(translate('No'))
+        button_no.setText(translate("No"))
 
     button_save = messageBox.button(QMessageBox.Save)
     if button_save:
-        button_save.setText(translate('Save'))
+        button_save.setText(translate("Save"))
 
     button_cancel = messageBox.button(QMessageBox.Cancel)
     if button_cancel:
-        button_cancel.setText(translate('Cancel'))
+        button_cancel.setText(translate("Cancel"))
 
     return messageBox.exec_()

@@ -13,7 +13,6 @@ def get_last_relay_number_protocol():
 
 
 def get_next_relay_number(num):
-
     last_num = num
     if last_num == 1000:
         return 1001
@@ -33,14 +32,14 @@ def get_next_relay_number_protocol():
 
 def get_next_relay_number_setting():
     obj = race()
-    settings_num = obj.get_setting('relay_next_number', 1001)
+    settings_num = obj.get_setting("relay_next_number", 1001)
     # protocol_num = get_next_relay_number_protocol()
     return settings_num
 
 
 def set_next_relay_number(num):
     obj = race()
-    obj.set_setting('relay_next_number', num)
+    obj.set_setting("relay_next_number", num)
 
 
 def get_leg_count():
@@ -49,7 +48,7 @@ def get_leg_count():
 
 
 def set_next_relay_number_to_person(person):
-    person.bib = get_next_relay_number_setting()
+    person.set_bib(get_next_relay_number_setting())
     set_next_relay_number(get_next_relay_number(person.bib))
 
 

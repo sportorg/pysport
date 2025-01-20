@@ -22,7 +22,7 @@
     }
 </style>
 <script>
-    var MAX_ORG_NAME = 30;
+    var MAX_ORG_NAME = 50;
     var MAX_PERSON_NAME = 30;
 
     var TableGenerator = (function () {
@@ -385,7 +385,7 @@
         };
         SettingsGenerator.prototype.getHiddenButton = function () {
             var el = document.createElement('button');
-            el.appendChild(document.createTextNode('Свернуть/Развернуть'));
+            el.appendChild(document.createTextNode('SETTINGS'));
             var _this = this;
             el.onclick = function (ev) { _this.toggleHidden() };
             return el;
@@ -468,7 +468,7 @@
 
     function dateFormat(date) {
         date = date ? new Date(date) : new Date();
-        return date.getDate() + '.' + (date.getMonth() + 1) + '.' + date.getFullYear();
+		return date.getDate().toString().padStart(2,'0')  + '.' + (date.getMonth() + 1).toString().padStart(2,'0') + '.' + date.getFullYear();
     }
 
     var Qualification = {

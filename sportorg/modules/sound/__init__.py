@@ -4,14 +4,14 @@ from sportorg.modules.configs.configs import Config
 
 
 @singleton
-class Sound(object):
+class Sound:
     @staticmethod
     def is_enabled():
-        return Config().sound.get('enabled')
+        return Config().sound.get("enabled")
 
     @staticmethod
     def is_enabled_rented_card():
-        return Config().sound.get('enabled_rented_card')
+        return Config().sound.get("enabled_rented_card")
 
     def _play(self, name):
         sound = Config().sound.get(name)
@@ -19,11 +19,14 @@ class Sound(object):
             Audio().play(sound)
 
     def ok(self):
-        self._play('successful')
+        self._play("successful")
 
     def fail(self):
-        self._play('unsuccessful')
+        self._play("unsuccessful")
 
     def rented_card(self):
         if self.is_enabled_rented_card():
-            self._play('rented_card')
+            self._play("rented_card")
+
+    def enter_number(self):
+        self._play("enter_number")

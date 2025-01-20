@@ -21,7 +21,7 @@ def test_WDBPunch_parsing():
     code = 31
     time = 3600000
 
-    byte_array = struct.pack('<I', code) + struct.pack('<I', time)
+    byte_array = struct.pack("<I", code) + struct.pack("<I", time)
     obj1 = WDBPunch()
     obj1.parse_bytes(byte_array)
     obj2 = WDBPunch(code, time)
@@ -40,7 +40,7 @@ def test_WDBFinish_parsing():
     sound = 101
 
     byte_array = (
-        struct.pack('<I', number) + struct.pack('<I', time) + struct.pack('<I', sound)
+        struct.pack("<I", number) + struct.pack("<I", time) + struct.pack("<I", sound)
     )
     obj1 = WDBFinish()
     obj1.parse_bytes(byte_array)
@@ -69,7 +69,7 @@ def test_WDBChip_parsing():
 def test_WDBTeam_parsing():
     obj1 = WDBTeam()
     obj1.id = 766
-    obj1.name = 'Команда 6673'
+    obj1.name = "Команда 6673"
 
     byte_array = obj1.get_bytes()
     obj2 = WDBTeam()
@@ -81,7 +81,7 @@ def test_WDBTeam_parsing():
 def test_WDBDistance_parsing():
     obj1 = WDBDistance()
     obj1.id = 766
-    obj1.name = 'Длинн 2'
+    obj1.name = "Длинн 2"
     obj1.penalty_seconds = 19
 
     byte_array = obj1.get_bytes()
@@ -95,7 +95,7 @@ def test_WDBDistance_parsing():
 def test_WDBGroup_parsing():
     obj1 = WDBGroup()
     obj1.id = 766
-    obj1.name = 'Длинн2'
+    obj1.name = "Длинн2"
     obj1.owner_discount_cost = 1200
     obj1.distance_id = 120
 
@@ -110,7 +110,7 @@ def test_WDBGroup_parsing():
 
 def test_WDBMan_parsing():
     obj1 = WDBMan(WDB())
-    obj1.name = 'Ахтаров Данил'
+    obj1.name = "Ахтаров Данил"
     obj1.round = 4
     obj1.is_finished = True
 
@@ -122,17 +122,17 @@ def test_WDBMan_parsing():
     assert len(byte_array) == 196
 
 
-@pytest.mark.skip(reason='Not working')
+@pytest.mark.skip(reason="Not working")
 def test_WDB_read_file():
-    file_path = 'tests/data/test.wdb'
+    file_path = "tests/data/test.wdb"
     wdb_object = parse_wdb(file_path)
 
-    file_path_out = 'data/test.wdb'
-    wdb_file_out = open(file_path_out, 'wb')
+    file_path_out = "data/test.wdb"
+    wdb_file_out = open(file_path_out, "wb")
     test_out = wdb_object.get_bytes()
     wdb_file_out.write(test_out)
     wdb_file_out.close()
-    byte_array_in = open(file_path, 'rb').read()
-    byte_array_out = open(file_path_out, 'rb').read()
+    byte_array_in = open(file_path, "rb").read()
+    byte_array_out = open(file_path_out, "rb").read()
 
     assert byte_array_in == byte_array_out

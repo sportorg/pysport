@@ -29,66 +29,64 @@ def import_csv(source):
             obj.organizations.append(org)
 
     for person_dict in wo_csv.data:
-        if person_dict['qual_id'] and person_dict['qual_id'].isdigit():
-            qual_id = int(person_dict['qual_id'])
+        if person_dict["qual_id"] and person_dict["qual_id"].isdigit():
+            qual_id = int(person_dict["qual_id"])
         else:
             qual_id = 0
-        person_org = memory.find(obj.organizations, name=person_dict['team_name'])
-        person_org.contact = person_dict['representative']
+        person_org = memory.find(obj.organizations, name=person_dict["team_name"])
+        person_org.contact = person_dict["representative"]
 
         person = memory.Person()
-        person.name = person_dict['name']
-        person.surname = person_dict['surname']
-        person.bib = person_dict['bib']
-        person.set_year(person_dict['year'])
-        person.card_number = int(person_dict['sportident_card'])
-        person.group = memory.find(obj.groups, name=person_dict['group_name'])
+        person.name = person_dict["name"]
+        person.surname = person_dict["surname"]
+        person.set_bib(int(person_dict["bib"]))
+        person.set_year(person_dict["year"])
+        person.set_card_number(int(person_dict["sportident_card"]))
+        person.group = memory.find(obj.groups, name=person_dict["group_name"])
         person.organization = person_org
         person.qual = Qualification(qual_id)
-        person.comment = person_dict['comment']
+        person.comment = person_dict["comment"]
         obj.persons.append(person)
 
     new_lengths = obj.get_lengths()
 
-    logging.info(translate('Import result'))
-    logging.info('{}: {}'.format(translate('Persons'), new_lengths[0] - old_lengths[0]))
+    logging.info(translate("Import result"))
+    logging.info("{}: {}".format(translate("Persons"), new_lengths[0] - old_lengths[0]))
     # logging.info('{}: {}'.format(translate('Race Results'), new_lengths[1]-old_lengths[1]))
-    logging.info('{}: {}'.format(translate('Groups'), new_lengths[2] - old_lengths[2]))
+    logging.info("{}: {}".format(translate("Groups"), new_lengths[2] - old_lengths[2]))
     # logging.info('{}: {}'.format(translate('Courses'), new_lengths[3]-old_lengths[3]))
-    logging.info('{}: {}'.format(translate('Teams'), new_lengths[4] - old_lengths[4]))
+    logging.info("{}: {}".format(translate("Teams"), new_lengths[4] - old_lengths[4]))
 
     persons_dupl_cards = obj.get_duplicate_card_numbers()
     persons_dupl_names = obj.get_duplicate_names()
 
     if len(persons_dupl_cards):
         logging.info(
-            '{}'.format(translate('Duplicate card numbers (card numbers are reset)'))
+            "{}".format(translate("Duplicate card numbers (card numbers are reset)"))
         )
-        for person in persons_dupl_cards:
+        for person in sorted(persons_dupl_cards, key=lambda x: x.card_number):
             logging.info(
-                '{} {} {} {}'.format(
+                "{} {} {} {}".format(
                     person.full_name,
-                    person.group.name if person.group else '',
-                    person.organization.name if person.organization else '',
+                    person.group.name if person.group else "",
+                    person.organization.name if person.organization else "",
                     person.card_number,
                 )
             )
-            person.card_number = 0
+            person.set_card_number(0)
     if len(persons_dupl_names):
-        logging.info('{}'.format(translate('Duplicate names')))
-        for person in persons_dupl_names:
-            person.card_number = 0
+        logging.info("{}".format(translate("Duplicate names")))
+        for person in sorted(persons_dupl_names, key=lambda x: x.full_name):
             logging.info(
-                '{} {} {} {}'.format(
+                "{} {} {} {}".format(
                     person.full_name,
                     person.get_year(),
-                    person.group.name if person.group else '',
-                    person.organization.name if person.organization else '',
+                    person.group.name if person.group else "",
+                    person.organization.name if person.organization else "",
                 )
             )
 
 
 def import_wo_wdb(file_name):
     wb = WinOrientBinary(file=file_name)
-    # wb.run()
     wb.create_objects()

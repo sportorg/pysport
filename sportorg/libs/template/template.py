@@ -8,9 +8,9 @@ from jinja2 import Environment, FileSystemLoader, Template
 def to_hhmmss(value, fmt=None):
     """value = 1/1000 s"""
     if value is None:
-        return ''
+        return ""
     if not fmt:
-        fmt = '%H:%M:%S'
+        fmt = "%H:%M:%S"
     dt = datetime.datetime(
         2000,
         1,
@@ -25,31 +25,30 @@ def to_hhmmss(value, fmt=None):
 
 def date(value, fmt=None):
     if not value:
-        return ''
+        return ""
     if not fmt:
-        fmt = '%d.%m.%Y'
+        fmt = "%d.%m.%Y"
     return dateutil.parser.parse(value).strftime(fmt)
 
 
 def finalize(thing):
-    return thing if thing else ''
+    return thing if thing else ""
 
 
 def get_text_from_path(path, **kwargs):
-    custom_encoding = locale.getdefaultlocale()[1]
-    # custom_encoding = 'cp1251'
-    with open(path, errors='ignore') as f:
-        html = f.read().encode(custom_encoding, 'ignore').decode(errors='ignore')
+    custom_encoding = locale.getdefaultlocale()[1] or "utf-8"
+    with open(path, errors="ignore") as f:
+        html = f.read().encode(custom_encoding, "ignore").decode(errors="ignore")
 
     template = Template(html, finalize=finalize)
     return template.render(**kwargs)
 
 
-def get_text_from_template(searchpath, path, **kwargs):
+def get_text_from_template(searchpath: str, path: str, **kwargs):
     env = Environment(loader=FileSystemLoader(searchpath), finalize=finalize)
-    env.filters['tohhmmss'] = to_hhmmss
-    env.filters['date'] = date
-    env.policies['json.dumps_kwargs']['ensure_ascii'] = False
+    env.filters["tohhmmss"] = to_hhmmss
+    env.filters["date"] = date
+    env.policies["json.dumps_kwargs"]["ensure_ascii"] = False
     template = env.get_template(path)
 
     return template.render(**kwargs)

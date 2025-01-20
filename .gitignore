@@ -141,3 +141,5 @@ cython_debug/
 .vscode
 
 data
+!tests/data
+version

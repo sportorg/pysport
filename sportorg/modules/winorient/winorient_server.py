@@ -1,5 +1,5 @@
 import datetime
-from socket import *
+from socket import AF_INET, SOCK_DGRAM, socket
 
 from sportorg.utils.time import time_to_hhmmss
 
@@ -24,7 +24,7 @@ Format of WDB data package
 
 
 def int_to_time(value):
-    """ convert value from 1/100 s to time """
+    """convert value from 1/100 s to time"""
     today = datetime.datetime.now()
     ret = datetime.datetime(
         today.year,
@@ -39,7 +39,7 @@ def int_to_time(value):
     return ret
 
 
-host = 'localhost'
+host = "localhost"
 port = 1212
 addr = (host, port)
 
@@ -49,13 +49,12 @@ udp_socket.bind(addr)
 
 # main loop
 while True:
-
-    print('wait data...')
+    print("wait data...")
 
     # recvfrom - receiving of data
     conn, addr = udp_socket.recvfrom(1772)
-    print('client addr: ', addr)
-    print('data: ', conn)
+    print("client addr: ", addr)
+    print("data: ", conn)
 
     # string = ''
     # for i in conn:
@@ -67,29 +66,31 @@ while True:
     result = int_to_time(int(text_array[1]))
     status = text_array[2]
     start = int_to_time(int(text_array[4]))
-    byteorder = 'little'
+    byteorder = "little"
 
-    punch_qty = int.from_bytes(conn[136:140], byteorder)
-    card_start = int_to_time(int.from_bytes(conn[144:148], byteorder))
-    card_finish = int_to_time(int.from_bytes(conn[152:156], byteorder))
+    punch_qty = int.from_bytes(conn[136:140], byteorder)  # type:ignore
+    card_start = int_to_time(int.from_bytes(conn[144:148], byteorder))  # type:ignore
+    card_finish = int_to_time(int.from_bytes(conn[152:156], byteorder))  # type:ignore
 
     init_offset = 172
     punches = []
     for i in range(punch_qty):
         cp = int.from_bytes(
-            conn[init_offset + i * 8 : init_offset + i * 8 + 1], byteorder
+            conn[init_offset + i * 8 : init_offset + i * 8 + 1],
+            byteorder,  # type:ignore
         )
         time = int_to_time(
             int.from_bytes(
-                conn[init_offset + i * 8 + 4 : init_offset + i * 8 + 8], byteorder
+                conn[init_offset + i * 8 + 4 : init_offset + i * 8 + 8],
+                byteorder,  # type:ignore
             )
         )
         punches.append((cp, time_to_hhmmss(time)))
 
-    print('bib=' + bib + ' result=' + time_to_hhmmss(result) + ' punches=')
+    print("bib=" + bib + " result=" + time_to_hhmmss(result) + " punches=")
     print(punches)
 
     # sendto - responce
-    udp_socket.sendto(b'message received by the server', addr)
+    udp_socket.sendto(b"message received by the server", addr)
 
 # udp_socket.close()

@@ -1,7 +1,7 @@
 import logging
 
-from PySide2 import QtCore, QtGui, QtWidgets
-from PySide2.QtWidgets import QAbstractItemView, QTextEdit
+from PySide6 import QtCore, QtGui, QtWidgets
+from PySide6.QtWidgets import QAbstractItemView, QTextEdit
 
 from sportorg.common.broker import Broker
 from sportorg.gui.dialogs.result_edit import ResultEditDialog
@@ -18,7 +18,7 @@ class ResultsTable(TableView):
         super().__init__(obj)
 
         self.parent_widget = parent
-        self.setObjectName('ResultTable')
+        self.setObjectName("ResultTable")
 
         self.setModel(ResultMemoryModel())
         self.setSortingEnabled(True)
@@ -29,7 +29,7 @@ class ResultsTable(TableView):
 
         self.popup_items = []
 
-        Broker().subscribe('refresh', self.update_splits, 1)
+        Broker().subscribe("refresh", self.update_splits, 1)
 
     def update_splits(self):
         if -1 < self.currentIndex().row() < len(race().results):
@@ -53,7 +53,7 @@ class ResultsTable(TableView):
 
     def double_clicked(self, index):
         try:
-            logging.debug('Clicked on ' + str(index.row()))
+            logging.debug("Clicked on " + str(index.row()))
             if index.row() < len(race().results):
                 dialog = ResultEditDialog(race().results[index.row()])
                 dialog.exec_()
@@ -117,7 +117,7 @@ class Widget(QtWidgets.QWidget):
         )
         self.vertical_layout_course.addLayout(self.result_course_form)
         font = QtGui.QFont()
-        font.setFamily('Courier New')
+        font.setFamily("Courier New")
         self.result_course_details.setFont(font)
         self.vertical_layout_course.addWidget(self.result_course_details)
         self.vertical_layout_card.setContentsMargins(0, 0, 0, 0)
@@ -139,34 +139,34 @@ class Widget(QtWidgets.QWidget):
         self.vertical_layout_card.addLayout(self.result_card_form)
         self.result_card_details.setLineWrapMode(QTextEdit.NoWrap)
         font = QtGui.QFont()
-        font.setFamily('Courier New')
+        font.setFamily("Courier New")
         self.result_card_details.setFont(font)
         self.vertical_layout_card.addWidget(self.result_card_details)
 
         self.grid_layout.addWidget(self.result_splitter)
-        self.result_course_group_box.setTitle(translate('Course'))
-        self.result_course_name_label.setText(translate('Name'))
-        self.result_course_length_label.setText(translate('Length'))
-        self.result_card_group_box.setTitle(translate('Chip'))
-        self.result_card_start_label.setText(translate('Start'))
-        self.result_card_finish_label.setText(translate('Finish'))
+        self.result_course_group_box.setTitle(translate("Course"))
+        self.result_course_name_label.setText(translate("Name"))
+        self.result_course_length_label.setText(translate("Length"))
+        self.result_card_group_box.setTitle(translate("Chip"))
+        self.result_card_start_label.setText(translate("Start"))
+        self.result_card_finish_label.setText(translate("Finish"))
 
         self.result_course_group_box.setMinimumHeight(150)
         self.result_card_group_box.setMinimumHeight(150)
 
-        Broker().subscribe('resize', self.resize_event)
+        Broker().subscribe("resize", self.resize_event)
 
     def show_splits(self, index):
         self.resize_event()
         result = race().results[index.row()]
         self.result_card_details.clear()
-        self.result_card_finish_edit.setText('')
-        self.result_card_start_edit.setText('')
+        self.result_card_finish_edit.setText("")
+        self.result_card_start_edit.setText("")
 
         self.result_course_details.clear()
         self.result_course_details.setLineWrapMode(QTextEdit.NoWrap)
-        self.result_course_name_edit.setText('')
-        self.result_course_length_edit.setText('')
+        self.result_course_name_edit.setText("")
+        self.result_course_length_edit.setText("")
 
         if result.is_manual():
             return
@@ -182,17 +182,17 @@ class Widget(QtWidgets.QWidget):
             for control in course.controls:
                 control_codes.append(str(control.code))
 
-        code = ''
+        code = ""
         index = 1
-        time_accuracy = race().get_setting('time_accuracy', 0)
+        time_accuracy = race().get_setting("time_accuracy", 0)
         for split in result.splits:
-            str_fmt = '{index:02d} {code} {time} {diff}'
+            str_fmt = "{index:02d} {code} {time} {diff}"
             if not split.is_correct:
-                str_fmt = '-- {code} {time}'
+                str_fmt = "-- {code} {time}"
 
             s = str_fmt.format(
                 index=index,
-                code=('(' + str(split.code) + ')   ')[:5],
+                code=("(" + str(split.code) + ")   ")[:5],
                 time=split.time.to_str(time_accuracy),
                 diff=split.leg_time.to_str(time_accuracy),
                 leg_place=split.leg_place,
@@ -219,10 +219,10 @@ class Widget(QtWidgets.QWidget):
         if course:
             index = 1
             for control in course.controls:
-                s = '{index:02d} ({code}) {length}'.format(
+                s = "{index:02d} ({code}) {length}".format(
                     index=index,
                     code=control.code,
-                    length=control.length if control.length else '',
+                    length=control.length if control.length else "",
                 )
                 if is_highlight and str(control.code) not in split_codes:
                     s = '<span style="background: yellow">{}</span>'.format(s)

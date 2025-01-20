@@ -3,8 +3,10 @@ class Singleton(type):
     Define an Instance operation that lets clients access its unique
     instance.
 
-    >>>class SomeClass(metaclass=Singleton):
-    >>>    pass
+    ```python
+    class SomeClass(metaclass=Singleton):
+        pass
+    ```
     """
 
     def __init__(cls, name, bases, attrs, **kwargs):
@@ -18,12 +20,13 @@ class Singleton(type):
 
 
 def singleton(cls, *args, **kw):
-    """
-    Decorator
+    """Singlton decorator.
 
-    >>>@singleton
-    >>>class SomeClass(object):
-    >>>    pass
+    ```python
+    @singleton
+    class SomeClass:
+        pass
+    ```
     """
     instances = {}
 

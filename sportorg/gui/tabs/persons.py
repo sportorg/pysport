@@ -1,6 +1,6 @@
 import logging
 
-from PySide2 import QtWidgets
+from PySide6 import QtWidgets
 
 from sportorg.gui.dialogs.person_edit import PersonEditDialog
 from sportorg.gui.global_access import GlobalAccess, NumberClicker
@@ -41,8 +41,7 @@ class Widget(QtWidgets.QWidget):
             print(str(e))
 
     def setup_ui(self):
-
-        self.person_table.setObjectName('PersonTable')
+        self.person_table.setObjectName("PersonTable")
         self.person_table.setModel(PersonMemoryModel())
 
         def entry_double_clicked(index):
@@ -53,7 +52,7 @@ class Widget(QtWidgets.QWidget):
                     dialog.exec_()
                     GlobalAccess().get_main_window().refresh()
             except Exception as e:
-                logging.error(str(e))
+                logging.exception(e)
 
         def entry_single_clicked(index):
             try:

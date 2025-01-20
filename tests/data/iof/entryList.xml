@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<EntryList xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://www.orienteering.org/datastandard/3.0" iofVersion="3.0" creator="SportOrg v1.6.0"
+    createTime="2023-08-26T14:42:43">
+    <Event>
+        <Name></Name>
+    </Event>
+    <PersonEntry>
+        <Person>
+            <Id></Id>
+            <Name>
+                <Family>Akhtarov</Family>
+                <Given>Danil</Given>
+            </Name>
+            <BirthDate>1996-01-01</BirthDate>
+        </Person>
+        <Organisation>
+            <Id>72e30070-d35e-423a-a95b-b585f351c650</Id>
+            <Name>Abris</Name>
+            <ShortName>Abris</ShortName>
+        </Organisation>
+        <Class>
+            <Id>a1f1f92c-9f1b-46f1-bd94-30ed830154a6</Id>
+            <Name>Group1</Name>
+            <ShortName>G1</ShortName>
+        </Class>
+    </PersonEntry>
+</EntryList>

@@ -62,7 +62,7 @@ class WinOrientBinary:
 
     def _read_file(self):
         try:
-            with open(self._file, 'rb') as wdb_file:
+            with open(self._file, "rb") as wdb_file:
                 byte_array = wdb_file.read()
                 self.wdb_object = WDB()
                 self.wdb_object.parse_bytes(byte_array)
@@ -75,7 +75,7 @@ class WinOrientBinary:
         """Create objects in memory, according to model"""
         my_race = race()
 
-        my_race.data.title = '\n'.join(self.wdb_object.info.title)
+        my_race.data.title = "\n".join(self.wdb_object.info.title)
         my_race.data.location = self.wdb_object.info.place
         my_race.data.chief_referee = self.wdb_object.info.referee
         my_race.data.secretary = self.wdb_object.info.secretary
@@ -97,7 +97,7 @@ class WinOrientBinary:
             for i in range(course.point_quantity):
                 control = CourseControl()
                 control.code = str(course.point[i])
-                if control.code == '0':
+                if control.code == "0":
                     break
                 if i < len(course.leg):
                     control.length = course.leg[i]
@@ -116,9 +116,11 @@ class WinOrientBinary:
 
         for man in self.wdb_object.man:
             new_person = Person()
-            new_person.surname = man.name.strip().split(' ')[0]
-            new_person.name = man.name.strip().split(' ')[-1]
-            new_person.bib = man.number
+            new_person.surname = man.name.strip().split(" ")[0]
+            index_of_first_space = str(man.name.strip()).find(" ")
+            if index_of_first_space > 0:
+                new_person.name = man.name.strip()[index_of_first_space + 1 :].strip()
+            new_person.set_bib(man.number)
             if man.qualification:
                 if man.qualification == 10:
                     man.qualification = Qualification.MSMK.value  # Convert ZMS to MSMK
@@ -151,7 +153,7 @@ class WinOrientBinary:
             result.finish_time = int_to_otime(fin.time)
             result.bib = fin.number
 
-            person = find(my_race.persons, bib=result.bib)
+            person = race().find_person_by_bib(result.bib)
             if person:
                 result.person = person
                 wdb_person = find(self.wdb_object.man, number=result.bib)
@@ -163,8 +165,7 @@ class WinOrientBinary:
 
         # punches
         for chip in self.wdb_object.chip:
-
-            person = find(my_race.persons, card_number=chip.id)
+            person = my_race.find_person_by_card(chip.id)
             if person:
                 result = find(my_race.results, person=person)
                 if not result:
@@ -194,7 +195,7 @@ class WinOrientBinary:
         my_race = race()
 
         title = my_race.data.description
-        wdb_object.info.title = title.replace('<br>', '').split('\n')
+        wdb_object.info.title = title.replace("<br>", "").split("\n")
         wdb_object.info.place = my_race.data.location
         wdb_object.info.referee = my_race.data.chief_referee
         wdb_object.info.secretary = my_race.data.secretary
@@ -215,7 +216,6 @@ class WinOrientBinary:
 
             # controls
             for i in range(len(course.controls)):
-
                 if len(new_course.point) >= i:
                     new_course.point.append(0)
                     new_course.leg.append(0)
@@ -227,7 +227,7 @@ class WinOrientBinary:
                 leg = course.controls[i].length
 
                 if leg:
-                    if str(leg).find('.') > -1:
+                    if str(leg).find(".") > -1:
                         new_course.leg[i] = int(float(leg) * 1000)
                     else:
                         new_course.leg[i] = int(leg)
@@ -252,7 +252,7 @@ class WinOrientBinary:
 
         for man in my_race.persons:
             new_person = WDBMan(wdb_object)
-            new_person.name = str(man.surname) + ' ' + str(man.name)
+            new_person.name = str(man.surname) + " " + str(man.name)
             if man.bib:
                 new_person.number = int(man.bib)
 
@@ -319,5 +319,20 @@ class WinOrientBinary:
                         new_chip.punch.append(new_punch)
 
                     wdb_object.chip.append(new_chip)
+
+                # write start time from start station to person
+                if my_race.get_setting("system_start_source") == "station":
+                    if result.start_time and result.start_time > OTime(0):
+                        new_person.start = time_to_int(result.start_time)
+
+        if my_race.get_setting("system_start_source") == "station":
+            wdb_object.info.si_start_source = 1
+        elif my_race.get_setting("system_start_source") == "cp":
+            wdb_object.info.si_start_source = 2
+
+        if my_race.get_setting("system_finish_source") == "station":
+            wdb_object.info.si_finish_source = 1
+        elif my_race.get_setting("system_finish_source") == "cp":
+            wdb_object.info.si_finish_source = 2
 
         return wdb_object

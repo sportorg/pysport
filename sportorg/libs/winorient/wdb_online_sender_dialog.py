@@ -1,7 +1,7 @@
 import logging
 import sys
 
-from PySide2.QtWidgets import (
+from PySide6.QtWidgets import (
     QApplication,
     QDialog,
     QFileDialog,
@@ -18,17 +18,17 @@ from sportorg.libs.winorient.wdb_online_sender import WdbOnlineSender
 class WdbOnlineSenderDialog(QDialog):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle('Online sender')
+        self.setWindowTitle("Online sender")
         self.setSizeGripEnabled(False)
         self.setModal(True)
 
         self.layout = QFormLayout(self)
 
-        self.file_button = QPushButton('Select wdb file')
+        self.file_button = QPushButton("Select wdb file")
 
         def select_file():
             result = QFileDialog.getOpenFileName(
-                None, 'select wdb file', '', 'WDB Winorient (*.wdb)'
+                None, "select wdb file", "", "WDB Winorient (*.wdb)"
             )[0]
             self.file_path.setText(result)
 
@@ -36,9 +36,9 @@ class WdbOnlineSenderDialog(QDialog):
         self.file_path = QLineEdit()
         self.layout.addRow(self.file_button, self.file_path)
 
-        self.url_label = QLabel('URL')
+        self.url_label = QLabel("URL")
         # self.url_item = QLineEdit('http://orgeo.ru/online/sv?id=20000&sk=20000&sub=1&')
-        self.url_item = QLineEdit('http://orgeo.ru/online/sv?id=5651&sk=05c15&sub=1&')
+        self.url_item = QLineEdit("http://orgeo.ru/online/sv?id=5651&sk=05c15&sub=1&")
         self.url_item.setMinimumWidth(300)
         self.layout.addRow(self.url_label, self.url_item)
 
@@ -54,9 +54,9 @@ class WdbOnlineSenderDialog(QDialog):
             except Exception as e:
                 logging.error(str(e))
 
-        self.button_ok = QPushButton('Start')
+        self.button_ok = QPushButton("Start")
         self.button_ok.clicked.connect(start)
-        self.button_cancel = QPushButton('Cancel')
+        self.button_cancel = QPushButton("Cancel")
         self.button_cancel.clicked.connect(cancel_changes)
         self.layout.addRow(self.button_ok, self.button_cancel)
 
@@ -73,7 +73,7 @@ class WdbOnlineSenderDialog(QDialog):
         self.online_sender.start()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app = QApplication(sys.argv)
     logging.basicConfig(level=logging.DEBUG)
     WdbOnlineSenderDialog().exec_()

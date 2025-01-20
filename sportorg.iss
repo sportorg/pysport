@@ -2,13 +2,13 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "SportOrg"
-#define MyAppVersion "v1.5.0"
-#define MyVersionInfoVersion "1.5.0.0"
-#define MyAppPublisher "Danil Akhtarov, Sergei Kobelev"
-#define MyAppURL "http://sportorg.o-ural.ru/"
+#define MyAppVersion "v1.7.1"
+#define MyVersionInfoVersion "1.7.1.0"
+#define MyAppPublisher "SportOrg Team"
+#define MyAppURL "https://sportorg.readthedocs.io"
 #define MyAppExeName "SportOrg.exe"
 
-#define BuildDir "build/exe.win32-3.6" ; !!replace with your build path!!
+#define BuildDir "build/exe.win32-3.8" ; !!replace with your build path!!
 #define AdditionalLib32 "data/additional_lib_32" ; !!replace with your lib path!!
 
 [Setup]
@@ -25,6 +25,7 @@ AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DefaultDirName={pf}\{#MyAppName}
+UsePreviousAppDir=no
 DisableProgramGroupPage=yes
 OutputBaseFilename={#MyAppName}-{#MyAppVersion}
 Compression=lzma
