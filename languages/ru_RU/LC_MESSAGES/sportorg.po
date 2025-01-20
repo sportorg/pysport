@@ -873,6 +873,15 @@ msgstr "Открыть файл CSV Winorient"
 msgid "CSV Winorient (*.csv)"
 msgstr "Файл CSV Winorient (*.csv)"
 
+msgid "file SFRX"
+msgstr "Файл SFRX"
+
+msgid "Open SFRX file"
+msgstr "Открыть файл SFRX"
+
+msgid "SFRX (*.sfrx)"
+msgstr "Файл SFRX (*.sfrx)"
+
 msgid "Import error"
 msgstr "Ошибка импорта"
 
