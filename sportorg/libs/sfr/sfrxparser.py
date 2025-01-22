@@ -5,7 +5,6 @@ from sportorg.models.memory import RaceType
 
 class SFRXParser:
     def __init__(self, data=None):
-
         self._settings = dict()
         self._dists = dict()
         self._dists = dict()
@@ -16,7 +15,7 @@ class SFRXParser:
         self._splits = list()
 
     def parse(self, source):
-        f = codecs.open(source, 'r', 'UTF-8')
+        f = codecs.open(source, "r", "UTF-8")
 
         for row in f:
             self.append(row.split("\t"))
@@ -45,28 +44,20 @@ class SFRXParser:
             controls = []
             i = 9
             while i < len(row) - 1:
-                controls.append(
-                    {
-                        "code": row[i],
-                        "length": row[i + 1],
-                        "order": i - 8
-                    })
+                controls.append({"code": row[i], "length": row[i + 1], "order": i - 8})
                 i = i + 2
             dist_dict = {
                 "bib": bib,
                 "name": name,
                 "length": length,
                 "climb": climb,
-                "controls": controls
+                "controls": controls,
             }
 
             self._dists[str(int(row[0][1:]))] = dist_dict
 
         if row[0].startswith("g"):
-            group = {
-                "name": row[1],
-                "course": int(row[7])
-            }
+            group = {"name": row[1], "course": int(row[7])}
             self._groups[str(int(row[0][1:]))] = group
         if row[0].startswith("t"):
             self._teams[str(int(row[0][1:]))] = row[1]
@@ -96,10 +87,7 @@ class SFRXParser:
                 splits.append((row[i], row[i + 2]))
                 i = i + 3
 
-            split_dict = {
-                "bib": bib,
-                "split": splits
-            }
+            split_dict = {"bib": bib, "split": splits}
             self._splits.append(split_dict)
 
     @property
@@ -121,8 +109,6 @@ class SFRXParser:
     @property
     def settings(self):
         return self._settings
-
-
 
 
 def parse(source):

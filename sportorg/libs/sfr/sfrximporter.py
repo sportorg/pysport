@@ -4,7 +4,14 @@ from sportorg.gui.dialogs.text_io import set_property
 from sportorg.language import translate
 from sportorg.libs.sfr import sfrxparser
 from sportorg.models import memory
-from sportorg.models.memory import Qualification, race, ResultManual, ResultStatus, Split, SystemType
+from sportorg.models.memory import (
+    Qualification,
+    race,
+    ResultManual,
+    ResultStatus,
+    Split,
+    SystemType,
+)
 from sportorg.utils.time import hhmmss_to_time
 
 
@@ -42,7 +49,7 @@ def import_sfrx(source):
                             memory.CourseControl,
                             code=control["code"],
                             order=order,
-                            length=control["length"]
+                            length=control["length"],
                         )
                     )
             c.controls = controls
@@ -71,7 +78,6 @@ def import_sfrx(source):
             obj.organizations.append(org)
 
     for person_dict in sfr_csv.data:
-
         person = memory.Person()
         person.name = person_dict["name"]
         person.surname = person_dict["surname"]
@@ -87,7 +93,9 @@ def import_sfrx(source):
 
         team = person_dict["team_id"]
         if int(team) >= 0:
-            person.organization = memory.find(obj.organizations, name=sfr_csv.teams[team])
+            person.organization = memory.find(
+                obj.organizations, name=sfr_csv.teams[team]
+            )
 
         if person_dict["qual_id"] and person_dict["qual_id"].isdigit():
             qual_id = sfr_qual_to_sportorg()[person_dict["qual_id"]]
@@ -99,26 +107,14 @@ def import_sfrx(source):
 
         finish = person_dict["finish"]
         if finish != "":
-            set_property(
-                person,
-                translate("Finish"),
-                finish,
-                creating_new_result=True)
+            set_property(person, translate("Finish"), finish, creating_new_result=True)
         credit = person_dict["credit"]
         if credit != "":
-            set_property(
-                person,
-                translate("Credit"),
-                credit,
-                creating_new_result=True)
+            set_property(person, translate("Credit"), credit, creating_new_result=True)
 
         start = person_dict["start"]
         if start != "":
-            set_property(
-                person,
-                translate("Start"),
-                start
-            )
+            set_property(person, translate("Start"), start)
         result = person_dict["result"].strip()
 
         if result != "" and len(result.split(":")) != 3:
@@ -229,5 +225,5 @@ def sfr_qual_to_sportorg():
         "7": 7,
         "8": 8,
         "9": 9,
-        "10": 8
+        "10": 8,
     }
