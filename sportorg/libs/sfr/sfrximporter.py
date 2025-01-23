@@ -9,7 +9,8 @@ from sportorg.models.memory import (
     ResultManual,
     ResultStatus,
     Split,
-    SystemType, Person,
+    SystemType,
+    Person,
 )
 from sportorg.utils.time import hhmmss_to_time
 
