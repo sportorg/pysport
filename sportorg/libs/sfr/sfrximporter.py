@@ -28,7 +28,6 @@ def import_sfrx(source):
     obj.data.title = settings["title"]
     obj.data.location = settings["location"]
 
-
     for course in iter(sfr_csv.dists.values()):
         name = course["name"]
         bib = convert_bib(course["bib"])
