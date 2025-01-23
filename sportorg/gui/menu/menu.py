@@ -65,6 +65,10 @@ def menu_list():
                             "action": "WDBWinorientImportAction",
                         },
                         {
+                            "title": translate("file SFRX"),
+                            "action": "SFRXImportAction",
+                        },
+                        {
                             "title": translate("Ocad txt v8"),
                             "action": "OcadTXTv8ImportAction",
                         },
