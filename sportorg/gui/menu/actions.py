@@ -45,6 +45,7 @@ from sportorg.gui.dialogs.timekeeping_properties import TimekeepingPropertiesDia
 from sportorg.gui.menu.action import Action
 from sportorg.gui.utils.custom_controls import messageBoxQuestion
 from sportorg.language import translate
+from sportorg.libs.sfr import sfrximporter
 from sportorg.libs.winorient.wdb import write_wdb
 from sportorg.models.memory import ResultManual, ResultStatus, race
 from sportorg.models.result.result_calculation import ResultCalculation
@@ -160,6 +161,24 @@ class CSVWinorientImportAction(Action, metaclass=ActionFactory):
         if file_name != "":
             try:
                 winorient.import_csv(file_name)
+            except Exception as e:
+                logging.error(str(e))
+                QMessageBox.warning(
+                    self.app,
+                    translate("Error"),
+                    translate("Import error") + ": " + file_name,
+                )
+            self.app.init_model()
+
+
+class SFRXImportAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        file_name = get_open_file_name(
+            translate("Open SFRX file"), translate("SFRX (*.sfrx)")
+        )
+        if file_name:
+            try:
+                sfrximporter.import_sfrx(file_name)
             except Exception as e:
                 logging.error(str(e))
                 QMessageBox.warning(
