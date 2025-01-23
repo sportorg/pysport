@@ -105,9 +105,8 @@ def import_sfrx(source):
 
         person.qual = Qualification(qual_id)
         person.comment = person_dict["comment"]
-
-        set_property(person, "Result", person_dict["result"])
         set_property(person, "Finish", person_dict["finish"])
+        set_property(person, "Result", person_dict["result"])
         set_property(person, "Credit", person_dict["credit"])
         set_property(person, "Start", person_dict["start"])
 
@@ -209,7 +208,7 @@ def sfr_qual_to_sportorg(value) -> int:
 def set_property(person, key, value):
     if value == "":
         return
-    value = value.strip()
+
     if key == "Start":
         result = race().find_person_result(person)
         if result:
@@ -230,19 +229,20 @@ def set_property(person, key, value):
         if result:
             result.credit_time = hhmmss_to_time(value)
     elif key == "Result":
-        result = value
-        if result and len(result.split(":")) != 3:
+        result_sfr = value
+        if result_sfr and len(result_sfr.split(":")) != 3:
+            logging.info(result_sfr)
             result_person = race().find_person_result(person)
             if result_person is None:
                 result_person = race().new_result(ResultManual)
                 result_person.person = person
                 result_person.bib = person.bib
                 race().add_new_result(result_person)
-            if result == "cнят":
+            if result_sfr == "cнят":
                 result_person.status = ResultStatus.DISQUALIFIED
-            if result == "cнят (запр.)":
+            if result_sfr == "cнят (запр.)":
                 result_person.status = ResultStatus.DISQUALIFIED
-            if result == "cнят (к/в)":
+            if result_sfr == "cнят (к/в)":
                 result_person.status = ResultStatus.OVERTIME
-            if result == "н/c":
+            if result_sfr == "н/с":
                 result_person.status = ResultStatus.DID_NOT_START
