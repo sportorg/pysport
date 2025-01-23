@@ -1,5 +1,4 @@
 import logging
-from typing import Dict, Any
 
 from sportorg.language import translate
 from sportorg.libs.sfr import sfrxparser
@@ -230,7 +229,6 @@ def set_property(person, key, value) -> None:
     elif key == "Result":
         result_sfr = value
         if result_sfr and len(result_sfr.split(":")) != 3:
-            logging.info(result_sfr)
             result_person = race().find_person_result(person)
             if result_person is None:
                 result_person = race().new_result(ResultManual)

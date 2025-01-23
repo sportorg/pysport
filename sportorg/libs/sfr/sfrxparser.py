@@ -1,5 +1,4 @@
 import codecs
-import logging
 
 from sportorg.models.memory import RaceType
 
@@ -112,6 +111,6 @@ class SFRXParser:
         return self._settings
 
 
-def parse(source) -> None:
+def parse(source) -> SFRXParser:
     parser = SFRXParser()
-    parser.parse(source)
+    return parser.parse(source)
