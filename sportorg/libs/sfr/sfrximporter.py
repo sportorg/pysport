@@ -1,6 +1,6 @@
 import logging
+from typing import Dict, Any
 
-from sportorg.gui.dialogs.text_io import set_property
 from sportorg.language import translate
 from sportorg.libs.sfr import sfrxparser
 from sportorg.models import memory
@@ -27,6 +27,7 @@ def import_sfrx(source):
     obj.data.race_type = race_type
     obj.data.title = settings["title"]
     obj.data.location = settings["location"]
+
 
     for course in iter(sfr_csv.dists.values()):
         name = course["name"]
@@ -98,41 +99,17 @@ def import_sfrx(source):
             )
 
         if person_dict["qual_id"] and person_dict["qual_id"].isdigit():
-            qual_id = sfr_qual_to_sportorg()[person_dict["qual_id"]]
+            qual_id = sfr_qual_to_sportorg(person_dict["qual_id"])
         else:
             qual_id = 0
 
         person.qual = Qualification(qual_id)
         person.comment = person_dict["comment"]
 
-        finish = person_dict["finish"]
-        if finish != "":
-            set_property(person, translate("Finish"), finish, creating_new_result=True)
-        credit = person_dict["credit"]
-        if credit != "":
-            set_property(person, translate("Credit"), credit, creating_new_result=True)
-
-        start = person_dict["start"]
-        if start != "":
-            set_property(person, translate("Start"), start)
-        result = person_dict["result"].strip()
-
-        if result != "" and len(result.split(":")) != 3:
-            result_person = race().find_person_result(person)
-            if result is None:
-                result_person = race().new_result(ResultManual)
-                result_person.person = person
-                result_person.bib = person.bib
-                race().add_new_result(result_person)
-
-            if result == "cнят":
-                result_person.status = ResultStatus.DISQUALIFIED
-            if result == "cнят (запр.)":
-                result_person.status = ResultStatus.DISQUALIFIED
-            if result == "cнят (к/в)":
-                result_person.status = ResultStatus.OVERTIME
-            if result == "н/c":
-                result_person.status = ResultStatus.DID_NOT_START
+        set_property(person, "Result", person_dict["result"])
+        set_property(person, "Finish", person_dict["finish"])
+        set_property(person, "Credit", person_dict["credit"])
+        set_property(person, "Start", person_dict["start"])
 
         obj.persons.append(person)
 
@@ -212,7 +189,7 @@ def convert_bib(bib):
         return int(bib[0] + str(int(bib[1:])))
 
 
-def sfr_qual_to_sportorg():
+def sfr_qual_to_sportorg(value) -> int:
     return {
         "": 0,
         "0": 0,
@@ -226,4 +203,46 @@ def sfr_qual_to_sportorg():
         "8": 8,
         "9": 9,
         "10": 8,
-    }
+    }[value]
+
+
+def set_property(person, key, value):
+    if value == "":
+        return
+    value = value.strip()
+    if key == "Start":
+        result = race().find_person_result(person)
+        if result:
+            result.start_time = hhmmss_to_time(value)
+            person.start_time = hhmmss_to_time(value)
+        else:
+            person.start_time = hhmmss_to_time(value)
+    elif key == "Finish":
+        result = race().find_person_result(person)
+        if not result:
+            result = race().new_result(ResultManual)
+            result.person = person
+            result.bib = person.bib
+            race().add_new_result(result)
+        result.finish_time = hhmmss_to_time(value)
+    elif key == "Credit":
+        result = race().find_person_result(person)
+        if result:
+            result.credit_time = hhmmss_to_time(value)
+    elif key == "Result":
+        result = value
+        if result and len(result.split(":")) != 3:
+            result_person = race().find_person_result(person)
+            if result_person is None:
+                result_person = race().new_result(ResultManual)
+                result_person.person = person
+                result_person.bib = person.bib
+                race().add_new_result(result_person)
+            if result == "cнят":
+                result_person.status = ResultStatus.DISQUALIFIED
+            if result == "cнят (запр.)":
+                result_person.status = ResultStatus.DISQUALIFIED
+            if result == "cнят (к/в)":
+                result_person.status = ResultStatus.OVERTIME
+            if result == "н/c":
+                result_person.status = ResultStatus.DID_NOT_START

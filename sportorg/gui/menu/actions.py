@@ -176,7 +176,7 @@ class SFRXImportAction(Action, metaclass=ActionFactory):
         file_name = get_open_file_name(
             translate("Open SFRX file"), translate("SFRX (*.sfrx)")
         )
-        if file_name != "":
+        if file_name:
             try:
                 sfrximporter.import_sfrx(file_name)
             except Exception as e:

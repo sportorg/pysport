@@ -7,7 +7,6 @@ from sportorg.models.memory import (
     find,
     race,
 )
-from sportorg.modules.winorient import winorient
 
 
 def test_import_sfrx():
@@ -18,7 +17,7 @@ def test_import_sfrx():
     assert person.group.name == "М14", "Group name error"
     assert isinstance(person.organization, Organization), "Not organization"
     assert (
-        person.organization.name == "СДЮСШ Балт. берег Peterhof"
+            person.organization.name == "СДЮСШ Балт. берег Peterhof"
     ), "Organization name error"
     assert person.get_year() == 2009, "Year error"
     assert person.card_number == 0, "Card number error"

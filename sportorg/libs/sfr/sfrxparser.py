@@ -1,18 +1,19 @@
 import codecs
+import logging
 
 from sportorg.models.memory import RaceType
 
 
 class SFRXParser:
     def __init__(self, data=None):
-        self._settings = dict()
-        self._dists = dict()
-        self._dists = dict()
-        self._groups = dict()
-        self._teams = dict()
+        self._settings = {}
+        self._dists = {}
+        self._dists = {}
+        self._groups = {}
+        self._teams = {}
 
         self._data = [] if data is None else data
-        self._splits = list()
+        self._splits = []
 
     def parse(self, source):
         f = codecs.open(source, "r", "UTF-8")
