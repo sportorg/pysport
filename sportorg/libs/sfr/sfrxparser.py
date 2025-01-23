@@ -112,6 +112,6 @@ class SFRXParser:
         return self._settings
 
 
-def parse(source):
+def parse(source) -> None:
     parser = SFRXParser()
-    return parser.parse(source)
+    parser.parse(source)

@@ -177,7 +177,7 @@ def import_sfrx(source):
         )
 
 
-def convert_bib(bib):
+def convert_bib(bib) -> int:
     if not bib.isdigit():
         return 0
 
@@ -204,7 +204,7 @@ def sfr_qual_to_sportorg(value) -> int:
     }[value]
 
 
-def set_property(person, key, value):
+def set_property(person, key, value) -> None:
     if value == "":
         return
 
