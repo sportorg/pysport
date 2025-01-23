@@ -9,12 +9,12 @@ from sportorg.models.memory import (
     ResultManual,
     ResultStatus,
     Split,
-    SystemType,
+    SystemType, Person,
 )
 from sportorg.utils.time import hhmmss_to_time
 
 
-def import_sfrx(source):
+def import_sfrx(source: str):
     sfr_csv = sfrxparser.parse(source)
     obj = memory.race()
 
@@ -176,7 +176,7 @@ def import_sfrx(source):
         )
 
 
-def convert_bib(bib) -> int:
+def convert_bib(bib: str) -> int:
     if not bib.isdigit():
         return 0
 
@@ -186,7 +186,7 @@ def convert_bib(bib) -> int:
         return int(bib[0] + str(int(bib[1:])))
 
 
-def sfr_qual_to_sportorg(value) -> int:
+def sfr_qual_to_sportorg(value: str) -> int:
     return {
         "": 0,
         "0": 0,
@@ -203,7 +203,7 @@ def sfr_qual_to_sportorg(value) -> int:
     }[value]
 
 
-def set_property(person, key, value) -> None:
+def set_property(person: Person, key: str, value: str) -> None:
     if value == "":
         return
 

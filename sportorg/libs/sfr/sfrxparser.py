@@ -14,7 +14,7 @@ class SFRXParser:
         self._data = [] if data is None else data
         self._splits = []
 
-    def parse(self, source):
+    def parse(self, source: str):
         f = codecs.open(source, "r", "UTF-8")
 
         for row in f:
@@ -111,6 +111,6 @@ class SFRXParser:
         return self._settings
 
 
-def parse(source) -> SFRXParser:
+def parse(source: str) -> SFRXParser:
     parser = SFRXParser()
     return parser.parse(source)
