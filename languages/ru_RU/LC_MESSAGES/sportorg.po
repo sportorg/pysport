@@ -1563,6 +1563,9 @@ msgstr "Онлайн"
 msgid "Save As MS Word file"
 msgstr "Сохранить в файл Word"
 
+msgid "Save As CSV file"
+msgstr "Сохранить в CSV-файл"
+
 msgid "SportOrg (*.json)"
 msgstr "Файл SportOrg (*.json)"
 
