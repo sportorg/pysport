@@ -1500,11 +1500,17 @@ msgstr "Онлайн"
 msgid "Save As MS Word file"
 msgstr "Сохранить в файл Word"
 
+msgid "Save As CSV file"
+msgstr "Сохранить в CSV-файл"
+
 msgid "SportOrg (*.json)"
 msgstr "Файл SportOrg (*.json)"
 
 msgid "MS Word file (*.docx)"
 msgstr "Файл MS Word (*.docx)"
+
+msgid "CSV file (*.csv)"
+msgstr "СSV-файл (*.csv)"
 
 msgid "Save in UTF-8 encoding"
 msgstr "Сохранять в UTF-8"
