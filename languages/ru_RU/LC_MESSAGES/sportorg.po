@@ -1509,9 +1509,6 @@ msgstr "Файл SportOrg (*.json)"
 msgid "MS Word file (*.docx)"
 msgstr "Файл MS Word (*.docx)"
 
-msgid "CSV file (*.csv)"
-msgstr "СSV-файл (*.csv)"
-
 msgid "Save in UTF-8 encoding"
 msgstr "Сохранять в UTF-8"
 
