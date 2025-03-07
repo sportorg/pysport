@@ -261,6 +261,32 @@ class ReportDialog(QDialog):
             if file_name:
                 doc.save(file_name)
                 os.startfile(file_name)
+     
+        elif template_path.endswith('.csv'):
+            template = get_text_from_file(
+                template_path,
+                race=races_dict[get_current_race_index()],
+                races=races_dict,
+                rent_cards=list(RentCards().get()),
+                current_race=get_current_race_index(),
+                selected={'persons': []},  # leave here for back compatibility
+            )
+
+            if _settings['save_to_last_file']:
+                file_name = _settings['last_file']
+            else:
+                file_name = get_save_file_name(
+                    translate('Save As CSV file'),
+                    translate('CSV file (*.csv)'),
+                    '{}_{}'.format(
+                        obj.data.get_start_datetime().strftime('%Y%m%d'), report_suffix
+                    ),
+                )
+            if len(file_name):
+                _settings['last_file'] = file_name
+                with codecs.open(file_name, 'w', 'utf-8') as file:
+                    file.write(template)
+                    file.close()
 
         else:
             template = get_text_from_file(
