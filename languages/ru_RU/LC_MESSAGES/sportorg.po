@@ -1721,3 +1721,6 @@ msgstr "Открыть директорию с шаблонами"
 
 msgid "Compress files to gzip"
 msgstr "Сохранять файлы в формате gzip"
+
+msgid "Download the zipped templates file — Source code (zip/tar.gz),\nthen unzip it and choose your locale"
+msgstr "Загрузите заархивированный файл шаблонов — Source code (zip/tar.gz),\nзатем распакуйте его и выберите свою локаль"

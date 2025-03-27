@@ -7,6 +7,7 @@ from docxtpl import DocxTemplate
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
     QCheckBox,
+    QCommandLinkButton,
     QDialog,
     QDialogButtonBox,
     QFormLayout,
@@ -64,6 +65,22 @@ class ReportDialog(QDialog):
         self.layout.addRow(self.label_template, self.item_template)
         if _settings["last_template"]:
             self.item_template.setCurrentText(_settings["last_template"])
+
+        self.item_download_description = QLabel()
+        self.item_download_description.setText(
+            translate(
+                "Download the zipped templates file — Source code (zip/tar.gz),\nthen unzip it and choose your locale"
+            )
+        )
+        self.layout.addRow(self.item_download_description)
+
+        self.item_download = QCommandLinkButton(translate("Download templates"))
+
+        def open_templates_page() -> None:
+            webbrowser.open("https://github.com/sportorg/templates/releases", new=2)
+
+        self.item_download.clicked.connect(open_templates_page)
+        self.layout.addRow(self.item_download)
 
         self.item_custom_dir = QPushButton(translate("Select the templates directory"))
 
@@ -261,30 +278,30 @@ class ReportDialog(QDialog):
             if file_name:
                 doc.save(file_name)
                 os.startfile(file_name)
-     
-        elif template_path.endswith('.csv'):
+
+        elif template_path.endswith(".csv"):
             template = get_text_from_file(
                 template_path,
                 race=races_dict[get_current_race_index()],
                 races=races_dict,
                 rent_cards=list(RentCards().get()),
                 current_race=get_current_race_index(),
-                selected={'persons': []},  # leave here for back compatibility
+                selected={"persons": []},  # leave here for back compatibility
             )
 
-            if _settings['save_to_last_file']:
-                file_name = _settings['last_file']
+            if _settings["save_to_last_file"]:
+                file_name = _settings["last_file"]
             else:
                 file_name = get_save_file_name(
-                    translate('Save As CSV file'),
-                    translate('CSV file (*.csv)'),
-                    '{}_{}'.format(
-                        obj.data.get_start_datetime().strftime('%Y%m%d'), report_suffix
+                    translate("Save As CSV file"),
+                    translate("CSV file (*.csv)"),
+                    "{}_{}".format(
+                        obj.data.get_start_datetime().strftime("%Y%m%d"), report_suffix
                     ),
                 )
             if len(file_name):
-                _settings['last_file'] = file_name
-                with codecs.open(file_name, 'w', 'utf-8') as file:
+                _settings["last_file"] = file_name
+                with codecs.open(file_name, "w", "utf-8") as file:
                     file.write(template)
                     file.close()
 

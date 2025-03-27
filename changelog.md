@@ -7,6 +7,7 @@
 * Added the ability to import participants from the table (For example Excel)
 * Add credit time calculation
 * Added the ability to save templates in CSV format
+* Add a description on how to download the templates
 
 ## 2024-10-07 v1.7.1
 
