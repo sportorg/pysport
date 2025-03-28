@@ -193,7 +193,7 @@ msgid "Secretary"
 msgstr "Главный секретарь"
 
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 msgid "Group properties"
 msgstr "Свойства группы"
@@ -282,14 +282,14 @@ msgstr "Диалог"
 msgid "Source number"
 msgstr "Исходный номер"
 
-msgid "Ivan Churakoff M21 11:09:00"
-msgstr ""
+msgid "Ivan Ivanov M21 11:09:00"
+msgstr "Иван Иванов М21 11:09:00"
 
 msgid "Target number"
 msgstr "Присваиваемый номер"
 
 msgid "Reserve M60 11:40:00"
-msgstr ""
+msgstr "Резерв М60 11:40:00"
 
 msgid "Remove source"
 msgstr "Удалять исходный номер"
@@ -400,7 +400,7 @@ msgid "Formula"
 msgstr "Формула"
 
 msgid "Limit per team"
-msgstr ""
+msgstr "Лимит по команде"
 
 msgid "Search"
 msgstr "Поиск"
@@ -562,22 +562,22 @@ msgid "Client/Server"
 msgstr "Клиент/Сервер"
 
 msgid "Telegram"
-msgstr ""
+msgstr "Telegram"
 
 msgid "Chat id"
-msgstr ""
+msgstr "Chat id"
 
 msgid "Parse mode"
-msgstr ""
+msgstr "Разметки"
 
 msgid "Text"
-msgstr ""
+msgstr "Text"
 
 msgid "Markdown"
-msgstr ""
+msgstr "Markdown"
 
 msgid "HTML"
-msgstr ""
+msgstr "HTML"
 
 msgid "Penalty time"
 msgstr "Штраф, время"

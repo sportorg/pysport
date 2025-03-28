@@ -21,7 +21,6 @@ from sportorg.gui.dialogs.marked_route_dialog import MarkedRouteDialog
 from sportorg.gui.dialogs.merge_results import MergeResultsDialog
 from sportorg.gui.dialogs.not_start_dialog import InputStartNumbersDialog
 from sportorg.gui.dialogs.import_persons_table_dialog import ImportPersonsTableDialog
-from sportorg.gui.dialogs.number_change import NumberChangeDialog
 from sportorg.gui.dialogs.organization_mass_edit import OrganizationMassEditDialog
 from sportorg.gui.dialogs.print_properties import PrintPropertiesDialog
 from sportorg.gui.dialogs.relay_clone_dialog import RelayCloneDialog
@@ -534,12 +533,6 @@ class RelayNumberAction(Action, metaclass=ActionFactory):
             self.app.relay_number_assign = True
             QApplication.setOverrideCursor(QtCore.Qt.PointingHandCursor)
             RelayNumberDialog().exec_()
-        self.app.refresh()
-
-
-class NumberChangeAction(Action, metaclass=ActionFactory):
-    def execute(self):
-        NumberChangeDialog().exec_()
         self.app.refresh()
 
 
