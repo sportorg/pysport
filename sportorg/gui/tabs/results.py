@@ -3,7 +3,6 @@ import logging
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtWidgets import QAbstractItemView, QTextEdit
 
-from sportorg.common.broker import Broker
 from sportorg.gui.dialogs.result_edit import ResultEditDialog
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.tabs.memory_model import ResultMemoryModel
@@ -28,8 +27,6 @@ class ResultsTable(TableView):
         self.activated.connect(self.double_clicked)
 
         self.popup_items = []
-
-        Broker().subscribe("refresh", self.update_splits, 1)
 
     def update_splits(self):
         if -1 < self.currentIndex().row() < len(race().results):
@@ -153,8 +150,6 @@ class Widget(QtWidgets.QWidget):
 
         self.result_course_group_box.setMinimumHeight(150)
         self.result_card_group_box.setMinimumHeight(150)
-
-        Broker().subscribe("resize", self.resize_event)
 
     def show_splits(self, index):
         self.resize_event()

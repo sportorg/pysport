@@ -1,3 +1,4 @@
+import logging
 import sys
 from multiprocessing import freeze_support
 
@@ -50,7 +51,7 @@ class Application(metaclass=Singleton):
                 content = f.readlines()
             StatusComments().set_default_statuses(content)
         except Exception as e:
-            print(str(e))
+            logging.exception(str(e))
 
     @staticmethod
     def set_names():
@@ -59,7 +60,7 @@ class Application(metaclass=Singleton):
                 content = f.readlines()
             PersonNames().set([x.strip() for x in content])
         except Exception as e:
-            print(str(e))
+            logging.exception(str(e))
 
     @staticmethod
     def set_regions():
@@ -68,7 +69,7 @@ class Application(metaclass=Singleton):
                 content = f.readlines()
             Regions().set([x.strip() for x in content])
         except Exception as e:
-            print(str(e))
+            logging.exception(str(e))
 
     @staticmethod
     def set_ranking():
@@ -77,7 +78,7 @@ class Application(metaclass=Singleton):
                 content = f.readlines()
             RankingTable().set([x.strip().split(";") for x in content])
         except Exception as e:
-            print(str(e))
+            logging.exception(str(e))
 
     @staticmethod
     def set_rent_cards():
@@ -88,4 +89,4 @@ class Application(metaclass=Singleton):
         except FileNotFoundError:
             pass
         except Exception as e:
-            print(str(e))
+            logging.exception(str(e))

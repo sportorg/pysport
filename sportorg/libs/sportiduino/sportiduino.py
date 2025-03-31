@@ -145,7 +145,7 @@ class Sportiduino:
             return "v%d.%d.%s" % (self.major, self.minor, vers_suffix)
 
     class Config:
-        def __init__(self, antenna_gain=0, timezone=0):
+        def __init__(self, antenna_gain=0, timezone=timedelta(0)):
             self.antenna_gain = antenna_gain
             self.timezone = timezone
 
@@ -159,7 +159,6 @@ class Sportiduino:
         def pack(self):
             config_data = b""
             config_data += int2byte(self.antenna_gain)
-            print(self.timezone.total_seconds())
             config_data += int2byte(int(self.timezone.total_seconds() / 60 / 15))
             return config_data
 

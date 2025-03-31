@@ -51,7 +51,7 @@ class ImpinjThread(QThread):
             try:
                 impinj_reader.connect(self.port)
             except BaseException as err:
-                print(err)
+                logging.exception(str(err))
                 return
 
             impinj_reader.worker_start()

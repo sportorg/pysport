@@ -14,7 +14,6 @@ from PySide6.QtGui import QAction
 from PySide6.QtWidgets import QMainWindow, QMessageBox
 
 from sportorg import config
-from sportorg.common.broker import Broker
 from sportorg.gui.dialogs.course_edit import CourseEditDialog
 from sportorg.gui.dialogs.file_dialog import get_save_file_name
 from sportorg.gui.dialogs.group_edit import GroupEditDialog
@@ -157,7 +156,7 @@ class MainWindow(QMainWindow):
                 ObjectTypes.ResultRfidImpinj.value,
             ]:
                 self.deleyed_res_recalculate(1000)
-            Broker().produce("teamwork_recieving", command.data)
+
             self.deleyed_refresh(1000)
 
         except Exception as e:
@@ -252,7 +251,7 @@ class MainWindow(QMainWindow):
             _event.ignore()
 
     def resizeEvent(self, e):
-        Broker().produce("resize", self.get_size())
+        self.results_tab.resize_event(self.get_size())
 
     def conf_read(self):
         Configuration().read()
@@ -393,7 +392,8 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.centralwidget)
 
         self.tabwidget.addTab(persons.Widget(), translate("Competitors"))
-        self.tabwidget.addTab(results.Widget(), translate("Race Results"))
+        self.results_tab = results.Widget()
+        self.tabwidget.addTab(self.results_tab, translate("Race Results"))
         self.tabwidget.addTab(groups.Widget(), translate("Groups"))
         self.tabwidget.addTab(courses.Widget(), translate("Courses"))
         self.tabwidget.addTab(organizations.Widget(), translate("Teams"))
@@ -486,7 +486,6 @@ class MainWindow(QMainWindow):
             table = self.get_organization_table()
             table.setModel(OrganizationMemoryModel())
 
-            Broker().produce("init_model")
         except Exception as e:
             logging.error(str(e))
 
@@ -505,7 +504,6 @@ class MainWindow(QMainWindow):
         self.res_recalculate.start(delay)
 
     def refresh(self):
-        logging.debug("Refreshing interface")
         try:
             t = time.time()
             table = self.get_person_table()
@@ -529,8 +527,8 @@ class MainWindow(QMainWindow):
             table.model().layoutChanged.emit()
             self.set_title()
 
-            print("Refresh in {:.3f} seconds.".format(time.time() - t))
-            Broker().produce("refresh")
+            logging.debug("Refresh in %s seconds", "{:.3f}".format(time.time() - t))
+            self.get_result_table().update_splits()
         except Exception as e:
             logging.error(str(e))
 

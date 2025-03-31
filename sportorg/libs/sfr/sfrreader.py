@@ -22,6 +22,7 @@
 sfrreader.py - Classes to read out SFR card data from master HID stations.
 """
 
+import logging
 import platform
 from datetime import datetime
 from time import sleep
@@ -116,7 +117,7 @@ class SFRReader:
     def _send_command(self, command, callback=True):
         """Send command to HID device"""
         if self.SFR_DEBUG:
-            print("sfrreader.send_command: ==>> command '%s' " % command)
+            logging.debug("sfrreader.send_command: ==>> command '%s'", str(command))
 
         buffer = self.get_hid_buffer(command)
 
@@ -128,7 +129,7 @@ class SFRReader:
 
                 while self._block:
                     if self.SFR_DEBUG:
-                        print("sfrreader.send_command: sleeping before command")
+                        logging.debug("sfrreader.send_command: sleeping before command")
                     sleep(0.1)
 
                 self._block = True
@@ -138,7 +139,7 @@ class SFRReader:
                     count = 1
                     while self._block and count < self.TIMEOUT_LIMIT:
                         if self.SFR_DEBUG:
-                            print(
+                            logging.debug(
                                 "sfrreader.send_command: sleeping, waiting for response"
                             )
                         sleep(self.TIMEOUT_STEP)
@@ -147,14 +148,13 @@ class SFRReader:
                     end = datetime.now()
                     time_used = end - start
                     if self.SFR_DEBUG:
-                        print(
-                            "sfrreader.send_command: ended in "
-                            + str(time_used.microseconds / 1000)
-                            + " ms"
+                        logging.debug(
+                            "sfrreader.send_command: ended in %s ms",
+                            str(time_used.microseconds / 1000),
                         )
                 except Exception as e:
                     if self.SFR_DEBUG:
-                        print(
+                        logging.debug(
                             "sfrreader.send_command: device disconnected during command"
                         )
                     self._logger.error(str(e))
@@ -167,11 +167,11 @@ class SFRReader:
                 self._last_command = command
         else:
             if self.SFR_DEBUG:
-                print("sfrreader.send_command: device is busy or unavailable")
+                logging.debug("sfrreader.send_command: device is busy or unavailable")
 
     def _data_handler(self, data):
         if self.SFR_DEBUG:
-            print("sfrreader.data_handler: Raw data: {0}".format(data))
+            logging.debug("sfrreader.data_handler: Raw data: {0}".format(data))
 
         last_command = self._last_command
 
@@ -211,7 +211,7 @@ class SFRReader:
 
         self._send_command(command, callback=callback)
         if self.SFR_DEBUG:
-            print("sfrreader.request: end of request")
+            logging.debug("sfrreader.request: end of request")
 
     def beep(self, count=1, delay=0.3):
         """Beep and blink control station. This even works if no card is
@@ -446,9 +446,9 @@ class SFRReaderReadout(SFRReader):
 
             if not self.is_card_connected():  # card was removed during readout
                 if self.SFR_DEBUG:
-                    print(
-                        "sfrreader.read_card: card was removed during readout, pos="
-                        + str(i)
+                    logging.debug(
+                        "sfrreader.read_card: card was removed during readout, pos=%s",
+                        str(i),
                     )
                 self._last_card = None  # to allow rereading
                 self._reading_process = False

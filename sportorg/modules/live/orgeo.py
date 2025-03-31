@@ -1,3 +1,4 @@
+import logging
 from re import subn
 from typing import Any, Dict
 
@@ -292,8 +293,11 @@ async def create_online_cp(url, data, race_data, log, *, session):
                                 res["finish_time"] // 10
                             ).to_str()
                         resp = await o.send_online_cp(card_number, code, finish_time)
-                        print(
-                            f"card={card_number} code={str(code)} finish={finish_time}"
+                        log.info(
+                            "card=%s code=%s finish=%s",
+                            str(card_number),
+                            str(code),
+                            str(finish_time),
                         )
                         result_txt = make_nice(str(await resp.text()))
 

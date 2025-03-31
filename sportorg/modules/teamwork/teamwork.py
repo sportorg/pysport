@@ -4,7 +4,6 @@ from threading import Event, main_thread
 
 from PySide6.QtCore import QThread, Signal
 
-from sportorg.common.broker import Broker
 from sportorg.common.singleton import singleton
 
 from .client import ClientThread
@@ -123,7 +122,6 @@ class Teamwork:
     def send(self, data, op=Operations.Update.name):
         """data is Dict or List[Dict]"""
         if self.is_alive():
-            Broker().produce("teamwork_sending", data)
             if isinstance(data, list):
                 for item in data:
                     self._in_queue.put(Command(item, op))
@@ -133,6 +131,5 @@ class Teamwork:
 
     def delete(self, data):
         """data is Dict or List[Dict]"""
-        Broker().produce("teamwork_deleting", data)
         if self.is_alive():
             pass

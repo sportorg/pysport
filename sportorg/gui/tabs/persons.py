@@ -38,7 +38,7 @@ class Widget(QtWidgets.QWidget):
                 )
                 GlobalAccess().get_main_window().refresh()
         except Exception as e:
-            print(str(e))
+            logging.exception(str(e))
 
     def setup_ui(self):
         self.person_table.setObjectName("PersonTable")

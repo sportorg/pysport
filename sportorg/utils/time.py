@@ -1,26 +1,9 @@
 import datetime
-import time
 from datetime import date
-from typing import Any
 
 from PySide6.QtCore import QDate, QTime
 
 from sportorg.common.otime import OTime
-
-
-def timeit(method):
-    def timed(*args: Any, **kw: Any) -> Any:
-        ts = time.time()
-        result = method(*args, **kw)
-        te = time.time()
-        if "log_time" in kw:
-            name = kw.get("log_name", method.__name__.upper())
-            kw["log_time"][name] = int((te - ts) * 1000)
-        else:
-            print("%r  %2.2f ms" % (method.__name__, (te - ts) * 1000))
-        return result
-
-    return timed
 
 
 def time_to_otime(t) -> OTime:

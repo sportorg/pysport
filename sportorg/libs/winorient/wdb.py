@@ -1,3 +1,5 @@
+import logging
+
 VERSION = 2018
 
 
@@ -63,15 +65,15 @@ def bytes_compare(obj1, obj2):
         return False
 
     if len(obj1) != len(obj2):
-        print("COMPARE: different length: %d and %d" % (len(obj1), len(obj2)))
+        logging.debug("COMPARE: different length: %d and %d", len(obj1), len(obj2))
 
     if str(bytearray(obj1)) != str(bytearray(obj2)):
-        print("COMPARE: different strings")
-        print(str(bytearray(obj1)))
-        print(str(bytearray(obj2)))
+        logging.debug("COMPARE: different strings")
+        logging.debug("bytes %s", str(bytearray(obj1)))
+        logging.debug("bytes %s", str(bytearray(obj2)))
         for i in range(len(obj1)):
             if bytearray(obj1)[i] != bytearray(obj2)[i]:
-                print(i)
+                logging.debug("obj1 != obj2 in %s", str(i))
         return True
     return False
 
@@ -1005,7 +1007,7 @@ class WDB:
             self.man.append(new_object)
 
             if bytes_compare(new_object.get_bytes(), byte_array[start_pos:end_pos]):
-                print("Error in Man")
+                logging.error("Error in Man")
 
         # reading of team objects - int (4 bytes) of quantity + set of 56 byte blocks
         object_size = 56
@@ -1022,7 +1024,7 @@ class WDB:
             self.team.append(new_object)
 
             if bytes_compare(new_object.get_bytes(), byte_array[start_pos:end_pos]):
-                print("Error in Team")
+                logging.error("Error in Team")
 
         # reading of group objects - int (4 bytes) of quantity + set of 36 byte blocks
         object_size = 36
@@ -1040,7 +1042,7 @@ class WDB:
             self.group.append(new_object)
 
             if bytes_compare(new_object.get_bytes(), byte_array[start_pos:end_pos]):
-                print("Error in Group")
+                logging.error("Error in Group")
 
         # reading of course objects - int (4 bytes) of quantity + set of 352 byte blocks
         object_size = 352
@@ -1057,7 +1059,7 @@ class WDB:
             self.dist.append(new_object)
 
             if bytes_compare(new_object.get_bytes(), byte_array[start_pos:end_pos]):
-                print("Error in Distance")
+                logging.error("Error in Distance")
 
         # reading of info block - 1556 bytes
         object_size = 1556
@@ -1067,7 +1069,7 @@ class WDB:
         self.info.parse_bytes(byte_array[start_pos:end_pos])
 
         if bytes_compare(self.info.get_bytes(), byte_array[start_pos:end_pos]):
-            print("Error in Info")
+            logging.error("Error in Info")
 
         #  reading of finish objects - int (4 bytes) of quantity + set of 12 byte blocks
         object_size = 12
@@ -1084,7 +1086,7 @@ class WDB:
             self.fin.append(new_object)
 
             if bytes_compare(new_object.get_bytes(), byte_array[start_pos:end_pos]):
-                print("Error in Finish")
+                logging.error("Error in Finish")
 
         initial_start = end_pos
         si_punch_count = 64  # format changing of 2009/03-2010/09: 64 -> 200 punches + added Adventure block
@@ -1113,7 +1115,7 @@ class WDB:
                     if bytes_compare(
                         new_object.get_bytes(), byte_array[start_pos:end_pos]
                     ):
-                        print("Error in Adventure object")
+                        logging.error("Error in Adventure object")
 
                 initial_start = end_pos
             qty = int.from_bytes(
@@ -1132,7 +1134,7 @@ class WDB:
             self.chip.append(new_object)
 
             if bytes_compare(new_object.get_bytes(), byte_array[start_pos:end_pos]):
-                print("Error in Chip object")
+                logging.error("Error in Chip object")
 
     def get_bytes(self, is_new_format=True):
         if len(self.adv) < 1:  # fictive 257 adventure objects
