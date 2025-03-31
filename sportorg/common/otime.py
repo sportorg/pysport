@@ -1,6 +1,7 @@
 import datetime
 from enum import Enum
 from math import trunc
+from typing import Optional
 
 
 class TimeRounding(Enum):
@@ -135,7 +136,7 @@ class OTime:
         return ret
 
     @staticmethod
-    def if_none(val: int, default: int) -> int:
+    def if_none(val: Optional[int], default: int) -> int:
         return default if val is None else val
 
     def to_str(self, time_accuracy: int = 0) -> str:
