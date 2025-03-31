@@ -93,7 +93,7 @@ def menu_list():
                             "action": "RecoverySportorgHtmlAction",
                         },
                         {
-                            "title": translate("Import persons from table"),
+                            "title": translate("Import persons from table (clipboard)"),
                             "action": "ImportPersonsAction",
                         },
                     ],

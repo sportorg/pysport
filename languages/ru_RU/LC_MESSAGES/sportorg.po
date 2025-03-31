@@ -261,8 +261,8 @@ msgstr "Включить"
 msgid "URL not valid"
 msgstr "URL недействителен"
 
-msgid "Import persons from table"
-msgstr "Импорт участников из таблицы"
+msgid "Import persons from table (clipboard)"
+msgstr "Импорт участников из таблицы (буфер обмена)"
 
 msgid "Set started numbers"
 msgstr "Ввод стартовавших участников"
