@@ -38,7 +38,6 @@ class TimekeepingPropertiesDialog(QDialog):
         # self.setWindowIcon(QIcon(icon_dir('sportident.png')))
         self.setSizeGripEnabled(False)
         self.setModal(True)
-        self.setMinimumWidth(400)
         self.tab_widget = QTabWidget()
 
         # timekeeping tab
@@ -70,10 +69,8 @@ class TimekeepingPropertiesDialog(QDialog):
 
         self.chip_duplicate_box = QGroupBox(translate("Several readout of chip"))
         self.chip_duplicate_layout = QFormLayout()
-        self.chip_duplicate_serveral_results = QRadioButton(
-            translate("Several results")
-        )
-        self.chip_duplicate_layout.addRow(self.chip_duplicate_serveral_results)
+        self.chip_duplicate_several_results = QRadioButton(translate("Several results"))
+        self.chip_duplicate_layout.addRow(self.chip_duplicate_several_results)
         self.chip_duplicate_bib_request = QRadioButton(
             translate("Ask for a bib when re-reading the card")
         )
@@ -475,7 +472,7 @@ class TimekeepingPropertiesDialog(QDialog):
             self.chip_reading_autocreate.setChecked(True)
 
         if duplicate_chip_processing == "several_results":
-            self.chip_duplicate_serveral_results.setChecked(True)
+            self.chip_duplicate_several_results.setChecked(True)
         elif duplicate_chip_processing == "bib_request":
             self.chip_duplicate_bib_request.setChecked(True)
         elif duplicate_chip_processing == "relay_find_leg":

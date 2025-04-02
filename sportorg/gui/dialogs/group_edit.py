@@ -26,7 +26,6 @@ class GroupEditDialog(BaseDialog):
         self.is_new = is_new
         time_format = "hh:mm:ss"
         self.title = translate("Group properties")
-        self.size = (450, 540)
         self.form = [
             LineField(
                 title=translate("Name"),

@@ -13,7 +13,6 @@ class OrganizationEditDialog(BaseDialog):
         self.current_object = organization
         self.is_new = is_new
         self.title = translate("Team properties")
-        self.size = (600, 250)
         self.form = [
             LineField(
                 title=translate("Name"),
