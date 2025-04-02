@@ -1,8 +1,10 @@
 import logging
+import webbrowser
 
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
     QCheckBox,
+    QCommandLinkButton,
     QDialog,
     QDialogButtonBox,
     QFormLayout,
@@ -14,6 +16,8 @@ from PySide6.QtWidgets import (
 
 from sportorg import config
 from sportorg.common.audio import get_sounds
+from sportorg.common.template import get_templates
+from sportorg.gui.dialogs.file_dialog import get_existing_directory
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox, AdvSpinBox
 from sportorg.language import get_languages, translate
@@ -256,6 +260,57 @@ class MultidayTab(Tab):
         self.item_races.setCurrentIndex(index)
 
 
+class TemplateTab(Tab):
+    def __init__(self, parent):
+        self.widget = QWidget()
+        self.layout = QFormLayout(parent)
+
+        self.item_download_description = QLabel()
+        self.item_download_description.setText(
+            translate(
+                "Download the zipped templates file — Source code (zip/tar.gz),\nthen unzip it and choose your locale"
+            )
+        )
+        self.layout.addRow(self.item_download_description)
+
+        self.item_download = QCommandLinkButton(translate("Download templates"))
+
+        def open_templates_page() -> None:
+            webbrowser.open("https://github.com/sportorg/templates/releases", new=2)
+
+        self.item_download.clicked.connect(open_templates_page)
+        self.layout.addRow(self.item_download)
+
+        self.item_custom_dir = QPushButton(translate("Select the templates directory"))
+
+        def select_custom_dir() -> None:
+            dirpath = get_existing_directory(
+                translate("Open the templates directory"), config.template_dir()
+            )
+            if not dirpath:
+                return
+
+            self.item_custom_dirpath.setText(dirpath)
+            Config().templates.set("directory", dirpath)
+            config.set_template_dir(dirpath)
+            self.item_template.clear()
+            self.item_template.addItems(
+                sorted(get_templates(config.template_dir("reports")))
+            )
+
+        self.item_custom_dir.clicked.connect(select_custom_dir)
+        self.layout.addRow(self.item_custom_dir)
+
+        self.item_custom_dirpath = QLabel()
+        self.item_custom_dirpath.setText(config.template_dir())
+        self.layout.addRow(self.item_custom_dirpath)
+
+        self.widget.setLayout(self.layout)
+
+    def save(self):
+        pass
+
+
 class SettingsDialog(QDialog):
     def __init__(self):
         super().__init__(GlobalAccess().get_main_window())
@@ -263,6 +318,7 @@ class SettingsDialog(QDialog):
             (MainTab(self), translate("Main settings")),
             (SoundTab(self), translate("Sounds")),
             (MultidayTab(self), translate("Multi day")),
+            (TemplateTab(self), translate("Templates directory")),
         ]
 
     def exec_(self):

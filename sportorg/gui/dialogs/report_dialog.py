@@ -7,7 +7,6 @@ from docxtpl import DocxTemplate
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
     QCheckBox,
-    QCommandLinkButton,
     QDialog,
     QDialogButtonBox,
     QFormLayout,
@@ -18,7 +17,6 @@ from PySide6.QtWidgets import (
 from sportorg import config
 from sportorg.common.template import get_templates, get_text_from_file
 from sportorg.gui.dialogs.file_dialog import (
-    get_existing_directory,
     get_open_file_name,
     get_save_file_name,
 )
@@ -30,7 +28,6 @@ from sportorg.models.memory import get_current_race_index, race, races
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.score_calculation import ScoreCalculation
 from sportorg.models.result.split_calculation import RaceSplits
-from sportorg.modules.configs.configs import Config
 
 _settings = {
     "last_template": None,
@@ -65,46 +62,6 @@ class ReportDialog(QDialog):
         self.layout.addRow(self.label_template, self.item_template)
         if _settings["last_template"]:
             self.item_template.setCurrentText(_settings["last_template"])
-
-        self.item_download_description = QLabel()
-        self.item_download_description.setText(
-            translate(
-                "Download the zipped templates file — Source code (zip/tar.gz),\nthen unzip it and choose your locale"
-            )
-        )
-        self.layout.addRow(self.item_download_description)
-
-        self.item_download = QCommandLinkButton(translate("Download templates"))
-
-        def open_templates_page() -> None:
-            webbrowser.open("https://github.com/sportorg/templates/releases", new=2)
-
-        self.item_download.clicked.connect(open_templates_page)
-        self.layout.addRow(self.item_download)
-
-        self.item_custom_dir = QPushButton(translate("Select the templates directory"))
-
-        def select_custom_dir() -> None:
-            dirpath = get_existing_directory(
-                translate("Open the templates directory"), config.template_dir()
-            )
-            if not dirpath:
-                return
-
-            self.item_custom_dirpath.setText(dirpath)
-            Config().templates.set("directory", dirpath)
-            config.set_template_dir(dirpath)
-            self.item_template.clear()
-            self.item_template.addItems(
-                sorted(get_templates(config.template_dir("reports")))
-            )
-
-        self.item_custom_dir.clicked.connect(select_custom_dir)
-        self.layout.addRow(self.item_custom_dir)
-
-        self.item_custom_dirpath = QLabel()
-        self.item_custom_dirpath.setText(config.template_dir())
-        self.layout.addRow(self.item_custom_dirpath)
 
         self.item_custom_path = QPushButton(translate("Choose template"))
 

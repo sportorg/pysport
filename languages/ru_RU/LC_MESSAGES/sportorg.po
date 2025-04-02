@@ -1713,6 +1713,12 @@ msgstr "Открыть файл финиша orgeo.ru, CSV (https://orgeo.ru/eve
 msgid "Miss penalty lap"
 msgstr "Пропущен штрафной круг"
 
+msgid "Templates directory"
+msgstr "Директория шаблонов"
+
+msgid "Download templates"
+msgstr "Загрузить шаблоны"
+
 msgid "Select the templates directory"
 msgstr "Выбрать директорию с шаблонами"
 
