@@ -483,9 +483,6 @@ def guess_courses_for_groups():
                 if str(course_name).find(group_name) > -1:
                     cur_group.course = cur_course
                     logging.debug(
-                        "Connecting: group "
-                        + group_name
-                        + " with course "
-                        + course_name
+                        "Connecting: group %s with course %s", group_name, course_name
                     )
                     break

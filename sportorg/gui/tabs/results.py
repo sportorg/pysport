@@ -50,7 +50,7 @@ class ResultsTable(TableView):
 
     def double_clicked(self, index):
         try:
-            logging.debug("Clicked on " + str(index.row()))
+            logging.debug("Clicked on %s", str(index.row()))
             if index.row() < len(race().results):
                 dialog = ResultEditDialog(race().results[index.row()])
                 dialog.exec_()

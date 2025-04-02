@@ -171,7 +171,7 @@ class SFRReader:
 
     def _data_handler(self, data):
         if self.SFR_DEBUG:
-            logging.debug("sfrreader.data_handler: Raw data: {0}".format(data))
+            logging.debug("sfrreader.data_handler: Raw data: %s", str(data))
 
         last_command = self._last_command
 

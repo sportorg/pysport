@@ -142,9 +142,7 @@ class MainWindow(QMainWindow):
     def teamwork(self, command):
         try:
             race().update_data(command.data)
-            # logging.info(repr(command.data))
             # if 'object' in command.data and command.data['object'] in
-
             # ['ResultManual', 'ResultSportident', 'ResultSFR', 'ResultSportiduino' etc.]:
             if command.header.obj_type in [
                 ObjectTypes.Result.value,

@@ -230,15 +230,15 @@ class TextExchangeDialog(QDialog):
                             )
                             success_count += 1
                         else:
-                            logging.debug("text_io: no person found for line " + i)
+                            logging.debug(
+                                "text_io: no person found for line %s", str(i)
+                            )
                     else:
-                        logging.debug("text_io: empty value for line " + i)
+                        logging.debug("text_io: empty value for line %s", str(i))
             logging.debug(
-                "text_io: processed "
-                + str(success_count)
-                + " from "
-                + str(len(lines))
-                + " lines"
+                "text_io: processed %s from %s lines",
+                str(success_count),
+                str(len(lines)),
             )
         except Exception as e:
             logging.error(e)

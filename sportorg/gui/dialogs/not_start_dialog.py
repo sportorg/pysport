@@ -120,7 +120,7 @@ class InputStartNumbersDialog(QDialog):
                     Teamwork().send(result.to_dict())
                     obj.add_new_result(result)
                 else:
-                    logging.info("{} not found".format(number))
+                    logging.info("Number %s not found", str(number))
                 old_numbers.append(number)
         ResultCalculation(race()).process_results()
 

@@ -343,7 +343,7 @@ class SplitsText(SplitsObject):
                         split.days = int(item[2])
                     splits.append(split)
                 else:
-                    logging.error('In "{}" no code and no time'.format(row))
+                    logging.error('In "%s" no code and no time', str(row))
             self._splits = splits
         else:
             self._splits = splits

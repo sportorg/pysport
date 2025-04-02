@@ -134,7 +134,7 @@ class CPDeleteDialog(QDialog):
                     if str(number) == control.code:
                         if i < len(course.controls) - 1:
                             course.controls[i + 1].length += control.length
-                        logging.info("Del {} from {}".format(number, course.name))
+                        logging.info("Del %s from %s", str(number), str(course.name))
                     else:
                         controls.append(control)
                 course.controls = controls
@@ -147,9 +147,10 @@ class CPDeleteDialog(QDialog):
                 for split in result.splits:
                     if str(number) == str(split.code):
                         logging.info(
-                            "Del {} from {} {}".format(
-                                number, result.card_number, split.time
-                            )
+                            "Del %s from %s %s",
+                            str(number),
+                            str(result.card_number),
+                            str(split.time),
                         )
                     else:
                         splits.append(split)

@@ -52,9 +52,7 @@ def import_csv(source):
 
     logging.info(translate("Import result"))
     logging.info("{}: {}".format(translate("Persons"), new_lengths[0] - old_lengths[0]))
-    # logging.info('{}: {}'.format(translate('Race Results'), new_lengths[1]-old_lengths[1]))
     logging.info("{}: {}".format(translate("Groups"), new_lengths[2] - old_lengths[2]))
-    # logging.info('{}: {}'.format(translate('Courses'), new_lengths[3]-old_lengths[3]))
     logging.info("{}: {}".format(translate("Teams"), new_lengths[4] - old_lengths[4]))
 
     persons_dupl_cards = obj.get_duplicate_card_numbers()

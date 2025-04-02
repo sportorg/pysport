@@ -111,7 +111,7 @@ class MergeResultsDialog(QDialog):
                     cur_cp += cp_increment
                 else:
                     logging.debug(
-                        "skip time: " + str(i.finish_time) + " for bib " + str(cur_bib)
+                        "skip time: %s for bib %s", str(i.finish_time), str(cur_bib)
                     )
 
             # append splits from existing objects
