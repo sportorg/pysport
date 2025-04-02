@@ -8,6 +8,7 @@ from PySide6.QtWidgets import (
     QDialog,
     QDialogButtonBox,
     QFormLayout,
+    QHBoxLayout,
     QLabel,
     QPushButton,
     QTabWidget,
@@ -43,6 +44,8 @@ class MainTab(Tab):
     def __init__(self, parent):
         self.widget = QWidget()
         self.layout = QFormLayout(parent)
+
+        self.widget.setLayout(self.layout)
 
         self.label_lang = QLabel(translate("Languages"))
         self.item_lang = AdvComboBox()
@@ -88,8 +91,6 @@ class MainTab(Tab):
         )
         self.layout.addRow(self.item_save_in_gzip)
 
-        self.widget.setLayout(self.layout)
-
     def save(self):
         Config().configuration.set("current_locale", self.item_lang.currentText())
         Config().configuration.set("autosave_interval", self.item_auto_save.value())
@@ -121,6 +122,8 @@ class SoundTab(Tab):
     def __init__(self, parent):
         self.widget = QWidget()
         self.layout = QFormLayout(parent)
+
+        self.widget.setLayout(self.layout)
 
         self.sounds = get_sounds()
 
@@ -166,8 +169,6 @@ class SoundTab(Tab):
         )
         self.layout.addRow(self.label_enter_number, self.item_enter_number)
 
-        self.widget.setLayout(self.layout)
-
     def save(self):
         Config().sound.set("enabled", self.item_enabled.isChecked())
         Config().sound.set("successful", self.item_successful.currentText())
@@ -184,10 +185,14 @@ class MultidayTab(Tab):
         self.widget = QWidget()
         self.layout = QFormLayout(parent)
 
+        self.buttons_layout = QHBoxLayout()
+        self.button_container = QWidget()
+        self.button_container.setLayout(self.buttons_layout)
+
+        self.widget.setLayout(self.layout)
+
         self.item_races = AdvComboBox()
         self.fill_race_list()
-
-        max_button_width = 100
 
         def select_race():
             index = self.item_races.currentIndex()
@@ -204,8 +209,7 @@ class MultidayTab(Tab):
 
         self.item_new = QPushButton(translate("New"))
         self.item_new.clicked.connect(add_race_function)
-        self.item_new.setMaximumWidth(max_button_width)
-        self.layout.addRow(self.item_new)
+        self.buttons_layout.addWidget(self.item_new)
 
         def copy_race_function():
             copy_race()
@@ -213,8 +217,7 @@ class MultidayTab(Tab):
 
         self.item_copy = QPushButton(translate("Copy"))
         self.item_copy.clicked.connect(copy_race_function)
-        self.item_copy.setMaximumWidth(max_button_width)
-        self.layout.addRow(self.item_copy)
+        self.buttons_layout.addWidget(self.item_copy)
 
         def move_up_race_function():
             move_up_race()
@@ -222,8 +225,7 @@ class MultidayTab(Tab):
 
         self.item_move_up = QPushButton(translate("Move up"))
         self.item_move_up.clicked.connect(move_up_race_function)
-        self.item_move_up.setMaximumWidth(max_button_width)
-        self.layout.addRow(self.item_move_up)
+        self.buttons_layout.addWidget(self.item_move_up)
 
         def move_down_race_function():
             move_down_race()
@@ -231,8 +233,7 @@ class MultidayTab(Tab):
 
         self.item_move_down = QPushButton(translate("Move down"))
         self.item_move_down.clicked.connect(move_down_race_function)
-        self.item_move_down.setMaximumWidth(max_button_width)
-        self.layout.addRow(self.item_move_down)
+        self.buttons_layout.addWidget(self.item_move_down)
 
         def del_race_function():
             del_race()
@@ -240,10 +241,9 @@ class MultidayTab(Tab):
 
         self.item_del = QPushButton(translate("Delete"))
         self.item_del.clicked.connect(del_race_function)
-        self.item_del.setMaximumWidth(max_button_width)
-        self.layout.addRow(self.item_del)
+        self.buttons_layout.addWidget(self.item_del)
 
-        self.widget.setLayout(self.layout)
+        self.layout.addRow(self.button_container)
 
     def save(self):
         pass
@@ -264,6 +264,8 @@ class TemplateTab(Tab):
     def __init__(self, parent):
         self.widget = QWidget()
         self.layout = QFormLayout(parent)
+
+        self.widget.setLayout(self.layout)
 
         self.item_download_description = QLabel()
         self.item_download_description.setText(
@@ -304,8 +306,6 @@ class TemplateTab(Tab):
         self.item_custom_dirpath = QLabel()
         self.item_custom_dirpath.setText(config.template_dir())
         self.layout.addRow(self.item_custom_dirpath)
-
-        self.widget.setLayout(self.layout)
 
     def save(self):
         pass
