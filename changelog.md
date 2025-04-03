@@ -8,7 +8,7 @@
 * Add credit time calculation
 * Added the ability to save templates in CSV format
 * Add a description on how to download the templates
-* Added time accuracy to the results list if the accuracy is specified in the settings
+* Added time accuracy to the results list if the accuracy is specified in the settings ([#481](https://github.com/sportorg/pysport/pull/481))
 
 ## 2024-10-07 v1.7.1
 
