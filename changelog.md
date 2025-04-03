@@ -8,6 +8,7 @@
 * Add credit time calculation
 * Added the ability to save templates in CSV format
 * Add a description on how to download the templates
+* Improved the split panel: added start and finish times; added tenths/hundredths if accuracy is specified; reduced initial panel size
 
 ## 2024-10-07 v1.7.1
 

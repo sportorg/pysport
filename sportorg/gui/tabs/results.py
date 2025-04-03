@@ -3,12 +3,13 @@ import logging
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtWidgets import QAbstractItemView, QTextEdit
 
+from sportorg.common.otime import OTime
 from sportorg.gui.dialogs.result_edit import ResultEditDialog
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.tabs.memory_model import ResultMemoryModel
 from sportorg.gui.tabs.table import TableView
 from sportorg.language import translate
-from sportorg.models.memory import race
+from sportorg.models.memory import Result, race
 from sportorg.utils.time import time_to_hhmmss
 
 
@@ -67,10 +68,9 @@ class Widget(QtWidgets.QWidget):
         self.result_course_form = QtWidgets.QFormLayout()
         self.grid_layout = QtWidgets.QGridLayout(self)
         self.result_splitter = QtWidgets.QSplitter(self)
-        self.result_detail_part = QtWidgets.QFrame(self.result_splitter)
+        self.result_course_group_box = QtWidgets.QGroupBox(self.result_splitter)
+        self.result_card_group_box = QtWidgets.QGroupBox(self.result_splitter)
         self.result_table = ResultsTable(self, self.result_splitter)
-        self.result_card_group_box = QtWidgets.QGroupBox(self.result_detail_part)
-        self.result_course_group_box = QtWidgets.QGroupBox(self.result_detail_part)
         self.result_card_details = QtWidgets.QTextBrowser(self.result_card_group_box)
         self.result_card_finish_edit = QtWidgets.QLineEdit(self.result_card_group_box)
         self.result_card_finish_label = QtWidgets.QLabel(self.result_card_group_box)
@@ -93,9 +93,12 @@ class Widget(QtWidgets.QWidget):
 
     def setup_ui(self):
         self.result_splitter.setOrientation(QtCore.Qt.Horizontal)
-        self.result_detail_part.setMaximumSize(QtCore.QSize(350, 16777215))
-        self.result_detail_part.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.result_detail_part.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.result_course_name_edit.setAlignment(QtCore.Qt.AlignLeft)
+        self.result_course_name_edit.setMinimumWidth(46)
+        self.result_course_length_edit.setMinimumWidth(46)
+        self.result_splitter.setStretchFactor(2, 100)
+        self.result_splitter.setSizes([100, 195, self.result_table.maximumWidth()])
+
         self.vertical_layout_course.setContentsMargins(0, 0, 0, 0)
         self.vertical_layout_course.setSpacing(0)
         self.result_course_form.setWidget(
@@ -113,6 +116,7 @@ class Widget(QtWidgets.QWidget):
             1, QtWidgets.QFormLayout.FieldRole, self.result_course_length_edit
         )
         self.vertical_layout_course.addLayout(self.result_course_form)
+
         font = QtGui.QFont()
         font.setFamily("Courier New")
         self.result_course_details.setFont(font)
@@ -152,8 +156,7 @@ class Widget(QtWidgets.QWidget):
         self.result_card_group_box.setMinimumHeight(150)
 
     def show_splits(self, index):
-        self.resize_event()
-        result = race().results[index.row()]
+        result: Result = race().results[index.row()]
         self.result_card_details.clear()
         self.result_card_finish_edit.setText("")
         self.result_card_start_edit.setText("")
@@ -177,13 +180,24 @@ class Widget(QtWidgets.QWidget):
             for control in course.controls:
                 control_codes.append(str(control.code))
 
-        code = ""
-        index = 1
         time_accuracy = race().get_setting("time_accuracy", 0)
+        code = ""
+        last_correct_time = OTime()
+
+        start_fmt = "{name:<8} {time}"
+        start_time = result.get_start_time()
+        start_str = start_fmt.format(
+            name=translate("Start"), time=start_time.to_str(time_accuracy)
+        )
+        self.result_card_details.append(start_str)
+
+        str_fmt_correct = "{index:02d} {code} {time} {diff}"
+        str_fmt_incorrect = "-- {code} {time}"
+        index = 1
         for split in result.splits:
-            str_fmt = "{index:02d} {code} {time} {diff}"
+            str_fmt = str_fmt_correct
             if not split.is_correct:
-                str_fmt = "-- {code} {time}"
+                str_fmt = str_fmt_incorrect
 
             s = str_fmt.format(
                 index=index,
@@ -195,6 +209,7 @@ class Widget(QtWidgets.QWidget):
             )
             if split.is_correct:
                 index += 1
+                last_correct_time = split.time
 
             if split.code == code:
                 s = '<span style="background: red">{}</span>'.format(s)
@@ -204,6 +219,16 @@ class Widget(QtWidgets.QWidget):
             self.result_card_details.append(s)
             code = split.code
 
+        finish_time = result.get_finish_time()
+        finish_leg = finish_time - last_correct_time
+        finish_fmt = "{name:<8} {time} {diff}"
+        finish_str = finish_fmt.format(
+            name=translate("Finish"),
+            time=finish_time.to_str(time_accuracy),
+            diff=finish_leg.to_str(time_accuracy),
+        )
+        self.result_card_details.append(finish_str)
+
         self.result_card_finish_edit.setText(time_to_hhmmss(result.get_finish_time()))
         self.result_card_start_edit.setText(time_to_hhmmss(result.get_start_time()))
 
@@ -211,6 +236,8 @@ class Widget(QtWidgets.QWidget):
         for split in result.splits:
             split_codes.append(split.code)
 
+        start_str = translate("Start")
+        self.result_course_details.append(start_str)
         if course:
             index = 1
             for control in course.controls:
@@ -225,12 +252,7 @@ class Widget(QtWidgets.QWidget):
                 index += 1
 
             self.result_course_name_edit.setText(course.name)
+            self.result_course_name_edit.setCursorPosition(0)
             self.result_course_length_edit.setText(str(course.length))
-
-    def resize_event(self, *args, **kwargs):
-        self.result_course_group_box.setGeometry(
-            QtCore.QRect(1, 1, 120, self.result_table.height())
-        )
-        self.result_card_group_box.setGeometry(
-            QtCore.QRect(120, 1, 235, self.result_table.height())
-        )
+        finish_str = translate("Finish")
+        self.result_course_details.append(finish_str)
