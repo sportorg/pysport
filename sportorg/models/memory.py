@@ -565,6 +565,7 @@ class Result(ABC):
         pass
 
     def to_dict(self):
+        accuracy = race().get_setting("time_accuracy", 0)
         return {
             "object": self.__class__.__name__,
             "id": str(self.id),
@@ -594,7 +595,7 @@ class Result(ABC):
             "result": self.get_result(),  # readonly
             "result_relay": self.get_result_relay(),
             "result_current": (
-                self.get_result_otime_current_day().to_str()
+                self.get_result_otime_current_day().to_str(time_accuracy=accuracy)
                 if self.is_status_ok()
                 else self.get_result()
             ),
