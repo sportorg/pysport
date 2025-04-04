@@ -248,9 +248,6 @@ class MainWindow(QMainWindow):
         else:
             _event.ignore()
 
-    def resizeEvent(self, e):
-        self.results_tab.resize_event(self.get_size())
-
     def conf_read(self):
         Configuration().read()
         if Configuration().parser.has_section(ConfigFile.PATH):
