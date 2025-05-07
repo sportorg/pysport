@@ -236,6 +236,10 @@ def get_names():
     return PersonNames().get_all()
 
 
+def get_middle_names():
+    return PersonMiddleNames().get_all()
+
+
 def get_qualification_list():
     return [q.get_title() for q in Qualification]
 
@@ -253,6 +257,18 @@ class PersonNames:
             items.insert(0, "")
         self.NAMES = items
 
+@singleton
+class PersonMiddleNames:
+    NAMES: List[str] = []
+
+    def get_all(self):
+        return self.NAMES
+
+    def set(self, items):
+        items.sort()
+        if "" not in items:
+            items.insert(0, "")
+        self.NAMES = items
 
 @singleton
 class Regions:

@@ -138,7 +138,7 @@ class DrawManager:
             cur_group = None
             cur_array = []
             # sort all person by group
-            for cur_person in sorted(persons, key=lambda x: x.group.name):
+            for cur_person in sorted(persons, key=lambda x: x.group.name if x.group else ""):
                 if not cur_group:
                     cur_group = cur_person.group
                 if cur_person.group != cur_group:
@@ -447,6 +447,7 @@ class DrawManager:
             rest_count -= len(duplicated_array)
 
         cur_index = 0
+        cur_prop = ""
         while max_count > 0:
             limit = (rest_count + 1) // 2
             if max_count >= limit:
@@ -486,7 +487,10 @@ class DrawManager:
             array_tmp = separated_dict.get(cur_prop)
             if array_tmp:
                 for cur_person in array_tmp:
-                    result_list.insert(randint(0, len(result_list) - 1), cur_person)
+                    pos = 0
+                    if len(result_list) > 1:
+                        pos = randint(0, len(result_list) - 1)
+                    result_list.insert(pos, cur_person)
 
         return result_list
 

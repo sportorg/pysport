@@ -10,7 +10,7 @@ except ModuleNotFoundError:
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import translate
 from sportorg.models.memory import Qualification, ResultManual, race
-from sportorg.utils.time import hhmmss_to_time, time_to_hhmmss
+from sportorg.utils.time import hhmmss_to_time, time_to_hhmmss, date_to_ddmmyyyy, ddmmyyyy_to_time
 
 
 def get_value_options():
@@ -30,6 +30,8 @@ def get_value_options():
         translate("Start group"),
         translate("IOF id"),
         translate("National id"),
+        translate("Middle name"),
+        translate("Birthday"),
     ]
 
 
@@ -334,7 +336,10 @@ def get_property(person, key):
         return str(person.national_code)
     elif key == translate("Start group"):
         return str(person.start_group)
-
+    elif key == translate("Middle name"):
+        return str(person.middle_name)
+    elif key == translate("Birthday"):
+        return str(date_to_ddmmyyyy(person.birth_date))
     return ""
 
 
@@ -399,3 +404,7 @@ def set_property(person, key, value, **options):
     elif key == translate("Start group"):
         if str(value).isdigit():
             person.start_group = int(value)
+    elif key == translate("Middle name"):
+        person.middle_name = str(value)
+    elif key == translate("Birthday"):
+        person.birth_date = ddmmyyyy_to_time(str(value))

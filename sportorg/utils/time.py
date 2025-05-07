@@ -88,6 +88,30 @@ def time_to_hhmmss(value):
     return time_.strftime("%H:%M:%S")
 
 
+def date_to_yyyymmdd(value):
+    time_ = value
+    return time_.strftime("%Y.%m.%d")
+
+
+def date_to_ddmmyyyy(value):
+    time_ = value
+    return time_.strftime("%d.%m.%Y")
+
+
+def ddmmyyyy_to_time(value):
+    if len(value) != 10 or "." not in value:
+        return datetime.datetime(year=1900, day=1, month=1)
+
+    arr = str(value).split(".")
+    if len(arr) == 3:
+        new_value = datetime.datetime(
+            year=int(arr[2]),
+            month=int(arr[1]),
+            day=int(arr[0])
+        )
+        return new_value
+
+
 def hhmmss_to_time(value):
     arr = str(value).split(":")
     if len(arr) == 3:

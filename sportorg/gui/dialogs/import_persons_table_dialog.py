@@ -1,5 +1,8 @@
 import logging
 from enum import Enum
+
+from sportorg.utils.time import ddmmyyyy_to_time
+
 try:
     from PySide6.QtGui import QIcon
     from PySide6.QtWidgets import (
@@ -49,7 +52,9 @@ class ImportPersonsTableDialog(QDialog):
         TEAM = translate("Team")
         NAME = translate("First name")
         SURNAME = translate("Last name")
+        MIDDLE_NAME = translate("Middle name")
         YEAR = translate("Year of birth")
+        BIRTHDAY = translate("Birthday")
         COMMENT = translate("Comment")
         QUAL = translate("Qualification")
         CARD = translate("Card number")
@@ -78,7 +83,7 @@ class ImportPersonsTableDialog(QDialog):
 
         self.option_import = AdvComboBox()
         self.option_import.addItems(
-            [self.REPLACEMENT_BY_BIB, self.REPLACEMENT_BY_NAME, self.INSERT_NEW]
+            [self.INSERT_NEW, self.REPLACEMENT_BY_BIB, self.REPLACEMENT_BY_NAME]
         )
         self.layout.addRow(self.option_import)
 
@@ -252,6 +257,14 @@ class ImportPersonsTableDialog(QDialog):
                     self.HEADER.START_GROUP.value,
                     self.get_value_table(i, self.HEADER.START_GROUP),
                 )
+
+            if self.HEADER.MIDDLE_NAME in self.input_headers:
+                person.middle_name = self.get_value_table(i, self.HEADER.MIDDLE_NAME)
+
+            if self.HEADER.BIRTHDAY in self.input_headers:
+                birthday = self.get_value_table(i, self.HEADER.BIRTHDAY)
+                if birthday != "":
+                    person.birth_date = ddmmyyyy_to_time(birthday)
 
             if self.option_import.currentText() == self.INSERT_NEW and person:
                 obj.persons.append(person)

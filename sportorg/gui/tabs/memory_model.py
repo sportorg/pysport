@@ -254,6 +254,7 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
         return [
             translate("Last name"),
             translate("First name"),
+            translate("Middle name"),
             translate("Qualification title"),
             translate("Group"),
             translate("Team"),
@@ -294,6 +295,7 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
 
         ret.append(person.surname)
         ret.append(person.name)
+        ret.append(person.middle_name)
         if person.qual:
             ret.append(person.qual.get_title())
         else:

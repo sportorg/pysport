@@ -14,7 +14,7 @@ from sportorg.common.model import Model
 from sportorg.common.otime import OTime, TimeRounding
 from sportorg.language import translate
 from sportorg.modules.configs.configs import Config
-from sportorg.utils.time import hhmmss_to_time
+from sportorg.utils.time import hhmmss_to_time, date_to_ddmmyyyy
 
 
 class NotEmptyException(Exception):
@@ -1291,6 +1291,7 @@ class Person(Model):
         self.id = uuid.uuid4()
         self.name = ""
         self.surname = ""
+        self.middle_name = ""
 
         self._card_number = 0
         self._bib = 0
@@ -1328,6 +1329,11 @@ class Person(Model):
             return self.birth_date.year
         return 0
 
+    def get_birthday(self):
+        if self.birth_date:
+            return date_to_ddmmyyyy(self.birth_date)
+        return ""
+
     def set_year(self, year):
         """Change only year of birth_date"""
         if year == 0:
@@ -1341,9 +1347,19 @@ class Person(Model):
 
     @property
     def full_name(self):
+        ret = self.name
         if self.surname:
-            return f"{self.surname} {self.name}"
-        return self.name
+            ret = self.surname + " " + ret
+        return ret
+
+    @property
+    def full_name_with_middle(self):
+        ret = self.name
+        if self.middle_name:
+            ret += " " + self.middle_name
+        if self.surname:
+            ret = self.surname + " " + ret
+        return ret
 
     @property
     def multi_day_id(self):
@@ -1358,12 +1374,14 @@ class Person(Model):
             "id": str(self.id),
             "name": self.name,
             "surname": self.surname,
+            "middle_name": self.middle_name,
             "card_number": self.card_number,
             "bib": self.bib,
             "birth_date": str(self.birth_date) if self.birth_date else None,
             "year": (
                 self.get_year() if self.get_year() else 0
             ),  # back compatibility with 1.0
+            "birthday": self.get_birthday(),
             "group_id": str(self.group.id) if self.group else None,
             "organization_id": str(self.organization.id) if self.organization else None,
             "world_code": self.world_code,
@@ -1382,6 +1400,8 @@ class Person(Model):
     def update_data(self, data):
         self.name = str(data["name"])
         self.surname = str(data["surname"])
+        if "middle_name" in data and data["middle_name"]:
+            self.middle_name = str(data["middle_name"])
         self.set_card_number(int(data["card_number"]))
         self.set_bib(int(data["bib"]))
         self.contact = []
@@ -1468,6 +1488,16 @@ class Person(Model):
     def index_card(self):
         self._index_card(self._card_number)
 
+    def extract_middle_name(self):
+        arr = self.name.split(" ", 1)
+        if len(arr) > 1:
+            self.name = arr[0]
+            self.middle_name = arr[1]
+
+    def insert_middle_name_to_name(self):
+        if self.middle_name and len(self.middle_name) > 1:
+            if not self.name.endswith(self.middle_name):
+                self.name += " " + self.middle_name
 
 class RaceData(Model):
     def __init__(self):

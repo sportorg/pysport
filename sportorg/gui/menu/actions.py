@@ -958,3 +958,17 @@ class MarkedRouteCourseGeneration(Action, metaclass=ActionFactory):
     def execute(self):
         MarkedRouteDialog().exec_()
         self.app.refresh()
+
+
+class ExtractPersonMiddleName(Action, metaclass=ActionFactory):
+    def execute(self):
+        for person in race().persons:
+            person.extract_middle_name()
+        self.app.refresh()
+
+
+class InsertPersonMiddleNameToName(Action, metaclass=ActionFactory):
+    def execute(self):
+        for person in race().persons:
+            person.insert_middle_name_to_name()
+        self.app.refresh()
