@@ -1,18 +1,33 @@
 import logging
 
-from PySide6.QtCore import QTime
-from PySide6.QtWidgets import (
-    QCheckBox,
-    QDialog,
-    QDialogButtonBox,
-    QFormLayout,
-    QGroupBox,
-    QLabel,
-    QLineEdit,
-    QRadioButton,
-    QTabWidget,
-    QWidget,
-)
+try:
+    from PySide6.QtCore import QTime
+    from PySide6.QtWidgets import (
+        QCheckBox,
+        QDialog,
+        QDialogButtonBox,
+        QFormLayout,
+        QGroupBox,
+        QLabel,
+        QLineEdit,
+        QRadioButton,
+        QTabWidget,
+        QWidget,
+    )
+except ModuleNotFoundError:
+    from PySide2.QtCore import QTime
+    from PySide2.QtWidgets import (
+        QCheckBox,
+        QDialog,
+        QDialogButtonBox,
+        QFormLayout,
+        QGroupBox,
+        QLabel,
+        QLineEdit,
+        QRadioButton,
+        QTabWidget,
+        QWidget,
+    )
 
 from sportorg.common.otime import OTime
 from sportorg.gui.global_access import GlobalAccess

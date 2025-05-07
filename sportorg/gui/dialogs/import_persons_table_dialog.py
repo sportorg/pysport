@@ -1,15 +1,25 @@
 import logging
 from enum import Enum
-
-from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import (
-    QApplication,
-    QDialog,
-    QDialogButtonBox,
-    QFormLayout,
-    QTableWidget,
-    QTableWidgetItem,
-)
+try:
+    from PySide6.QtGui import QIcon
+    from PySide6.QtWidgets import (
+        QDialog,
+        QDialogButtonBox,
+        QFormLayout,
+        QTableWidget,
+        QTableWidgetItem,
+        QApplication,
+    )
+except ModuleNotFoundError:
+    from PySide2.QtGui import QIcon
+    from PySide2.QtWidgets import (
+        QDialog,
+        QDialogButtonBox,
+        QFormLayout,
+        QTableWidget,
+        QTableWidgetItem,
+        QApplication,
+    )
 
 from sportorg import config
 from sportorg.gui.dialogs.text_io import set_property

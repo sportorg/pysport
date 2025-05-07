@@ -1,7 +1,11 @@
 import logging
 
-from PySide6 import QtCore, QtGui, QtWidgets
-from PySide6.QtWidgets import QAbstractItemView, QTextEdit
+try:
+    from PySide6 import QtCore, QtGui, QtWidgets
+    from PySide6.QtWidgets import QAbstractItemView, QTextEdit
+except ModuleNotFoundError:
+    from PySide2 import QtCore, QtGui, QtWidgets
+    from PySide2.QtWidgets import QAbstractItemView, QTextEdit
 
 from sportorg.common.otime import OTime
 from sportorg.gui.dialogs.result_edit import ResultEditDialog

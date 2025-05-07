@@ -5,7 +5,10 @@ from abc import abstractmethod
 from copy import copy, deepcopy
 from typing import List
 
-from PySide6.QtCore import QAbstractTableModel, Qt
+try:
+    from PySide6.QtCore import QAbstractTableModel, Qt
+except ModuleNotFoundError:
+    from PySide2.QtCore import QAbstractTableModel, Qt
 
 from sportorg.language import translate
 from sportorg.models.constant import RentCards

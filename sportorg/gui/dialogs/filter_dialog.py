@@ -1,8 +1,13 @@
 import logging
 
-from PySide6 import QtCore, QtWidgets
-from PySide6.QtGui import QIcon, Qt
-from PySide6.QtWidgets import QDialog, QDialogButtonBox, QGridLayout, QPushButton
+try:
+    from PySide6 import QtCore, QtWidgets
+    from PySide6.QtGui import QIcon, Qt
+    from PySide6.QtWidgets import QDialog, QDialogButtonBox, QGridLayout, QPushButton
+except ModuleNotFoundError:
+    from PySide2 import QtCore, QtWidgets
+    from PySide2.QtGui import QIcon, Qt
+    from PySide2.QtWidgets import QDialog, QDialogButtonBox, QGridLayout, QPushButton
 
 from sportorg import config
 from sportorg.gui.dialogs.person_edit import PersonEditDialog

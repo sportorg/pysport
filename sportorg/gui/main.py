@@ -1,8 +1,10 @@
-import logging
 import sys
 from multiprocessing import freeze_support
 
-from PySide6.QtWidgets import QApplication
+try:
+    from PySide6.QtWidgets import QApplication
+except ModuleNotFoundError:
+    from PySide2.QtWidgets import QApplication
 
 from sportorg import config
 from sportorg.common.singleton import Singleton

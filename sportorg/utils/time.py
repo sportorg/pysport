@@ -1,7 +1,10 @@
 import datetime
 from datetime import date
 
-from PySide6.QtCore import QDate, QTime
+try:
+    from PySide6.QtCore import QDate, QTime
+except ModuleNotFoundError:
+    from PySide2.QtCore import QDate, QTime
 
 from sportorg.common.otime import OTime
 

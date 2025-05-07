@@ -8,10 +8,17 @@ from queue import Queue
 
 import psutil
 from psutil import Process
-from PySide6 import QtCore, QtGui, QtWidgets
-from PySide6.QtCore import QTimer
-from PySide6.QtGui import QAction
-from PySide6.QtWidgets import QMainWindow, QMessageBox
+
+try:
+    from PySide6 import QtCore, QtGui, QtWidgets
+    from PySide6.QtCore import QTimer
+    from PySide6.QtGui import QAction
+    from PySide6.QtWidgets import QMainWindow, QMessageBox
+except ModuleNotFoundError:
+    from PySide2 import QtCore, QtGui, QtWidgets
+    from PySide2.QtCore import QTimer
+    from PySide2.QtGui import QActionEvent
+    from PySide2.QtWidgets import QMainWindow, QMessageBox, QAction
 
 from sportorg import config
 from sportorg.gui.dialogs.course_edit import CourseEditDialog
