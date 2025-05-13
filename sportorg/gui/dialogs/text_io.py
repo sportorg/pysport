@@ -37,6 +37,7 @@ class TextExchangeDialog(QDialog):
     def __init__(self):
         super().__init__(GlobalAccess().get_main_window())
         self.setWindowModality(QtCore.Qt.WindowModal)
+        self.resize(319, 462)
         self.setSizeGripEnabled(False)
         self.setModal(True)
 

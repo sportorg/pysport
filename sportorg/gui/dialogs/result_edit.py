@@ -54,6 +54,7 @@ class ResultEditDialog(QDialog):
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(True)
+        self.resize(450, 740)
         self.setMaximumWidth(self.parent().size().width())
         self.setMaximumHeight(self.parent().size().height())
 

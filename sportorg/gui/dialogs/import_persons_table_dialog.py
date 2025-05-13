@@ -114,6 +114,7 @@ class ImportPersonsTableDialog(QDialog):
         self.button_cancel.clicked.connect(cancel_changes)
         self.layout.addRow(button_box)
 
+        self.resize(900, 300)
         self.show()
 
     def apply_changes_impl(self):
