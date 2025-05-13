@@ -637,9 +637,9 @@ class SplitPrintoutAction(Action, metaclass=ActionFactory):
 
 class RecheckingAction(Action, metaclass=ActionFactory):
     def execute(self):
+        race().rebuild_indexes()
         ResultChecker.check_all()
         ResultCalculation(race()).process_results()
-        race().rebuild_indexes()
         self.app.refresh()
 
 

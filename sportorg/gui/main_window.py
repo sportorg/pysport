@@ -9,6 +9,8 @@ from queue import Queue
 import psutil
 from psutil import Process
 
+from sportorg.models.result.result_checker import ResultChecker
+
 try:
     from PySide6 import QtCore, QtGui, QtWidgets
     from PySide6.QtCore import QTimer
@@ -45,7 +47,7 @@ from sportorg.models.memory import (
     Race,
     new_event,
     race,
-    set_current_race_index,
+    set_current_race_index, RaceType, races, get_current_race_index,
 )
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.split_calculation import GroupSplits
@@ -488,6 +490,18 @@ class MainWindow(QMainWindow):
             table = self.get_organization_table()
             table.setModel(OrganizationMemoryModel())
 
+            obj = race()
+            if obj.data.race_type == RaceType.MULTI_DAY_RACE:
+                day_index = get_current_race_index()
+                for i in range(len(races())):
+                    set_current_race_index(i)
+                    race().rebuild_indexes()
+                    ResultChecker.check_all()
+                    ResultCalculation(race()).process_results()
+                set_current_race_index(day_index)
+            else:
+                obj.rebuild_indexes()
+
         except Exception as e:
             logging.error(str(e))
 
@@ -880,6 +894,7 @@ class MainWindow(QMainWindow):
         elif tab == 3:
             try:
                 res = race().delete_courses(indexes)
+                race().rebuild_indexes()
             except NotEmptyException as e:
                 logging.warning(str(e))
                 QMessageBox.question(

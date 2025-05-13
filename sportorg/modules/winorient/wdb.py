@@ -88,7 +88,7 @@ class WinOrientBinary:
         for course in self.wdb_object.dist:
             new_course = Course()
             new_course.controls = []
-            new_course.name = course.name
+            new_course.set_name(course.name)
             new_course.climb = course.elevation
             new_course.length = course.length
             # new_course.type = self.wdb_object.info.type  # TODO parse type

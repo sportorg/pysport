@@ -283,8 +283,8 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
         person = self.race.persons[position]
         new_person = copy(person)
         new_person.id = uuid.uuid4()
-        new_person.set_bib(0)
-        new_person.set_card_number(0)
+        new_person.set_bib_without_indexing(0)
+        new_person.set_card_number_without_indexing(0)
         self.race.persons.insert(position, new_person)
 
     def get_values_from_object(self, obj):
@@ -551,7 +551,11 @@ class CourseMemoryModel(AbstractSportOrgMemoryModel):
         course = self.race.courses[position]
         new_course = copy(course)
         new_course.id = uuid.uuid4()
-        new_course.name = new_course.name + "_"
+        new_course.name = ""
+        new_name = course.name + "_"
+        while new_name in self.race.course_index_name:
+            new_name = new_name + "_"
+        new_course.set_name(new_name)
         new_course.controls = deepcopy(course.controls)
         self.race.courses.insert(position, new_course)
 

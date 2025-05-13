@@ -93,6 +93,7 @@ class ResultStatus(_TitleType):
     CANCELLED = 15
     RESTORED = 16
     MISS_PENALTY_LAP = 17
+    MULTI_DAY_ISSUE = 18
 
 
 class Organization(Model):
@@ -255,7 +256,7 @@ class Course(Model):
         }
 
     def update_data(self, data):
-        self.name = str(data["name"])
+        self.set_name(str(data["name"]))
         self.bib = int(data["bib"])
         self.length = int(data["length"])
         self.climb = int(data["climb"])
@@ -266,6 +267,25 @@ class Course(Model):
             control.update_data(item)
             self.controls.append(control)
 
+    def index_name(self):
+        self.set_name(self.name)
+
+    def set_name(self, new_name: str) -> None:
+        r = race()
+
+        # remove old name index
+        if self.name != new_name and self.name in r.course_index_name:
+            r.course_index_name.pop(self.name)
+
+        if new_name in r.course_index_name:
+            other_course = r.course_index_name[new_name]
+            if other_course is not self:
+                logging.info(
+                    "Duplicate course name: %s",
+                    new_name
+                )
+        r.course_index_name[new_name] = self
+        self.name = new_name
 
 class Group(Model):
     def __init__(self):
@@ -792,10 +812,11 @@ class Result(ABC):
                 if result_tmp.is_status_ok():
                     sum_result += result_tmp.get_result_otime_current_day()
                 else:
-                    self.status = ResultStatus.DISQUALIFIED
+                    self.status = ResultStatus.MULTI_DAY_ISSUE
+                    self.status_comment = result_tmp.status_comment
                     return OTime()  # DSQ/DNS
             else:
-                self.status = ResultStatus.DISQUALIFIED
+                self.status = ResultStatus.MULTI_DAY_ISSUE
                 return OTime()  # result not found in that day
         return sum_result
 
@@ -1437,6 +1458,10 @@ class Person(Model):
         self._index_bib(new_bib)
         self._bib = new_bib
 
+    # used for duplication
+    def set_bib_without_indexing(self, new_bib: int) -> None:
+        self._bib = new_bib
+
     def _index_bib(self, new_bib: int) -> None:
         r = race()
         if self._bib != new_bib and self._bib in r.person_index_bib:
@@ -1468,6 +1493,10 @@ class Person(Model):
             return
 
         self._index_card(new_card)
+        self._card_number = new_card
+
+    # used for duplication
+    def set_card_number_without_indexing(self, new_card: int):
         self._card_number = new_card
 
     def _index_card(self, new_card):
@@ -1591,9 +1620,10 @@ class Race(Model):
         self.person_index_bib: Dict[int, Person] = {}
         self.person_index_card: Dict[int, Person] = {}
         self.person_index: Dict[str, Result] = {}
-        self.group_index: Dict[str, Result] = {}
-        self.organization_index: Dict[str, Result] = {}
-        self.course_index: Dict[str, Result] = {}
+        self.group_index: Dict[str, Group] = {}
+        self.organization_index: Dict[str, Organization] = {}
+        self.course_index: Dict[str, Course] = {}
+        self.course_index_name: Dict[str, Course] = {}
 
     def __repr__(self) -> str:
         return repr(self.data)
@@ -1813,6 +1843,9 @@ class Race(Model):
         for person in self.persons:
             person.index_bib()
             person.index_card()
+        self.course_index_name = {}
+        for course in self.courses:
+            course.index_name()
 
     def delete_persons(self, indexes):
         indexes = sorted(indexes, reverse=True)
@@ -1913,6 +1946,19 @@ class Race(Model):
             return None
 
         bib = person.bib
+
+        # use cache
+        obj = race()
+
+        if str(bib) in obj.course_index_name:
+            return obj.course_index_name[str(bib)]
+
+        bib_with_dot = ""
+        if bib > 1000:
+            bib_with_dot = str(bib % 1000) + "." + str(bib // 1000)
+        if bib_with_dot in obj.course_index_name:
+            return obj.course_index_name[bib_with_dot]
+
         ret = find(self.courses, name=str(bib))
         if not ret and bib > 1000:
             course_name = "{}.{}".format(bib % 1000, bib // 1000)
