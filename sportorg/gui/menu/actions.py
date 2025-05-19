@@ -10,6 +10,7 @@ from PySide6.QtWidgets import QApplication, QMessageBox
 from sportorg import config
 from sportorg.common.otime import OTime
 from sportorg.gui.dialogs.about import AboutDialog
+from sportorg.gui.dialogs.control_time_change_dialog import ControlTimeChangeDialog
 from sportorg.gui.dialogs.cp_delete import CPDeleteDialog
 from sportorg.gui.dialogs.entry_mass_edit import MassEditDialog
 from sportorg.gui.dialogs.event_properties import EventPropertiesDialog
@@ -725,6 +726,12 @@ class SetDNSNumbersAction(Action, metaclass=ActionFactory):
 class ImportPersonsAction(Action, metaclass=ActionFactory):
     def execute(self):
         ImportPersonsTableDialog().exec_()
+        self.app.refresh()
+
+
+class ControlTimeChangeAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        ControlTimeChangeDialog().exec_()
         self.app.refresh()
 
 
