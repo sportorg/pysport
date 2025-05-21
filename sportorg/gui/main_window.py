@@ -40,7 +40,7 @@ from sportorg.models.memory import (
     race,
     set_current_race_index,
 )
-from sportorg.models.result.result_calculation import ResultCalculation
+from sportorg.models.result.result_tools import recalculate_results
 from sportorg.models.result.split_calculation import GroupSplits
 from sportorg.modules.backup.file import File
 from sportorg.modules.configs.configs import Config as Configuration
@@ -492,7 +492,7 @@ class MainWindow(QMainWindow):
         self.refresh_timer.start(delay)
 
     def res_recalculate_by_timer(self):
-        ResultCalculation(race()).process_results()
+        recalculate_results(recheck_results=False)
         self.res_recalculate.stop()
 
     def deleyed_res_recalculate(self, delay=1000):  # msec
@@ -607,7 +607,7 @@ class MainWindow(QMainWindow):
                 rg = ResultSportidentGeneration(result)
                 if rg.add_result():
                     result = rg.get_result()
-                    ResultCalculation(race()).process_results()
+                    recalculate_results(recheck_results=False)
                     if race().get_setting("split_printout", False):
                         try:
                             split_printout([result])
@@ -853,12 +853,12 @@ class MainWindow(QMainWindow):
         res = []
         if tab == 0:
             res = race().delete_persons(indexes)
-            ResultCalculation(race()).process_results()
+            recalculate_results(recheck_results=False)
             live_client.delete(res)
             race().rebuild_indexes()
         elif tab == 1:
             res = race().delete_results(indexes)
-            ResultCalculation(race()).process_results()
+            recalculate_results(recheck_results=False)
             live_client.delete(res)
         elif tab == 2:
             try:

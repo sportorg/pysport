@@ -5,20 +5,15 @@ from PySide6.QtWidgets import (
     QDialog,
     QDialogButtonBox,
     QFormLayout,
-    QRadioButton,
     QLabel,
+    QRadioButton,
 )
 
 from sportorg import config
-from sportorg.common.otime import OTime
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvSpinBox, AdvTimeEdit
 from sportorg.language import translate
-from sportorg.models.memory import race
-from sportorg.models.result.result_calculation import ResultCalculation
-from sportorg.models.result.result_checker import ResultChecker
-from sportorg.models.result.score_calculation import ScoreCalculation
-from sportorg.models.result.split_calculation import RaceSplits
+from sportorg.models.result.result_tools import change_control_time
 
 
 class ControlTimeChangeDialog(QDialog):
@@ -74,35 +69,7 @@ class ControlTimeChangeDialog(QDialog):
 
     def apply_changes_impl(self):
         change_control_time(
-            self.control_number.value(),
-            self.time_add.isChecked(),
-            self.time_value.getOTime(),
+            control_number=self.control_number.value(),
+            add=self.time_add.isChecked(),
+            time=self.time_value.getOTime(),
         )
-
-
-def change_control_time(control_number: int, add: bool, time: OTime):
-    """
-    Changes the control time for a specified control number in read cards
-
-    Args:
-        control_number (int): The control number whose time is to be changed
-        add (bool): If True, adds the specified time; if False, subtracts the time
-        time (OTime): The amount of time to add or subtract
-
-    Returns:
-        None
-    """
-    control_number = str(control_number)
-    for result in race().results:
-        for control in result.splits:
-            if control.code == control_number:
-                if add:
-                    control.time += time
-                else:
-                    control.time -= time
-
-    race().clear_results()
-    ResultChecker.check_all()
-    ResultCalculation(race()).process_results()
-    RaceSplits(race()).generate()
-    ScoreCalculation(race()).calculate_scores()
