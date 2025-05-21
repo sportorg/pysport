@@ -204,7 +204,7 @@ class ControlPoint(Model):
 class Course(Model):
     def __init__(self):
         self.id = uuid.uuid4()
-        self.name = ""
+        self._name = ""
         self.bib = 0
         self.length = 0
         self.climb = 0
@@ -228,6 +228,13 @@ class Course(Model):
                 return False
 
         return True
+
+    @property
+    def name(self):
+        return self._name
+    @name.setter
+    def name(self, new_name: str):
+        self._set_name(new_name)
 
     def is_unknown(self):
         for control in self.controls:
@@ -256,7 +263,7 @@ class Course(Model):
         }
 
     def update_data(self, data):
-        self.set_name(str(data["name"]))
+        self.name = str(data["name"])
         self.bib = int(data["bib"])
         self.length = int(data["length"])
         self.climb = int(data["climb"])
@@ -268,9 +275,9 @@ class Course(Model):
             self.controls.append(control)
 
     def index_name(self):
-        self.set_name(self.name)
+        self._set_name(self.name)
 
-    def set_name(self, new_name: str) -> None:
+    def _set_name(self, new_name: str) -> None:
         r = race()
 
         # remove old name index
@@ -285,7 +292,7 @@ class Course(Model):
                     new_name
                 )
         r.course_index_name[new_name] = self
-        self.name = new_name
+        self._name = new_name
 
 class Group(Model):
     def __init__(self):
@@ -1837,15 +1844,18 @@ class Race(Model):
                 p.is_rented_card = False
                 return p
 
-    def rebuild_indexes(self):
-        self.person_index_bib = {}
-        self.person_index_card = {}
-        for person in self.persons:
-            person.index_bib()
-            person.index_card()
-        self.course_index_name = {}
-        for course in self.courses:
-            course.index_name()
+    def rebuild_indexes(self, rebuild_person = True, rebuild_course = False):
+        if rebuild_person:
+            self.person_index_bib = {}
+            self.person_index_card = {}
+            for person in self.persons:
+                person.index_bib()
+                person.index_card()
+
+        if rebuild_course:
+            self.course_index_name = {}
+            for course in self.courses:
+                course.index_name()
 
     def delete_persons(self, indexes):
         indexes = sorted(indexes, reverse=True)

@@ -549,13 +549,14 @@ class CourseMemoryModel(AbstractSportOrgMemoryModel):
 
     def duplicate(self, position):
         course = self.race.courses[position]
+        old_name = course.name
         new_course = copy(course)
         new_course.id = uuid.uuid4()
-        new_course.name = ""
         new_name = course.name + "_"
         while new_name in self.race.course_index_name:
             new_name = new_name + "_"
-        new_course.set_name(new_name)
+        new_course.name = new_name
+        course.name = old_name  # recover index for old name, broken while setting name to copy
         new_course.controls = deepcopy(course.controls)
         self.race.courses.insert(position, new_course)
 

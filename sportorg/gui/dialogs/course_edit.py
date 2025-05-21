@@ -18,6 +18,7 @@ class CourseEditDialog(BaseDialog):
         self.current_object = course
         self.is_new = is_new
         self.title = translate("Course properties")
+        self.size = (400, 360)
         self.form = [
             LineField(
                 title=translate("Name"),

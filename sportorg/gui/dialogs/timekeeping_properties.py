@@ -53,6 +53,7 @@ class TimekeepingPropertiesDialog(QDialog):
         # self.setWindowIcon(QIcon(icon_dir('sportident.png')))
         self.setSizeGripEnabled(False)
         self.setModal(True)
+        self.setMinimumWidth(400)
         self.tab_widget = QTabWidget()
 
         # timekeeping tab

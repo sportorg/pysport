@@ -120,6 +120,7 @@ class BaseDialog(QDialog):
         self.ok_title: str = translate("Ok")
         self.cancel_title: str = translate("Cancel")
         self.is_modal: bool = True
+        self.size = (400, 319)
         self.form = [
             LineField(),
             TextField(),
@@ -136,11 +137,13 @@ class BaseDialog(QDialog):
         return super().exec_()
 
     def _init_ui(self) -> None:
+        # type:ignore
         parent = self.parent()
 
         self.setWindowTitle(self.title)
         self.setWindowIcon(QIcon(config.ICON))
         self.setModal(self.is_modal)
+        self.resize(*self.size)  # type:ignore
         if self.is_modal and parent:  # type:ignore
             self.setMaximumWidth(parent.size().width())
             self.setMaximumHeight(parent.size().height())

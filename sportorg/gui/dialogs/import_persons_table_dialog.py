@@ -1,8 +1,6 @@
 import logging
 from enum import Enum
 
-from sportorg.utils.time import ddmmyyyy_to_time
-
 try:
     from PySide6.QtGui import QIcon
     from PySide6.QtWidgets import (
@@ -31,6 +29,7 @@ from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import translate
 from sportorg.models import memory
 from sportorg.models.memory import find, race
+from sportorg.utils.time import ddmmyyyy_to_time
 
 
 class ImportPersonsTableDialog(QDialog):
@@ -129,6 +128,7 @@ class ImportPersonsTableDialog(QDialog):
         self.button_cancel.clicked.connect(cancel_changes)
         self.layout.addRow(button_box)
 
+        self.resize(900, 300)
         self.show()
 
     def apply_changes_impl(self):

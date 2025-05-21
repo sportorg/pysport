@@ -500,7 +500,7 @@ class MainWindow(QMainWindow):
                     ResultCalculation(race()).process_results()
                 set_current_race_index(day_index)
             else:
-                obj.rebuild_indexes()
+                obj.rebuild_indexes(True, True)
 
         except Exception as e:
             logging.error(str(e))
@@ -894,7 +894,7 @@ class MainWindow(QMainWindow):
         elif tab == 3:
             try:
                 res = race().delete_courses(indexes)
-                race().rebuild_indexes()
+                race().rebuild_indexes(False, True)
             except NotEmptyException as e:
                 logging.warning(str(e))
                 QMessageBox.question(
