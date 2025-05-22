@@ -42,6 +42,7 @@ def menu_list():
                 },
                 {
                     "title": translate("Event Settings"),
+                    "shortcut": "Ctrl+I",
                     "icon": config.icon_dir("form.svg"),
                     "action": "EventSettingsAction",
                 },
@@ -163,10 +164,15 @@ def menu_list():
                     "tabs": list(range(5)),
                     "action": "DuplicateAction",
                 },
-                {"title": translate("Text exchange"), "action": "TextExchangeAction"},
+                {
+                    "title": translate("Text exchange"),
+                    "shortcut": "Ctrl+T",
+                    "action": "TextExchangeAction",
+                },
                 {
                     "title": translate("Mass edit"),
                     "tabs": [0, 2, 4],
+                    "shortcut": "Ctrl+E",
                     "action": "MassEditAction",
                 },
             ],
@@ -229,6 +235,11 @@ def menu_list():
                     "shortcut": "Ctrl+5",
                     "action": "ToTeamsAction",
                 },
+                {
+                    "title": translate("Logs"),
+                    "shortcut": "Ctrl+6",
+                    "action": "ToLogsAction",
+                },
             ],
         },
         {
@@ -236,6 +247,7 @@ def menu_list():
             "actions": [
                 {
                     "title": translate("Start Preparation"),
+                    "shortcut": "F6",
                     "action": "StartPreparationAction",
                 },
                 {"title": translate("Guess courses"), "action": "GuessCoursesAction"},
@@ -282,6 +294,7 @@ def menu_list():
                 },
                 {
                     "title": translate("Add SPORTident result"),
+                    "shortcut": "F7",
                     "action": "AddSPORTidentResultAction",
                 },
             ],
@@ -310,6 +323,7 @@ def menu_list():
                 {
                     "title": translate("Find group by punches"),
                     "tabs": [1],
+                    "shortcut": "Ctrl+G",
                     "action": "GroupFinderAction",
                 },
                 {
@@ -419,6 +433,7 @@ def menu_list():
             "actions": [
                 {
                     "title": translate("Timekeeping settings"),
+                    "shortcut": "F9",
                     "icon": config.icon_dir("stopwatch.svg"),
                     "action": "TimekeepingSettingsAction",
                 },
