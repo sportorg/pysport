@@ -33,7 +33,7 @@ def import_sfrx(source: str):
         bib = convert_bib(course["bib"])
         if bib != 0:
             name = str(bib)
-        if memory.find(memory.race().courses, name=name) is None:
+        if name not in race().course_index_name:
             c = memory.create(
                 memory.Course,
                 bib=bib,
