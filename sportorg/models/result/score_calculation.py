@@ -24,7 +24,6 @@ class ScoreCalculation:
         return 0
 
     def calculate_scores(self):
-        logging.debug("Score calculation")
         for i in self.race.results:
             self.calculate_scores_result(i)
 

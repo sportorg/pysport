@@ -6,8 +6,8 @@ from PySide6.QtWidgets import (
     QDialogButtonBox,
     QFormLayout,
     QLabel,
-    QTextEdit,
     QMessageBox,
+    QTextEdit,
 )
 
 from sportorg import config
@@ -16,7 +16,7 @@ from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import translate
 from sportorg.models.constant import StatusComments
 from sportorg.models.memory import ResultManual, ResultStatus, race
-from sportorg.models.result.result_calculation import ResultCalculation
+from sportorg.models.result.result_tools import recalculate_results
 from sportorg.modules.live.live import live_client
 from sportorg.modules.teamwork.teamwork import Teamwork
 
@@ -122,7 +122,7 @@ class InputStartNumbersDialog(QDialog):
                 else:
                     logging.info("Number %s not found", str(number))
                 old_numbers.append(number)
-        ResultCalculation(race()).process_results()
+        recalculate_results(recheck_results=False)
 
     def parse_input_numbers(self):
         text = self.item_numbers.toPlainText()

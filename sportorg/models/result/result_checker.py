@@ -1,5 +1,3 @@
-import logging
-
 from sportorg.common.otime import OTime
 from sportorg.models.constant import StatusComments
 from sportorg.models.memory import (
@@ -110,7 +108,6 @@ class ResultChecker:
 
     @staticmethod
     def check_all():
-        logging.debug("Checking all results")
         for result in race().results:
             if result.person:
                 ResultChecker.checking(result)
