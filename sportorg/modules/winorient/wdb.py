@@ -22,7 +22,7 @@ from sportorg.models.memory import (
     find,
     race,
 )
-from sportorg.models.result.result_calculation import ResultCalculation
+from sportorg.models.result.result_tools import recalculate_results
 from sportorg.utils.time import int_to_otime, time_to_int
 
 
@@ -188,7 +188,7 @@ class WinOrientBinary:
                 if code > 0:
                     result.splits.append(split)
 
-        ResultCalculation(race()).process_results()
+        recalculate_results(recheck_results=False)
 
     def export(self):
         wdb_object = WDB()

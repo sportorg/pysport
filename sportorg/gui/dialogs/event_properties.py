@@ -16,7 +16,7 @@ from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox, AdvSpinBox
 from sportorg.language import translate
 from sportorg.models.memory import RaceType, race
-from sportorg.models.result.result_calculation import ResultCalculation
+from sportorg.models.result.result_tools import recalculate_results
 
 
 class EventPropertiesDialog(QDialog):
@@ -152,6 +152,6 @@ class EventPropertiesDialog(QDialog):
 
         obj.set_setting("system_zero_time", (start_date.hour, start_date.minute, 0))
 
-        ResultCalculation(race()).process_results()
+        recalculate_results()
         GlobalAccess().get_main_window().set_title()
         GlobalAccess().get_main_window().refresh()

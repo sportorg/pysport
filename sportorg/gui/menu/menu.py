@@ -344,6 +344,10 @@ def menu_list():
                     "title": translate("Set DNS numbers"),
                     "action": "SetDNSNumbersAction",
                 },
+                {
+                    "title": translate("Control time change"),
+                    "action": "ControlTimeChangeAction",
+                },
                 {"title": translate("Delete CP"), "action": "CPDeleteAction"},
                 {"title": translate("Delete Split"), "action": "SplitDeleteAction"},
                 {"title": translate("Merge results"), "action": "MergeResultsAction"},
