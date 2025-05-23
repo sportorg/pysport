@@ -14,17 +14,18 @@ except ModuleNotFoundError:
 from sportorg import config
 from sportorg.common.otime import OTime
 from sportorg.gui.dialogs.about import AboutDialog
+from sportorg.gui.dialogs.control_time_change_dialog import ControlTimeChangeDialog
 from sportorg.gui.dialogs.cp_delete import CPDeleteDialog
 from sportorg.gui.dialogs.entry_mass_edit import MassEditDialog
 from sportorg.gui.dialogs.event_properties import EventPropertiesDialog
 from sportorg.gui.dialogs.file_dialog import get_open_file_name, get_save_file_name
 from sportorg.gui.dialogs.filter_dialog import DialogFilter
 from sportorg.gui.dialogs.group_mass_edit import GroupMassEditDialog
+from sportorg.gui.dialogs.import_persons_table_dialog import ImportPersonsTableDialog
 from sportorg.gui.dialogs.live_dialog import LiveDialog
 from sportorg.gui.dialogs.marked_route_dialog import MarkedRouteDialog
 from sportorg.gui.dialogs.merge_results import MergeResultsDialog
 from sportorg.gui.dialogs.not_start_dialog import InputStartNumbersDialog
-from sportorg.gui.dialogs.import_persons_table_dialog import ImportPersonsTableDialog
 from sportorg.gui.dialogs.organization_mass_edit import OrganizationMassEditDialog
 from sportorg.gui.dialogs.print_properties import PrintPropertiesDialog
 from sportorg.gui.dialogs.relay_clone_dialog import RelayCloneDialog
@@ -51,8 +52,8 @@ from sportorg.language import translate
 from sportorg.libs.sfr import sfrximporter
 from sportorg.libs.winorient.wdb import write_wdb
 from sportorg.models.memory import ResultManual, ResultStatus, race
-from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.result_checker import ResultChecker
+from sportorg.models.result.result_tools import recalculate_results
 from sportorg.models.start.start_preparation import (
     copy_bib_to_card_number,
     copy_card_number_to_bib,
@@ -510,6 +511,11 @@ class ToTeamsAction(Action, metaclass=ActionFactory):
         self.app.select_tab(4)
 
 
+class ToLogsAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        self.app.select_tab(5)
+
+
 class StartPreparationAction(Action, metaclass=ActionFactory):
     def execute(self):
         StartPreparationDialog().exec_()
@@ -670,7 +676,7 @@ class PenaltyCalculationAction(Action, metaclass=ActionFactory):
             if result.person:
                 ResultChecker.checking(result)
         logging.debug("Penalty calculation finish")
-        ResultCalculation(race()).process_results()
+        recalculate_results(recheck_results=False)
         self.app.refresh()
 
 
@@ -681,7 +687,7 @@ class PenaltyRemovingAction(Action, metaclass=ActionFactory):
             result.penalty_time = OTime(msec=0)
             result.penalty_laps = 0
         logging.debug("Penalty removing finish")
-        ResultCalculation(race()).process_results()
+        recalculate_results(recheck_results=False)
         self.app.refresh()
 
 
@@ -729,6 +735,12 @@ class SetDNSNumbersAction(Action, metaclass=ActionFactory):
 class ImportPersonsAction(Action, metaclass=ActionFactory):
     def execute(self):
         ImportPersonsTableDialog().exec_()
+        self.app.refresh()
+
+
+class ControlTimeChangeAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        ControlTimeChangeDialog().exec_()
         self.app.refresh()
 
 

@@ -42,8 +42,8 @@ from sportorg.gui.utils.custom_controls import AdvComboBox, AdvSpinBox, AdvTimeE
 from sportorg.language import translate
 from sportorg.models.constant import StatusComments
 from sportorg.models.memory import Limit, Result, ResultStatus, Split, race
-from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.result_checker import ResultChecker, ResultCheckerException
+from sportorg.models.result.result_tools import recalculate_results
 from sportorg.models.result.split_calculation import GroupSplits
 from sportorg.modules.live.live import live_client
 from sportorg.modules.teamwork.teamwork import Teamwork
@@ -309,7 +309,7 @@ class ResultEditDialog(QDialog):
                     GroupSplits(race(), result.person.group).generate(True)
             except ResultCheckerException as e:
                 logging.error(str(e))
-        ResultCalculation(race()).process_results()
+        recalculate_results(recheck_results=False)
         live_client.send(result)
         Teamwork().send(result.to_dict())
 

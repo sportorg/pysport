@@ -11,10 +11,7 @@ from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import translate
 from sportorg.models.memory import race
-from sportorg.models.result.result_calculation import ResultCalculation
-from sportorg.models.result.result_checker import ResultChecker
-from sportorg.models.result.score_calculation import ScoreCalculation
-from sportorg.models.result.split_calculation import RaceSplits
+from sportorg.models.result.result_tools import recalculate_results
 
 
 class SplitDeleteDialog(QDialog):
@@ -97,7 +94,4 @@ class SplitDeleteDialog(QDialog):
                     cur_res.splits[i].time = cur_res.splits[i].time - delta
                 cur_res.finish_time = cur_res.finish_time - delta
 
-        ResultChecker.check_all()
-        ResultCalculation(obj).process_results()
-        RaceSplits(obj).generate()
-        ScoreCalculation(obj).calculate_scores()
+        recalculate_results(race_object=obj)

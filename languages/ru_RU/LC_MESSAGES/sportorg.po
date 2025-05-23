@@ -525,6 +525,12 @@ msgstr "Протокол старта"
 msgid "Save to file"
 msgstr "Сохранить в файл"
 
+msgid "Control time change"
+msgstr "Смещение времени КП"
+
+msgid "Adjust the control time in read cards"
+msgstr "Смещение времени КП в считанных чипах"
+
 msgid "Start time change"
 msgstr "Смещение времени старта"
 
