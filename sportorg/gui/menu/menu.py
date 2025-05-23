@@ -273,10 +273,6 @@ def menu_list():
                     "title": translate("Extract person middle name"),
                     "action": "ExtractPersonMiddleName",
                 },
-                {
-                    "title": translate("Insert person middle name to name"),
-                    "action": "InsertPersonMiddleNameToName",
-                },
             ],
         },
         {

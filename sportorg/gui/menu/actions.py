@@ -966,9 +966,3 @@ class ExtractPersonMiddleName(Action, metaclass=ActionFactory):
             person.extract_middle_name()
         self.app.refresh()
 
-
-class InsertPersonMiddleNameToName(Action, metaclass=ActionFactory):
-    def execute(self):
-        for person in race().persons:
-            person.insert_middle_name_to_name()
-        self.app.refresh()

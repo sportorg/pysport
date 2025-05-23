@@ -17,7 +17,8 @@ from sportorg.models.constant import (
     RankingTable,
     Regions,
     RentCards,
-    StatusComments, PersonMiddleNames,
+    StatusComments,
+    PersonMiddleNames,
 )
 
 

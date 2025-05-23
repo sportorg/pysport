@@ -110,7 +110,7 @@ def ddmmyyyy_to_time(value):
             day=int(arr[0])
         )
         return new_value
-
+    return datetime.datetime(year=1900, day=1, month=1)
 
 def hhmmss_to_time(value):
     arr = str(value).split(":")

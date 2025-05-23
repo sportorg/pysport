@@ -1738,9 +1738,6 @@ msgstr ""
 msgid "Extract person middle name"
 msgstr "Извлечь отчество из имени"
 
-msgid "Insert person middle name to name"
-msgstr "Вставить отчество в имя"
-
 msgid "Middle name"
 msgstr "Отчество"
 

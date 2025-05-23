@@ -1377,16 +1377,16 @@ class Person(Model):
     def full_name(self):
         ret = self.name
         if self.surname:
-            ret = self.surname + " " + ret
+            ret = f"{self.surname} {ret}"
         return ret
 
     @property
     def full_name_with_middle(self):
         ret = self.name
         if self.middle_name:
-            ret += " " + self.middle_name
+            ret = f"{ret} {self.middle_name}"
         if self.surname:
-            ret = self.surname + " " + ret
+            ret = f"{self.surname} {ret}"
         return ret
 
     @property
@@ -1530,10 +1530,6 @@ class Person(Model):
             self.name = arr[0]
             self.middle_name = arr[1]
 
-    def insert_middle_name_to_name(self):
-        if self.middle_name and len(self.middle_name) > 1:
-            if not self.name.endswith(self.middle_name):
-                self.name += " " + self.middle_name
 
 class RaceData(Model):
     def __init__(self):

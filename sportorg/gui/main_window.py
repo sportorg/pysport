@@ -47,7 +47,10 @@ from sportorg.models.memory import (
     Race,
     new_event,
     race,
-    set_current_race_index, RaceType, races, get_current_race_index,
+    set_current_race_index,
+    RaceType,
+    races,
+    get_current_race_index,
 )
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.split_calculation import GroupSplits

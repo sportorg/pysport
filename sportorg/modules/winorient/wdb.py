@@ -253,7 +253,7 @@ class WinOrientBinary:
 
         for man in my_race.persons:
             new_person = WDBMan(wdb_object)
-            new_person.name = str(man.surname) + " " + str(man.name)
+            new_person.name = str(man.full_name_with_middle)
             if man.bib:
                 new_person.number = int(man.bib)
 
