@@ -1,6 +1,11 @@
-from PySide6 import QtCore, QtWidgets
-from PySide6.QtCore import QPoint
-from PySide6.QtWidgets import QAbstractItemView, QHeaderView, QMenu
+try:
+    from PySide6 import QtCore, QtWidgets
+    from PySide6.QtCore import QPoint
+    from PySide6.QtWidgets import QAbstractItemView, QHeaderView, QMenu
+except ModuleNotFoundError:
+    from PySide2 import QtCore, QtWidgets
+    from PySide2.QtCore import QPoint
+    from PySide2.QtWidgets import QAbstractItemView, QHeaderView, QMenu
 
 
 class TableView(QtWidgets.QTableView):

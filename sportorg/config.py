@@ -102,6 +102,8 @@ LOCALE_DIR = base_dir("languages")
 
 NAMES_FILE = base_dir("configs", "names.txt")
 
+MIDDLE_NAMES_FILE = base_dir("configs", "middle_names.txt")
+
 REGIONS_FILE = base_dir("configs", "regions.txt")
 
 STATUS_COMMENTS_FILE = base_dir("configs", "status_comments.txt")

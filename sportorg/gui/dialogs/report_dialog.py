@@ -4,15 +4,27 @@ import os
 import webbrowser
 
 from docxtpl import DocxTemplate
-from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import (
-    QCheckBox,
-    QDialog,
-    QDialogButtonBox,
-    QFormLayout,
-    QLabel,
-    QPushButton,
-)
+
+try:
+    from PySide6.QtGui import QIcon
+    from PySide6.QtWidgets import (
+        QCheckBox,
+        QDialog,
+        QDialogButtonBox,
+        QFormLayout,
+        QLabel,
+        QPushButton,
+    )
+except ModuleNotFoundError:
+    from PySide2.QtGui import QIcon
+    from PySide2.QtWidgets import (
+        QCheckBox,
+        QDialog,
+        QDialogButtonBox,
+        QFormLayout,
+        QLabel,
+        QPushButton,
+    )
 
 from sportorg import config
 from sportorg.common.template import get_templates, get_text_from_file

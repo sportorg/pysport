@@ -284,7 +284,7 @@ class SRPid:
         """
         sum = 0
         for c in s:
-            sum += byte2int(c)
+            sum += c
         sum &= 0xFF
         return int2byte(sum)
 
@@ -307,7 +307,7 @@ class SRPid:
         #        result['Reserv'] = data[6:14]
         result["CP"] = []
         for i in range(14, len(data), 5):
-            cp = byte2int(data[i])
+            cp = data[i]
             time = datetime.fromtimestamp(SRPid._to_int(data[i + 1 : i + 5]))
             result["CP"].append((cp, time))
         return result

@@ -2,7 +2,10 @@ import logging
 import sys
 from multiprocessing import freeze_support
 
-from PySide6.QtWidgets import QApplication
+try:
+    from PySide6.QtWidgets import QApplication
+except ModuleNotFoundError:
+    from PySide2.QtWidgets import QApplication
 
 from sportorg import config
 from sportorg.common.singleton import Singleton
@@ -15,6 +18,7 @@ from sportorg.models.constant import (
     Regions,
     RentCards,
     StatusComments,
+    PersonMiddleNames,
 )
 
 
@@ -34,6 +38,7 @@ class Application(metaclass=Singleton):
         freeze_support()
         self.set_status_comments()
         self.set_names()
+        self.set_middle_names()
         self.set_regions()
         self.set_ranking()
         self.set_rent_cards()
@@ -59,6 +64,15 @@ class Application(metaclass=Singleton):
             with open(config.NAMES_FILE, encoding="utf-8") as f:
                 content = f.readlines()
             PersonNames().set([x.strip() for x in content])
+        except Exception as e:
+            logging.exception(str(e))
+
+    @staticmethod
+    def set_middle_names():
+        try:
+            with open(config.MIDDLE_NAMES_FILE, encoding="utf-8") as f:
+                content = f.readlines()
+            PersonMiddleNames().set([x.strip() for x in content])
         except Exception as e:
             logging.exception(str(e))
 

@@ -1,17 +1,30 @@
 import logging
 import uuid
 
-from PySide6.QtWidgets import (
-    QDialog,
-    QDialogButtonBox,
-    QFormLayout,
-    QGroupBox,
-    QLabel,
-    QLineEdit,
-    QRadioButton,
-    QTabWidget,
-    QWidget,
-)
+try:
+    from PySide6.QtWidgets import (
+        QDialog,
+        QDialogButtonBox,
+        QFormLayout,
+        QGroupBox,
+        QLabel,
+        QLineEdit,
+        QRadioButton,
+        QTabWidget,
+        QWidget,
+    )
+except ModuleNotFoundError:
+    from PySide2.QtWidgets import (
+        QDialog,
+        QDialogButtonBox,
+        QFormLayout,
+        QGroupBox,
+        QLabel,
+        QLineEdit,
+        QRadioButton,
+        QTabWidget,
+        QWidget,
+    )
 
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvSpinBox

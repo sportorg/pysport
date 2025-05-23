@@ -2,21 +2,38 @@ import logging
 from abc import abstractmethod
 from datetime import datetime
 
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import (
-    QComboBox,
-    QDialog,
-    QDialogButtonBox,
-    QFormLayout,
-    QGroupBox,
-    QLabel,
-    QLineEdit,
-    QScrollArea,
-    QTextEdit,
-    QVBoxLayout,
-    QWidget,
-)
+try:
+    from PySide6.QtCore import Qt
+    from PySide6.QtGui import QIcon
+    from PySide6.QtWidgets import (
+        QComboBox,
+        QDialog,
+        QDialogButtonBox,
+        QFormLayout,
+        QGroupBox,
+        QLabel,
+        QLineEdit,
+        QScrollArea,
+        QTextEdit,
+        QVBoxLayout,
+        QWidget,
+    )
+except ModuleNotFoundError:
+    from PySide2.QtCore import Qt
+    from PySide2.QtGui import QIcon
+    from PySide2.QtWidgets import (
+        QComboBox,
+        QDialog,
+        QDialogButtonBox,
+        QFormLayout,
+        QGroupBox,
+        QLabel,
+        QLineEdit,
+        QScrollArea,
+        QTextEdit,
+        QVBoxLayout,
+        QWidget,
+    )
 
 from sportorg import config
 from sportorg.gui.dialogs.person_edit import PersonEditDialog

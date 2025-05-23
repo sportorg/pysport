@@ -1,7 +1,10 @@
 import datetime
 from datetime import date
 
-from PySide6.QtCore import QDate, QTime
+try:
+    from PySide6.QtCore import QDate, QTime
+except ModuleNotFoundError:
+    from PySide2.QtCore import QDate, QTime
 
 from sportorg.common.otime import OTime
 
@@ -84,6 +87,30 @@ def time_to_hhmmss(value):
     time_ = time_to_datetime(value)
     return time_.strftime("%H:%M:%S")
 
+
+def date_to_yyyymmdd(value):
+    time_ = value
+    return time_.strftime("%Y.%m.%d")
+
+
+def date_to_ddmmyyyy(value):
+    time_ = value
+    return time_.strftime("%d.%m.%Y")
+
+
+def ddmmyyyy_to_time(value):
+    if len(value) != 10 or "." not in value:
+        return datetime.datetime(year=1900, day=1, month=1)
+
+    arr = str(value).split(".")
+    if len(arr) == 3:
+        new_value = datetime.datetime(
+            year=int(arr[2]),
+            month=int(arr[1]),
+            day=int(arr[0])
+        )
+        return new_value
+    return datetime.datetime(year=1900, day=1, month=1)
 
 def hhmmss_to_time(value):
     arr = str(value).split(":")

@@ -5,7 +5,11 @@ from queue import Empty, Queue
 from threading import Event, main_thread
 
 import serial
-from PySide6.QtCore import QThread, Signal
+
+try:
+    from PySide6.QtCore import QThread, Signal
+except ModuleNotFoundError:
+    from PySide2.QtCore import QThread, Signal
 
 from sportorg.common.singleton import singleton
 from sportorg.libs.sportiduino import sportiduino

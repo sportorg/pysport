@@ -3,10 +3,16 @@ import sys
 import time
 from multiprocessing import Process, Queue
 
-from PySide6.QtCore import QMarginsF, QSizeF
-from PySide6.QtGui import QPageLayout, QTextDocument
-from PySide6.QtPrintSupport import QPrinter
-from PySide6.QtWidgets import QApplication
+try:
+    from PySide6.QtCore import QMarginsF, QSizeF
+    from PySide6.QtGui import QPageLayout, QTextDocument
+    from PySide6.QtPrintSupport import QPrinter
+    from PySide6.QtWidgets import QApplication
+except ModuleNotFoundError:
+    from PySide2.QtCore import QMarginsF, QSizeF
+    from PySide2.QtGui import QPageLayout, QTextDocument
+    from PySide2.QtPrintSupport import QPrinter
+    from PySide2.QtWidgets import QApplication
 
 from sportorg.common.fake_std import FakeStd
 from sportorg.gui.global_access import GlobalAccess

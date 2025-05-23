@@ -46,6 +46,7 @@ def import_csv(source):
         person.organization = person_org
         person.qual = Qualification(qual_id)
         person.comment = person_dict["comment"]
+        person.extract_middle_name()
         obj.persons.append(person)
 
     new_lengths = obj.get_lengths()

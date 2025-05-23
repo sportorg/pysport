@@ -1,6 +1,9 @@
 import logging
 
-from PySide6 import QtWidgets
+try:
+    from PySide6 import QtWidgets
+except ModuleNotFoundError:
+    from PySide2 import QtWidgets
 
 from sportorg.gui.dialogs.person_edit import PersonEditDialog
 from sportorg.gui.global_access import GlobalAccess, NumberClicker
