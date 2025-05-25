@@ -145,6 +145,7 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
             translate("contain"): f".*{value}.*",
             translate("equal to"): f"{value}$",
             translate("doesn't contain"): f"^((?!{value}).)*$",
+            translate("in list"): f"{value.replace(',', '|')}$",
         }.get(action, ".*")
         return re.compile(regex_string)
 
@@ -556,7 +557,9 @@ class CourseMemoryModel(AbstractSportOrgMemoryModel):
         while new_name in self.race.course_index_name:
             new_name = new_name + "_"
         new_course.name = new_name
-        course.name = old_name  # recover index for old name, broken while setting name to copy
+        course.name = (
+            old_name  # recover index for old name, broken while setting name to copy
+        )
         new_course.controls = deepcopy(course.controls)
         self.race.courses.insert(position, new_course)
 

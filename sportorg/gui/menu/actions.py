@@ -965,4 +965,3 @@ class ExtractPersonMiddleName(Action, metaclass=ActionFactory):
         for person in race().persons:
             person.extract_middle_name()
         self.app.refresh()
-

@@ -257,6 +257,7 @@ class PersonNames:
             items.insert(0, "")
         self.NAMES = items
 
+
 @singleton
 class PersonMiddleNames:
     NAMES: List[str] = []
@@ -269,6 +270,7 @@ class PersonMiddleNames:
         if "" not in items:
             items.insert(0, "")
         self.NAMES = items
+
 
 @singleton
 class Regions:

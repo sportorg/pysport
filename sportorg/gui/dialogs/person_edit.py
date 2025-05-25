@@ -13,7 +13,12 @@ from sportorg.gui.dialogs.dialog import (
 )
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import translate
-from sportorg.models.constant import get_names, get_race_groups, get_race_teams, get_middle_names
+from sportorg.models.constant import (
+    get_names,
+    get_race_groups,
+    get_race_teams,
+    get_middle_names,
+)
 from sportorg.models.memory import (
     Limit,
     Organization,

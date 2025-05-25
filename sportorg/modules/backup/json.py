@@ -86,6 +86,7 @@ def _move_indexes_to_new_race(obj):
     obj.course_index_name = race().course_index_name
     race().course_index_name = {}
 
+
 def _race_migrate(data):
     for person in data["persons"]:
         if "sportident_card" in person:

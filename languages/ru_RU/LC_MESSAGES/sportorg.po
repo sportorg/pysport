@@ -1743,3 +1743,6 @@ msgstr "Отчество"
 
 msgid "Multi day issue"
 msgstr "Не все дни"
+
+msgid "in list"
+msgstr "в списке"

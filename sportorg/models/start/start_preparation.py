@@ -138,7 +138,9 @@ class DrawManager:
             cur_group = None
             cur_array = []
             # sort all person by group
-            for cur_person in sorted(persons, key=lambda x: x.group.name if x.group else ""):
+            for cur_person in sorted(
+                persons, key=lambda x: x.group.name if x.group else ""
+            ):
                 if not cur_group:
                     cur_group = cur_person.group
                 if cur_person.group != cur_group:
@@ -220,7 +222,7 @@ class DrawManager:
                             f"conflict on start group boundaries cannot be solved!"
                             f" group: {persons_sub_lists[i][0].group.name},"
                             f" start groups: {persons_sub_lists[i][0].start_group},"
-                            f" {persons_sub_lists[i+1][0].start_group}"
+                            f" {persons_sub_lists[i + 1][0].start_group}"
                         )
                         break
 
@@ -403,7 +405,7 @@ class DrawManager:
                 persons.insert(i + 1, person)
                 logging.info(
                     f"Conflict at start group boundaries solving in group: {person.group.name}, "
-                    f"moving {person.full_name} to position {i+2}"
+                    f"moving {person.full_name} to position {i + 2}"
                 )
                 return True
 

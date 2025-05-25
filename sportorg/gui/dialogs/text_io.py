@@ -2,15 +2,32 @@ import logging
 
 try:
     from PySide6 import QtCore, QtWidgets
-    from PySide6.QtWidgets import QCheckBox, QDialog, QDialogButtonBox, QVBoxLayout, QWidget
+    from PySide6.QtWidgets import (
+        QCheckBox,
+        QDialog,
+        QDialogButtonBox,
+        QVBoxLayout,
+        QWidget,
+    )
 except ModuleNotFoundError:
     from PySide2 import QtCore, QtWidgets
-    from PySide2.QtWidgets import QCheckBox, QDialog, QDialogButtonBox, QVBoxLayout, QWidget
+    from PySide2.QtWidgets import (
+        QCheckBox,
+        QDialog,
+        QDialogButtonBox,
+        QVBoxLayout,
+        QWidget,
+    )
 
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import translate
 from sportorg.models.memory import Qualification, ResultManual, race
-from sportorg.utils.time import hhmmss_to_time, time_to_hhmmss, date_to_ddmmyyyy, ddmmyyyy_to_time
+from sportorg.utils.time import (
+    hhmmss_to_time,
+    time_to_hhmmss,
+    date_to_ddmmyyyy,
+    ddmmyyyy_to_time,
+)
 
 
 def get_value_options():

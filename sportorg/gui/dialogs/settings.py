@@ -11,7 +11,9 @@ try:
         QLabel,
         QPushButton,
         QTabWidget,
-        QWidget,QHBoxLayout, QCommandLinkButton
+        QWidget,
+        QHBoxLayout,
+        QCommandLinkButton,
     )
 except ModuleNotFoundError:
     from PySide2.QtGui import QIcon
@@ -23,8 +25,10 @@ except ModuleNotFoundError:
         QLabel,
         QPushButton,
         QTabWidget,
-        QWidget, QHBoxLayout, QCommandLinkButton,
-)
+        QWidget,
+        QHBoxLayout,
+        QCommandLinkButton,
+    )
 
 from sportorg import config
 from sportorg.common.audio import get_sounds

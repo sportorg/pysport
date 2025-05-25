@@ -232,6 +232,7 @@ class Course(Model):
     @property
     def name(self):
         return self._name
+
     @name.setter
     def name(self, new_name: str):
         self._set_name(new_name)
@@ -287,12 +288,10 @@ class Course(Model):
         if new_name in r.course_index_name:
             other_course = r.course_index_name[new_name]
             if other_course is not self:
-                logging.info(
-                    "Duplicate course name: %s",
-                    new_name
-                )
+                logging.info("Duplicate course name: %s", new_name)
         r.course_index_name[new_name] = self
         self._name = new_name
+
 
 class Group(Model):
     def __init__(self):
@@ -1840,7 +1839,7 @@ class Race(Model):
                 p.is_rented_card = False
                 return p
 
-    def rebuild_indexes(self, rebuild_person = True, rebuild_course = False):
+    def rebuild_indexes(self, rebuild_person=True, rebuild_course=False):
         if rebuild_person:
             self.person_index_bib = {}
             self.person_index_card = {}
