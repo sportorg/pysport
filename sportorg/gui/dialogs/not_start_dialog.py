@@ -51,7 +51,7 @@ class InputStartNumbersDialog(QDialog):
         self.layout = QFormLayout(self)
 
         self.input_start_list = AdvComboBox()
-        self.input_start_list.addItems([self.STARTED_NUMBERS, self.NOT_STARTED_NUMBERS])
+        self.input_start_list.addItems([self.NOT_STARTED_NUMBERS, self.STARTED_NUMBERS])
 
         self.layout.addRow(self.input_start_list)
 
@@ -101,7 +101,10 @@ class InputStartNumbersDialog(QDialog):
         all_numbers = set(race().person_index_bib.keys())
         not_started_numbers = set(all_numbers)
         for number in started_numbers:
-            not_started_numbers.remove(number)
+            if number in not_started_numbers:
+                not_started_numbers.remove(number)
+            else:
+                logging.info("Number %s not found", str(number))
 
         if len(not_started_numbers) <= len(all_numbers) / 2:
             self.apply_not_started_list_changes_impl(not_started_numbers)
