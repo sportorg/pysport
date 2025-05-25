@@ -12,7 +12,7 @@ from sportorg.models.memory import (
     SystemType,
     Person,
 )
-from sportorg.utils.time import hhmmss_to_time
+from sportorg.utils.time import hhmmss_to_time, ddmmyyyy_to_time
 
 
 def import_sfrx(source: str):
@@ -86,6 +86,8 @@ def import_sfrx(source: str):
 
         person.set_bib(bib)
         person.set_year(person_dict["year"])
+        if len(person_dict["birthday"]):
+            person.birth_date = ddmmyyyy_to_time(person_dict["birthday"])
         group = person_dict["group_id"]
 
         if int(group) >= 0:

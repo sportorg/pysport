@@ -183,7 +183,7 @@ class SFRXImportAction(Action, metaclass=ActionFactory):
             try:
                 sfrximporter.import_sfrx(file_name)
             except Exception as e:
-                logging.error(str(e))
+                logging.exception(e)
                 QMessageBox.warning(
                     self.app,
                     translate("Error"),
