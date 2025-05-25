@@ -5,10 +5,7 @@ from sportorg.gui.dialogs.dialog import BaseDialog, LineField, NumberField, Text
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import translate
 from sportorg.models.memory import CourseControl, find, race
-from sportorg.models.result.result_calculation import ResultCalculation
-from sportorg.models.result.result_checker import ResultChecker
-from sportorg.models.result.score_calculation import ScoreCalculation
-from sportorg.models.result.split_calculation import RaceSplits
+from sportorg.models.result.result_tools import recalculate_results
 from sportorg.modules.teamwork.teamwork import Teamwork
 
 
@@ -99,8 +96,5 @@ class CourseEditDialog(BaseDialog):
         self.current_object.index_name()
         if self.is_new:
             obj.courses.insert(0, self.current_object)
-        ResultChecker.check_all()
-        ResultCalculation(obj).process_results()
-        RaceSplits(obj).generate()
-        ScoreCalculation(obj).calculate_scores()
+        recalculate_results()
         Teamwork().send(self.current_object.to_dict())

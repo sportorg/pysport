@@ -13,10 +13,7 @@ from sportorg.models.memory import (
     races,
     set_current_race_index,
 )
-from sportorg.models.result.result_calculation import ResultCalculation
-from sportorg.models.result.result_checker import ResultChecker
-from sportorg.models.result.score_calculation import ScoreCalculation
-from sportorg.models.result.split_calculation import RaceSplits
+from sportorg.models.result.result_tools import recalculate_results
 
 
 def dump(file, *, compress=False):
@@ -42,12 +39,10 @@ def load(file, *, compress=False):
     event, current_race = get_races_from_file(file, compress=compress)
     new_event(event)
     set_current_race_index(current_race)
-    obj = race()
 
-    ResultChecker.check_all()
-    ResultCalculation(obj).process_results()
-    RaceSplits(obj).generate()
-    ScoreCalculation(obj).calculate_scores()
+    obj = race()
+    recalculate_results(race_object=obj)
+
     obj.set_setting(
         "live_enabled", False
     )  # force user to activate Live broadcast manually (not to lose live results)

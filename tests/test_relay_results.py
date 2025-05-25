@@ -14,7 +14,7 @@ from sportorg.models.memory import (
     new_event,
     race,
 )
-from sportorg.models.result.result_calculation import ResultCalculation
+from sportorg.models.result.result_tools import recalculate_results
 
 
 @pytest.fixture
@@ -28,7 +28,7 @@ def prepare_race():
 @pytest.fixture
 def create_single_team(prepare_race):
     create_relay_team("Team1", 1, 3, 30)
-    ResultCalculation(race()).process_results()
+    recalculate_results(recheck_results=False)
 
 
 def test_create_relay_data(create_single_team):
@@ -127,7 +127,7 @@ def create_multiple_teams(prepare_race):
     team = create_relay_team("Team18", 18, 1, 20)
     team.get_leg(1).result.status = ResultStatus.DID_NOT_START
 
-    ResultCalculation(race()).process_results()
+    recalculate_results(recheck_results=False)
 
 
 @pytest.mark.usefixtures("create_multiple_teams")
@@ -290,7 +290,7 @@ class TestRelayResults:
 def create_multiple_teams_best_team_placing(create_multiple_teams):
     group = get_group()
     group.is_best_team_placing_mode = True
-    ResultCalculation(race()).process_results()
+    recalculate_results(recheck_results=False)
 
 
 @pytest.mark.usefixtures("create_multiple_teams_best_team_placing")

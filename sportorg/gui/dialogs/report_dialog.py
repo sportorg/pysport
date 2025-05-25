@@ -37,9 +37,7 @@ from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import translate
 from sportorg.models.constant import RentCards
 from sportorg.models.memory import get_current_race_index, race, races
-from sportorg.models.result.result_calculation import ResultCalculation
-from sportorg.models.result.score_calculation import ScoreCalculation
-from sportorg.models.result.split_calculation import RaceSplits
+from sportorg.models.result.result_tools import recalculate_results
 
 _settings = {
     "last_template": None,
@@ -135,9 +133,7 @@ class ReportDialog(QDialog):
         _settings["save_to_last_file"] = self.item_save_to_last_file.isChecked()
         _settings["selected"] = self.item_selected.isChecked()
 
-        ResultCalculation(obj).process_results()
-        RaceSplits(obj).generate()
-        ScoreCalculation(obj).calculate_scores()
+        recalculate_results(recheck_results=False)
 
         races_dict = []
         if _settings["selected"]:

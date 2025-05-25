@@ -10,6 +10,9 @@
 * Add a description on how to download the templates
 * Added time accuracy to the results list if the accuracy is specified in the settings ([#481](https://github.com/sportorg/pysport/pull/481))
 * Improved the split panel: added start and finish times; added tenths/hundredths if accuracy is specified; reduced initial panel size ([#480](https://github.com/sportorg/pysport/pull/480))
+* Added keyboard shortcuts for frequent operations ([#487](https://github.com/sportorg/pysport/pull/487))
+* Added the ability to change control times in read chips ([#485](https://github.com/sportorg/pysport/pull/485))
+* Added logging of timing of course checking ([#485](https://github.com/sportorg/pysport/pull/485), `SportOrg/log/sportorg.log`)
 
 ## 2024-10-07 v1.7.1
 

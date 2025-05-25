@@ -27,7 +27,7 @@ from sportorg.models.memory import (
     find,
     race,
 )
-from sportorg.models.result.result_calculation import ResultCalculation
+from sportorg.models.result.result_tools import recalculate_results
 from sportorg.modules.configs.configs import Config
 from sportorg.modules.live.live import live_client
 from sportorg.modules.teamwork.teamwork import Teamwork
@@ -291,6 +291,6 @@ class PersonEditDialog(BaseDialog):
         if self.is_new:
             race().add_person(person)
 
-        ResultCalculation(race()).process_results()
+        recalculate_results(recheck_results=False)
         live_client.send(person)
         Teamwork().send(person.to_dict())

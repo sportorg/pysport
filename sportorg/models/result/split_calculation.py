@@ -1,6 +1,7 @@
 import logging
+from typing import Optional
 
-from sportorg.models.memory import Course, Qualification, ResultStatus
+from sportorg.models.memory import Course, Group, Qualification, ResultStatus
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.utils.time import get_speed_min_per_km
 
@@ -260,8 +261,11 @@ class RaceSplits:
     def __init__(self, r):
         self.race = r
 
-    def generate(self):
-        logging.debug("Race splits generate")
-        for group in self.race.groups:
+    def generate(self, group: Optional[Group] = None):
+        if group is None:
+            for group in self.race.groups:
+                GroupSplits(self.race, group).generate()
+        else:
             GroupSplits(self.race, group).generate()
+
         return self
