@@ -281,6 +281,10 @@ def menu_list():
                     "title": translate("Marked route course generation"),
                     "action": "MarkedRouteCourseGeneration",
                 },
+                {
+                    "title": translate("Extract person middle name"),
+                    "action": "ExtractPersonMiddleName",
+                },
             ],
         },
         {

@@ -69,6 +69,7 @@ class ResultChecker:
             ResultStatus.MISSING_PUNCH,
             ResultStatus.OVERTIME,
             ResultStatus.MISS_PENALTY_LAP,
+            ResultStatus.MULTI_DAY_ISSUE,
         ]:
             result.status = ResultStatus.OK
 

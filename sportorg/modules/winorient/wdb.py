@@ -111,7 +111,8 @@ class WinOrientBinary:
             new_group.price = group.owner_cost
             course = group.get_course()
             if course:
-                new_group.course = find(race().courses, name=course.name)
+                if course.name in race().course_index_name:
+                    new_group.course = race().course_index_name[course.name]
             my_race.groups.append(new_group)
 
         for man in self.wdb_object.man:
@@ -252,7 +253,7 @@ class WinOrientBinary:
 
         for man in my_race.persons:
             new_person = WDBMan(wdb_object)
-            new_person.name = str(man.surname) + " " + str(man.name)
+            new_person.name = str(man.full_name_with_middle)
             if man.bib:
                 new_person.number = int(man.bib)
 

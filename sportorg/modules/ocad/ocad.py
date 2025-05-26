@@ -1,5 +1,6 @@
 from sportorg.libs.ocad import ocad
 from sportorg.models import memory
+from sportorg.models.memory import race
 
 
 class OcadImportException(Exception):
@@ -16,7 +17,7 @@ def import_txt_v8(source):
                 name = course.group
             else:
                 name = course.course
-            if memory.find(memory.race().courses, name=name) is None:
+            if name not in race().course_index_name:
                 c = memory.create(
                     memory.Course,
                     name=name,

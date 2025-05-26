@@ -42,7 +42,9 @@ def course_data(tree, ns):
             course = {
                 "name": course_el.find("iof:Name", ns).text,
                 "length": int(course_el.find("iof:Length", ns).text),
-                "climb": int(course_el.find("iof:Climb", ns).text),
+                "climb": int(course_el.find("iof:Climb", ns).text)
+                if course_el.find("iof:Climb", ns)
+                else 0,
                 "controls": [],
             }
 

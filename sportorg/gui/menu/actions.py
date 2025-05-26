@@ -4,8 +4,12 @@ import uuid
 from os import remove
 from typing import Any, Dict, Type
 
-from PySide6 import QtCore
-from PySide6.QtWidgets import QApplication, QMessageBox
+try:
+    from PySide6 import QtCore
+    from PySide6.QtWidgets import QApplication, QMessageBox
+except ModuleNotFoundError:
+    from PySide2 import QtCore
+    from PySide2.QtWidgets import QApplication, QMessageBox
 
 from sportorg import config
 from sportorg.common.otime import OTime
@@ -180,7 +184,7 @@ class SFRXImportAction(Action, metaclass=ActionFactory):
             try:
                 sfrximporter.import_sfrx(file_name)
             except Exception as e:
-                logging.error(str(e))
+                logging.exception(e)
                 QMessageBox.warning(
                     self.app,
                     translate("Error"),
@@ -964,4 +968,11 @@ class RentCardsAction(Action, metaclass=ActionFactory):
 class MarkedRouteCourseGeneration(Action, metaclass=ActionFactory):
     def execute(self):
         MarkedRouteDialog().exec_()
+        self.app.refresh()
+
+
+class ExtractPersonMiddleName(Action, metaclass=ActionFactory):
+    def execute(self):
+        for person in race().persons:
+            person.extract_middle_name()
         self.app.refresh()

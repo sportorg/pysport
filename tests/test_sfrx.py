@@ -16,9 +16,9 @@ def test_import_sfrx():
     assert isinstance(person.group, Group), "Not group"
     assert person.group.name == "М14", "Group name error"
     assert isinstance(person.organization, Organization), "Not organization"
-    assert (
-        person.organization.name == "СДЮСШ Балт. берег Peterhof"
-    ), "Organization name error"
+    assert person.organization.name == "СДЮСШ Балт. берег Peterhof", (
+        "Organization name error"
+    )
     assert person.get_year() == 2009, "Year error"
     assert person.card_number == 0, "Card number error"
     assert person.qual == Qualification.I_Y, "Qualification error"

@@ -14,7 +14,7 @@ from sportorg.common.model import Model
 from sportorg.common.otime import OTime, TimeRounding
 from sportorg.language import translate
 from sportorg.modules.configs.configs import Config
-from sportorg.utils.time import hhmmss_to_time
+from sportorg.utils.time import hhmmss_to_time, date_to_ddmmyyyy
 
 
 class NotEmptyException(Exception):
@@ -93,6 +93,7 @@ class ResultStatus(_TitleType):
     CANCELLED = 15
     RESTORED = 16
     MISS_PENALTY_LAP = 17
+    MULTI_DAY_ISSUE = 18
 
 
 class Organization(Model):
@@ -203,7 +204,7 @@ class ControlPoint(Model):
 class Course(Model):
     def __init__(self):
         self.id = uuid.uuid4()
-        self.name = ""
+        self._name = ""
         self.bib = 0
         self.length = 0
         self.climb = 0
@@ -227,6 +228,14 @@ class Course(Model):
                 return False
 
         return True
+
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, new_name: str):
+        self._set_name(new_name)
 
     def is_unknown(self):
         for control in self.controls:
@@ -265,6 +274,23 @@ class Course(Model):
             control = CourseControl()
             control.update_data(item)
             self.controls.append(control)
+
+    def index_name(self):
+        self._set_name(self.name)
+
+    def _set_name(self, new_name: str) -> None:
+        r = race()
+
+        # remove old name index
+        if self.name != new_name and self.name in r.course_index_name:
+            r.course_index_name.pop(self.name)
+
+        if new_name in r.course_index_name:
+            other_course = r.course_index_name[new_name]
+            if other_course is not self:
+                logging.info("Duplicate course name: %s", new_name)
+        r.course_index_name[new_name] = self
+        self._name = new_name
 
 
 class Group(Model):
@@ -792,10 +818,11 @@ class Result(ABC):
                 if result_tmp.is_status_ok():
                     sum_result += result_tmp.get_result_otime_current_day()
                 else:
-                    self.status = ResultStatus.DISQUALIFIED
+                    self.status = ResultStatus.MULTI_DAY_ISSUE
+                    self.status_comment = result_tmp.status_comment
                     return OTime()  # DSQ/DNS
             else:
-                self.status = ResultStatus.DISQUALIFIED
+                self.status = ResultStatus.MULTI_DAY_ISSUE
                 return OTime()  # result not found in that day
         return sum_result
 
@@ -1291,6 +1318,7 @@ class Person(Model):
         self.id = uuid.uuid4()
         self.name = ""
         self.surname = ""
+        self.middle_name = ""
 
         self._card_number = 0
         self._bib = 0
@@ -1328,6 +1356,11 @@ class Person(Model):
             return self.birth_date.year
         return 0
 
+    def get_birthday(self):
+        if self.birth_date:
+            return date_to_ddmmyyyy(self.birth_date)
+        return ""
+
     def set_year(self, year):
         """Change only year of birth_date"""
         if year == 0:
@@ -1341,9 +1374,19 @@ class Person(Model):
 
     @property
     def full_name(self):
+        ret = self.name
         if self.surname:
-            return f"{self.surname} {self.name}"
-        return self.name
+            ret = f"{self.surname} {ret}"
+        return ret
+
+    @property
+    def full_name_with_middle(self):
+        ret = self.name
+        if self.middle_name:
+            ret = f"{ret} {self.middle_name}"
+        if self.surname:
+            ret = f"{self.surname} {ret}"
+        return ret
 
     @property
     def multi_day_id(self):
@@ -1358,12 +1401,14 @@ class Person(Model):
             "id": str(self.id),
             "name": self.name,
             "surname": self.surname,
+            "middle_name": self.middle_name,
             "card_number": self.card_number,
             "bib": self.bib,
             "birth_date": str(self.birth_date) if self.birth_date else None,
             "year": (
                 self.get_year() if self.get_year() else 0
             ),  # back compatibility with 1.0
+            "birthday": self.get_birthday(),
             "group_id": str(self.group.id) if self.group else None,
             "organization_id": str(self.organization.id) if self.organization else None,
             "world_code": self.world_code,
@@ -1382,6 +1427,8 @@ class Person(Model):
     def update_data(self, data):
         self.name = str(data["name"])
         self.surname = str(data["surname"])
+        if "middle_name" in data and data["middle_name"]:
+            self.middle_name = str(data["middle_name"])
         self.set_card_number(int(data["card_number"]))
         self.set_bib(int(data["bib"]))
         self.contact = []
@@ -1417,6 +1464,10 @@ class Person(Model):
         self._index_bib(new_bib)
         self._bib = new_bib
 
+    # used for duplication
+    def set_bib_without_indexing(self, new_bib: int) -> None:
+        self._bib = new_bib
+
     def _index_bib(self, new_bib: int) -> None:
         r = race()
         if self._bib != new_bib and self._bib in r.person_index_bib:
@@ -1450,6 +1501,10 @@ class Person(Model):
         self._index_card(new_card)
         self._card_number = new_card
 
+    # used for duplication
+    def set_card_number_without_indexing(self, new_card: int):
+        self._card_number = new_card
+
     def _index_card(self, new_card):
         r = race()
         if self._card_number != new_card and self._card_number in r.person_index_card:
@@ -1467,6 +1522,12 @@ class Person(Model):
 
     def index_card(self):
         self._index_card(self._card_number)
+
+    def extract_middle_name(self):
+        arr = self.name.split(" ", 1)
+        if len(arr) > 1:
+            self.name = arr[0]
+            self.middle_name = arr[1]
 
 
 class RaceData(Model):
@@ -1561,9 +1622,10 @@ class Race(Model):
         self.person_index_bib: Dict[int, Person] = {}
         self.person_index_card: Dict[int, Person] = {}
         self.person_index: Dict[str, Result] = {}
-        self.group_index: Dict[str, Result] = {}
-        self.organization_index: Dict[str, Result] = {}
-        self.course_index: Dict[str, Result] = {}
+        self.group_index: Dict[str, Group] = {}
+        self.organization_index: Dict[str, Organization] = {}
+        self.course_index: Dict[str, Course] = {}
+        self.course_index_name: Dict[str, Course] = {}
 
     def __repr__(self) -> str:
         return repr(self.data)
@@ -1777,12 +1839,18 @@ class Race(Model):
                 p.is_rented_card = False
                 return p
 
-    def rebuild_indexes(self):
-        self.person_index_bib = {}
-        self.person_index_card = {}
-        for person in self.persons:
-            person.index_bib()
-            person.index_card()
+    def rebuild_indexes(self, rebuild_person=True, rebuild_course=False):
+        if rebuild_person:
+            self.person_index_bib = {}
+            self.person_index_card = {}
+            for person in self.persons:
+                person.index_bib()
+                person.index_card()
+
+        if rebuild_course:
+            self.course_index_name = {}
+            for course in self.courses:
+                course.index_name()
 
     def delete_persons(self, indexes):
         indexes = sorted(indexes, reverse=True)
@@ -1883,6 +1951,19 @@ class Race(Model):
             return None
 
         bib = person.bib
+
+        # use cache
+        obj = race()
+
+        if str(bib) in obj.course_index_name:
+            return obj.course_index_name[str(bib)]
+
+        bib_with_dot = ""
+        if bib > 1000:
+            bib_with_dot = str(bib % 1000) + "." + str(bib // 1000)
+        if bib_with_dot in obj.course_index_name:
+            return obj.course_index_name[bib_with_dot]
+
         ret = find(self.courses, name=str(bib))
         if not ret and bib > 1000:
             course_name = "{}.{}".format(bib % 1000, bib // 1000)

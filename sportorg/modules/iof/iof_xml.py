@@ -144,6 +144,7 @@ def create_person(person_entry):
 
     person.surname = person_entry["person"]["family"]
     person.name = person_entry["person"]["given"]
+    person.extract_middle_name()
 
     if "id" in person_entry["person"]:
         person.world_code = str(person_entry["person"]["id"])

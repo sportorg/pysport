@@ -78,6 +78,8 @@ def _move_indexes_to_new_race(obj):
     race().person_index_bib = {}
     obj.person_index_card = race().person_index_card
     race().person_index_card = {}
+    obj.course_index_name = race().course_index_name
+    race().course_index_name = {}
 
 
 def _race_migrate(data):

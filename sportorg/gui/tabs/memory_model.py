@@ -5,7 +5,10 @@ from abc import abstractmethod
 from copy import copy, deepcopy
 from typing import List
 
-from PySide6.QtCore import QAbstractTableModel, Qt
+try:
+    from PySide6.QtCore import QAbstractTableModel, Qt
+except ModuleNotFoundError:
+    from PySide2.QtCore import QAbstractTableModel, Qt
 
 from sportorg.language import translate
 from sportorg.models.constant import RentCards
@@ -142,6 +145,7 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
             translate("contain"): f".*{value}.*",
             translate("equal to"): f"{value}$",
             translate("doesn't contain"): f"^((?!{value}).)*$",
+            translate("in list"): f"{value.replace(',', '|')}$",
         }.get(action, ".*")
         return re.compile(regex_string)
 
@@ -251,6 +255,7 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
         return [
             translate("Last name"),
             translate("First name"),
+            translate("Middle name"),
             translate("Qualification title"),
             translate("Group"),
             translate("Team"),
@@ -279,8 +284,8 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
         person = self.race.persons[position]
         new_person = copy(person)
         new_person.id = uuid.uuid4()
-        new_person.set_bib(0)
-        new_person.set_card_number(0)
+        new_person.set_bib_without_indexing(0)
+        new_person.set_card_number_without_indexing(0)
         self.race.persons.insert(position, new_person)
 
     def get_values_from_object(self, obj):
@@ -291,6 +296,7 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
 
         ret.append(person.surname)
         ret.append(person.name)
+        ret.append(person.middle_name)
         if person.qual:
             ret.append(person.qual.get_title())
         else:
@@ -544,9 +550,16 @@ class CourseMemoryModel(AbstractSportOrgMemoryModel):
 
     def duplicate(self, position):
         course = self.race.courses[position]
+        old_name = course.name
         new_course = copy(course)
         new_course.id = uuid.uuid4()
-        new_course.name = new_course.name + "_"
+        new_name = course.name + "_"
+        while new_name in self.race.course_index_name:
+            new_name = new_name + "_"
+        new_course.name = new_name
+        course.name = (
+            old_name  # recover index for old name, broken while setting name to copy
+        )
         new_course.controls = deepcopy(course.controls)
         self.race.courses.insert(position, new_course)
 

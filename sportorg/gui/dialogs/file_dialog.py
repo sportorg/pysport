@@ -2,7 +2,10 @@ import os
 import platform
 import re
 
-from PySide6.QtWidgets import QFileDialog
+try:
+    from PySide6.QtWidgets import QFileDialog
+except ModuleNotFoundError:
+    from PySide2.QtWidgets import QFileDialog
 
 from sportorg.modules.configs.configs import Config, ConfigFile
 

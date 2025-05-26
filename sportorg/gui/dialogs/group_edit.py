@@ -134,6 +134,8 @@ class GroupEditDialog(BaseDialog):
         return race().get_type(self.current_object).get_title()
 
     def parse_course(self, text: str):
+        if text in race().course_index_name:
+            return race().course_index_name[text]
         return find(race().courses, name=text)
 
     def parse_race_type(self, text: str):
@@ -152,9 +154,7 @@ class GroupEditDialog(BaseDialog):
                 self.button_ok.setDisabled(True)
 
     def on_ranking_clicked(self):
-        self.hide()
         GroupRankingDialog(self.current_object).exec_()
-        self.show()
 
     def on_is_any_course_changed(self):
         self.fields["course"].q_item.setDisabled(

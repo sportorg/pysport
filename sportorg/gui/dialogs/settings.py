@@ -1,19 +1,34 @@
 import logging
 import webbrowser
 
-from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import (
-    QCheckBox,
-    QCommandLinkButton,
-    QDialog,
-    QDialogButtonBox,
-    QFormLayout,
-    QHBoxLayout,
-    QLabel,
-    QPushButton,
-    QTabWidget,
-    QWidget,
-)
+try:
+    from PySide6.QtGui import QIcon
+    from PySide6.QtWidgets import (
+        QCheckBox,
+        QDialog,
+        QDialogButtonBox,
+        QFormLayout,
+        QLabel,
+        QPushButton,
+        QTabWidget,
+        QWidget,
+        QHBoxLayout,
+        QCommandLinkButton,
+    )
+except ModuleNotFoundError:
+    from PySide2.QtGui import QIcon
+    from PySide2.QtWidgets import (
+        QCheckBox,
+        QDialog,
+        QDialogButtonBox,
+        QFormLayout,
+        QLabel,
+        QPushButton,
+        QTabWidget,
+        QWidget,
+        QHBoxLayout,
+        QCommandLinkButton,
+    )
 
 from sportorg import config
 from sportorg.common.audio import get_sounds
