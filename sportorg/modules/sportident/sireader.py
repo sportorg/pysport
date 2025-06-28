@@ -30,6 +30,7 @@ from sportorg.modules.sportident import backup
 from sportorg.utils.time import time_to_otime
 from serial.tools import list_ports
 
+
 class SIReaderCommand:
     def __init__(self, command, data=None):
         self.command = command
