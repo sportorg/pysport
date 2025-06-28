@@ -9,8 +9,6 @@ from queue import Queue
 import psutil
 from psutil import Process
 
-from sportorg.models.result.result_checker import ResultChecker
-
 try:
     from PySide6 import QtCore, QtGui, QtWidgets
     from PySide6.QtCore import QTimer
@@ -20,7 +18,7 @@ except ModuleNotFoundError:
     from PySide2 import QtCore, QtGui, QtWidgets
     from PySide2.QtCore import QTimer
     from PySide2.QtGui import QActionEvent
-    from PySide2.QtWidgets import QMainWindow, QMessageBox, QAction
+    from PySide2.QtWidgets import QAction, QMainWindow, QMessageBox
 
 from sportorg import config
 from sportorg.gui.dialogs.course_edit import CourseEditDialog
@@ -45,12 +43,12 @@ from sportorg.models.constant import RentCards
 from sportorg.models.memory import (
     NotEmptyException,
     Race,
+    RaceType,
+    get_current_race_index,
     new_event,
     race,
-    set_current_race_index,
-    RaceType,
     races,
-    get_current_race_index,
+    set_current_race_index,
 )
 from sportorg.models.result.result_tools import recalculate_results
 from sportorg.models.result.split_calculation import GroupSplits
@@ -499,8 +497,7 @@ class MainWindow(QMainWindow):
                 for i in range(len(races())):
                     set_current_race_index(i)
                     race().rebuild_indexes()
-                    ResultChecker.check_all()
-                    ResultCalculation(race()).process_results()
+                    recalculate_results(race_object=race())
                 set_current_race_index(day_index)
             else:
                 obj.rebuild_indexes(True, True)
