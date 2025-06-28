@@ -4,7 +4,7 @@ from queue import Queue
 from threading import Thread
 
 try:
-    from playsound import playsound
+    from playsound3 import playsound
 except ModuleNotFoundError:
     playsound = None
 
