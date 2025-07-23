@@ -10,11 +10,11 @@ from typing import Any, Dict, List, Optional
 
 import dateutil.parser
 
+from sportorg import settings
 from sportorg.common.model import Model
 from sportorg.common.otime import OTime, TimeRounding
 from sportorg.language import translate
-from sportorg.modules.configs.configs import Config
-from sportorg.utils.time import hhmmss_to_time, date_to_ddmmyyyy
+from sportorg.utils.time import date_to_ddmmyyyy, hhmmss_to_time
 
 
 class NotEmptyException(Exception):
@@ -2223,9 +2223,7 @@ class Qualification(IntEnum):
 
     # get score for ranking, stored in config.ini file
     def get_score(self):
-        ret = Config().ranking.get(self.name.lower(), 0)
-        ret = float(ret)
-        return ret
+        return float(settings.SETTINGS.ranking.get(self.name.lower(), 0))
 
     @staticmethod
     def list_qual():

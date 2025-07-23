@@ -1,5 +1,6 @@
 from typing import Dict, List
 
+from sportorg import settings
 from sportorg.common.otime import OTime
 from sportorg.models.constant import RankingTable
 from sportorg.models.memory import (
@@ -12,7 +13,6 @@ from sportorg.models.memory import (
     ResultStatus,
     find,
 )
-from sportorg.modules.configs.configs import Config
 
 
 class ResultCalculation:
@@ -275,15 +275,15 @@ class ResultCalculation:
         Rank calculation, takes sums or scores from qualification of best X (default=10)
         athletes, who have OK result and are not out of competition
 
-        :return: rank of group, -1 if we have < X (default=5) successfull results
+        :return: rank of group, -1 if we have < X (default=5) successful results
         """
         scores = []
         array = self.get_group_finishes(group)
 
-        start_limit = Config().ranking.get("start_limit", 10)
-        finish_limit = Config().ranking.get("finish_limit", 5)
-        sum_count = Config().ranking.get("sum_count", 10)
-        individual_ranking_method = Config().ranking.get(
+        start_limit = settings.SETTINGS.get("start_limit", 10)
+        finish_limit = settings.SETTINGS.get("finish_limit", 5)
+        sum_count = settings.SETTINGS.get("sum_count", 10)
+        individual_ranking_method = settings.SETTINGS.get(
             "individual_ranking_method", "best"
         )
 
@@ -323,15 +323,15 @@ class ResultCalculation:
         Rank calculation, takes sums or scores from qualification of best X (default=10)
         athletes, who have OK result and are not out of competition
 
-        :return: rank of group, -1 if we have < X (default=4) successfull teams
+        :return: rank of group, -1 if we have < X (default=4) successful teams
         """
         teams = find(self.race.relay_teams, group=group, return_all=True)
         success_teams = []
 
-        start_limit = Config().ranking.get("start_limit_relay", 6)
-        finish_limit = Config().ranking.get("finish_limit_relay", 4)
-        sum_count = Config().ranking.get("sum_count_relay", 10)
-        relay_ranking_method = Config().ranking.get("relay_ranking_method", "personal")
+        start_limit = settings.SETTINGS.get("start_limit_relay", 6)
+        finish_limit = settings.SETTINGS.get("finish_limit_relay", 4)
+        sum_count = settings.SETTINGS.get("sum_count_relay", 10)
+        relay_ranking_method = settings.SETTINGS.get("relay_ranking_method", "personal")
 
         started_teams = 0
         if teams:

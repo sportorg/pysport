@@ -29,14 +29,13 @@ except ModuleNotFoundError:
         QPushButton,
     )
 
-from sportorg import config
+from sportorg import config, settings
 from sportorg.common.template import get_templates
 from sportorg.gui.dialogs.file_dialog import get_open_file_name
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import translate
 from sportorg.models.memory import race
-from sportorg.modules.configs.configs import Config
 
 
 class PrintPropertiesDialog(QDialog):
@@ -134,7 +133,7 @@ class PrintPropertiesDialog(QDialog):
         obj = race()
         default_printer_name = QPrinter().printerName()
 
-        printer_name = Config().printer.get("split", default_printer_name)
+        printer_name = settings.SETTINGS.printer_split or default_printer_name
         # try:
         #     QPrinter().setPrinterName(printer_name)
         # except Exception as e:
@@ -167,7 +166,7 @@ class PrintPropertiesDialog(QDialog):
     def apply_changes_impl(self):
         obj = race()
         split_printer = self.selected_split_printer.text()
-        Config().printer.set("split", split_printer)
+        settings.SETTINGS.printer_split = split_printer
         obj.set_setting("split_printout", self.print_splits_checkbox.isChecked())
         obj.set_setting("split_template", self.item_template.currentText())
 

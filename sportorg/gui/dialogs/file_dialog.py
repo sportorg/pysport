@@ -7,7 +7,7 @@ try:
 except ModuleNotFoundError:
     from PySide2.QtWidgets import QFileDialog
 
-from sportorg.modules.configs.configs import Config, ConfigFile
+from sportorg import settings
 
 
 def get_existing_directory(caption="", dir=""):
@@ -40,15 +40,8 @@ def get_save_file_name(caption="", filter_text="", file_name=""):
 
 
 def get_default_dir():
-    if get_conf().has_section(ConfigFile.DIRECTORY):
-        return get_conf().get(ConfigFile.DIRECTORY, "dialog_default_dir", fallback="")
-    return ""
+    return settings.SETTINGS.window_dialog_path
 
 
 def set_default_dir(directory):
-    # FIXME
-    get_conf()[ConfigFile.DIRECTORY] = {"dialog_default_dir": directory}
-
-
-def get_conf():
-    return Config().parser
+    settings.SETTINGS.window_dialog_path = directory

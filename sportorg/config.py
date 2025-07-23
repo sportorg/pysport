@@ -97,6 +97,7 @@ def commit_version() -> str:
 ICON = icon_dir("sportorg.svg")
 
 CONFIG_INI = data_dir("config.ini")
+SETTINGS_JSON = data_dir("settings.json")
 
 LOCALE_DIR = base_dir("languages")
 

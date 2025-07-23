@@ -1,11 +1,11 @@
 import platform
 
+from sportorg import settings
 from sportorg.common.template import get_text_from_file
 from sportorg.config import template_dir
 from sportorg.language import translate
 from sportorg.models.memory import Organization, race
 from sportorg.models.result.split_calculation import GroupSplits
-from sportorg.modules.configs.configs import Config
 from sportorg.modules.printing.printing import print_html
 from sportorg.modules.printing.printout_split import SportorgPrinter
 
@@ -21,7 +21,7 @@ class NoPrinterSelectedException(Exception):
 def split_printout(results):
     isDirectMode = False
 
-    printer = Config().printer.get("split")
+    printer = settings.SETTINGS.printer_split
     obj = race()
     template_path = obj.get_setting(
         "split_template", template_dir("split", "1_split_printout.html")

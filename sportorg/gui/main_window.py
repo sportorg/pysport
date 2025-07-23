@@ -20,7 +20,7 @@ except ModuleNotFoundError:
     from PySide2.QtGui import QActionEvent
     from PySide2.QtWidgets import QAction, QMainWindow, QMessageBox
 
-from sportorg import config
+from sportorg import config, settings
 from sportorg.gui.dialogs.course_edit import CourseEditDialog
 from sportorg.gui.dialogs.file_dialog import get_save_file_name
 from sportorg.gui.dialogs.group_edit import GroupEditDialog
@@ -136,7 +136,7 @@ class MainWindow(QMainWindow):
         self._set_style()
         self._setup_ui()
         self._setup_menu()
-        if Configuration().configuration.get("show_toolbar"):
+        if settings.SETTINGS.window_show_toolbar:
             self._setup_toolbar()
         self._setup_tab()
         self._setup_statusbar()
@@ -193,10 +193,11 @@ class MainWindow(QMainWindow):
             self.teamwork_status = Teamwork().is_alive()
 
         try:
-            if self.get_configuration().get("autosave_interval"):
+            if settings.SETTINGS.file_autosave_interval:
                 if self.file:
-                    if time.time() - self.last_update > int(
-                        self.get_configuration().get("autosave_interval")
+                    if (
+                        time.time() - self.last_update
+                        > settings.SETTINGS.file_autosave_interval
                     ):
                         self.save_file()
                         logging.info(translate("Auto save"))
@@ -259,35 +260,91 @@ class MainWindow(QMainWindow):
             _event.ignore()
 
     def conf_read(self):
+        _, exists = settings.load_settings_from_file()
         Configuration().read()
-        if Configuration().parser.has_section(ConfigFile.PATH):
-            try:
-                recent_files = ast.literal_eval(
-                    Configuration().parser.get(
-                        ConfigFile.PATH, "recent_files", fallback="[]"
-                    )
-                )
-                if isinstance(recent_files, list):
-                    self.recent_files = recent_files
-            except Exception as e:
-                logging.error(str(e))
+        if not exists:
+            settings.SETTINGS.app_check_updates = Configuration().configuration.get(
+                "check_updates", True
+            )
+            settings.SETTINGS.locale = Configuration().configuration.get(
+                "current_locale", "ru_RU"
+            )
+            settings.SETTINGS.logging_level = Configuration().configuration.get(
+                "logging_level", True
+            )
+            settings.SETTINGS.logging_window_row_count = (
+                Configuration().configuration.get("log_window_row_count", True)
+            )
+            settings.SETTINGS.window_show_toolbar = Configuration().configuration.get(
+                "show_toolbar", True
+            )
+            settings.SETTINGS.window_geometry = Configuration().geometry.get(
+                "main", "01"
+            )
+            settings.SETTINGS.window_dialog_path = Configuration().parser.get(
+                ConfigFile.DIRECTORY, "dialog_default_dir", fallback=""
+            )
+            settings.SETTINGS.race_use_birthday = Configuration().configuration.get(
+                "use_birthday", False
+            )
+            settings.SETTINGS.templates_path = Configuration().templates.get(
+                "directory", ""
+            )
+            settings.SETTINGS.file_autosave_interval = (
+                Configuration().configuration.get("autosave_interval", 0)
+            )
+            settings.SETTINGS.file_save_in_utf8 = Configuration().configuration.get(
+                "save_in_utf8", True
+            )
+            settings.SETTINGS.file_save_in_gzip = Configuration().configuration.get(
+                "save_in_gzip", True
+            )
+            settings.SETTINGS.file_open_recent_file = Configuration().configuration.get(
+                "open_recent_file", True
+            )
+            settings.SETTINGS.printer_main = Configuration().printer.get("main", "")
+            settings.SETTINGS.printer_split = Configuration().printer.get("split", "")
+            settings.SETTINGS.sound_enabled = Configuration().sound.get(
+                "enabled", False
+            )
+            settings.SETTINGS.sound_successful_path = Configuration().sound.get(
+                "successful", ""
+            )
+            settings.SETTINGS.sound_unsuccessful_path = Configuration().sound.get(
+                "unsuccessful", ""
+            )
+            settings.SETTINGS.sound_enabled_rented_card = Configuration().sound.get(
+                "enabled_rented_card", True
+            )
+            settings.SETTINGS.sound_rented_card_path = Configuration().sound.get(
+                "rented_card", True
+            )
+            settings.SETTINGS.sound_enter_number_path = Configuration().sound.get(
+                "enter_number", True
+            )
+            settings.SETTINGS.ranking = Configuration().ranking.get_all() or {}
+            settings.save_settings_to_file()
 
-        level: str = Configuration().configuration.get("logging_level", "INFO")
-        self._handler.setLevel(level)
+        if settings.SETTINGS.file_recent:
+            self.recent_files = [settings.SETTINGS.file_recent]
 
-        dirpath = Configuration().templates.get("directory")
-        if dirpath:
-            config.set_template_dir(dirpath)
+        self._handler.setLevel(settings.SETTINGS.logging_level)
+
+        templates_path = settings.SETTINGS.templates_path
+        if templates_path:
+            config.set_template_dir(templates_path)
 
     def conf_write(self):
-        Configuration().save()
+        settings.SETTINGS.window_geometry = bytes(self.saveGeometry().toHex()).decode(
+            "utf-8"
+        )
+        settings.save_settings_to_file()
 
     def post_show(self):
         if self.file:
             self.open_file(self.file)
-        elif Configuration().configuration.get("open_recent_file"):
-            if len(self.recent_files):
-                self.open_file(self.recent_files[0])
+        elif settings.SETTINGS.file_open_recent_file and self.recent_files:
+            self.open_file(self.recent_files[0])
 
         Teamwork().set_call(self.teamwork)
         SIReaderClient().set_call(self.add_sportident_result_from_sireader)
@@ -310,11 +367,7 @@ class MainWindow(QMainWindow):
         self._menu_disable(self.current_tab)
 
     def _setup_ui(self):
-        geometry = ConfigFile.GEOMETRY
-
-        geom = bytearray.fromhex(
-            Configuration().parser.get(geometry, "main", fallback="01")
-        )
+        geom = bytearray.fromhex(str(settings.SETTINGS.window_geometry))
         self.restoreGeometry(geom)
 
         self.setWindowIcon(QtGui.QIcon(config.ICON))
@@ -425,16 +478,6 @@ class MainWindow(QMainWindow):
             race().update_counters()
             self.refresh()
 
-    def get_size(self):
-        return {
-            # 'x': self.x() + 8,
-            "x": self.geometry().x(),
-            # 'y': self.y() + 30,
-            "y": self.geometry().y(),
-            "width": self.width(),
-            "height": self.height(),
-        }
-
     def set_title(self, title=None):
         main_title = "{} {}".format(config.NAME, config.VERSION)
         if title:
@@ -467,10 +510,6 @@ class MainWindow(QMainWindow):
             self.tabwidget.setCurrentIndex(index)
         else:
             logging.error("{} {}".format(index, translate("Tab doesn't exist")))
-
-    @staticmethod
-    def get_configuration():
-        return Configuration().configuration
 
     def init_model(self):
         try:
@@ -567,7 +606,7 @@ class MainWindow(QMainWindow):
     def add_recent_file(self, file):
         self.delete_from_recent_files(file)
         self.recent_files.insert(0, file)
-        Configuration().parser[ConfigFile.PATH] = {"recent_files": self.recent_files}
+        settings.SETTINGS.file_recent = file
 
     def delete_from_recent_files(self, file):
         if file in self.recent_files:
