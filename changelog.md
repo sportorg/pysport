@@ -14,6 +14,7 @@
 * Added the ability to change control times in read chips ([#485](https://github.com/sportorg/pysport/pull/485))
 * Added logging of timing of course checking ([#485](https://github.com/sportorg/pysport/pull/485), `SportOrg/log/sportorg.log`)
 * Bumped dependencies jinja2, psutil, pywin32, playsound and others ([#493](https://github.com/sportorg/pysport/pull/493))
+* Sending compressed data to orgeo (gzip)
 
 ## 2024-10-07 v1.7.1
 

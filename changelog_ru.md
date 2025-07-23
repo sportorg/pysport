@@ -15,6 +15,7 @@
 + Добавлено диалоговое окно для смещения времени КП в считанных чипах ([#485](https://github.com/sportorg/pysport/pull/485))
 + Добавлено логирование продолжительности проверки правильности прохождения ([#485](https://github.com/sportorg/pysport/pull/485), лог-файл `SportOrg/log/sportorg.log`)
 + Обновлены зависимости jinja2, psutil, pywin32, playsound и другие ([#493](https://github.com/sportorg/pysport/pull/493))
++ Отправка сжатых данных в orgeo (gzip)
 
 ## 2024-10-07 v1.7.1
 

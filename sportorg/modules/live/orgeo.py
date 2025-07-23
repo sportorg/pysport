@@ -1,7 +1,9 @@
-import logging
+import gzip
+import json
 from re import subn
 from typing import Any, Dict
 
+from sportorg import config
 from sportorg.common.otime import OTime
 from sportorg.utils.time import int_to_otime, time_to_hhmmss
 
@@ -31,12 +33,31 @@ RESULT_STATUS = [
 
 
 class Orgeo:
-    def __init__(self, session, url: str, user_agent: str = "SportOrg"):
+    def __init__(
+        self,
+        session,
+        url: str,
+        user_agent: str = "SportOrg " + config.VERSION,
+        compression: bool = True,
+    ):
         self.session = session
         self._url = url
+        self._compression = compression
         self._headers = {"User-Agent": user_agent}
 
     async def send(self, data):
+        if self._compression:
+            json_bytes = json.dumps(data).encode("utf-8")
+            compressed = gzip.compress(json_bytes)
+            headers = {
+                "Content-Type": "application/json",
+                "Content-Encoding": "gzip",
+                "Content-Length": str(len(compressed)),
+                **self._headers,
+            }
+
+            return await self.session.post(self._url, headers=headers, data=compressed)
+
         return await self.session.post(self._url, headers=self._headers, json=data)
 
     async def send_online_cp(self, chip, code, time):
