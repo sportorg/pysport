@@ -27,10 +27,11 @@ class Settings:
     sound_enabled: bool = True
     sound_successful_path: Optional[str] = None
     sound_unsuccessful_path: Optional[str] = None
-    sound_enabled_rented_card: bool = True
+    sound_rented_card_enabled: bool = True
     sound_rented_card_path: Optional[str] = None
     sound_enter_number_path: Optional[str] = None
     ranking: Dict[str, Any] = field(default_factory=dict)
+    live_gzip_enabled: bool = True
 
 
 SETTINGS = Settings()

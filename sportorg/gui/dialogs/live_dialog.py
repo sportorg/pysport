@@ -27,7 +27,7 @@ except ModuleNotFoundError:
         QTextEdit,
     )
 
-from sportorg import config
+from sportorg import config, settings
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvSpinBox
 from sportorg.language import translate
@@ -70,6 +70,9 @@ class LiveDialog(QDialog):
 
         self.item_live_enabled = QCheckBox(translate("Enabled"))
         self.layout.addRow(self.item_live_enabled)
+
+        self.item_live_gzip_enabled = QCheckBox(translate("Gzip compression"))
+        self.layout.addRow(self.item_live_gzip_enabled)
 
         self.item_sending_all_controls = QCheckBox(
             translate("Sending the entire contents of the chip")
@@ -189,6 +192,8 @@ class LiveDialog(QDialog):
         self.online_cp_from_finish.setChecked(live_cp_finish_enabled)
         self.online_cp_from_splits.setChecked(live_cp_splits_enabled)
 
+        self.item_live_gzip_enabled.setChecked(settings.SETTINGS.live_gzip_enabled)
+
         self.on_enable_checkbox_state_changed()
 
     def apply_changes_impl(self):
@@ -208,6 +213,8 @@ class LiveDialog(QDialog):
             "live_cp_splits_enabled", self.online_cp_from_splits.isChecked()
         )
         obj.set_setting("live_cp_split_codes", self.online_cp_from_splits_codes.text())
+
+        settings.SETTINGS.live_gzip_enabled = self.item_live_gzip_enabled.isChecked()
 
         logging.debug("Saving settings of live")
 

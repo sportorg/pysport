@@ -3,7 +3,7 @@ import json
 from re import subn
 from typing import Any, Dict
 
-from sportorg import config
+from sportorg import config, settings
 from sportorg.common.otime import OTime
 from sportorg.utils.time import int_to_otime, time_to_hhmmss
 
@@ -221,7 +221,7 @@ async def create(url, data, race_data, log, *, session):
     data is Dict: Person, Result, Group, Course, Organization
     race_data is Dict: Race
     """
-    o = Orgeo(session, url)
+    o = Orgeo(session, url, compression=settings.SETTINGS.live_gzip_enabled)
     is_start = False
     group_i = 0
     persons = []
@@ -283,7 +283,7 @@ async def create_online_cp(url, data, race_data, log, *, session):
     if not race_data["settings"].get("live_cp_enabled", False):
         return
 
-    o = Orgeo(session, url)
+    o = Orgeo(session, url, compression=settings.SETTINGS.live_gzip_enabled)
 
     for item in data:
         if item["object"] in [
@@ -364,7 +364,7 @@ async def create_online_cp(url, data, race_data, log, *, session):
 
 
 async def delete(url, data, race_data, log, *, session):
-    o = Orgeo(session, url)
+    o = Orgeo(session, url, compression=settings.SETTINGS.live_gzip_enabled)
     persons = []
     for item in data:
         if item["object"] == "Person":

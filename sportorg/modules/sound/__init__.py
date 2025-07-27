@@ -11,7 +11,7 @@ class Sound:
 
     @staticmethod
     def is_enabled_rented_card():
-        return settings.SETTINGS.sound_enabled_rented_card
+        return settings.SETTINGS.sound_rented_card_enabled
 
     def _play(self, sound_path: str) -> None:
         if self.is_enabled() and sound_path:

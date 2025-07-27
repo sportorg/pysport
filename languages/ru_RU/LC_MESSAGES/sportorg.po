@@ -1752,3 +1752,6 @@ msgstr "Не все дни"
 
 msgid "in list"
 msgstr "в списке"
+
+msgid "Gzip compression"
+msgstr "Сжатие gzip"

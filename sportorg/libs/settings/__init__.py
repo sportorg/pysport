@@ -16,4 +16,8 @@ def load_settings(path: Path, cls: Type[Any]) -> Any:
     with path.open("r", encoding="utf-8") as f:
         data = json.load(f)
 
+    # Remove any keys from data that are not fields in the dataclass
+    field_names = {f.name for f in cls.__dataclass_fields__.values()}
+    data = {k: v for k, v in data.items() if k in field_names}
+
     return cls(**data)

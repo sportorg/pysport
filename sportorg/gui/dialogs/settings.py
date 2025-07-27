@@ -151,7 +151,7 @@ class SoundTab(Tab):
 
         self.item_enabled_rented_card = QCheckBox(translate("Enable rented card sound"))
         self.item_enabled_rented_card.setChecked(
-            settings.SETTINGS.sound_enabled_rented_card
+            settings.SETTINGS.sound_rented_card_enabled
             or settings.SETTINGS.sound_enabled
         )
         self.layout.addRow(self.item_enabled_rented_card)
@@ -178,7 +178,7 @@ class SoundTab(Tab):
         settings.SETTINGS.sound_enabled = self.item_enabled.isChecked()
         settings.SETTINGS.sound_successful_path = self.item_successful.currentText()
         settings.SETTINGS.sound_unsuccessful_path = self.item_unsuccessful.currentText()
-        settings.SETTINGS.sound_enabled_rented_card = (
+        settings.SETTINGS.sound_rented_card_enabled = (
             self.item_enabled_rented_card.isChecked()
         )
         settings.SETTINGS.sound_rented_card_path = self.item_rented_card.currentText()

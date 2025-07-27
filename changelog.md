@@ -15,6 +15,7 @@
 * Added logging of timing of course checking ([#485](https://github.com/sportorg/pysport/pull/485), `SportOrg/log/sportorg.log`)
 * Bumped dependencies jinja2, psutil, pywin32, playsound and others ([#493](https://github.com/sportorg/pysport/pull/493))
 * Sending compressed data to orgeo (gzip)
+* New settings format (json) with the ability to add new fields without losing compatibility
 
 ## 2024-10-07 v1.7.1
 

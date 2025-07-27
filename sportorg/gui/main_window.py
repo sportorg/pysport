@@ -313,14 +313,14 @@ class MainWindow(QMainWindow):
             settings.SETTINGS.sound_unsuccessful_path = Configuration().sound.get(
                 "unsuccessful", ""
             )
-            settings.SETTINGS.sound_enabled_rented_card = Configuration().sound.get(
+            settings.SETTINGS.sound_rented_card_enabled = Configuration().sound.get(
                 "enabled_rented_card", True
             )
             settings.SETTINGS.sound_rented_card_path = Configuration().sound.get(
-                "rented_card", True
+                "rented_card", ""
             )
             settings.SETTINGS.sound_enter_number_path = Configuration().sound.get(
-                "enter_number", True
+                "enter_number", ""
             )
             settings.SETTINGS.ranking = Configuration().ranking.get_all() or {}
             settings.save_settings_to_file()
