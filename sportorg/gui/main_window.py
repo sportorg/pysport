@@ -1,4 +1,3 @@
-import ast
 import logging
 import os
 import time
@@ -17,7 +16,6 @@ try:
 except ModuleNotFoundError:
     from PySide2 import QtCore, QtGui, QtWidgets
     from PySide2.QtCore import QTimer
-    from PySide2.QtGui import QActionEvent
     from PySide2.QtWidgets import QAction, QMainWindow, QMessageBox
 
 from sportorg import config, settings
@@ -53,8 +51,6 @@ from sportorg.models.memory import (
 from sportorg.models.result.result_tools import recalculate_results
 from sportorg.models.result.split_calculation import GroupSplits
 from sportorg.modules.backup.file import File
-from sportorg.modules.configs.configs import Config as Configuration
-from sportorg.modules.configs.configs import ConfigFile
 from sportorg.modules.live.live import live_client
 from sportorg.modules.printing.model import (
     NoPrinterSelectedException,
@@ -260,79 +256,10 @@ class MainWindow(QMainWindow):
             _event.ignore()
 
     def conf_read(self):
-        _, exists = settings.load_settings_from_file()
-        Configuration().read()
-        if not exists:
-            settings.SETTINGS.app_check_updates = Configuration().configuration.get(
-                "check_updates", True
-            )
-            settings.SETTINGS.locale = Configuration().configuration.get(
-                "current_locale", "ru_RU"
-            )
-            settings.SETTINGS.logging_level = Configuration().configuration.get(
-                "logging_level", True
-            )
-            settings.SETTINGS.logging_window_row_count = (
-                Configuration().configuration.get("log_window_row_count", True)
-            )
-            settings.SETTINGS.window_show_toolbar = Configuration().configuration.get(
-                "show_toolbar", True
-            )
-            settings.SETTINGS.window_geometry = Configuration().geometry.get(
-                "main", "01"
-            )
-            settings.SETTINGS.window_dialog_path = Configuration().parser.get(
-                ConfigFile.DIRECTORY, "dialog_default_dir", fallback=""
-            )
-            settings.SETTINGS.race_use_birthday = Configuration().configuration.get(
-                "use_birthday", False
-            )
-            settings.SETTINGS.templates_path = Configuration().templates.get(
-                "directory", ""
-            )
-            settings.SETTINGS.file_autosave_interval = (
-                Configuration().configuration.get("autosave_interval", 0)
-            )
-            settings.SETTINGS.file_save_in_utf8 = Configuration().configuration.get(
-                "save_in_utf8", True
-            )
-            settings.SETTINGS.file_save_in_gzip = Configuration().configuration.get(
-                "save_in_gzip", True
-            )
-            settings.SETTINGS.file_open_recent_file = Configuration().configuration.get(
-                "open_recent_file", True
-            )
-            settings.SETTINGS.printer_main = Configuration().printer.get("main", "")
-            settings.SETTINGS.printer_split = Configuration().printer.get("split", "")
-            settings.SETTINGS.sound_enabled = Configuration().sound.get(
-                "enabled", False
-            )
-            settings.SETTINGS.sound_successful_path = Configuration().sound.get(
-                "successful", ""
-            )
-            settings.SETTINGS.sound_unsuccessful_path = Configuration().sound.get(
-                "unsuccessful", ""
-            )
-            settings.SETTINGS.sound_rented_card_enabled = Configuration().sound.get(
-                "enabled_rented_card", True
-            )
-            settings.SETTINGS.sound_rented_card_path = Configuration().sound.get(
-                "rented_card", ""
-            )
-            settings.SETTINGS.sound_enter_number_path = Configuration().sound.get(
-                "enter_number", ""
-            )
-            settings.SETTINGS.ranking = Configuration().ranking.get_all() or {}
-            settings.save_settings_to_file()
-
         if settings.SETTINGS.file_recent:
             self.recent_files = [settings.SETTINGS.file_recent]
 
         self._handler.setLevel(settings.SETTINGS.logging_level)
-
-        templates_path = settings.SETTINGS.templates_path
-        if templates_path:
-            config.set_template_dir(templates_path)
 
     def conf_write(self):
         settings.SETTINGS.window_geometry = bytes(self.saveGeometry().toHex()).decode(

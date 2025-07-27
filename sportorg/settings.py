@@ -1,3 +1,4 @@
+import os
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
@@ -16,7 +17,7 @@ class Settings:
     window_dialog_path: str = ""
     window_geometry: str = ""
     race_use_birthday: bool = False
-    templates_path: str = ""
+    templates_path: str = config.TEMPLATE_DIR
     file_autosave_interval = 0
     file_save_in_utf8: bool = False
     file_save_in_gzip: bool = True
@@ -32,6 +33,16 @@ class Settings:
     sound_enter_number_path: Optional[str] = None
     ranking: Dict[str, Any] = field(default_factory=dict)
     live_gzip_enabled: bool = True
+
+    source_names_path: str = config.base_dir("configs", "names.txt")
+    source_middle_names_path: str = config.base_dir("configs", "middle_names.txt")
+    source_regions_path: str = config.base_dir("configs", "regions.txt")
+    source_status_comments_path: str = config.base_dir("configs", "status_comments.txt")
+    source_status_default_comments_path: str = config.base_dir(
+        "configs", "status_default.txt"
+    )
+    source_ranking_score_path: str = config.base_dir("configs", "ranking.txt")
+    source_rent_cards_path: str = config.data_dir("rent_cards.txt")
 
 
 SETTINGS = Settings()
@@ -53,3 +64,7 @@ def load_settings_from_file(path: str = config.SETTINGS_JSON) -> Tuple[Settings,
 
 def save_settings_to_file(path: str = config.SETTINGS_JSON) -> None:
     save_settings(SETTINGS, Path(path))
+
+
+def template_dir(*paths) -> str:
+    return os.path.join(SETTINGS.templates_path, *paths)

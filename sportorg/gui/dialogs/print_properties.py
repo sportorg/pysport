@@ -76,7 +76,7 @@ class PrintPropertiesDialog(QDialog):
         self.item_template.addItem(
             translate("Internal printing") + " " + translate("scale") + "=75"
         )
-        self.item_template.addItems(get_templates(config.template_dir("split")))
+        self.item_template.addItems(get_templates(settings.template_dir("split")))
         self.layout.addRow(self.label_template, self.item_template)
 
         self.item_custom_path = QPushButton(translate("Choose template"))

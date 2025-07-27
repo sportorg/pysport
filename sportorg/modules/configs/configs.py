@@ -89,8 +89,6 @@ class Config(metaclass=Singleton):
             ConfigFile.SOUND: Configurations(
                 {
                     "enabled": False,
-                    "successful": "",
-                    "unsuccessful": "",
                 }
             ),
             ConfigFile.PRINTER: Configurations(
@@ -123,7 +121,7 @@ class Config(metaclass=Singleton):
                 }
             ),
             ConfigFile.GEOMETRY: Configurations({"main": "01"}),
-            ConfigFile.TEMPLATES: Configurations({"directory": ""}),
+            ConfigFile.TEMPLATES: Configurations({}),
         }
 
     @property

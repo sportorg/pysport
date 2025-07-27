@@ -291,25 +291,24 @@ class TemplateTab(Tab):
         self.item_custom_dir = QPushButton(translate("Select the templates directory"))
 
         def select_custom_dir() -> None:
-            dirpath = get_existing_directory(
-                translate("Open the templates directory"), config.template_dir()
+            templates_path = get_existing_directory(
+                translate("Open the templates directory"), settings.template_dir()
             )
-            if not dirpath:
+            if not templates_path:
                 return
 
-            self.item_custom_dirpath.setText(dirpath)
-            settings.SETTINGS.templates_path = dirpath
-            config.set_template_dir(dirpath)
+            self.item_custom_dirpath.setText(templates_path)
+            settings.SETTINGS.templates_path = templates_path
             self.item_template.clear()
             self.item_template.addItems(
-                sorted(get_templates(config.template_dir("reports")))
+                sorted(get_templates(settings.template_dir("reports")))
             )
 
         self.item_custom_dir.clicked.connect(select_custom_dir)
         self.layout.addRow(self.item_custom_dir)
 
         self.item_custom_dirpath = QLabel()
-        self.item_custom_dirpath.setText(config.template_dir())
+        self.item_custom_dirpath.setText(settings.template_dir())
         self.layout.addRow(self.item_custom_dirpath)
 
     def save(self):

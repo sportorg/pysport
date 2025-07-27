@@ -60,15 +60,6 @@ def data_dir(*paths) -> str:
 TEMPLATE_DIR = TEMPLATES_PATH or base_dir("templates")
 
 
-def set_template_dir(dirpath: str) -> None:
-    global TEMPLATE_DIR
-    TEMPLATE_DIR = dirpath
-
-
-def template_dir(*paths) -> str:
-    return os.path.join(TEMPLATE_DIR, *paths)
-
-
 SOUND_DIR = base_dir("sounds")
 
 
@@ -100,18 +91,6 @@ CONFIG_INI = data_dir("config.ini")
 SETTINGS_JSON = data_dir("settings.json")
 
 LOCALE_DIR = base_dir("languages")
-
-NAMES_FILE = base_dir("configs", "names.txt")
-
-MIDDLE_NAMES_FILE = base_dir("configs", "middle_names.txt")
-
-REGIONS_FILE = base_dir("configs", "regions.txt")
-
-STATUS_COMMENTS_FILE = base_dir("configs", "status_comments.txt")
-
-STATUS_DEFAULT_COMMENTS_FILE = base_dir("configs", "status_default.txt")
-
-RANKING_SCORE_FILE = base_dir("configs", "ranking.txt")
 
 DIRS = [
     IMG_DIR,

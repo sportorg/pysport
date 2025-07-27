@@ -26,7 +26,7 @@ except ModuleNotFoundError:
         QPushButton,
     )
 
-from sportorg import config
+from sportorg import config, settings
 from sportorg.common.template import get_templates, get_text_from_file
 from sportorg.gui.dialogs.file_dialog import (
     get_open_file_name,
@@ -67,7 +67,7 @@ class ReportDialog(QDialog):
         self.label_template = QLabel(translate("Template"))
         self.item_template = AdvComboBox()
         self.item_template.addItems(
-            sorted(get_templates(config.template_dir("reports")))
+            sorted(get_templates(settings.template_dir("reports")))
         )
         self.layout.addRow(self.label_template, self.item_template)
         if _settings["last_template"]:
@@ -221,7 +221,7 @@ class ReportDialog(QDialog):
 
         if template_path.endswith(".docx"):
             # DOCX template processing
-            full_path = config.template_dir() + template_path
+            full_path = settings.template_dir() + template_path
             doc = DocxTemplate(full_path)
             context = {}
             context["race"] = races_dict[get_current_race_index()]
