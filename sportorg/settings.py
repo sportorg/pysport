@@ -34,6 +34,8 @@ class Settings:
     ranking: Dict[str, Any] = field(default_factory=dict)
     live_gzip_enabled: bool = True
 
+    telegram_token: str = ""
+
     source_names_path: str = config.base_dir("configs", "names.txt")
     source_middle_names_path: str = config.base_dir("configs", "middle_names.txt")
     source_regions_path: str = config.base_dir("configs", "regions.txt")

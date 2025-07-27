@@ -27,7 +27,7 @@ except ModuleNotFoundError:
         QTextEdit,
     )
 
-from sportorg import config
+from sportorg import config, settings
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import translate
 from sportorg.models.memory import race
@@ -105,7 +105,7 @@ class TelegramDialog(QDialog):
 
     def set_values(self):
         obj = race()
-        token = obj.get_setting("telegram_token", "")
+        token = settings.SETTINGS.telegram_token
         url = obj.get_setting("telegram_chat_id", "")
         thread_id = obj.get_setting("telegram_thread_id", "")
         parse_mode = obj.get_setting("telegram_parse_mode", "")
@@ -135,7 +135,7 @@ class TelegramDialog(QDialog):
             parse_mode = "HTML"
 
         obj = race()
-        obj.set_setting("telegram_token", self.item_token.text())
+        settings.SETTINGS.telegram_token = self.item_token.text()
         obj.set_setting("telegram_chat_id", self.item_chat_id.text())
         obj.set_setting("telegram_thread_id", self.item_thread_id.text())
         obj.set_setting("telegram_enabled", self.item_enabled.isChecked())
