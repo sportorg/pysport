@@ -280,10 +280,10 @@ class ResultCalculation:
         scores = []
         array = self.get_group_finishes(group)
 
-        start_limit = settings.SETTINGS.get("start_limit", 10)
-        finish_limit = settings.SETTINGS.get("finish_limit", 5)
-        sum_count = settings.SETTINGS.get("sum_count", 10)
-        individual_ranking_method = settings.SETTINGS.get(
+        start_limit = settings.SETTINGS.ranking.get("start_limit", 10)
+        finish_limit = settings.SETTINGS.ranking.get("finish_limit", 5)
+        sum_count = settings.SETTINGS.ranking.get("sum_count", 10)
+        individual_ranking_method = settings.SETTINGS.ranking.get(
             "individual_ranking_method", "best"
         )
 
@@ -328,10 +328,10 @@ class ResultCalculation:
         teams = find(self.race.relay_teams, group=group, return_all=True)
         success_teams = []
 
-        start_limit = settings.SETTINGS.get("start_limit_relay", 6)
-        finish_limit = settings.SETTINGS.get("finish_limit_relay", 4)
-        sum_count = settings.SETTINGS.get("sum_count_relay", 10)
-        relay_ranking_method = settings.SETTINGS.get("relay_ranking_method", "personal")
+        start_limit = settings.SETTINGS.ranking.get("start_limit_relay", 6)
+        finish_limit = settings.SETTINGS.ranking.get("finish_limit_relay", 4)
+        sum_count = settings.SETTINGS.ranking.get("sum_count_relay", 10)
+        relay_ranking_method = settings.SETTINGS.ranking.get("relay_ranking_method", "personal")
 
         started_teams = 0
         if teams:
