@@ -94,7 +94,7 @@ class ImportPersonsTableDialog(QDialog):
         self.count_columns = len(copied_values[0]) if len(copied_values) else 0
 
         self.persons_info_table = QTableWidget(self)
-        self.persons_info_table.setRowCount(self.count_rows)
+        self.persons_info_table.setRowCount(self.count_rows + 1)
         self.persons_info_table.setColumnCount(self.count_columns)
 
         for i in range(self.count_columns):
@@ -150,7 +150,7 @@ class ImportPersonsTableDialog(QDialog):
             item = self.persons_info_table.cellWidget(0, i)
             self.input_headers[self.HEADER(item.currentText())] = i
 
-        for i in range(1, self.count_rows):
+        for i in range(1, self.count_rows + 1):
             person: memory.Person = None
             if self.option_import.currentText() == self.INSERT_NEW:
                 person = memory.Person()
