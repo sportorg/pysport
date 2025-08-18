@@ -48,7 +48,14 @@ def encode(byte_array):
     null_index = obj.find(0x00)
     if null_index > -1:
         obj = obj[0:null_index]
-    return str(obj, get_wdb_encoding())
+
+    ret = ""
+    try:
+        ret = str(obj, get_wdb_encoding())
+    except Exception as e:
+        logging.exception(e)
+
+    return ret
 
 
 def bytes_compare(obj1, obj2):
