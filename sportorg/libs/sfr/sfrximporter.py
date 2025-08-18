@@ -49,7 +49,7 @@ def import_sfrx(source: str):
                             memory.CourseControl,
                             code=control["code"],
                             order=order,
-                            length=control["length"],
+                            length=int(control["length"]),
                         )
                     )
             c.controls = controls
