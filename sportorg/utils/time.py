@@ -89,7 +89,9 @@ def date_to_yyyymmdd(value):
 
 
 def date_to_ddmmyyyy(value):
-    return value.strftime("%d.%m.%Y")
+    if value:
+        return value.strftime("%d.%m.%Y")
+    return ""
 
 
 def ddmmyyyy_to_time(value):
