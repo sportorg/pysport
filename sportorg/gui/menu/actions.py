@@ -4,6 +4,8 @@ import uuid
 from os import remove
 from typing import Any, Dict, Type
 
+from sportorg.utils.text import detect_encoding
+
 try:
     from PySide6 import QtCore
     from PySide6.QtWidgets import QApplication, QMessageBox
@@ -383,7 +385,10 @@ class RecoverySportorgHtmlAction(Action, metaclass=ActionFactory):
             False,
         )
         tmp_filename = recovery_sportorg_html.recovery(file_name)
-        with open(tmp_filename) as f:
+        if tmp_filename == "":
+            return
+        encoding = detect_encoding(tmp_filename)
+        with open(tmp_filename, encoding=encoding) as f:
             attr = get_races_from_file(f)
         SportOrgImportDialog(*attr).exec_()
         remove(tmp_filename)
