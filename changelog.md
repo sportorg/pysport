@@ -16,6 +16,7 @@
 * Bumped dependencies jinja2, psutil, pywin32, playsound and others ([#493](https://github.com/sportorg/pysport/pull/493))
 * Sending compressed data to orgeo (gzip)
 * New settings format (json) with the ability to add new fields without losing compatibility
+* Fix performance issue with large number of participants ([#494](https://github.com/sportorg/pysport/pull/494))
 
 ## 2024-10-07 v1.7.1
 
