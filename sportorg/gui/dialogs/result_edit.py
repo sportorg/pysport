@@ -309,7 +309,8 @@ class ResultEditDialog(QDialog):
                     GroupSplits(race(), result.person.group).generate(True)
             except ResultCheckerException as e:
                 logging.error(str(e))
-        recalculate_results(recheck_results=False)
+        group = result.person.group if result.person else None
+        recalculate_results(recheck_results=False, group=group)
         live_client.send(result)
         Teamwork().send(result.to_dict())
 

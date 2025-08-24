@@ -594,7 +594,8 @@ class MainWindow(QMainWindow):
                 rg = ResultSportidentGeneration(result)
                 if rg.add_result():
                     result = rg.get_result()
-                    recalculate_results(recheck_results=False)
+                    group = result.person.group if result.person else None
+                    recalculate_results(recheck_results=False, group=group)
                     if race().get_setting("split_printout", False):
                         try:
                             split_printout([result])
