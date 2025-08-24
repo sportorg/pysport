@@ -68,7 +68,7 @@ class ClassesV8:
             raise TypeError('file is not str or IO')
         if isinstance(file, str):
             try:
-                enc = detect_encoding(file)
+                enc = detect_encoding(file, default_encoding="windows-1251")
                 with open(file, encoding=enc) as f:
                     content = f.readlines()
             except FileNotFoundError:

@@ -1,7 +1,7 @@
 from chardet import UniversalDetector
 
 
-def detect_encoding(file):
+def detect_encoding(file, default_encoding="utf-8"):
     detector = UniversalDetector()
     with open(file, 'rb') as fh:
         for line in fh:
@@ -16,5 +16,7 @@ def detect_encoding(file):
     if detected_encoding in supported_encodings:
         return detected_encoding
 
-    default_encoding = 'utf-8'  # for Russia and people with OCAD < 11.0
-    return default_encoding
+    ret_encoding = default_encoding
+    if not ret_encoding:
+        ret_encoding = 'utf-8'  # for Russia and people with OCAD < 11.0 use windows-1251
+    return ret_encoding

@@ -2,6 +2,28 @@
 
 ## next
 
+### Improvements
++ New field - middle name (new Russian requirements)
++ Import of full date of birth
++ Optional build on Pyside2 (Qt5) / Pyside6 (Qt6)
++ Import form SFRX files (SFR)
++ Course indexing by name
++ New "in list" operator in table filtering
+
+### Fixes
++ Fixed: multi day race processing - all days are refreshed on the file opening 
++ Fixed: SRPid readout, error in byte conversion
++ Fixed: Import from WDB with the rubbish in course object (special characters)
++ Fixed: Import from the buffer - last raw was missed
++ Fixed: IOF XML with empty height (Purple Pen) now supported
++ Fixed dialog sizes reverted (dynamic size was sometimes wrong)
++ DNS processing - checking the bib for existence
++ Fixed: People indexing while duplication
++ Start preparation - checking start group for draw to have more than 1 person
+
+## 2025-04-01
+
+* Added the option of templates directory changing
 * Fix not working online results when the settings responsible for timing are missing
 * Added the ability to enter started numbers
 * Added the ability to import participants from the table (For example Excel)
