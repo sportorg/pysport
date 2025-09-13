@@ -2,6 +2,7 @@
 Parse SportOrg HTML report (containing full json)
 
 """
+
 import logging
 import os.path
 import string
