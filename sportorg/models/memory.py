@@ -320,6 +320,7 @@ class Group(Model):
 
         self.ranking = Ranking()
         self.__type: Optional[RaceType] = None
+        self.is_all_russian_competition: bool = False
         self.is_best_team_placing_mode: bool = False
         self.relay_legs = 0
 
@@ -347,6 +348,7 @@ class Group(Model):
 
     def set_type(self, new_type):
         if self.__type == RaceType.RELAY and new_type != RaceType.RELAY:
+            self.is_all_russian_competition = False
             self.is_best_team_placing_mode = False
         self.__type = new_type
 
@@ -375,6 +377,7 @@ class Group(Model):
             "count_finished": self.count_finished,  # readonly
             "ranking": self.ranking.to_dict() if self.ranking else None,
             "__type": self.__type.value if self.__type is not None else None,
+            "is_all_russian_competition": self.is_all_russian_competition,
             "is_best_team_placing_mode": self.is_best_team_placing_mode,
             "relay_legs": self.relay_legs,
             "sex": 0,
@@ -402,6 +405,9 @@ class Group(Model):
             self.is_any_course = bool(data["is_any_course"])
         if data["__type"] is not None:
             self.__type = RaceType(int(data["__type"]))
+        self.is_all_russian_competition = bool(
+            data.get("is_all_russian_competition", False)
+        )
         self.is_best_team_placing_mode = bool(
             data.get("is_best_team_placing_mode", False)
         )
@@ -2533,11 +2539,11 @@ class RelayTeam:
         if self.get_correct_lap_count() != other.get_correct_lap_count():
             return self.get_correct_lap_count() < other.get_correct_lap_count()
 
-        if not self.get_is_out_of_competition() and other.get_is_out_of_competition():
-            return False
+        # if not self.get_is_out_of_competition() and other.get_is_out_of_competition():
+        #     return False
 
-        if self.get_is_out_of_competition() and not other.get_is_out_of_competition():
-            return True
+        # if self.get_is_out_of_competition() and not other.get_is_out_of_competition():
+        #     return True
 
         return self.get_time() > other.get_time()
 
@@ -2610,16 +2616,6 @@ class RelayTeam:
                 return correct_qty
         return correct_qty
 
-    def get_is_team_placed(self):
-        """Is the team taking place? - the team has completed all stages,
-        the status is ok and there are no participants out of competition
-        """
-        return (
-            self.get_is_status_ok()
-            and self.get_is_all_legs_finished()
-            and not self.get_is_out_of_competition()
-        )
-
     def get_is_status_ok(self):
         """Get the whole team status - OK if all laps are OK"""
         for leg in self.legs:
@@ -2632,15 +2628,26 @@ class RelayTeam:
         leg_count = race().data.relay_leg_count
         return len(self.legs) >= leg_count
 
+    def get_is_team_placed(self, /, place_out_of_competition=False):
+        """Is the team taking place? - the team has completed all stages,
+        the status is ok and there are no participants out of competition
+        """
+        return (
+            self.get_is_status_ok()
+            and self.get_is_all_legs_finished()
+            and (not self.get_is_out_of_competition() or place_out_of_competition)
+        )
+
     def get_is_out_of_competition(self):
         """Get the whole team status - True if any lap is out of competition"""
         for leg in self.legs:
             if leg.is_out_of_competition():
                 return True
-        if self.group and self.group.is_best_team_placing_mode:
-            if not self.description:
-                return True
         return False
+
+    def get_is_mixed_team(self):
+        """Is the team mixed - has members from different organizations"""
+        return not self.description
 
     def set_place(self, place):
         self.place = place

@@ -130,13 +130,13 @@ class ResultCalculation:
             team.add_result(res)
         teams_sorted = sorted(relay_teams.values())
 
-        if group.is_best_team_placing_mode:
-            teams_sorted = self.sort_best_relay_team_placing(teams_sorted)
+        if group.is_all_russian_competition:
+            teams_sorted = self.sort_relay_all_russian_competition(teams_sorted)
 
         place = 1  # place to show
         order = 1  # order for templates
         for cur_team in teams_sorted:
-            if not cur_team.get_is_status_ok() or cur_team.get_is_out_of_competition():
+            if not cur_team.get_is_team_placed():
                 cur_team.set_place(-1)
             else:
                 cur_team.set_place(place)
@@ -148,7 +148,9 @@ class ResultCalculation:
             cur_team.set_start_times()
         return relay_teams.values()
 
-    def sort_best_relay_team_placing(self, teams_sorted_by_result: List[RelayTeam]):
+    def sort_relay_all_russian_competition(
+        self, teams_sorted_by_result: List[RelayTeam]
+    ):
         """If a Federation is represented by more than one team in a relay class,
         one team with the best result from each Federation shall be placed first
 
@@ -165,20 +167,36 @@ class ResultCalculation:
 
         processed_teams = set()
         sorted_teams: List[RelayTeam] = []
-        skipped_teams: List[RelayTeam] = []
+        skipped_second_teams: List[RelayTeam] = []
+        skipped_mixed_teams: List[RelayTeam] = []
+        skipped_out_of_competition_teams: List[RelayTeam] = []
         best_team = teams_sorted_by_result[0]
+        is_all_russian_competition = best_team.group.is_all_russian_competition
+        is_best_team_placing_mode = best_team.group.is_best_team_placing_mode
         is_placed_flag = best_team.get_is_team_placed()
 
         for team in teams_sorted_by_result:
-            if is_placed_flag and not team.get_is_team_placed():
+            if is_placed_flag and not team.get_is_team_placed(
+                place_out_of_competition=True
+            ):
                 is_placed_flag = False
-                sorted_teams.extend(skipped_teams)
+                sorted_teams.extend(skipped_second_teams)
+                sorted_teams.extend(skipped_mixed_teams)
+                sorted_teams.extend(skipped_out_of_competition_teams)
             if is_placed_flag:
-                if team.description and team.description not in processed_teams:
+                if is_all_russian_competition and team.get_is_out_of_competition():
+                    skipped_out_of_competition_teams.append(team)
+                elif is_all_russian_competition and not team.description:
+                    skipped_mixed_teams.append(team)
+                elif (
+                    is_best_team_placing_mode
+                    and team.description
+                    and team.description not in processed_teams
+                ):
                     sorted_teams.append(team)
                     processed_teams.add(team.description)
                 else:
-                    skipped_teams.append(team)
+                    skipped_second_teams.append(team)
             else:
                 sorted_teams.append(team)
 
