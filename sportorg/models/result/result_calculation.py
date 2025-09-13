@@ -331,7 +331,9 @@ class ResultCalculation:
         start_limit = settings.SETTINGS.ranking.get("start_limit_relay", 6)
         finish_limit = settings.SETTINGS.ranking.get("finish_limit_relay", 4)
         sum_count = settings.SETTINGS.ranking.get("sum_count_relay", 10)
-        relay_ranking_method = settings.SETTINGS.ranking.get("relay_ranking_method", "personal")
+        relay_ranking_method = settings.SETTINGS.ranking.get(
+            "relay_ranking_method", "personal"
+        )
 
         started_teams = 0
         if teams:
