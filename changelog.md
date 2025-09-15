@@ -39,6 +39,7 @@
 * Sending compressed data to orgeo (gzip)
 * New settings format (json) with the ability to add new fields without losing compatibility
 * Fix performance issue with large number of participants ([#494](https://github.com/sportorg/pysport/pull/494))
+* Default value for auto-save has been increased from 5 seconds to 5 minutes ([#497](https://github.com/sportorg/pysport/pull/497))
 
 ## 2024-10-07 v1.7.1
 
