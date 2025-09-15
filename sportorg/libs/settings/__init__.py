@@ -14,7 +14,7 @@ def save_settings(settings: Any, path: Path) -> None:
         data = old_data
 
     with path.open("w", encoding="utf-8") as f:
-        json.dump(data, f, indent=4)
+        json.dump(data, f, indent=4, ensure_ascii=False)
 
 
 def load_settings(path: Path, cls: Type[Any]) -> Optional[Any]:

@@ -12,13 +12,13 @@ class Settings:
     app_check_updates: bool = True
     locale: str = "ru_RU"
     logging_level: str = "INFO"
-    logging_window_row_count = 1000
+    logging_window_row_count: int = 1000
     window_show_toolbar: bool = True
     window_dialog_path: str = ""
     window_geometry: str = ""
     race_use_birthday: bool = False
     templates_path: str = config.TEMPLATE_DIR
-    file_autosave_interval = 0
+    file_autosave_interval: int = 300
     file_save_in_utf8: bool = False
     file_save_in_gzip: bool = True
     file_open_recent_file: bool = False
