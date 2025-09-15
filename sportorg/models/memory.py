@@ -1667,7 +1667,7 @@ class Race(Model):
             "object": self.__class__.__name__,
             "id": str(self.id),
             "data": self.data.to_dict(),
-            "settings": self.settings,
+            "settings": self.settings.copy(),
             "organizations": [item.to_dict() for item in self.organizations],
             "courses": [item.to_dict() for item in self.courses],
             "groups": [item.to_dict() for item in self.groups],
