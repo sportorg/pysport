@@ -71,7 +71,7 @@ class PrintPropertiesDialog(QDialog):
 
         self.label_template = QLabel(translate("Template"))
         self.item_template = AdvComboBox()
-        self.item_template.setMaximumWidth(200)
+        self.item_template.setMaximumWidth(350)
         self.item_template.addItem(translate("Internal printing"))
         self.item_template.addItem(
             translate("Internal printing") + " " + translate("scale") + "=75"
