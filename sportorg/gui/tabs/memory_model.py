@@ -269,6 +269,7 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
             translate("World code title"),
             translate("National code title"),
             translate("Out of competition title"),
+            translate("Course"),
             translate("Result count title"),
         ]
 
@@ -328,6 +329,10 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
         if person.is_out_of_competition:
             out_of_comp_status = translate("o/c")
         ret.append(out_of_comp_status)
+        if person.group and person.group.course:
+            ret.append(person.group.course.name)
+        else:
+            ret.append("")
         ret.append(person.result_count)
 
         return ret
@@ -365,6 +370,7 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
             translate("Type"),
             translate("Rented card"),
             translate("Result day/leg"),
+            translate("Comment"),
         ]
 
     def init_cache(self):
@@ -441,6 +447,7 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
                 if i.is_status_ok()
                 else i.get_result()
             ),
+            person.comment,
         ]
         return ret
 
@@ -467,9 +474,10 @@ class GroupMemoryModel(AbstractSportOrgMemoryModel):
             translate("Climb title"),
             translate("Min year title"),
             translate("Max year title"),
-            translate("Start interval title"),
+            translate("Max time title"),
             translate("Start corridor title"),
             translate("Order in corridor title"),
+            translate("Start interval title"),
             translate("Count of person"),
             translate("Count of finished"),
             translate("Count of not finished"),
@@ -507,9 +515,10 @@ class GroupMemoryModel(AbstractSportOrgMemoryModel):
             course.climb if course else 0,
             group.min_year,
             group.max_year,
-            group.start_interval,
+            group.max_time.to_str(),
             group.start_corridor,
             group.order_in_corridor,
+            group.start_interval.to_str(),
             group.count_person,
             group.count_finished,
             group.count_person - group.count_finished,
