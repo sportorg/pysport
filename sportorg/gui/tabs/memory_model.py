@@ -10,6 +10,7 @@ try:
 except ModuleNotFoundError:
     from PySide2.QtCore import QAbstractTableModel, Qt
 
+from sportorg import settings
 from sportorg.language import translate
 from sportorg.models.constant import RentCards
 from sportorg.models.memory import (
@@ -222,9 +223,16 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
     def sort(self, p_int, order=None):
         """Sort table by given column number."""
 
-        def sort_key(x):
+        def default_sort_key(x):
             item = self.get_item(x, p_int)
             return item is None, str(type(item)), item
+
+        def birthday_sort_key(person: Person):
+            return person.birth_date is None, person.birth_date
+
+        sort_key = default_sort_key
+        if self.get_headers()[p_int] == translate("Birthday title"):
+            sort_key = birthday_sort_key
 
         try:
             self.layoutAboutToBeChanged.emit()
@@ -260,6 +268,8 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
         self.init_cache()
 
     def get_headers(self) -> List[str]:
+        use_birthday = settings.SETTINGS.race_use_birthday
+
         return [
             translate("Last name"),
             translate("First name"),
@@ -267,7 +277,7 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
             translate("Qualification title"),
             translate("Group"),
             translate("Team"),
-            translate("Year title"),
+            translate("Birthday title") if use_birthday else translate("Year title"),
             translate("Bib"),
             translate("Start"),
             translate("Start group"),
@@ -305,6 +315,8 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
             translate("Rented card") if is_rented_card else translate("Rented stub")
         )
 
+        use_birthday = settings.SETTINGS.race_use_birthday
+
         ret = [
             person.surname,
             person.name,
@@ -312,7 +324,7 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
             person.qual.get_title() if person.qual else "",
             person.group.name if person.group else "",
             person.organization.name if person.organization else "",
-            person.get_year(),
+            person.get_birthday() if use_birthday else person.year,
             person.bib,
             person.start_time.to_str(),
             person.start_group,

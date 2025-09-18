@@ -114,6 +114,9 @@ msgstr "Фамилия"
 msgid "First name"
 msgstr "Имя"
 
+msgid "Birthday title"
+msgstr "Дата рожд."
+
 msgid "Birthday"
 msgstr "Дата рождения"
 

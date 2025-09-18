@@ -26,6 +26,9 @@ msgstr "Qual"
 msgid "Year title"
 msgstr "Year"
 
+msgid "Birthday title"
+msgstr "Birthday"
+
 msgid "Card title"
 msgstr "Card"
 
