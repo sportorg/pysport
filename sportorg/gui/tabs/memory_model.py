@@ -12,7 +12,15 @@ except ModuleNotFoundError:
 
 from sportorg.language import translate
 from sportorg.models.constant import RentCards
-from sportorg.models.memory import race
+from sportorg.models.memory import (
+    Course,
+    Group,
+    Organization,
+    Person,
+    Race,
+    Result,
+    race,
+)
 from sportorg.utils.time import time_to_hhmmss
 
 
@@ -23,7 +31,7 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
 
     def __init__(self):
         super().__init__()
-        self.race = race()
+        self.race: Race = race()
         self.cache = []
         self.init_cache()
         self.filter = {}
@@ -251,7 +259,7 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
         super().__init__()
         self.init_cache()
 
-    def get_headers(self):
+    def get_headers(self) -> List[str]:
         return [
             translate("Last name"),
             translate("First name"),
@@ -275,10 +283,10 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
 
     def init_cache(self):
         self.cache.clear()
-        for i in range(len(self.race.persons)):
-            self.cache.append(self.get_data(i))
+        for row in range(len(self.race.persons)):
+            self.cache.append(self.get_data(row))
 
-    def get_data(self, position):
+    def get_data(self, position: int):
         return self.get_values_from_object(self.race.persons[position])
 
     def duplicate(self, position):
@@ -289,51 +297,34 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
         new_person.set_card_number_without_indexing(0)
         self.race.persons.insert(position, new_person)
 
-    def get_values_from_object(self, obj):
+    def get_values_from_object(self, person: Person):
         ret = []
-        person = obj
 
         is_rented_card = person.is_rented_card or RentCards().exists(person.card_number)
-
-        ret.append(person.surname)
-        ret.append(person.name)
-        ret.append(person.middle_name)
-        if person.qual:
-            ret.append(person.qual.get_title())
-        else:
-            ret.append("")
-        if person.group:
-            ret.append(person.group.name)
-        else:
-            ret.append("")
-        if person.organization:
-            ret.append(person.organization.name)
-        else:
-            ret.append("")
-        ret.append(person.get_year())
-        ret.append(person.bib)
-        if person.start_time:
-            ret.append(time_to_hhmmss(person.start_time))
-        else:
-            ret.append("")
-        ret.append(person.start_group)
-        ret.append(person.card_number)
-        ret.append(
+        rented_card_text = (
             translate("Rented card") if is_rented_card else translate("Rented stub")
         )
-        ret.append(person.comment)
-        ret.append(str(person.world_code) if person.world_code else "")
-        ret.append(str(person.national_code) if person.national_code else "")
 
-        out_of_comp_status = ""
-        if person.is_out_of_competition:
-            out_of_comp_status = translate("o/c")
-        ret.append(out_of_comp_status)
-        if person.group and person.group.course:
-            ret.append(person.group.course.name)
-        else:
-            ret.append("")
-        ret.append(person.result_count)
+        ret = [
+            person.surname,
+            person.name,
+            person.middle_name,
+            person.qual.get_title() if person.qual else "",
+            person.group.name if person.group else "",
+            person.organization.name if person.organization else "",
+            person.get_year(),
+            person.bib,
+            person.start_time.to_str(),
+            person.start_group,
+            person.card_number,
+            rented_card_text,
+            person.comment,
+            str(person.world_code) if person.world_code else "",
+            str(person.national_code) if person.national_code else "",
+            translate("o/c") if person.is_out_of_competition else "",
+            person.group.course.name if (person.group and person.group.course) else "",
+            person.result_count,
+        ]
 
         return ret
 
@@ -350,7 +341,7 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
         self.values = None
         self.count = None
 
-    def get_headers(self):
+    def get_headers(self) -> List[str]:
         return [
             translate("Last name"),
             translate("First name"),
@@ -375,8 +366,8 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
 
     def init_cache(self):
         self.cache.clear()
-        for i in range(len(self.race.results)):
-            self.cache.append(self.get_data(i))
+        for row in range(len(self.race.results)):
+            self.cache.append(self.get_data(row))
 
     def get_data(self, position):
         ret = self.get_values_from_object(self.race.results[position])
@@ -389,64 +380,46 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
         new_result.splits = deepcopy(result.splits)
         self.race.results.insert(position, new_result)
 
-    def get_values_from_object(self, result):
-        i = result
-        person = i.person
+    def get_values_from_object(self, result: Result):
+        person = result.person if result.person is not None else Person()
 
-        group = ""
-        team = ""
-        first_name = ""
-        last_name = ""
-        bib = result.get_bib()
-        rented_card = ""
-        if person:
-            is_rented_card = person.is_rented_card or RentCards().exists(i.card_number)
-            first_name = person.name
-            last_name = person.surname
+        is_rented_card = person.is_rented_card or RentCards().exists(result.card_number)
+        rented_card_text = (
+            translate("Rented card") if is_rented_card else translate("Rented stub")
+        )
 
-            if person.group:
-                group = person.group.name
-
-            if person.organization:
-                team = person.organization.name
-
-            rented_card = (
-                translate("Rented card") if is_rented_card else translate("Rented stub")
-            )
-
+        time_accuracy = self.race.get_setting("time_accuracy", 0)
         start = ""
-        if i.get_start_time():
-            time_accuracy = self.race.get_setting("time_accuracy", 0)
-            start = i.get_start_time().to_str(time_accuracy)
-
+        if result.get_start_time():
+            start = result.get_start_time().to_str(time_accuracy)
         finish = ""
-        if i.get_finish_time():
-            time_accuracy = self.race.get_setting("time_accuracy", 0)
-            finish = i.get_finish_time().to_str(time_accuracy)
+        if result.get_finish_time():
+            finish = result.get_finish_time().to_str(time_accuracy)
+        day_leg_result = (
+            result.get_result_otime_current_day().to_str(time_accuracy)
+            if result.is_status_ok()
+            else result.get_result()
+        )
 
         ret = [
-            last_name,
-            first_name,
-            group,
-            team,
-            i.get_place(),
-            i.get_result(),
-            time_to_hhmmss(i.diff),
-            i.status.get_title(),
-            bib,
-            i.card_number,
+            person.name,
+            person.surname,
+            person.group.name if person.group else "",
+            person.organization.name if person.organization else "",
+            result.get_place(),
+            result.get_result(),
+            result.diff.to_str() if result.diff else "",
+            result.status.get_title(),
+            result.get_bib(),
+            result.card_number,
             start,
             finish,
-            time_to_hhmmss(i.get_credit_time()),
-            time_to_hhmmss(i.get_penalty_time()),
-            i.penalty_laps,
-            str(i.system_type),
-            rented_card,
-            (
-                time_to_hhmmss(i.get_result_otime_current_day())
-                if i.is_status_ok()
-                else i.get_result()
-            ),
+            result.get_credit_time().to_str(),
+            result.get_penalty_time().to_str(),
+            result.penalty_laps,
+            str(result.system_type),
+            rented_card_text,
+            day_leg_result,
             person.comment,
         ]
         return ret
@@ -462,7 +435,7 @@ class GroupMemoryModel(AbstractSportOrgMemoryModel):
     def __init__(self):
         super().__init__()
 
-    def get_headers(self):
+    def get_headers(self) -> List[str]:
         return [
             translate("Name"),
             translate("Full name"),
@@ -485,8 +458,8 @@ class GroupMemoryModel(AbstractSportOrgMemoryModel):
 
     def init_cache(self):
         self.cache.clear()
-        for i in range(len(self.race.groups)):
-            self.cache.append(self.get_data(i))
+        for row in range(len(self.race.groups)):
+            self.cache.append(self.get_data(row))
 
     def get_data(self, position):
         ret = self.get_values_from_object(self.race.groups[position])
@@ -499,7 +472,7 @@ class GroupMemoryModel(AbstractSportOrgMemoryModel):
         new_group.name = new_group.name + "_"
         self.race.groups.insert(position, new_group)
 
-    def get_values_from_object(self, group):
+    def get_values_from_object(self, group: Group):
         course = group.course
 
         control_count = len(course.controls) if course else 0
@@ -535,7 +508,7 @@ class CourseMemoryModel(AbstractSportOrgMemoryModel):
     def __init__(self):
         super().__init__()
 
-    def get_headers(self):
+    def get_headers(self) -> List[str]:
         return [
             translate("Name"),
             translate("Length title"),
@@ -550,8 +523,8 @@ class CourseMemoryModel(AbstractSportOrgMemoryModel):
 
     def init_cache(self):
         self.cache.clear()
-        for i in range(len(self.race.courses)):
-            self.cache.append(self.get_data(i))
+        for row in range(len(self.race.courses)):
+            self.cache.append(self.get_data(row))
 
     def get_data(self, position):
         ret = self.get_values_from_object(self.race.courses[position])
@@ -572,7 +545,7 @@ class CourseMemoryModel(AbstractSportOrgMemoryModel):
         new_course.controls = deepcopy(course.controls)
         self.race.courses.insert(position, new_course)
 
-    def get_values_from_object(self, course):
+    def get_values_from_object(self, course: Course):
         return [
             course.name,
             course.length,
@@ -596,7 +569,7 @@ class OrganizationMemoryModel(AbstractSportOrgMemoryModel):
     def __init__(self):
         super().__init__()
 
-    def get_headers(self):
+    def get_headers(self) -> List[str]:
         return [
             translate("Name"),
             translate("Code"),
@@ -610,8 +583,8 @@ class OrganizationMemoryModel(AbstractSportOrgMemoryModel):
 
     def init_cache(self):
         self.cache.clear()
-        for i in range(len(self.race.organizations)):
-            self.cache.append(self.get_data(i))
+        for row in range(len(self.race.organizations)):
+            self.cache.append(self.get_data(row))
 
     def get_data(self, position):
         ret = self.get_values_from_object(self.race.organizations[position])
@@ -624,7 +597,7 @@ class OrganizationMemoryModel(AbstractSportOrgMemoryModel):
         new_organization.name = new_organization.name + "_"
         self.race.organizations.insert(position, new_organization)
 
-    def get_values_from_object(self, organization):
+    def get_values_from_object(self, organization: Organization):
         return [
             organization.name,
             organization.code,
