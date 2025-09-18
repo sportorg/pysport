@@ -235,14 +235,13 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
             sort_key = birthday_sort_key
 
         try:
+            is_descending = order == Qt.DescendingOrder
             self.layoutAboutToBeChanged.emit()
 
             source_array = self.get_source_array()
 
             if len(source_array):
-                source_array = sorted(source_array, key=sort_key)
-                if order == Qt.DescendingOrder:
-                    source_array = source_array[::-1]
+                source_array = sorted(source_array, key=sort_key, reverse=is_descending)
 
                 self.set_source_array(source_array)
 
