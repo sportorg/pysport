@@ -114,6 +114,9 @@ msgstr "Фамилия"
 msgid "First name"
 msgstr "Имя"
 
+msgid "Birthday title"
+msgstr "Дата рожд."
+
 msgid "Birthday"
 msgstr "Дата рождения"
 
@@ -1355,6 +1358,9 @@ msgstr "Мин. ГР"
 
 msgid "Max year title"
 msgstr "Макс. ГР"
+
+msgid "Max time title"
+msgstr "Контр. время"
 
 msgid "Start interval title"
 msgstr "Интервал"

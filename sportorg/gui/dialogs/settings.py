@@ -367,4 +367,5 @@ class SettingsDialog(QDialog):
     def apply_changes_impl(self):
         for tab, _ in self.widgets:
             tab.save()
+        GlobalAccess().get_main_window().refresh()
         settings.save_settings_to_file()
