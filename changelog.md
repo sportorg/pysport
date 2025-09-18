@@ -9,6 +9,8 @@
 + Import form SFRX files (SFR)
 + Course indexing by name
 + New "in list" operator in table filtering
++ Default value for auto-save has been increased from 5 seconds to 5 minutes ([#497](https://github.com/sportorg/pysport/pull/497))
++ Added columns: birthday and distance in participants, comment in results, control time, and start interval in groups ([#500](https://github.com/sportorg/pysport/issues/500))
 
 ### Fixes
 + Fixed: multi day race processing - all days are refreshed on the file opening 
@@ -20,6 +22,8 @@
 + DNS processing - checking the bib for existence
 + Fixed: People indexing while duplication
 + Start preparation - checking start group for draw to have more than 1 person
++ Fix performance issue with large number of participants ([#494](https://github.com/sportorg/pysport/pull/494))
++ Added stability when sorting tables ([#500](https://github.com/sportorg/pysport/issues/500))
 
 ## 2025-04-01
 
@@ -38,8 +42,6 @@
 * Bumped dependencies jinja2, psutil, pywin32, playsound and others ([#493](https://github.com/sportorg/pysport/pull/493))
 * Sending compressed data to orgeo (gzip)
 * New settings format (json) with the ability to add new fields without losing compatibility
-* Fix performance issue with large number of participants ([#494](https://github.com/sportorg/pysport/pull/494))
-* Default value for auto-save has been increased from 5 seconds to 5 minutes ([#497](https://github.com/sportorg/pysport/pull/497))
 
 ## 2024-10-07 v1.7.1
 
