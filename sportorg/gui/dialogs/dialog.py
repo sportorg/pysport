@@ -49,6 +49,7 @@ class Field:
     id: str = ""
     q_item: Optional[Any] = None
     q_label: Optional[Any] = None
+    tooltip: Optional[str] = None
 
 
 @dataclass
@@ -236,8 +237,14 @@ class BaseDialog(QDialog):
             form_layout.addRow(label, item)  # type:ignore
             form_field.q_label = label
             form_field.q_item = item
+
             if form_field.id:
                 self.fields[form_field.id] = form_field
+
+            if form_field.tooltip:
+                form_field.q_item.setToolTip(form_field.tooltip)
+                if hasattr(form_field.q_item, "setToolTip"):
+                    form_field.q_item.setToolTip(form_field.tooltip)
 
         scroll_area.setWidget(content_widget)
         scroll_area.setWidgetResizable(True)

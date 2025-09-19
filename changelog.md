@@ -9,6 +9,7 @@
 + Import form SFRX files (SFR)
 + Course indexing by name
 + New "in list" operator in table filtering
++ Results of relay teams as in All-Russian competitions ([#495](https://github.com/sportorg/pysport/issues/495))
 + Default value for auto-save has been increased from 5 seconds to 5 minutes ([#497](https://github.com/sportorg/pysport/pull/497))
 + Added columns: birthday and distance in participants, comment in results, control time, and start interval in groups ([#500](https://github.com/sportorg/pysport/issues/500))
 

@@ -97,11 +97,19 @@ class GroupMassEditDialog(QDialog):
         self.type_combobox.currentIndexChanged.connect(self.on_race_type_changed)
         self.layout.addRow(self.type_checkbox, self.type_combobox)
 
-        self.relay_type_checkbox = QtWidgets.QCheckBox(self)
-        self.relay_type_combobox = AdvComboBox(self, val_list={yes, no}, max_width=50)
-        self.relay_type_combobox.setEditable(False)
+        self.comp_type_checkbox = QtWidgets.QCheckBox(self)
+        self.comp_type_checkbox.stateChanged.connect(self.on_race_type_changed)
+        self.comp_type_combobox = AdvComboBox(self, val_list={yes, no}, max_width=50)
+        self.comp_type_combobox.currentIndexChanged.connect(self.on_race_type_changed)
+        self.comp_type_combobox.setEditable(False)
 
-        self.layout.addRow(self.relay_type_checkbox, self.relay_type_combobox)
+        self.layout.addRow(self.comp_type_checkbox, self.comp_type_combobox)
+
+        self.best_placing_checkbox = QtWidgets.QCheckBox(self)
+        self.best_placing_combobox = AdvComboBox(self, val_list={yes, no}, max_width=50)
+        self.best_placing_combobox.setEditable(False)
+
+        self.layout.addRow(self.best_placing_checkbox, self.best_placing_combobox)
 
         self.ranking_checkbox = QtWidgets.QCheckBox(self)
         self.ranking_combobox = AdvComboBox(self, val_list={yes, no}, max_width=50)
@@ -122,12 +130,21 @@ class GroupMassEditDialog(QDialog):
         self.show()
 
     def on_race_type_changed(self):
+        yes = translate("Yes")
         text = self.type_combobox.currentText()
         is_relay = RaceType.get_by_name(text) == RaceType.RELAY
         is_relay_type_enabled = self.type_checkbox.isChecked() and is_relay
+        is_comp_type_all_russian = (
+            is_relay_type_enabled
+            and self.comp_type_checkbox.isChecked()
+            and self.comp_type_combobox.currentText() == yes
+        )
 
-        self.relay_type_checkbox.setEnabled(is_relay_type_enabled)
-        self.relay_type_combobox.setEnabled(is_relay_type_enabled)
+        self.comp_type_checkbox.setEnabled(is_relay_type_enabled)
+        self.comp_type_combobox.setEnabled(is_relay_type_enabled)
+
+        self.best_placing_checkbox.setEnabled(is_comp_type_all_russian)
+        self.best_placing_combobox.setEnabled(is_comp_type_all_russian)
 
     def accept(self, *args, **kwargs):
         yes = translate("Yes")
@@ -150,7 +167,10 @@ class GroupMassEditDialog(QDialog):
                 change_start_interval = self.start_interval_edit.getOTime()
                 change_fee = int(self.fee_spinbox.value())
                 change_type = RaceType.get_by_name(self.type_combobox.currentText())
-                change_relay_type = self.relay_type_combobox.currentText() == yes
+                change_comp_type = self.comp_type_combobox.currentText() == yes
+                change_placing_type = (
+                    change_comp_type and self.best_placing_combobox.currentText() == yes
+                )
                 change_ranking = self.ranking_combobox.currentText() == yes
 
                 for i in selection:
@@ -187,8 +207,11 @@ class GroupMassEditDialog(QDialog):
                         if self.type_checkbox.isChecked():
                             cur_group.set_type(change_type)
 
-                        if self.relay_type_checkbox.isChecked():
-                            cur_group.is_best_team_placing_mode = change_relay_type
+                        if self.comp_type_checkbox.isChecked():
+                            cur_group.is_all_russian_competition = change_comp_type
+
+                        if self.best_placing_checkbox.isChecked():
+                            cur_group.is_best_team_placing_mode = change_placing_type
 
                         if self.ranking_checkbox.isChecked():
                             cur_group.ranking.is_active = change_ranking
@@ -210,7 +233,8 @@ class GroupMassEditDialog(QDialog):
         self.start_interval_checkbox.setText(translate("Start interval"))
         self.fee_checkbox.setText(translate("Start fee"))
         self.type_checkbox.setText(translate("Type"))
-        self.relay_type_checkbox.setText(translate("Best team placing"))
+        self.comp_type_checkbox.setText(translate("All-Russian competition"))
+        self.best_placing_checkbox.setText(translate("Best team placing"))
         self.ranking_checkbox.setText(translate("Rank calculation"))
 
         self.button_ok.setText(translate("OK"))
