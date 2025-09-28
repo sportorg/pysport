@@ -11,6 +11,8 @@
 + New "in list" operator in table filtering
 + Default value for auto-save has been increased from 5 seconds to 5 minutes ([#497](https://github.com/sportorg/pysport/pull/497))
 + Added columns: birthday and distance in participants, comment in results, control time, and start interval in groups ([#500](https://github.com/sportorg/pysport/issues/500))
++ End of competitors' maximum time column ([#501](https://github.com/sportorg/pysport/issues/501))
++ Competitors' numbers in relay format (e.g., 15.1, [#501](https://github.com/sportorg/pysport/issues/501))
 
 ### Fixes
 + Fixed: multi day race processing - all days are refreshed on the file opening 

@@ -1341,6 +1341,9 @@ msgstr "Нац. код"
 msgid "Out of competition title"
 msgstr "В/К"
 
+msgid "Max time at"
+msgstr "Контр. время"
+
 msgid "Result count title"
 msgstr "Финиш"
 

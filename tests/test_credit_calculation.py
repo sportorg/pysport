@@ -9,15 +9,14 @@ from sportorg.models.memory import (
     Person,
     Race,
     ResultSportident,
+    ResultStatus,
     Split,
     create,
     new_event,
     race,
-    ResultStatus,
 )
 from sportorg.models.result.result_checker import ResultChecker
 from sportorg.utils.time import hhmmss_to_time
-
 
 # Settings calculation time.
 # credit_time_enabled [bool] - is enabled calculation credit time
@@ -77,7 +76,7 @@ def test_credit_calculation_when_credit_time_disabled(
 ):
     race().set_setting("credit_time_enabled", False)
     ok(new_split1, expected_result=OTime())
-    ok(new_split1, expected_result=OTime())
+    ok(new_split2, expected_result=OTime())
 
 
 def test_credit_calculation_when_credit_time_enabled(
