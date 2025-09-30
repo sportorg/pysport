@@ -69,6 +69,7 @@ class MarkedRouteDialog(QDialog):
         self.label_sample = QLabel("\n\n31,32\n33,34\n35,36\n37,38\n...")
         self.item_table = QTextEdit()
         self.item_table.setPlainText("")
+        self.item_table.setTabChangesFocus(True)
 
         self.layout.addRow(self.label_sample, self.item_table)
 
