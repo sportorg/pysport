@@ -81,7 +81,7 @@ class OrganizationMassEditDialog(QDialog):
                 change_organization = find(
                     obj.organizations, name=self.orzanization_combo.currentText()
                 )
-                change_code = self.code_textedit.toPlainText()
+                change_code = self.code_textedit.text()
                 change_country = self.country_combo.currentText()
                 change_region = self.region_combo.currentText()
 
