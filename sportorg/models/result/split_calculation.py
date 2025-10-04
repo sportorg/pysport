@@ -42,7 +42,7 @@ class PersonSplits:
 
         if self.course.length:
             self.result.speed = get_speed_min_per_km(
-                self.result.get_result_otime(), self.course.length
+                self.result.get_result_otime_current_day(), self.course.length
             )
 
         for split in self.result.splits:
