@@ -413,8 +413,8 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
         )
 
         ret = [
-            person.name,
             person.surname,
+            person.name,
             person.group.name if person.group else "",
             person.organization.name if person.organization else "",
             result.get_place(),
