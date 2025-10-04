@@ -4,6 +4,7 @@ import uuid
 from os import remove
 from typing import Any, Dict, Type
 
+from sportorg.modules.ruident.ruident import RuidentClient
 from sportorg.utils.text import detect_encoding
 
 try:
@@ -222,7 +223,7 @@ class OcadTXTv8ImportAction(Action, metaclass=ActionFactory):
             try:
                 ocad.import_txt_v8(file_name)
             except OcadImportException as e:
-                logging.error(str(e))
+                logging.exception(e)
                 QMessageBox.warning(
                     self.app,
                     translate("Error"),
@@ -624,6 +625,13 @@ class ImpinjReadoutAction(Action, metaclass=ActionFactory):
 class SrpidReadoutAction(Action, metaclass=ActionFactory):
     def execute(self):
         SrpidClient().toggle()
+        time.sleep(0.5)
+        self.app.interval()
+
+
+class RuidentReadoutAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        RuidentClient().toggle()
         time.sleep(0.5)
         self.app.interval()
 

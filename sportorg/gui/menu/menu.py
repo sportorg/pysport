@@ -395,6 +395,11 @@ def menu_list():
                     "action": "SrpidReadoutAction",
                 },
                 {
+                    "title": translate("on/off Ruident readout"),
+                    "icon": config.icon_dir("ruident.png"),
+                    "action": "RuidentReadoutAction",
+                },
+                {
                     "title": translate("Teamwork"),
                     "icon": config.icon_dir("network.svg"),
                     "actions": [
