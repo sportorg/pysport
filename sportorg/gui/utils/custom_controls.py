@@ -30,7 +30,14 @@ class AdvComboBox(QComboBox):
     Found in Internet by Sergei
     """
 
-    def __init__(self, parent=None, val_list=None, max_width=0):
+    def __init__(
+        self,
+        parent=None,
+        val_list=None,
+        max_width=0,
+        min_width=0,
+        min_context_length_symbols=0,
+    ):
         super(AdvComboBox, self).__init__(parent)
 
         self.setFocusPolicy(QtCore.Qt.StrongFocus)
@@ -61,6 +68,15 @@ class AdvComboBox(QComboBox):
 
         if max_width > 0:
             self.setMaximumWidth(max_width)
+
+        if min_width > 0:
+            self.setMinimumWidth(min_width)
+
+        if min_context_length_symbols > 0:
+            self.setMinimumContentsLength(min_context_length_symbols)
+            self.setSizeAdjustPolicy(
+                self.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon
+            )
 
     def wheelEvent(self, ev):
         if ev.type() == QtCore.QEvent.Wheel:
