@@ -65,7 +65,7 @@ class ReportDialog(QDialog):
         self.layout = QFormLayout(self)
 
         self.label_template = QLabel(translate("Template"))
-        self.item_template = AdvComboBox()
+        self.item_template = AdvComboBox(min_width=250, min_context_length_symbols=60)
         self.item_template.addItems(
             sorted(get_templates(settings.template_dir("reports")))
         )
