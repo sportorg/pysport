@@ -1464,6 +1464,28 @@ class Person(Model):
         self._index_bib(new_bib)
         self._bib = new_bib
 
+    def get_relay_team_number(self) -> int:
+        """Return relay team bib if relay leg, otherwise 0"""
+        if self.bib > 1000 and self.group and self.group.is_relay():
+            team_number = self.bib % 1000
+            return team_number
+        return 0
+
+    def get_relay_leg_number(self) -> int:
+        """Return relay leg number if relay leg, otherwise 0"""
+        if self.bib > 1000 and self.group and self.group.is_relay():
+            leg_number = self.bib // 1000
+            return leg_number
+        return 0
+
+    def get_relay_bib(self) -> str:
+        """Return relay bib as team.leg if relay leg, otherwise empty string"""
+        team_number = self.get_relay_team_number()
+        leg_number = self.get_relay_leg_number()
+        if team_number > 0 and leg_number > 0:
+            return f"{team_number}.{leg_number}"
+        return ""
+
     # used for duplication
     def set_bib_without_indexing(self, new_bib: int) -> None:
         self._bib = new_bib

@@ -5,6 +5,8 @@ from abc import abstractmethod
 from copy import copy, deepcopy
 from typing import List
 
+from sportorg.gui.global_access import GlobalAccess
+
 try:
     from PySide6.QtCore import QAbstractTableModel, Qt
 except ModuleNotFoundError:
@@ -181,9 +183,11 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
         maximum = len(current_array)
         while i < maximum:
             cur_pos = (self.search_offset + i) % maximum
-            obj = self.get_values_from_object(current_array[cur_pos])
-            for column in columns:
-                value = str(obj[column])
+            obj = current_array[cur_pos]
+            row_values = self.get_values_from_object(obj)
+            row_values.append(self._extract_bib(obj))  # add raw bib to search
+            row_values.append(self._extract_relay_bib(obj).replace(".", ","))
+            for value in [str(v) for v in row_values]:
                 if value == self.search:
                     self.search_offset = cur_pos
                     self.search_old = self.search
@@ -195,9 +199,9 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
         maximum = len(current_array)
         while i < maximum:
             cur_pos = (self.search_offset + i) % maximum
-            obj = self.get_values_from_object(current_array[cur_pos])
+            row_values = self.get_values_from_object(current_array[cur_pos])
             for column in columns:
-                value = str(obj[column])
+                value = str(row_values[column])
                 if check.match(value):
                     self.search_offset = cur_pos
                     self.search_old = self.search
@@ -209,9 +213,9 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
         maximum = len(current_array)
         while i < maximum:
             cur_pos = (self.search_offset + i) % maximum
-            obj = self.get_values_from_object(current_array[cur_pos])
+            row_values = self.get_values_from_object(current_array[cur_pos])
             for column in columns:
-                value = str(obj[column])
+                value = str(row_values[column])
                 if check.search(value):
                     self.search_offset = cur_pos
                     self.search_old = self.search
@@ -219,6 +223,28 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
             i += 1
 
         self.search_offset = -1
+
+    def _extract_bib(self, obj) -> str:
+        """
+        Extracts the bib number as a string from a given object or returns an empty string if not available
+        """
+        bib = ""
+        if isinstance(obj, Person):
+            bib = str(obj.bib)
+        elif isinstance(obj, Result):
+            bib = str(obj.person.bib) if obj.person else ""
+        return bib
+
+    def _extract_relay_bib(self, obj) -> str:
+        """
+        Extracts the rey bib number as a string from a given object or returns an empty string if not available
+        """
+        bib = ""
+        if isinstance(obj, Person):
+            bib = str(obj.get_relay_bib())
+        elif isinstance(obj, Result):
+            bib = str(obj.person.get_relay_bib()) if obj.person else ""
+        return bib
 
     def sort(self, p_int, order=None):
         """Sort table by given column number."""
@@ -230,9 +256,31 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
         def birthday_sort_key(person: Person):
             return person.birth_date is None, person.birth_date
 
+        def bib_persons_sort_key(person: Person):
+            return (
+                person.bib is None,
+                person.get_relay_team_number() or person.bib,
+                person.get_relay_leg_number(),
+            )
+
+        def bib_results_sort_key(result: Result):
+            if result.person is None:
+                return (True, 0, 0)
+            person = result.person
+            return (
+                person.bib is None,
+                person.get_relay_team_number() or person.bib,
+                person.get_relay_leg_number(),
+            )
+
+        current_tab = GlobalAccess().get_main_window().current_tab
         sort_key = default_sort_key
         if self.get_headers()[p_int] == translate("Birthday title"):
             sort_key = birthday_sort_key
+        elif self.get_headers()[p_int] == translate("Bib") and current_tab == 0:
+            sort_key = bib_persons_sort_key
+        elif self.get_headers()[p_int] == translate("Bib") and current_tab == 1:
+            sort_key = bib_results_sort_key
 
         try:
             is_descending = order == Qt.DescendingOrder
@@ -287,6 +335,7 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
             translate("National code title"),
             translate("Out of competition title"),
             translate("Course"),
+            translate("Max time at"),
             translate("Result count title"),
         ]
 
@@ -316,6 +365,18 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
 
         use_birthday = settings.SETTINGS.race_use_birthday
 
+        start_source = race().get_setting("system_start_source", "protocol")
+        max_time_ends_at_str = ""
+        if (
+            person.group
+            and person.group.max_time
+            and person.start_time
+            and not person.result_count
+            and start_source == "protocol"
+        ):
+            max_time_at = person.start_time + person.group.max_time
+            max_time_ends_at_str = max_time_at.to_str()
+
         ret = [
             person.surname,
             person.name,
@@ -324,7 +385,7 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
             person.group.name if person.group else "",
             person.organization.name if person.organization else "",
             person.get_birthday() if use_birthday else person.year,
-            person.bib,
+            person.get_relay_bib() or person.bib,
             person.start_time.to_str(),
             person.start_group,
             person.card_number,
@@ -334,6 +395,7 @@ class PersonMemoryModel(AbstractSportOrgMemoryModel):
             str(person.national_code) if person.national_code else "",
             translate("o/c") if person.is_out_of_competition else "",
             person.group.course.name if (person.group and person.group.course) else "",
+            max_time_ends_at_str,
             person.result_count,
         ]
 
@@ -413,20 +475,20 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
         )
 
         ret = [
-            person.name,
             person.surname,
+            person.name,
             person.group.name if person.group else "",
             person.organization.name if person.organization else "",
             result.get_place(),
             result.get_result(),
             result.diff.to_str() if result.diff else "",
             result.status.get_title(),
-            result.get_bib(),
+            person.get_relay_bib() or person.bib,
             result.card_number,
             start,
             finish,
-            result.get_credit_time().to_str(),
-            result.get_penalty_time().to_str(),
+            result.get_credit_time().to_str() if result.get_credit_time() else "",
+            result.get_penalty_time().to_str() if result.get_penalty_time() else "",
             result.penalty_laps,
             str(result.system_type),
             rented_card_text,
@@ -499,10 +561,10 @@ class GroupMemoryModel(AbstractSportOrgMemoryModel):
             course.climb if course else 0,
             group.min_year,
             group.max_year,
-            group.max_time.to_str(),
+            group.max_time.to_str() if group.max_time else "",
             group.start_corridor,
             group.order_in_corridor,
-            group.start_interval.to_str(),
+            group.start_interval.to_str() if group.start_interval else "",
             group.count_person,
             group.count_finished,
             group.count_person - group.count_finished,
