@@ -26,6 +26,7 @@
 + Start preparation - checking start group for draw to have more than 1 person
 + Fix performance issue with large number of participants ([#494](https://github.com/sportorg/pysport/pull/494))
 + Added stability when sorting tables ([#500](https://github.com/sportorg/pysport/issues/500))
++ Fixed: wiping the file by saving or auto-saving if the file could not be opened ([#502](https://github.com/sportorg/pysport/issues/502))
 
 ## 2025-04-01
 

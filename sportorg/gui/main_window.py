@@ -740,6 +740,7 @@ class MainWindow(QMainWindow):
                 self.last_update = time.time()
             except Exception as e:
                 logging.exception(e)
+                self.file = None
                 self.delete_from_recent_files(file_name)
                 QMessageBox.warning(
                     self,
