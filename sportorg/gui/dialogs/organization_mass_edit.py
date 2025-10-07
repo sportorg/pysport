@@ -3,11 +3,11 @@ import logging
 try:
     from PySide6 import QtCore, QtWidgets
     from PySide6.QtGui import QIcon
-    from PySide6.QtWidgets import QDialog, QDialogButtonBox, QFormLayout, QTextEdit
+    from PySide6.QtWidgets import QDialog, QDialogButtonBox, QFormLayout, QLineEdit
 except ModuleNotFoundError:
     from PySide2 import QtCore, QtWidgets
     from PySide2.QtGui import QIcon
-    from PySide2.QtWidgets import QDialog, QDialogButtonBox, QFormLayout, QTextEdit
+    from PySide2.QtWidgets import QDialog, QDialogButtonBox, QFormLayout, QLineEdit
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
@@ -42,7 +42,7 @@ class OrganizationMassEditDialog(QDialog):
         self.layout.addRow(self.orzanization_checkbox, self.orzanization_combo)
 
         self.code_checkbox = QtWidgets.QCheckBox(self)
-        self.code_textedit = QTextEdit(self)
+        self.code_textedit = QLineEdit(self)
         self.code_textedit.setMaximumHeight(23)
         self.code_textedit.setMaximumWidth(max_field_width)
         self.layout.addRow(self.code_checkbox, self.code_textedit)
@@ -81,7 +81,7 @@ class OrganizationMassEditDialog(QDialog):
                 change_organization = find(
                     obj.organizations, name=self.orzanization_combo.currentText()
                 )
-                change_code = self.code_textedit.toPlainText()
+                change_code = self.code_textedit.text()
                 change_country = self.country_combo.currentText()
                 change_region = self.region_combo.currentText()
 

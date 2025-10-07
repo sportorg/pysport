@@ -48,6 +48,7 @@ class RentCardsDialog(QDialog):
         )
         self.item_cards = QTextEdit()
         self.item_cards.setPlainText(RentCards().to_text())
+        self.item_cards.setTabChangesFocus(True)
 
         self.layout.addRow(self.label_cards, self.item_cards)
 

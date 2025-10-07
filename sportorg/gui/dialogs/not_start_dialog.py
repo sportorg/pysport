@@ -7,8 +7,8 @@ try:
         QDialogButtonBox,
         QFormLayout,
         QLabel,
-        QTextEdit,
         QMessageBox,
+        QTextEdit,
     )
 except ModuleNotFoundError:
     from PySide2.QtGui import QIcon
@@ -17,8 +17,8 @@ except ModuleNotFoundError:
         QDialogButtonBox,
         QFormLayout,
         QLabel,
-        QTextEdit,
         QMessageBox,
+        QTextEdit,
     )
 
 from sportorg import config
@@ -64,6 +64,7 @@ class InputStartNumbersDialog(QDialog):
 
         self.label_controls = QLabel("\n\n1 4 15 25\n58 32\n33\n34\n...\n150")
         self.item_numbers = QTextEdit()
+        self.item_numbers.setTabChangesFocus(True)
 
         self.layout.addRow(self.label_controls, self.item_numbers)
 

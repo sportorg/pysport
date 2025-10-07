@@ -65,6 +65,7 @@ class TelegramDialog(QDialog):
         self.label_template = QLabel(translate("Template"))
         self.item_template = QTextEdit()
         self.item_template.setMinimumHeight(150)
+        self.item_template.setTabChangesFocus(True)
         self.layout.addRow(self.label_template, self.item_template)
 
         self.item_enabled = QCheckBox(translate("Enabled"))

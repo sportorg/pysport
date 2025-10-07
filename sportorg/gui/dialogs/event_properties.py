@@ -55,6 +55,7 @@ class EventPropertiesDialog(QDialog):
         self.label_sub_title = QLabel(translate("Sub title"))
         self.item_sub_title = QTextEdit()
         self.item_sub_title.setMaximumHeight(100)
+        self.item_sub_title.setTabChangesFocus(True)
         self.layout.addRow(self.label_sub_title, self.item_sub_title)
 
         self.label_start_date = QLabel(translate("Start date"))
