@@ -1,3 +1,4 @@
+import copy
 import datetime
 import logging
 from datetime import time
@@ -72,6 +73,8 @@ def import_from_iof(file) -> None:
             import_from_entry_list(result.data)
         elif result.name == "CourseData":
             import_from_course_data(result.data)
+        elif result.name == "VariationData":
+            import_from_variation_data(result.data)
         elif result.name == "ResultList":
             import_from_result_list(result.data)
         elif result.name == "StartList":
@@ -83,28 +86,43 @@ def import_from_iof(file) -> None:
 def import_from_course_data(courses) -> None:
     obj = race()
     for course in courses:
-        if find(obj.courses, name=course["name"]) is None:
-            c = create(
-                Course,
-                name=course["name"],
-                length=course["length"],
-                climb=course["climb"],
-            )
-            controls = []
-            i = 1
-            for control in course["controls"]:
-                if control["type"] == "Control":
-                    controls.append(
-                        create(
-                            CourseControl,
-                            code=control["control"],
-                            order=i,
-                            length=control["leg_length"],
+        if "name" in course:
+            if find(obj.courses, name=course["name"]) is None:
+                c = create(
+                    Course,
+                    name=course["name"],
+                    length=course["length"],
+                    climb=course["climb"],
+                )
+                controls = []
+                i = 1
+                for control in course["controls"]:
+                    if control["type"] == "Control":
+                        controls.append(
+                            create(
+                                CourseControl,
+                                code=control["control"],
+                                order=i,
+                                length=control["leg_length"],
+                            )
                         )
-                    )
-                    i += 1
-            c.controls = controls
-            obj.courses.append(c)
+                        i += 1
+                c.controls = controls
+                obj.courses.append(c)
+
+def import_from_variation_data(teams) -> None:
+    obj = race()
+    for team in teams:
+        for leg in team["legs"]:
+            leg_number = leg["leg_number"]
+            course_name = leg["course_name"]
+            course = find(obj.courses, name=course_name)
+            if course:
+                new_course = Course()
+                new_course.name = str(team["bib_number"]) + "." + str(leg_number)
+                new_course.length = course.length
+                new_course.controls = copy.deepcopy(course.controls)
+                obj.courses.append(new_course)
 
 
 def create_person(person_entry):
