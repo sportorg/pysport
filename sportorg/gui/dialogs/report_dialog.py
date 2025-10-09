@@ -212,7 +212,8 @@ class ReportDialog(QDialog):
 
         # Remove sensitive data
         for race_data in races_dict:
-            race_data["settings"].pop("live_urls", None)
+            if race_data:
+                race_data["settings"].pop("live_urls", None)
 
         template_path_items = template_path.split("/")[-1]
         template_path_items = ".".join(template_path_items.split(".")[:-1]).split("_")
