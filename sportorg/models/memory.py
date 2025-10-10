@@ -1833,7 +1833,7 @@ class Race(Model):
         obj = self.support_obj[dict_obj["object"]]()
         obj.id = uuid.UUID(dict_obj["id"])
         self.update_obj(obj, dict_obj)
-        self.list_obj[dict_obj["object"]].insert(0, obj)
+        self.list_obj[dict_obj["object"]].append(obj)
         self.index_obj[dict_obj["object"]][dict_obj["id"]] = obj
 
     def get_type(self, group: Group):
