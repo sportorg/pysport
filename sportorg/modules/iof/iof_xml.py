@@ -110,6 +110,7 @@ def import_from_course_data(courses) -> None:
                 c.controls = controls
                 obj.courses.append(c)
 
+
 def import_from_variation_data(teams) -> None:
     obj = race()
     for team in teams:
