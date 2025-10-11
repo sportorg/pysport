@@ -21,7 +21,11 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-win = ["pywin32>=228", "pyImpinj~=1.2", "playsound3>=3,<4"]
+win = [
+  "pywin32>=228",
+  "pyImpinj~=1.2; python_version == '3.8'",
+  "playsound3>=3,<4; python_version == '3.8'",
+]
 
 [dependency-groups]
 dev = [

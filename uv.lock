@@ -3411,7 +3411,7 @@ dependencies = [
 win = [
     { name = "playsound3", version = "3.2.7", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
     { name = "playsound3", version = "3.2.8", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
-    { name = "pyimpinj" },
+    { name = "pyimpinj", marker = "python_full_version < '3.9'" },
     { name = "pywin32" },
 ]
 
@@ -3454,7 +3454,7 @@ requires-dist = [
     { name = "playsound3", marker = "extra == 'win'", specifier = ">=3,<4" },
     { name = "polib", specifier = ">=1,<2" },
     { name = "psutil", specifier = ">=7,<8" },
-    { name = "pyimpinj", marker = "extra == 'win'", specifier = "~=1.2" },
+    { name = "pyimpinj", marker = "python_full_version == '3.8.*' and extra == 'win'", specifier = "~=1.2" },
     { name = "pyside6", specifier = ">=6,<7" },
     { name = "python-dateutil", specifier = ">=2,<3" },
     { name = "pywin32", marker = "extra == 'win'", specifier = ">=228" },
