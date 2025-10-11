@@ -60,7 +60,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        python_version: [3.8, 3.14]
+        python_version: [3.8]
         architecture: [x64]
     name: Build on Windows ${{ matrix.architecture }}
     steps:
