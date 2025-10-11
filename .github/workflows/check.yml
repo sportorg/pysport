@@ -22,12 +22,13 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
+        python_version: [3.8, 3.14]
         architecture: [x64]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.8'
+          python-version: ${{ matrix.python_version }}
           architecture: ${{ matrix.architecture }}
 
       - name: Install python dependencies
@@ -40,12 +41,13 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
+        python_version: [3.8, 3.14]
         architecture: [x64]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.8'
+          python-version: ${{ matrix.python_version }}
           architecture: ${{ matrix.architecture }}
 
       - name: Install python dependencies
@@ -58,6 +60,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
+        python_version: [3.8]
         architecture: [x64]
     name: Build on Windows ${{ matrix.architecture }}
     steps:
@@ -67,7 +70,7 @@ jobs:
         id: set_up_python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.8'
+          python-version: ${{ matrix.python_version }}
           architecture: ${{ matrix.architecture }}
       - name: Install python dependencies
         run: pip install uv && uv sync --frozen --extra win
