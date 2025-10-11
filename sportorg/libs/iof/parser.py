@@ -108,15 +108,17 @@ def variation_data(tree, ns):
 
     if version == "3":
         # TeamCourseAssignment - variations for relays
-        for team_el in root.find("iof:RaceCourseData", ns).findall("iof:TeamCourseAssignment", ns):
+        for team_el in root.find("iof:RaceCourseData", ns).findall(
+            "iof:TeamCourseAssignment", ns
+        ):
             team = {
                 "bib_number": int(team_el.find("iof:BibNumber", ns).text),
-                "legs": []
+                "legs": [],
             }
             for leg_el in team_el.findall("iof:TeamMemberCourseAssignment", ns):
                 leg = {
                     "leg_number": leg_el.find("iof:Leg", ns).text,
-                    "course_name": leg_el.find("iof:CourseName", ns).text
+                    "course_name": leg_el.find("iof:CourseName", ns).text,
                 }
                 team["legs"].append(leg)
             teams.append(team)
