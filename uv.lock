@@ -2324,43 +2324,12 @@ wheels = [
 name = "playsound3"
 version = "3.2.7"
 source = { registry = "https://pypi.org/simple" }
-resolution-markers = [
-    "(python_full_version < '3.9' and platform_machine != 'aarch64' and platform_machine != 'armv7l' and platform_machine != 'i686' and platform_machine != 'ppc64le' and platform_machine != 's390x' and platform_machine != 'x86_64') or (python_full_version < '3.9' and sys_platform != 'linux')",
-    "python_full_version < '3.9' and platform_machine == 'aarch64' and sys_platform == 'linux'",
-    "python_full_version < '3.9' and platform_machine == 'armv7l' and sys_platform == 'linux'",
-    "python_full_version < '3.9' and platform_machine == 'i686' and sys_platform == 'linux'",
-    "python_full_version < '3.9' and platform_machine == 'ppc64le' and sys_platform == 'linux'",
-    "python_full_version < '3.9' and platform_machine == 's390x' and sys_platform == 'linux'",
-    "python_full_version < '3.9' and platform_machine == 'x86_64' and sys_platform == 'linux'",
-]
 dependencies = [
     { name = "pywin32", marker = "python_full_version < '3.9' and sys_platform == 'win32'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/0c/f7/0cbfcfc88b432e129a223c56d17723a95359e2581b235bac2bf794b22b3a/playsound3-3.2.7.tar.gz", hash = "sha256:764f5d9de3c95a5651047a3547057c4d21bc7a0878604cae5b7ca052172dac7b", size = 608401, upload-time = "2025-09-30T12:30:29.486Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/a9/6c/923b05cb5fb28608462a3673d3b052340cf69a0ebe29ed6b97bff4028d85/playsound3-3.2.7-py3-none-any.whl", hash = "sha256:5541ec0a7efb5147d1248a9d8c9c3459c211f99bb0fc3c02d0223249c0c5e952", size = 9745, upload-time = "2025-09-30T12:30:27.277Z" },
-]
-
-[[package]]
-name = "playsound3"
-version = "3.2.8"
-source = { registry = "https://pypi.org/simple" }
-resolution-markers = [
-    "python_full_version >= '3.14' and platform_machine == 'x86_64' and sys_platform == 'linux'",
-    "python_full_version >= '3.14' and platform_machine == 'i686' and sys_platform == 'linux'",
-    "python_full_version >= '3.14' and platform_machine == 'aarch64' and sys_platform == 'linux'",
-    "python_full_version >= '3.14' and platform_machine == 'armv7l' and sys_platform == 'linux'",
-    "python_full_version >= '3.14' and platform_machine == 'ppc64le' and sys_platform == 'linux'",
-    "python_full_version >= '3.14' and platform_machine == 's390x' and sys_platform == 'linux'",
-    "(python_full_version >= '3.14' and platform_machine != 'aarch64' and platform_machine != 'armv7l' and platform_machine != 'i686' and platform_machine != 'ppc64le' and platform_machine != 's390x' and platform_machine != 'x86_64') or (python_full_version >= '3.14' and sys_platform != 'linux')",
-    "python_full_version >= '3.9' and python_full_version < '3.14'",
-]
-dependencies = [
-    { name = "pywin32", marker = "python_full_version >= '3.9' and sys_platform == 'win32'" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/20/df/1bc4664f65f5068df468e1d4c085382dcdf17454276531938341a01ee935/playsound3-3.2.8.tar.gz", hash = "sha256:c7a7b4dbbd1cdf76a2715059daf20537bb2f8713ee8f2f5a27e3e053374c2342", size = 608326, upload-time = "2025-10-01T19:45:28.958Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/37/11/83a47fa57257f4b2bbc52aa4b5ebcdb1e6aba0ebd8604a85d9a375194e36/playsound3-3.2.8-py3-none-any.whl", hash = "sha256:1225807f14354702cba0171c999fe062580d77d07d8718a35b5978ed00272402", size = 9679, upload-time = "2025-10-01T19:45:27.277Z" },
 ]
 
 [[package]]
@@ -3409,8 +3378,7 @@ dependencies = [
 
 [package.optional-dependencies]
 win = [
-    { name = "playsound3", version = "3.2.7", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
-    { name = "playsound3", version = "3.2.8", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
+    { name = "playsound3", marker = "python_full_version < '3.9'" },
     { name = "pyimpinj", marker = "python_full_version < '3.9'" },
     { name = "pywin32" },
 ]
@@ -3451,7 +3419,7 @@ requires-dist = [
     { name = "docxtpl", specifier = ">=0,<1" },
     { name = "jinja2", specifier = ">=3,<4" },
     { name = "orjson", specifier = ">=3.9.5,<4" },
-    { name = "playsound3", marker = "extra == 'win'", specifier = ">=3,<4" },
+    { name = "playsound3", marker = "python_full_version == '3.8.*' and extra == 'win'", specifier = ">=3,<4" },
     { name = "polib", specifier = ">=1,<2" },
     { name = "psutil", specifier = ">=7,<8" },
     { name = "pyimpinj", marker = "python_full_version == '3.8.*' and extra == 'win'", specifier = "~=1.2" },
