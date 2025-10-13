@@ -33,7 +33,7 @@ dev = [
   "cx_Freeze>=8; python_version >= '3.14'",
   "mypy~=1.4; python_version == '3.8'",
   "mypy>=1.4; python_version >= '3.14'",
-  "poethepoet>=0.22,<0.31",
+  "poethepoet>=0.22,<0.38",
   "pytest>=7.4,<9.0",
   "pytest-cov",
   "pytest-deadfixtures",
