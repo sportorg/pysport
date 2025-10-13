@@ -29,7 +29,7 @@ win = [
 
 [dependency-groups]
 dev = [
-  "cx_Freeze>=6.15.16,<7; python_version == '3.8'",
+  "cx_Freeze>=6.15.16,<9; python_version == '3.8'",
   "cx_Freeze>=8; python_version >= '3.14'",
   "mypy~=1.4; python_version == '3.8'",
   "mypy>=1.4; python_version >= '3.14'",
