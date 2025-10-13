@@ -6,7 +6,7 @@ authors = [{ name = "Danil Akhtarov", email = "daxartio@gmail.com" }]
 requires-python = ">=3.8.1,<=3.14"
 dependencies = [
   "aiohttp>=3.9.0,<4",
-  "boltons>=20,<21",
+  "boltons>=20,<26",
   "chardet>=5.2.0,<6",
   "docxtpl>=0,<1",
   "jinja2>=3,<4",
