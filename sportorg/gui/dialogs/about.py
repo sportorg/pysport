@@ -62,14 +62,16 @@ class AboutDialog(QDialog):
         home_page_text.setOpenExternalLinks(True)
         self.layout.addRow(home_page_text)
 
-        commit_version_text = QLabel()
-        commit_version_text.setTextInteractionFlags(
+        extra_version_text = QLabel()
+        extra_version_text.setTextInteractionFlags(
             Qt.TextInteractionFlag.TextSelectableByMouse
         )
-        commit_version_text.setText(
-            "{}: {}".format(translate("Version"), config.commit_version())
+        extra_version_text.setText(
+            "{}: {}\npython {}".format(
+                translate("Version"), config.commit_version(), config.PYTHON_VERSION
+            )
         )
-        self.layout.addRow(commit_version_text)
+        self.layout.addRow(extra_version_text)
 
         licence_title = QLabel()
         licence_title.setText("\nGPL v3 License")
