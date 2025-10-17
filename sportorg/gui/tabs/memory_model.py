@@ -88,10 +88,16 @@ class AbstractSportOrgMemoryModel(QAbstractTableModel):
     def headerData(self, index, orientation, role=None):
         if role == Qt.DisplayRole:
             if orientation == Qt.Horizontal:
-                columns = self.get_headers()
-                return columns[index]
+                return self._horizontal_header_data(index)
             if orientation == Qt.Vertical:
-                return str(index + 1)
+                return self._vertical_header_data(index)
+
+    def _horizontal_header_data(self, index):
+        columns = self.get_headers()
+        return columns[index]
+
+    def _vertical_header_data(self, index):
+        return str(index + 1)
 
     def data(self, index, role=None):
         if role == Qt.DisplayRole:
@@ -436,6 +442,9 @@ class ResultMemoryModel(AbstractSportOrgMemoryModel):
             translate("Result day/leg"),
             translate("Comment"),
         ]
+
+    def _vertical_header_data(self, index):
+        return str(len(self.cache) - index)
 
     def init_cache(self):
         self.cache.clear()
