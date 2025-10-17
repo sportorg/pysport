@@ -484,6 +484,8 @@ def format_result(result, length):
 
 
 class Result(ABC):
+    _name = "Result"
+
     def __init__(self):
         self.id = uuid.uuid4()
         self.days = 0
@@ -971,10 +973,12 @@ class Result(ABC):
 
 
 class ResultManual(Result):
+    _name = "ResultManual"
     system_type = SystemType.MANUAL
 
 
 class ResultSportident(Result):
+    _name = "ResultSportident"
     system_type = SystemType.SPORTIDENT
 
     def __init__(self):
@@ -1298,18 +1302,22 @@ class ResultSportident(Result):
 
 
 class ResultSFR(ResultSportident):
+    _name = "ResultSFR"
     system_type = SystemType.SFR
 
 
 class ResultSportiduino(ResultSportident):
+    _name = "ResultSportiduino"
     system_type = SystemType.SPORTIDUINO
 
 
 class ResultRfidImpinj(ResultSportident):
+    _name = "ResultRfidImpinj"
     system_type = SystemType.RFID_IMPINJ
 
 
 class ResultSrpid(ResultSportident):
+    _name = "ResultSrpid"
     system_type = SystemType.SRPID
 
 
@@ -1808,8 +1816,10 @@ class Race(Model):
 
     def get_obj(self, obj_name, obj_id):
         cur_dict = self.index_obj[obj_name]
-        if obj_id in cur_dict:
+        try:
             return cur_dict[obj_id]
+        except KeyError:
+            return None
 
     def update_obj(self, obj, dict_obj):
         obj.update_data(dict_obj)
@@ -1957,14 +1967,16 @@ class Race(Model):
         return None
 
     def find_person_by_bib(self, bib: int) -> Person:
-        if bib in self.person_index_bib:
+        try:
             return self.person_index_bib[bib]
-        return None
+        except KeyError:
+            return None
 
     def find_person_by_card(self, card: int) -> Person:
-        if card in self.person_index_card:
+        try:
             return self.person_index_card[card]
-        return None
+        except KeyError:
+            return None
 
     def find_course(self, result: Result) -> Optional[Course]:
         # first get course by number
@@ -2120,12 +2132,10 @@ class Race(Model):
                 return
 
         self.results.insert(0, result)
+        self.index_obj[result._name][str(result.id)] = result
 
     def add_result(self, result):
-        for r in self.results:
-            if r is result:
-                break
-        else:
+        if not self.index_obj[result._name].get(str(result.id), None):
             self.add_new_result(result)
 
     def clear_results(self):
