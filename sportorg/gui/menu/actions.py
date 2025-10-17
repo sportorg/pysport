@@ -5,6 +5,7 @@ from os import remove
 from typing import Any, Dict, Type
 
 from sportorg.modules.ruident.ruident import RuidentClient
+from sportorg.modules.ruident.ruident_window import RuidentDialog
 from sportorg.utils.text import detect_encoding
 
 try:
@@ -603,6 +604,10 @@ class ManualFinishAction(Action, metaclass=ActionFactory):
 
 class SPORTidentReadoutAction(Action, metaclass=ActionFactory):
     def execute(self):
+        if RuidentClient().is_alive():
+            RuidentDialog().open()
+            return
+
         SIReaderClient().toggle()
         time.sleep(0.5)
         self.app.interval()
@@ -635,6 +640,10 @@ class RuidentReadoutAction(Action, metaclass=ActionFactory):
         time.sleep(0.5)
         self.app.interval()
 
+
+class RuidentMenuAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        RuidentDialog().open()
 
 class SFRReadoutAction(Action, metaclass=ActionFactory):
     def execute(self):

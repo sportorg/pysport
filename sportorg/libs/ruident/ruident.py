@@ -34,6 +34,7 @@ class Ruident:
         self._last_line = 0
         self._last_card = -1
         self.current_data = {}
+        self.last_utility_time = None
 
         if debug:
             self._log_debug = print_
@@ -73,10 +74,23 @@ class Ruident:
                 self._logger.info(f"RUIDENT: read_file, processing line: {line}")
                 separator = self._separator
                 arr = line.split(separator)
-                if len(arr) > 9:
+
+                process_results = True
+                if len(arr) > 0:
+                    station_type = str(arr[1])
+                    if station_type == "STA":
+                        # launching of service utility
+                        process_results = False
+                        self._logger.info(f"RUIDENT: STA signal received from utility")
+                    if station_type == "SU":
+                        # service utility heartbeat (each 4-5 sec)
+                        process_results = False
+                        self.last_utility_time = datetime.now()
+                        self._logger.info(f"RUIDENT: SU signal received from station")
+
+                if process_results and len(arr) > 9:
                     correct_lines += 1
                     header = str(arr[0])
-                    station_type = str(arr[1])
                     station_code = int(arr[2]) if arr[2] else 0
                     h = int(arr[3])
                     m = int(arr[4])
@@ -109,12 +123,13 @@ class Ruident:
                         self.current_data["finish"] = t
                     elif station_type == "SR":
                         self.current_data["start"] = t
+                    ret.append(self.current_data)
                 else:
-                    self._logger.info(f"RUIDENT: read_file, ignoring line: {line}")
-                    self._logger.info(
-                        f"RUIDENT: correct format: @;type;code;HH;MM;SS;MS;card_id;battery;index)"
-                    )
-            ret.append(self.current_data)
+                    if process_results:
+                        self._logger.info(f"RUIDENT: read_file, ignoring line: {line}")
+                        self._logger.info(
+                            f"RUIDENT: correct format: @;type;code;HH;MM;SS;MS;card_id;battery;index)"
+                        )
         return ret
 
     def disconnect(self):

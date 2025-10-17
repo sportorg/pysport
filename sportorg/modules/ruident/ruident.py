@@ -2,9 +2,11 @@ import logging
 import os
 import subprocess
 import time
+from datetime import datetime, timedelta
 from queue import Empty, Queue
 from threading import Event, main_thread
 from time import sleep
+
 import bluetooth
 import yaml
 
@@ -64,6 +66,13 @@ class RuidentThread(QThread):
                 else:
                     # no data, wait 1 second before repeating
                     sleep(1)
+                    cur_time = datetime.now()
+                    timeout = 10
+                    if ruident.last_utility_time == None:
+                        ruident.last_utility_time = cur_time
+                    if ruident.last_utility_time and ruident.last_utility_time + timedelta(seconds=timeout) < cur_time:
+                        self._logger.info(f"RUIDENT: no SU signal from station for more than {timeout} seconds!")
+                        ruident.last_utility_time = cur_time  # reset timeout
 
         except Exception as e:
             self._logger.exception(e)
@@ -99,6 +108,9 @@ class ResultThread(QThread):
     @staticmethod
     def _get_result(card_data):
         result = memory.race().new_result(memory.ResultRuident)
+        if "card_number" not in card_data:
+            return None
+
         result.card_number = int(card_data["card_number"])
 
         for i in range(len(card_data["punches"])):
@@ -147,14 +159,13 @@ class RuidentClient:
             self.launch_reader_service()
 
             # open results tab
-            GlobalAccess().get_main_window().select_tab(1)
+            GlobalAccess().get_main_window().select_tab(5)
 
             # show icon on toolbar
             GlobalAccess().get_main_window().sportident_icon = {
                 True: "ruident.png",
                 False: "sportident.png",
             }
-
 
             self._ruident_thread = RuidentThread(
                 self.file_name, self.separator, self._queue, self._stop_event, self._logger, debug=True
@@ -206,6 +217,29 @@ class RuidentClient:
     def choose_port(self):
         return memory.race().get_setting("system_port", None)
 
+    def get_data_filepath(self):
+        cwd = os.getcwd()
+        ruident_folder = cwd + os.path.sep + "ruident"
+        ruident_config = ruident_folder + os.path.sep + "config.yaml"
+        if os.path.isfile(ruident_config):
+            with open(ruident_config) as stream:
+                try:
+                    config = yaml.safe_load(stream)
+                    out_path = config["export"]["out_path"]
+                    is_date_delimit = config["export"]["is_date_delimit"]
+                    self.separator = config["export"]["delimiter"]
+
+                    if out_path == ".":
+                        out_path = ruident_folder
+
+                    if is_date_delimit:
+                        self.file_name = out_path + os.path.sep + time.strftime("data_%Y_%m_%d.csv")
+                    else:
+                        self.file_name = out_path + os.path.sep + "data.csv"
+
+                except Exception as e:
+                    self._logger.exception(e)
+
     def launch_reader_service(self):
         cwd = os.getcwd()
         ruident_folder = cwd + os.path.sep + "ruident"
@@ -217,33 +251,21 @@ class RuidentClient:
                     if "RuidConnectRD.exe" not in progs:
                         self._logger.info(f"RUIDENT: starting RuidConnectRD.exe")
                         os.chdir(ruident_folder)
-                        os.system("start cmd /k " + ruident_exe)
+                        # os.system("start cmd /k " + ruident_exe)
+                        os.startfile(ruident_exe)
                         os.chdir(cwd)
                     else:
                         self._logger.info(f"RUIDENT: RuidConnectRD.exe already started")
                 except Exception as e:
                     self._logger.exception(e)
 
-            ruident_config = ruident_folder + os.path.sep + "config.yaml"
-            if os.path.isfile(ruident_config):
-                with open(ruident_config) as stream:
-                    try:
-                        config = yaml.safe_load(stream)
-                        out_path = config["export"]["out_path"]
-                        is_date_delimit = config["export"]["is_date_delimit"]
-                        self.separator = config["export"]["delimiter"]
-                        if is_date_delimit:
-                            self.file_name = out_path + os.path.sep + time.strftime("data_%Y_%m_%d.csv")
-                        else:
-                            self.file_name = out_path + os.path.sep + "data.csv"
+            self.get_data_filepath()
 
-                        if not os.path.exists(self.file_name):
-                            sleep(1)
-                            if not os.path.exists(self.file_name):
-                                self.file_name = get_open_file_name()
+            if not os.path.exists(self.file_name):
+                sleep(1)
+                if not os.path.exists(self.file_name):
+                    self.file_name = get_open_file_name()
 
-                    except yaml.YAMLError as e:
-                        print(e)
             if not self.file_name:
                 self.file_name = get_open_file_name()
 

@@ -394,10 +394,22 @@ def menu_list():
                     "icon": config.icon_dir("srpid.png"),
                     "action": "SrpidReadoutAction",
                 },
+
                 {
-                    "title": translate("on/off Ruident readout"),
+                    "title": translate("Ruident"),
                     "icon": config.icon_dir("ruident.png"),
-                    "action": "RuidentReadoutAction",
+                    "actions": [
+                        {
+                            "title": translate("on/off Ruident readout"),
+                            "icon": config.icon_dir("ruident.png"),
+                            "action": "RuidentReadoutAction",
+                        },
+                        {
+                            "title": translate("Ruident menu"),
+                            "icon": config.icon_dir("ruident.png"),
+                            "action": "RuidentMenuAction",
+                        },
+                    ]
                 },
                 {
                     "title": translate("Teamwork"),
