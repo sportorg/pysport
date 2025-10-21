@@ -39,7 +39,9 @@ def import_sfrx(source: str):
         try:
             if date := settings["disciplines"][day].get("date"):
                 start_datetime = datetime.strptime(date, "%d.%m.%Y")
-                cur_race.data.start_datetime = cur_race.data.end_datetime = start_datetime
+                cur_race.data.start_datetime = cur_race.data.end_datetime = (
+                    start_datetime
+                )
         except (KeyError, ValueError):
             pass
 
