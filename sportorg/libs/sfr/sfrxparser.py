@@ -40,9 +40,10 @@ class SFRXParser:
                 self._settings["race_type"] = RaceType.INDIVIDUAL_RACE
         if row[0].startswith("p"):
             number_day = row[0][1]
-            discipline = row[1]
-            date = row[2]
-            orgeo = row[3]
+            discipline = row[1] if len(row) > 1 else None
+            date = row[2] if len(row) > 2 else None
+            orgeo = row[3] if len(row) > 3 else None
+
             self._settings["disciplines"].append(
                 {
                     "day": number_day,

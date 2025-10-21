@@ -35,12 +35,13 @@ def import_sfrx(source: str):
         cur_race.data.race_type = race_type
         cur_race.data.title = settings["title"]
         cur_race.data.location = settings["location"]
-        date = settings["disciplines"][day]["date"]
 
-        if date != "":
-            start_datetime = datetime.strptime(date, "%d.%m.%Y")
-            cur_race.data.start_datetime = start_datetime
-            cur_race.data.end_datetime = start_datetime
+        try:
+            if date := settings["disciplines"][day].get("date"):
+                start_datetime = datetime.strptime(date, "%d.%m.%Y")
+                cur_race.data.start_datetime = cur_race.data.end_datetime = start_datetime
+        except (KeyError, ValueError):
+            pass
 
         for course in iter(sfr_csv.dists.values()):
             if course["day"] - 1 != day:
