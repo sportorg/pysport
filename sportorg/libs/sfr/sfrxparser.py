@@ -44,7 +44,13 @@ class SFRXParser:
             date = row[2]
             orgeo = row[3]
             self._settings["disciplines"].append(
-                {"day": number_day, "date": date, "discipline": discipline, "orgeo": orgeo})
+                {
+                    "day": number_day,
+                    "date": date,
+                    "discipline": discipline,
+                    "orgeo": orgeo,
+                }
+            )
 
         if row[0].startswith("d"):
             name = row[1]
