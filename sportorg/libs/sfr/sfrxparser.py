@@ -81,14 +81,13 @@ class SFRXParser:
         if row[0].startswith("t"):
             self._teams[str(int(row[0][1:]))] = row[1]
         if row[0].startswith("c"):
+            names = row[4].split(" ", 1)
             person_dict = {
                 "bib": int(row[1]),
                 "group_id": row[2],
                 "surname": row[3],
-                "name": row[4].split(" ", 1)[0],
-                "middle_name": row[4].split(" ", 1)[1]
-                if len(row[4].split(" ", 1)) > 1
-                else "",
+                "name": names[0],
+                "middle_name": names[1] if len(names) > 1 else "",
                 "team_id": row[5],
                 "year": int(row[6]) if len(row[6]) == 4 else 0,
                 "birthday": row[6] if len(row[6]) == 10 else "",
