@@ -7,12 +7,12 @@ from sportorg.models import memory
 from sportorg.models.memory import (
     Qualification,
     race,
-    ResultManual,
     ResultStatus,
     Split,
     SystemType,
     Person,
     Race,
+    ResultSFR,
 )
 from sportorg.utils.time import hhmmss_to_time, ddmmyyyy_to_time
 
@@ -253,7 +253,7 @@ def set_property(race: Race, person: Person, key: str, value: str) -> None:
     elif key == "Finish":
         result = race.find_person_result(person)
         if not result:
-            result = race.new_result(ResultManual)
+            result = race.new_result(ResultSFR)
             result.person = person
             result.bib = person.bib
             race.add_new_result(result)
@@ -267,7 +267,7 @@ def set_property(race: Race, person: Person, key: str, value: str) -> None:
         if result_sfr and len(result_sfr.split(":")) != 3:
             result_person = race.find_person_result(person)
             if result_person is None:
-                result_person = race.new_result(ResultManual)
+                result_person = race.new_result(ResultSFR)
                 result_person.person = person
                 result_person.bib = person.bib
                 race.add_new_result(result_person)
