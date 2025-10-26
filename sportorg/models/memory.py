@@ -1707,11 +1707,11 @@ class Race(Model):
 
     def to_dict_partial(
         self,
-        person_list=[],
-        group_list=[],
-        course_list=[],
-        orgs_list=[],
-        result_list=[],
+        person_list=None,
+        group_list=None,
+        course_list=None,
+        orgs_list=None,
+        result_list=None,
     ):
         if course_list and len(course_list) > 0:
             for group in self.groups:
