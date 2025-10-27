@@ -34,7 +34,7 @@ jobs:
       - name: Generate installer
         run: uv run python builder.py bdist_msi
       - name: Upload the artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           path: dist/*.msi
           name: ${{ runner.os }}-${{ matrix.architecture }}
