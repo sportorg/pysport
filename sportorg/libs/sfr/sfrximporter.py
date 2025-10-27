@@ -96,11 +96,11 @@ def import_sfrx(source: str):
                 org.name = team_name
                 cur_race.organizations.append(org)
 
-    for person_dict in sfr_csv.data:
-        person = memory.Person()
-        person.name = person_dict["name"]
-        person.surname = person_dict["surname"]
-        person.middle_name = person_dict["middle_name"]
+        for person_dict in sfr_csv.data:
+            person = memory.Person()
+            person.name = person_dict["name"]
+            person.surname = person_dict["surname"]
+            person.middle_name = person_dict["middle_name"]
 
             bib = convert_bib(str(person_dict["bib"]))
 
