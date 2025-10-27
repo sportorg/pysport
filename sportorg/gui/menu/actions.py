@@ -593,9 +593,9 @@ class CopyCardNumberToBib(Action, metaclass=ActionFactory):
 class ManualFinishAction(Action, metaclass=ActionFactory):
     def execute(self):
         result = race().new_result(ResultManual)
+        race().add_new_result(result)
         Teamwork().send(result.to_dict())
         live_client.send(result)
-        race().add_new_result(result)
         logging.info(translate("Manual finish"))
         self.app.refresh()
 

@@ -5,6 +5,9 @@ from pathlib import Path
 
 NAME = "SportOrg"
 VERSION = "v1.7.1"
+PYTHON_VERSION = (
+    f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
+)
 
 ENV_PREFIX = "SPORTORG_"
 DEBUG = os.getenv(f"{ENV_PREFIX}DEBUG", "false").lower() in ["1", "yes", "true"]
