@@ -256,6 +256,7 @@ class ReportDialog(QDialog):
                 rent_cards=list(RentCards().get()),
                 current_race=get_current_race_index(),
                 selected={"persons": []},  # leave here for back compatibility
+                settings=settings.SETTINGS.templates_settings,
             )
 
             if _settings["save_to_last_file"]:
@@ -282,6 +283,7 @@ class ReportDialog(QDialog):
                 rent_cards=list(RentCards().get()),
                 current_race=get_current_race_index(),
                 selected={"persons": []},  # leave here for back compatibility
+                settings=settings.SETTINGS.templates_settings,
             )
 
             if _settings["save_to_last_file"]:

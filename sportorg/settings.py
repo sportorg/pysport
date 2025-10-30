@@ -18,6 +18,7 @@ class Settings:
     window_geometry: str = ""
     race_use_birthday: bool = False
     templates_path: str = config.TEMPLATE_DIR
+    templates_settings: Dict[str, Any] = field(default_factory=dict)
     file_autosave_interval: int = 300
     file_save_in_utf8: bool = False
     file_save_in_gzip: bool = True

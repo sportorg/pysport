@@ -14,9 +14,10 @@
 + End of competitors' maximum time column ([#501](https://github.com/sportorg/pysport/issues/501))
 + Competitors' numbers in relay format (e.g., 15.1, [#501](https://github.com/sportorg/pysport/issues/501))
 + Reverse row numbering in the results tab ([#519](https://github.com/sportorg/pysport/issues/519))
++ Templates can compress data (gzip) to reduce the size of html files
 
 ### Fixes
-+ Fixed: multi day race processing - all days are refreshed on the file opening 
++ Fixed: multi day race processing - all days are refreshed on the file opening
 + Fixed: SRPid readout, error in byte conversion
 + Fixed: Import from WDB with the rubbish in course object (special characters)
 + Fixed: Import from the buffer - last raw was missed
