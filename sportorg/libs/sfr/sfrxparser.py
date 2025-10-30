@@ -93,10 +93,10 @@ class SFRXParser:
                 "birthday": row[6] if len(row[6]) == 10 else "",
                 "qual_id": row[7],
                 "comment": row[8],
-                "start": [row[13 + i * 7] for i in range(self._settings["days"])],
-                "finish": [row[14 + i * 7] for i in range(self._settings["days"])],
-                "credit": [row[15 + i * 7] for i in range(self._settings["days"])],
-                "result": [row[16 + i * 7] for i in range(self._settings["days"])],
+                "start": [row[13 + i * 7] for i in range(self._settings["days"]) if 13 + i * 7 < len(row)],
+                "finish": [row[14 + i * 7] for i in range(self._settings["days"]) if 14 + i * 7 < len(row)],
+                "credit": [row[15 + i * 7] for i in range(self._settings["days"]) if 15 + i * 7 < len(row)],
+                "result": [row[16 + i * 7] for i in range(self._settings["days"]) if 16 + i * 7 < len(row)],
             }
             self._data.append(person_dict)
 
