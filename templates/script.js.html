@@ -1,6 +1,5 @@
 {% raw %}
 <style>
-    /* SETTINGS */
     .sportorg-settings {
         position: fixed;
         border: 1px solid #dddddd;
@@ -8,7 +7,7 @@
         background: white;
         top: 3px;
         right: 3px;
-        box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     }
 
     .sportorg-settings-row {
@@ -468,7 +467,7 @@
 
     function dateFormat(date) {
         date = date ? new Date(date) : new Date();
-		return date.getDate().toString().padStart(2,'0')  + '.' + (date.getMonth() + 1).toString().padStart(2,'0') + '.' + date.getFullYear();
+        return date.getDate().toString().padStart(2, '0') + '.' + (date.getMonth() + 1).toString().padStart(2, '0') + '.' + date.getFullYear();
     }
 
     var Qualification = {
@@ -494,6 +493,23 @@
                 .substring(1);
         }
         return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+    }
+
+    function base64ToBytes(base64) {
+        base64 = base64.replace(/\s+/g, '');
+        const pad = base64.length % 4;
+        if (pad) base64 += '='.repeat(4 - pad);
+        const bin = atob(base64);
+        const arr = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+        return arr;
+    }
+
+    async function gunzipBase64(base64) {
+        const gz = base64ToBytes(base64);
+        const stream = new Blob([gz]).stream().pipeThrough(new DecompressionStream('gzip'));
+        const ab = await new Response(stream).arrayBuffer();
+        return new TextDecoder().decode(ab);
     }
 </script>
 {% endraw %}

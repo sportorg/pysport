@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     {% block head %}
@@ -8,16 +9,18 @@
     {% include 'style.css.html' %}
     {% include 'script.js.html' %}
 </head>
+
 <body>
-<div id="content">{% block content %}{% endblock %}</div>
-<div id="footer">
-    {% block footer %}
-    <a href="https://sportorg.readthedocs.io">ПО {{name}} {{version}}</a>
-    <script type="text/javascript">
-        var l = new Date();
-        document.write ('<span class="print-only">Время печати: ' + l.toLocaleString() + '</span>');
-    </script>
-    {% endblock %}
-</div>
+    <div id="content">{% block content %}{% endblock %}</div>
+    <div id="footer">
+        {% block footer %}
+        <a href="https://sportorg.readthedocs.io">Software {{name}} {{version}}</a>
+        <script type="text/javascript">
+            var l = new Date();
+            document.write('<span class="print-only">Print time: ' + l.toLocaleString() + '</span>');
+        </script>
+        {% endblock %}
+    </div>
 </body>
+
 </html>

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>{{name}} Split</title>
@@ -8,6 +9,7 @@
         td {
             padding-right: 7px;
         }
+
         body {
             font-weight: bold;
         }
@@ -99,12 +101,15 @@
             @page {
                 margin: 0.5cm;
             }
+
             body {
                 font-size: 85%;
             }
+
             pre {
                 margin-bottom: 1px;
             }
+
             h1,
             h2,
             h3,
@@ -113,24 +118,31 @@
             h6 {
                 margin: 1px 0;
             }
+
             section {
                 page-break-before: always;
             }
+
             ul {
                 page-break-inside: avoid;
             }
+
             p {
                 widows: 4;
             }
+
             a[href^="http"]:after {
                 content: " (" attr(href) ")";
             }
+
             abbr[title]:after {
                 content: " (" attr(title) ")";
             }
+
             .print {
                 display: block;
             }
+
             .no-print {
                 display: none;
             }
@@ -138,6 +150,7 @@
     </style>
     {% endraw %}
 </head>
+
 <body>
     <code>
         {{ race.data.title }}
@@ -219,4 +232,5 @@
         <br> {{ race.data.url }}
     </code>
 </body>
+
 </html>

@@ -23,22 +23,7 @@
         var race = {% endraw %}{{ race | tojson | compress | tojson }} {% raw %};
         var selected = {% endraw %}{{ selected | tojson }} {% raw %};
 
-        function b64ToBytes(b64) {
-            b64 = b64.replace(/\s+/g, '');
-            const pad = b64.length % 4;
-            if (pad) b64 += '='.repeat(4 - pad);
-            const bin = atob(b64);
-            const arr = new Uint8Array(bin.length);
-            for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
-            return arr;
-        }
-        async function gunzipB64(b64) {
-            const gz = b64ToBytes(b64);
-            const stream = new Blob([gz]).stream().pipeThrough(new DecompressionStream('gzip'));
-            const ab = await new Response(stream).arrayBuffer();
-            return new TextDecoder().decode(ab);
-        }
-        var race = JSON.parse(await gunzipB64(race));
+        var race = JSON.parse(await gunzipBase64(race));
 
         racePreparation(race);
 
