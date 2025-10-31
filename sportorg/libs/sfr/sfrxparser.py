@@ -32,16 +32,34 @@ class SFRXParser:
         if row[0].startswith("SFRx"):
             self._settings["title"] = row[1]
             self._settings["location"] = row[2]
+            self._settings["days"] = int(row[3])
+            self._settings["disciplines"] = []
             if row[7] == "Эстафета":
                 self._settings["race_type"] = RaceType.RELAY
             else:
                 self._settings["race_type"] = RaceType.INDIVIDUAL_RACE
+        if row[0].startswith("p"):
+            number_day = row[0][1]
+            discipline = row[1] if len(row) > 1 else None
+            date = row[2] if len(row) > 2 else None
+            orgeo = row[3] if len(row) > 3 else None
+
+            self._settings["disciplines"].append(
+                {
+                    "day": number_day,
+                    "date": date,
+                    "discipline": discipline,
+                    "orgeo": orgeo,
+                }
+            )
+
         if row[0].startswith("d"):
             name = row[1]
             length = row[6]
             climb = row[7]
             bib = row[2]
             controls = []
+            day = int(row[3])
             i = 9
             while i < len(row) - 1:
                 controls.append({"code": row[i], "length": row[i + 1], "order": i - 8})
@@ -52,6 +70,7 @@ class SFRXParser:
                 "length": length,
                 "climb": climb,
                 "controls": controls,
+                "day": day,
             }
 
             self._dists[str(int(row[0][1:]))] = dist_dict
@@ -61,7 +80,6 @@ class SFRXParser:
             self._groups[str(int(row[0][1:]))] = group
         if row[0].startswith("t"):
             self._teams[str(int(row[0][1:]))] = row[1]
-
         if row[0].startswith("c"):
             names = row[4].split(" ", 1)
             person_dict = {
@@ -75,22 +93,23 @@ class SFRXParser:
                 "birthday": row[6] if len(row[6]) == 10 else "",
                 "qual_id": row[7],
                 "comment": row[8],
-                "start": row[13],
-                "finish": row[14],
-                "credit": row[15],
-                "result": row[16],
+                "start": [row[13 + i * 7] for i in range(self._settings["days"]) if 13 + i * 7 < len(row)],
+                "finish": [row[14 + i * 7] for i in range(self._settings["days"]) if 14 + i * 7 < len(row)],
+                "credit": [row[15 + i * 7] for i in range(self._settings["days"]) if 15 + i * 7 < len(row)],
+                "result": [row[16 + i * 7] for i in range(self._settings["days"]) if 16 + i * 7 < len(row)],
             }
             self._data.append(person_dict)
 
         if row[0].startswith("s"):
             bib = row[1]
+            day = int(row[4])
             splits = []
             i = 6
             while i < len(row) - 1:
                 splits.append((row[i], row[i + 2]))
                 i = i + 3
 
-            split_dict = {"bib": bib, "split": splits}
+            split_dict = {"bib": bib, "split": splits, "day": day}
             self._splits.append(split_dict)
 
     @property
