@@ -484,8 +484,6 @@ def format_result(result, length):
 
 
 class Result(ABC):
-    _name = "Result"
-
     def __init__(self):
         self.id = uuid.uuid4()
         self.days = 0
@@ -973,12 +971,10 @@ class Result(ABC):
 
 
 class ResultManual(Result):
-    _name = "ResultManual"
     system_type = SystemType.MANUAL
 
 
 class ResultSportident(Result):
-    _name = "ResultSportident"
     system_type = SystemType.SPORTIDENT
 
     def __init__(self):
@@ -1302,22 +1298,18 @@ class ResultSportident(Result):
 
 
 class ResultSFR(ResultSportident):
-    _name = "ResultSFR"
     system_type = SystemType.SFR
 
 
 class ResultSportiduino(ResultSportident):
-    _name = "ResultSportiduino"
     system_type = SystemType.SPORTIDUINO
 
 
 class ResultRfidImpinj(ResultSportident):
-    _name = "ResultRfidImpinj"
     system_type = SystemType.RFID_IMPINJ
 
 
 class ResultSrpid(ResultSportident):
-    _name = "ResultSrpid"
     system_type = SystemType.SRPID
 
 
@@ -2132,10 +2124,10 @@ class Race(Model):
                 return
 
         self.results.insert(0, result)
-        self.index_obj[result._name][str(result.id)] = result
+        self.index_obj[result.__class__.__name__][str(result.id)] = result
 
     def add_result(self, result):
-        if not self.index_obj[result._name].get(str(result.id), None):
+        if not self.index_obj[result.__class__.__name__].get(str(result.id), None):
             self.add_new_result(result)
 
     def clear_results(self):
