@@ -82,8 +82,8 @@ def import_sfrx(source: str):
                 group.name = group_name
                 group.long_name = group_name
                 cur_race.groups.append(group)
-            if group_val["course"] != -1:
-                course = sfr_csv.dists[str(group_val["course"])]
+            if group_val["course"][day] != -1:
+                course = sfr_csv.dists[str(group_val["course"][day])]
                 course = memory.find(cur_race.courses, name=course["name"])
                 group.course = course
 

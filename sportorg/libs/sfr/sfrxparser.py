@@ -76,7 +76,13 @@ class SFRXParser:
             self._dists[str(int(row[0][1:]))] = dist_dict
 
         if row[0].startswith("g"):
-            group = {"name": row[1], "course": int(row[7])}
+            days = range(self._settings["days"])
+            group = {
+                "name": row[1],
+                "course": [
+                    int(row[7 + i * 6]) if 7 + i * 6 < len(row) else -1 for i in days
+                ],
+            }
             self._groups[str(int(row[0][1:]))] = group
         if row[0].startswith("t"):
             self._teams[str(int(row[0][1:]))] = row[1]
@@ -93,10 +99,26 @@ class SFRXParser:
                 "birthday": row[6] if len(row[6]) == 10 else "",
                 "qual_id": row[7],
                 "comment": row[8],
-                "start": [row[13 + i * 7] for i in range(self._settings["days"]) if 13 + i * 7 < len(row)],
-                "finish": [row[14 + i * 7] for i in range(self._settings["days"]) if 14 + i * 7 < len(row)],
-                "credit": [row[15 + i * 7] for i in range(self._settings["days"]) if 15 + i * 7 < len(row)],
-                "result": [row[16 + i * 7] for i in range(self._settings["days"]) if 16 + i * 7 < len(row)],
+                "start": [
+                    row[13 + i * 7]
+                    for i in range(self._settings["days"])
+                    if 13 + i * 7 < len(row)
+                ],
+                "finish": [
+                    row[14 + i * 7]
+                    for i in range(self._settings["days"])
+                    if 14 + i * 7 < len(row)
+                ],
+                "credit": [
+                    row[15 + i * 7]
+                    for i in range(self._settings["days"])
+                    if 15 + i * 7 < len(row)
+                ],
+                "result": [
+                    row[16 + i * 7]
+                    for i in range(self._settings["days"])
+                    if 16 + i * 7 < len(row)
+                ],
             }
             self._data.append(person_dict)
 
