@@ -1,6 +1,6 @@
 # sfrxexporter.py
 import logging
-from datetime import datetime
+from datetime import datetime, time
 
 from sportorg.language import translate
 from sportorg.models import memory
@@ -21,8 +21,9 @@ def export_sfrx(destination: str):
         return False
 
     try:
-        with open(destination, 'w', encoding='UTF-8') as f:
-            # Заголовок файла SFRx - ВАЖНО: точно как в примере
+        # Важно: открываем без BOM и с табуляцией как разделитель
+        with open(destination, 'w', encoding='utf-8', newline='') as f:
+            # Заголовок файла SFRx
             _write_header(f, race)
             
             # Дни соревнований
@@ -34,7 +35,7 @@ def export_sfrx(destination: str):
             # Клубы  
             _write_clubs(f)
             
-            # Группы - ВАЖНО: правильное количество полей
+            # Группы
             _write_groups(f, race)
             
             # Команды
@@ -46,7 +47,7 @@ def export_sfrx(destination: str):
             # Контрольные пункты
             _write_controls(f, race)
             
-            # Участники - ВАЖНО: правильное количество полей
+            # Участники
             _write_competitors(f, race)
             
             # Отметки (сплиты)
@@ -61,14 +62,18 @@ def export_sfrx(destination: str):
 
 
 def _write_header(f, race: Race):
-    """Запись заголовка файла - ТОЧНО как в примере"""
+    """Запись заголовка файла - исправленная версия"""
     title = race.data.title or "Competition"
     location = race.data.location or ""
-    days = 1
     
-    # Организаторы - берем из настроек или используем заглушки
-    organizer = getattr(race.data, 'organizer', 'Долгов Е.Н.') or 'Долгов Е.Н.'
-    secretary = getattr(race.data, 'secretary', 'Степанов П.Н.') or 'Степанов П.Н.'
+    # Получаем организатора из доступных атрибутов
+    organizer = ""
+    if hasattr(race.data, 'organizer') and race.data.organizer:
+        organizer = race.data.organizer
+    elif hasattr(race.data, 'organization') and race.data.organization:
+        organizer = race.data.organization
+    
+    days = 1
     
     # Тип соревнования
     race_type = "Индивидуальные"
@@ -76,123 +81,181 @@ def _write_header(f, race: Race):
         if race.data.race_type.value == "relay":
             race_type = "Эстафета"
     
-    # ВАЖНО: точно 8 полей как в примере, включая пустые
-    header_line = "SFRx_v2404\t{}\t{}\t{}\t\t\t\t{}\n".format(
-        title, location, days, race_type
-    )
-    f.write(header_line)
+    # Полный заголовок согласно формату SFRx
+    header_fields = [
+        "SFRx_v2404",
+        title,
+        location,
+        str(days),
+        "", "", "",  # пустые поля
+        race_type,
+        organizer,
+        "", "", "", "", "",  # дополнительные пустые поля
+        "SportOrg Export"  # источник данных
+    ]
+    f.write("\t".join(header_fields) + "\n")
 
 
 def _write_days(f, race: Race):
     """Запись информации о днях соревнований"""
     start_date = race.data.start_datetime or datetime.now()
     date_str = start_date.strftime("%d.%m.%Y")
-    discipline = "Кросс - спринт"
     
-    # ВАЖНО: только 4 поля как в примере
-    day_line = "p1\t{}\t{}\t\n".format(discipline, date_str)
-    f.write(day_line)
+    # Определяем дисциплину на основе типа гонки
+    discipline = "Кросс - спринт"
+    if race.data.race_type and hasattr(race.data.race_type, 'value'):
+        if race.data.race_type.value == "relay":
+            discipline = "Эстафета"
+        elif race.data.race_type.value == "skiing":
+            discipline = "Лыжные гонки"
+    
+    day_fields = [
+        "p1",
+        discipline,
+        date_str,
+        ""  # пустое поле в конце
+    ]
+    f.write("\t".join(day_fields) + "\n")
 
 
 def _write_federations(f):
     """Запись информации о федерациях"""
-    federation_line = "h0\tРегиональная ОО ФСО\n"
-    f.write(federation_line)
+    federation_fields = [
+        "h0", 
+        "Региональная ОО ФСО"
+    ]
+    f.write("\t".join(federation_fields) + "\n")
 
 
 def _write_clubs(f):
     """Запись информации о клубах"""
-    club_line = "f0\tЭкстрим парк\n"
-    f.write(club_line)
+    club_fields = [
+        "f0",
+        "Экстрим парк"
+    ]
+    f.write("\t".join(club_fields) + "\n")
 
 
 def _write_groups(f, race: Race):
-    """Запись информации о группах - ВАЖНО: 13 полей"""
+    """Запись информации о группах"""
     for i, group in enumerate(race.groups):
-        group_id = str(i).zfill(5)
+        # ID группы в формате g00000, g00001, etc.
+        group_id_str = str(i).zfill(5)
         group_name = group.name or f"Group_{i}"
         
-        # Находим связанную дистанцию
-        course_index = 0
+        course_index = "0"
         if group.course and group.course in race.courses:
-            course_index = race.courses.index(group.course)
+            course_index = str(race.courses.index(group.course))
         
-        # ВАЖНО: ровно 13 полей как в примере
-        group_line = "g{}\t{}\t-1\t0\t0\t\t150\t{}\t0\t0\t0\t5400000\t0\t\n".format(
-            group_id,
+        group_fields = [
+            f"g{group_id_str}",
             group_name,
-            course_index
-        )
-        f.write(group_line)
+            "-1", "0", "0",
+            "",  # пустое поле
+            "150",  # стартовый взнос
+            course_index,
+            "0", "0", "0",
+            "5400000",  # контрольное время (90 минут)
+            "0",
+            ""  # пустое поле в конце
+        ]
+        f.write("\t".join(group_fields) + "\n")
 
 
 def _write_teams(f, race: Race):
-    """Запись информации о командах - ВАЖНО: 7 полей"""
+    """Запись информации о командах"""
     for i, org in enumerate(race.organizations):
-        team_id = str(i).zfill(5)
+        # ID команды в формате t00000, t00001, etc.
+        team_id_str = str(i).zfill(5)
         team_name = org.name or f"Team_{i}"
         
-        # ВАЖНО: ровно 7 полей как в примере
-        team_line = "t{}\t{}\t-1\t\t\t\t0\t\n".format(team_id, team_name)
-        f.write(team_line)
+        team_fields = [
+            f"t{team_id_str}",
+            team_name,
+            "-1", "", "", "",
+            "0",
+            ""  # пустое поле в конце
+        ]
+        f.write("\t".join(team_fields) + "\n")
 
 
 def _write_courses(f, race: Race):
     """Запись информации о дистанциях"""
     for i, course in enumerate(race.courses):
-        course_id = str(i).zfill(5)
+        # ID дистанции в формате d00000, d00001, etc.
+        course_id_str = str(i).zfill(5)
         course_name = course.name or f"Course_{i}"
         
-        # Формируем строку контролов - пары код/длина
-        controls_str = ""
+        # Формируем пары код/длина для контролов
+        control_pairs = []
         if course.controls:
             for control in course.controls:
-                if str(control.code).isdigit() and control.code not in ['240', '241', '242']:
-                    controls_str += "\t{}\t{}".format(control.code, control.length or "0")
+                code_str = str(control.code)
+                if code_str.isdigit() and code_str not in ['240', '241', '242']:
+                    control_pairs.extend([code_str, str(control.length or "0")])
         
-        # ВАЖНО: правильное количество основных полей + пары контролов
-        course_line = "d{}\t{}\t{}\t1\t0\t0\t{}\t{}\t{}".format(
-            course_id,
+        course_fields = [
+            f"d{course_id_str}",
             course_name,
-            course.bib or "0",  # bib дистанции
-            course.length or "0",  # длина
-            course.climb or "0",   # набор высоты
-            controls_str
-        )
-        f.write(course_line + "\n")
+            str(course.bib or "0"),
+            "1", "0", "0",
+            str(course.length or "0"),
+            str(course.climb or "0"),
+            str(len(control_pairs) // 2)  # количество пар контролов
+        ]
+        
+        # Добавляем пары контролов
+        course_fields.extend(control_pairs)
+        
+        f.write("\t".join(course_fields) + "\n")
 
 
 def _write_controls(f, race: Race):
-    """Запись информации о контрольных пунктах - ВАЖНО: 7 полей"""
+    """Запись информации о контрольных пунктах"""
     # Собираем все уникальные коды контролов
     control_codes = set()
     for course in race.courses:
         for control in course.controls:
-            if str(control.code).isdigit() and control.code not in ['240', '241', '242']:
-                control_codes.add(control.code)
+            code_str = str(control.code)
+            if code_str.isdigit() and code_str not in ['240', '241', '242']:
+                control_codes.add(int(code_str))
     
-    # Сортируем и выводим
-    for i, code in enumerate(sorted(control_codes, key=int)):
-        control_id = str(i).zfill(5)
-        # ВАЖНО: ровно 7 полей как в примере
-        control_line = "k{}\t{}\t{}\t0\t0\t0\t-1\t\n".format(control_id, code, code)
-        f.write(control_line)
+    for i, code in enumerate(sorted(control_codes)):
+        # ID контрольного пункта в формате k00000, k00001, etc.
+        control_id_str = str(i).zfill(5)
+        
+        control_fields = [
+            f"k{control_id_str}",
+            str(code),
+            str(code),
+            "0", "0", "0",
+            "-1",
+            ""  # пустое поле в конце
+        ]
+        f.write("\t".join(control_fields) + "\n")
 
 
 def _write_competitors(f, race: Race):
-    """Запись информации об участниках - ВАЖНО: 19 полей"""
+    """Запись информации об участниках"""
     for i, person in enumerate(race.persons):
-        person_id = str(i).zfill(5)
+        # ID участника в формате c00000, c00001, etc.
+        person_id_str = str(i).zfill(5)
         
         # Определяем группу
         group_id = "0"
-        if person.group and person.group in race.groups:
-            group_id = str(race.groups.index(person.group))
+        if person.group:
+            for idx, group in enumerate(race.groups):
+                if group == person.group:
+                    group_id = str(idx)
+                    break
         
         # Определяем команду
         team_id = "0"
-        if person.organization and person.organization in race.organizations:
-            team_id = str(race.organizations.index(person.organization))
+        if person.organization:
+            for idx, org in enumerate(race.organizations):
+                if org == person.organization:
+                    team_id = str(idx)
+                    break
         
         # Год рождения
         year = ""
@@ -221,50 +284,54 @@ def _write_competitors(f, race: Race):
         if result and result.finish_time:
             finish_time = _format_time(result.finish_time)
         
-        # Результат
+        # Результат и статус
         result_status = ""
         result_time = ""
         if result:
-            if result.status == ResultStatus.DISQUALIFIED:
+            if result.status == ResultStatus.OK:
+                if result.finish_time and result.start_time:
+                    result_time = _calculate_result_time(result.start_time, result.finish_time)
+                elif result.finish_time:
+                    # Если нет стартового времени, используем только финишное
+                    result_time = _format_time(result.finish_time)
+            elif result.status == ResultStatus.DISQUALIFIED:
                 result_status = "cнят"
             elif result.status == ResultStatus.OVERTIME:
                 result_status = "cнят (к/в)"
+            elif result.status == ResultStatus.DID_NOT_FINISH:
+                result_status = "снят"
             elif result.status == ResultStatus.DID_NOT_START:
                 result_status = "н/с"
-            elif result.finish_time and result.start_time:
-                # Рассчитываем время результата
-                result_time = _calculate_result_time(result.start_time, result.finish_time)
+            elif result.status == ResultStatus.MISSING_PUNCH:
+                result_status = "снят"
         
-        # Полное имя (только имя и фамилия как в примере)
-        full_name = "{} {}".format(
-            person.surname or "", 
-            person.name or ""
-        ).strip()
+        # Полное имя - исправленная версия
+        surname = person.surname or ""
+        first_name = person.name or ""
         
-        # ВАЖНО: ровно 19 полей как в примере
-        competitor_line = "c{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(
-            person_id,
-            person.bib or "0",      # 1. номер
-            group_id,               # 2. группа
-            person.surname or "",   # 3. фамилия
-            full_name,              # 4. полное имя
-            team_id,                # 5. команда
-            year,                   # 6. год рождения
-            birthday,               # 7. дата рождения
-            qual_id,                # 8. квалификация
-            person.comment or "",   # 9. комментарий
-            "0",                    # 10. аренда карты
-            "150",                  # 11. стартовый взнос
-            "0",                    # 12. оплачено
-            "0",                    # 13. дата оплаты
-            start_time,             # 14. время старта
-            finish_time,            # 15. время финиша
-            "",                     # 16. кредитное время (пустое)
-            result_time or result_status,  # 17. результат/статус
-            "0",                    # 18. нули
-            "0"                     # 19. нули
-        )
-        f.write(competitor_line)
+        competitor_fields = [
+            f"c{person_id_str}",
+            str(person.bib or "0"),
+            group_id,
+            surname,
+            first_name,  # имя отдельно
+            team_id,
+  #         year,
+            birthday,
+            qual_id,
+            person.comment or "",
+            "",  # пустое поле
+            "0",  # аренда карты
+            "150",  # стартовый взнос
+            "0",  # оплачено
+            "0",  # дата оплаты
+            start_time,
+            finish_time,
+            "",  # кредитное время
+            result_time or result_status,
+            "0", "0"  # нули в конце
+        ]
+        f.write("\t".join(competitor_fields) + "\n")
 
 
 def _write_splits(f, race: Race):
@@ -285,58 +352,133 @@ def _write_splits(f, race: Race):
         if not sorted_splits:
             continue
             
-        splits_str = ""
-        order = 1
+        split_data = []
         
         # Добавляем старт если есть
         if result.start_time:
             start_time = _format_time(result.start_time)
-            splits_str += "\t241\t0\t{}".format(start_time)
+            split_data.extend(["241", "0", start_time])
         
         # Добавляем контрольные пункты
+        order = 1
         for split in sorted_splits:
-            if split.code and split.time and str(split.code) not in ['240', '241', '242']:
-                time_str = _format_time(split.time)
-                splits_str += "\t{}\t{}\t{}".format(split.code, order, time_str)
-                order += 1
+            if split.code and split.time:
+                code_str = str(split.code)
+                if code_str not in ['240', '241', '242']:
+                    time_str = _format_time(split.time)
+                    split_data.extend([code_str, str(order), time_str])
+                    order += 1
         
         # Добавляем финиш если есть
         if result.finish_time:
             finish_time = _format_time(result.finish_time)
-            splits_str += "\t240\t0\t{}".format(finish_time)
+            split_data.extend(["240", "0", finish_time])
         
-        if splits_str:
-            split_line = "s{}\t{}\t\t\t1\t128{}\n".format(
-                str(split_id).zfill(5),
-                person.bib or "0",
-                splits_str
-            )
-            f.write(split_line)
+        if split_data:
+            # ID сплита в формате s00000, s00001, etc.
+            split_id_str = str(split_id).zfill(5)
+            split_fields = [
+                f"s{split_id_str}",
+                str(person.bib or "0"),
+                "", "",  # пустые поля
+                "1",
+                "128"
+            ]
+            split_fields.extend(split_data)
+            f.write("\t".join(split_fields) + "\n")
             split_id += 1
 
 
 def _format_time(dt):
-    """Форматирование времени в HH:MM:SS"""
-    if hasattr(dt, 'strftime'):
-        return dt.strftime("%H:%M:%S")
-    elif hasattr(dt, 'str'):
-        return str(dt)
+    """Форматирование времени для различных типов объектов"""
+    if not dt:
+        return ""
+    
+    try:
+        # Если это datetime объект
+        if hasattr(dt, 'strftime'):
+            return dt.strftime("%H:%M:%S")
+        
+        # Если это time объект
+        elif hasattr(dt, 'hour') and hasattr(dt, 'minute') and hasattr(dt, 'second'):
+            return f"{dt.hour:02d}:{dt.minute:02d}:{dt.second:02d}"
+        
+        # Если это OTime объект (SportOrg) - используем to_datetime для конвертации
+        elif hasattr(dt, 'to_datetime'):
+            datetime_obj = dt.to_datetime()
+            return datetime_obj.strftime("%H:%M:%S")
+        
+        # Если это OTime объект - пробуем получить часы, минуты, секунды через getattr
+        elif hasattr(dt, 'hour') or hasattr(dt, 'minute'):
+            hour = getattr(dt, 'hour', 0)
+            minute = getattr(dt, 'minute', 0)
+            second = getattr(dt, 'second', 0)
+            return f"{hour:02d}:{minute:02d}:{second:02d}"
+        
+        # Если это строка
+        elif isinstance(dt, str):
+            return dt
+            
+    except Exception as e:
+        logging.debug(f"Time formatting error for {type(dt)}: {e}")
+    
     return ""
 
 
 def _calculate_result_time(start_time, finish_time):
     """Расчет времени результата"""
     try:
-        if hasattr(start_time, 'timestamp') and hasattr(finish_time, 'timestamp'):
-            time_diff = finish_time - start_time
+        # Конвертируем в datetime если необходимо
+        start_dt = _convert_to_datetime(start_time)
+        finish_dt = _convert_to_datetime(finish_time)
+        
+        if start_dt and finish_dt:
+            time_diff = finish_dt - start_dt
             total_seconds = int(time_diff.total_seconds())
+            
             hours = total_seconds // 3600
             minutes = (total_seconds % 3600) // 60
             seconds = total_seconds % 60
-            return "{:02d}:{:02d}:{:02d}".format(hours, minutes, seconds)
-    except:
-        pass
+            
+            return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+            
+    except Exception as e:
+        logging.debug(f"Result time calculation error: {e}")
+    
     return ""
+
+
+def _convert_to_datetime(time_obj):
+    """Конвертирует различные типы времени в datetime"""
+    if not time_obj:
+        return None
+    
+    try:
+        # Если уже datetime
+        if hasattr(time_obj, 'strftime') and hasattr(time_obj, 'date'):
+            return time_obj
+        
+        # Если это time объект
+        elif hasattr(time_obj, 'hour') and hasattr(time_obj, 'minute') and hasattr(time_obj, 'second'):
+            return datetime.combine(datetime.today().date(), 
+                                  time(hour=time_obj.hour, minute=time_obj.minute, second=time_obj.second))
+        
+        # Если это OTime объект с методом to_datetime
+        elif hasattr(time_obj, 'to_datetime'):
+            return time_obj.to_datetime()
+        
+        # Если это OTime объект - создаем time из атрибутов
+        elif hasattr(time_obj, 'hour') or hasattr(time_obj, 'minute'):
+            hour = getattr(time_obj, 'hour', 0)
+            minute = getattr(time_obj, 'minute', 0)
+            second = getattr(time_obj, 'second', 0)
+            return datetime.combine(datetime.today().date(), 
+                                  time(hour=hour, minute=minute, second=second))
+    
+    except Exception as e:
+        logging.debug(f"Time conversion error: {e}")
+    
+    return None
 
 
 def sportorg_qual_to_sfr(qual: Qualification) -> str:
