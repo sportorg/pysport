@@ -201,11 +201,13 @@ def _write_courses(f, race: Race):
         course_fields = [
             f"d{course_id_str}",
             course_name,
-            str(course.bib or "0"),
-            "1", "0", "0",
-            str(course.length or "0"),
-            str(course.climb or "0"),
-            str(len(control_pairs) // 2)  # количество пар контролов
+            str(course.bib or "0"),  # номер дистанции для эстафеты
+            "1", #  
+            "0", #
+            "0",  #
+            str(course.length or "0"),  # длина дистанции
+            str(course.climb or "0"),  # набор высоты
+            str(len(control_pairs) // 2)  # количество КП
         ]
         
         # Добавляем пары контролов
@@ -329,7 +331,7 @@ def _write_competitors(f, race: Race):
             birthday,
             qual_id,
             person.comment or "",
-            "",  # пустое поле
+ #           "",  # пустое поле
             "0",  # аренда карты
             "150",  # стартовый взнос
             "0",  # оплачено
@@ -338,7 +340,7 @@ def _write_competitors(f, race: Race):
             finish_time,     # абсолютное время финиша
             result_time or result_status,  # относительное время результата
             "",  # кредитное время
-            "0", "0"  # нули в конце
+            "0", "0", "0"  # нули в конце
         ]
         f.write("\t".join(competitor_fields) + "\n")
 
@@ -398,7 +400,7 @@ def _write_splits(f, race: Race):
             split_id_str = str(split_id).zfill(5)
             split_fields = [
                 f"s{split_id_str}",
-                str(person.bib or "0"),
+                str(person.bib or "0"),  # Используем номер участника (bib), а не ID
                 "", "",  # пустые поля
                 "1",
                 "128"
