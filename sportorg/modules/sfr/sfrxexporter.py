@@ -1,4 +1,5 @@
 # sfrxexporter.py
+import os
 import logging
 from datetime import datetime, time
 
@@ -22,7 +23,10 @@ def export_sfrx(destination: str):
 
     try:
         # Важно: открываем без BOM и с табуляцией как разделитель
-        with open(destination, 'w', encoding='utf-8', newline='') as f:
+        base_name = os.path.splitext(destination)[0]
+        with open(base_name + '.sfrx', 'w', encoding='utf-8', newline='') as f:
+        
+ #       with open(destination, 'w', encoding='utf-8', newline='') as f:
             # Заголовок файла SFRx
             _write_header(f, race)
             
