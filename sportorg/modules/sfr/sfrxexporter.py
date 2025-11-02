@@ -331,16 +331,18 @@ def _write_competitors(f, race: Race):
             birthday,
             qual_id,
             person.comment or "",
- #           "",  # пустое поле
+ #           "",  # пустое поле?
             "0",  # аренда карты
-            "150",  # стартовый взнос
+            "0",  # стартовый взнос
             "0",  # оплачено
             "0",  # дата оплаты
             start_time,      # абсолютное время старта
             finish_time,     # абсолютное время финиша
+            "0",  # кредитное время (бонусное)
             result_time or result_status,  # относительное время результата
-            "",  # кредитное время
-            "0", "0", "0"  # нули в конце
+            "0", 
+            "0", 
+            "0"  # массив из 7 полей
         ]
         f.write("\t".join(competitor_fields) + "\n")
 
@@ -361,12 +363,12 @@ def _write_splits(f, race: Race):
         elif person.start_time:
             start_time = person.start_time
         
-        # Фильтруем сплиты: только после времени старта и обычные КП
+        # Фильтруем сплиты: только после времени старта и обычные КП, 241 - старт, оставляеем
         valid_splits = []
         for split in result.splits:
             if (split.time and split.code and 
                 str(split.code) not in ['240', '241', '242']):
-                # Если известно время старта, фильтруем по нему
+                # Если известно время старта, фильтруем по нему 
                 if start_time is None or split.time >= start_time:
                     valid_splits.append(split)
         
@@ -401,9 +403,10 @@ def _write_splits(f, race: Race):
             split_fields = [
                 f"s{split_id_str}",
                 str(person.bib or "0"),  # Используем номер участника (bib), а не ID
-                "", "",  # пустые поля
-                "1",
-                "128"
+                "", # команда?
+                "",  # пустые поля
+                "1",  # номер дня?
+                "128" #?
             ]
             split_fields.extend(split_data)
             f.write("\t".join(split_fields) + "\n")
