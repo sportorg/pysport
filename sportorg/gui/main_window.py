@@ -364,42 +364,26 @@ class MainWindow(QMainWindow):
         self.setMenuBar(self.menubar)
         self._create_menu(self.menubar, menu_list())
         
-        # Добавляем пункты SFR экспорта в существующее меню
-        self.add_sfr_export_to_file_menu()
+        # Добавляем меню экспорта SFR
+        self.add_export_menu()
 
-    def add_sfr_export_to_file_menu(self):
-        """Добавление пунктов SFR экспорта в меню Файл -> Экспорт"""
+    def add_export_menu(self):
+        """Добавление меню экспорта"""
         if not SFR_AVAILABLE:
             return
             
-        # Находим меню "Файл"
-        file_menu = None
-        for action in self.menubar.actions():
-            if action.text() == translate("File"):
-                file_menu = action.menu()
-                break
+        export_menu = self.menubar.addMenu(translate('Export'))
         
-        if file_menu:
-            # Находим подменю "Экспорт" в меню "Файл"
-            export_menu = None
-            for action in file_menu.actions():
-                if action.text() == translate("Export"):
-                    export_menu = action.menu()
-                    break
-            
-            if export_menu:
-                # Добавляем разделитель перед пунктами SFR
-                export_menu.addSeparator()
-                
-                # Добавляем пункт экспорта в SFRx
-                sfrx_action = QAction(translate('Export to SFRx...'), self)
-                sfrx_action.triggered.connect(self.export_sfrx)
-                export_menu.addAction(sfrx_action)
-                
-                # Добавляем пункт записи на SFR карту
-                sfr_card_action = QAction(translate('Write to SFR card...'), self)
-                sfr_card_action.triggered.connect(self.write_sfr_card)
-                export_menu.addAction(sfr_card_action)
+        # SFR экспорт
+        sfr_menu = export_menu.addMenu(translate('SFR'))
+        
+        sfrx_action = QAction(translate('Export to SFRx file...'), self)
+        sfrx_action.triggered.connect(self.export_sfrx)
+        sfr_menu.addAction(sfrx_action)
+        
+        sfr_card_action = QAction(translate('Write to SFR card...'), self)
+        sfr_card_action.triggered.connect(self.write_sfr_card)
+        sfr_menu.addAction(sfr_card_action)
 
     def export_sfrx(self):
         """Экспорт в SFRx файл"""
