@@ -276,28 +276,33 @@ def _write_competitors(f, race: Race):
         # Результаты
         result = race.find_person_result(person)
         
-        # Время старта
+        # Время старта (абсолютное)
         start_time = ""
         if result and result.start_time:
             start_time = _format_time(result.start_time)
         elif person.start_time:
             start_time = _format_time(person.start_time)
         
-        # Время финиша
+        # Время финиша (абсолютное)
         finish_time = ""
         if result and result.finish_time:
             finish_time = _format_time(result.finish_time)
         
-        # Результат и статус
+        # Результат - берем напрямую из результата, если есть
         result_status = ""
         result_time = ""
         if result:
-            if result.status == ResultStatus.OK:
+            # Пробуем получить результат напрямую из объекта результата
+            if hasattr(result, 'result') and result.result:
+                result_time = _format_time(result.result)
+            elif hasattr(result, 'get_result') and callable(result.get_result):
+                result_time_obj = result.get_result()
+                if result_time_obj:
+                    result_time = _format_time(result_time_obj)
+            elif result.status == ResultStatus.OK:
+                # Если прямого результата нет, но статус ОК, рассчитываем
                 if result.finish_time and result.start_time:
                     result_time = _calculate_result_time(result.start_time, result.finish_time)
-                elif result.finish_time:
-                    # Если нет стартового времени, используем только финишное
-                    result_time = _format_time(result.finish_time)
             elif result.status == ResultStatus.DISQUALIFIED:
                 result_status = "cнят"
             elif result.status == ResultStatus.OVERTIME:
@@ -309,7 +314,7 @@ def _write_competitors(f, race: Race):
             elif result.status == ResultStatus.MISSING_PUNCH:
                 result_status = "снят"
         
-        # Полное имя - исправленная версия
+        # Полное имя
         surname = person.surname or ""
         first_name = person.name or ""
         
@@ -318,9 +323,9 @@ def _write_competitors(f, race: Race):
             str(person.bib or "0"),
             group_id,
             surname,
-            first_name,  # имя отдельно
+            first_name,
             team_id,
-  #         year,
+ #          "",  # год рождения (пустое поле)
             birthday,
             qual_id,
             person.comment or "",
@@ -329,10 +334,10 @@ def _write_competitors(f, race: Race):
             "150",  # стартовый взнос
             "0",  # оплачено
             "0",  # дата оплаты
-            start_time,
-            finish_time,
+            start_time,      # абсолютное время старта
+            finish_time,     # абсолютное время финиша
+            result_time or result_status,  # относительное время результата
             "",  # кредитное время
-            result_time or result_status,
             "0", "0"  # нули в конце
         ]
         f.write("\t".join(competitor_fields) + "\n")
@@ -347,39 +352,49 @@ def _write_splits(f, race: Race):
         if not result or not result.splits:
             continue
         
-        # Сортируем сплиты по времени
-        sorted_splits = sorted(
-            [s for s in result.splits if s.time], 
-            key=lambda x: x.time
-        )
+        # Получаем время старта для фильтрации
+        start_time = None
+        if result.start_time:
+            start_time = result.start_time
+        elif person.start_time:
+            start_time = person.start_time
+        
+        # Фильтруем сплиты: только после времени старта и обычные КП
+        valid_splits = []
+        for split in result.splits:
+            if (split.time and split.code and 
+                str(split.code) not in ['240', '241', '242']):
+                # Если известно время старта, фильтруем по нему
+                if start_time is None or split.time >= start_time:
+                    valid_splits.append(split)
+        
+        # Сортируем отфильтрованные сплиты по времени
+        sorted_splits = sorted(valid_splits, key=lambda x: x.time)
         
         if not sorted_splits:
             continue
             
         split_data = []
         
-        # Добавляем старт если есть
-        if result.start_time:
-            start_time = _format_time(result.start_time)
-            split_data.extend(["241", "0", start_time])
+        # Добавляем старт если есть реальная отметка 241
+        start_split = next((s for s in result.splits if str(s.code) == '241' and s.time), None)
+        if start_split:
+            start_time_str = _format_time(start_split.time)
+            split_data.extend(["241", "0", start_time_str])
         
-        # Добавляем контрольные пункты
-        order = 1
-        for split in sorted_splits:
-            if split.code and split.time:
-                code_str = str(split.code)
-                if code_str not in ['240', '241', '242']:
-                    time_str = _format_time(split.time)
-                    split_data.extend([code_str, str(order), time_str])
-                    order += 1
+        # Добавляем контрольные пункты в правильном порядке
+        for i, split in enumerate(sorted_splits):
+            code_str = str(split.code)
+            time_str = _format_time(split.time)
+            split_data.extend([code_str, str(i + 1), time_str])
         
-        # Добавляем финиш если есть
-        if result.finish_time:
-            finish_time = _format_time(result.finish_time)
-            split_data.extend(["240", "0", finish_time])
+        # Добавляем финиш если есть реальная отметка 240
+        finish_split = next((s for s in result.splits if str(s.code) == '240' and s.time), None)
+        if finish_split:
+            finish_time_str = _format_time(finish_split.time)
+            split_data.extend(["240", "0", finish_time_str])
         
         if split_data:
-            # ID сплита в формате s00000, s00001, etc.
             split_id_str = str(split_id).zfill(5)
             split_fields = [
                 f"s{split_id_str}",
@@ -392,9 +407,8 @@ def _write_splits(f, race: Race):
             f.write("\t".join(split_fields) + "\n")
             split_id += 1
 
-
 def _format_time(dt):
-    """Форматирование времени для различных типов объектов"""
+    """Форматирование времени для различных типов объектов с секундами"""
     if not dt:
         return ""
     
@@ -406,11 +420,6 @@ def _format_time(dt):
         # Если это time объект
         elif hasattr(dt, 'hour') and hasattr(dt, 'minute') and hasattr(dt, 'second'):
             return f"{dt.hour:02d}:{dt.minute:02d}:{dt.second:02d}"
-        
-        # Если это OTime объект (SportOrg) - используем to_datetime для конвертации
-        elif hasattr(dt, 'to_datetime'):
-            datetime_obj = dt.to_datetime()
-            return datetime_obj.strftime("%H:%M:%S")
         
         # Если это OTime объект - пробуем получить часы, минуты, секунды через getattr
         elif hasattr(dt, 'hour') or hasattr(dt, 'minute'):
@@ -425,29 +434,6 @@ def _format_time(dt):
             
     except Exception as e:
         logging.debug(f"Time formatting error for {type(dt)}: {e}")
-    
-    return ""
-
-
-def _calculate_result_time(start_time, finish_time):
-    """Расчет времени результата"""
-    try:
-        # Конвертируем в datetime если необходимо
-        start_dt = _convert_to_datetime(start_time)
-        finish_dt = _convert_to_datetime(finish_time)
-        
-        if start_dt and finish_dt:
-            time_diff = finish_dt - start_dt
-            total_seconds = int(time_diff.total_seconds())
-            
-            hours = total_seconds // 3600
-            minutes = (total_seconds % 3600) // 60
-            seconds = total_seconds % 60
-            
-            return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
-            
-    except Exception as e:
-        logging.debug(f"Result time calculation error: {e}")
     
     return ""
 
@@ -483,6 +469,32 @@ def _convert_to_datetime(time_obj):
     
     return None
 
+def _calculate_result_time(start_time, finish_time):
+    """Расчет времени результата"""
+    try:
+        # Конвертируем в datetime для точного расчета
+        start_dt = _convert_to_datetime(start_time)
+        finish_dt = _convert_to_datetime(finish_time)
+        
+        if start_dt and finish_dt:
+            # Убедимся, что оба времени в один день
+            if finish_dt < start_dt:
+                # Если финиш раньше старта (после полуночи), добавляем 1 день
+                finish_dt = finish_dt.replace(day=finish_dt.day + 1)
+            
+            time_diff = finish_dt - start_dt
+            total_seconds = int(time_diff.total_seconds())
+            
+            hours = total_seconds // 3600
+            minutes = (total_seconds % 3600) // 60
+            seconds = total_seconds % 60
+            
+            return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+            
+    except Exception as e:
+        logging.debug(f"Result time calculation error: {e}")
+    
+    return ""
 
 def sportorg_qual_to_sfr(qual: Qualification) -> str:
     """Конвертация квалификации из SportOrg в SFR"""
