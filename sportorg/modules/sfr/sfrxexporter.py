@@ -154,8 +154,9 @@ def _write_groups(f, race: Race):
         group_fields = [
             f"g{group_id_str}",
             group_name,
-            "-1", "0", "0",
-            "",  # пустое поле
+            "-1", # входит в группу   -1 - не входит
+            "0", "0",
+            "",  # название соревнований для грамот
             "150",  # стартовый взнос
             course_index,
             "0", "0", "0",
@@ -234,7 +235,7 @@ def _write_controls(f, race: Race):
             f"k{control_id_str}",
             str(code),
             str(code),
-            "0", "0", "0",
+            "0", "0", "0",  
             "-1",
             ""  # пустое поле в конце
         ]
@@ -294,27 +295,31 @@ def _write_competitors(f, race: Race):
         result_status = ""
         result_time = ""
         if result:
-            # Пробуем получить результат напрямую из объекта результата
-            if hasattr(result, 'result') and result.result:
-                result_time = _format_time(result.result)
-            elif hasattr(result, 'get_result') and callable(result.get_result):
-                result_time_obj = result.get_result()
-                if result_time_obj:
-                    result_time = _format_time(result_time_obj)
-            elif result.status == ResultStatus.OK:
-                # Если прямого результата нет, но статус ОК, рассчитываем
+            if result.status == ResultStatus.OK:
                 if result.finish_time and result.start_time:
                     result_time = _calculate_result_time(result.start_time, result.finish_time)
+                elif result.finish_time:
+                    result_time = _format_time(result.finish_time)
             elif result.status == ResultStatus.DISQUALIFIED:
-                result_status = "cнят"
+                result_status = "снят"  # было "cнят" с английской c
             elif result.status == ResultStatus.OVERTIME:
-                result_status = "cнят (к/в)"
+                result_status = "снят (к/в)"
             elif result.status == ResultStatus.DID_NOT_FINISH:
                 result_status = "снят"
             elif result.status == ResultStatus.DID_NOT_START:
                 result_status = "н/с"
             elif result.status == ResultStatus.MISSING_PUNCH:
                 result_status = "снят"
+            elif result.status == ResultStatus.REJECTED:
+                result_status = "снят"
+        else:
+            # Если результата нет вообще, проверяем статус участника
+            if person.start_time:
+                # Если есть время старта, но нет результата - снят
+                result_status = "снят"
+            else:
+                # Если нет времени старта - не стартовал
+                result_status = "н/с"
         
         # Полное имя
         surname = person.surname or ""
@@ -403,8 +408,8 @@ def _write_splits(f, race: Race):
             split_fields = [
                 f"s{split_id_str}",
                 str(person.bib or "0"),  # Используем номер участника (bib), а не ID
-                "", # команда?
-                "",  # пустые поля
+                "1", # отметка проверена?
+                "0",  # пустые поля
                 "1",  # номер дня?
                 "128" #?
             ]
@@ -431,10 +436,25 @@ def _format_time(dt):
             hour = getattr(dt, 'hour', 0)
             minute = getattr(dt, 'minute', 0)
             second = getattr(dt, 'second', 0)
+            # Если секунды не найдены, пробуем получить из других атрибутов
+            if second == 0:
+                second = getattr(dt, 'sec', 0)
             return f"{hour:02d}:{minute:02d}:{second:02d}"
+        
+        # Если у объекта есть метод to_time()
+        elif hasattr(dt, 'to_time') and callable(dt.to_time):
+            time_obj = dt.to_time()
+            if hasattr(time_obj, 'hour'):
+                return f"{time_obj.hour:02d}:{time_obj.minute:02d}:{time_obj.second:02d}"
         
         # Если это строка
         elif isinstance(dt, str):
+            # Если в строке уже есть секунды, оставляем как есть
+            if dt.count(':') == 2:
+                return dt
+            # Если только часы и минуты, добавляем секунды
+            elif dt.count(':') == 1:
+                return dt + ":00"
             return dt
             
     except Exception as e:
