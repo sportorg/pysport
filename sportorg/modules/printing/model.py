@@ -1,9 +1,10 @@
 import platform
+from typing import List
 
 from sportorg import settings
 from sportorg.common.template import get_text_from_file
 from sportorg.language import translate
-from sportorg.models.memory import Organization, race
+from sportorg.models.memory import Course, Group, Organization, Result, race
 from sportorg.models.result.split_calculation import GroupSplits
 from sportorg.modules.printing.printing import print_html
 from sportorg.modules.printing.printout_split import SportorgPrinter
@@ -17,18 +18,27 @@ class NoPrinterSelectedException(Exception):
     pass
 
 
-def split_printout(results):
-    isDirectMode = False
+def split_printout(results: List[Result]):
+    obj = race()
 
     printer = settings.SETTINGS.printer_split
-    obj = race()
+    if not printer:
+        raise NoPrinterSelectedException("No printer selected")
+
+    margins = {
+        "left": obj.get_setting("print_margin_left", 5.0),
+        "top": obj.get_setting("print_margin_top", 5.0),
+        "right": obj.get_setting("print_margin_right", 5.0),
+        "bottom": obj.get_setting("print_margin_bottom", 5.0),
+    }
     template_path = obj.get_setting(
         "split_template", settings.template_dir("split", "1_split_printout.html")
     )
 
     # don't process results in one group several times while bulk printing, track processed groups
-    processed_groups = []
+    processed_groups = set()
 
+    isDirectMode = False
     if not str(template_path).endswith(".html") and platform.system() == "Windows":
         # Internal split printout, pure python. Works faster, than jinja2 template + pdf
         isDirectMode = True
@@ -54,46 +64,30 @@ def split_printout(results):
         if not person:
             continue
 
-        course = obj.find_course(result)
+        group = person.group or Group()
+        course = obj.find_course(result) or Course()
+        organization = person.organization or Organization()
 
-        if person.group and course:
-            if person.group not in processed_groups:
-                s = GroupSplits(obj, person.group).generate(True)
-                processed_groups.append(person.group)
+        if group not in processed_groups:
+            group_splits = GroupSplits(obj, group).generate(True)
+            processed_groups.add(group)
 
-            result.check_who_can_win()
+        result.check_who_can_win()
 
-            if isDirectMode:
-                pr.print_split(result)
-
-            else:
-                organization = person.organization
-                if not organization:
-                    organization = Organization()
-
-                template = get_text_from_file(
-                    template_path,
-                    race=obj.to_dict(),
-                    person=person.to_dict(),
-                    result=result.to_dict(),
-                    group=person.group.to_dict(),
-                    course=course.to_dict(),
-                    organization=organization.to_dict(),
-                    items=s.to_dict(),
-                )
-                if not printer:
-                    raise NoPrinterSelectedException("No printer selected")
-                print_html(
-                    printer,
-                    template,
-                    obj.get_setting("print_margin_left", 5.0),
-                    obj.get_setting("print_margin_top", 5.0),
-                    obj.get_setting("print_margin_right", 5.0),
-                    obj.get_setting("print_margin_bottom", 5.0),
-                )
-        else:
-            # no group or course - just print all splits
+        if isDirectMode:
             pr.print_split(result)
+        else:
+            template = get_text_from_file(
+                template_path,
+                race=obj.to_dict(),
+                person=person.to_dict(),
+                result=result.to_dict(),
+                group=group.to_dict(),
+                course=course.to_dict(),
+                organization=organization.to_dict(),
+                items=group_splits.to_dict(),
+            )
+            print_html(printer, template, **margins)
 
     if isDirectMode:
         pr.end_doc()
