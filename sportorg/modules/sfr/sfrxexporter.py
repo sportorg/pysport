@@ -451,7 +451,6 @@ def _calculate_result_time(start_time, finish_time):
     
     return ""
 
-
 def _convert_to_datetime(time_obj):
     """Конвертирует различные типы времени в datetime"""
     if not time_obj:
