@@ -381,9 +381,9 @@ class MainWindow(QMainWindow):
         sfrx_action.triggered.connect(self.export_sfrx)
         sfr_menu.addAction(sfrx_action)
         
-        sfr_card_action = QAction(translate('Write to SFR card...'), self)
-        sfr_card_action.triggered.connect(self.write_sfr_card)
-        sfr_menu.addAction(sfr_card_action)
+        # sfr_card_action = QAction(translate('Write to SFR card...'), self)
+        # sfr_card_action.triggered.connect(self.write_sfr_card)
+        # sfr_menu.addAction(sfr_card_action)
 
     def export_sfrx(self):
         """Экспорт в SFRx файл"""
@@ -408,21 +408,21 @@ class MainWindow(QMainWindow):
             except Exception as e:
                 QMessageBox.critical(self, translate('Error'), str(e))
 
-    def write_sfr_card(self):
-        """Запись на SFR карту"""
-        if not SFR_AVAILABLE:
-            QMessageBox.warning(self, translate('Export'), translate('SFR card writing not available'))
-            return
+    # def write_sfr_card(self):
+    #     """Запись на SFR карту"""
+    #     if not SFR_AVAILABLE:
+    #         QMessageBox.warning(self, translate('Export'), translate('SFR card writing not available'))
+    #         return
             
-        try:
-            # Здесь можно добавить диалог выбора участника
-            success = export_sfr_data('', export_type='card')
-            if success:
-                QMessageBox.information(self, translate('Export'), translate('Data written to SFR card'))
-            else:
-                QMessageBox.warning(self, translate('Export'), translate('Failed to write SFR card'))
-        except Exception as e:
-            QMessageBox.critical(self, translate('Error'), str(e))
+    #     try:
+    #         # Здесь можно добавить диалог выбора участника
+    #         success = export_sfr_data('', export_type='card')
+    #         if success:
+    #             QMessageBox.information(self, translate('Export'), translate('Data written to SFR card'))
+    #         else:
+    #             QMessageBox.warning(self, translate('Export'), translate('Failed to write SFR card'))
+    #     except Exception as e:
+    #         QMessageBox.critical(self, translate('Error'), str(e))
 
     def _setup_toolbar(self):
         self.toolbar = self.addToolBar(translate("Toolbar"))

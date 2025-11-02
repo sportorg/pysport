@@ -301,22 +301,22 @@ def _write_competitors(f, race: Race):
                 elif result.finish_time:
                     result_time = _format_time(result.finish_time)
             elif result.status == ResultStatus.DISQUALIFIED:
-                result_status = "снят"  # было "cнят" с английской c
+                result_status = "cнят"  # было "cнят" с английской c
             elif result.status == ResultStatus.OVERTIME:
-                result_status = "снят (к/в)"
+                result_status = "cнят (к/в)"
             elif result.status == ResultStatus.DID_NOT_FINISH:
-                result_status = "снят"
+                result_status = "cнят"
             elif result.status == ResultStatus.DID_NOT_START:
                 result_status = "н/с"
             elif result.status == ResultStatus.MISSING_PUNCH:
-                result_status = "снят"
+                result_status = "cнят"
             elif result.status == ResultStatus.REJECTED:
-                result_status = "снят"
+                result_status = "cнят"
         else:
             # Если результата нет вообще, проверяем статус участника
             if person.start_time:
                 # Если есть время старта, но нет результата - снят
-                result_status = "снят"
+                result_status = "cнят"
             else:
                 # Если нет времени старта - не стартовал
                 result_status = "н/с"
@@ -332,11 +332,9 @@ def _write_competitors(f, race: Race):
             surname,
             first_name,
             team_id,
- #          "",  # год рождения (пустое поле)
             birthday,
             qual_id,
             person.comment or "",
- #           "",  # пустое поле?
             "0",  # аренда карты
             "0",  # стартовый взнос
             "0",  # оплачено
@@ -347,7 +345,7 @@ def _write_competitors(f, race: Race):
             result_time or result_status,  # относительное время результата
             "0", 
             "0", 
-            "0"  # массив из 7 полей
+            "0"  # массив из 7 полей (должен повторяться в многодневке - to do)
         ]
         f.write("\t".join(competitor_fields) + "\n")
 
@@ -361,23 +359,24 @@ def _write_splits(f, race: Race):
         if not result or not result.splits:
             continue
         
-        # Получаем время старта для фильтрации
-        start_time = None
-        if result.start_time:
-            start_time = result.start_time
-        elif person.start_time:
-            start_time = person.start_time
+        # Определяем номер дистанции и саму дистанцию
+        course_index = "0"
+        course = None
+        if person.group and person.group.course:
+            if person.group.course in race.courses:
+                course_index = str(race.courses.index(person.group.course))
+                course = person.group.course
         
-        # Фильтруем сплиты: только после времени старта и обычные КП, 241 - старт, оставляеем
-        valid_splits = []
-        for split in result.splits:
-            if (split.time and split.code and 
-                str(split.code) not in ['240', '241', '242']):
-                # Если известно время старта, фильтруем по нему 
-                if start_time is None or split.time >= start_time:
-                    valid_splits.append(split)
+        # Получаем правильный порядок КП для этой дистанции
+        expected_codes = []
+        if course and course.controls:
+            for control in course.controls:
+                code_str = str(control.code)
+                if code_str not in ['240', '241', '242']:
+                    expected_codes.append(code_str)
         
-        # Сортируем отфильтрованные сплиты по времени
+        # Берем все сплиты как есть из чипа
+        valid_splits = [s for s in result.splits if s.time and s.code]
         sorted_splits = sorted(valid_splits, key=lambda x: x.time)
         
         if not sorted_splits:
@@ -385,33 +384,66 @@ def _write_splits(f, race: Race):
             
         split_data = []
         
-        # Добавляем старт если есть реальная отметка 241
-        start_split = next((s for s in result.splits if str(s.code) == '241' and s.time), None)
-        if start_split:
-            start_time_str = _format_time(start_split.time)
-            split_data.extend(["241", "0", start_time_str])
+        # Счетчик для проверки порядка КП
+        current_position = 0
         
-        # Добавляем контрольные пункты в правильном порядке
-        for i, split in enumerate(sorted_splits):
+        # Добавляем все сплиты в том порядке, как они отсортированы по времени
+        for split in valid_splits:
             code_str = str(split.code)
             time_str = _format_time(split.time)
-            split_data.extend([code_str, str(i + 1), time_str])
+            
+            # Определяем порядковый номер
+            if code_str in ['240', '241', '242']:
+                # Для старта/финиша порядковый номер всегда 0
+                order = "0"
+                split_data.extend([code_str, order, time_str])
+            else:
+                # Ищем этот КП в оставшейся части дистанции
+                found_position = -1
+                for i in range(current_position, len(expected_codes)):
+                    if code_str == expected_codes[i]:
+                        found_position = i
+                        break
+                
+                if found_position >= current_position:
+                    # Нашли КП в правильном порядке дальше в дистанции
+                    order = str(found_position + 1)
+                    current_position = found_position + 1
+                else:
+                    # КП не найден в оставшейся части дистанции или уже пройден
+                    order = "0"
+                
+                split_data.extend([code_str, order, time_str])
         
-        # Добавляем финиш если есть реальная отметка 240
-        finish_split = next((s for s in result.splits if str(s.code) == '240' and s.time), None)
-        if finish_split:
-            finish_time_str = _format_time(finish_split.time)
+        # Если нет отметки финиша (240), но есть время финиша в результате - добавляем
+        has_finish = any(str(split.code) == '240' for split in sorted_splits)
+        if not has_finish and result and result.finish_time:
+            finish_time_str = _format_time(result.finish_time)
             split_data.extend(["240", "0", finish_time_str])
+        
+        # # Если нет отметки старта (241), но есть время старта - добавляем в начало
+        # has_start = any(str(split.code) == '241' for split in sorted_splits)
+        # if not has_start:
+        #     start_time = None
+        #     if result and result.start_time:
+        #         start_time = result.start_time
+        #     elif person.start_time:
+        #         start_time = person.start_time
+            
+        #     if start_time:
+        #         start_time_str = _format_time(start_time)
+        #         # Добавляем старт в начало данных сплитов
+        #         split_data = ["241", "0", start_time_str] + split_data
         
         if split_data:
             split_id_str = str(split_id).zfill(5)
             split_fields = [
                 f"s{split_id_str}",
-                str(person.bib or "0"),  # Используем номер участника (bib), а не ID
-                "1", # отметка проверена?
-                "0",  # пустые поля
-                "1",  # номер дня?
-                "128" #?
+                str(person.bib or "0"),
+                course_index,  # номер дистанции
+                "0",  # пустое поле
+                "1",
+                "128"
             ]
             split_fields.extend(split_data)
             f.write("\t".join(split_fields) + "\n")
