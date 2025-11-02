@@ -2,6 +2,7 @@ import logging
 import sys
 from threading import Thread
 
+from sportorg import settings
 from sportorg.common.fake_std import FakeStd
 from sportorg.libs.telegram.telegram import Telegram
 from sportorg.models.memory import race
@@ -43,7 +44,7 @@ class TelegramClient:
     def get_options():
         obj = race()
         return BotOption(
-            obj.get_setting("telegram_token", ""),
+            settings.SETTINGS.telegram_token,
             obj.get_setting("telegram_chat_id", ""),
             obj.get_setting("telegram_template", ""),
             obj.get_setting("telegram_parse_mode", ""),

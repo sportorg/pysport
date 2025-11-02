@@ -4,7 +4,7 @@ from typing import Optional
 
 from boltons.fileutils import atomic_rename
 
-from sportorg.modules.configs.configs import Config
+from sportorg import settings
 
 from . import json
 
@@ -23,14 +23,14 @@ def is_gzip_file(file_name: str) -> bool:
 class File:
     def __init__(self, file_name: str):
         self._file_name = file_name
-        self.use_utf8 = Config().configuration.get("save_in_utf8", False)
-        self.use_gzip = Config().configuration.get("save_in_gzip", False)
+        self.use_utf8 = settings.SETTINGS.file_save_in_utf8
+        self.use_gzip = settings.SETTINGS.file_save_in_gzip
 
     def _backup(self, file_name: str, func, mode: str = "r") -> None:
         # if user set UTF-8 usage, first try to open file in UTF-8,
         # then in system locale (1251 for RU Windows)
-        use_utf8 = Config().configuration.get("save_in_utf8", False)
-        use_gzip = Config().configuration.get("save_in_gzip", False)
+        use_utf8 = settings.SETTINGS.file_save_in_utf8
+        use_gzip = settings.SETTINGS.file_save_in_gzip
 
         if mode == "r":
             use_gzip = is_gzip_file(file_name)

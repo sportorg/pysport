@@ -1,19 +1,39 @@
 import logging
+import webbrowser
 
-from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import (
-    QCheckBox,
-    QDialog,
-    QDialogButtonBox,
-    QFormLayout,
-    QLabel,
-    QPushButton,
-    QTabWidget,
-    QWidget,
-)
+try:
+    from PySide6.QtGui import QIcon
+    from PySide6.QtWidgets import (
+        QCheckBox,
+        QCommandLinkButton,
+        QDialog,
+        QDialogButtonBox,
+        QFormLayout,
+        QHBoxLayout,
+        QLabel,
+        QPushButton,
+        QTabWidget,
+        QWidget,
+    )
+except ModuleNotFoundError:
+    from PySide2.QtGui import QIcon
+    from PySide2.QtWidgets import (
+        QCheckBox,
+        QCommandLinkButton,
+        QDialog,
+        QDialogButtonBox,
+        QFormLayout,
+        QHBoxLayout,
+        QLabel,
+        QPushButton,
+        QTabWidget,
+        QWidget,
+    )
 
-from sportorg import config
+from sportorg import config, settings
 from sportorg.common.audio import get_sounds
+from sportorg.common.template import get_templates
+from sportorg.gui.dialogs.file_dialog import get_existing_directory
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox, AdvSpinBox
 from sportorg.language import get_languages, translate
@@ -27,7 +47,6 @@ from sportorg.models.memory import (
     races,
     set_current_race_index,
 )
-from sportorg.modules.configs.configs import Config
 
 
 class Tab:
@@ -40,63 +59,56 @@ class MainTab(Tab):
         self.widget = QWidget()
         self.layout = QFormLayout(parent)
 
+        self.widget.setLayout(self.layout)
+
         self.label_lang = QLabel(translate("Languages"))
         self.item_lang = AdvComboBox()
         self.item_lang.addItems(get_languages())
-        self.item_lang.setCurrentText(
-            Config().configuration.get("current_locale", "ru_RU")
-        )
+        self.item_lang.setCurrentText(settings.SETTINGS.locale)
         self.layout.addRow(self.label_lang, self.item_lang)
 
         self.item_auto_save = AdvSpinBox(
-            maximum=3600 * 24, value=Config().configuration.get("autosave_interval")
+            maximum=3600 * 24, value=settings.SETTINGS.file_autosave_interval
         )
         self.item_auto_save.setMinimum(5)
         self.layout.addRow(translate("Auto save") + " (sec)", self.item_auto_save)
 
         self.item_show_toolbar = QCheckBox(translate("Show toolbar"))
-        self.item_show_toolbar.setChecked(Config().configuration.get("show_toolbar"))
+        self.item_show_toolbar.setChecked(settings.SETTINGS.window_show_toolbar)
         self.layout.addRow(self.item_show_toolbar)
 
         self.item_open_recent_file = QCheckBox(translate("Open recent file"))
-        self.item_open_recent_file.setChecked(
-            Config().configuration.get("open_recent_file")
-        )
+        self.item_open_recent_file.setChecked(settings.SETTINGS.file_open_recent_file)
         self.layout.addRow(self.item_open_recent_file)
 
         self.item_use_birthday = QCheckBox(translate("Use birthday"))
-        self.item_use_birthday.setChecked(Config().configuration.get("use_birthday"))
+        self.item_use_birthday.setChecked(settings.SETTINGS.race_use_birthday)
         self.layout.addRow(self.item_use_birthday)
 
         self.item_check_updates = QCheckBox(translate("Check updates"))
-        self.item_check_updates.setChecked(Config().configuration.get("check_updates"))
+        self.item_check_updates.setChecked(settings.SETTINGS.app_check_updates)
         # self.layout.addRow(self.item_check_updates)
 
         self.item_save_in_utf8 = QCheckBox(translate("Save in UTF-8 encoding"))
-        self.item_save_in_utf8.setChecked(
-            Config().configuration.get("save_in_utf8", False)
-        )
+        self.item_save_in_utf8.setChecked(settings.SETTINGS.file_save_in_utf8)
         self.layout.addRow(self.item_save_in_utf8)
 
         self.item_save_in_gzip = QCheckBox(translate("Compress files to gzip"))
-        self.item_save_in_gzip.setChecked(
-            Config().configuration.get("save_in_gzip", False)
-        )
+        self.item_save_in_gzip.setChecked(settings.SETTINGS.file_save_in_gzip)
         self.layout.addRow(self.item_save_in_gzip)
 
-        self.widget.setLayout(self.layout)
-
     def save(self):
-        Config().configuration.set("current_locale", self.item_lang.currentText())
-        Config().configuration.set("autosave_interval", self.item_auto_save.value())
-        Config().configuration.set(
-            "open_recent_file", self.item_open_recent_file.isChecked()
-        )
+        old_window_show_toolbar = settings.SETTINGS.window_show_toolbar
+        settings.SETTINGS.locale = self.item_lang.currentText()
+        settings.SETTINGS.file_autosave_interval = self.item_auto_save.value()
+        settings.SETTINGS.file_open_recent_file = self.item_open_recent_file.isChecked()
+        settings.SETTINGS.window_show_toolbar = self.item_show_toolbar.isChecked()
+        settings.SETTINGS.race_use_birthday = self.item_use_birthday.isChecked()
+        settings.SETTINGS.app_check_updates = self.item_check_updates.isChecked()
+        settings.SETTINGS.file_save_in_utf8 = self.item_save_in_utf8.isChecked()
+        settings.SETTINGS.file_save_in_gzip = self.item_save_in_gzip.isChecked()
 
-        if (
-            bool(Config().configuration.get("show_toolbar"))
-            != self.item_show_toolbar.isChecked()
-        ):
+        if old_window_show_toolbar != self.item_show_toolbar.isChecked():
             if self.item_show_toolbar.isChecked():
                 mw = GlobalAccess().get_main_window()
                 if hasattr(mw, "toolbar"):
@@ -106,11 +118,6 @@ class MainTab(Tab):
             else:
                 mw = GlobalAccess().get_main_window()
                 mw.toolbar.hide()
-        Config().configuration.set("show_toolbar", self.item_show_toolbar.isChecked())
-        Config().configuration.set("use_birthday", self.item_use_birthday.isChecked())
-        Config().configuration.set("check_updates", self.item_check_updates.isChecked())
-        Config().configuration.set("save_in_utf8", self.item_save_in_utf8.isChecked())
-        Config().configuration.set("save_in_gzip", self.item_save_in_gzip.isChecked())
 
 
 class SoundTab(Tab):
@@ -118,17 +125,19 @@ class SoundTab(Tab):
         self.widget = QWidget()
         self.layout = QFormLayout(parent)
 
+        self.widget.setLayout(self.layout)
+
         self.sounds = get_sounds()
 
         self.item_enabled = QCheckBox(translate("Enabled"))
-        self.item_enabled.setChecked(Config().sound.get("enabled"))
+        self.item_enabled.setChecked(settings.SETTINGS.sound_enabled)
         self.layout.addRow(self.item_enabled)
 
         self.label_successful = QLabel(translate("Successful result"))
         self.item_successful = AdvComboBox()
         self.item_successful.addItems(self.sounds)
         self.item_successful.setCurrentText(
-            Config().sound.get("successful") or config.sound_dir("ok.wav")
+            settings.SETTINGS.sound_successful_path or config.sound_dir("ok.wav")
         )
         self.layout.addRow(self.label_successful, self.item_successful)
 
@@ -136,13 +145,14 @@ class SoundTab(Tab):
         self.item_unsuccessful = AdvComboBox()
         self.item_unsuccessful.addItems(self.sounds)
         self.item_unsuccessful.setCurrentText(
-            Config().sound.get("unsuccessful") or config.sound_dir("failure.wav")
+            settings.SETTINGS.sound_unsuccessful_path or config.sound_dir("failure.wav")
         )
         self.layout.addRow(self.label_unsuccessful, self.item_unsuccessful)
 
         self.item_enabled_rented_card = QCheckBox(translate("Enable rented card sound"))
         self.item_enabled_rented_card.setChecked(
-            Config().sound.get("enabled_rented_card", Config().sound.get("enabled"))
+            settings.SETTINGS.sound_rented_card_enabled
+            or settings.SETTINGS.sound_enabled
         )
         self.layout.addRow(self.item_enabled_rented_card)
 
@@ -150,7 +160,8 @@ class SoundTab(Tab):
         self.item_rented_card = AdvComboBox()
         self.item_rented_card.addItems(self.sounds)
         self.item_rented_card.setCurrentText(
-            Config().sound.get("rented_card") or config.sound_dir("rented_card.wav")
+            settings.SETTINGS.sound_rented_card_path
+            or config.sound_dir("rented_card.wav")
         )
         self.layout.addRow(self.label_rented_card, self.item_rented_card)
 
@@ -158,21 +169,20 @@ class SoundTab(Tab):
         self.item_enter_number = AdvComboBox()
         self.item_enter_number.addItems(self.sounds)
         self.item_enter_number.setCurrentText(
-            Config().sound.get("enter_number") or config.sound_dir("enter_number.wav")
+            settings.SETTINGS.sound_enter_number_path
+            or config.sound_dir("enter_number.wav")
         )
         self.layout.addRow(self.label_enter_number, self.item_enter_number)
 
-        self.widget.setLayout(self.layout)
-
     def save(self):
-        Config().sound.set("enabled", self.item_enabled.isChecked())
-        Config().sound.set("successful", self.item_successful.currentText())
-        Config().sound.set("unsuccessful", self.item_unsuccessful.currentText())
-        Config().sound.set(
-            "enabled_rented_card", self.item_enabled_rented_card.isChecked()
+        settings.SETTINGS.sound_enabled = self.item_enabled.isChecked()
+        settings.SETTINGS.sound_successful_path = self.item_successful.currentText()
+        settings.SETTINGS.sound_unsuccessful_path = self.item_unsuccessful.currentText()
+        settings.SETTINGS.sound_rented_card_enabled = (
+            self.item_enabled_rented_card.isChecked()
         )
-        Config().sound.set("rented_card", self.item_rented_card.currentText())
-        Config().sound.set("enter_number", self.item_enter_number.currentText())
+        settings.SETTINGS.sound_rented_card_path = self.item_rented_card.currentText()
+        settings.SETTINGS.sound_enter_number_path = self.item_enter_number.currentText()
 
 
 class MultidayTab(Tab):
@@ -180,10 +190,14 @@ class MultidayTab(Tab):
         self.widget = QWidget()
         self.layout = QFormLayout(parent)
 
+        self.buttons_layout = QHBoxLayout()
+        self.button_container = QWidget()
+        self.button_container.setLayout(self.buttons_layout)
+
+        self.widget.setLayout(self.layout)
+
         self.item_races = AdvComboBox()
         self.fill_race_list()
-
-        max_button_width = 100
 
         def select_race():
             index = self.item_races.currentIndex()
@@ -200,8 +214,7 @@ class MultidayTab(Tab):
 
         self.item_new = QPushButton(translate("New"))
         self.item_new.clicked.connect(add_race_function)
-        self.item_new.setMaximumWidth(max_button_width)
-        self.layout.addRow(self.item_new)
+        self.buttons_layout.addWidget(self.item_new)
 
         def copy_race_function():
             copy_race()
@@ -209,8 +222,7 @@ class MultidayTab(Tab):
 
         self.item_copy = QPushButton(translate("Copy"))
         self.item_copy.clicked.connect(copy_race_function)
-        self.item_copy.setMaximumWidth(max_button_width)
-        self.layout.addRow(self.item_copy)
+        self.buttons_layout.addWidget(self.item_copy)
 
         def move_up_race_function():
             move_up_race()
@@ -218,8 +230,7 @@ class MultidayTab(Tab):
 
         self.item_move_up = QPushButton(translate("Move up"))
         self.item_move_up.clicked.connect(move_up_race_function)
-        self.item_move_up.setMaximumWidth(max_button_width)
-        self.layout.addRow(self.item_move_up)
+        self.buttons_layout.addWidget(self.item_move_up)
 
         def move_down_race_function():
             move_down_race()
@@ -227,8 +238,7 @@ class MultidayTab(Tab):
 
         self.item_move_down = QPushButton(translate("Move down"))
         self.item_move_down.clicked.connect(move_down_race_function)
-        self.item_move_down.setMaximumWidth(max_button_width)
-        self.layout.addRow(self.item_move_down)
+        self.buttons_layout.addWidget(self.item_move_down)
 
         def del_race_function():
             del_race()
@@ -236,10 +246,9 @@ class MultidayTab(Tab):
 
         self.item_del = QPushButton(translate("Delete"))
         self.item_del.clicked.connect(del_race_function)
-        self.item_del.setMaximumWidth(max_button_width)
-        self.layout.addRow(self.item_del)
+        self.buttons_layout.addWidget(self.item_del)
 
-        self.widget.setLayout(self.layout)
+        self.layout.addRow(self.button_container)
 
     def save(self):
         pass
@@ -256,6 +265,56 @@ class MultidayTab(Tab):
         self.item_races.setCurrentIndex(index)
 
 
+class TemplateTab(Tab):
+    def __init__(self, parent):
+        self.widget = QWidget()
+        self.layout = QFormLayout(parent)
+
+        self.widget.setLayout(self.layout)
+
+        self.item_download_description = QLabel()
+        self.item_download_description.setText(
+            translate(
+                "Download the zipped templates file — Source code (zip/tar.gz),\nthen unzip it and choose your locale"
+            )
+        )
+        self.layout.addRow(self.item_download_description)
+
+        self.item_download = QCommandLinkButton(translate("Download templates"))
+
+        def open_templates_page() -> None:
+            webbrowser.open("https://github.com/sportorg/templates/releases", new=2)
+
+        self.item_download.clicked.connect(open_templates_page)
+        self.layout.addRow(self.item_download)
+
+        self.item_custom_dir = QPushButton(translate("Select the templates directory"))
+
+        def select_custom_dir() -> None:
+            templates_path = get_existing_directory(
+                translate("Open the templates directory"), settings.template_dir()
+            )
+            if not templates_path:
+                return
+
+            self.item_custom_dirpath.setText(templates_path)
+            settings.SETTINGS.templates_path = templates_path
+            self.item_template.clear()
+            self.item_template.addItems(
+                sorted(get_templates(settings.template_dir("reports")))
+            )
+
+        self.item_custom_dir.clicked.connect(select_custom_dir)
+        self.layout.addRow(self.item_custom_dir)
+
+        self.item_custom_dirpath = QLabel()
+        self.item_custom_dirpath.setText(settings.template_dir())
+        self.layout.addRow(self.item_custom_dirpath)
+
+    def save(self):
+        pass
+
+
 class SettingsDialog(QDialog):
     def __init__(self):
         super().__init__(GlobalAccess().get_main_window())
@@ -263,6 +322,7 @@ class SettingsDialog(QDialog):
             (MainTab(self), translate("Main settings")),
             (SoundTab(self), translate("Sounds")),
             (MultidayTab(self), translate("Multi day")),
+            (TemplateTab(self), translate("Templates directory")),
         ]
 
     def exec_(self):
@@ -307,4 +367,5 @@ class SettingsDialog(QDialog):
     def apply_changes_impl(self):
         for tab, _ in self.widgets:
             tab.save()
-        Config().save()
+        GlobalAccess().get_main_window().refresh()
+        settings.save_settings_to_file()

@@ -1,6 +1,11 @@
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QFont, QIcon, QPixmap
-from PySide6.QtWidgets import QDialog, QFormLayout, QLabel, QTextEdit
+try:
+    from PySide6.QtCore import Qt
+    from PySide6.QtGui import QFont, QIcon, QPixmap
+    from PySide6.QtWidgets import QDialog, QFormLayout, QLabel, QTextEdit
+except ModuleNotFoundError:
+    from PySide2.QtCore import Qt
+    from PySide2.QtGui import QFont, QIcon, QPixmap
+    from PySide2.QtWidgets import QDialog, QFormLayout, QLabel, QTextEdit
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
@@ -57,14 +62,16 @@ class AboutDialog(QDialog):
         home_page_text.setOpenExternalLinks(True)
         self.layout.addRow(home_page_text)
 
-        commit_version_text = QLabel()
-        commit_version_text.setTextInteractionFlags(
+        extra_version_text = QLabel()
+        extra_version_text.setTextInteractionFlags(
             Qt.TextInteractionFlag.TextSelectableByMouse
         )
-        commit_version_text.setText(
-            "{}: {}".format(translate("Version"), config.commit_version())
+        extra_version_text.setText(
+            "{}: {}\npython {}".format(
+                translate("Version"), config.commit_version(), config.PYTHON_VERSION
+            )
         )
-        self.layout.addRow(commit_version_text)
+        self.layout.addRow(extra_version_text)
 
         licence_title = QLabel()
         licence_title.setText("\nGPL v3 License")

@@ -1,10 +1,11 @@
+"""This module is deprecated and will be removed in future versions."""
+
 import configparser
 import logging
 import os
 
 from sportorg import config as sportorg_config
 from sportorg.common.singleton import Singleton
-from sportorg.gui.global_access import GlobalAccess
 
 
 class ConfigFile:
@@ -77,7 +78,6 @@ class Config(metaclass=Singleton):
                 {
                     "current_locale": "ru_RU",
                     "show_toolbar": True,
-                    "autoconnect": False,
                     "open_recent_file": False,
                     "use_birthday": False,
                     "check_updates": True,
@@ -89,8 +89,6 @@ class Config(metaclass=Singleton):
             ConfigFile.SOUND: Configurations(
                 {
                     "enabled": False,
-                    "successful": "",
-                    "unsuccessful": "",
                 }
             ),
             ConfigFile.PRINTER: Configurations(
@@ -122,8 +120,8 @@ class Config(metaclass=Singleton):
                     "relay_ranking_method": "personal",  # 'personal', 'average', 'first'
                 }
             ),
-            ConfigFile.GEOMETRY: Configurations({"x": 0, "y": 0}),
-            ConfigFile.TEMPLATES: Configurations({"directory": ""}),
+            ConfigFile.GEOMETRY: Configurations({"main": "01"}),
+            ConfigFile.TEMPLATES: Configurations({}),
         }
 
     @property
@@ -179,17 +177,3 @@ class Config(metaclass=Singleton):
             # remove incorrect config
             if config_name:
                 os.remove(config_name)
-
-    def save(self):
-        for config_name in self._configurations.keys():
-            self.parser[config_name] = self._configurations[config_name].get_all()
-
-        self.parser[ConfigFile.LOCALE] = {
-            "current": self.configuration.get("current_locale")
-        }
-        self.parser[ConfigFile.GEOMETRY]["main"] = bytes(
-            GlobalAccess().get_main_window().saveGeometry().toHex()
-        ).decode()
-
-        with open(sportorg_config.CONFIG_INI, "w") as configfile:
-            self.parser.write(configfile)

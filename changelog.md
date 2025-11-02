@@ -2,10 +2,52 @@
 
 ## next
 
+### Improvements
++ New field - middle name (new Russian requirements)
++ Import of full date of birth
++ Optional build on Pyside2 (Qt5) / Pyside6 (Qt6)
++ Import form SFRX files (SFR)
++ Course indexing by name
++ New "in list" operator in table filtering
++ Default value for auto-save has been increased from 5 seconds to 5 minutes ([#497](https://github.com/sportorg/pysport/pull/497))
++ Added columns: birthday and distance in participants, comment in results, control time, and start interval in groups ([#500](https://github.com/sportorg/pysport/issues/500))
++ End of competitors' maximum time column ([#501](https://github.com/sportorg/pysport/issues/501))
++ Competitors' numbers in relay format (e.g., 15.1, [#501](https://github.com/sportorg/pysport/issues/501))
++ Reverse row numbering in the results tab ([#519](https://github.com/sportorg/pysport/issues/519))
++ Templates can compress data (gzip) to reduce the size of html files
+
+### Fixes
++ Fixed: multi day race processing - all days are refreshed on the file opening
++ Fixed: SRPid readout, error in byte conversion
++ Fixed: Import from WDB with the rubbish in course object (special characters)
++ Fixed: Import from the buffer - last raw was missed
++ Fixed: IOF XML with empty height (Purple Pen) now supported
++ Fixed dialog sizes reverted (dynamic size was sometimes wrong)
++ DNS processing - checking the bib for existence
++ Fixed: People indexing while duplication
++ Start preparation - checking start group for draw to have more than 1 person
++ Fix performance issue with large number of participants ([#494](https://github.com/sportorg/pysport/pull/494))
++ Added stability when sorting tables ([#500](https://github.com/sportorg/pysport/issues/500))
++ Fixed: wiping the file by saving or auto-saving if the file could not be opened ([#502](https://github.com/sportorg/pysport/issues/502))
++ Fixed reversed line order when opening the file ([#509](https://github.com/sportorg/pysport/issues/509))
+
+## 2025-04-01
+
+* Added the option of templates directory changing
 * Fix not working online results when the settings responsible for timing are missing
 * Added the ability to enter started numbers
 * Added the ability to import participants from the table (For example Excel)
 * Add credit time calculation
+* Added the ability to save templates in CSV format
+* Add a description on how to download the templates
+* Added time accuracy to the results list if the accuracy is specified in the settings ([#481](https://github.com/sportorg/pysport/pull/481))
+* Improved the split panel: added start and finish times; added tenths/hundredths if accuracy is specified; reduced initial panel size ([#480](https://github.com/sportorg/pysport/pull/480))
+* Added keyboard shortcuts for frequent operations ([#487](https://github.com/sportorg/pysport/pull/487))
+* Added the ability to change control times in read chips ([#485](https://github.com/sportorg/pysport/pull/485))
+* Added logging of timing of course checking ([#485](https://github.com/sportorg/pysport/pull/485), `SportOrg/log/sportorg.log`)
+* Bumped dependencies jinja2, psutil, pywin32, playsound and others ([#493](https://github.com/sportorg/pysport/pull/493))
+* Sending compressed data to orgeo (gzip)
+* New settings format (json) with the ability to add new fields without losing compatibility
 
 ## 2024-10-07 v1.7.1
 

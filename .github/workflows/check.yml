@@ -6,14 +6,14 @@ on:
       - ".github/workflows/**"
       - "sportorg/**"
       - "tests/**"
-      - "poetry.lock"
+      - "uv.lock"
     branches: [ master ]
   pull_request:
     paths:
       - ".github/workflows/**"
       - "sportorg/**"
       - "tests/**"
-      - "poetry.lock"
+      - "uv.lock"
     branches: [ master ]
   workflow_dispatch:
 
@@ -22,60 +22,63 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
+        python_version: [3.8, 3.14]
         architecture: [x64]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.8'
+          python-version: ${{ matrix.python_version }}
           architecture: ${{ matrix.architecture }}
 
       - name: Install python dependencies
-        run: pip install poetry && poetry install -E win
+        run: pip install uv && uv sync --frozen --extra win
 
       - name: Run linters
-        run: poetry run poe lint
+        run: uv run poe lint
 
   test:
     runs-on: windows-latest
     strategy:
       matrix:
+        python_version: [3.8, 3.14]
         architecture: [x64]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.8'
+          python-version: ${{ matrix.python_version }}
           architecture: ${{ matrix.architecture }}
 
       - name: Install python dependencies
-        run: pip install poetry && poetry install -E win
+        run: pip install uv && uv sync --frozen --extra win
 
       - name: Run test
-        run: poetry run poe test
+        run: uv run poe test
 
   build:
     runs-on: windows-latest
     strategy:
       matrix:
+        python_version: [3.8]
         architecture: [x64]
     name: Build on Windows ${{ matrix.architecture }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Set up Python
         id: set_up_python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.8'
+          python-version: ${{ matrix.python_version }}
           architecture: ${{ matrix.architecture }}
       - name: Install python dependencies
-        run: pip install poetry && poetry install -E win
+        run: pip install uv && uv sync --frozen --extra win
       - name: Generate mo files
-        run: poetry run poe generate-mo
+        run: uv run poe generate-mo
       - name: Generate version file
-        run: poetry run poe generate-version
+        run: uv run poe generate-version
       - name: Build
-        run: poetry run python builder.py build
+        run: uv run python builder.py build
       - name: Generate installer
-        run: poetry run python builder.py bdist_msi
+        run: uv run python builder.py bdist_msi

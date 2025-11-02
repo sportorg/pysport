@@ -22,7 +22,7 @@ from sportorg.models.memory import (
     find,
     race,
 )
-from sportorg.models.result.result_calculation import ResultCalculation
+from sportorg.models.result.result_tools import recalculate_results
 from sportorg.utils.time import int_to_otime, time_to_int
 
 
@@ -112,7 +112,8 @@ class WinOrientBinary:
             new_group.price = group.owner_cost
             course = group.get_course()
             if course:
-                new_group.course = find(race().courses, name=course.name)
+                if course.name in race().course_index_name:
+                    new_group.course = race().course_index_name[course.name]
             my_race.groups.append(new_group)
 
         for man in self.wdb_object.man:
@@ -189,7 +190,7 @@ class WinOrientBinary:
                 if code > 0:
                     result.splits.append(split)
 
-        ResultCalculation(race()).process_results()
+        recalculate_results(recheck_results=False)
 
     def export(self):
         wdb_object = WDB()
@@ -253,7 +254,7 @@ class WinOrientBinary:
 
         for man in my_race.persons:
             new_person = WDBMan(wdb_object)
-            new_person.name = str(man.surname) + " " + str(man.name)
+            new_person.name = str(man.full_name_with_middle)
             if man.bib:
                 new_person.number = int(man.bib)
 

@@ -1,16 +1,16 @@
 import pytest
 
+from sportorg import settings
 from sportorg.models.memory import Group, Organization, Person, race
 from sportorg.modules.backup.file import File
-from sportorg.modules.configs.configs import Config
 
 
 @pytest.fixture()
 def use_gzip():
-    old_value = Config().configuration.get("save_in_gzip", False)
-    Config().configuration.set("save_in_gzip", True)
+    old_value = settings.SETTINGS.file_save_in_gzip
+    settings.SETTINGS.file_save_in_gzip = True
     yield
-    Config().configuration.set("save_in_gzip", old_value)
+    settings.SETTINGS.file_save_in_gzip = old_value
 
 
 @pytest.mark.usefixtures("use_gzip")

@@ -5,6 +5,9 @@ from pathlib import Path
 
 NAME = "SportOrg"
 VERSION = "v1.7.1"
+PYTHON_VERSION = (
+    f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
+)
 
 ENV_PREFIX = "SPORTORG_"
 DEBUG = os.getenv(f"{ENV_PREFIX}DEBUG", "false").lower() in ["1", "yes", "true"]
@@ -60,15 +63,6 @@ def data_dir(*paths) -> str:
 TEMPLATE_DIR = TEMPLATES_PATH or base_dir("templates")
 
 
-def set_template_dir(dirpath: str) -> None:
-    global TEMPLATE_DIR
-    TEMPLATE_DIR = dirpath
-
-
-def template_dir(*paths) -> str:
-    return os.path.join(TEMPLATE_DIR, *paths)
-
-
 SOUND_DIR = base_dir("sounds")
 
 
@@ -97,18 +91,9 @@ def commit_version() -> str:
 ICON = icon_dir("sportorg.svg")
 
 CONFIG_INI = data_dir("config.ini")
+SETTINGS_JSON = data_dir("settings.json")
 
 LOCALE_DIR = base_dir("languages")
-
-NAMES_FILE = base_dir("configs", "names.txt")
-
-REGIONS_FILE = base_dir("configs", "regions.txt")
-
-STATUS_COMMENTS_FILE = base_dir("configs", "status_comments.txt")
-
-STATUS_DEFAULT_COMMENTS_FILE = base_dir("configs", "status_default.txt")
-
-RANKING_SCORE_FILE = base_dir("configs", "ranking.txt")
 
 DIRS = [
     IMG_DIR,

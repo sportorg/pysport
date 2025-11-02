@@ -1,8 +1,7 @@
 from dataclasses import dataclass, field
 from typing import IO
 from xml.etree import ElementTree
-
-from chardet.universaldetector import UniversalDetector
+from sportorg.utils.text import detect_encoding
 
 
 class OcadImportException(Exception):
@@ -64,30 +63,12 @@ class ClassesV8:
         self._courses = CourseList()
         self._groups = set()
 
-    def detect_encoding(self, file):
-        detector = UniversalDetector()
-        with open(file, 'rb') as fh:
-            for line in fh:
-                detector.feed(line)
-                if detector.done:
-                    break
-            detector.close()
-
-        detected_encoding = detector.result['encoding']
-
-        supported_encodings = ['utf-8', 'UTF-8-SIG', 'windows-1251', 'UTF-32']
-        if detected_encoding in supported_encodings:
-            return detected_encoding
-
-        default_encoding = 'windows-1251'  # for Russia and people with OCAD < 11.0
-        return default_encoding
-
     def parse(self, file):
         if not isinstance(file, str) and not isinstance(file, IO):
             raise TypeError('file is not str or IO')
         if isinstance(file, str):
             try:
-                enc = self.detect_encoding(file)
+                enc = detect_encoding(file, default_encoding="windows-1251")
                 with open(file, encoding=enc) as f:
                     content = f.readlines()
             except FileNotFoundError:

@@ -1,5 +1,6 @@
 from datetime import date
 
+from sportorg import settings
 from sportorg.gui.dialogs.dialog import (
     AdvComboBoxField,
     BaseDialog,
@@ -13,7 +14,12 @@ from sportorg.gui.dialogs.dialog import (
 )
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import translate
-from sportorg.models.constant import get_names, get_race_groups, get_race_teams
+from sportorg.models.constant import (
+    get_middle_names,
+    get_names,
+    get_race_groups,
+    get_race_teams,
+)
 from sportorg.models.memory import (
     Limit,
     Organization,
@@ -22,8 +28,7 @@ from sportorg.models.memory import (
     find,
     race,
 )
-from sportorg.models.result.result_calculation import ResultCalculation
-from sportorg.modules.configs.configs import Config
+from sportorg.models.result.result_tools import recalculate_results
 from sportorg.modules.live.live import live_client
 from sportorg.modules.teamwork.teamwork import Teamwork
 
@@ -45,7 +50,7 @@ class PersonEditDialog(BaseDialog):
             time_format = "hh:mm:ss.zzz"
 
         self.title = translate("Entry properties")
-        self.size = (450, 670)
+        self.size = (450, 700)
         self.form = [
             LineField(
                 title=translate("Last name"),
@@ -58,6 +63,12 @@ class PersonEditDialog(BaseDialog):
                 object=person,
                 key="name",
                 items=get_names(),
+            ),
+            AdvComboBoxField(
+                title=translate("Middle name"),
+                object=person,
+                key="middle_name",
+                items=get_middle_names(),
             ),
             AdvComboBoxField(
                 title=translate("Group"),
@@ -81,7 +92,7 @@ class PersonEditDialog(BaseDialog):
                     key="birth_date",
                     maximum=date.today(),
                 )
-                if Config().configuration.get("use_birthday", False)
+                if settings.SETTINGS.race_use_birthday
                 else NumberField(
                     title=translate("Year of birth"),
                     object=person,
@@ -280,6 +291,6 @@ class PersonEditDialog(BaseDialog):
         if self.is_new:
             race().add_person(person)
 
-        ResultCalculation(race()).process_results()
+        recalculate_results(recheck_results=False)
         live_client.send(person)
         Teamwork().send(person.to_dict())

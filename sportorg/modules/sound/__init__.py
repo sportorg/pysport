@@ -1,32 +1,31 @@
+from sportorg import settings
 from sportorg.common.audio import Audio
 from sportorg.common.singleton import singleton
-from sportorg.modules.configs.configs import Config
 
 
 @singleton
 class Sound:
     @staticmethod
     def is_enabled():
-        return Config().sound.get("enabled")
+        return settings.SETTINGS.sound_enabled
 
     @staticmethod
     def is_enabled_rented_card():
-        return Config().sound.get("enabled_rented_card")
+        return settings.SETTINGS.sound_rented_card_enabled
 
-    def _play(self, name):
-        sound = Config().sound.get(name)
-        if self.is_enabled() and sound:
-            Audio().play(sound)
+    def _play(self, sound_path: str) -> None:
+        if self.is_enabled() and sound_path:
+            Audio().play(sound_path)
 
     def ok(self):
-        self._play("successful")
+        self._play(settings.SETTINGS.sound_successful_path or "")
 
     def fail(self):
-        self._play("unsuccessful")
+        self._play(settings.SETTINGS.sound_unsuccessful_path or "")
 
     def rented_card(self):
         if self.is_enabled_rented_card():
-            self._play("rented_card")
+            self._play(settings.SETTINGS.sound_rented_card_path or "")
 
     def enter_number(self):
-        self._play("enter_number")
+        self._play(settings.SETTINGS.sound_enter_number_path or "")

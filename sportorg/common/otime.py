@@ -1,6 +1,7 @@
 import datetime
 from enum import Enum
 from math import trunc
+from typing import Optional
 
 
 class TimeRounding(Enum):
@@ -50,17 +51,17 @@ class OTime:
         return self._args
 
     def __eq__(self, other):
-        if not other:
+        if not isinstance(other, OTime):
             return False
         return self.to_msec() == other.to_msec()
 
     def __gt__(self, other):
-        if not other:
+        if not isinstance(other, OTime):
             return True
         return self.to_msec() > other.to_msec()
 
     def __ge__(self, other):
-        if not other:
+        if not isinstance(other, OTime):
             return False
         return self.to_msec() >= other.to_msec()
 
@@ -84,6 +85,9 @@ class OTime:
 
     def __repr__(self):
         return self.__str__()
+
+    def __bool__(self):
+        return self.to_msec() != 0
 
     @classmethod
     def now(cls) -> "OTime":
@@ -135,7 +139,7 @@ class OTime:
         return ret
 
     @staticmethod
-    def if_none(val: int, default: int) -> int:
+    def if_none(val: Optional[int], default: int) -> int:
         return default if val is None else val
 
     def to_str(self, time_accuracy: int = 0) -> str:

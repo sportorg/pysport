@@ -20,7 +20,7 @@ class Singleton(type):
 
 
 def singleton(cls, *args, **kw):
-    """Singlton decorator.
+    """Singleton decorator.
 
     ```python
     @singleton

@@ -4,20 +4,31 @@ import os
 import webbrowser
 
 from docxtpl import DocxTemplate
-from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import (
-    QCheckBox,
-    QDialog,
-    QDialogButtonBox,
-    QFormLayout,
-    QLabel,
-    QPushButton,
-)
 
-from sportorg import config
+try:
+    from PySide6.QtGui import QIcon
+    from PySide6.QtWidgets import (
+        QCheckBox,
+        QDialog,
+        QDialogButtonBox,
+        QFormLayout,
+        QLabel,
+        QPushButton,
+    )
+except ModuleNotFoundError:
+    from PySide2.QtGui import QIcon
+    from PySide2.QtWidgets import (
+        QCheckBox,
+        QDialog,
+        QDialogButtonBox,
+        QFormLayout,
+        QLabel,
+        QPushButton,
+    )
+
+from sportorg import config, settings
 from sportorg.common.template import get_templates, get_text_from_file
 from sportorg.gui.dialogs.file_dialog import (
-    get_existing_directory,
     get_open_file_name,
     get_save_file_name,
 )
@@ -26,10 +37,7 @@ from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import translate
 from sportorg.models.constant import RentCards
 from sportorg.models.memory import get_current_race_index, race, races
-from sportorg.models.result.result_calculation import ResultCalculation
-from sportorg.models.result.score_calculation import ScoreCalculation
-from sportorg.models.result.split_calculation import RaceSplits
-from sportorg.modules.configs.configs import Config
+from sportorg.models.result.result_tools import recalculate_results
 
 _settings = {
     "last_template": None,
@@ -57,37 +65,13 @@ class ReportDialog(QDialog):
         self.layout = QFormLayout(self)
 
         self.label_template = QLabel(translate("Template"))
-        self.item_template = AdvComboBox()
+        self.item_template = AdvComboBox(min_width=250, min_context_length_symbols=60)
         self.item_template.addItems(
-            sorted(get_templates(config.template_dir("reports")))
+            sorted(get_templates(settings.template_dir("reports")))
         )
         self.layout.addRow(self.label_template, self.item_template)
         if _settings["last_template"]:
             self.item_template.setCurrentText(_settings["last_template"])
-
-        self.item_custom_dir = QPushButton(translate("Select the templates directory"))
-
-        def select_custom_dir() -> None:
-            dirpath = get_existing_directory(
-                translate("Open the templates directory"), config.template_dir()
-            )
-            if not dirpath:
-                return
-
-            self.item_custom_dirpath.setText(dirpath)
-            Config().templates.set("directory", dirpath)
-            config.set_template_dir(dirpath)
-            self.item_template.clear()
-            self.item_template.addItems(
-                sorted(get_templates(config.template_dir("reports")))
-            )
-
-        self.item_custom_dir.clicked.connect(select_custom_dir)
-        self.layout.addRow(self.item_custom_dir)
-
-        self.item_custom_dirpath = QLabel()
-        self.item_custom_dirpath.setText(config.template_dir())
-        self.layout.addRow(self.item_custom_dirpath)
 
         self.item_custom_path = QPushButton(translate("Choose template"))
 
@@ -123,7 +107,6 @@ class ReportDialog(QDialog):
             except FileNotFoundError as e:
                 logging.error(str(e))
             except Exception as e:
-                logging.error(str(e))
                 logging.exception(e)
             self.close()
 
@@ -150,9 +133,7 @@ class ReportDialog(QDialog):
         _settings["save_to_last_file"] = self.item_save_to_last_file.isChecked()
         _settings["selected"] = self.item_selected.isChecked()
 
-        ResultCalculation(obj).process_results()
-        RaceSplits(obj).generate()
-        ScoreCalculation(obj).calculate_scores()
+        recalculate_results(recheck_results=False)
 
         races_dict = []
         if _settings["selected"]:
@@ -229,6 +210,11 @@ class ReportDialog(QDialog):
         else:
             races_dict = [r.to_dict() for r in races()]
 
+        # Remove sensitive data
+        for race_data in races_dict:
+            if race_data:
+                race_data["settings"].pop("live_urls", None)
+
         template_path_items = template_path.split("/")[-1]
         template_path_items = ".".join(template_path_items.split(".")[:-1]).split("_")
 
@@ -240,7 +226,7 @@ class ReportDialog(QDialog):
 
         if template_path.endswith(".docx"):
             # DOCX template processing
-            full_path = config.template_dir() + template_path
+            full_path = settings.template_dir() + template_path
             doc = DocxTemplate(full_path)
             context = {}
             context["race"] = races_dict[get_current_race_index()]
@@ -262,6 +248,33 @@ class ReportDialog(QDialog):
                 doc.save(file_name)
                 os.startfile(file_name)
 
+        elif template_path.endswith(".csv"):
+            template = get_text_from_file(
+                template_path,
+                race=races_dict[get_current_race_index()],
+                races=races_dict,
+                rent_cards=list(RentCards().get()),
+                current_race=get_current_race_index(),
+                selected={"persons": []},  # leave here for back compatibility
+                settings=settings.SETTINGS.templates_settings,
+            )
+
+            if _settings["save_to_last_file"]:
+                file_name = _settings["last_file"]
+            else:
+                file_name = get_save_file_name(
+                    translate("Save As CSV file"),
+                    translate("CSV file (*.csv)"),
+                    "{}_{}".format(
+                        obj.data.get_start_datetime().strftime("%Y%m%d"), report_suffix
+                    ),
+                )
+            if len(file_name):
+                _settings["last_file"] = file_name
+                with codecs.open(file_name, "w", "utf-8") as file:
+                    file.write(template)
+                    file.close()
+
         else:
             template = get_text_from_file(
                 template_path,
@@ -270,6 +283,7 @@ class ReportDialog(QDialog):
                 rent_cards=list(RentCards().get()),
                 current_race=get_current_race_index(),
                 selected={"persons": []},  # leave here for back compatibility
+                settings=settings.SETTINGS.templates_settings,
             )
 
             if _settings["save_to_last_file"]:

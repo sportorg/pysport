@@ -1,14 +1,25 @@
 import logging
 
-from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import (
-    QDialog,
-    QDialogButtonBox,
-    QFormLayout,
-    QLabel,
-    QPushButton,
-    QTextEdit,
-)
+try:
+    from PySide6.QtGui import QIcon
+    from PySide6.QtWidgets import (
+        QDialog,
+        QDialogButtonBox,
+        QFormLayout,
+        QLabel,
+        QPushButton,
+        QTextEdit,
+    )
+except ModuleNotFoundError:
+    from PySide2.QtGui import QIcon
+    from PySide2.QtWidgets import (
+        QDialog,
+        QDialogButtonBox,
+        QFormLayout,
+        QLabel,
+        QPushButton,
+        QTextEdit,
+    )
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
@@ -58,6 +69,7 @@ class MarkedRouteDialog(QDialog):
         self.label_sample = QLabel("\n\n31,32\n33,34\n35,36\n37,38\n...")
         self.item_table = QTextEdit()
         self.item_table.setPlainText("")
+        self.item_table.setTabChangesFocus(True)
 
         self.layout.addRow(self.label_sample, self.item_table)
 

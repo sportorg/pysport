@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: SportOrg\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-04-12 11:13+0300\n"
-"PO-Revision-Date: 2023-12-17 19:16+0500\n"
+"PO-Revision-Date: 2025-05-13 15:25+0500\n"
 "Last-Translator: SportOrg\n"
 "Language-Team: SportOrg\n"
 "Language: ru_RU\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Loco-Source-Locale: ru_RU\n"
-"X-Generator: Poedit 3.4.1\n"
+"X-Generator: Poedit 3.4.4\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Loco-Parser: loco_parse_po\n"
 "X-Poedit-Basepath: ../../../sportorg\n"
@@ -114,6 +114,9 @@ msgstr "Фамилия"
 msgid "First name"
 msgstr "Имя"
 
+msgid "Birthday title"
+msgstr "Дата рожд."
+
 msgid "Birthday"
 msgstr "Дата рождения"
 
@@ -193,7 +196,7 @@ msgid "Secretary"
 msgstr "Главный секретарь"
 
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 msgid "Group properties"
 msgstr "Свойства группы"
@@ -261,8 +264,8 @@ msgstr "Включить"
 msgid "URL not valid"
 msgstr "URL недействителен"
 
-msgid "Import persons from table"
-msgstr "Импорт участников из таблицы"
+msgid "Import persons from table (clipboard)"
+msgstr "Импорт участников из таблицы (буфер обмена)"
 
 msgid "Set started numbers"
 msgstr "Ввод стартовавших участников"
@@ -282,14 +285,14 @@ msgstr "Диалог"
 msgid "Source number"
 msgstr "Исходный номер"
 
-msgid "Ivan Churakoff M21 11:09:00"
-msgstr ""
+msgid "Ivan Ivanov M21 11:09:00"
+msgstr "Иван Иванов М21 11:09:00"
 
 msgid "Target number"
 msgstr "Присваиваемый номер"
 
 msgid "Reserve M60 11:40:00"
-msgstr ""
+msgstr "Резерв М60 11:40:00"
 
 msgid "Remove source"
 msgstr "Удалять исходный номер"
@@ -400,7 +403,7 @@ msgid "Formula"
 msgstr "Формула"
 
 msgid "Limit per team"
-msgstr ""
+msgstr "Лимит по команде"
 
 msgid "Search"
 msgstr "Поиск"
@@ -525,6 +528,12 @@ msgstr "Протокол старта"
 msgid "Save to file"
 msgstr "Сохранить в файл"
 
+msgid "Control time change"
+msgstr "Смещение времени КП"
+
+msgid "Adjust the control time in read cards"
+msgstr "Смещение времени КП в считанных чипах"
+
 msgid "Start time change"
 msgstr "Смещение времени старта"
 
@@ -562,22 +571,22 @@ msgid "Client/Server"
 msgstr "Клиент/Сервер"
 
 msgid "Telegram"
-msgstr ""
+msgstr "Telegram"
 
 msgid "Chat id"
-msgstr ""
+msgstr "Chat id"
 
 msgid "Parse mode"
-msgstr ""
+msgstr "Разметки"
 
 msgid "Text"
-msgstr ""
+msgstr "Text"
 
 msgid "Markdown"
-msgstr ""
+msgstr "Markdown"
 
 msgid "HTML"
-msgstr ""
+msgstr "HTML"
 
 msgid "Penalty time"
 msgstr "Штраф, время"
@@ -872,6 +881,15 @@ msgstr "Открыть файл CSV Winorient"
 
 msgid "CSV Winorient (*.csv)"
 msgstr "Файл CSV Winorient (*.csv)"
+
+msgid "file SFRX"
+msgstr "Файл SFRX"
+
+msgid "Open SFRX file"
+msgstr "Открыть файл SFRX"
+
+msgid "SFRX (*.sfrx)"
+msgstr "Файл SFRX (*.sfrx)"
 
 msgid "Import error"
 msgstr "Ошибка импорта"
@@ -1323,6 +1341,9 @@ msgstr "Нац. код"
 msgid "Out of competition title"
 msgstr "В/К"
 
+msgid "Max time at"
+msgstr "Контр. время"
+
 msgid "Result count title"
 msgstr "Финиш"
 
@@ -1340,6 +1361,9 @@ msgstr "Мин. ГР"
 
 msgid "Max year title"
 msgstr "Макс. ГР"
+
+msgid "Max time title"
+msgstr "Контр. время"
 
 msgid "Start interval title"
 msgstr "Интервал"
@@ -1554,6 +1578,9 @@ msgstr "Онлайн"
 msgid "Save As MS Word file"
 msgstr "Сохранить в файл Word"
 
+msgid "Save As CSV file"
+msgstr "Сохранить в CSV-файл"
+
 msgid "SportOrg (*.json)"
 msgstr "Файл SportOrg (*.json)"
 
@@ -1701,6 +1728,12 @@ msgstr "Открыть файл финиша orgeo.ru, CSV (https://orgeo.ru/eve
 msgid "Miss penalty lap"
 msgstr "Пропущен штрафной круг"
 
+msgid "Templates directory"
+msgstr "Директория шаблонов"
+
+msgid "Download templates"
+msgstr "Загрузить шаблоны"
+
 msgid "Select the templates directory"
 msgstr "Выбрать директорию с шаблонами"
 
@@ -1709,3 +1742,25 @@ msgstr "Открыть директорию с шаблонами"
 
 msgid "Compress files to gzip"
 msgstr "Сохранять файлы в формате gzip"
+
+msgid ""
+"Download the zipped templates file — Source code (zip/tar.gz),\n"
+"then unzip it and choose your locale"
+msgstr ""
+"Загрузите заархивированный файл шаблонов — Source code (zip/tar.gz),\n"
+"затем распакуйте его и выберите свою локаль"
+
+msgid "Extract person middle name"
+msgstr "Извлечь отчество из имени"
+
+msgid "Middle name"
+msgstr "Отчество"
+
+msgid "Multi day issue"
+msgstr "Не все дни"
+
+msgid "in list"
+msgstr "в списке"
+
+msgid "Gzip compression"
+msgstr "Сжатие gzip"

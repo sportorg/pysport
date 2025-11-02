@@ -20,7 +20,7 @@ include_files = [
     config.STYLE_DIR,
     config.COMMIT_VERSION_FILE,
 ]
-includes = ["atexit", "codecs", "playsound", "pyImpinj"]
+includes = ["atexit", "codecs", "playsound3", "pyImpinj"]
 excludes = ["Tkinter", "unittest", "test", "pydoc"]
 
 build_exe_options = {

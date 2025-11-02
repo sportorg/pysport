@@ -4,7 +4,7 @@ from queue import Queue
 from threading import Thread
 
 try:
-    from playsound import playsound
+    from playsound3 import playsound
 except ModuleNotFoundError:
     playsound = None
 
@@ -61,5 +61,4 @@ class Audio:
             try:
                 play(sound)
             except Exception as e:
-                self._logger.error("Can not play {}".format(sound))
-                print(e)
+                self._logger.error("Can not play %s", sound)

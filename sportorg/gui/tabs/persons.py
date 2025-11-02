@@ -1,6 +1,9 @@
 import logging
 
-from PySide6 import QtWidgets
+try:
+    from PySide6 import QtWidgets
+except ModuleNotFoundError:
+    from PySide2 import QtWidgets
 
 from sportorg.gui.dialogs.person_edit import PersonEditDialog
 from sportorg.gui.global_access import GlobalAccess, NumberClicker
@@ -38,7 +41,7 @@ class Widget(QtWidgets.QWidget):
                 )
                 GlobalAccess().get_main_window().refresh()
         except Exception as e:
-            print(str(e))
+            logging.exception(str(e))
 
     def setup_ui(self):
         self.person_table.setObjectName("PersonTable")

@@ -2,21 +2,38 @@ import logging
 from abc import abstractmethod
 from datetime import datetime
 
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import (
-    QComboBox,
-    QDialog,
-    QDialogButtonBox,
-    QFormLayout,
-    QGroupBox,
-    QLabel,
-    QLineEdit,
-    QScrollArea,
-    QTextEdit,
-    QVBoxLayout,
-    QWidget,
-)
+try:
+    from PySide6.QtCore import Qt
+    from PySide6.QtGui import QIcon
+    from PySide6.QtWidgets import (
+        QComboBox,
+        QDialog,
+        QDialogButtonBox,
+        QFormLayout,
+        QGroupBox,
+        QLabel,
+        QLineEdit,
+        QScrollArea,
+        QTextEdit,
+        QVBoxLayout,
+        QWidget,
+    )
+except ModuleNotFoundError:
+    from PySide2.QtCore import Qt
+    from PySide2.QtGui import QIcon
+    from PySide2.QtWidgets import (
+        QComboBox,
+        QDialog,
+        QDialogButtonBox,
+        QFormLayout,
+        QGroupBox,
+        QLabel,
+        QLineEdit,
+        QScrollArea,
+        QTextEdit,
+        QVBoxLayout,
+        QWidget,
+    )
 
 from sportorg import config
 from sportorg.gui.dialogs.person_edit import PersonEditDialog
@@ -25,8 +42,8 @@ from sportorg.gui.utils.custom_controls import AdvComboBox, AdvSpinBox, AdvTimeE
 from sportorg.language import translate
 from sportorg.models.constant import StatusComments
 from sportorg.models.memory import Limit, Result, ResultStatus, Split, race
-from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.result_checker import ResultChecker, ResultCheckerException
+from sportorg.models.result.result_tools import recalculate_results
 from sportorg.models.result.split_calculation import GroupSplits
 from sportorg.modules.live.live import live_client
 from sportorg.modules.teamwork.teamwork import Teamwork
@@ -292,7 +309,8 @@ class ResultEditDialog(QDialog):
                     GroupSplits(race(), result.person.group).generate(True)
             except ResultCheckerException as e:
                 logging.error(str(e))
-        ResultCalculation(race()).process_results()
+        group = result.person.group if result.person else None
+        recalculate_results(recheck_results=False, group=group)
         live_client.send(result)
         Teamwork().send(result.to_dict())
 
@@ -344,7 +362,7 @@ class SplitsText(SplitsObject):
                         split.days = int(item[2])
                     splits.append(split)
                 else:
-                    logging.error('In "{}" no code and no time'.format(row))
+                    logging.error('In "%s" no code and no time', str(row))
             self._splits = splits
         else:
             self._splits = splits

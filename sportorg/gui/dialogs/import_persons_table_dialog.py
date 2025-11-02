@@ -1,15 +1,26 @@
 import logging
 from enum import Enum
 
-from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import (
-    QDialog,
-    QDialogButtonBox,
-    QFormLayout,
-    QTableWidget,
-    QTableWidgetItem,
-    QApplication,
-)
+try:
+    from PySide6.QtGui import QIcon
+    from PySide6.QtWidgets import (
+        QDialog,
+        QDialogButtonBox,
+        QFormLayout,
+        QTableWidget,
+        QTableWidgetItem,
+        QApplication,
+    )
+except ModuleNotFoundError:
+    from PySide2.QtGui import QIcon
+    from PySide2.QtWidgets import (
+        QDialog,
+        QDialogButtonBox,
+        QFormLayout,
+        QTableWidget,
+        QTableWidgetItem,
+        QApplication,
+    )
 
 from sportorg import config
 from sportorg.gui.dialogs.text_io import set_property
@@ -18,6 +29,7 @@ from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import translate
 from sportorg.models import memory
 from sportorg.models.memory import find, race
+from sportorg.utils.time import ddmmyyyy_to_time
 
 
 class ImportPersonsTableDialog(QDialog):
@@ -39,7 +51,9 @@ class ImportPersonsTableDialog(QDialog):
         TEAM = translate("Team")
         NAME = translate("First name")
         SURNAME = translate("Last name")
+        MIDDLE_NAME = translate("Middle name")
         YEAR = translate("Year of birth")
+        BIRTHDAY = translate("Birthday")
         COMMENT = translate("Comment")
         QUAL = translate("Qualification")
         CARD = translate("Card number")
@@ -55,7 +69,7 @@ class ImportPersonsTableDialog(QDialog):
         return super().exec_()
 
     def init_ui(self):
-        self.setWindowTitle(translate("Import persons from table"))
+        self.setWindowTitle(translate("Import persons from table (clipboard)"))
         self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(True)
         self.setModal(True)
@@ -68,7 +82,7 @@ class ImportPersonsTableDialog(QDialog):
 
         self.option_import = AdvComboBox()
         self.option_import.addItems(
-            [self.REPLACEMENT_BY_BIB, self.REPLACEMENT_BY_NAME, self.INSERT_NEW]
+            [self.INSERT_NEW, self.REPLACEMENT_BY_BIB, self.REPLACEMENT_BY_NAME]
         )
         self.layout.addRow(self.option_import)
 
@@ -77,10 +91,10 @@ class ImportPersonsTableDialog(QDialog):
         copied_values = self.parse_clipboard_value()
 
         self.count_rows = len(copied_values)
-        self.count_columns = len(copied_values[0])
+        self.count_columns = len(copied_values[0]) if len(copied_values) else 0
 
         self.persons_info_table = QTableWidget(self)
-        self.persons_info_table.setRowCount(self.count_rows)
+        self.persons_info_table.setRowCount(self.count_rows + 1)
         self.persons_info_table.setColumnCount(self.count_columns)
 
         for i in range(self.count_columns):
@@ -118,7 +132,7 @@ class ImportPersonsTableDialog(QDialog):
         self.show()
 
     def apply_changes_impl(self):
-        import_data(self)
+        self.import_data()
         return
 
     @staticmethod
@@ -129,154 +143,164 @@ class ImportPersonsTableDialog(QDialog):
             output_list.append(row.split("\t"))
         return output_list
 
+    def import_data(self):
+        obj = memory.race()
+        self.input_headers = {}
+        for i in range(self.count_columns):
+            item = self.persons_info_table.cellWidget(0, i)
+            self.input_headers[self.HEADER(item.currentText())] = i
 
-def import_data(self):
-    obj = memory.race()
-    self.input_headers = {}
-    for i in range(self.count_columns):
-        item = self.persons_info_table.cellWidget(0, i)
-        self.input_headers[self.HEADER(item.currentText())] = i
+        for i in range(1, self.count_rows + 1):
+            person: memory.Person = None
+            if self.option_import.currentText() == self.INSERT_NEW:
+                person = memory.Person()
 
-    for i in range(1, self.count_rows):
-        person = None
-        if self.option_import.currentText() == self.INSERT_NEW:
-            person = memory.Person()
+            if self.option_import.currentText() == self.REPLACEMENT_BY_BIB:
+                if self.HEADER.BIB not in self.input_headers:
+                    logging.error("{}".format(translate("Bib header not found")))
+                    break
+                bib = self.get_value_table(i, self.HEADER.BIB)
+                if not bib.isdigit():
+                    logging.error("{}".format(translate("Bib not found") + ":" + bib))
+                    continue
+                person = memory.race().find_person_by_bib(int(bib))
+                if person is None:
+                    logging.error("{}".format(translate("Bib not found") + ":" + bib))
+                    continue
 
-        if self.option_import.currentText() == self.REPLACEMENT_BY_BIB:
-            if self.HEADER.BIB not in self.input_headers:
-                logging.error("{}".format(translate("Bib header not found")))
-                break
-            bib = get_value_table(self, i, self.HEADER.BIB)
-            if not bib.isdigit():
-                logging.error("{}".format(translate("Bib not found") + ":" + bib))
-                continue
-            person = memory.race().find_person_by_bib(int(bib))
-            if person is None:
-                logging.error("{}".format(translate("Bib not found") + ":" + bib))
-                continue
+            if self.option_import.currentText() == self.REPLACEMENT_BY_NAME:
+                if (self.HEADER.NAME not in self.input_headers) or (
+                    self.HEADER.SURNAME not in self.input_headers
+                ):
+                    logging.error("{}".format(translate("Name header not found")))
+                    break
+                name = self.get_value_table(i, self.HEADER.NAME)
+                surname = self.get_value_table(i, self.HEADER.SURNAME)
+                person = find(race().persons, name=name, surname=surname)
+                if person is None:
+                    logging.error(
+                        "{}".format(
+                            translate("Person not found") + ":" + name + " " + surname
+                        )
+                    )
+                    continue
 
-        if self.option_import.currentText() == self.REPLACEMENT_BY_NAME:
-            if (self.HEADER.NAME not in self.input_headers) or (
-                self.HEADER.SURNAME not in self.input_headers
-            ):
-                logging.error("{}".format(translate("Name header not found")))
-                break
-            name = get_value_table(self, i, self.HEADER.NAME)
-            surname = get_value_table(self, i, self.HEADER.SURNAME)
-            person = find(race().persons, name=name, surname=surname)
-            if person is None:
-                logging.error(
-                    "{}".format(
-                        translate("Person not found") + ":" + name + " " + surname
+            if self.HEADER.NAME in self.input_headers:
+                person.name = self.get_value_table(i, self.HEADER.NAME)
+
+            if self.HEADER.SURNAME in self.input_headers:
+                person.surname = self.get_value_table(i, self.HEADER.SURNAME)
+
+            if self.HEADER.YEAR in self.input_headers:
+                year = self.get_value_table(i, self.HEADER.YEAR)
+                if year.isdigit():
+                    person.set_year(int(self.get_value_table(i, self.HEADER.YEAR)))
+
+            if self.HEADER.GROUP in self.input_headers:
+                group_name = self.get_value_table(i, self.HEADER.GROUP)
+                group = memory.find(obj.groups, name=group_name)
+                if group is None:
+                    group = memory.Group()
+                    group.name = group_name
+                    group.long_name = group_name
+                    obj.groups.append(group)
+                person.group = group
+
+            if self.HEADER.TEAM in self.input_headers:
+                team_name = self.get_value_table(i, self.HEADER.TEAM)
+                org = memory.find(obj.organizations, name=team_name)
+                if org is None:
+                    org = memory.Organization()
+                    org.name = team_name
+                    obj.organizations.append(org)
+                person.organization = org
+
+            if self.HEADER.BIB in self.input_headers:
+                bib = self.get_value_table(i, self.HEADER.BIB)
+                if bib != "":
+                    set_property(person, self.HEADER.BIB.value, bib)
+
+            if self.HEADER.CARD in self.input_headers:
+                card = self.get_value_table(i, self.HEADER.CARD)
+                if card != "":
+                    set_property(person, self.HEADER.CARD.value, card)
+
+            if self.HEADER.QUAL in self.input_headers:
+                qual = self.get_value_table(i, self.HEADER.QUAL)
+                if qual != "":
+                    set_property(person, self.HEADER.QUAL.value, qual)
+
+            if self.HEADER.COMMENT in self.input_headers:
+                set_property(
+                    person,
+                    self.HEADER.COMMENT.value,
+                    self.get_value_table(i, self.HEADER.COMMENT),
+                )
+
+            if self.HEADER.START in self.input_headers:
+                set_property(
+                    person,
+                    self.HEADER.START.value,
+                    self.get_value_table(i, self.HEADER.START),
+                )
+
+            if self.HEADER.FINISH in self.input_headers:
+                set_property(
+                    person,
+                    self.HEADER.FINISH.value,
+                    self.get_value_table(i, self.HEADER.FINISH),
+                )
+
+            if self.HEADER.START_GROUP in self.input_headers:
+                set_property(
+                    person,
+                    self.HEADER.START_GROUP.value,
+                    self.get_value_table(i, self.HEADER.START_GROUP),
+                )
+
+            if self.HEADER.MIDDLE_NAME in self.input_headers:
+                person.middle_name = self.get_value_table(i, self.HEADER.MIDDLE_NAME)
+
+            if self.HEADER.BIRTHDAY in self.input_headers:
+                birthday = self.get_value_table(i, self.HEADER.BIRTHDAY)
+                if birthday != "":
+                    person.birth_date = ddmmyyyy_to_time(birthday)
+
+            if self.option_import.currentText() == self.INSERT_NEW and person:
+                obj.persons.append(person)
+
+        persons_dupl_cards = obj.get_duplicate_card_numbers()
+        persons_dupl_names = obj.get_duplicate_names()
+
+        if len(persons_dupl_cards):
+            logging.info(
+                "{}".format(
+                    translate("Duplicate card numbers (card numbers are reset)")
+                )
+            )
+            for person in sorted(persons_dupl_cards, key=lambda x: x.card_number):
+                logging.info(
+                    "{} {} {} {}".format(
+                        person.full_name,
+                        person.group.name if person.group else "",
+                        person.organization.name if person.organization else "",
+                        person.card_number,
                     )
                 )
-                continue
+                person.set_card_number(0)
+        if len(persons_dupl_names):
+            logging.info("{}".format(translate("Duplicate names")))
+            for person in sorted(persons_dupl_names, key=lambda x: x.full_name):
+                logging.info(
+                    "{} {} {} {}".format(
+                        person.full_name,
+                        person.get_year(),
+                        person.group.name if person.group else "",
+                        person.organization.name if person.organization else "",
+                    )
+                )
 
-        if self.HEADER.NAME in self.input_headers:
-            person.name = get_value_table(self, i, self.HEADER.NAME)
-
-        if self.HEADER.SURNAME in self.input_headers:
-            person.surname = get_value_table(self, i, self.HEADER.SURNAME)
-
-        if self.HEADER.YEAR in self.input_headers:
-            year = get_value_table(self, i, self.HEADER.YEAR)
-            if year.isdigit():
-                person.set_year(int(get_value_table(self, i, self.HEADER.YEAR)))
-
-        if self.HEADER.GROUP in self.input_headers:
-            group_name = get_value_table(self, i, self.HEADER.GROUP)
-            group = memory.find(obj.groups, name=group_name)
-            if group is None:
-                group = memory.Group()
-                group.name = group_name
-                group.long_name = group_name
-                obj.groups.append(group)
-            person.group = group
-
-        if self.HEADER.TEAM in self.input_headers:
-            team_name = get_value_table(self, i, self.HEADER.TEAM)
-            org = memory.find(obj.organizations, name=team_name)
-            if org is None:
-                org = memory.Organization()
-                org.name = team_name
-                obj.organizations.append(org)
-            person.organization = org
-
-        if self.HEADER.BIB in self.input_headers:
-            bib = get_value_table(self, i, self.HEADER.BIB)
-            if bib != "":
-                set_property(person, self.HEADER.BIB.value, bib)
-
-        if self.HEADER.CARD in self.input_headers:
-            card = get_value_table(self, i, self.HEADER.CARD)
-            if card != "":
-                set_property(person, self.HEADER.CARD.value, card)
-
-        if self.HEADER.QUAL in self.input_headers:
-            qual = get_value_table(self, i, self.HEADER.QUAL)
-            if qual != "":
-                set_property(person, self.HEADER.QUAL.value, qual)
-
-        if self.HEADER.COMMENT in self.input_headers:
-            set_property(
-                person,
-                self.HEADER.COMMENT.value,
-                get_value_table(self, i, self.HEADER.COMMENT),
-            )
-
-        if self.HEADER.START in self.input_headers:
-            set_property(
-                person,
-                self.HEADER.START.value,
-                get_value_table(self, i, self.HEADER.START),
-            )
-
-        if self.HEADER.FINISH in self.input_headers:
-            set_property(
-                person,
-                self.HEADER.FINISH.value,
-                get_value_table(self, i, self.HEADER.FINISH),
-            )
-
-        if self.HEADER.START_GROUP in self.input_headers:
-            set_property(
-                person,
-                self.HEADER.START_GROUP.value,
-                get_value_table(self, i, self.HEADER.START_GROUP),
-            )
-
-        if self.option_import.currentText() == self.INSERT_NEW:
-            obj.persons.append(person)
-
-    persons_dupl_cards = obj.get_duplicate_card_numbers()
-    persons_dupl_names = obj.get_duplicate_names()
-
-    if len(persons_dupl_cards):
-        logging.info(
-            "{}".format(translate("Duplicate card numbers (card numbers are reset)"))
+    def get_value_table(self, idx, header):
+        return (
+            self.persons_info_table.item(idx, self.input_headers[header]).text().strip()
         )
-        for person in sorted(persons_dupl_cards, key=lambda x: x.card_number):
-            logging.info(
-                "{} {} {} {}".format(
-                    person.full_name,
-                    person.group.name if person.group else "",
-                    person.organization.name if person.organization else "",
-                    person.card_number,
-                )
-            )
-            person.set_card_number(0)
-    if len(persons_dupl_names):
-        logging.info("{}".format(translate("Duplicate names")))
-        for person in sorted(persons_dupl_names, key=lambda x: x.full_name):
-            logging.info(
-                "{} {} {} {}".format(
-                    person.full_name,
-                    person.get_year(),
-                    person.group.name if person.group else "",
-                    person.organization.name if person.organization else "",
-                )
-            )
-
-
-def get_value_table(self, idx, header):
-    return self.persons_info_table.item(idx, self.input_headers[header]).text().strip()

@@ -1,35 +1,19 @@
-import datetime
-import time
-from datetime import date
-from typing import Any
+try:
+    from PySide6.QtCore import QDate, QTime
+except ModuleNotFoundError:
+    from PySide2.QtCore import QDate, QTime
 
-from PySide6.QtCore import QDate, QTime
-
+from datetime import date, datetime, timedelta
 from sportorg.common.otime import OTime
 
 
-def timeit(method):
-    def timed(*args: Any, **kw: Any) -> Any:
-        ts = time.time()
-        result = method(*args, **kw)
-        te = time.time()
-        if "log_time" in kw:
-            name = kw.get("log_name", method.__name__.upper())
-            kw["log_time"][name] = int((te - ts) * 1000)
-        else:
-            print("%r  %2.2f ms" % (method.__name__, (te - ts) * 1000))
-        return result
-
-    return timed
-
-
 def time_to_otime(t) -> OTime:
-    if isinstance(t, datetime.datetime):
+    if isinstance(t, datetime):
         return OTime(0, t.hour, t.minute, t.second, round(t.microsecond / 1000))
     if isinstance(t, QTime):
         return OTime(0, t.hour(), t.minute(), t.second(), t.msec())
-    if isinstance(t, datetime.timedelta):
-        return time_to_otime(datetime.datetime(2000, 1, 1, 0, 0, 0) + t)
+    if isinstance(t, timedelta):
+        return time_to_otime(datetime(2000, 1, 1, 0, 0, 0) + t)
     if isinstance(t, OTime):
         return t
     return OTime()
@@ -45,11 +29,9 @@ def time_iof_to_otime(t) -> OTime:
     return OTime()
 
 
-def time_to_datetime(t) -> datetime.datetime:
+def time_to_datetime(t) -> datetime:
     otime = time_to_otime(t)
-    return datetime.datetime(
-        2000, 1, 1, otime.hour, otime.minute, otime.sec, otime.msec * 1000
-    )
+    return datetime(2000, 1, 1, otime.hour, otime.minute, otime.sec, otime.msec * 1000)
 
 
 def time_to_qtime(t) -> OTime:
@@ -59,11 +41,11 @@ def time_to_qtime(t) -> OTime:
     return time_
 
 
-def _int_to_time(value) -> datetime.datetime:
+def _int_to_time(value) -> datetime:
     """convert value from 1/100 s to time"""
 
-    today = datetime.datetime.now()
-    ret = datetime.datetime(
+    today = datetime.now()
+    ret = datetime(
         today.year,
         today.month,
         today.day,
@@ -100,6 +82,23 @@ def time_to_mmss(value):
 def time_to_hhmmss(value):
     time_ = time_to_datetime(value)
     return time_.strftime("%H:%M:%S")
+
+
+def date_to_yyyymmdd(value):
+    return value.strftime("%Y.%m.%d")
+
+
+def date_to_ddmmyyyy(value):
+    if value:
+        return value.strftime("%d.%m.%Y")
+    return ""
+
+
+def ddmmyyyy_to_time(value):
+    try:
+        return datetime.strptime(value, "%d.%m.%Y")
+    except (ValueError, TypeError):
+        return datetime(1900, 1, 1)
 
 
 def hhmmss_to_time(value):

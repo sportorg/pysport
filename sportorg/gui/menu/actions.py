@@ -4,24 +4,30 @@ import uuid
 from os import remove
 from typing import Any, Dict, Type
 
-from PySide6 import QtCore
-from PySide6.QtWidgets import QApplication, QMessageBox
+from sportorg.utils.text import detect_encoding
 
-from sportorg import config
+try:
+    from PySide6 import QtCore
+    from PySide6.QtWidgets import QApplication, QMessageBox
+except ModuleNotFoundError:
+    from PySide2 import QtCore
+    from PySide2.QtWidgets import QApplication, QMessageBox
+
+from sportorg import config, settings
 from sportorg.common.otime import OTime
 from sportorg.gui.dialogs.about import AboutDialog
+from sportorg.gui.dialogs.control_time_change_dialog import ControlTimeChangeDialog
 from sportorg.gui.dialogs.cp_delete import CPDeleteDialog
 from sportorg.gui.dialogs.entry_mass_edit import MassEditDialog
 from sportorg.gui.dialogs.event_properties import EventPropertiesDialog
 from sportorg.gui.dialogs.file_dialog import get_open_file_name, get_save_file_name
 from sportorg.gui.dialogs.filter_dialog import DialogFilter
 from sportorg.gui.dialogs.group_mass_edit import GroupMassEditDialog
+from sportorg.gui.dialogs.import_persons_table_dialog import ImportPersonsTableDialog
 from sportorg.gui.dialogs.live_dialog import LiveDialog
 from sportorg.gui.dialogs.marked_route_dialog import MarkedRouteDialog
 from sportorg.gui.dialogs.merge_results import MergeResultsDialog
 from sportorg.gui.dialogs.not_start_dialog import InputStartNumbersDialog
-from sportorg.gui.dialogs.import_persons_table_dialog import ImportPersonsTableDialog
-from sportorg.gui.dialogs.number_change import NumberChangeDialog
 from sportorg.gui.dialogs.organization_mass_edit import OrganizationMassEditDialog
 from sportorg.gui.dialogs.print_properties import PrintPropertiesDialog
 from sportorg.gui.dialogs.relay_clone_dialog import RelayCloneDialog
@@ -45,10 +51,11 @@ from sportorg.gui.dialogs.timekeeping_properties import TimekeepingPropertiesDia
 from sportorg.gui.menu.action import Action
 from sportorg.gui.utils.custom_controls import messageBoxQuestion
 from sportorg.language import translate
+from sportorg.libs.sfr import sfrximporter
 from sportorg.libs.winorient.wdb import write_wdb
 from sportorg.models.memory import ResultManual, ResultStatus, race
-from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.models.result.result_checker import ResultChecker
+from sportorg.models.result.result_tools import recalculate_results
 from sportorg.models.start.start_preparation import (
     copy_bib_to_card_number,
     copy_card_number_to_bib,
@@ -56,7 +63,6 @@ from sportorg.models.start.start_preparation import (
 )
 from sportorg.modules.backup.file import is_gzip_file
 from sportorg.modules.backup.json import get_races_from_file
-from sportorg.modules.configs.configs import Config
 from sportorg.modules.iof import iof_xml
 from sportorg.modules.live.live import live_client
 from sportorg.modules.ocad import ocad
@@ -162,6 +168,24 @@ class CSVWinorientImportAction(Action, metaclass=ActionFactory):
                 winorient.import_csv(file_name)
             except Exception as e:
                 logging.error(str(e))
+                QMessageBox.warning(
+                    self.app,
+                    translate("Error"),
+                    translate("Import error") + ": " + file_name,
+                )
+            self.app.init_model()
+
+
+class SFRXImportAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        file_name = get_open_file_name(
+            translate("Open SFRX file"), translate("SFRX (*.sfrx)")
+        )
+        if file_name:
+            try:
+                sfrximporter.import_sfrx(file_name)
+            except Exception as e:
+                logging.exception(e)
                 QMessageBox.warning(
                     self.app,
                     translate("Error"),
@@ -361,7 +385,10 @@ class RecoverySportorgHtmlAction(Action, metaclass=ActionFactory):
             False,
         )
         tmp_filename = recovery_sportorg_html.recovery(file_name)
-        with open(tmp_filename) as f:
+        if tmp_filename == "":
+            return
+        encoding = detect_encoding(tmp_filename)
+        with open(tmp_filename, encoding=encoding) as f:
             attr = get_races_from_file(f)
         SportOrgImportDialog(*attr).exec_()
         remove(tmp_filename)
@@ -488,6 +515,11 @@ class ToTeamsAction(Action, metaclass=ActionFactory):
         self.app.select_tab(4)
 
 
+class ToLogsAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        self.app.select_tab(5)
+
+
 class StartPreparationAction(Action, metaclass=ActionFactory):
     def execute(self):
         StartPreparationDialog().exec_()
@@ -515,12 +547,6 @@ class RelayNumberAction(Action, metaclass=ActionFactory):
             self.app.relay_number_assign = True
             QApplication.setOverrideCursor(QtCore.Qt.PointingHandCursor)
             RelayNumberDialog().exec_()
-        self.app.refresh()
-
-
-class NumberChangeAction(Action, metaclass=ActionFactory):
-    def execute(self):
-        NumberChangeDialog().exec_()
         self.app.refresh()
 
 
@@ -567,9 +593,9 @@ class CopyCardNumberToBib(Action, metaclass=ActionFactory):
 class ManualFinishAction(Action, metaclass=ActionFactory):
     def execute(self):
         result = race().new_result(ResultManual)
+        race().add_new_result(result)
         Teamwork().send(result.to_dict())
         live_client.send(result)
-        race().add_new_result(result)
         logging.info(translate("Manual finish"))
         self.app.refresh()
 
@@ -621,8 +647,7 @@ class SplitPrintoutAction(Action, metaclass=ActionFactory):
 
 class RecheckingAction(Action, metaclass=ActionFactory):
     def execute(self):
-        ResultChecker.check_all()
-        ResultCalculation(race()).process_results()
+        recalculate_results()
         race().rebuild_indexes()
         self.app.refresh()
 
@@ -654,7 +679,7 @@ class PenaltyCalculationAction(Action, metaclass=ActionFactory):
             if result.person:
                 ResultChecker.checking(result)
         logging.debug("Penalty calculation finish")
-        ResultCalculation(race()).process_results()
+        recalculate_results(recheck_results=False)
         self.app.refresh()
 
 
@@ -665,7 +690,7 @@ class PenaltyRemovingAction(Action, metaclass=ActionFactory):
             result.penalty_time = OTime(msec=0)
             result.penalty_laps = 0
         logging.debug("Penalty removing finish")
-        ResultCalculation(race()).process_results()
+        recalculate_results(recheck_results=False)
         self.app.refresh()
 
 
@@ -713,6 +738,12 @@ class SetDNSNumbersAction(Action, metaclass=ActionFactory):
 class ImportPersonsAction(Action, metaclass=ActionFactory):
     def execute(self):
         ImportPersonsTableDialog().exec_()
+        self.app.refresh()
+
+
+class ControlTimeChangeAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        ControlTimeChangeDialog().exec_()
         self.app.refresh()
 
 
@@ -907,8 +938,8 @@ class ImportSportOrgAction(Action, metaclass=ActionFactory):
 
         # if user set UTF-8 usage, first try to open file in UTF-8,
         # then in system locale (1251 for RU Windows)
-        use_utf8 = Config().configuration.get("save_in_utf8", False)
-        use_gzip = Config().configuration.get("save_in_gzip", False)
+        use_utf8 = settings.SETTINGS.file_save_in_utf8
+        use_gzip = settings.SETTINGS.file_save_in_gzip
 
         if mode == "r":
             use_gzip = is_gzip_file(file_name)
@@ -941,4 +972,11 @@ class RentCardsAction(Action, metaclass=ActionFactory):
 class MarkedRouteCourseGeneration(Action, metaclass=ActionFactory):
     def execute(self):
         MarkedRouteDialog().exec_()
+        self.app.refresh()
+
+
+class ExtractPersonMiddleName(Action, metaclass=ActionFactory):
+    def execute(self):
+        for person in race().persons:
+            person.extract_middle_name()
         self.app.refresh()

@@ -1,4 +1,6 @@
+import base64
 import datetime
+import gzip
 import locale
 
 import dateutil.parser
@@ -44,10 +46,15 @@ def get_text_from_path(path, **kwargs):
     return template.render(**kwargs)
 
 
+def compress(data: str) -> str:
+    return base64.b64encode(gzip.compress(data.encode())).decode()
+
+
 def get_text_from_template(searchpath: str, path: str, **kwargs):
     env = Environment(loader=FileSystemLoader(searchpath), finalize=finalize)
     env.filters["tohhmmss"] = to_hhmmss
     env.filters["date"] = date
+    env.filters["compress"] = compress
     env.policies["json.dumps_kwargs"]["ensure_ascii"] = False
     template = env.get_template(path)
 

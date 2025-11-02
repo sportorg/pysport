@@ -1,7 +1,11 @@
 import logging
 
-from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import QDialog, QDialogButtonBox, QFormLayout, QLabel
+try:
+    from PySide6.QtGui import QIcon
+    from PySide6.QtWidgets import QDialog, QDialogButtonBox, QFormLayout, QLabel
+except ModuleNotFoundError:
+    from PySide2.QtGui import QIcon
+    from PySide2.QtWidgets import QDialog, QDialogButtonBox, QFormLayout, QLabel
 
 from sportorg import config
 from sportorg.common.otime import OTime
@@ -9,10 +13,7 @@ from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvSpinBox, AdvTimeEdit
 from sportorg.language import translate
 from sportorg.models.memory import ResultSportident, Split, race
-from sportorg.models.result.result_calculation import ResultCalculation
-from sportorg.models.result.result_checker import ResultChecker
-from sportorg.models.result.score_calculation import ScoreCalculation
-from sportorg.models.result.split_calculation import RaceSplits
+from sportorg.models.result.result_tools import recalculate_results
 
 
 class MergeResultsDialog(QDialog):
@@ -111,7 +112,7 @@ class MergeResultsDialog(QDialog):
                     cur_cp += cp_increment
                 else:
                     logging.debug(
-                        "skip time: " + str(i.finish_time) + " for bib " + str(cur_bib)
+                        "skip time: %s for bib %s", str(i.finish_time), str(cur_bib)
                     )
 
             # append splits from existing objects
@@ -126,7 +127,4 @@ class MergeResultsDialog(QDialog):
             final_result.finish_time = final_result.splits[-1].time
             obj.results.append(final_result)
 
-        ResultChecker.check_all()
-        ResultCalculation(obj).process_results()
-        RaceSplits(obj).generate()
-        ScoreCalculation(obj).calculate_scores()
+        recalculate_results(race_object=obj)

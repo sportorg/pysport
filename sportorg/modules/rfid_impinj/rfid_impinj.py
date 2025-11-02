@@ -7,7 +7,11 @@ from threading import Event, main_thread
 from time import sleep
 
 import serial
-from PySide6.QtCore import QThread, Signal
+
+try:
+    from PySide6.QtCore import QThread, Signal
+except ModuleNotFoundError:
+    from PySide2.QtCore import QThread, Signal
 
 try:
     from pyImpinj import ImpinjR2KReader
@@ -51,7 +55,7 @@ class ImpinjThread(QThread):
             try:
                 impinj_reader.connect(self.port)
             except BaseException as err:
-                print(err)
+                logging.exception(str(err))
                 return
 
             impinj_reader.worker_start()

@@ -1,22 +1,34 @@
 import logging
 
-from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import (
-    QDateTimeEdit,
-    QDialog,
-    QDialogButtonBox,
-    QFormLayout,
-    QLabel,
-    QLineEdit,
-    QTextEdit,
-)
+try:
+    from PySide6.QtGui import QIcon
+    from PySide6.QtWidgets import (
+        QDateTimeEdit,
+        QDialog,
+        QDialogButtonBox,
+        QFormLayout,
+        QLabel,
+        QLineEdit,
+        QTextEdit,
+    )
+except ModuleNotFoundError:
+    from PySide2.QtGui import QIcon
+    from PySide2.QtWidgets import (
+        QDateTimeEdit,
+        QDialog,
+        QDialogButtonBox,
+        QFormLayout,
+        QLabel,
+        QLineEdit,
+        QTextEdit,
+    )
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox, AdvSpinBox
 from sportorg.language import translate
 from sportorg.models.memory import RaceType, race
-from sportorg.models.result.result_calculation import ResultCalculation
+from sportorg.models.result.result_tools import recalculate_results
 
 
 class EventPropertiesDialog(QDialog):
@@ -43,6 +55,7 @@ class EventPropertiesDialog(QDialog):
         self.label_sub_title = QLabel(translate("Sub title"))
         self.item_sub_title = QTextEdit()
         self.item_sub_title.setMaximumHeight(100)
+        self.item_sub_title.setTabChangesFocus(True)
         self.layout.addRow(self.label_sub_title, self.item_sub_title)
 
         self.label_start_date = QLabel(translate("Start date"))
@@ -152,6 +165,6 @@ class EventPropertiesDialog(QDialog):
 
         obj.set_setting("system_zero_time", (start_date.hour, start_date.minute, 0))
 
-        ResultCalculation(race()).process_results()
+        recalculate_results()
         GlobalAccess().get_main_window().set_title()
         GlobalAccess().get_main_window().refresh()

@@ -8,7 +8,12 @@ from queue import Empty, Queue
 from threading import Event, main_thread
 
 import serial
-from PySide6.QtCore import QThread, Signal
+
+try:
+    from PySide6.QtCore import QThread, Signal
+except ModuleNotFoundError:
+    from PySide2.QtCore import QThread, Signal
+
 from sportident import (
     SIReader,
     SIReaderCardChanged,
@@ -23,6 +28,7 @@ from sportorg.language import translate
 from sportorg.models import memory
 from sportorg.modules.sportident import backup
 from sportorg.utils.time import time_to_otime
+from serial.tools import list_ports
 
 
 class SIReaderCommand:
@@ -259,26 +265,7 @@ class SIReaderClient:
 
     @staticmethod
     def get_ports():
-        ports = []
-        scan_ports = []
-        if platform.system() == "Linux":
-            scan_ports = [
-                os.path.join("/dev", f)
-                for f in os.listdir("/dev")
-                if re.match("ttyS.*|ttyUSB.*", f)
-            ]
-        elif platform.system() == "Windows":
-            scan_ports = ["COM" + str(i) for i in range(48)]
-
-        for p in scan_ports:
-            try:
-                com = serial.Serial(p, 38400, timeout=5)
-                com.close()
-                ports.append(p)
-            except serial.SerialException:
-                continue
-
-        return ports
+        return [port.device for port in list_ports.comports()]
 
     def choose_port(self):
         si_port = memory.race().get_setting("system_port", "")

@@ -18,6 +18,7 @@ def parse(file):
         IOFParseResult("EntryList", entry_list(tree, ns)),
         IOFParseResult("StartList", start_list(tree, ns)),
         IOFParseResult("CourseData", course_data(tree, ns)),
+        IOFParseResult("VariationData", variation_data(tree, ns)),
         IOFParseResult("ResultList", result_list(tree, ns)),
         IOFParseResult("Event", event(tree, ns)),
     ]
@@ -42,7 +43,9 @@ def course_data(tree, ns):
             course = {
                 "name": course_el.find("iof:Name", ns).text,
                 "length": int(course_el.find("iof:Length", ns).text),
-                "climb": int(course_el.find("iof:Climb", ns).text),
+                "climb": int(course_el.find("iof:Climb", ns).text)
+                if course_el.find("iof:Climb", ns)
+                else 0,
                 "controls": [],
             }
 
@@ -89,6 +92,38 @@ def course_data(tree, ns):
             courses.append(course)
 
     return courses
+
+
+def variation_data(tree, ns):
+    root = tree.getroot()
+    if "CourseData" not in root.tag:
+        return
+    teams = []
+
+    version = "0"
+    if "iofVersion" in root.attrib:
+        version = root.attrib["iofVersion"][0]
+    elif root.find("IOFVersion") is not None:
+        version = root.find("IOFVersion").attrib["version"][0]
+
+    if version == "3":
+        # TeamCourseAssignment - variations for relays
+        for team_el in root.find("iof:RaceCourseData", ns).findall(
+            "iof:TeamCourseAssignment", ns
+        ):
+            team = {
+                "bib_number": int(team_el.find("iof:BibNumber", ns).text),
+                "legs": [],
+            }
+            for leg_el in team_el.findall("iof:TeamMemberCourseAssignment", ns):
+                leg = {
+                    "leg_number": leg_el.find("iof:Leg", ns).text,
+                    "course_name": leg_el.find("iof:CourseName", ns).text,
+                }
+                team["legs"].append(leg)
+            teams.append(team)
+
+    return teams
 
 
 def entry_list(tree, ns):

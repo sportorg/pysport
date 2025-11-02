@@ -1,10 +1,27 @@
 import logging
 
-from PySide6 import QtCore
-from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import QDialog, QDialogButtonBox, QFormLayout, QLabel, QTextEdit
+try:
+    from PySide6 import QtCore
+    from PySide6.QtGui import QIcon
+    from PySide6.QtWidgets import (
+        QDialog,
+        QDialogButtonBox,
+        QFormLayout,
+        QLabel,
+        QTextEdit,
+    )
+except ModuleNotFoundError:
+    from PySide2 import QtCore
+    from PySide2.QtGui import QIcon
+    from PySide2.QtWidgets import (
+        QDialog,
+        QDialogButtonBox,
+        QFormLayout,
+        QLabel,
+        QTextEdit,
+    )
 
-from sportorg import config
+from sportorg import config, settings
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import translate
 from sportorg.models.constant import RentCards
@@ -31,6 +48,7 @@ class RentCardsDialog(QDialog):
         )
         self.item_cards = QTextEdit()
         self.item_cards.setPlainText(RentCards().to_text())
+        self.item_cards.setTabChangesFocus(True)
 
         self.layout.addRow(self.label_cards, self.item_cards)
 
@@ -60,5 +78,5 @@ class RentCardsDialog(QDialog):
     def apply_changes_impl(self):
         text = self.item_cards.toPlainText()
         RentCards().set_from_text(text)
-        with open(config.data_dir("rent_cards.txt"), "w", encoding="utf-8") as f:
+        with open(settings.SETTINGS.source_rent_cards_path, "w", encoding="utf-8") as f:
             f.write(RentCards().to_text())

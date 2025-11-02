@@ -1,24 +1,32 @@
 import logging
 
-from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import (
-    QCheckBox,
-    QDialog,
-    QDialogButtonBox,
-    QFormLayout,
-    QLabel,
-    QTextEdit,
-)
+try:
+    from PySide6.QtGui import QIcon
+    from PySide6.QtWidgets import (
+        QCheckBox,
+        QDialog,
+        QDialogButtonBox,
+        QFormLayout,
+        QLabel,
+        QTextEdit,
+    )
+except ModuleNotFoundError:
+    from PySide2.QtGui import QIcon
+    from PySide2.QtWidgets import (
+        QCheckBox,
+        QDialog,
+        QDialogButtonBox,
+        QFormLayout,
+        QLabel,
+        QTextEdit,
+    )
 
 from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvSpinBox
 from sportorg.language import translate
 from sportorg.models.memory import race
-from sportorg.models.result.result_calculation import ResultCalculation
-from sportorg.models.result.result_checker import ResultChecker
-from sportorg.models.result.score_calculation import ScoreCalculation
-from sportorg.models.result.split_calculation import RaceSplits
+from sportorg.models.result.result_tools import recalculate_results
 
 
 class CPDeleteDialog(QDialog):
@@ -134,7 +142,7 @@ class CPDeleteDialog(QDialog):
                     if str(number) == control.code:
                         if i < len(course.controls) - 1:
                             course.controls[i + 1].length += control.length
-                        logging.info("Del {} from {}".format(number, course.name))
+                        logging.info("Del %s from %s", str(number), str(course.name))
                     else:
                         controls.append(control)
                 course.controls = controls
@@ -147,16 +155,13 @@ class CPDeleteDialog(QDialog):
                 for split in result.splits:
                     if str(number) == str(split.code):
                         logging.info(
-                            "Del {} from {} {}".format(
-                                number, result.card_number, split.time
-                            )
+                            "Del %s from %s %s",
+                            str(number),
+                            str(result.card_number),
+                            str(split.time),
                         )
                     else:
                         splits.append(split)
                 result.splits = splits
 
-        obj.clear_results()
-        ResultChecker.check_all()
-        ResultCalculation(obj).process_results()
-        RaceSplits(obj).generate()
-        ScoreCalculation(obj).calculate_scores()
+        recalculate_results(race_object=obj)

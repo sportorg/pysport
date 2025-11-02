@@ -1,6 +1,9 @@
-from PySide6 import QtCore, QtGui, QtWidgets
+try:
+    from PySide6 import QtCore, QtGui, QtWidgets
+except ModuleNotFoundError:
+    from PySide2 import QtCore, QtGui, QtWidgets
 
-from sportorg.modules.configs.configs import Config as Configuration
+from sportorg import settings
 
 
 class Widget(QtWidgets.QWidget):
@@ -20,9 +23,7 @@ class Widget(QtWidgets.QWidget):
         self.textEdit = QtWidgets.QPlainTextEdit(self)
         self.textEdit.setLineWrapMode(QtWidgets.QPlainTextEdit.NoWrap)
         self.textEdit.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
-        self.textEdit.setMaximumBlockCount(
-            Configuration().configuration.get("log_window_row_count")
-        )
+        self.textEdit.setMaximumBlockCount(settings.SETTINGS.logging_window_row_count)
         self.layout.addWidget(self.textEdit)
 
     def write(self, s):

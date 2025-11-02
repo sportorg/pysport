@@ -1,13 +1,23 @@
 import logging
 
-from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import (
-    QDialog,
-    QDialogButtonBox,
-    QFormLayout,
-    QLabel,
-    QRadioButton,
-)
+try:
+    from PySide6.QtGui import QIcon
+    from PySide6.QtWidgets import (
+        QDialog,
+        QDialogButtonBox,
+        QFormLayout,
+        QLabel,
+        QRadioButton,
+    )
+except ModuleNotFoundError:
+    from PySide2.QtGui import QIcon
+    from PySide2.QtWidgets import (
+        QDialog,
+        QDialogButtonBox,
+        QFormLayout,
+        QLabel,
+        QRadioButton,
+    )
 
 from sportorg import config
 from sportorg.common.otime import OTime
@@ -73,7 +83,6 @@ class StartHandicapDialog(QDialog):
             try:
                 self.apply_changes_impl()
             except Exception as e:
-                logging.error(str(e))
                 logging.exception(e)
             self.close()
 

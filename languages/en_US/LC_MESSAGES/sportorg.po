@@ -26,6 +26,9 @@ msgstr "Qual"
 msgid "Year title"
 msgstr "Year"
 
+msgid "Birthday title"
+msgstr "Birthday"
+
 msgid "Card title"
 msgstr "Card"
 
@@ -55,6 +58,9 @@ msgstr "Min year"
 
 msgid "Max year title"
 msgstr "Max year"
+
+msgid "Max time title"
+msgstr "Max time"
 
 msgid "Start interval title"
 msgstr "Start interval"

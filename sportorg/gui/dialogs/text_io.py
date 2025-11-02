@@ -1,12 +1,33 @@
 import logging
 
-from PySide6 import QtCore, QtWidgets
-from PySide6.QtWidgets import QCheckBox, QDialog, QDialogButtonBox, QVBoxLayout, QWidget
+try:
+    from PySide6 import QtCore, QtWidgets
+    from PySide6.QtWidgets import (
+        QCheckBox,
+        QDialog,
+        QDialogButtonBox,
+        QVBoxLayout,
+        QWidget,
+    )
+except ModuleNotFoundError:
+    from PySide2 import QtCore, QtWidgets
+    from PySide2.QtWidgets import (
+        QCheckBox,
+        QDialog,
+        QDialogButtonBox,
+        QVBoxLayout,
+        QWidget,
+    )
 
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.language import translate
 from sportorg.models.memory import Qualification, ResultManual, race
-from sportorg.utils.time import hhmmss_to_time, time_to_hhmmss
+from sportorg.utils.time import (
+    hhmmss_to_time,
+    time_to_hhmmss,
+    date_to_ddmmyyyy,
+    ddmmyyyy_to_time,
+)
 
 
 def get_value_options():
@@ -26,6 +47,8 @@ def get_value_options():
         translate("Start group"),
         translate("IOF id"),
         translate("National id"),
+        translate("Middle name"),
+        translate("Birthday"),
     ]
 
 
@@ -231,15 +254,15 @@ class TextExchangeDialog(QDialog):
                             )
                             success_count += 1
                         else:
-                            logging.debug("text_io: no person found for line " + i)
+                            logging.debug(
+                                "text_io: no person found for line %s", str(i)
+                            )
                     else:
-                        logging.debug("text_io: empty value for line " + i)
+                        logging.debug("text_io: empty value for line %s", str(i))
             logging.debug(
-                "text_io: processed "
-                + str(success_count)
-                + " from "
-                + str(len(lines))
-                + " lines"
+                "text_io: processed %s from %s lines",
+                str(success_count),
+                str(len(lines)),
             )
         except Exception as e:
             logging.error(e)
@@ -331,7 +354,10 @@ def get_property(person, key):
         return str(person.national_code)
     elif key == translate("Start group"):
         return str(person.start_group)
-
+    elif key == translate("Middle name"):
+        return str(person.middle_name)
+    elif key == translate("Birthday"):
+        return str(date_to_ddmmyyyy(person.birth_date))
     return ""
 
 
@@ -396,3 +422,7 @@ def set_property(person, key, value, **options):
     elif key == translate("Start group"):
         if str(value).isdigit():
             person.start_group = int(value)
+    elif key == translate("Middle name"):
+        person.middle_name = str(value)
+    elif key == translate("Birthday"):
+        person.birth_date = ddmmyyyy_to_time(str(value))

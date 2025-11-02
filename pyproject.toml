@@ -1,51 +1,55 @@
-[tool.poetry]
+[project]
 name = "sportorg"
 version = "1.7.1"
 description = "SportOrg, python, sportident, orienteering"
-authors = ["Danil Akhtarov <daxartio@gmail.com>"]
+authors = [{ name = "Danil Akhtarov", email = "daxartio@gmail.com" }]
+requires-python = ">=3.8.1,<=3.14"
+dependencies = [
+  "aiohttp>=3.9.0,<4",
+  "boltons>=20,<21",
+  "chardet>=5.2.0,<6",
+  "docxtpl>=0,<1",
+  "jinja2>=3,<4",
+  "orjson>=3.9.5,<4",
+  "playsound3>=3,<4",
+  "polib>=1,<2",
+  "psutil>=7,<8",
+  "PySide6>=6,<7",
+  "python-dateutil>=2,<3",
+  "pywinusb>=0,<1",
+  "requests>=2,<3",
+  "sportident>=1,<2",
+]
 
-[tool.poetry.dependencies]
-python = "~3.8.1"
-pywin32 = {version="^228", optional = true}
-pyImpinj = {version="^1.2", optional = true}
-playsound = {version="=1.2.2", optional = true}
-aiohttp = "^3.9.0"
-boltons = "^20"
-chardet = "^5.2.0"
-docxtpl = "^0"
-jinja2 = "^2"
-markupsafe = "2.0.1"
-orjson = "^3.9.5"
-polib = "^1"
-psutil = "^5.9.5"
-PySide6 = "^6"
-python-dateutil = "^2"
-pywinusb = "^0"
-requests = "^2"
-sportident = "^1"
+[project.optional-dependencies]
+win = [
+  "pywin32>=228",
+  "pyImpinj~=1.2; python_version == '3.8'",
+]
 
-[tool.poetry.group.dev.dependencies]
-cx_Freeze = ">=6,<8"
-mypy = "^1.4"
-poethepoet = ">=0.22,<0.31"
-pytest = ">=7.4,<9.0"
-pytest-cov = "*"
-pytest-deadfixtures = "*"
-pytest-mock = "*"
-ruff = "^0.8.0"
-toml = "*"
-types-playsound = "^1.3.1.3"
-types-polib = "^1.2.0.1"
-types-python-dateutil = "^2.8.19.14"
-types-requests = "^2.31.0.2"
-types-six = "^1.16.21.9"
-
-[tool.poetry.extras]
-win = ["pywin32", "pyImpinj", "playsound"]
+[dependency-groups]
+dev = [
+  "cx_Freeze>=6.15.16,<7; python_version == '3.8'",
+  "cx_Freeze>=8; python_version >= '3.14'",
+  "mypy~=1.4; python_version == '3.8'",
+  "mypy>=1.4; python_version >= '3.14'",
+  "poethepoet>=0.22,<0.31",
+  "pytest>=7.4,<9.0",
+  "pytest-cov",
+  "pytest-deadfixtures",
+  "pytest-mock",
+  "ruff>=0.12,<0.13",
+  "toml",
+  "types-polib>=1,<2",
+  "types-python-dateutil>=2.8.19.14,<3",
+  "types-requests>=2.31.0.2,<3",
+  "types-six>=1.16.21.9,<2",
+  "types-pywin32>=228",
+]
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [tool.mypy]
 check_untyped_defs = true
@@ -96,10 +100,7 @@ default_item_type = "ref"
 
 [tool.poe.tasks.test]
 help = "Test with coverage"
-sequence = [
-    {ref = "generate-mo"},
-    {cmd = "pytest -vv --cov"},
-]
+sequence = [{ ref = "generate-mo" }, { cmd = "pytest -vv --cov" }]
 
 [tool.poe.tasks.test-fast]
 help = "Test until error"
@@ -112,19 +113,15 @@ cmd = "pytest -vv --last-failed"
 [tool.poe.tasks.lint]
 help = "Check code"
 sequence = [
-    {cmd = "poetry check"},
-    {ref = "generate-mo"},
-    {cmd = "ruff check ${CODE}"},
-    {cmd = "pytest --dead-fixtures --dup-fixtures"},
-    # {cmd = "mypy ${CODE}"},
+  { ref = "generate-mo" },
+  { cmd = "ruff check ${CODE}" },
+  { cmd = "pytest --dead-fixtures --dup-fixtures" },
+  # {cmd = "mypy ${CODE}"},
 ]
 
 [tool.poe.tasks.format]
 help = "Formating code"
-sequence = [
-    {ref = "generate-mo"},
-	{cmd = "ruff format ${CODE}"},
-]
+sequence = [{ ref = "generate-mo" }, { cmd = "ruff format ${CODE}" }]
 
 [tool.poe.tasks.generate-mo]
 help = "Generate mo files"
@@ -136,7 +133,4 @@ cmd = "python .github/scripts/version.py"
 
 [tool.poe.tasks.run]
 help = "Run"
-sequence = [
-    {ref = "generate-mo"},
-    {cmd = "python SportOrg.pyw"}
-]
+sequence = [{ ref = "generate-mo" }, { cmd = "python SportOrg.pyw" }]
