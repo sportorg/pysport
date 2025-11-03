@@ -134,6 +134,7 @@ def menu_list():
 
 {
             "title": translate("toSFR"),
+            "title": translate("SFR"),
             "action": "SFRExportAction",
         },
 
