@@ -131,6 +131,13 @@ def menu_list():
                                 },
                             ],
                         },
+
+{
+            "title": translate("SFR"),
+            "action": "SFRExportAction",
+        },
+
+
                     ],
                 },
             ],

@@ -69,13 +69,6 @@ from sportorg.modules.teamwork.packet_header import ObjectTypes
 from sportorg.modules.teamwork.teamwork import Teamwork
 from sportorg.modules.telegram.telegram import telegram_client
 
-# Добавляем импорт SFR экспорта
-try:
-    from sportorg.modules.sfr.sfrxexporter import export_sfrx
-    from sportorg.modules.sfr.sfrexporter import export_sfr_data
-    SFR_AVAILABLE = True
-except ImportError:
-    SFR_AVAILABLE = False
 
 
 class ConsolePanelHandler(logging.Handler):
@@ -364,65 +357,7 @@ class MainWindow(QMainWindow):
         self.setMenuBar(self.menubar)
         self._create_menu(self.menubar, menu_list())
         
-        # Добавляем меню экспорта SFR
-        self.add_export_menu()
-
-    def add_export_menu(self):
-        """Добавление меню экспорта"""
-        if not SFR_AVAILABLE:
-            return
-            
-        export_menu = self.menubar.addMenu(translate('Export'))
-        
-        # SFR экспорт
-        sfr_menu = export_menu.addMenu(translate('SFR'))
-        
-        sfrx_action = QAction(translate('Export to SFRx file...'), self)
-        sfrx_action.triggered.connect(self.export_sfrx)
-        sfr_menu.addAction(sfrx_action)
-        
-        # sfr_card_action = QAction(translate('Write to SFR card...'), self)
-        # sfr_card_action.triggered.connect(self.write_sfr_card)
-        # sfr_menu.addAction(sfr_card_action)
-
-    def export_sfrx(self):
-        """Экспорт в SFRx файл"""
-        if not SFR_AVAILABLE:
-            QMessageBox.warning(self, translate('Export'), translate('SFR export not available'))
-            return
-            
-        filename, _ = QFileDialog.getSaveFileName(
-            self,
-            translate('Export to SFRx'),
-            '',
-            'SFRx files (*.txt);;All files (*)'
-        )
-        
-        if filename:
-            try:
-                success = export_sfrx(filename)
-                if success:
-                    QMessageBox.information(self, translate('Export'), translate('Export completed successfully'))
-                else:
-                    QMessageBox.warning(self, translate('Export'), translate('Export failed'))
-            except Exception as e:
-                QMessageBox.critical(self, translate('Error'), str(e))
-
-    # def write_sfr_card(self):
-    #     """Запись на SFR карту"""
-    #     if not SFR_AVAILABLE:
-    #         QMessageBox.warning(self, translate('Export'), translate('SFR card writing not available'))
-    #         return
-            
-    #     try:
-    #         # Здесь можно добавить диалог выбора участника
-    #         success = export_sfr_data('', export_type='card')
-    #         if success:
-    #             QMessageBox.information(self, translate('Export'), translate('Data written to SFR card'))
-    #         else:
-    #             QMessageBox.warning(self, translate('Export'), translate('Failed to write SFR card'))
-    #     except Exception as e:
-    #         QMessageBox.critical(self, translate('Error'), str(e))
+    
 
     def _setup_toolbar(self):
         self.toolbar = self.addToolBar(translate("Toolbar"))
