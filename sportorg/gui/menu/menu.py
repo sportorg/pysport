@@ -133,8 +133,7 @@ def menu_list():
                         },
 
 {
-            "title": translate("toSFR"),
-            "title": translate("SFR"),
+            "title": translate("Файл SFRХ"),
             "action": "SFRExportAction",
         },
 
