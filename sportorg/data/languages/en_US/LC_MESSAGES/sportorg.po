@@ -18,6 +18,9 @@ msgstr ""
 "X-Loco-Parser: loco_parse_po"
 msgstr "Fail for SFR"
 
+msgid "toSFR"
+msgstr "Fail for SFR"
+
 msgid "SportOrg"
 msgstr "SportOrg"
 
