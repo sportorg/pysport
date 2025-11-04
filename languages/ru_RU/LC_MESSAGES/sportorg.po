@@ -27,6 +27,9 @@ msgstr "Версия"
 msgid "Contributors"
 msgstr "Разработчики"
 
+msgid "toSFR"
+msgstr "Файл SFRX"
+
 msgid "Home page"
 msgstr "Веб-сайт"
 
