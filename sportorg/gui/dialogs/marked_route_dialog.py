@@ -37,7 +37,7 @@ class MarkedRouteDialog(QDialog):
 
     def list_31_32(self):
         self.item_table.setPlainText("")
-        for i in range(31, 100):
+        for i in range(31, 200):
             if i % 2 > 0:
                 self.item_table.append(str(i) + "," + str(i + 1))
 
@@ -48,7 +48,7 @@ class MarkedRouteDialog(QDialog):
 
     def list_31(self):
         self.item_table.setPlainText("")
-        for i in range(31, 100):
+        for i in range(31, 200):
             self.item_table.append(str(i))
 
     def init_ui(self):
