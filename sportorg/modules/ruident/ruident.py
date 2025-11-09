@@ -1,6 +1,5 @@
 import logging
 import os
-import subprocess
 import time
 from datetime import datetime, timedelta
 from queue import Empty, Queue
@@ -8,16 +7,19 @@ from threading import Event, main_thread
 from time import sleep
 
 import bluetooth
+import pygetwindow
 import yaml
+from PySide2 import QtGui
 
+from sportorg import config
 from sportorg.gui.global_access import GlobalAccess
 
 try:
     from PySide6.QtCore import QThread, Signal
-    from PySide6.QtWidgets import QMessageBox
+    from PySide6.QtWidgets import QMessageBox, QApplication
 except ModuleNotFoundError:
     from PySide2.QtCore import QThread, Signal
-    from PySide2.QtWidgets import QMessageBox
+    from PySide2.QtWidgets import QMessageBox, QApplication
 
 from sportorg.common.singleton import singleton
 from sportorg.gui.dialogs.file_dialog import get_open_file_name
@@ -34,7 +36,7 @@ class RuidentCommand:
 
 
 class RuidentThread(QThread):
-    def __init__(self, file_name, separator, queue, stop_event, logger, debug=False):
+    def __init__(self, file_name, separator, queue, stop_event, logger, debug=False, timeout=0):
         super().__init__()
         self.setObjectName(self.__class__.__name__)
         self._queue = queue
@@ -43,36 +45,76 @@ class RuidentThread(QThread):
         self._debug = debug
         self.file_name = file_name
         self.separator = separator
+        self.timeout = timeout
 
     def run(self):
+        self._logger.info(f"RUIDENT: starting reader with timeout {self.timeout} seconds")
         try:
-            ruident = Ruident(data_file=self.file_name, separator=self.separator, debug=True, logger=logging.root)
+            ruident = Ruident(data_file=self.file_name, separator=self.separator, debug=True, logger=logging.root,
+                              timeout_sec=self.timeout)
         except Exception as e:
             self._logger.exception(e)
             return
 
         try:
+            su_event_count = 0
+            minimize_window_time = None
             while True:
                 if not main_thread().is_alive() or self._stop_event.is_set():
                     ruident.disconnect()
                     self._logger.info("RUIDENT: stopping reader")
                     return
                 card_data_array = ruident.get_next_data()
+
+                if minimize_window_time is not None and minimize_window_time < datetime.now():
+                    minimize_window_time = None
+                    RuidentClient().minimize_ruident_utility()
+
                 if card_data_array:
+                    su_event_count = 0
                     for card_data in card_data_array:
                         self._queue.put(
                             RuidentCommand("card_data", card_data), timeout=1
                         )
+                    self._queue.put(
+                        RuidentCommand("smile_icon", None), timeout=1
+                    )
+                    # got data from utility, wait 3 seconds and minimize window
+                    if minimize_window_time is None and not RuidentClient().is_window_minimized():
+                        minimize_window_time = datetime.now() + timedelta(seconds=3)
                 else:
                     # no data, wait 1 second before repeating
                     sleep(1)
+                    self._queue.put(
+                        RuidentCommand("ruident_icon", None), timeout=1
+                    )
                     cur_time = datetime.now()
                     timeout = 10
-                    if ruident.last_utility_time == None:
+                    if ruident.last_utility_time is None:
                         ruident.last_utility_time = cur_time
                     if ruident.last_utility_time and ruident.last_utility_time + timedelta(seconds=timeout) < cur_time:
                         self._logger.info(f"RUIDENT: no SU signal from station for more than {timeout} seconds!")
-                        ruident.last_utility_time = cur_time  # reset timeout
+
+                        # self._queue.put(
+                        #     RuidentCommand("smile_icon", None), timeout=1
+                        # )
+
+                        ruident.last_utility_time = cur_time
+                        su_event_count += 1
+
+                    if su_event_count > 1:
+                        # show Ruident utility after 2 SU missed events
+
+                        if RuidentClient().is_window_launched():
+                            RuidentClient().show_ruident_utility()
+                            self._logger.info(f'RUIDENT: No data received from reader station. You may need to '
+                                              f'activate or restart reader station. Your reader station can also be '
+                                              f'connected to other access point. Disconnect and restart.')
+                        else:
+                            self._logger.info(f"RUIDENT: RuidConnectRD utility is closed, please restart "
+                                              f"Ruident Service.")
+
+                        su_event_count = 0
 
         except Exception as e:
             self._logger.exception(e)
@@ -80,6 +122,8 @@ class RuidentThread(QThread):
 
 class ResultThread(QThread):
     data_sender = Signal(object)
+    data_sender_icon_smile = Signal()
+    data_sender_icon_ruident = Signal()
 
     def __init__(self, queue, stop_event, logger):
         super().__init__()
@@ -97,6 +141,10 @@ class ResultThread(QThread):
                     result = self._get_result(cmd.data)
                     self.data_sender.emit(result)
                     backup.backup_data(cmd.data)
+                if cmd.command == "smile_icon":
+                    self.data_sender_icon_smile.emit()
+                if cmd.command == "ruident_icon":
+                    self.data_sender_icon_ruident.emit()
             except Empty:
                 if not main_thread().is_alive() or self._stop_event.is_set():
                     break
@@ -138,6 +186,8 @@ class RuidentClient:
         # self.port = None
         self._logger = logging.root
         self._call_back = None
+        self._call_back_icon_smile = self.set_icon_smile
+        self._call_back_icon_ruident = self.set_icon_ruident
         self.file_name = None
         self.separator = ";"
 
@@ -146,7 +196,7 @@ class RuidentClient:
             self._call_back = value
         return self
 
-    def _start_ruident_thread(self):
+    def _start_ruident_thread(self, timeout=0):
         if self._ruident_thread is None:
 
             # self.file_name = get_open_file_name()
@@ -162,18 +212,18 @@ class RuidentClient:
             GlobalAccess().get_main_window().select_tab(5)
 
             # show icon on toolbar
-            GlobalAccess().get_main_window().sportident_icon = {
-                True: "ruident.png",
-                False: "sportident.png",
-            }
+            self.set_icon_ruident()
 
             self._ruident_thread = RuidentThread(
-                self.file_name, self.separator, self._queue, self._stop_event, self._logger, debug=True
+                self.file_name, self.separator, self._queue, self._stop_event, self._logger, debug=True, timeout=timeout
             )
             self._ruident_thread.start()
-        elif self._ruident_thread.isFinished():
-            self._ruident_thread = None
-            self._start_ruident_thread()
+        else:
+            if self._ruident_thread.isFinished():
+                self._ruident_thread = None
+                self._start_ruident_thread(timeout=timeout)
+            else:
+                self._ruident_thread.timeout = timeout
 
     def _start_result_thread(self):
         if self._result_thread is None:
@@ -184,6 +234,10 @@ class RuidentClient:
             )
             if self._call_back:
                 self._result_thread.data_sender.connect(self._call_back)
+            if self._call_back_icon_ruident:
+                self._result_thread.data_sender_icon_ruident.connect(self._call_back_icon_ruident)
+            if self._call_back_icon_smile:
+                self._result_thread.data_sender_icon_smile.connect(self._call_back_icon_smile)
             self._result_thread.start()
         # elif not self._result_thread.is_alive():
         elif self._result_thread.isFinished():
@@ -199,14 +253,43 @@ class RuidentClient:
 
         return False
 
-    def start(self):
+    def start(self, timeout=0):
         # self.port = self.choose_port()
         self._stop_event.clear()
-        self._start_ruident_thread()
+        self._start_ruident_thread(timeout=timeout)
         self._start_result_thread()
 
     def stop(self):
         self._stop_event.set()
+
+    @staticmethod
+    def stop_ruident_utility():
+        service_name = "RuidConnectRD.exe"
+        # Find the window by title (case-insensitive)
+        for window in pygetwindow.getWindowsWithTitle(service_name):
+            # Close the window
+            window.close()
+
+    @staticmethod
+    def minimize_ruident_utility():
+        service_name = "RuidConnectRD.exe"
+        # Find the window by title (case-insensitive)
+        for window in pygetwindow.getWindowsWithTitle(service_name):
+            # minimize all windows
+            window.minimize()
+
+    @staticmethod
+    def show_ruident_utility():
+        service_name = "RuidConnectRD.exe"
+        # Find the window by title (case-insensitive)
+        for window in pygetwindow.getWindowsWithTitle(service_name):
+            # maximize first found window
+            window.restore()
+            try:
+                window.activate()
+            except Exception as e:
+                logging.info("Cannot open window, SportOrg is not active now")
+            break
 
     def toggle(self):
         if self.is_alive():
@@ -214,7 +297,8 @@ class RuidentClient:
             return
         self.start()
 
-    def choose_port(self):
+    @staticmethod
+    def choose_port():
         return memory.race().get_setting("system_port", None)
 
     def get_data_filepath(self):
@@ -247,8 +331,8 @@ class RuidentClient:
             ruident_exe = ruident_folder + os.path.sep + "RuidConnectRD.exe"
             if os.path.isfile(ruident_exe):
                 try:
-                    progs = str(subprocess.check_output('tasklist'))
-                    if "RuidConnectRD.exe" not in progs:
+                    app_list = pygetwindow.getWindowsWithTitle('RuidConnectRD.exe')
+                    if len(app_list) == 0:
                         self._logger.info(f"RUIDENT: starting RuidConnectRD.exe")
                         os.chdir(ruident_folder)
                         # os.system("start cmd /k " + ruident_exe)
@@ -283,3 +367,46 @@ class RuidentClient:
         except Exception as e:
             self._logger.info(f"RUIDENT: Unexpected Bluetooth error: {e}")
         return False
+
+    def set_icon_smile(self):
+        self._logger.info(f"RUIDENT: smile!")
+        GlobalAccess().get_main_window().sportident_icon = {
+            True: "ruident_ok.png",
+            False: "sportident.png",
+        }
+        # GlobalAccess().get_main_window().interval()
+        GlobalAccess().get_main_window().toolbar_property["sportident"].setIcon(
+            QtGui.QIcon(
+                config.icon_dir(GlobalAccess().get_main_window().sportident_icon[True])
+            )
+        )
+
+
+    def set_icon_ruident(self):
+        # self._logger.info(f"RUIDENT: ruident 1!")
+        GlobalAccess().get_main_window().sportident_icon = {
+            True: "ruident.png",
+            False: "sportident.png",
+        }
+        # GlobalAccess().get_main_window().interval()
+        GlobalAccess().get_main_window().toolbar_property["sportident"].setIcon(
+            QtGui.QIcon(
+                config.icon_dir(GlobalAccess().get_main_window().sportident_icon[True])
+            )
+        )
+
+    @staticmethod
+    def is_window_minimized():
+        service_name = "RuidConnectRD.exe"
+        # Find the window by title (case-insensitive)
+        for window in pygetwindow.getWindowsWithTitle(service_name):
+            # check first found window to be maximized
+            return window.isMinimized
+
+        return False
+
+    @staticmethod
+    def is_window_launched():
+        service_name = "RuidConnectRD.exe"
+        # Find the window by title (case-insensitive)
+        return len(pygetwindow.getWindowsWithTitle(service_name)) > 0

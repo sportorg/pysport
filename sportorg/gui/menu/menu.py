@@ -398,18 +398,19 @@ def menu_list():
                 {
                     "title": translate("Ruident"),
                     "icon": config.icon_dir("ruident.png"),
-                    "actions": [
-                        {
-                            "title": translate("on/off Ruident readout"),
-                            "icon": config.icon_dir("ruident.png"),
-                            "action": "RuidentReadoutAction",
-                        },
-                        {
-                            "title": translate("Ruident menu"),
-                            "icon": config.icon_dir("ruident.png"),
-                            "action": "RuidentMenuAction",
-                        },
-                    ]
+                    "action": "RuidentMenuAction",
+                    # "actions": [
+                    #     {
+                    #         "title": translate("on/off Ruident readout"),
+                    #         "icon": config.icon_dir("ruident.png"),
+                    #         "action": "RuidentReadoutAction",
+                    #     },
+                    #     {
+                    #         "title": translate("Ruident menu"),
+                    #         "icon": config.icon_dir("ruident.png"),
+                    #         "action": "RuidentMenuAction",
+                    #     },
+                    # ]
                 },
                 {
                     "title": translate("Teamwork"),

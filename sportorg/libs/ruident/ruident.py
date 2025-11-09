@@ -15,18 +15,18 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""ruident.py - Classes Ruident v1.1"""
+"""ruident.py - Classes Ruident v0.5"""
 
 from datetime import datetime
 from os.path import exists, getmtime
-
 from six import print_
 
 
 class Ruident:
-    def __init__(self, data_file="C:\\ruident\\data.csv", separator=";", debug=False, logger=None):
-        self._serial = None
+    def __init__(self, data_file="C:\\ruident\\data.csv", separator=";", debug=False, logger=None, timeout_sec=0):
         self._logger = logger
+        self._logger.info(f"RUIDENT: creating reader for file {data_file}")
+        self._serial = None
         self._file_name = data_file
         self._separator = separator
         self._file = None
@@ -35,6 +35,8 @@ class Ruident:
         self._last_card = -1
         self.current_data = {}
         self.last_utility_time = None
+        self.timeout_sec = timeout_sec
+        self.is_connected = False
 
         if debug:
             self._log_debug = print_
@@ -69,26 +71,61 @@ class Ruident:
         correct_lines = 0
         self._logger.info(f"RUIDENT: read_file, new lines: {lines_count}")
         if lines_count > 0:
+            skipped_lines = 0
             for i in range(0, lines_count):
                 line = lines[i]
-                self._logger.info(f"RUIDENT: read_file, processing line: {line}")
                 separator = self._separator
                 arr = line.split(separator)
 
-                process_results = True
-                if len(arr) > 0:
-                    station_type = str(arr[1])
-                    if station_type == "STA":
-                        # launching of service utility
-                        process_results = False
-                        self._logger.info(f"RUIDENT: STA signal received from utility")
-                    if station_type == "SU":
-                        # service utility heartbeat (each 4-5 sec)
-                        process_results = False
-                        self.last_utility_time = datetime.now()
-                        self._logger.info(f"RUIDENT: SU signal received from station")
+                if len(arr) < 11:
+                    self._logger.info(f"RUIDENT: read_file, ignoring line: {line}")
+                    self._logger.info(
+                        f"RUIDENT: correct format: @;type;code;HH;MM;SS;MS;card_id;battery;index;date"
+                    )
+                    continue
 
-                if process_results and len(arr) > 9:
+                # skip obsolete lines
+                if self.timeout_sec > 0:
+                    date_string = arr[10]
+                    # 20:12:13.155 22/10/2025
+                    # self._logger.info(f"RUIDENT: time = {arr[10]}")
+
+                    # format_code = "%H:%M:%S.%f %d/%m/%Y"
+                    # datetime_object = datetime.strptime(date_string, format_code)
+
+                    time_h = int(date_string.split(":")[0])
+                    time_m = int(date_string.split(":")[1])
+                    time_s = int(date_string.split(":")[2].split(".")[0])
+                    time_d = int(date_string.split(" ")[1].split("/")[0])
+                    time_mon = int(date_string.split(" ")[1].split("/")[1])
+                    time_y = int(date_string.split(" ")[1].split("/")[2])
+                    datetime_object = datetime(hour=time_h, minute=time_m, second=time_s, day=time_d, month=time_mon,
+                                               year=time_y)
+
+                    if (datetime.now() - datetime_object).total_seconds() > self.timeout_sec:
+                        skipped_lines += 1
+                        continue
+
+                self._logger.info(f"RUIDENT: read_file, processing line: {line}")
+
+                process_results = True
+
+                station_type = str(arr[1])
+                if station_type == "STA":
+                    # launching of service utility
+                    process_results = False
+                    self._logger.info(f"RUIDENT: STA signal received from utility")
+                else:
+                    self.is_connected = True
+
+
+                if station_type == "SU":
+                    # service utility heartbeat (each 4-5 sec)
+                    process_results = False
+                    self.last_utility_time = datetime.now()
+                    self._logger.info(f"RUIDENT: SU signal received from station")
+
+                if process_results:
                     correct_lines += 1
                     header = str(arr[0])
                     station_code = int(arr[2]) if arr[2] else 0
@@ -124,12 +161,9 @@ class Ruident:
                     elif station_type == "SR":
                         self.current_data["start"] = t
                     ret.append(self.current_data)
-                else:
-                    if process_results:
-                        self._logger.info(f"RUIDENT: read_file, ignoring line: {line}")
-                        self._logger.info(
-                            f"RUIDENT: correct format: @;type;code;HH;MM;SS;MS;card_id;battery;index)"
-                        )
+
+            if skipped_lines > 0:
+                self._logger.info(f"RUIDENT: skipping {skipped_lines} lines, too old")
         return ret
 
     def disconnect(self):

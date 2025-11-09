@@ -249,6 +249,7 @@ class MainWindow(QMainWindow):
         )
 
         self.close_split_printer()
+        RuidentClient().stop_ruident_utility()
         if reply == QMessageBox.Save:
             self.save_file()
             self.close()

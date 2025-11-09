@@ -1,10 +1,13 @@
 import os
 import platform
 from os.path import exists
+from time import sleep
 
 import pygetwindow
+from PySide2 import QtCore
 
 from sportorg.modules.ruident.ruident import RuidentClient
+from sportorg.modules.ruident.ruident_wait_window import RuidentWaitDialog
 
 try:
     from PySide6.QtGui import QIcon
@@ -16,7 +19,7 @@ try:
         QSpinBox,
     )
 except ModuleNotFoundError:
-    from PySide2.QtGui import QIcon
+    from PySide2.QtGui import QIcon, QFont
     from PySide2.QtWidgets import (
         QDialog,
         QDialogButtonBox,
@@ -40,13 +43,12 @@ class RuidentDialog(QDialog):
 
     def init_ui(self):
         self.setWindowTitle(translate("Ruident mode"))
-        # self.setWindowIcon(QIcon(config.ICON))
         self.setSizeGripEnabled(False)
         self.setModal(True)
 
         self.layout = QFormLayout(self)
 
-        self.item_restart_service = QPushButton(text=translate("Restart Ruident service"))
+        self.item_restart_service = QPushButton(text=translate("Start / Restart Ruident service"))
         self.layout.addRow(self.item_restart_service)
 
         self.item_monitor_log = QPushButton(text=translate("Monitor log"))
@@ -64,8 +66,10 @@ class RuidentDialog(QDialog):
         self.item_help = QPushButton(text=translate("Help"))
         self.layout.addRow(self.item_help)
 
-        self.item_no_action = QPushButton(text=translate("No action"))
-        self.layout.addRow(self.item_no_action)
+        self.item_counter = QLabel("0")
+        self.item_counter.setFont(QFont("Arial", 40))
+        self.item_counter.setMinimumWidth(200)
+        self.layout.addRow(self.item_counter)
 
         self.item_restart_service.clicked.connect(self.restart_service)
         self.item_monitor_log.clicked.connect(self.monitor_log)
@@ -73,18 +77,20 @@ class RuidentDialog(QDialog):
         self.item_verify_data.clicked.connect(self.verify_data)
         self.item_stop.clicked.connect(self.stop_service)
         self.item_help.clicked.connect(self.help)
-        self.item_no_action.clicked.connect(self.close)
 
         self.setMinimumWidth(400)
         self.show()
+        self.timer_start()
 
     def start_service(self):
-        ruident = RuidentClient()
-        ruident.launch_reader_service()
+        RuidentClient().start(timeout=10)
 
     def restart_service(self):
         self.stop_service()
+        sleep(2)
         self.start_service()
+        sleep(1)
+        # RuidentWaitDialog().show()
 
     def maximize_service_win(self):
         # Find the window by title (case-insensitive)
@@ -94,15 +100,17 @@ class RuidentDialog(QDialog):
 
             # Maximize the window
             window.restore()
-            window.activate()
+            try:
+                window.activate()
+            except Exception as e:
+                print("Cannot open window, SportOrg is not active now")
 
     def stop_service(self):
-        service_name = "RuidConnectRD.exe"
-        # Find the window by title (case-insensitive)
-        for window in pygetwindow.getWindowsWithTitle(service_name):
-            # Close the window
-            window.close()
-            RuidentClient().toggle()
+        RuidentClient().stop_ruident_utility()
+        RuidentClient().stop()
+        # wait for 2 sec to terminate correctly
+        # sleep(2)
+        self.time_int = 3
 
     def monitor_log(self):
         GlobalAccess().get_main_window().select_tab(5)
@@ -120,3 +128,22 @@ class RuidentDialog(QDialog):
         ruident_folder = cwd + os.path.sep + "ruident"
         filepath = ruident_folder + os.path.sep + "help.pdf"
         os.startfile(filepath)
+
+    def timer_start(self):
+        self.time_int = 15
+
+        self.my_qtimer = QtCore.QTimer(self)
+        self.my_qtimer.timeout.connect(self.timer_timeout)
+        self.my_qtimer.start(1000)
+
+        self.update_gui()
+
+    def timer_timeout(self):
+        self.time_int -= 1
+        if self.time_int < 0:
+            self.close()
+
+        self.update_gui()
+
+    def update_gui(self):
+        self.item_counter.setText(str(self.time_int % 60))
