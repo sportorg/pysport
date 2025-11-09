@@ -91,6 +91,9 @@ class Application(metaclass=Singleton):
             settings.SETTINGS.file_save_in_gzip = Config().configuration.get(
                 "save_in_gzip", True
             )
+            settings.SETTINGS.file_generate_srb = Config().configuration.get(
+                "generate_srb", True
+            )
             settings.SETTINGS.file_open_recent_file = Config().configuration.get(
                 "open_recent_file", True
             )
@@ -119,7 +122,7 @@ class Application(metaclass=Singleton):
     def set_status_comments():
         try:
             with open(
-                settings.SETTINGS.source_status_comments_path, encoding="utf-8"
+                    settings.SETTINGS.source_status_comments_path, encoding="utf-8"
             ) as f:
                 content = f.readlines()
             StatusComments().set([x.strip() for x in content])
@@ -129,7 +132,7 @@ class Application(metaclass=Singleton):
 
         try:
             with open(
-                settings.SETTINGS.source_status_default_comments_path, encoding="utf-8"
+                    settings.SETTINGS.source_status_default_comments_path, encoding="utf-8"
             ) as f:
                 content = f.readlines()
             StatusComments().set_default_statuses(content)
@@ -149,7 +152,7 @@ class Application(metaclass=Singleton):
     def set_middle_names():
         try:
             with open(
-                settings.SETTINGS.source_middle_names_path, encoding="utf-8"
+                    settings.SETTINGS.source_middle_names_path, encoding="utf-8"
             ) as f:
                 content = f.readlines()
             PersonMiddleNames().set([x.strip() for x in content])
@@ -169,7 +172,7 @@ class Application(metaclass=Singleton):
     def set_ranking():
         try:
             with open(
-                settings.SETTINGS.source_ranking_score_path, encoding="utf-8"
+                    settings.SETTINGS.source_ranking_score_path, encoding="utf-8"
             ) as f:
                 content = f.readlines()
             RankingTable().set([x.strip().split(";") for x in content])
