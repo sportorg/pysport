@@ -609,6 +609,7 @@ class Result(ABC):
             "status": self.status.value,
             "status_comment": self.status_comment,
             "penalty_laps": self.penalty_laps,
+            "penalty_laps_stat": self.get_penalty_stat(),
             "place": self.place,
             "assigned_rank": self.assigned_rank.value,
             "splits": [split.to_dict() for split in self.splits],
@@ -974,6 +975,9 @@ class Result(ABC):
                     ret.append(cur_res)
         return ret
 
+    #
+    def get_penalty_stat(self):
+        return ""
 
 class ResultManual(Result):
     system_type = SystemType.MANUAL
@@ -1301,6 +1305,19 @@ class ResultSportident(Result):
             if self.splits[i] == self.splits[i + 1]:
                 self.splits.remove(self.splits[i])
 
+    # information about penalty on each control point
+    def get_penalty_stat(self):
+        ret = ""
+        if race().get_setting("marked_route_mode", "") == "laps":
+            for split in self.splits:
+                if split.is_correct:
+                    if split.has_penalty:
+                        ret += "0"
+                    else:
+                        ret += "1"
+        if len(ret) > 0:
+            ret = "{" + ret + "}"
+        return ret
 
 class ResultSFR(ResultSportident):
     system_type = SystemType.SFR

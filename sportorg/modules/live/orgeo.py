@@ -34,11 +34,11 @@ RESULT_STATUS = [
 
 class Orgeo:
     def __init__(
-        self,
-        session,
-        url: str,
-        user_agent: str = "SportOrg " + config.VERSION,
-        compression: bool = True,
+            self,
+            session,
+            url: str,
+            user_agent: str = "SportOrg " + config.VERSION,
+            compression: bool = True,
     ):
         self.session = session
         self._url = url
@@ -163,7 +163,7 @@ def _get_person_obj(data, race_data, result=None):
             splits = []
             for split in result["splits"]:
                 if split["is_correct"] or race_data["settings"].get(
-                    "live_sending_all_controls", False
+                        "live_sending_all_controls", False
                 ):
                     splits.append(split)
             for i in range(len(splits)):
@@ -197,7 +197,7 @@ def _get_person_obj(data, race_data, result=None):
 
             # add info about penalty (as string(20))
             if result["penalty_laps"] and result["penalty_laps"] > 0:
-                obj["penalty"] = str(result["penalty_laps"])
+                obj["penalty"] = str(result["penalty_laps"]) + " " + result["penalty_laps_stat"]
             if result["penalty_time"] and result["penalty_time"] > 0:
                 obj["penalty"] = time_to_hhmmss(OTime(msec=result["penalty_time"]))
 
@@ -238,8 +238,8 @@ async def create(url, data, race_data, log, *, session):
         if item["object"] == "Organization":
             for person_data in race_data["persons"]:
                 if (
-                    person_data["organization_id"]
-                    and person_data["organization_id"] == item["id"]
+                        person_data["organization_id"]
+                        and person_data["organization_id"] == item["id"]
                 ):
                     result_data = _get_result_by_person(person_data, race_data)
                     persons.append(_get_person_obj(person_data, race_data, result_data))
@@ -263,6 +263,7 @@ async def create(url, data, race_data, log, *, session):
         if is_start:
             obj_for_send["params"] = {"start_list": True}
         try:
+            log.info(f"sending: {str(obj_for_send)}")
             resp = await o.send(obj_for_send)
 
             result_txt = make_nice(str(await resp.text()))
