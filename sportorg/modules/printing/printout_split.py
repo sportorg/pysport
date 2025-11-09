@@ -57,8 +57,8 @@ class SportorgPrinter:
 
     def print_split(self, result):
         if not (
-            race().get_setting("marked_route_if_counting_lap", False)
-            and race().get_setting("marked_route_mode", "laps") == "laps"
+                race().get_setting("marked_route_if_counting_lap", False)
+                and race().get_setting("marked_route_mode", "laps") == "laps"
         ):
             # Normal split printout
             self.print_split_normal(result)
@@ -202,38 +202,38 @@ class SportorgPrinter:
         for split in result.splits:
             if not is_group_existed:
                 line = (
-                    ("  " + str(index))[-3:]
-                    + " "
-                    + ("  " + split.code)[-3:]
-                    + " "
-                    + split.time.to_str()[-7:]
+                        ("  " + str(index))[-3:]
+                        + " "
+                        + ("  " + split.code)[-3:]
+                        + " "
+                        + split.time.to_str()[-7:]
                 )
                 index += 1
                 self.print_line(line, fn, fs_main)
             elif not course:
                 line = (
-                    ("  " + str(index))[-3:]
-                    + " "
-                    + ("  " + split.code)[-3:]
-                    + " "
-                    + split.relative_time.to_str()[-7:]
-                    + " "
-                    + split.leg_time.to_str()[-5:]
+                        ("  " + str(index))[-3:]
+                        + " "
+                        + ("  " + split.code)[-3:]
+                        + " "
+                        + split.relative_time.to_str()[-7:]
+                        + " "
+                        + split.leg_time.to_str()[-5:]
                 )
                 index += 1
                 self.print_line(line, fn, fs_main)
             elif split.is_correct:
                 line = (
-                    ("  " + str(split.course_index + 1))[-3:]
-                    + " "
-                    + ("  " + split.code)[-3:]
-                    + " "
-                    + split.relative_time.to_str()[-7:]
-                    + " "
-                    + split.leg_time.to_str()[-5:]
-                    + " "
-                    + split.speed
-                    + " "
+                        ("  " + str(split.course_index + 1))[-3:]
+                        + " "
+                        + ("  " + split.code)[-3:]
+                        + " "
+                        + split.relative_time.to_str()[-7:]
+                        + " "
+                        + split.leg_time.to_str()[-5:]
+                        + " "
+                        + split.speed
+                        + " "
                 )
 
                 if not is_relay:
@@ -249,10 +249,10 @@ class SportorgPrinter:
                 self.print_line(line, fn, fs_main)
             else:
                 line = (
-                    " " * 4
-                    + (" " + split.code)[-3:]
-                    + " "
-                    + split.relative_time.to_str()[-7:]
+                        " " * 4
+                        + (" " + split.code)[-3:]
+                        + " "
+                        + split.relative_time.to_str()[-7:]
                 )
                 self.print_line(line, fn, fs_main)
 
@@ -333,15 +333,15 @@ class SportorgPrinter:
             place = translate("Place") + ": " + str(result.place)
             if not is_relay:
                 place += (
-                    " "
-                    + translate("from")
-                    + " "
-                    + str(group.count_finished)
-                    + " ("
-                    + translate("total")
-                    + " "
-                    + str(group.count_person)
-                    + ")"
+                        " "
+                        + translate("from")
+                        + " "
+                        + str(group.count_finished)
+                        + " ("
+                        + translate("total")
+                        + " "
+                        + str(group.count_person)
+                        + ")"
                 )
             self.print_line(place, fn, fs_main)
         elif result.person.is_out_of_competition:
@@ -350,10 +350,10 @@ class SportorgPrinter:
 
         # Info about competitors, who can win current person
         if (
-            result.is_status_ok()
-            and not is_relay
-            and not is_rogaine
-            and is_group_existed
+                result.is_status_ok()
+                and not is_relay
+                and not is_rogaine
+                and is_group_existed
         ):
             if obj.get_setting("system_start_source", "protocol") == "protocol":
                 if hasattr(result, "can_win_count"):
