@@ -68,11 +68,12 @@ class File:
         )
         atomic_rename(self._file_name + ".tmp", self._file_name, overwrite=True)
 
-        self._backup(
-            self._file_name + ".srb",
-            sfr_results_board.dump,
-            "w",
-        )
+        if settings.SETTINGS.file_generate_srb:
+            self._backup(
+                self._file_name + ".srb",
+                sfr_results_board.dump,
+                "w",
+            )
 
     def open(self) -> None:
         logger.info("Open " + self._file_name)
