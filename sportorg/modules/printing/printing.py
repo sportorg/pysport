@@ -3,11 +3,14 @@ import sys
 import time
 from multiprocessing import Process, Queue
 
+qt_version = 5
 try:
     from PySide6.QtCore import QMarginsF, QSizeF
     from PySide6.QtGui import QPageLayout, QTextDocument
     from PySide6.QtPrintSupport import QPrinter
     from PySide6.QtWidgets import QApplication
+
+    qt_version = 6
 except ModuleNotFoundError:
     from PySide2.QtCore import QMarginsF, QSizeF
     from PySide2.QtGui import QPageLayout, QTextDocument
@@ -20,7 +23,7 @@ from sportorg.gui.global_access import GlobalAccess
 
 class PrintProcess(Process):
     def __init__(
-        self, queue, printer_name, html, left=5.0, top=5.0, right=5.0, bottom=5.0
+            self, queue, printer_name, html, left=5.0, top=5.0, right=5.0, bottom=5.0
     ):
         super().__init__()
         self.printer_name = printer_name
@@ -68,15 +71,25 @@ class PrintProcess(Process):
             text_document = QTextDocument()
 
             printer.setFullPage(True)
-            printer.setPageMargins(
-                QMarginsF(
+            if qt_version == 5:
+                printer.setPageMargins(
+
                     self.margin_left,
                     self.margin_top,
                     self.margin_right,
                     self.margin_bottom,
-                ),
-                QPageLayout.Unit.Millimeter,
-            )
+                    QPrinter.Unit.Millimeter,
+                )
+            else:
+                printer.setPageMargins(
+                    QMarginsF(
+                        self.margin_left,
+                        self.margin_top,
+                        self.margin_right,
+                        self.margin_bottom,
+                    ),
+                    QPageLayout.Unit.Millimeter,
+                )
 
             page_size = QSizeF()
             page_size.setHeight(printer.height())
@@ -119,11 +132,11 @@ class PrintProcess(Process):
                     )
                 )
         except Exception as e:
-            logging.error(str(e))
+            logging.exception(e)
 
 
 def print_html(
-    printer_name, html, left=5.0, top=5.0, right=5.0, bottom=5.0, scale=100.0
+        printer_name, html, left=5.0, top=5.0, right=5.0, bottom=5.0, scale=100.0
 ):
     logging.info("print_html: Starting printing process")
     thread = GlobalAccess().get_main_window().get_split_printer_thread()
