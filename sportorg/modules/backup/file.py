@@ -5,8 +5,7 @@ from typing import Optional
 from boltons.fileutils import atomic_rename
 
 from sportorg import settings
-
-from . import json
+from . import json, sfr_results_board
 
 logger = logging.getLogger(__name__)
 
@@ -68,6 +67,13 @@ class File:
             "w",
         )
         atomic_rename(self._file_name + ".tmp", self._file_name, overwrite=True)
+
+        if settings.SETTINGS.file_generate_srb:
+            self._backup(
+                self._file_name + ".srb",
+                sfr_results_board.dump,
+                "w",
+            )
 
     def open(self) -> None:
         logger.info("Open " + self._file_name)
