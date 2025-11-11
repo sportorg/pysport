@@ -27,7 +27,11 @@ def dump(file, *, compress=False):
             leg_for_sort = 0
             if is_relay:
                 leg_for_sort = int(person.bib) // 1000
-            sort = ("0" + str(leg_for_sort))[-2:] + str(scores_for_sort) + result.get_result()
+            sort = (
+                ("0" + str(leg_for_sort))[-2:]
+                + str(scores_for_sort)
+                + result.get_result()
+            )
 
             place = "1"
             if not result.is_status_ok():
@@ -39,7 +43,22 @@ def dump(file, *, compress=False):
             team = ""
             if person.organization:
                 team = person.organization.name
-            line = uid + sep + group + sep + sort + sep + place + sep + name + sep + team + sep + res + "\n"
+            line = (
+                uid
+                + sep
+                + group
+                + sep
+                + sort
+                + sep
+                + place
+                + sep
+                + name
+                + sep
+                + team
+                + sep
+                + res
+                + "\n"
+            )
             if compress:
                 file.write(bytes(line, "utf-8"))
             else:

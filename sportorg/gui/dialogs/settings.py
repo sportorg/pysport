@@ -98,7 +98,9 @@ class MainTab(Tab):
 
         self.layout.addRow(self.item_save_in_gzip)
 
-        self.item_generate_srb = QCheckBox(translate("Generate SRB file (SFR results board)"))
+        self.item_generate_srb = QCheckBox(
+            translate("Generate SRB file (SFR results board)")
+        )
         self.item_generate_srb.setChecked(settings.SETTINGS.file_generate_srb)
 
         self.layout.addRow(self.item_generate_srb)
