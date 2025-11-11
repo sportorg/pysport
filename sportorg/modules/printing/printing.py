@@ -23,7 +23,7 @@ from sportorg.gui.global_access import GlobalAccess
 
 class PrintProcess(Process):
     def __init__(
-            self, queue, printer_name, html, left=5.0, top=5.0, right=5.0, bottom=5.0
+        self, queue, printer_name, html, left=5.0, top=5.0, right=5.0, bottom=5.0
     ):
         super().__init__()
         self.printer_name = printer_name
@@ -73,7 +73,6 @@ class PrintProcess(Process):
             printer.setFullPage(True)
             if qt_version == 5:
                 printer.setPageMargins(
-
                     self.margin_left,
                     self.margin_top,
                     self.margin_right,
@@ -136,7 +135,7 @@ class PrintProcess(Process):
 
 
 def print_html(
-        printer_name, html, left=5.0, top=5.0, right=5.0, bottom=5.0, scale=100.0
+    printer_name, html, left=5.0, top=5.0, right=5.0, bottom=5.0, scale=100.0
 ):
     logging.info("print_html: Starting printing process")
     thread = GlobalAccess().get_main_window().get_split_printer_thread()
