@@ -98,7 +98,7 @@ def variation_data(tree, ns):
     root = tree.getroot()
     if "CourseData" not in root.tag:
         return
-    teams = []
+    course_assignments = []
 
     version = "0"
     if "iofVersion" in root.attrib:
@@ -108,22 +108,28 @@ def variation_data(tree, ns):
 
     if version == "3":
         # TeamCourseAssignment - variations for relays
-        for team_el in root.find("iof:RaceCourseData", ns).findall(
-            "iof:TeamCourseAssignment", ns
-        ):
+        for team_el in root.find("iof:RaceCourseData", ns).findall("iof:TeamCourseAssignment", ns):
             team = {
                 "bib_number": int(team_el.find("iof:BibNumber", ns).text),
-                "legs": [],
+                "legs": []
             }
             for leg_el in team_el.findall("iof:TeamMemberCourseAssignment", ns):
                 leg = {
                     "leg_number": leg_el.find("iof:Leg", ns).text,
-                    "course_name": leg_el.find("iof:CourseName", ns).text,
+                    "course_name": leg_el.find("iof:CourseName", ns).text
                 }
                 team["legs"].append(leg)
-            teams.append(team)
+            course_assignments.append(team)
 
-    return teams
+        for person_el in root.find("iof:RaceCourseData", ns).findall("iof:PersonCourseAssignment", ns):
+            course_assignment = {
+                "bib_number": int(person_el.find("iof:BibNumber", ns).text),
+                "course_name": person_el.find("iof:CourseName", ns).text,
+                "legs": []
+            }
+            course_assignments.append(course_assignment)
+
+    return course_assignments
 
 
 def entry_list(tree, ns):
@@ -163,6 +169,12 @@ def entry_list(tree, ns):
                 bib_el = extensions_el.find("orgeo:BibNumber", ns)
                 if bib_el is not None:
                     person["extensions"]["bib"] = bib_el.text
+
+            service_request_el = person_entry_el.find("iof:ServiceRequest", ns)
+            if service_request_el is not None:
+                comment_el = service_request_el.find("iof:Comment", ns)
+                if comment_el is not None:
+                    person["comment"] = comment_el.text
 
             org_el = person_entry_el.find("iof:Organisation", ns)
             organization = None

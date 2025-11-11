@@ -111,20 +111,32 @@ def import_from_course_data(courses) -> None:
                 obj.courses.append(c)
 
 
-def import_from_variation_data(teams) -> None:
+def import_from_variation_data(course_assignments) -> None:
     obj = race()
-    for team in teams:
-        for leg in team["legs"]:
-            leg_number = leg["leg_number"]
-            course_name = leg["course_name"]
+    for course_assignment in course_assignments:
+        if course_assignment["legs"] and len(course_assignment["legs"]) > 0:
+            # relay
+            for leg in course_assignment["legs"]:
+                leg_number = leg["leg_number"]
+                course_name = leg["course_name"]
+                course = find(obj.courses, name=course_name)
+                if course:
+                    new_course = Course()
+                    new_course.name = str(course_assignment["bib_number"]) + "." + str(leg_number)
+                    new_course.length = course.length
+                    new_course.controls = copy.deepcopy(course.controls)
+                    obj.courses.append(new_course)
+
+        elif course_assignment["course_name"] is not None:
+            # one man relay
+            course_name = course_assignment["course_name"]
             course = find(obj.courses, name=course_name)
             if course:
                 new_course = Course()
-                new_course.name = str(team["bib_number"]) + "." + str(leg_number)
+                new_course.name = str(course_assignment["bib_number"])
                 new_course.length = course.length
                 new_course.controls = copy.deepcopy(course.controls)
                 obj.courses.append(new_course)
-
 
 def create_person(person_entry):
     obj = race()
@@ -133,8 +145,8 @@ def create_person(person_entry):
 
     name = person_entry["group"]["name"]
     if (
-        "short_name" in person_entry["group"]
-        and len(person_entry["group"]["short_name"]) > 0
+            "short_name" in person_entry["group"]
+            and len(person_entry["group"]["short_name"]) > 0
     ):
         name = person_entry["group"]["short_name"]
     group = find(obj.groups, name=name)
@@ -142,8 +154,8 @@ def create_person(person_entry):
         group = Group()
         group.long_name = person_entry["group"]["name"]
         if (
-            "short_name" in person_entry["group"]
-            and len(person_entry["group"]["short_name"]) > 0
+                "short_name" in person_entry["group"]
+                and len(person_entry["group"]["short_name"]) > 0
         ):
             group.name = person_entry["group"]["short_name"]
         else:
@@ -180,19 +192,22 @@ def create_person(person_entry):
     if "bib" in person_entry["person"] and person_entry["person"]["bib"]:
         person.set_bib(int(person_entry["person"]["bib"]))
     elif (
-        "bib" in person_entry["person"]["extensions"]
-        and person_entry["person"]["extensions"]["bib"]
+            "bib" in person_entry["person"]["extensions"]
+            and person_entry["person"]["extensions"]["bib"]
     ):
         person.set_bib(int(person_entry["person"]["extensions"]["bib"]))
     if (
-        "qual" in person_entry["person"]["extensions"]
-        and person_entry["person"]["extensions"]["qual"]
+            "qual" in person_entry["person"]["extensions"]
+            and person_entry["person"]["extensions"]["qual"]
     ):
         person.qual = Qualification.get_qual_by_name(
             person_entry["person"]["extensions"]["qual"]
         )
     if "start" in person_entry["person"] and person_entry["person"]["start"]:
         person.start_time = time_iof_to_otime(person_entry["person"]["start"])
+    if "comment" in person_entry["person"]:
+        person.comment = person_entry["person"]["comment"]
+
 
     obj.persons.append(person)
     return person
@@ -306,10 +321,10 @@ def import_from_event_data(data) -> None:
     if "name" in data:
         new_name = data["name"]
         if (
-            new_name
-            and len(new_name) > 0
-            and new_name != "Event"
-            and new_name.find("Example") < 0
+                new_name
+                and len(new_name) > 0
+                and new_name != "Event"
+                and new_name.find("Example") < 0
         ):
             obj.data.title = data["name"]
 
