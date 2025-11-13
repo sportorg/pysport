@@ -480,7 +480,7 @@ def format_result(result, length):
             ret = result.get_result_otime_current_day().to_str()
         else:
             ret = result.status_comment
-    return (ret + " " * length)[0:length]
+    return (str(ret) + " " * length)[0:length]
 
 
 class Result(ABC):
@@ -492,6 +492,7 @@ class Result(ABC):
         self.finish_time: OTime = OTime.now()
         self.person: Optional[Person] = None
         self.status = ResultStatus.OK
+        self.status_multiday = ResultStatus.OK
         self.status_comment = ""
         self.penalty_time: Optional[OTime] = None
         self.credit_time: Optional[OTime] = None
@@ -606,6 +607,7 @@ class Result(ABC):
             "penalty_time": self.penalty_time.to_msec() if self.penalty_time else None,
             "credit_time": self.credit_time.to_msec() if self.credit_time else None,
             "status": self.status.value,
+            "status_multiday": self.status_multiday.value,
             "status_comment": self.status_comment,
             "penalty_laps": self.penalty_laps,
             "place": self.place,
@@ -689,6 +691,16 @@ class Result(ABC):
         return self.bib
 
     def get_result(self) -> str:
+        race_type = RaceType.INDIVIDUAL_RACE
+        if self.person and self.person.group:
+            race_type = self.person.group.race_type
+
+        if (
+            race_type == RaceType.MULTI_DAY_RACE
+            and self.status_multiday != ResultStatus.OK
+        ):
+            return self.status_multiday.get_title()
+
         if not self.is_status_ok():
             if self.status_comment:
                 return self.status_comment
@@ -705,28 +717,6 @@ class Result(ABC):
 
         time_accuracy = race().get_setting("time_accuracy", 0)
         ret += self.get_result_otime().to_str(time_accuracy)
-        return ret
-
-    def get_result_start_in_comment(self):
-        if not self.is_status_ok():
-            if self.status_comment:
-                return self.status_comment
-            return self.status.get_title()
-
-        if not self.person:
-            return ""
-
-        ret = ""
-        if race().get_setting("result_processing_mode", "time") == "ardf":
-            ret += f"{self.scores_ardf} {translate('points')} "
-        elif race().get_setting("result_processing_mode", "time") == "scores":
-            ret += f"{self.rogaine_score} {translate('points')} "
-
-        # time_accuracy = race().get_setting('time_accuracy', 0)
-        start = hhmmss_to_time(self.person.comment)
-        if start == OTime():
-            raise ValueError
-        ret += str(self.get_finish_time() - start)
         return ret
 
     def get_result_relay(self) -> str:
@@ -764,7 +754,7 @@ class Result(ABC):
 
     def get_result_for_sort(self):
         ret = self.get_result_otime()
-        return self.status, ret.to_msec()
+        return self.status_multiday, self.status, ret.to_msec()
 
     def get_result_otime(self):
         race_type = RaceType.INDIVIDUAL_RACE
@@ -812,17 +802,19 @@ class Result(ABC):
     def get_result_otime_multi_day(self):
         person_id = self.person.multi_day_id
         sum_result = OTime()
+        self.status_multiday = ResultStatus.OK
         for day in races():
             result_tmp = day.find_result_by_person_id(person_id)
             if result_tmp:
                 if result_tmp.is_status_ok():
                     sum_result += result_tmp.get_result_otime_current_day()
                 else:
-                    self.status = ResultStatus.MULTI_DAY_ISSUE
+                    self.status_multiday = ResultStatus.MULTI_DAY_ISSUE
                     self.status_comment = result_tmp.status_comment
                     return OTime()  # DSQ/DNS
             else:
-                self.status = ResultStatus.MULTI_DAY_ISSUE
+                self.status_multiday = ResultStatus.MULTI_DAY_ISSUE
+                self.status_comment = ResultStatus.MULTI_DAY_ISSUE.value
                 return OTime()  # result not found in that day
         return sum_result
 
