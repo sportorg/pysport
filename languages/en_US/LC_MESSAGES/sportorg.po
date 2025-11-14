@@ -17,6 +17,9 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Loco-Parser: loco_parse_po"
 
+msgid "toSFR"
+msgstr "Fail for SFR"
+
 msgid "SportOrg"
 msgstr "SportOrg"
 

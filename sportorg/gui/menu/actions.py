@@ -980,3 +980,50 @@ class ExtractPersonMiddleName(Action, metaclass=ActionFactory):
         for person in race().persons:
             person.extract_middle_name()
         self.app.refresh()
+
+class SFRExportAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        file_name = get_save_file_name(
+            translate("Export to SFR"),
+            translate("SFR files (*.txt)"),
+            "{}_sfr_export".format(
+                race().data.get_start_datetime().strftime("%Y%m%d")
+            ),
+        )
+        if file_name:
+            try:
+                # Проверяем доступность модуля SFR
+                try:
+                    from sportorg.modules.sfr.sfrxexporter import export_sfrx
+                    SFR_AVAILABLE = True
+                except ImportError:
+                    SFR_AVAILABLE = False
+                
+                if not SFR_AVAILABLE:
+                    QMessageBox.warning(
+                        self.app,
+                        translate("Export"),
+                        translate("SFR export not available")
+                    )
+                    return
+                
+                success = export_sfrx(file_name)
+                if success:
+                    QMessageBox.information(
+                        self.app,
+                        translate("Export"),
+                        translate("Export completed successfully")
+                    )
+                else:
+                    QMessageBox.warning(
+                        self.app,
+                        translate("Export"),
+                        translate("Export failed")
+                    )
+            except Exception as e:
+                logging.exception(str(e))
+                QMessageBox.critical(
+                    self.app,
+                    translate("Error"),
+                    str(e)
+                )
