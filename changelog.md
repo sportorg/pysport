@@ -3,6 +3,7 @@
 ## next
 
 ### Improvements
++ Generation of SRB file (SFR results board) on saving
 + New field - middle name (new Russian requirements)
 + Import of full date of birth
 + Optional build on Pyside2 (Qt5) / Pyside6 (Qt6)
