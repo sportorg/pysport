@@ -53,7 +53,7 @@ from sportorg.gui.utils.custom_controls import messageBoxQuestion
 from sportorg.language import translate
 from sportorg.libs.sfr import sfrximporter
 from sportorg.libs.winorient.wdb import write_wdb
-from sportorg.models.memory import ResultManual, ResultStatus, race
+from sportorg.models.memory import ResultManual, ResultStatus, race, SystemType
 from sportorg.models.result.result_checker import ResultChecker
 from sportorg.models.result.result_tools import recalculate_results
 from sportorg.models.start.start_preparation import (
@@ -600,37 +600,19 @@ class ManualFinishAction(Action, metaclass=ActionFactory):
         self.app.refresh()
 
 
-class SPORTidentReadoutAction(Action, metaclass=ActionFactory):
+class CardReadoutAction(Action, metaclass=ActionFactory):
     def execute(self):
-        SIReaderClient().toggle()
-        time.sleep(0.5)
-        self.app.interval()
-
-
-class SportiduinoReadoutAction(Action, metaclass=ActionFactory):
-    def execute(self):
-        SportiduinoClient().toggle()
-        time.sleep(0.5)
-        self.app.interval()
-
-
-class ImpinjReadoutAction(Action, metaclass=ActionFactory):
-    def execute(self):
-        ImpinjClient().toggle()
-        time.sleep(0.5)
-        self.app.interval()
-
-
-class SrpidReadoutAction(Action, metaclass=ActionFactory):
-    def execute(self):
-        SrpidClient().toggle()
-        time.sleep(0.5)
-        self.app.interval()
-
-
-class SFRReadoutAction(Action, metaclass=ActionFactory):
-    def execute(self):
-        SFRReaderClient().toggle()
+        punch_system = race().get_punch_system()
+        if punch_system == SystemType.SFR:
+            SFRReaderClient().toggle()
+        elif punch_system == SystemType.SPORTIDUINO:
+            SportiduinoClient().toggle()
+        elif punch_system == SystemType.RFID_IMPINJ:
+            ImpinjClient().toggle()
+        elif punch_system == SystemType.SRPID:
+            SrpidClient().toggle()
+        else:
+            SIReaderClient().toggle()
         time.sleep(0.5)
         self.app.interval()
 

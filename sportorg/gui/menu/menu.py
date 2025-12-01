@@ -369,30 +369,10 @@ def menu_list():
             "title": translate("Service"),
             "actions": [
                 {
-                    "title": translate("on/off SPORTident readout"),
+                    "title": translate("On/Off card readout"),
                     "icon": config.icon_dir("sportident.png"),
                     "shortcut": "F8",
-                    "action": "SPORTidentReadoutAction",
-                },
-                {
-                    "title": translate("on/off Sportiduino readout"),
-                    "icon": config.icon_dir("sportiduino.png"),
-                    "action": "SportiduinoReadoutAction",
-                },
-                {
-                    "title": translate("on/off SFR readout"),
-                    "icon": config.icon_dir("sfr.png"),
-                    "action": "SFRReadoutAction",
-                },
-                {
-                    "title": translate("on/off RFID Impinj readout"),
-                    "icon": config.icon_dir("rfid_impinj.png"),
-                    "action": "ImpinjReadoutAction",
-                },
-                {
-                    "title": translate("on/off SRPid readout"),
-                    "icon": config.icon_dir("srpid.png"),
-                    "action": "SrpidReadoutAction",
+                    "action": "CardReadoutAction",
                 },
                 {
                     "title": translate("Teamwork"),

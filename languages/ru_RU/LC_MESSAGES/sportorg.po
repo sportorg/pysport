@@ -1032,6 +1032,9 @@ msgstr "Ввести Шахматку"
 msgid "Service"
 msgstr "Сервис"
 
+msgid "On/Off card readout"
+msgstr "Запустить/остановить чтение чипов"
+
 msgid "on/off SPORTident readout"
 msgstr "Запустить/остановить чтение чипов SPORTident"
 
@@ -1040,6 +1043,9 @@ msgstr "Запустить/остановить чтение чипов Sportidu
 
 msgid "on/off SFR readout"
 msgstr "Запустить/остановить чтение чипов SFR"
+
+msgid "Punch system"
+msgstr "Система отметки"
 
 msgid "Send selected"
 msgstr "Отправить выбранные"
