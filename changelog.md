@@ -15,6 +15,7 @@
 + Competitors' numbers in relay format (e.g., 15.1, [#501](https://github.com/sportorg/pysport/issues/501))
 + Reverse row numbering in the results tab ([#519](https://github.com/sportorg/pysport/issues/519))
 + Templates can compress data (gzip) to reduce the size of html files
++ Punch system selection in timekeeping properties dialog
 
 ### Fixes
 + Fixed: multi day race processing - all days are refreshed on the file opening
