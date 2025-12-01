@@ -1853,7 +1853,7 @@ class Race(Model):
             return nvl_value
 
     def get_punch_system(self):
-        return SystemType(self.get_setting('punch_system', SystemType.SPORTIDENT.value))
+        return SystemType(self.get_setting("punch_system", SystemType.SPORTIDENT.value))
 
     def get_days(self, date_=None):
         return self.data.get_days(date_)

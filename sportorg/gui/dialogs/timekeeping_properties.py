@@ -70,17 +70,17 @@ class TimekeepingPropertiesDialog(QDialog):
         self.item_si_port.addItems(SIReaderClient().get_ports())
         self.tk_layout.addRow(self.label_si_port, self.item_si_port)
 
-        self.punch_system_box = QGroupBox(translate('Punch system'))
+        self.punch_system_box = QGroupBox(translate("Punch system"))
         self.punch_system_layout = QFormLayout()
-        self.punch_system_si = QRadioButton(translate('SPORTident'))
+        self.punch_system_si = QRadioButton(translate("SPORTident"))
         self.punch_system_layout.addRow(self.punch_system_si)
-        self.punch_system_sfr = QRadioButton(translate('SFR'))
+        self.punch_system_sfr = QRadioButton(translate("SFR"))
         self.punch_system_layout.addRow(self.punch_system_sfr)
-        self.punch_system_sportiduino = QRadioButton(translate('Sportiduino (Clever)'))
+        self.punch_system_sportiduino = QRadioButton(translate("Sportiduino (Clever)"))
         self.punch_system_layout.addRow(self.punch_system_sportiduino)
-        self.punch_system_impinj = QRadioButton(translate('RFID Impinj'))
+        self.punch_system_impinj = QRadioButton(translate("RFID Impinj"))
         self.punch_system_layout.addRow(self.punch_system_impinj)
-        self.punch_system_srpid = QRadioButton(translate('SRPID'))
+        self.punch_system_srpid = QRadioButton(translate("SRPID"))
         self.punch_system_layout.addRow(self.punch_system_srpid)
         self.punch_system_si.setChecked(True)
         self.punch_system_box.setLayout(self.punch_system_layout)
@@ -705,15 +705,15 @@ class TimekeepingPropertiesDialog(QDialog):
         obj.set_setting("system_port", self.item_si_port.currentText())
 
         if self.punch_system_sfr.isChecked():
-            obj.set_setting('punch_system', SystemType.SFR.value)
+            obj.set_setting("punch_system", SystemType.SFR.value)
         elif self.punch_system_sportiduino.isChecked():
-            obj.set_setting('punch_system', SystemType.SPORTIDUINO.value)
+            obj.set_setting("punch_system", SystemType.SPORTIDUINO.value)
         elif self.punch_system_impinj.isChecked():
-            obj.set_setting('punch_system', SystemType.RFID_IMPINJ.value)
+            obj.set_setting("punch_system", SystemType.RFID_IMPINJ.value)
         elif self.punch_system_srpid.isChecked():
-            obj.set_setting('punch_system', SystemType.SRPID.value)
+            obj.set_setting("punch_system", SystemType.SRPID.value)
         else:
-            obj.set_setting('punch_system', SystemType.SPORTIDENT.value)
+            obj.set_setting("punch_system", SystemType.SPORTIDENT.value)
 
         obj.set_setting("system_start_source", start_source)
         obj.set_setting("system_finish_source", finish_source)
