@@ -1,5 +1,3 @@
-# test_sfrxexporter.py
-# import pytest
 import tempfile
 import os
 from unittest.mock import Mock, patch, MagicMock
