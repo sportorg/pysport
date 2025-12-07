@@ -2,6 +2,7 @@
 import os
 import logging
 from datetime import datetime, time
+from sportorg import config, settings
 
 from sportorg.language import translate
 from sportorg.models import memory
@@ -76,20 +77,21 @@ def _write_header(f, race: Race):
     if race.data.race_type and hasattr(race.data.race_type, 'value'):
         if race.data.race_type.value == "relay":
             race_type = "Эстафета"
-
+    write_from = "SportOrg Export " + config.VERSION
+    write_url = config.
     header_fields = [
         "SFRx_v2404",
         title,
         location,
         str(days),
-        "", #3
+        "", # (количество проведенных/законченных дней?)
         "", 
         "",  # 2 неизвестных поля
         race_type,
         name_style, 
-        punch_bib_style, #Запись номера в чипе "Номер команды и этап (последняя цифра)"
-        "", "", "", "",  # дополнительные неизвестные (неизвлеченные) поля
-        "SportOrg Export"  # источник данных
+        punch_bib_style, 
+        "", "", "", "",  # 4 дополнительных неизвестных (неизвлеченные) поля
+        write_from  
     ]
     f.write("\t".join(header_fields) + "\n")
 
@@ -107,10 +109,10 @@ def _write_days(f, race: Race):
             discipline = "Лыжные гонки"
     
     day_fields = [
-        "p1",
-        discipline,
+        "p1",    
+        discipline, #Кросс - лонг (0830031811Я)  ? Первый день
         date_str,
-        ""  # пустое поле в конце
+        ""  # ссылка оргео!
     ]
     f.write("\t".join(day_fields) + "\n")
 
