@@ -54,14 +54,21 @@ def export_sfrx(destination: str):
 
 def _write_header(f, race: Race):
 
-    title = race.data.title or "Competition"
-    location = race.data.location or ""
+    title = race.data.title or "Соревнования"
+    location = race.data.location or "Место"
 
-    organizer = ""
-    if hasattr(race.data, 'organizer') and race.data.organizer:
-        organizer = race.data.organizer
-    elif hasattr(race.data, 'organization') and race.data.organization:
-        organizer = race.data.organization
+    name_style = "Фамилия и имя заглавными"
+    #Фамилия заглавными/Фамилия и имя заглавными/Заглавные начальные/Как введено
+    
+    punch_bib_style ="Номер команды и этап (последняя цифра)"
+    #Только номер команды
+    #Номер команды + этап *1000
+
+
+    # if hasattr(race.data, 'organizer') and race.data.organizer:
+    #     organizer = race.data.organizer
+    # elif hasattr(race.data, 'organization') and race.data.organization:
+    #     organizer = race.data.organization
     
     days = 1
    
@@ -75,10 +82,13 @@ def _write_header(f, race: Race):
         title,
         location,
         str(days),
-        "", "", "",  # пустые поля
+        "", #3
+        "", 
+        "",  # 2 неизвестных поля
         race_type,
-        organizer,
-        "", "", "", "", "",  # дополнительные пустые поля
+        name_style, 
+        punch_bib_style, #Запись номера в чипе "Номер команды и этап (последняя цифра)"
+        "", "", "", "",  # дополнительные неизвестные (неизвлеченные) поля
         "SportOrg Export"  # источник данных
     ]
     f.write("\t".join(header_fields) + "\n")
