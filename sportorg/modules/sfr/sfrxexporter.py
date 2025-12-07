@@ -29,9 +29,9 @@ def export_sfrx(destination: str):
   
             _write_days(f, race)
    
-            _write_federations(f)
+            _write_descriptions(f, race)
      
-            _write_clubs(f)
+            _write_clubs(f, race)
       
             _write_groups(f, race)
      
@@ -67,15 +67,17 @@ def _write_header(f, race: Race):
         if race.data.race_type.value == "relay":
             race_type = "Эстафета"
     write_from = "SportOrg Export " + config.VERSION
-      
+    Chief_referee = race.data.chief_referee 
+    Chief_secretary = race.data.secretary 
+
     header_fields = [
         "SFRx_v2404",
         title,
         location,
         str(days),
         "", # (количество проведенных/законченных дней?)
-        "", 
-        "",  # 2 неизвестных поля
+        Chief_referee, # гл судья
+        Chief_secretary,  # гл секретарь
         race_type,
         name_style, 
         punch_bib_style, 
@@ -87,7 +89,7 @@ def _write_header(f, race: Race):
 
 def _write_days(f, race: Race):
     """Запись информации о днях соревнований"""
-    #write_url = url or ""
+    url = race.data.url or "" 
     start_date = race.data.start_datetime or datetime.now()
     date_str = start_date.strftime("%d.%m.%Y")
     
@@ -96,34 +98,33 @@ def _write_days(f, race: Race):
         if race.data.race_type.value == "relay":
             discipline = "Эстафета"
         elif race.data.race_type.value == "skiing":
-            discipline = "Лыжные гонки"
+            discipline = "Лыжная гонка"
     
     day_fields = [
         "p1",    
         discipline, #Кросс - лонг (0830031811Я)  ? Первый день
         date_str,
-        "" #write_url  # ссылка оргео!
+        url #write_url  # ссылка оргео!
     ]
     f.write("\t".join(day_fields) + "\n")
 
 
-def _write_federations(f):
-
-    federation_fields = [
-        "h0", 
-        "Региональная ОО ФСО"
-    ]
-    f.write("\t".join(federation_fields) + "\n")
 
 
-def _write_clubs(f):
+def _write_descriptions(f, race: Race):
+    description_field = race.data.description 
 
-    club_fields = [
-        "f0",
-        "Экстрим парк"
-    ]
-    f.write("\t".join(club_fields) + "\n")
+    lines = [line.strip() for line in description_field.split('<br>')]
+    
+    for i, line in enumerate(lines):
+        f.write(f"h{i}\t{line}\n")
 
+# дополнения в шапку протокола (в спорторге это тоже в дескриптионс, но как разделить)
+def _write_clubs(f, race: Race):
+    description_field = race.data.description 
+    lines = [line.strip() for line in description_field.split('<br>')]
+    for i, line in enumerate(lines):
+        f.write(f"f{i}\t{line}\n")
 
 def _write_groups(f, race: Race):
 
