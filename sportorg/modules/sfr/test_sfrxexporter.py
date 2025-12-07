@@ -1,17 +1,10 @@
-<<<<<<< HEAD
-=======
 # test_sfrxexporter.py
-# import pytest
->>>>>>> 6d538c4 (добавлен тест)
+import pytest
 import tempfile
 import os
 from unittest.mock import Mock, patch, MagicMock
 from datetime import datetime, date
-<<<<<<< HEAD
-import pytest
-=======
 from uuid import uuid4
->>>>>>> 6d538c4 (добавлен тест)
 
 from sportorg.models.memory import (
     RaceType, ResultStatus, Qualification, OTime,
@@ -21,228 +14,6 @@ from sportorg.models.memory import (
 
 
 class TestSFRxExporter:
-<<<<<<< HEAD
-    """Упрощенные тесты для экспорта SFRx"""
-    
-    def setup_method(self):
-        """Базовая настройка для всех тестов"""
-        self.test_dir = tempfile.mkdtemp()
-        self.test_file = os.path.join(self.test_dir, "test_export.sfrx")
-        
-        # Создаем мок-объекты
-        self.create_mock_race()
-    
-    def teardown_method(self):
-        """Очистка после тестов"""
-        if os.path.exists(self.test_file):
-            os.remove(self.test_file)
-        os.rmdir(self.test_dir)
-    
-    def create_mock_race(self, race_type=RaceType.INDIVIDUAL_RACE, **kwargs):
-        """Создание мок-объекта гонки с параметрами"""
-        self.race = Mock(spec=Race)
-        self.race.data = Mock(spec=RaceData)
-        self.race.data.title = kwargs.get('title', "Тестовые соревнования")
-        self.race.data.location = kwargs.get('location', "Тестовая локация")
-        self.race.data.start_datetime = kwargs.get('start_datetime', datetime(2024, 1, 15, 10, 0, 0))
-        self.race.data.race_type = race_type
-        self.race.data.description = kwargs.get('description', "Тестовое описание")
-        self.race.data.chief_referee = kwargs.get('chief_referee', "Главный судья")
-        self.race.data.secretary = kwargs.get('secretary', "Секретарь")
-        
-        # Базовая группа
-        self.group1 = self.create_mock_group(
-            name="М21",
-            course=self.create_mock_course(
-                name="Длинная",
-                controls=[
-                    self.create_mock_control("31"),
-                    self.create_mock_control("32")
-                ]
-            )
-        )
-        
-        # Базовая организация
-        self.org1 = self.create_mock_organization("СК Приз")
-        
-        # Базовый участник
-        self.person1 = self.create_mock_person(
-            name="Иван",
-            surname="Иванов",
-            bib=101,
-            group=self.group1,
-            organization=self.org1,
-            birth_date=date(1990, 5, 15),
-            start_time=OTime(10, 30, 0)
-        )
-        
-        # Базовый результат
-        self.result1 = self.create_mock_result(
-            person=self.person1,
-            start_time=OTime(10, 30, 0),
-            finish_time=OTime(11, 15, 30),
-            status=ResultStatus.OK,
-            splits=[
-                self.create_mock_split("31", OTime(10, 45, 0)),
-                self.create_mock_split("32", OTime(11, 0, 0))
-            ]
-        )
-        
-        # Настройка гонки
-        self.race.groups = [self.group1]
-        self.race.organizations = [self.org1]
-        self.race.persons = [self.person1]
-        self.race.courses = [self.group1.course]
-        self.race.results = [self.result1]
-        self.race.relay_teams = []
-        self.race.settings = {'live_urls': ['http://test.org/geo']}
-        self.race.controls = []
-        
-        self.race.find_person_result = Mock(return_value=self.result1)
-        self.race.get_setting = lambda key, default=None: self.race.settings.get(key, default)
-    
-    def create_mock_group(self, name, course=None):
-        group = Mock(spec=Group)
-        group.name = name
-        group.course = course
-        return group
-    
-    def create_mock_course(self, name, controls=None, **kwargs):
-        course = Mock(spec=Course)
-        course.name = name
-        course.bib = kwargs.get('bib', 1)
-        course.length = kwargs.get('length', 4200)
-        course.climb = kwargs.get('climb', 150)
-        course.controls = controls or []
-        return course
-    
-    def create_mock_control(self, code):
-        control = Mock(spec=CourseControl)
-        control.code = code
-        control.length = 0
-        control.get_number_code = Mock(return_value=code)
-        return control
-    
-    def create_mock_organization(self, name):
-        org = Mock(spec=Organization)
-        org.name = name
-        return org
-    
-    def create_mock_person(self, name, surname, bib, group, organization, **kwargs):
-        person = Mock(spec=Person)
-        person.name = name
-        person.surname = surname
-        person.bib = bib
-        person.group = group
-        person.organization = organization
-        person.birth_date = kwargs.get('birth_date')
-        person.year = kwargs.get('year', 1990)
-        person.qual = kwargs.get('qual', Qualification.NOT_QUALIFIED)
-        person.comment = kwargs.get('comment', "")
-        person.start_time = kwargs.get('start_time')
-        person.is_out_of_competition = kwargs.get('is_out_of_competition', False)
-        return person
-    
-    def create_mock_result(self, person, start_time, finish_time, status, splits=None):
-        result = Mock(spec=ResultSportident)
-        result.person = person
-        result.start_time = start_time
-        result.finish_time = finish_time
-        result.status = status
-        result.splits = splits or []
-        result.get_start_time = Mock(return_value=start_time)
-        result.get_finish_time = Mock(return_value=finish_time)
-        return result
-    
-    def create_mock_split(self, code, time):
-        split = Mock(spec=Split)
-        split.code = code
-        split.time = time
-        split.is_correct = True
-        return split
-    
-    @patch('sportorg.modules.sfr.sfrxexporter.memory')
-    @patch('sportorg.modules.sfr.sfrxexporter.logging')
-    @patch('sportorg.modules.sfr.sfrxexporter.translate')
-    def test_export_sfrx_success(self, mock_translate, mock_logging, mock_memory):
-        """Базовый успешный экспорт"""
-        mock_memory.race.return_value = self.race
-        mock_translate.side_effect = lambda x: x
-        
-        from sportorg.modules.sfr.sfrxexporter import export_sfrx
-        result = export_sfrx(self.test_file)
-        
-        assert result is True
-        assert os.path.exists(self.test_file)
-        mock_logging.info.assert_called()
-    
-    @patch('sportorg.modules.sfr.sfrxexporter.memory')
-    @patch('sportorg.modules.sfr.sfrxexporter.logging')
-    @patch('sportorg.modules.sfr.sfrxexporter.translate')
-    def test_export_sfrx_no_race_data(self, mock_translate, mock_logging, mock_memory):
-        """Экспорт без данных гонки"""
-        mock_memory.race.return_value = None
-        mock_translate.side_effect = lambda x: x
-        
-        from sportorg.modules.sfr.sfrxexporter import export_sfrx
-        result = export_sfrx(self.test_file)
-        
-        assert result is False
-        mock_logging.error.assert_called_with("No race data found")
-    
-    @patch('sportorg.modules.sfr.sfrxexporter.memory')
-    @patch('sportorg.modules.sfr.sfrxexporter.logging')
-    @patch('sportorg.modules.sfr.sfrxexporter.translate')
-    def test_export_sfrx_with_relay(self, mock_translate, mock_logging, mock_memory):
-        """Экспорт эстафеты"""
-        self.create_mock_race(RaceType.RELAY)
-        mock_memory.race.return_value = self.race
-        mock_translate.side_effect = lambda x: x
-        
-        from sportorg.modules.sfr.sfrxexporter import export_sfrx
-        result = export_sfrx(self.test_file)
-        
-        assert result is True
-        assert os.path.exists(self.test_file)
-    
-    @patch('sportorg.modules.sfr.sfrxexporter.memory')
-    @patch('sportorg.modules.sfr.sfrxexporter.logging')
-    @patch('sportorg.modules.sfr.sfrxexporter.translate')
-    def test_export_sfrx_different_result_statuses(self, mock_translate, mock_logging, mock_memory):
-        """Экспорт с разными статусами результатов"""
-        # Создаем участников с разными статусами
-        person_dsq = self.create_mock_person(
-            name="Петр", surname="Петров", bib=102,
-            group=self.group1, organization=self.org1,
-            birth_date=date(1995, 3, 20)
-        )
-        
-        result_dsq = self.create_mock_result(
-            person=person_dsq,
-            start_time=OTime(10, 35, 0),
-            finish_time=OTime(11, 20, 0),
-            status=ResultStatus.DISQUALIFIED
-        )
-        
-        # Обновляем гонку
-        self.race.persons = [self.person1, person_dsq]
-        self.race.results = [self.result1, result_dsq]
-        
-        def find_result_side_effect(person):
-            if person.bib == 101:
-                return self.result1
-            elif person.bib == 102:
-                return result_dsq
-            return None
-        
-        self.race.find_person_result.side_effect = find_result_side_effect
-        mock_memory.race.return_value = self.race
-        mock_translate.side_effect = lambda x: x
-        
-        from sportorg.modules.sfr.sfrxexporter import export_sfrx
-        result = export_sfrx(self.test_file)
-        
-=======
       def setup_method(self):
         self.test_dir = tempfile.mkdtemp()
         self.test_file = os.path.join(self.test_dir, "test_export.sfrx")
@@ -253,18 +24,23 @@ class TestSFRxExporter:
         self.race.data.start_datetime = datetime(2024, 1, 15, 10, 0, 0)
         self.race.data.race_type = RaceType.INDIVIDUAL_RACE
         
+        #  organizer и organization в RaceData!
+        
+        # Создаем мок группы
         self.group1 = Mock(spec=Group)
         self.group1.name = "М21"
         self.group1.course = None
         self.group1.get_type = Mock(return_value=RaceType.INDIVIDUAL_RACE)
         self.group1.is_relay = Mock(return_value=False)
-       
+        
+        # Создаем мок трассы
         self.course1 = Mock(spec=Course)
         self.course1.name = "Длинная"
         self.course1.bib = 1
         self.course1.length = 4200
         self.course1.climb = 150
         
+        # Создаем CourseControl объекты
         self.control1 = Mock(spec=CourseControl)
         self.control1.code = "31"
         self.control1.length = 0
@@ -278,9 +54,11 @@ class TestSFRxExporter:
         self.course1.controls = [self.control1, self.control2]
         self.group1.course = self.course1
         
+        # Создаем мок организации
         self.org1 = Mock(spec=Organization)
         self.org1.name = "СК Приз"
         
+        # Создаем мок участника
         self.person1 = Mock(spec=Person)
         self.person1.id = uuid4()
         self.person1.name = "Иван"
@@ -289,17 +67,22 @@ class TestSFRxExporter:
         self.person1.bib = 101
         self.person1.group = self.group1
         self.person1.organization = self.org1
-       
+        
+        # birth_date - это date, а не datetime!
         self.person1.birth_date = date(1990, 5, 15)
         
+        # year - это property, возвращающее год из birth_date
         self.person1.year = 1990
         
+        # qual - это Qualification Enum
         self.person1.qual = Qualification.NOT_QUALIFIED
         
         self.person1.comment = "Тестовый участник"
         
+        # start_time - это OTime объект!
         self.person1.start_time = OTime(10, 30, 0)
-    
+        
+        # Дополнительные поля Person
         self.person1.is_out_of_competition = False
         self.person1.is_rented_card = False
         self.person1.is_paid = False
@@ -309,13 +92,16 @@ class TestSFRxExporter:
         self.person1.card_number = 123456
         self.person1.start_group = 0
         self.person1.result_count = 0
-      
+        
+        # Свойство full_name
         self.person1.full_name = "Иванов Иван"
         
+        # Создаем мок результата - ResultSportident (наследник Result)
         self.result1 = Mock(spec=ResultSportident)
         self.result1.id = uuid4()
         self.result1.person = self.person1
-      
+        
+        # Время - OTime объекты!
         self.result1.start_time = OTime(10, 30, 0)
         self.result1.finish_time = OTime(11, 15, 30)
         self.result1.status = ResultStatus.OK
@@ -328,7 +114,8 @@ class TestSFRxExporter:
         self.result1.rogaine_score = 0
         self.result1.scores_ardf = 0
         self.result1.card_number = 123456
-       
+        
+        # Создаем моки сплитов
         self.split1 = Mock(spec=Split)
         self.split1.code = "31"
         self.split1.time = OTime(10, 45, 0)
@@ -340,7 +127,8 @@ class TestSFRxExporter:
         self.split2.is_correct = True
         
         self.result1.splits = [self.split1, self.split2]
-      
+        
+        # Методы Result
         self.result1.get_start_time = Mock(return_value=OTime(10, 30, 0))
         self.result1.get_finish_time = Mock(return_value=OTime(11, 15, 30))
         self.result1.get_penalty_time = Mock(return_value=OTime())
@@ -348,6 +136,7 @@ class TestSFRxExporter:
         self.result1.is_status_ok = Mock(return_value=True)
         self.result1.is_sportident = Mock(return_value=True)
         
+        # Настраиваем структуру гонки
         self.race.groups = [self.group1]
         self.race.organizations = [self.org1]
         self.race.persons = [self.person1]
@@ -357,11 +146,14 @@ class TestSFRxExporter:
         self.race.settings = {}
         self.race.controls = []
         
+        # Настраиваем методы race
         self.race.find_person_result = Mock(return_value=self.result1)
         self.race.find_person_by_bib = Mock(return_value=None)
         self.race.find_person_by_card = Mock(return_value=None)
         self.race.get_persons_by_group = Mock(return_value=[self.person1])
         
+        # Для CourseControl в реальном коде есть метод get_number_code()
+        # Убедимся, что мок его поддерживает
         for control in [self.control1, self.control2]:
             control.get_number_code = Mock(return_value=control.code)
     
@@ -378,19 +170,24 @@ class TestSFRxExporter:
       @patch('sportorg.modules.sfr.sfrxexporter.translate')
       
       def test_export_sfrx_success(self, mock_translate, mock_logging, mock_memory):
-   
+        """Тест успешного экспорта"""
+        # Arrange
         mock_memory.race.return_value = self.race
         mock_translate.side_effect = lambda x: x
-  
+        
+        # Act
         result = export_sfrx(self.test_file)
-  
+        
+        # Assert
         assert result is True
         assert os.path.exists(self.test_file)
- 
+        
+        # Проверяем, что файл не пустой
         with open(self.test_file, 'r', encoding='utf-8') as f:
             content = f.read()
             assert len(content) > 0
-        
+            
+        # Проверяем логирование
         mock_logging.info.assert_called()
     
       @patch('sportorg.modules.sfr.sfrxexporter.memory')
@@ -550,7 +347,8 @@ class TestSFRxExporter:
         result3.get_credit_time = Mock(return_value=OTime())
         result3.is_status_ok = Mock(return_value=False)
         result3.is_sportident = Mock(return_value=True)
-   
+        
+        # Добавляем в гонку
         self.race.persons = [self.person1, person2, person3]
         self.race.results = [self.result1, result2, result3]
         
@@ -567,14 +365,16 @@ class TestSFRxExporter:
         
         mock_memory.race.return_value = self.race
         mock_translate.side_effect = lambda x: x
-       
+        
+        # Act
         result = export_sfrx(self.test_file)
-      
+        
+        # Assert
         assert result is True
         
         with open(self.test_file, 'r', encoding='utf-8') as f:
             content = f.read()
- 
+            # Проверяем, что все участники экспортированы
             assert "Иванов" in content
             assert "Петров" in content
             assert "Сергеев" in content
@@ -583,52 +383,39 @@ class TestSFRxExporter:
       @patch('sportorg.modules.sfr.sfrxexporter.logging')
       @patch('sportorg.modules.sfr.sfrxexporter.translate')
       def test_export_sfrx_person_without_birth_date(self, mock_translate, mock_logging, mock_memory):
-      
+        """Тест экспорта участника без даты рождения"""
+        # Arrange
         self.person1.birth_date = None
         self.person1.year = 0
         
         mock_memory.race.return_value = self.race
         mock_translate.side_effect = lambda x: x
-      
+        
+        # Act
         result = export_sfrx(self.test_file)
-      
->>>>>>> 6d538c4 (добавлен тест)
+        
+        # Assert
         assert result is True
         
         with open(self.test_file, 'r', encoding='utf-8') as f:
             content = f.read()
             assert "Иванов" in content
-<<<<<<< HEAD
-            assert "Петров" in content
-    
-    @patch('sportorg.modules.sfr.sfrxexporter.memory')
-    @patch('sportorg.modules.sfr.sfrxexporter.logging')
-    @patch('sportorg.modules.sfr.sfrxexporter.translate')
-    def test_export_sfrx_exception_handling(self, mock_translate, mock_logging, mock_memory):
-        """Обработка исключений при экспорте"""
-        mock_memory.race.return_value = self.race
-        mock_translate.side_effect = lambda x: x
-        
-        from sportorg.modules.sfr.sfrxexporter import export_sfrx
-        
-        # Симулируем ошибку при открытии файла
-        with patch('builtins.open', side_effect=Exception("Test error")):
-            result = export_sfrx(self.test_file)
-            
-=======
     
       @patch('sportorg.modules.sfr.sfrxexporter.memory')
       @patch('sportorg.modules.sfr.sfrxexporter.logging')
       @patch('sportorg.modules.sfr.sfrxexporter.translate')
       def test_export_sfrx_person_without_result(self, mock_translate, mock_logging, mock_memory):
-   
+        """Тест экспорта участника без результата"""
+        # Arrange
         self.race.find_person_result.return_value = None
         
         mock_memory.race.return_value = self.race
         mock_translate.side_effect = lambda x: x
-       
+        
+        # Act
         result = export_sfrx(self.test_file)
-     
+        
+        # Assert
         assert result is True
         
         with open(self.test_file, 'r', encoding='utf-8') as f:
@@ -639,7 +426,8 @@ class TestSFRxExporter:
       @patch('sportorg.modules.sfr.sfrxexporter.logging')
       @patch('sportorg.modules.sfr.sfrxexporter.translate')
       def test_export_sfrx_with_multiple_organizations(self, mock_translate, mock_logging, mock_memory):
-  
+        """Тест экспорта с несколькими организациями"""
+        # Arrange
         org2 = Mock(spec=Organization)
         org2.name = "Динамо"
         
@@ -650,9 +438,11 @@ class TestSFRxExporter:
         
         mock_memory.race.return_value = self.race
         mock_translate.side_effect = lambda x: x
-       
+        
+        # Act
         result = export_sfrx(self.test_file)
-      
+        
+        # Assert
         assert result is True
     
       @patch('sportorg.modules.sfr.sfrxexporter.memory')
@@ -671,7 +461,8 @@ class TestSFRxExporter:
         control4.code = "241"
         control4.length = 0
         control4.get_number_code = Mock(return_value="241")
-
+        
+        # Также добавляем КП с нецифровым кодом
         control5 = Mock(spec=CourseControl)
         control5.code = "A"
         control5.length = 0
@@ -681,26 +472,33 @@ class TestSFRxExporter:
         
         mock_memory.race.return_value = self.race
         mock_translate.side_effect = lambda x: x
-      
+        
+        # Act
         result = export_sfrx(self.test_file)
-       
+        
+        # Assert
         assert result is True
     
       @patch('sportorg.modules.sfr.sfrxexporter.memory')
       @patch('sportorg.modules.sfr.sfrxexporter.logging')
       def test_export_sfrx_file_structure(self, mock_logging, mock_memory):
-     
+        """Тест структуры выходного файла"""
+        # Arrange
         mock_memory.race.return_value = self.race
-    
+        
+        # Act
         result = export_sfrx(self.test_file)
         
+        # Assert
         assert result is True
         
         with open(self.test_file, 'r', encoding='utf-8') as f:
             lines = f.readlines()
-          
+            
+        # Проверяем основные секции
         content = "".join(lines)
-     
+        
+        # Должны быть все основные секции
         assert "SFRx_v2404" in content  # Заголовок
         assert "p1" in content  # Дни
         assert "h0" in content  # Федерации
@@ -715,21 +513,21 @@ class TestSFRxExporter:
       @patch('sportorg.modules.sfr.sfrxexporter.logging')
       @patch('sportorg.modules.sfr.sfrxexporter.translate')
       def test_export_sfrx_exception_handling(self, mock_translate, mock_logging, mock_memory):
-  
+        """Тест обработки исключений при записи файла"""
+        # Arrange
         mock_memory.race.return_value = self.race
         mock_translate.side_effect = lambda x: x
         
+        # Имитируем ошибку при записи файла
         with patch('builtins.open', side_effect=Exception("Test error")):
-    
+            # Act
             result = export_sfrx(self.test_file)
-     
->>>>>>> 6d538c4 (добавлен тест)
+            
+            # Assert
             assert result is False
             mock_logging.error.assert_called()
 
 
-<<<<<<< HEAD
-=======
 class TestSFRExporter:
     """Тесты для функции-обертки export_sfr_data"""
     
@@ -737,18 +535,22 @@ class TestSFRExporter:
     @patch('sportorg.modules.sfr.sfrexporter.logging')
     @patch('sportorg.modules.sfr.sfrexporter.translate')
     def test_export_sfr_data_file_type(self, mock_translate, mock_logging, mock_memory):
-          
+        """Тест экспорта с типом 'file'"""
+        # Arrange
         from sportorg.modules.sfr.sfrexporter import export_sfr_data
         
         race = Mock(spec=Race)
         mock_memory.race.return_value = race
         mock_translate.side_effect = lambda x: x
-     
+        
+        # Мокируем export_sfrx
         with patch('sportorg.modules.sfr.sfrexporter.export_sfrx') as mock_export_sfrx:
             mock_export_sfrx.return_value = True
-          
+            
+            # Act
             result = export_sfr_data("test.sfrx", export_type='file')
-        
+            
+            # Assert
             assert result is True
             mock_export_sfrx.assert_called_once_with("test.sfrx")
     
@@ -757,14 +559,16 @@ class TestSFRExporter:
     @patch('sportorg.modules.sfr.sfrexporter.translate')
     def test_export_sfr_data_no_race(self, mock_translate, mock_logging, mock_memory):
         """Тест экспорта без данных о гонке"""
-     
+        # Arrange
         from sportorg.modules.sfr.sfrexporter import export_sfr_data
         
         mock_memory.race.return_value = None
         mock_translate.side_effect = lambda x: x
         
+        # Act
         result = export_sfr_data("test.sfrx", export_type='file')
         
+        # Assert
         assert result is False
         mock_logging.error.assert_called_with("No race data found")
     
@@ -772,21 +576,23 @@ class TestSFRExporter:
     @patch('sportorg.modules.sfr.sfrexporter.translate')
     def test_export_sfr_data_invalid_type(self, mock_translate, mock_memory):
         """Тест экспорта с неверным типом"""
-
+        # Arrange
         from sportorg.modules.sfr.sfrexporter import export_sfr_data
         
         race = Mock(spec=Race)
         mock_memory.race.return_value = race
         mock_translate.side_effect = lambda x: x
         
+        # Act
         result = export_sfr_data("test.sfrx", export_type='invalid')
         
+        # Assert
         assert result is False
 
 
+# Импорт в конце, чтобы избежать циклических импортов
 from sportorg.modules.sfr.sfrxexporter import export_sfrx
 
 
->>>>>>> 6d538c4 (добавлен тест)
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
