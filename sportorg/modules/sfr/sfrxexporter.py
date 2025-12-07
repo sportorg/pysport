@@ -3,7 +3,7 @@ import os
 import logging
 from datetime import datetime, time
 from sportorg import config, settings
-
+#from sportorg.modules.live.orgeo import url
 from sportorg.language import translate
 from sportorg.models import memory
 from sportorg.models.memory import (
@@ -57,28 +57,17 @@ def _write_header(f, race: Race):
 
     title = race.data.title or "Соревнования"
     location = race.data.location or "Место"
-
     name_style = "Фамилия и имя заглавными"
     #Фамилия заглавными/Фамилия и имя заглавными/Заглавные начальные/Как введено
-    
     punch_bib_style ="Номер команды и этап (последняя цифра)"
-    #Только номер команды
-    #Номер команды + этап *1000
-
-
-    # if hasattr(race.data, 'organizer') and race.data.organizer:
-    #     organizer = race.data.organizer
-    # elif hasattr(race.data, 'organization') and race.data.organization:
-    #     organizer = race.data.organization
-    
-    days = 1
-   
+    #Только номер команды/Номер команды + этап *1000
+    days = 1  # пока экспорт только первого/одного дня, есть смысл делать мульти?
     race_type = "Индивидуальные"
     if race.data.race_type and hasattr(race.data.race_type, 'value'):
         if race.data.race_type.value == "relay":
             race_type = "Эстафета"
     write_from = "SportOrg Export " + config.VERSION
-    write_url = config.
+      
     header_fields = [
         "SFRx_v2404",
         title,
@@ -98,6 +87,7 @@ def _write_header(f, race: Race):
 
 def _write_days(f, race: Race):
     """Запись информации о днях соревнований"""
+    #write_url = url or ""
     start_date = race.data.start_datetime or datetime.now()
     date_str = start_date.strftime("%d.%m.%Y")
     
@@ -112,7 +102,7 @@ def _write_days(f, race: Race):
         "p1",    
         discipline, #Кросс - лонг (0830031811Я)  ? Первый день
         date_str,
-        ""  # ссылка оргео!
+        "" #write_url  # ссылка оргео!
     ]
     f.write("\t".join(day_fields) + "\n")
 
