@@ -33,7 +33,7 @@ from sportorg.common.otime import OTime
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox, AdvSpinBox, AdvTimeEdit
 from sportorg.language import translate
-from sportorg.models.memory import race
+from sportorg.models.memory import race, SystemType
 from sportorg.models.result.result_tools import recalculate_results
 from sportorg.modules.sportident.sireader import SIReaderClient
 
@@ -69,6 +69,22 @@ class TimekeepingPropertiesDialog(QDialog):
         self.item_si_port = AdvComboBox()
         self.item_si_port.addItems(SIReaderClient().get_ports())
         self.tk_layout.addRow(self.label_si_port, self.item_si_port)
+
+        self.punch_system_box = QGroupBox(translate("Punch system"))
+        self.punch_system_layout = QFormLayout()
+        self.punch_system_si = QRadioButton(translate("SPORTident"))
+        self.punch_system_layout.addRow(self.punch_system_si)
+        self.punch_system_sfr = QRadioButton(translate("SFR"))
+        self.punch_system_layout.addRow(self.punch_system_sfr)
+        self.punch_system_sportiduino = QRadioButton(translate("Sportiduino (Clever)"))
+        self.punch_system_layout.addRow(self.punch_system_sportiduino)
+        self.punch_system_impinj = QRadioButton(translate("RFID Impinj"))
+        self.punch_system_layout.addRow(self.punch_system_impinj)
+        self.punch_system_srpid = QRadioButton(translate("SRPID"))
+        self.punch_system_layout.addRow(self.punch_system_srpid)
+        self.punch_system_si.setChecked(True)
+        self.punch_system_box.setLayout(self.punch_system_layout)
+        self.tk_layout.addRow(self.punch_system_box)
 
         self.chip_reading_box = QGroupBox(translate("Assigning a chip when reading"))
         self.chip_reading_layout = QFormLayout()
@@ -443,6 +459,8 @@ class TimekeepingPropertiesDialog(QDialog):
             "ignore_punches_before_start", False
         )
         si_port = cur_race.get_setting("system_port", "")
+        punch_system = cur_race.get_punch_system()
+
         readout_duplicate_timeout = OTime(
             msec=cur_race.get_setting("readout_duplicate_timeout", 15000)
         )
@@ -450,6 +468,17 @@ class TimekeepingPropertiesDialog(QDialog):
         self.item_zero_time.setTime(QTime(zero_time[0], zero_time[1]))
 
         self.item_si_port.setCurrentText(si_port)
+
+        if punch_system == SystemType.SFR:
+            self.punch_system_sfr.setChecked(True)
+        elif punch_system == SystemType.SPORTIDUINO:
+            self.punch_system_sportiduino.setChecked(True)
+        elif punch_system == SystemType.RFID_IMPINJ:
+            self.punch_system_impinj.setChecked(True)
+        elif punch_system == SystemType.SRPID:
+            self.punch_system_srpid.setChecked(True)
+        else:
+            self.punch_system_si.setChecked(True)
 
         if start_source == "protocol":
             self.item_start_protocol.setChecked(True)
@@ -674,6 +703,17 @@ class TimekeepingPropertiesDialog(QDialog):
             race().clear_results()
 
         obj.set_setting("system_port", self.item_si_port.currentText())
+
+        if self.punch_system_sfr.isChecked():
+            obj.set_setting("punch_system", SystemType.SFR.value)
+        elif self.punch_system_sportiduino.isChecked():
+            obj.set_setting("punch_system", SystemType.SPORTIDUINO.value)
+        elif self.punch_system_impinj.isChecked():
+            obj.set_setting("punch_system", SystemType.RFID_IMPINJ.value)
+        elif self.punch_system_srpid.isChecked():
+            obj.set_setting("punch_system", SystemType.SRPID.value)
+        else:
+            obj.set_setting("punch_system", SystemType.SPORTIDENT.value)
 
         obj.set_setting("system_start_source", start_source)
         obj.set_setting("system_finish_source", finish_source)

@@ -91,6 +91,9 @@ class Application(metaclass=Singleton):
             settings.SETTINGS.file_save_in_gzip = Config().configuration.get(
                 "save_in_gzip", True
             )
+            settings.SETTINGS.file_generate_srb = Config().configuration.get(
+                "generate_srb", True
+            )
             settings.SETTINGS.file_open_recent_file = Config().configuration.get(
                 "open_recent_file", True
             )

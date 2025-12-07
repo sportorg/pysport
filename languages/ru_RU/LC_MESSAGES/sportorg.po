@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: SportOrg\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-04-12 11:13+0300\n"
-"PO-Revision-Date: 2025-05-13 15:25+0500\n"
+"PO-Revision-Date: 2025-11-09 23:27+0500\n"
 "Last-Translator: SportOrg\n"
 "Language-Team: SportOrg\n"
 "Language: ru_RU\n"
@@ -1035,6 +1035,9 @@ msgstr "Ввести Шахматку"
 msgid "Service"
 msgstr "Сервис"
 
+msgid "On/Off card readout"
+msgstr "Запустить/остановить чтение чипов"
+
 msgid "on/off SPORTident readout"
 msgstr "Запустить/остановить чтение чипов SPORTident"
 
@@ -1043,6 +1046,9 @@ msgstr "Запустить/остановить чтение чипов Sportidu
 
 msgid "on/off SFR readout"
 msgstr "Запустить/остановить чтение чипов SFR"
+
+msgid "Punch system"
+msgstr "Система отметки"
 
 msgid "Send selected"
 msgstr "Отправить выбранные"
@@ -1767,3 +1773,6 @@ msgstr "в списке"
 
 msgid "Gzip compression"
 msgstr "Сжатие gzip"
+
+msgid "Generate SRB file (SFR results board)"
+msgstr "Генерация файла SRB (SFR results board) при сохранении"

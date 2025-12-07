@@ -95,7 +95,15 @@ class MainTab(Tab):
 
         self.item_save_in_gzip = QCheckBox(translate("Compress files to gzip"))
         self.item_save_in_gzip.setChecked(settings.SETTINGS.file_save_in_gzip)
+
         self.layout.addRow(self.item_save_in_gzip)
+
+        self.item_generate_srb = QCheckBox(
+            translate("Generate SRB file (SFR results board)")
+        )
+        self.item_generate_srb.setChecked(settings.SETTINGS.file_generate_srb)
+
+        self.layout.addRow(self.item_generate_srb)
 
     def save(self):
         old_window_show_toolbar = settings.SETTINGS.window_show_toolbar
@@ -107,6 +115,7 @@ class MainTab(Tab):
         settings.SETTINGS.app_check_updates = self.item_check_updates.isChecked()
         settings.SETTINGS.file_save_in_utf8 = self.item_save_in_utf8.isChecked()
         settings.SETTINGS.file_save_in_gzip = self.item_save_in_gzip.isChecked()
+        settings.SETTINGS.file_generate_srb = self.item_generate_srb.isChecked()
 
         if old_window_show_toolbar != self.item_show_toolbar.isChecked():
             if self.item_show_toolbar.isChecked():
