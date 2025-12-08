@@ -3,7 +3,7 @@ import os
 import logging
 from datetime import datetime, time
 from sportorg import config, settings
-#from sportorg.modules.live.orgeo import url
+from sportorg.modules.live.live import live_client
 from sportorg.language import translate
 from sportorg.models import memory
 from sportorg.models.memory import (
@@ -26,23 +26,14 @@ def export_sfrx(destination: str):
         with open(base_name + '.sfrx', 'w', encoding='utf-8', newline='') as f:
 
             _write_header(f, race)
-  
             _write_days(f, race)
-   
             _write_descriptions(f, race)
-     
             _write_clubs(f, race)
-      
             _write_groups(f, race)
-     
             _write_teams(f, race)
-   
             _write_courses(f, race)
-   
             _write_controls(f, race)
-     
             _write_competitors(f, race)
-   
             _write_splits(f, race)
             
         logging.info(translate("Export completed successfully to {}").format(destination))
@@ -86,10 +77,14 @@ def _write_header(f, race: Race):
     ]
     f.write("\t".join(header_fields) + "\n")
 
-
 def _write_days(f, race: Race):
     """Запись информации о днях соревнований"""
-    url = race.data.url or "" 
+    first_url = ""
+    url_list = race.get_setting("live_urls", [])
+    if url_list and isinstance(url_list, list) and len(url_list) > 0:
+            first_url = url_list[0]
+    w_url = first_url or "" 
+
     start_date = race.data.start_datetime or datetime.now()
     date_str = start_date.strftime("%d.%m.%Y")
     
@@ -104,7 +99,7 @@ def _write_days(f, race: Race):
         "p1",    
         discipline, #Кросс - лонг (0830031811Я)  ? Первый день
         date_str,
-        url #write_url  # ссылка оргео!
+        w_url #write_url  # ссылка оргео!
     ]
     f.write("\t".join(day_fields) + "\n")
 
