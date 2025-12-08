@@ -3,7 +3,6 @@ import os
 import logging
 from datetime import datetime, time
 from sportorg import config, settings
-from sportorg.modules.live.live import live_client
 from sportorg.language import translate
 from sportorg.models import memory
 from sportorg.models.memory import (
