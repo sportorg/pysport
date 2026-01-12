@@ -47,6 +47,7 @@ class Application(metaclass=Singleton):
         self.set_middle_names()
         self.set_regions()
         self.set_ranking()
+        self.set_ranking_ardf()
         self.set_rent_cards()
         self.main_window.show_window()
         sys.exit(self.app.exec_())
@@ -116,6 +117,7 @@ class Application(metaclass=Singleton):
                 "enter_number", config.sound_dir("enter_number.wav")
             )
             settings.SETTINGS.ranking = Config().ranking.get_all() or {}
+            settings.SETTINGS.ranking_ardf = Config().ranking_ardf.get_all() or {}
             settings.save_settings_to_file()
 
     @staticmethod
@@ -175,7 +177,18 @@ class Application(metaclass=Singleton):
                 settings.SETTINGS.source_ranking_score_path, encoding="utf-8"
             ) as f:
                 content = f.readlines()
-            RankingTable().set([x.strip().split(";") for x in content])
+            RankingTable().set_table([x.strip().split(";") for x in content])
+        except Exception as e:
+            logging.exception(str(e))
+
+    @staticmethod
+    def set_ranking_ardf():
+        try:
+            with open(
+                settings.SETTINGS.source_ranking_ardf_score_path, encoding="utf-8"
+            ) as f:
+                content = f.readlines()
+            RankingTable().set_table([x.strip().split(";") for x in content], "ardf")
         except Exception as e:
             logging.exception(str(e))
 

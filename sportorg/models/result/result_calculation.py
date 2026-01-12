@@ -24,6 +24,7 @@ class ResultCalculation:
     def process_results(self):
         self.race.relay_teams.clear()
         self.race.result_index = {}
+
         for person in self.race.persons:
             person.result_count = 0
             if person.start_time and person.group:
@@ -188,6 +189,14 @@ class ResultCalculation:
         ranking = group.ranking
         results = self.get_group_finishes(group)
 
+        is_ardf = self.race.get_setting("result_processing_mode", "time") == "ardf"
+        is_rogaine = self.race.get_setting("result_processing_mode", "time") == "scores"
+        
+        if is_ardf:
+            RankingTable().set_current_type("ardf")
+        else:
+            RankingTable().set_current_type("default")
+
         # initial turning off, for disabling ranking
         for i in results:
             i.assigned_rank = Qualification.NOT_QUALIFIED
@@ -199,17 +208,18 @@ class ResultCalculation:
                 rank = self.get_group_rank(group)
             ranking.rank_scores = rank
             if rank > 0:
-                is_score_processing_mode = (
-                    self.race.get_setting("result_processing_mode", "time") == "scores"
-                    or self.race.get_setting("result_processing_mode", "time") == "ardf"
-                )
+                is_score_processing_mode = is_rogaine or is_ardf
                 leader_time = OTime(0)
                 leader_scores = 0
                 if is_score_processing_mode:
                     results = self.get_group_finishes(group)
                     if len(results) > 0:
                         leader_result = results[0]
-                        leader_scores = leader_result.scores
+                        if is_ardf:
+                            leader_scores = leader_result.scores_ardf
+                            max_scores_ardf = leader_scores
+                        else:
+                            leader_scores = leader_result.scores
                 else:
                     leader_time = self.get_group_leader_time(group)
 
@@ -217,10 +227,14 @@ class ResultCalculation:
                     if i.is_active and i.use_scores:
                         i.percent = self.get_percent_for_rank(i.qual, rank)
                         i.max_place = 0
+                        i.min_scores = 0
                         if is_score_processing_mode:
-                            i.min_scores = self.get_scores_for_rank(
-                                leader_scores, i.qual, rank
-                            )
+                            if is_ardf:
+                                i.min_scores = leader_scores
+                            else:
+                                i.min_scores = self.get_scores_for_rank(
+                                    leader_scores, i.qual, rank
+                                )
                         else:
                             i.max_time = self.get_time_for_rank(
                                 leader_time, i.qual, rank
@@ -231,7 +245,10 @@ class ResultCalculation:
             # Rank assigning for all athletes
             for i in results:
                 result_time = i.get_result_otime()
-                result_scores = i.scores
+                if is_ardf:
+                    result_scores = i.scores_ardf
+                else:
+                    result_scores = i.scores
                 place = i.place
 
                 if i.person.is_out_of_competition or not i.is_status_ok():
@@ -244,15 +261,21 @@ class ResultCalculation:
                 )
                 for j in qual_list:
                     if j.is_active:
-                        if isinstance(place, int) and j.max_place >= place:
-                            i.assigned_rank = j.qual
-                            break
-                        if j.max_time and j.max_time >= result_time:
-                            i.assigned_rank = j.qual
-                            break
-                        if result_scores >= j.min_scores > 0:
-                            i.assigned_rank = j.qual
-                            break
+                        if is_ardf:
+                            if (result_scores == max_scores_ardf and
+                                j.max_time and j.max_time >= result_time):
+                                i.assigned_rank = j.qual
+                                break
+                        else:
+                            if isinstance(place, int) and j.max_place >= place:
+                                i.assigned_rank = j.qual
+                                break
+                            if j.max_time and j.max_time >= result_time:
+                                i.assigned_rank = j.qual
+                                break
+                            if isinstance(result_scores, int) and isinstance(j.min_scores, int) and result_scores >= j.min_scores > 0:
+                                i.assigned_rank = j.qual
+                                break
 
     def get_group_leader_time(self, group):
         if self.race.get_type(group) == RaceType.RELAY:
@@ -280,10 +303,18 @@ class ResultCalculation:
         scores = []
         array = self.get_group_finishes(group)
 
-        start_limit = settings.SETTINGS.ranking.get("start_limit", 10)
-        finish_limit = settings.SETTINGS.ranking.get("finish_limit", 5)
-        sum_count = settings.SETTINGS.ranking.get("sum_count", 10)
-        individual_ranking_method = settings.SETTINGS.ranking.get(
+        is_ardf = self.race.get_setting("result_processing_mode", "time") == "ardf"
+        scores_ardf = 0
+        
+        if is_ardf:
+            settings_ranking = settings.SETTINGS.ranking_ardf
+        else:
+            settings_ranking = settings.SETTINGS.ranking
+
+        start_limit = settings_ranking.get("start_limit", 10)
+        finish_limit = settings_ranking.get("finish_limit", 5)
+        sum_count = settings_ranking.get("sum_count", 10)
+        individual_ranking_method = settings_ranking.get(
             "individual_ranking_method", "best"
         )
 
@@ -293,10 +324,13 @@ class ResultCalculation:
             if not person.is_out_of_competition and i.status not in [
                 ResultStatus.DID_NOT_START
             ]:
+                if is_ardf and i.place == 1:
+                    scores_ardf = i.scores_ardf
+
                 started_count += 1
-                if i.is_status_ok():
+                if i.is_status_ok() and (is_ardf == False or (i.scores_ardf > 0 and scores_ardf == i.scores_ardf)):
                     qual = person.qual
-                    scores.append(qual.get_score())
+                    scores.append(qual.get_score(is_ardf))
 
         if started_count < start_limit:
             # less than X (default=10) started
