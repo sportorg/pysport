@@ -15,6 +15,7 @@ try:
         QPushButton,
         QScrollArea,
         QTextEdit,
+        QHBoxLayout,
         QVBoxLayout,
         QWidget,
     )
@@ -31,6 +32,7 @@ except ModuleNotFoundError:
         QPushButton,
         QScrollArea,
         QTextEdit,
+        QHBoxLayout,
         QVBoxLayout,
         QWidget,
     )
@@ -68,6 +70,12 @@ class NumberField(Field):
     single_step: Optional[int] = None
     is_disabled: Optional[bool] = None
 
+
+@dataclass
+class NumberButtonField(Field):
+    maximum: Optional[int] = None
+    minimum: Optional[int] = None
+    button_text: str = "+"
 
 @dataclass
 class LabelField(Field):
@@ -189,6 +197,40 @@ class BaseDialog(QDialog):
                 callback = getattr(self, f"on_{form_field.id}_changed", None)
                 if callback:
                     item.valueChanged.connect(callback)
+            if isinstance(form_field, NumberButtonField):
+                h_layout = QHBoxLayout()
+                h_layout.setContentsMargins(0, 0, 0, 0)
+                
+                spinbox = AdvSpinBox()
+                if form_field.maximum is not None:
+                    spinbox.setMaximum(form_field.maximum)
+                if form_field.minimum is not None:
+                    spinbox.setMinimum(form_field.minimum)
+                if value is not Empty:
+                    spinbox.setValue(value)
+                
+                button = QPushButton(form_field.button_text)
+                button.setFixedWidth(60)
+                
+                h_layout.addWidget(spinbox)
+                h_layout.addWidget(button)
+                
+                container = QWidget()
+                container.setLayout(h_layout)
+                item = container
+                
+                form_field.spinbox = spinbox
+                form_field.button = button
+                
+                callback = getattr(self, f"on_{form_field.id}_finished", None)  # type:ignore
+                if callback:
+                    spinbox.editingFinished.connect(callback)
+                callback = getattr(self, f"on_{form_field.id}_changed", None)
+                if callback:
+                    spinbox.valueChanged.connect(callback)
+                callback_button = getattr(self, f"on_{form_field.id}_button_clicked", None)
+                if callback_button:
+                    button.clicked.connect(callback_button)
             if isinstance(form_field, LabelField):
                 item = QLabel()
                 item.hide()
@@ -274,6 +316,11 @@ class BaseDialog(QDialog):
                 value = form_field.q_item.text()  # type:ignore
             if isinstance(form_field, NumberField):
                 value = form_field.q_item.value()  # type:ignore
+            if isinstance(form_field, NumberButtonField):
+                if hasattr(form_field, 'spinbox'):
+                    value = form_field.spinbox.value()
+                else:
+                    continue
             if isinstance(form_field, LabelField):
                 pass
             if isinstance(form_field, CheckBoxField):
