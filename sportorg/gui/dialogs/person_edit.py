@@ -117,7 +117,7 @@ class PersonEditDialog(BaseDialog):
                 id="bib",
                 minimum=0,
                 maximum=Limit.BIB,
-                button_text=translate("Max+1"),
+                button_text=translate("Assign"),
             ),
             LabelField(id="bib_info"),
             LineField(
@@ -300,12 +300,7 @@ class PersonEditDialog(BaseDialog):
         if not spinbox:
             return
         
-        max_bib = 0
-        for person in race().persons:
-            if person.bib and person.bib > max_bib:
-                max_bib = person.bib
-        
-        next_bib = max_bib + 1
+        next_bib = max(race().person_index_bib) + 1
         while next_bib <= Limit.BIB:
             person = race().find_person_by_bib(next_bib)
             if not person:

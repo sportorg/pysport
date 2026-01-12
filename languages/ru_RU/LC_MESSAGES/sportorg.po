@@ -1774,5 +1774,8 @@ msgstr "Сжатие gzip"
 msgid "Generate SRB file (SFR results board)"
 msgstr "Генерация файла SRB (SFR results board) при сохранении"
 
-msgid "Max+1"
-msgstr "Макс.+1"
+msgid "Assign"
+msgstr "Присвоить"
+
+msgid "No free numbers available"
+msgstr "Свободных номеров нет"
