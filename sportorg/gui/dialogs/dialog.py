@@ -210,7 +210,7 @@ class BaseDialog(QDialog):
                     spinbox.setValue(value)
                 
                 button = QPushButton(form_field.button_text)
-                button.setFixedWidth(60)
+                button.setFixedWidth(75)
                 
                 h_layout.addWidget(spinbox)
                 h_layout.addWidget(button)
