@@ -295,22 +295,13 @@ class PersonEditDialog(BaseDialog):
         bib_field = self.fields.get("bib")
         if not bib_field or not hasattr(bib_field, 'spinbox'):
             return
-        
         spinbox = bib_field.spinbox
         if not spinbox:
             return
-        
         next_bib = max(race().person_index_bib) + 1
-        while next_bib <= Limit.BIB:
-            person = race().find_person_by_bib(next_bib)
-            if not person:
-                break
-            next_bib += 1
-        
         if next_bib > Limit.BIB:
             self.fields["bib_info"].set_text(translate("No free numbers available"))
             return
-        
         spinbox.setValue(next_bib)
         self.bib = next_bib
         self.on_bib_changed()
