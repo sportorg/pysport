@@ -17,6 +17,8 @@
 + Reverse row numbering in the results tab ([#519](https://github.com/sportorg/pysport/issues/519))
 + Templates can compress data (gzip) to reduce the size of html files
 + Punch system selection in timekeeping properties dialog
++ Added support for multi-sport ranking tables and settings simultaneously
++ For ARDF, rank fulfillment according to the requirements of EVSK
 
 ### Fixes
 + Fixed: multi day race processing - all days are refreshed on the file opening
@@ -59,7 +61,6 @@
 ## 2024-10-04 v1.7.0
 
 - New features
-
 - Fix teamwork
 - The program is faster
 
@@ -117,7 +118,6 @@
 - Calculating scores from leader time - ignoring mispunched athletes
 - Team work data exchange format changed. Previous: `0{}1`, now: `{}`
 - Search window freezing was fixed
-
 
 ## 2018-10-08 v1.3.0
 + Added MSP (mispunch) status, calculated by punches automatically
