@@ -34,6 +34,7 @@
 + Fixed reversed line order when opening the file ([#509](https://github.com/sportorg/pysport/issues/509))
 + Fixed a split printout error when a participant’s group or course was not found ([#526](https://github.com/sportorg/pysport/issues/526))
 + Fixed quick start group input using Alt+number ([#536](https://github.com/sportorg/pysport/issues/536))
++ Fixed: incorrect row deletion when records table are update during confirmation
 
 ## 2025-04-01
 
