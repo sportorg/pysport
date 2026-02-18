@@ -813,7 +813,7 @@ class Result(ABC):
         person_id = self.person.multi_day_id
         sum_result = OTime()
         for day in races():
-            result_tmp = day.find_result_by_person_id(person_id)
+            result_tmp = day.find_result_by_multi_day_id(person_id)
             if result_tmp:
                 if result_tmp.is_status_ok():
                     sum_result += result_tmp.get_result_otime_current_day()
@@ -964,7 +964,7 @@ class Result(ABC):
         ):
             person_id = self.person.multi_day_id
             for day in races():
-                cur_res: Result = day.find_result_by_person_id(person_id)
+                cur_res: Result = day.find_result_by_multi_day_id(person_id)
                 if cur_res:
                     ret.append(cur_res)
         return ret
@@ -1641,6 +1641,7 @@ class Race(Model):
         self.settings: Dict[str, Any] = {}
         self.controls: List[ControlPoint] = []
         self.result_index: Dict[str, Result] = {}
+        self.result_index_by_multi_day_id: Dict[str, Result] = {}
         self.person_index_bib: Dict[int, Person] = {}
         self.person_index_card: Dict[int, Person] = {}
         self.person_index: Dict[str, Result] = {}
@@ -2181,15 +2182,15 @@ class Race(Model):
                 current_name = person.full_name
         return ret
 
-    def find_result_by_person_id(self, person_id) -> Optional[Result]:
-        if len(self.result_index) < 1:
+    def find_result_by_multi_day_id(self, person_id) -> Optional[Result]:
+        if len(self.result_index_by_multi_day_id) < 1:
             for res in self.results:
                 if res.person:
                     id = res.person.multi_day_id
-                    self.result_index[id] = res
+                    self.result_index_by_multi_day_id[id] = res
 
-        if person_id in self.result_index:
-            return self.result_index[person_id]
+        if person_id in self.result_index_by_multi_day_id:
+            return self.result_index_by_multi_day_id[person_id]
         else:
             return None
 
