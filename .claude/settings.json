@@ -1,0 +1,18 @@
+{
+  "plansDirectory": "./doc/plans",
+  "enableAllProjectMcpServers": true,
+  "permissions": {
+    "allow": [
+      "Bash(uv:*)", 
+      "Bash(git:*)", 
+      "Edit(tests/**)",
+      "Edit(pysport/**)"
+    ],
+    "deny": [
+      "Read(.env*)"
+    ]
+  },
+  "env": {
+    "ENABLE_TOOL_SEARCH": "auto:5"
+  }
+}
