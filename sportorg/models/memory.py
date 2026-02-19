@@ -1895,6 +1895,8 @@ class Race(Model):
             if result.person is person:
                 result.person = None
                 result.bib = person.bib
+        if person.id in self.person_index:
+            del self.person_index[person.id]
         if (
             person.bib
             and person.bib in self.person_index_bib
@@ -1914,6 +1916,8 @@ class Race(Model):
         for i in indexes:
             result = self.results[i]
             results.append(result)
+            if result.id in self.result_index:
+                del self.result_index[result.id]
             del self.results[i]
         return results
 
@@ -1927,6 +1931,8 @@ class Race(Model):
 
         indexes = sorted(indexes, reverse=True)
         for i in indexes:
+            if self.groups[i].id in self.group_index:
+                del self.group_index[self.groups[i].id]
             del self.groups[i]
         return groups
 
@@ -1940,6 +1946,8 @@ class Race(Model):
 
         indexes = sorted(indexes, reverse=True)
         for i in indexes:
+            if self.courses[i].id in self.course_index:
+                del self.course_index[self.courses[i].id]
             del self.courses[i]
         return courses
 
@@ -1953,6 +1961,8 @@ class Race(Model):
         indexes = sorted(indexes, reverse=True)
 
         for i in indexes:
+            if self.organizations[i].id in self.organization_index:
+                del self.organization_index[self.organizations[i].id]
             del self.organizations[i]
         return organizations
 
