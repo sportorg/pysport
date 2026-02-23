@@ -818,6 +818,14 @@ class LiveSettingsAction(Action, metaclass=ActionFactory):
         self.app.refresh()
 
 
+class LiveToggleAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        obj = race()
+        current = obj.get_setting("live_enabled", False)
+        obj.set_setting("live_enabled", not current)
+        self.app.refresh()
+
+
 class TelegramSettingsAction(Action, metaclass=ActionFactory):
     def execute(self):
         TelegramDialog().exec_()
