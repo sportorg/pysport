@@ -6,7 +6,10 @@
       "Bash(uv:*)", 
       "Bash(git:*)", 
       "Edit(tests/**)",
-      "Edit(pysport/**)"
+      "Edit(pysport/**)",
+      "Bash(openspec new:*)",
+      "Bash(openspec status:*)",
+      "Bash(openspec instructions:*)"
     ],
     "deny": [
       "Read(.env*)"
