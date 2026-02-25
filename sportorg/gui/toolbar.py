@@ -15,7 +15,7 @@ def toolbar_list():
         (
             config.icon_dir("sportident.png"),
             translate("SPORTident readout"),
-            "SPORTidentReadoutAction",
+            "CardReadoutAction",
             "sportident",
         ),
         (
