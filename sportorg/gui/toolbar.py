@@ -19,6 +19,13 @@ def toolbar_list():
             "sportident",
         ),
         (
+            config.icon_dir("live.svg"),
+            translate("Live"),
+            "LiveToggleAction",
+            "live",
+            True,
+        ),
+        (
             config.icon_dir("network-off.svg"),
             translate("Teamwork"),
             "TeamworkEnableAction",

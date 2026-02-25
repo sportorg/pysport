@@ -172,6 +172,12 @@ class MainWindow(QMainWindow):
         False: "network-off.svg",
     }
 
+    live_status = False
+    live_icon = {
+        True: "live-on.svg",
+        False: "live.svg",
+    }
+
     def interval(self):
         if is_reading_active() != self.sportident_status and hasattr(self, "toolbar"):
             self.sportident_status = is_reading_active()
@@ -187,6 +193,14 @@ class MainWindow(QMainWindow):
                 QtGui.QIcon(config.icon_dir(self.teamwork_icon[Teamwork().is_alive()]))
             )
             self.teamwork_status = Teamwork().is_alive()
+
+        if "live" in self.toolbar_property:
+            live_enabled = bool(live_client.is_enabled())
+            if live_enabled != self.live_status:
+                self.toolbar_property["live"].setIcon(
+                    QtGui.QIcon(config.icon_dir(self.live_icon[live_enabled]))
+                )
+                self.live_status = live_enabled
 
         try:
             if settings.SETTINGS.file_autosave_interval:
@@ -356,14 +370,49 @@ class MainWindow(QMainWindow):
         self.setMenuBar(self.menubar)
         self._create_menu(self.menubar, menu_list())
 
-    def _setup_toolbar(self):
+    def _setup_toolbar(self) -> None:
         self.toolbar = self.addToolBar(translate("Toolbar"))
         for tb in toolbar_list():
-            tb_action = QAction(QtGui.QIcon(tb[0]), tb[1], self)
-            tb_action.triggered.connect(self.menu_factory.get_action(tb[2]))
-            if len(tb) == 4:
-                self.toolbar_property[tb[3]] = tb_action
-            self.toolbar.addAction(tb_action)
+            if len(tb) == 5:
+                btn = QtWidgets.QToolButton(self)
+                btn.setIcon(QtGui.QIcon(tb[0]))
+                btn.setToolTip(tb[1])
+                btn.clicked.connect(self.menu_factory.get_action(tb[2]))
+                btn.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+                btn.customContextMenuRequested.connect(self._show_live_context_menu)
+                self.toolbar_property[tb[3]] = btn
+                self.toolbar.addWidget(btn)
+            else:
+                tb_action = QAction(QtGui.QIcon(tb[0]), tb[1], self)
+                tb_action.triggered.connect(self.menu_factory.get_action(tb[2]))
+                if len(tb) == 4:
+                    self.toolbar_property[tb[3]] = tb_action
+                self.toolbar.addAction(tb_action)
+
+    def _show_live_context_menu(self, pos: QtCore.QPoint) -> None:
+        live_enabled = race().get_setting("live_enabled", False)
+        menu = QtWidgets.QMenu(self)
+
+        label = translate("Disable Live") if live_enabled else translate("Enable Live")
+        toggle_action = QAction(label, self)
+        toggle_action.triggered.connect(
+            self.menu_factory.get_action("LiveToggleAction")
+        )
+        menu.addAction(toggle_action)
+
+        send_action = QAction(translate("Send selected"), self)
+        send_action.setShortcut("Ctrl+K")
+        send_action.setEnabled(bool(live_client.is_enabled()))
+        send_action.triggered.connect(self.menu_factory.get_action("OnlineSendAction"))
+        menu.addAction(send_action)
+
+        settings_action = QAction(translate("Settings"), self)
+        settings_action.triggered.connect(
+            self.menu_factory.get_action("LiveSettingsAction")
+        )
+        menu.addAction(settings_action)
+
+        menu.popup(self.toolbar_property["live"].mapToGlobal(pos))
 
     def _setup_statusbar(self):
         self.statusbar = QtWidgets.QStatusBar()
