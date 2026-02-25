@@ -15,8 +15,15 @@ def toolbar_list():
         (
             config.icon_dir("sportident.png"),
             translate("SPORTident readout"),
-            "SPORTidentReadoutAction",
+            "CardReadoutAction",
             "sportident",
+        ),
+        (
+            config.icon_dir("live.svg"),
+            translate("Live"),
+            "LiveToggleAction",
+            "live",
+            True,
         ),
         (
             config.icon_dir("network-off.svg"),
