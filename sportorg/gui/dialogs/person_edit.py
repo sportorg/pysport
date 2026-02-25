@@ -291,7 +291,6 @@ class PersonEditDialog(BaseDialog):
         self.button_ok.setEnabled(self.is_items_ok())
 
     def on_bib_button_clicked(self):
-        """Автоматически назначить следующий номер"""
         bib_field = self.fields.get("bib")
         if not bib_field or not hasattr(bib_field, 'spinbox'):
             return
