@@ -8,8 +8,8 @@ from sportorg.gui.dialogs.dialog import (
     DateField,
     LabelField,
     LineField,
-    NumberField,
     NumberButtonField,
+    NumberField,
     TextField,
     TimeField,
 )
@@ -242,7 +242,7 @@ class PersonEditDialog(BaseDialog):
     def on_bib_changed(self):
         self.is_item_valid["bib"] = True
         bib_field = self.fields.get("bib")
-        if not bib_field or not hasattr(bib_field, 'spinbox'):
+        if not bib_field or not hasattr(bib_field, "spinbox"):
             return
         spinbox = bib_field.spinbox
         if not spinbox:
@@ -291,12 +291,12 @@ class PersonEditDialog(BaseDialog):
 
     def on_bib_button_clicked(self):
         bib_field = self.fields.get("bib")
-        if not bib_field or not hasattr(bib_field, 'spinbox'):
+        if not bib_field or not hasattr(bib_field, "spinbox"):
             return
         spinbox = bib_field.spinbox
         if not spinbox:
             return
-        next_bib = max(race().person_index_bib) + 1
+        next_bib = max(race().person_index_bib, default=0) + 1
         if next_bib > Limit.BIB:
             self.fields["bib_info"].set_text(translate("No free numbers available"))
             return

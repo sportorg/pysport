@@ -871,7 +871,7 @@ class OnlineSendAction(Action, metaclass=ActionFactory):
                 if index < 0:
                     continue
                 if index >= len(items):
-                    pass
+                    continue
                 selected_items.append(items[index])
             if self.app.current_tab == 1:
                 # Most recent results are sent last
