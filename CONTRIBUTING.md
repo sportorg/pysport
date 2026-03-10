@@ -41,6 +41,7 @@ uv sync --frozen --extra win  # for Windows
 ### Run SportOrg
 
 ```
+cd c:\pysport
 uv run poe run
 ```
 
