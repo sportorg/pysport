@@ -395,6 +395,7 @@ def menu_list():
                 },
                 {
                     "title": translate("Telegram"),
+                    "icon": config.icon_dir("telegram.png"),
                     "actions": [
                         {
                             "title": translate("Send results"),
@@ -442,6 +443,7 @@ def menu_list():
                 },
                 {
                     "title": translate("Telegram"),
+                    "icon": config.icon_dir("telegram.png"),
                     "action": "TelegramSettingsAction",
                 },
                 {
