@@ -20,6 +20,7 @@
 + Punch system selection in timekeeping properties dialog
 + Live (Online) toolbar button with state indicator and context menu (Enable/Disable, Send Selected, Settings)
 + A button has been added to the participant card for assigning a number (maximum existing number + 1)
++ MAX messenger integration for result notifications and manual sending from the menu; settings are similar to Telegram, without chat topics/thread id
 
 ### Fixes
 

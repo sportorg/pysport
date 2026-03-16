@@ -26,6 +26,7 @@ from sportorg.gui.dialogs.group_mass_edit import GroupMassEditDialog
 from sportorg.gui.dialogs.import_persons_table_dialog import ImportPersonsTableDialog
 from sportorg.gui.dialogs.live_dialog import LiveDialog
 from sportorg.gui.dialogs.marked_route_dialog import MarkedRouteDialog
+from sportorg.gui.dialogs.max_dialog import MaxDialog
 from sportorg.gui.dialogs.merge_results import MergeResultsDialog
 from sportorg.gui.dialogs.not_start_dialog import InputStartNumbersDialog
 from sportorg.gui.dialogs.organization_mass_edit import OrganizationMassEditDialog
@@ -65,6 +66,7 @@ from sportorg.modules.backup.file import is_gzip_file
 from sportorg.modules.backup.json import get_races_from_file
 from sportorg.modules.iof import iof_xml
 from sportorg.modules.live.live import live_client
+from sportorg.modules.max.max import max_client
 from sportorg.modules.ocad import ocad
 from sportorg.modules.ocad.ocad import OcadImportException
 from sportorg.modules.recovery import (
@@ -845,6 +847,29 @@ class TelegramSendAction(Action, metaclass=ActionFactory):
                 if index >= len(items):
                     pass
                 telegram_client.send_result(items[index])
+        except Exception as e:
+            logging.error(str(e))
+
+
+class MaxSettingsAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        MaxDialog().exec_()
+
+
+class MaxSendAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        try:
+            if not self.app.current_tab == 1:
+                logging.warning(translate("No result selected"))
+                return
+            items = race().results
+            indexes = self.app.get_selected_rows()
+            for index in indexes:
+                if index < 0:
+                    continue
+                if index >= len(items):
+                    pass
+                max_client.send_result(items[index])
         except Exception as e:
             logging.error(str(e))
 

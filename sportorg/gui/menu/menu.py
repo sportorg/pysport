@@ -404,6 +404,17 @@ def menu_list():
                     ],
                 },
                 {
+                    "title": translate("MAX"),
+                    "icon": config.icon_dir("max.png"),
+                    "actions": [
+                        {
+                            "title": translate("Send results"),
+                            "tabs": [1],
+                            "action": "MaxSendAction",
+                        },
+                    ],
+                },
+                {
                     "title": translate("Online"),
                     "actions": [
                         {
@@ -443,6 +454,11 @@ def menu_list():
                 {
                     "title": translate("Telegram"),
                     "action": "TelegramSettingsAction",
+                },
+                {
+                    "title": translate("MAX"),
+                    "icon": config.icon_dir("max.png"),
+                    "action": "MaxSettingsAction",
                 },
                 {
                     "title": translate("Rent cards"),

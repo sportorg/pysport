@@ -52,6 +52,7 @@ from sportorg.models.result.result_tools import recalculate_results
 from sportorg.models.result.split_calculation import GroupSplits
 from sportorg.modules.backup.file import File
 from sportorg.modules.live.live import live_client
+from sportorg.modules.max.max import max_client
 from sportorg.modules.printing.model import (
     NoPrinterSelectedException,
     NoResultToPrintException,
@@ -659,6 +660,7 @@ class MainWindow(QMainWindow):
                     Teamwork().send(result.to_dict())
                     live_client.send(result)
                     telegram_client.send_result(result)
+                    max_client.send_result(result)
                     if result.person:
                         if result.is_status_ok():
                             Sound().ok()

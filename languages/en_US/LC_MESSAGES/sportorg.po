@@ -91,3 +91,6 @@ msgstr "Penalty"
 
 msgid "Time settings"
 msgstr "Time"
+
+msgid "MAX"
+msgstr "MAX"

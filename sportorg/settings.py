@@ -37,6 +37,7 @@ class Settings:
     live_gzip_enabled: bool = True
 
     telegram_token: str = ""
+    max_token: str = ""
 
     source_names_path: str = config.base_dir("configs", "names.txt")
     source_middle_names_path: str = config.base_dir("configs", "middle_names.txt")

@@ -579,6 +579,9 @@ msgstr "Клиент/Сервер"
 msgid "Telegram"
 msgstr "Telegram"
 
+msgid "MAX"
+msgstr "MAX"
+
 msgid "Chat id"
 msgstr "Chat id"
 
