@@ -1889,6 +1889,20 @@ class Race(Model):
             self.remove_person_from_indexes(person)
             del self.persons[i]
         return persons
+    
+    def delete_persons_by_id(self, person_ids):
+        person_ids_set = set(person_ids)
+        persons = []
+        i = 0
+        while i < len(self.persons):
+            if self.persons[i].id in person_ids_set:
+                person = self.persons[i]
+                persons.append(person)
+                self.remove_person_from_indexes(person)
+                del self.persons[i]
+            else:
+                i += 1
+        return persons
 
     def remove_person_from_indexes(self, person: Person):
         for result in self.results:
@@ -1920,6 +1934,19 @@ class Race(Model):
                 del self.result_index[result.id]
             del self.results[i]
         return results
+    
+    def delete_results_by_id(self, result_ids):
+        result_ids_set = set(result_ids)
+        results = []
+        i = 0
+        while i < len(self.results):
+            if self.results[i].id in result_ids_set:
+                result = self.results[i]
+                results.append(result)
+                del self.results[i]
+            else:
+                i += 1
+        return results
 
     def delete_groups(self, indexes: List[int]) -> List[Group]:
         groups = []
@@ -1934,6 +1961,21 @@ class Race(Model):
             if self.groups[i].id in self.group_index:
                 del self.group_index[self.groups[i].id]
             del self.groups[i]
+        return groups
+    
+    def delete_groups_by_id(self, group_ids):
+        group_ids_set = set(group_ids)
+        groups = []
+        i = 0
+        while i < len(self.groups):
+            if self.groups[i].id in group_ids_set:
+                group = self.groups[i]
+                if group.count_person > 0:
+                    raise NotEmptyException("Cannot remove group")
+                groups.append(group)
+                del self.groups[i]
+            else:
+                i += 1
         return groups
 
     def delete_courses(self, indexes: List[int]) -> List[Course]:
@@ -1950,6 +1992,21 @@ class Race(Model):
                 del self.course_index[self.courses[i].id]
             del self.courses[i]
         return courses
+    
+    def delete_courses_by_id(self, course_ids):
+        course_ids_set = set(course_ids)
+        courses = []
+        i = 0
+        while i < len(self.courses):
+            if self.courses[i].id in course_ids_set:
+                course = self.courses[i]
+                if course.count_group > 0:
+                    raise NotEmptyException("Cannot remove course")
+                courses.append(course)
+                del self.courses[i]
+            else:
+                i += 1
+        return courses
 
     def delete_organizations(self, indexes: List[int]) -> List[Organization]:
         organizations = []
@@ -1964,6 +2021,21 @@ class Race(Model):
             if self.organizations[i].id in self.organization_index:
                 del self.organization_index[self.organizations[i].id]
             del self.organizations[i]
+        return organizations
+    
+    def delete_organizations_by_id(self, organization_ids):
+        organization_ids_set = set(organization_ids)
+        organizations = []
+        i = 0
+        while i < len(self.organizations):
+            if self.organizations[i].id in organization_ids_set:
+                organization = self.organizations[i]
+                if organization.count_person > 0:
+                    raise NotEmptyException("Cannot remove organization")
+                organizations.append(organization)
+                del self.organizations[i]
+            else:
+                i += 1
         return organizations
 
     def find_person_result(self, person: Person) -> Optional[Result]:

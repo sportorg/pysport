@@ -875,8 +875,31 @@ class MainWindow(QMainWindow):
             logging.exception(e)
 
     def _delete_object(self):
-        indexes = self.get_selected_rows()
-        if not len(indexes):
+        tab = self.current_tab
+        
+        obj_ids = []
+        if tab == 0:
+            for index in self.get_selected_rows():
+                if 0 <= index < len(race().persons):
+                    obj_ids.append(race().persons[index].id)
+        elif tab == 1:
+            for index in self.get_selected_rows():
+                if 0 <= index < len(race().results):
+                    obj_ids.append(race().results[index].id)
+        elif tab == 2:
+            for index in self.get_selected_rows():
+                if 0 <= index < len(race().groups):
+                    obj_ids.append(race().groups[index].id)
+        elif tab == 3:
+            for index in self.get_selected_rows():
+                if 0 <= index < len(race().courses):
+                    obj_ids.append(race().courses[index].id)
+        elif tab == 4:
+            for index in self.get_selected_rows():
+                if 0 <= index < len(race().organizations):
+                    obj_ids.append(race().organizations[index].id)
+        
+        if not len(obj_ids):
             return
 
         confirm = messageBoxQuestion(
@@ -887,20 +910,20 @@ class MainWindow(QMainWindow):
         )
         if confirm == QMessageBox.No:
             return
-        tab = self.current_tab
+        
         res = []
         if tab == 0:
-            res = race().delete_persons(indexes)
+            res = race().delete_persons_by_id(obj_ids)
             recalculate_results(recheck_results=False)
             live_client.delete(res)
             race().rebuild_indexes()
         elif tab == 1:
-            res = race().delete_results(indexes)
+            res = race().delete_results_by_id(obj_ids)
             recalculate_results(recheck_results=False)
             live_client.delete(res)
         elif tab == 2:
             try:
-                res = race().delete_groups(indexes)
+                res = race().delete_groups_by_id(obj_ids)
             except NotEmptyException as e:
                 logging.warning(str(e))
                 QMessageBox.question(
@@ -910,7 +933,7 @@ class MainWindow(QMainWindow):
                 )
         elif tab == 3:
             try:
-                res = race().delete_courses(indexes)
+                res = race().delete_courses_by_id(obj_ids)
                 race().rebuild_indexes(False, True)
             except NotEmptyException as e:
                 logging.warning(str(e))
@@ -921,7 +944,7 @@ class MainWindow(QMainWindow):
                 )
         elif tab == 4:
             try:
-                res = race().delete_organizations(indexes)
+                res = race().delete_organizations_by_id(obj_ids)
             except NotEmptyException as e:
                 logging.warning(str(e))
                 QMessageBox.question(
