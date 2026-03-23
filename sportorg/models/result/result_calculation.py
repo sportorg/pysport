@@ -25,6 +25,7 @@ class ResultCalculation:
         self.race.relay_teams.clear()
         self.race.result_index = {}
 
+        self.race.result_index_by_multi_day_id = {}
         for person in self.race.persons:
             person.result_count = 0
             if person.start_time and person.group:

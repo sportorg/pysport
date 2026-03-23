@@ -1,23 +1,73 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-`sportorg/` holds the core application: GUI elements live under `sportorg/gui`, hardware/data integrations under `sportorg/modules`, and shared utilities in `sportorg/common` and `sportorg/utils`. PySide resources and other assets reside in `img/`, `sounds/`, `templates/`, and `styles/`. Configuration defaults are under `configs/`, while CLI helpers sit at the repo root (`SportOrg.pyw`, `builder.py`). Tests are colocated in `tests/`, with sample fixtures in `tests/data/`. Languages files live in `languages/<locale>/LC_MESSAGES/` and must be regenerated via the `generate-mo` task after edits.
+- Core application code is in `sportorg/`.
+- GUI elements are in `sportorg/gui`.
+- Hardware and data integrations are in `sportorg/modules`.
+- Shared utilities are in `sportorg/common` and `sportorg/utils`.
+- PySide resources and assets are in `img/`, `sounds/`, `templates/`, and `styles/`.
+- Configuration defaults are in `configs/`.
+- CLI helpers are at the repository root: `SportOrg.pyw`, `builder.py`.
+- Tests are in `tests/`, with sample fixtures in `tests/data/`.
+- Translation files are in `languages/<locale>/LC_MESSAGES/`.
+- After editing `.po` files, regenerate `.mo` files via `generate-mo`.
 
 ## Build, Test, and Development Commands
 - `uv sync --frozen [--extra win]`: install locked dependencies for Python 3.8 environments.
-- `uv run poe run`: regenerate translations and launch the GUI (`SportOrg.pyw`) in debug mode.
-- `uv run poe format` / `uv run poe lint`: run Ruff formatting, Ruff linting, and fixture sanity checks.
-- `uv run poe test`, `uv run poe test-fast`, `uv run poe test-failed`: execute the pytest suites with coverage, fail-fast, or rerun modes.
-- `python builder.py build`: create the cx_Freeze desktop bundle (Windows friendly).
+- `uv run poe run`: regenerate translations and launch `SportOrg.pyw` in debug mode.
+- `uv run poe format`: run Ruff formatting.
+- `uv run poe lint`: run Ruff linting and fixture sanity checks.
+- `uv run poe test`: run full pytest suite with coverage.
+- `uv run poe test-fast`: run fail-fast test mode.
+- `uv run poe test-failed`: rerun failed tests.
+- `python builder.py build`: create a cx_Freeze desktop bundle (Windows-friendly).
 
 ## Coding Style & Naming Conventions
-Python files use 4-space indentation, type hints where practical, and follow Ruff’s defaults (`ruff format` for layout, `ruff check` for lint). Keep GUI classes PascalCase, helper functions snake_case, and configuration constants UPPER_SNAKE_CASE. Templates and translation IDs should mirror the GUI object names for easier traceability. Regenerate `.mo` files via `uv run poe generate-mo` after editing `.po` resources.
+- Use 4-space indentation in Python files.
+- Use type hints where practical.
+- Follow Ruff defaults: `ruff format` for formatting and `ruff check` for linting.
+- Use PascalCase for GUI classes.
+- Use snake_case for helper functions.
+- Use UPPER_SNAKE_CASE for configuration constants.
+- Keep templates and translation IDs aligned with GUI object names.
+- Regenerate `.mo` files after editing `.po` resources via `uv run poe generate-mo`.
+- Write all code comments in English.
+
+## Python Compatibility
+- Keep all code compatible with Python 3.8 and the latest stable Python release (currently Python 3.14).
+- Use language features and standard-library APIs that are available in Python 3.8.
+- If newer features are required, add explicit version-conditional branches.
+- Ensure version-conditional branches provide equivalent fallback implementations.
 
 ## Testing Guidelines
-Pytest is the canonical framework; test files follow `tests/test_*` naming and should load fixtures from `tests/data/`. Add regression tests alongside affected modules (e.g., `tests/test_live.py` for `sportorg/modules/live`). Coverage thresholds are enforced at 42% branch coverage, so include `--cov` results locally before opening a PR. Prefer `uv run poe test-fast` while iterating and `uv run poe test` before committing. Mock hardware adapters (SportIdent, RFID, SRPID) instead of hitting physical devices.
+- Use pytest as the primary testing framework.
+- Name test files as `tests/test_*`.
+- Load fixtures from `tests/data/`.
+- Add regression tests near affected modules, for example `tests/test_live.py` for `sportorg/modules/live`.
+- Maintain at least 42% branch coverage.
+- Check local `--cov` results before opening a PR.
+- Use `uv run poe test-fast` during iteration.
+- Run `uv run poe test` before committing.
+- Mock hardware adapters (SportIdent, RFID, SRPID) instead of using physical devices.
 
 ## Commit & Pull Request Guidelines
-Use Conventional Commits (`feat(live): add Orgeo client`) and keep summaries under 70 characters. Each PR should include: purpose, behavioural changes, test evidence (`uv run poe test` output), and any screenshots impacting the GUI (store captures under `img/` if they belong in docs). Link related issues in the description and request reviews from domain owners (`modules/<area>` maintainers). Keep PRs focused; split large changes into feature and cleanup branches rather than mixing refactors with functional work.
+- Use Conventional Commits, for example `feat(live): add Orgeo client`.
+- Keep commit summaries under 70 characters.
+- Include PR purpose.
+- Include behavioral changes.
+- Include test evidence, such as `uv run poe test` output.
+- Include GUI screenshots when relevant.
+- Store documentation screenshots under `img/` when appropriate.
+- Link related issues in the PR description.
+- Request reviews from relevant domain owners, such as `modules/<area>` maintainers.
+- Keep PRs focused.
+- Split large work into feature and cleanup branches instead of mixing refactors with functional changes.
 
 ## Security & Configuration Tips
-Sensitive credentials (e.g., live result endpoints, Telegram tokens) must be provided via local config files and never committed—use entries in `configs/` as templates and add real values to `.gitignored` overrides. When testing network modules, stub responses with `aiohttp` mocks to prevent accidental external traffic. Always confirm Windows-specific behaviour under Python 3.8 because production bundles target that interpreter.
+- Keep sensitive credentials (for example live result endpoints and Telegram tokens) in local config files only.
+- Never commit secrets.
+- Use `configs/` entries as templates.
+- Put real secret values in `.gitignored` overrides.
+- Stub network-module responses with `aiohttp` mocks during tests.
+- Avoid accidental external traffic in tests.
+- Verify Windows-specific behavior under Python 3.8 because production bundles target that interpreter.

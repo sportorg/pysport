@@ -154,7 +154,7 @@ class GroupMassEditDialog(QDialog):
                 change_ranking = self.ranking_combobox.currentText() == yes
 
                 for i in selection:
-                    if i < len(obj.persons):
+                    if i < len(obj.groups):
                         cur_group = obj.groups[i]
 
                         if self.course_checkbox.isChecked():

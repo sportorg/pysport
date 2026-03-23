@@ -8,6 +8,7 @@ from sportorg.gui.dialogs.dialog import (
     DateField,
     LabelField,
     LineField,
+    NumberButtonField,
     NumberField,
     TextField,
     TimeField,
@@ -109,13 +110,14 @@ class PersonEditDialog(BaseDialog):
                 id="qual",
                 items=[qual.get_title() for qual in Qualification],
             ),
-            NumberField(
+            NumberButtonField(
                 title=translate("Bib"),
                 object=self,
                 key="bib",
                 id="bib",
                 minimum=0,
                 maximum=Limit.BIB,
+                button_text=translate("Assign"),
             ),
             LabelField(id="bib_info"),
             LineField(
@@ -139,7 +141,6 @@ class PersonEditDialog(BaseDialog):
                 object=person,
                 key="start_group",
                 minimum=0,
-                maximum=99,
             ),
             NumberField(
                 title=translate("Punch card #"),
@@ -240,7 +241,13 @@ class PersonEditDialog(BaseDialog):
 
     def on_bib_changed(self):
         self.is_item_valid["bib"] = True
-        bib = self.fields["bib"].q_item.value()
+        bib_field = self.fields.get("bib")
+        if not bib_field or not hasattr(bib_field, "spinbox"):
+            return
+        spinbox = bib_field.spinbox
+        if not spinbox:
+            return
+        bib = spinbox.value()
         bib_info = self.fields["bib_info"]
         bib_info.set_text("")
         if bib:
@@ -281,6 +288,21 @@ class PersonEditDialog(BaseDialog):
                     info = "{}\n{}: {}".format(info, translate("Bib"), person.bib)
                 card_info.set_text(info)
         self.button_ok.setEnabled(self.is_items_ok())
+
+    def on_bib_button_clicked(self):
+        bib_field = self.fields.get("bib")
+        if not bib_field or not hasattr(bib_field, "spinbox"):
+            return
+        spinbox = bib_field.spinbox
+        if not spinbox:
+            return
+        next_bib = max(race().person_index_bib, default=0) + 1
+        if next_bib > Limit.BIB:
+            self.fields["bib_info"].set_text(translate("No free numbers available"))
+            return
+        spinbox.setValue(next_bib)
+        self.bib = next_bib
+        self.on_bib_changed()
 
     def apply(self):
         person = self.current_object

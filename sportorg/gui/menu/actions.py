@@ -818,6 +818,14 @@ class LiveSettingsAction(Action, metaclass=ActionFactory):
         self.app.refresh()
 
 
+class LiveToggleAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        obj = race()
+        current = obj.get_setting("live_enabled", False)
+        obj.set_setting("live_enabled", not current)
+        self.app.refresh()
+
+
 class TelegramSettingsAction(Action, metaclass=ActionFactory):
     def execute(self):
         TelegramDialog().exec_()
@@ -863,7 +871,7 @@ class OnlineSendAction(Action, metaclass=ActionFactory):
                 if index < 0:
                     continue
                 if index >= len(items):
-                    pass
+                    continue
                 selected_items.append(items[index])
             if self.app.current_tab == 1:
                 # Most recent results are sent last

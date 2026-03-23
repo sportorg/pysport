@@ -3,6 +3,7 @@
 ## next
 
 ### Improvements
+
 + Generation of SRB file (SFR results board) on saving
 + New field - middle name (new Russian requirements)
 + Import of full date of birth
@@ -19,8 +20,11 @@
 + Punch system selection in timekeeping properties dialog
 + Added support for multi-sport ranking tables and settings simultaneously
 + For ARDF, rank fulfillment according to the requirements of EVSK
++ Live (Online) toolbar button with state indicator and context menu (Enable/Disable, Send Selected, Settings)
++ A button has been added to the participant card for assigning a number (maximum existing number + 1)
 
 ### Fixes
+
 + Fixed: multi day race processing - all days are refreshed on the file opening
 + Fixed: SRPid readout, error in byte conversion
 + Fixed: Import from WDB with the rubbish in course object (special characters)
@@ -35,6 +39,8 @@
 + Fixed: wiping the file by saving or auto-saving if the file could not be opened ([#502](https://github.com/sportorg/pysport/issues/502))
 + Fixed reversed line order when opening the file ([#509](https://github.com/sportorg/pysport/issues/509))
 + Fixed a split printout error when a participant’s group or course was not found ([#526](https://github.com/sportorg/pysport/issues/526))
++ Fixed quick start group input using Alt+number ([#536](https://github.com/sportorg/pysport/issues/536))
++ Fixed duplicate results in teamwork
 
 ## 2025-04-01
 
@@ -105,9 +111,11 @@
 + Results by course
 + Results autoscroll
 + Search athlete by name while unknown chip readout
+
 - Relays: set first leg finish as seond leg start etc.
 - Improved SI-6 support
 - Fixing in *.docx template for relays (last teams was missed)
+
 * Data model was changed. Use exchange formats to downgrade (xml, wdb)
 
 ## 2019-01-18 v1.4.0
@@ -115,11 +123,13 @@
 + Added import of CourseData (courses) for IOF xml
 + New status "Forced OK" to recover
 + Mass edit possibility for selected athletes
+
 - Calculating scores from leader time - ignoring mispunched athletes
 - Team work data exchange format changed. Previous: `0{}1`, now: `{}`
 - Search window freezing was fixed
 
 ## 2018-10-08 v1.3.0
+
 + Added MSP (mispunch) status, calculated by punches automatically
 + List or electronic cards to rent
 + Reduced row height in tables
@@ -132,7 +142,9 @@
 + File auto-saving
 + Show quantity of results for each athlete
 + Jinja2 templates .docx (MS Word)
+
 - Safe file saving (first write to file.sportorg.tmp, if it written correctly, rename to file.sportorg)
+
 * Introduced custom scripts for online sending
 
 ## 2018-06-13 v1.2.0
@@ -145,6 +157,7 @@
 + Multi day support
 + Dictionary of regions (file `regions.txt`)
 + Dictionary of given names (file `names.txt`)
+
 - Fixed error with last record in SFR card readout
 - Fixed error with mixed toss (all athletes of course)
 

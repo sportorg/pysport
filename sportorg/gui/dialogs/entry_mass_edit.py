@@ -101,9 +101,7 @@ class MassEditDialog(QDialog):
         self.layout.addRow(self.start_time_checkbox, self.start_time_edit)
 
         self.start_group_checkbox = QtWidgets.QCheckBox(self)
-        self.start_group_spinbox = AdvSpinBox(
-            minimum=0, maximum=99, max_width=max_field_width
-        )
+        self.start_group_spinbox = AdvSpinBox(minimum=0, max_width=max_field_width)
         self.layout.addRow(self.start_group_checkbox, self.start_group_spinbox)
 
         self.comment_checkbox = QtWidgets.QCheckBox(self)
