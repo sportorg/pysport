@@ -34,6 +34,7 @@ class Settings:
     sound_rented_card_path: Optional[str] = None
     sound_enter_number_path: Optional[str] = None
     ranking: Dict[str, Any] = field(default_factory=dict)
+    ranking_ardf: Dict[str, Any] = field(default_factory=dict)
     live_gzip_enabled: bool = True
 
     telegram_token: str = ""
@@ -46,6 +47,7 @@ class Settings:
         "configs", "status_default.txt"
     )
     source_ranking_score_path: str = config.base_dir("configs", "ranking.txt")
+    source_ranking_ardf_score_path: str = config.base_dir("configs", "ranking_ardf.txt")
     source_rent_cards_path: str = config.data_dir("rent_cards.txt")
 
 

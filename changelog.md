@@ -18,6 +18,8 @@
 + Reverse row numbering in the results tab ([#519](https://github.com/sportorg/pysport/issues/519))
 + Templates can compress data (gzip) to reduce the size of html files
 + Punch system selection in timekeeping properties dialog
++ Added support for multi-sport ranking tables and settings simultaneously
++ For ARDF, rank fulfillment according to the requirements of EVSK
 + Live (Online) toolbar button with state indicator and context menu (Enable/Disable, Send Selected, Settings)
 + A button has been added to the participant card for assigning a number (maximum existing number + 1)
 

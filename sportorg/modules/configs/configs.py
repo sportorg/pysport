@@ -17,6 +17,7 @@ class ConfigFile:
     SOUND = "sound"
     PRINTER = "printer"
     RANKING = "ranking"
+    RANKING_ARDF = "ranking_ardf"
     TEMPLATES = "templates"
 
 
@@ -120,6 +121,29 @@ class Config(metaclass=Singleton):
                     "relay_ranking_method": "personal",  # 'personal', 'average', 'first'
                 }
             ),
+            ConfigFile.RANKING_ARDF: Configurations(
+                {
+                    "not_qualified": 1.5,
+                    "iii_y": 3,
+                    "ii_y": 3,
+                    "i_y": 3,
+                    "iii": 6,
+                    "ii": 12,
+                    "i": 25,
+                    "kms": 50,
+                    "ms": 100,
+                    "msmk": 100,
+                    "zms": 100,
+                    "start_limit": 10,
+                    "finish_limit": 3,
+                    "start_limit_relay": 6,
+                    "finish_limit_relay": 6,
+                    "sum_count": 10,
+                    "sum_count_relay": 10,
+                    "individual_ranking_method": "first",
+                    "relay_ranking_method": "personal",
+                }
+            ),
             ConfigFile.GEOMETRY: Configurations({"main": "01"}),
             ConfigFile.TEMPLATES: Configurations({}),
         }
@@ -143,6 +167,10 @@ class Config(metaclass=Singleton):
     @property
     def ranking(self):
         return self._configurations[ConfigFile.RANKING]
+
+    @property
+    def ranking_ardf(self):
+        return self._configurations[ConfigFile.RANKING_ARDF]
 
     @property
     def geometry(self):

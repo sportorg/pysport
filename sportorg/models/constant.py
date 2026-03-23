@@ -354,7 +354,7 @@ class RentCards:
 @singleton
 class RankingTable:
     """
-    Ranking is read from configuration file called 'ranking_score.txt'
+    Ranking is read from configuration file called 'ranking.txt' / 'ranking_ardf.txt'
     ```
     Format: RANK;I;II;III;I_Y;II_Y[;III_Y[;KMS[;MS]]]
     e.g. 1000;136;151;169;;
@@ -363,7 +363,10 @@ class RankingTable:
     ```
     """
 
-    RANKING: List[List[int]] = []
+    _RANKING_TABLES = {}
+
+    _current_type = "default"
+
     column_mapping = {
         Qualification.I: 1,
         Qualification.II: 2,
@@ -374,22 +377,19 @@ class RankingTable:
         Qualification.KMS: 7,
         Qualification.MS: 8,
     }
-
-    def get_all(self):
-        return self.RANKING
-
-    def get_qual_table(self, qual):
-        # get only 2 columns from whole table, corresponding to specified qualification
-        try:
-            columns = [0, self.column_mapping[qual]]
-            my_items = operator.itemgetter(*columns)
-            return [my_items(x) for x in self.RANKING]
-        except Exception:
-            # logging.exception(e)
-            return [[0, 0]]
-
-    def set(self, items):
-        self.RANKING = []
+        
+    @classmethod
+    def set_current_type(cls, table_type: str):
+        cls._current_type = table_type
+    
+    @classmethod
+    def get_table(cls, table_type: str = None):
+        table_type = table_type or cls._current_type
+        return cls._RANKING_TABLES.get(table_type, [])
+    
+    @classmethod
+    def set_table(cls, items, table_type: str = "default"):
+        table_data = []
         for i in items:
             row = []
             for j in i:
@@ -397,4 +397,20 @@ class RankingTable:
                     row.append(int(j))
                 else:
                     row.append(0)
-            self.RANKING.append(row)
+            table_data.append(row)
+        
+        cls._RANKING_TABLES[table_type] = table_data
+
+    def get_all(self):
+        return self.get_table(self._current_type)
+
+    def get_qual_table(self, qual):
+        # get only 2 columns from whole table, corresponding to specified qualification
+        try:
+            table_data = self.get_table(self._current_type)
+            columns = [0, self.column_mapping[qual]]
+            my_items = operator.itemgetter(*columns)
+            return [my_items(x) for x in table_data]
+        except Exception:
+            # logging.exception(e)
+            return [[0, 0]]

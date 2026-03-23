@@ -2332,8 +2332,11 @@ class Qualification(IntEnum):
         return qual[self.value]
 
     # get score for ranking, stored in config.ini file
-    def get_score(self):
-        return float(settings.SETTINGS.ranking.get(self.name.lower(), 0))
+    def get_score(self, is_ardf = False):
+        if is_ardf:
+            return float(settings.SETTINGS.ranking_ardf.get(self.name.lower(), 0))
+        else:
+            return float(settings.SETTINGS.ranking.get(self.name.lower(), 0))
 
     @staticmethod
     def list_qual():
