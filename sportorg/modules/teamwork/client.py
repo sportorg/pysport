@@ -1,6 +1,7 @@
 import queue
 import selectors
 import socket
+import time
 from threading import Event, Thread
 from typing import Tuple, cast
 
@@ -14,13 +15,15 @@ class ClientSender:
     def __init__(self, in_queue: queue.Queue):
         self._in_queue = in_queue
 
-    def __call__(self, conn: socket.socket) -> None:
+    def __call__(self, conn: socket.socket) -> bool:
+        sent = False
         try:
             while True:
                 cmd = self._in_queue.get(timeout=0.1)
                 conn.sendall(cmd.get_packet())
+                sent = True
         except queue.Empty:
-            return
+            return sent
 
 
 class ClientReceiver:
@@ -68,6 +71,7 @@ class ClientThread(Thread):
         out_queue: queue.Queue,
         stop_event: Event,
         logger,
+        keepalive_interval: float = 5.0,
     ):
         super().__init__()
         self.setName("Teamwork Client")
@@ -77,6 +81,7 @@ class ClientThread(Thread):
         self._stop_event = stop_event
         self._logger = logger
         self._started = Event()
+        self._keepalive_interval = keepalive_interval
 
     def wait(self) -> None:
         self._started.wait()
@@ -93,17 +98,25 @@ class ClientThread(Thread):
                 self._started.set()
                 sender = ClientSender(self._in_queue)
                 receiver = ClientReceiver(self._out_queue)
+                last_outgoing_packet_time = time.monotonic()
+
                 while True:
                     if self._stop_event.is_set():
                         break
                     events = selector.select(timeout=1)
-                    if not events:
-                        continue
                     for key, mask in events:
                         if mask & selectors.EVENT_READ:
                             receiver(cast(socket.socket, key.fileobj))
                         if mask & selectors.EVENT_WRITE:
-                            sender(cast(socket.socket, key.fileobj))
+                            if sender(cast(socket.socket, key.fileobj)):
+                                last_outgoing_packet_time = time.monotonic()
+
+                    if (
+                        time.monotonic() - last_outgoing_packet_time
+                        >= self._keepalive_interval
+                    ):
+                        s.sendall(Command(None, Operations.Read.name).get_packet())
+                        last_outgoing_packet_time = time.monotonic()
             except Exception as e:
                 self._logger.exception(e)
                 self._stop_event.set()

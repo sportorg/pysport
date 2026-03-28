@@ -1,6 +1,7 @@
 import logging
 from queue import Empty, Queue
 from threading import Event, main_thread
+from typing import List
 
 try:
     from PySide6.QtCore import QThread, Signal
@@ -136,3 +137,17 @@ class Teamwork:
         """data is Dict or List[Dict]"""
         if self.is_alive():
             pass
+
+    def get_server_clients(self) -> List[dict]:
+        if not self.is_alive() or self.connection_type != "server":
+            return []
+        if self._thread is None or not hasattr(self._thread, "get_clients"):
+            return []
+        return self._thread.get_clients()
+
+    def disconnect_server_client(self, client_id: int) -> None:
+        if not self.is_alive() or self.connection_type != "server":
+            return
+        if self._thread is None or not hasattr(self._thread, "disconnect_client"):
+            return
+        self._thread.disconnect_client(client_id)

@@ -24,6 +24,9 @@ class Command:
     def is_sender(self, sender: socket.socket) -> bool:
         return self._sender is sender
 
+    def is_service_keepalive(self) -> bool:
+        return self.data is None and self.header.op_type == Operations.Read.value
+
     def get_packet(self) -> bytes:
         pack_data = orjson.dumps(self.data)
         return self.header.pack_header(len(pack_data)) + pack_data

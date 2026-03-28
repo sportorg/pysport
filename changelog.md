@@ -22,6 +22,7 @@
 + For ARDF, rank fulfillment according to the requirements of EVSK
 + Live (Online) toolbar button with state indicator and context menu (Enable/Disable, Send Selected, Settings)
 + A button has been added to the participant card for assigning a number (maximum existing number + 1)
++ Added connected clients to teamwork properties
 
 ### Fixes
 
