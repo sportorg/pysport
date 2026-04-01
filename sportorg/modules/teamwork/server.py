@@ -3,11 +3,12 @@ import socket
 import time
 from queue import Empty, Queue
 from threading import Event, Lock, Thread
-from typing import Dict, List, Tuple, cast
+from typing import Dict, List, Optional, Tuple, cast
 
 import orjson
 
 from .command import Command
+from .crypto import TeamworkCipher, TeamworkCryptoError
 from .packet_header import Header, Operations
 
 
@@ -21,12 +22,14 @@ class ServerReceiver:
         out_queue: Queue,
         server_thread,
         logger,
+        cipher: Optional[TeamworkCipher] = None,
     ):
         self._selector = selector
         self._in_queue = in_queue
         self._out_queue = out_queue
         self._server_thread = server_thread
         self._logger = logger
+        self._cipher = cipher
         self._full_data = b""
         self._hdr = Header()
         self._is_new_pack = True
@@ -68,7 +71,12 @@ class ServerReceiver:
             return
 
         try:
-            command = Command(orjson.loads(packet), operation, sender=sock)
+            payload = self._decode_payload(packet)
+            command = Command(orjson.loads(payload), operation, sender=sock)
+        except TeamworkCryptoError as e:
+            self._logger.error(str(e))
+            self._server_thread.disconnect_socket(sock, self._selector)
+            return
         except Exception as e:
             self._logger.error(str(e))
             return
@@ -81,6 +89,20 @@ class ServerReceiver:
         self._out_queue.put(command)
         self._in_queue.put(command)
 
+    def _decode_payload(self, packet: bytes) -> bytes:
+        if self._cipher is None:
+            if self._hdr.version != Header.VERSION_PLAIN:
+                raise TeamworkCryptoError(
+                    "Encrypted teamwork packet received, but encryption is disabled"
+                )
+            return packet
+
+        if self._hdr.version != Header.VERSION_AES256_GCM:
+            raise TeamworkCryptoError(
+                "Unencrypted teamwork packet received, but encryption is enabled"
+            )
+        return self._cipher.decrypt(packet)
+
 
 class ServerSender:
     def __init__(
@@ -89,11 +111,13 @@ class ServerSender:
         in_queue: Queue,
         server_thread,
         logger,
+        cipher: Optional[TeamworkCipher] = None,
     ):
         self._selector = selector
         self._in_queue = in_queue
         self._server_thread = server_thread
         self._logger = logger
+        self._cipher = cipher
 
     def __call__(self, socks: List[socket.socket]) -> None:
         try:
@@ -103,7 +127,7 @@ class ServerSender:
                     if command.is_sender(sock):
                         continue
                     try:
-                        sock.sendall(command.get_packet())
+                        sock.sendall(command.get_packet(self._cipher))
                     except OSError as e:
                         self._logger.error(str(e))
                         self._server_thread.disconnect_socket(sock, self._selector)
@@ -119,12 +143,14 @@ class ConnectionAcceptor:
         out_queue: Queue,
         server_thread,
         logger,
+        cipher: Optional[TeamworkCipher] = None,
     ):
         self._selector = selector
         self._logger = logger
         self._in_queue = in_queue
         self._out_queue = out_queue
         self._server_thread = server_thread
+        self._cipher = cipher
 
     def __call__(self, sock: socket.socket) -> None:
         conn, addr = sock.accept()
@@ -139,6 +165,7 @@ class ConnectionAcceptor:
                 self._out_queue,
                 self._server_thread,
                 self._logger,
+                self._cipher,
             ),
         )
         self._logger.info(
@@ -157,6 +184,7 @@ class ServerThread(Thread):
         out_queue: Queue,
         stop_event: Event,
         logger,
+        cipher: Optional[TeamworkCipher] = None,
     ):
         super().__init__(daemon=True)
         self.setName("Teamwork Server")
@@ -165,6 +193,7 @@ class ServerThread(Thread):
         self._out_queue = out_queue
         self._stop_event = stop_event
         self._logger = logger
+        self._cipher = cipher
         self._started = Event()
         self._disconnect_queue: Queue = Queue()
         self._clients_lock = Lock()
@@ -302,12 +331,15 @@ class ServerThread(Thread):
                     self._out_queue,
                     self,
                     self._logger,
+                    self._cipher,
                 ),
             )
 
             self._logger.info("Server started")
 
-            sender = ServerSender(selector, self._in_queue, self, self._logger)
+            sender = ServerSender(
+                selector, self._in_queue, self, self._logger, self._cipher
+            )
             self._started.set()
 
             while True:

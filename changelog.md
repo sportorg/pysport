@@ -23,6 +23,7 @@
 + Live (Online) toolbar button with state indicator and context menu (Enable/Disable, Send Selected, Settings)
 + A button has been added to the participant card for assigning a number (maximum existing number + 1)
 + Added connected clients to teamwork properties
++ Optional Teamwork data encryption (AES-256-GCM) with local key storage, key-file selection, and key generation in settings
 
 ### Fixes
 

@@ -79,6 +79,10 @@ from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.modules.sportiduino.sportiduino import SportiduinoClient
 from sportorg.modules.srpid.srpid import SrpidClient
 from sportorg.modules.teamwork.teamwork import Teamwork
+from sportorg.modules.teamwork.crypto import (
+    TeamworkCryptoError,
+    load_teamwork_key_from_file,
+)
 from sportorg.modules.telegram.telegram import telegram_client
 from sportorg.modules.updater import checker
 from sportorg.modules.winorient import winorient
@@ -774,9 +778,24 @@ class TeamworkEnableAction(Action, metaclass=ActionFactory):
         port = race().get_setting("teamwork_port", 50010)
         token = race().get_setting("teamwork_token", str(uuid.uuid4())[:8])
         connection_type = race().get_setting("teamwork_type_connection", "client")
+        encryption_enabled = bool(race().get_setting("teamwork_encryption_enabled", False))
+        encryption_key = str(settings.SETTINGS.teamwork_encryption_key or "")
+        key_file = str(settings.SETTINGS.teamwork_encryption_last_key_file or "")
+        if key_file:
+            try:
+                encryption_key = load_teamwork_key_from_file(key_file)
+            except (OSError, TeamworkCryptoError) as e:
+                logging.error(str(e))
         if connection_type == "server":
             host = "0.0.0.0"
-        Teamwork().set_options(host, port, token, connection_type)
+        Teamwork().set_options(
+            host,
+            port,
+            token,
+            connection_type,
+            encryption_enabled=encryption_enabled,
+            encryption_key=encryption_key,
+        )
         Teamwork().toggle()
 
 

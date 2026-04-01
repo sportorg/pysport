@@ -1,7 +1,7 @@
 import logging
 from queue import Empty, Queue
 from threading import Event, main_thread
-from typing import List
+from typing import List, Optional
 
 try:
     from PySide6.QtCore import QThread, Signal
@@ -11,6 +11,7 @@ except ModuleNotFoundError:
 from sportorg.common.singleton import singleton
 
 from .client import ClientThread
+from .crypto import TeamworkCipher, TeamworkCryptoError
 from .packet_header import Operations
 from .server import Command, ServerThread
 
@@ -55,20 +56,36 @@ class Teamwork:
         self.port = 50010
         self.token = ""
         self.connection_type = "client"
+        self.encryption_enabled = False
+        self.encryption_key = ""
 
     def set_call(self, value):
         if self._call_back is None:
             self._call_back = value
         return self
 
-    def set_options(self, host, port, token, connection_type):
+    def set_options(
+        self,
+        host,
+        port,
+        token,
+        connection_type,
+        encryption_enabled=False,
+        encryption_key="",
+    ):
         self.host = host
         self.port = port
         self.token = token
         self.connection_type = connection_type
+        self.encryption_enabled = encryption_enabled
+        self.encryption_key = encryption_key
 
     def _start_thread(self):
         if self.connection_type not in self.factory.keys():
+            return
+        cipher = self._get_cipher()
+        if self.encryption_enabled and cipher is None:
+            self._stop_event.set()
             return
         if self._thread is None:
             self._thread = self.factory[self.connection_type](
@@ -77,6 +94,7 @@ class Teamwork:
                 self._out_queue,
                 self._stop_event,
                 self._logger,
+                cipher=cipher,
             )
             self._thread.start()
         elif not self._thread.is_alive():
@@ -113,6 +131,8 @@ class Teamwork:
         self._out_queue.queue.clear()
 
         self._start_thread()
+        if self._thread is None or not self._thread.is_alive():
+            return
         self._start_result_thread()
 
     def toggle(self):
@@ -151,3 +171,12 @@ class Teamwork:
         if self._thread is None or not hasattr(self._thread, "disconnect_client"):
             return
         self._thread.disconnect_client(client_id)
+
+    def _get_cipher(self) -> Optional[TeamworkCipher]:
+        if not self.encryption_enabled:
+            return None
+        try:
+            return TeamworkCipher(self.encryption_key)
+        except TeamworkCryptoError as e:
+            self._logger.error(str(e))
+            return None

@@ -1785,3 +1785,21 @@ msgstr "Присвоить"
 
 msgid "No free numbers available"
 msgstr "Свободных номеров нет"
+
+msgid "Enable encryption (AES-256-GCM)"
+msgstr "Включить шифрование (AES-256-GCM)"
+
+msgid "Encryption key"
+msgstr "Ключ шифрования"
+
+msgid "Generate key"
+msgstr "Сгенерировать ключ"
+
+msgid "Choose key file"
+msgstr "Выбрать файл с ключом"
+
+msgid "Open key file"
+msgstr "Открыть файл с ключом"
+
+msgid "Key file"
+msgstr "Файл с ключом"

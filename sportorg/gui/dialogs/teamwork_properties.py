@@ -5,6 +5,8 @@ try:
     from PySide6.QtCore import QTimer
     from PySide6.QtWidgets import (
         QAbstractItemView,
+        QCheckBox,
+        QComboBox,
         QDialog,
         QDialogButtonBox,
         QFormLayout,
@@ -24,6 +26,8 @@ except ModuleNotFoundError:
     from PySide2.QtCore import QTimer
     from PySide2.QtWidgets import (
         QAbstractItemView,
+        QCheckBox,
+        QComboBox,
         QDialog,
         QDialogButtonBox,
         QFormLayout,
@@ -40,10 +44,17 @@ except ModuleNotFoundError:
         QWidget,
     )
 
+from sportorg import settings
+from sportorg.gui.dialogs.file_dialog import get_open_file_name
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvSpinBox
 from sportorg.language import translate
 from sportorg.models.memory import race
+from sportorg.modules.teamwork.crypto import (
+    TeamworkCryptoError,
+    generate_teamwork_key,
+    load_teamwork_key_from_file,
+)
 from sportorg.modules.teamwork.teamwork import Teamwork
 
 
@@ -73,6 +84,26 @@ class TeamworkPropertiesDialog(QDialog):
         self.teamwork_item_host = QLineEdit()
         self.teamwork_item_port = AdvSpinBox(0, 65535)
         self.teamwork_item_token = QLineEdit()
+        self.teamwork_item_encryption_enabled = QCheckBox(
+            translate("Enable encryption (AES-256-GCM)")
+        )
+        self.teamwork_item_encryption_key = QLineEdit()
+        self.teamwork_generate_key_button = QPushButton(translate("Generate key"))
+        self.teamwork_key_editor_container = QWidget()
+        self.teamwork_key_editor_layout = QHBoxLayout()
+        self.teamwork_key_editor_layout.setContentsMargins(0, 0, 0, 0)
+        self.teamwork_key_editor_layout.addWidget(self.teamwork_item_encryption_key)
+        self.teamwork_key_editor_layout.addWidget(self.teamwork_generate_key_button)
+        self.teamwork_key_editor_container.setLayout(self.teamwork_key_editor_layout)
+        self.teamwork_item_key_file = QComboBox()
+        self.teamwork_item_key_file.setEditable(False)
+        self.teamwork_key_file_button = QPushButton(translate("Choose key file"))
+        self.teamwork_key_file_container = QWidget()
+        self.teamwork_key_file_layout = QHBoxLayout()
+        self.teamwork_key_file_layout.setContentsMargins(0, 0, 0, 0)
+        self.teamwork_key_file_layout.addWidget(self.teamwork_item_key_file)
+        self.teamwork_key_file_layout.addWidget(self.teamwork_key_file_button)
+        self.teamwork_key_file_container.setLayout(self.teamwork_key_file_layout)
         self.teamwork_groupbox = QGroupBox()
         self.teamwork_groupbox.setTitle(translate("Type connection"))
         self.teamwork_groupbox_layout = QFormLayout()
@@ -84,6 +115,13 @@ class TeamworkPropertiesDialog(QDialog):
 
         self.teamwork_layout.addRow(QLabel(translate("Host")), self.teamwork_item_host)
         self.teamwork_layout.addRow(QLabel(translate("Port")), self.teamwork_item_port)
+        self.teamwork_layout.addRow(self.teamwork_item_encryption_enabled)
+        self.teamwork_layout.addRow(
+            QLabel(translate("Encryption key")), self.teamwork_key_editor_container
+        )
+        self.teamwork_layout.addRow(
+            QLabel(translate("Key file")), self.teamwork_key_file_container
+        )
         self.teamwork_layout.addRow(self.teamwork_groupbox)
         self.teamwork_tab.setLayout(self.teamwork_layout)
 
@@ -147,6 +185,14 @@ class TeamworkPropertiesDialog(QDialog):
         self.connections_refresh_button.clicked.connect(self.refresh_connected_clients)
         self.connections_disconnect_button.clicked.connect(
             self.disconnect_selected_client
+        )
+        self.teamwork_key_file_button.clicked.connect(self._choose_key_file)
+        self.teamwork_item_key_file.currentIndexChanged.connect(
+            self._load_selected_key_file
+        )
+        self.teamwork_generate_key_button.clicked.connect(self._generate_key)
+        self.teamwork_item_encryption_key.textEdited.connect(
+            self._switch_to_manual_key_mode
         )
 
         self.set_values_from_model()
@@ -251,10 +297,21 @@ class TeamworkPropertiesDialog(QDialog):
         teamwork_port = obj.get_setting("teamwork_port", 50010)
         teamwork_token = obj.get_setting("teamwork_token", str(uuid.uuid4())[:8])
         teamwork_type_connection = obj.get_setting("teamwork_type_connection", "client")
+        teamwork_encryption_enabled = obj.get_setting(
+            "teamwork_encryption_enabled", False
+        )
 
         self.teamwork_item_host.setText(teamwork_host)
         self.teamwork_item_port.setValue(teamwork_port)
         self.teamwork_item_token.setText(teamwork_token)
+        self.teamwork_item_encryption_enabled.setChecked(teamwork_encryption_enabled)
+        self.teamwork_item_encryption_key.setText(
+            str(settings.SETTINGS.teamwork_encryption_key or "")
+        )
+        self._set_key_file_options(
+            settings.SETTINGS.teamwork_encryption_key_files or [],
+            str(settings.SETTINGS.teamwork_encryption_last_key_file or ""),
+        )
         if teamwork_type_connection == "client":
             self.teamwork_item_client.setChecked(True)
         elif teamwork_type_connection == "server":
@@ -266,6 +323,7 @@ class TeamworkPropertiesDialog(QDialog):
         teamwork_host = self.teamwork_item_host.text()
         teamwork_port = self.teamwork_item_port.value()
         teamwork_token = self.teamwork_item_token.text()
+        teamwork_encryption_enabled = self.teamwork_item_encryption_enabled.isChecked()
         teamwork_type_connection = "client"
         if self.teamwork_item_server.isChecked():
             teamwork_type_connection = "server"
@@ -274,3 +332,89 @@ class TeamworkPropertiesDialog(QDialog):
         obj.set_setting("teamwork_port", teamwork_port)
         obj.set_setting("teamwork_token", teamwork_token)
         obj.set_setting("teamwork_type_connection", teamwork_type_connection)
+        obj.set_setting("teamwork_encryption_enabled", teamwork_encryption_enabled)
+
+        settings.SETTINGS.teamwork_encryption_key = (
+            self.teamwork_item_encryption_key.text()
+        )
+        settings.SETTINGS.teamwork_encryption_key_files = self._get_key_files()
+        settings.SETTINGS.teamwork_encryption_last_key_file = str(
+            self.teamwork_item_key_file.currentData() or ""
+        )
+
+    def _choose_key_file(self):
+        path = get_open_file_name(
+            translate("Open key file"),
+            translate("Key file (*.key *.txt);;All files (*)"),
+        )
+        if not path:
+            return
+        self._add_key_file(path)
+        index = self.teamwork_item_key_file.findData(path)
+        if index >= 0:
+            self.teamwork_item_key_file.setCurrentIndex(index)
+
+    def _load_selected_key_file(self):
+        path = str(self.teamwork_item_key_file.currentData() or "").strip()
+        if not path:
+            return
+        try:
+            key_value = load_teamwork_key_from_file(path)
+        except (OSError, TeamworkCryptoError) as e:
+            logging.error(str(e))
+            return
+        self.teamwork_item_encryption_key.setText(key_value)
+
+    def _set_key_file_options(self, key_files, selected_file):
+        self.teamwork_item_key_file.blockSignals(True)
+        self.teamwork_item_key_file.clear()
+        self.teamwork_item_key_file.addItem(translate("Manual key"), "")
+        for path in self._normalize_key_files(key_files):
+            self.teamwork_item_key_file.addItem(path, path)
+        selected_index = 0
+        if self.teamwork_item_key_file.count():
+            selected_index = self.teamwork_item_key_file.findData(selected_file)
+            if selected_index < 0:
+                if selected_file:
+                    selected_index = self.teamwork_item_key_file.count() - 1
+                else:
+                    selected_index = 0
+            self.teamwork_item_key_file.setCurrentIndex(selected_index)
+        self.teamwork_item_key_file.blockSignals(False)
+        self._load_selected_key_file()
+
+    def _generate_key(self):
+        self._switch_to_manual_key_mode()
+        self.teamwork_item_encryption_key.setText(generate_teamwork_key())
+
+    def _switch_to_manual_key_mode(self, *_args):
+        manual_index = self.teamwork_item_key_file.findData("")
+        if manual_index < 0:
+            return
+        if self.teamwork_item_key_file.currentIndex() != manual_index:
+            self.teamwork_item_key_file.setCurrentIndex(manual_index)
+
+    def _add_key_file(self, path):
+        normalized = self._normalize_key_files([path])
+        if not normalized:
+            return
+        value = normalized[0]
+        if self.teamwork_item_key_file.findData(value) < 0:
+            self.teamwork_item_key_file.addItem(value, value)
+
+    def _get_key_files(self):
+        key_files = []
+        for index in range(self.teamwork_item_key_file.count()):
+            value = str(self.teamwork_item_key_file.itemData(index) or "").strip()
+            if value and value not in key_files:
+                key_files.append(value)
+        return key_files
+
+    @staticmethod
+    def _normalize_key_files(key_files):
+        normalized = []
+        for key_file in key_files:
+            value = str(key_file).strip()
+            if value and value not in normalized:
+                normalized.append(value)
+        return normalized
