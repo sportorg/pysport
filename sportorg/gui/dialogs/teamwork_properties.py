@@ -83,7 +83,6 @@ class TeamworkPropertiesDialog(QDialog):
         self.teamwork_layout = QFormLayout()
         self.teamwork_item_host = QLineEdit()
         self.teamwork_item_port = AdvSpinBox(0, 65535)
-        self.teamwork_item_token = QLineEdit()
         self.teamwork_item_encryption_enabled = QCheckBox(
             translate("Enable encryption (AES-256-GCM)")
         )
@@ -295,7 +294,6 @@ class TeamworkPropertiesDialog(QDialog):
 
         teamwork_host = obj.get_setting("teamwork_host", "localhost")
         teamwork_port = obj.get_setting("teamwork_port", 50010)
-        teamwork_token = obj.get_setting("teamwork_token", str(uuid.uuid4())[:8])
         teamwork_type_connection = obj.get_setting("teamwork_type_connection", "client")
         teamwork_encryption_enabled = obj.get_setting(
             "teamwork_encryption_enabled", False
@@ -303,7 +301,6 @@ class TeamworkPropertiesDialog(QDialog):
 
         self.teamwork_item_host.setText(teamwork_host)
         self.teamwork_item_port.setValue(teamwork_port)
-        self.teamwork_item_token.setText(teamwork_token)
         self.teamwork_item_encryption_enabled.setChecked(teamwork_encryption_enabled)
         self.teamwork_item_encryption_key.setText(
             str(settings.SETTINGS.teamwork_encryption_key or "")
@@ -322,7 +319,6 @@ class TeamworkPropertiesDialog(QDialog):
 
         teamwork_host = self.teamwork_item_host.text()
         teamwork_port = self.teamwork_item_port.value()
-        teamwork_token = self.teamwork_item_token.text()
         teamwork_encryption_enabled = self.teamwork_item_encryption_enabled.isChecked()
         teamwork_type_connection = "client"
         if self.teamwork_item_server.isChecked():
@@ -330,7 +326,6 @@ class TeamworkPropertiesDialog(QDialog):
 
         obj.set_setting("teamwork_host", teamwork_host)
         obj.set_setting("teamwork_port", teamwork_port)
-        obj.set_setting("teamwork_token", teamwork_token)
         obj.set_setting("teamwork_type_connection", teamwork_type_connection)
         obj.set_setting("teamwork_encryption_enabled", teamwork_encryption_enabled)
 

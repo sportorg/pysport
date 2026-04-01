@@ -54,7 +54,6 @@ class Teamwork:
 
         self.host = ""
         self.port = 50010
-        self.token = ""
         self.connection_type = "client"
         self.encryption_enabled = False
         self.encryption_key = ""
@@ -68,14 +67,12 @@ class Teamwork:
         self,
         host,
         port,
-        token,
         connection_type,
         encryption_enabled=False,
         encryption_key="",
     ):
         self.host = host
         self.port = port
-        self.token = token
         self.connection_type = connection_type
         self.encryption_enabled = encryption_enabled
         self.encryption_key = encryption_key

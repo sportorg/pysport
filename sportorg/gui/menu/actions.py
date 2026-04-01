@@ -776,7 +776,6 @@ class TeamworkEnableAction(Action, metaclass=ActionFactory):
     def execute(self):
         host = race().get_setting("teamwork_host", "localhost")
         port = race().get_setting("teamwork_port", 50010)
-        token = race().get_setting("teamwork_token", str(uuid.uuid4())[:8])
         connection_type = race().get_setting("teamwork_type_connection", "client")
         encryption_enabled = bool(race().get_setting("teamwork_encryption_enabled", False))
         encryption_key = str(settings.SETTINGS.teamwork_encryption_key or "")
@@ -791,7 +790,6 @@ class TeamworkEnableAction(Action, metaclass=ActionFactory):
         Teamwork().set_options(
             host,
             port,
-            token,
             connection_type,
             encryption_enabled=encryption_enabled,
             encryption_key=encryption_key,
