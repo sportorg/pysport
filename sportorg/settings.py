@@ -1,7 +1,7 @@
 import os
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple
 
 from sportorg import config
 from sportorg.libs.settings import load_settings, save_settings
@@ -39,8 +39,6 @@ class Settings:
 
     telegram_token: str = ""
     teamwork_encryption_key: str = ""
-    teamwork_encryption_key_files: List[str] = field(default_factory=list)
-    teamwork_encryption_last_key_file: str = ""
 
     source_names_path: str = config.configs_dir("names.txt")
     source_middle_names_path: str = config.configs_dir("middle_names.txt")

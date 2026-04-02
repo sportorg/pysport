@@ -1794,12 +1794,3 @@ msgstr "Ключ шифрования"
 
 msgid "Generate key"
 msgstr "Сгенерировать ключ"
-
-msgid "Choose key file"
-msgstr "Выбрать файл с ключом"
-
-msgid "Open key file"
-msgstr "Открыть файл с ключом"
-
-msgid "Key file"
-msgstr "Файл с ключом"
