@@ -3,7 +3,7 @@ import socket
 import time
 from queue import Empty, Queue
 from threading import Event, Lock, Thread
-from typing import Dict, List, Optional, Tuple, cast
+from typing import Any, Dict, List, Optional, Tuple, cast
 
 import orjson
 
@@ -85,6 +85,31 @@ class ServerReceiver:
             self._server_thread.mark_keepalive(sock)
             return
 
+        if operation == Operations.SendRaceId.name:
+            self._server_thread.mark_data_packet(sock)
+            mismatch, server_race_id = self._server_thread.handle_client_race_id(
+                sock, command.data
+            )
+            if mismatch:
+                mismatch_cmd = Command(
+                    {"object": "Race", "id": server_race_id},
+                    Operations.RaceIdMismatch.name,
+                )
+                try:
+                    sock.sendall(mismatch_cmd.get_packet(self._cipher))
+                except OSError as e:
+                    self._logger.error(str(e))
+                    self._server_thread.disconnect_socket(sock, self._selector)
+            return
+
+        if not self._server_thread.is_client_ready_for_sync(sock):
+            client_id = self._server_thread.get_client_id(sock)
+            self._logger.warning(
+                "Ignoring teamwork packet from unconfirmed client id=%s",
+                client_id,
+            )
+            return
+
         self._server_thread.mark_data_packet(sock)
         self._out_queue.put(command)
         self._in_queue.put(command)
@@ -125,6 +150,8 @@ class ServerSender:
                 command = self._in_queue.get(timeout=0.1)
                 for sock in socks:
                     if command.is_sender(sock):
+                        continue
+                    if not self._server_thread.is_client_ready_for_sync(sock):
                         continue
                     try:
                         sock.sendall(command.get_packet(self._cipher))
@@ -217,6 +244,8 @@ class ServerThread(Thread):
                 "last_seen_at": now,
                 "packets": 0,
                 "keepalive_packets": 0,
+                "client_race_id": "",
+                "race_id_confirmed": not self._is_race_id_check_enabled(),
             }
             self._clients_by_id[client_id] = sock
         return client_id
@@ -257,6 +286,60 @@ class ServerThread(Thread):
     def mark_data_packet(self, sock: socket.socket) -> None:
         self._mark_client_activity(sock, keepalive=False)
 
+    def get_client_id(self, sock: socket.socket) -> Optional[int]:
+        with self._clients_lock:
+            item = self._clients.get(sock)
+            if item is None:
+                return None
+            return cast(int, item["id"])
+
+    def is_client_ready_for_sync(self, sock: socket.socket) -> bool:
+        if not self._is_race_id_check_enabled():
+            return True
+        with self._clients_lock:
+            item = self._clients.get(sock)
+            if item is None:
+                return False
+            return bool(item.get("race_id_confirmed", False))
+
+    def handle_client_race_id(self, sock: socket.socket, data: Any) -> Tuple[bool, str]:
+        client_race_id = ""
+        if isinstance(data, dict):
+            client_race_id = str(data.get("id", "")).strip()
+
+        server_race_id = self._get_server_race_id()
+        client_id = self.get_client_id(sock)
+
+        with self._clients_lock:
+            item = self._clients.get(sock)
+            if item is not None:
+                item["client_race_id"] = client_race_id
+
+        self._logger.info(
+            "Teamwork client race id: id=%s client_race_id=%s server_race_id=%s",
+            client_id,
+            client_race_id,
+            server_race_id,
+        )
+
+        if not self._is_race_id_check_enabled():
+            self._set_client_race_confirmation(sock, True)
+            return False, server_race_id
+
+        race_id_matched = bool(client_race_id) and client_race_id == server_race_id
+        self._set_client_race_confirmation(sock, race_id_matched)
+
+        if race_id_matched:
+            return False, server_race_id
+
+        self._logger.warning(
+            "Teamwork race id mismatch: id=%s client_race_id=%s server_race_id=%s",
+            client_id,
+            client_race_id,
+            server_race_id,
+        )
+        return True, server_race_id
+
     def _mark_client_activity(self, sock: socket.socket, keepalive: bool) -> None:
         now = time.time()
         with self._clients_lock:
@@ -268,6 +351,27 @@ class ServerThread(Thread):
                 item["keepalive_packets"] = cast(int, item["keepalive_packets"]) + 1
             else:
                 item["packets"] = cast(int, item["packets"]) + 1
+
+    def _set_client_race_confirmation(
+        self, sock: socket.socket, is_confirmed: bool
+    ) -> None:
+        with self._clients_lock:
+            item = self._clients.get(sock)
+            if item is None:
+                return
+            item["race_id_confirmed"] = is_confirmed
+
+    @staticmethod
+    def _is_race_id_check_enabled() -> bool:
+        from sportorg import settings
+
+        return bool(getattr(settings.SETTINGS, "teamwork_check_race_id", False))
+
+    @staticmethod
+    def _get_server_race_id() -> str:
+        from sportorg.models.memory import race
+
+        return str(race().id)
 
     def _disconnect_socket(
         self, sock: socket.socket, selector: selectors.BaseSelector

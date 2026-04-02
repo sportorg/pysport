@@ -49,6 +49,8 @@ class Operations(Enum):
     SyncRace = 4
     GetLock = 5
     ReleaseLoc = 6
+    SendRaceId = 7
+    RaceIdMismatch = 8
 
     def __str__(self):
         return self._name_

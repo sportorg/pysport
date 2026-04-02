@@ -1,12 +1,15 @@
 import logging
 import socket
 import time
+import uuid
 from queue import Queue
 from threading import Event
 
 import pytest
 import orjson
 
+from sportorg import settings
+from sportorg.models.memory import race
 from sportorg.modules.teamwork.client import ClientThread
 from sportorg.modules.teamwork.crypto import (
     TeamworkCipher,
@@ -15,7 +18,7 @@ from sportorg.modules.teamwork.crypto import (
     load_teamwork_key_from_file,
     normalize_teamwork_key,
 )
-from sportorg.modules.teamwork.packet_header import Header
+from sportorg.modules.teamwork.packet_header import Header, Operations
 from sportorg.modules.teamwork.server import Command, ServerThread
 
 
@@ -236,6 +239,56 @@ def test_teamwork_encrypted_packet_contains_nonce():
     encrypted_payload = packet[Header.header_size :]
     decrypted_payload = cipher.decrypt(encrypted_payload)
     assert orjson.loads(decrypted_payload) == command.data
+
+
+def test_teamwork_race_id_mismatch_requires_confirmation():
+    original_check_race_id = settings.SETTINGS.teamwork_check_race_id
+    original_race_id = race().id
+    settings.SETTINGS.teamwork_check_race_id = True
+    race().id = uuid.uuid4()
+    server_race_id = str(race().id)
+
+    threads = start_server_and_client(keepalive_interval=1.0)
+    server = threads["server"]
+    server_out_queue = threads["server_out_queue"]
+    client_in_queue = threads["client_in_queue"]
+    client_out_queue = threads["client_out_queue"]
+
+    person_data = {
+        "object": "Person",
+        "id": "c24eef6c-a33b-4581-a6d1-78294711aef1",
+        "name": "Danil",
+    }
+
+    try:
+        wait_until(lambda: len(server.get_clients()) == 1)
+
+        client_in_queue.put(
+            Command(
+                {"object": "Race", "id": str(uuid.uuid4())}, Operations.SendRaceId.name
+            )
+        )
+
+        mismatch_cmd = client_out_queue.get(timeout=5)
+        assert mismatch_cmd.header.op_type == Operations.RaceIdMismatch.value
+        assert mismatch_cmd.data["id"] == server_race_id
+
+        client_in_queue.put(Command(person_data, "Create"))
+        time.sleep(0.5)
+        assert server_out_queue.empty()
+
+        client_in_queue.put(
+            Command(
+                {"object": "Race", "id": server_race_id}, Operations.SendRaceId.name
+            )
+        )
+        client_in_queue.put(Command(person_data, "Create"))
+        result = server_out_queue.get(timeout=5)
+        assert result.data == person_data
+    finally:
+        settings.SETTINGS.teamwork_check_race_id = original_check_race_id
+        race().id = original_race_id
+        stop_server_and_client(threads)
 
 
 def test_load_teamwork_key_from_file(tmp_path):

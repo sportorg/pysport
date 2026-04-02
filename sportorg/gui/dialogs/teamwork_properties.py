@@ -95,6 +95,11 @@ class TeamworkPropertiesDialog(QDialog):
         self.teamwork_groupbox_layout.addRow(self.teamwork_item_client)
         self.teamwork_groupbox_layout.addRow(self.teamwork_item_server)
         self.teamwork_groupbox.setLayout(self.teamwork_groupbox_layout)
+        self.server_settings_groupbox = QGroupBox(translate("Server settings"))
+        self.server_settings_groupbox_layout = QFormLayout()
+        self.teamwork_item_check_race_id = QCheckBox(translate("Check race identifier"))
+        self.server_settings_groupbox_layout.addRow(self.teamwork_item_check_race_id)
+        self.server_settings_groupbox.setLayout(self.server_settings_groupbox_layout)
 
         self.teamwork_layout.addRow(QLabel(translate("Host")), self.teamwork_item_host)
         self.teamwork_layout.addRow(QLabel(translate("Port")), self.teamwork_item_port)
@@ -103,6 +108,7 @@ class TeamworkPropertiesDialog(QDialog):
             QLabel(translate("Encryption key")), self.teamwork_key_editor_container
         )
         self.teamwork_layout.addRow(self.teamwork_groupbox)
+        self.teamwork_layout.addRow(self.server_settings_groupbox)
         self.teamwork_layout.addRow(self.teamwork_item_autorun)
         self.teamwork_tab.setLayout(self.teamwork_layout)
 
@@ -277,11 +283,13 @@ class TeamworkPropertiesDialog(QDialog):
             settings.SETTINGS.teamwork_encryption_enabled
         )
         teamwork_autorun = bool(settings.SETTINGS.teamwork_autorun)
+        teamwork_check_race_id = bool(settings.SETTINGS.teamwork_check_race_id)
 
         self.teamwork_item_host.setText(teamwork_host)
         self.teamwork_item_port.setValue(teamwork_port)
         self.teamwork_item_encryption_enabled.setChecked(teamwork_encryption_enabled)
         self.teamwork_item_autorun.setChecked(teamwork_autorun)
+        self.teamwork_item_check_race_id.setChecked(teamwork_check_race_id)
         self.teamwork_item_encryption_key.setText(
             str(settings.SETTINGS.teamwork_encryption_key or "")
         )
@@ -295,6 +303,7 @@ class TeamworkPropertiesDialog(QDialog):
         teamwork_port = self.teamwork_item_port.value()
         teamwork_encryption_enabled = self.teamwork_item_encryption_enabled.isChecked()
         teamwork_autorun = self.teamwork_item_autorun.isChecked()
+        teamwork_check_race_id = self.teamwork_item_check_race_id.isChecked()
         teamwork_type_connection = "client"
         if self.teamwork_item_server.isChecked():
             teamwork_type_connection = "server"
@@ -304,6 +313,7 @@ class TeamworkPropertiesDialog(QDialog):
         settings.SETTINGS.teamwork_type_connection = teamwork_type_connection
         settings.SETTINGS.teamwork_encryption_enabled = teamwork_encryption_enabled
         settings.SETTINGS.teamwork_autorun = teamwork_autorun
+        settings.SETTINGS.teamwork_check_race_id = teamwork_check_race_id
 
         settings.SETTINGS.teamwork_encryption_key = (
             self.teamwork_item_encryption_key.text()

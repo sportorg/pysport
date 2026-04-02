@@ -44,6 +44,7 @@ class Settings:
     teamwork_encryption_enabled: bool = False
     teamwork_autorun: bool = False
     teamwork_encryption_key: str = ""
+    teamwork_check_race_id: bool = False
 
     source_names_path: str = config.configs_dir("names.txt")
     source_middle_names_path: str = config.configs_dir("middle_names.txt")

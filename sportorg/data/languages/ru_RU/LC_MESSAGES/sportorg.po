@@ -1797,3 +1797,15 @@ msgstr "Сгенерировать ключ"
 
 msgid "Run at startup"
 msgstr "Запустить при старте"
+
+msgid "Server settings"
+msgstr "Настройки сервера"
+
+msgid "Check race identifier"
+msgstr "Проверять идентификатор соревнования"
+
+msgid "Race identifier does not match, do you want to continue and create a new file?"
+msgstr "Идентификатор соревнования не совпадает, хотите продолжить и создать новый файл?"
+
+msgid "Teamwork will be disabled, do you really want to continue?"
+msgstr "Командная работа будет выключена, вы действительно хотите продолжить?"

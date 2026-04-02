@@ -131,6 +131,8 @@ class Teamwork:
         if self._thread is None or not self._thread.is_alive():
             return
         self._start_result_thread()
+        if self.connection_type == "client":
+            self.send_race_id()
 
     def toggle(self):
         if self.is_alive():
@@ -149,6 +151,19 @@ class Teamwork:
                 return
 
             self._in_queue.put(Command(data, op))
+
+    def send_race_id(self) -> None:
+        if not self.is_alive() or self.connection_type != "client":
+            return
+
+        from sportorg.models.memory import race
+
+        self._in_queue.put(
+            Command(
+                {"object": "Race", "id": str(race().id)},
+                Operations.SendRaceId.name,
+            )
+        )
 
     def delete(self, data):
         """data is Dict or List[Dict]"""
