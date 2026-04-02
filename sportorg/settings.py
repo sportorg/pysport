@@ -38,6 +38,11 @@ class Settings:
     live_gzip_enabled: bool = True
 
     telegram_token: str = ""
+    teamwork_host: str = "localhost"
+    teamwork_port: int = 50010
+    teamwork_type_connection: str = "client"
+    teamwork_encryption_enabled: bool = False
+    teamwork_autorun: bool = False
     teamwork_encryption_key: str = ""
 
     source_names_path: str = config.configs_dir("names.txt")

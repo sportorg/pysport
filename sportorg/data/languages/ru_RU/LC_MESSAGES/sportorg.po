@@ -1794,3 +1794,6 @@ msgstr "Ключ шифрования"
 
 msgid "Generate key"
 msgstr "Сгенерировать ключ"
+
+msgid "Run at startup"
+msgstr "Запустить при старте"

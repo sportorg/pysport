@@ -66,7 +66,10 @@ from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.modules.sportiduino.sportiduino import SportiduinoClient
 from sportorg.modules.srpid.srpid import SrpidClient
 from sportorg.modules.teamwork.packet_header import ObjectTypes
-from sportorg.modules.teamwork.teamwork import Teamwork
+from sportorg.modules.teamwork.teamwork import (
+    Teamwork,
+    configure_teamwork_from_settings,
+)
 from sportorg.modules.telegram.telegram import telegram_client
 
 
@@ -288,6 +291,7 @@ class MainWindow(QMainWindow):
             self.open_file(self.recent_files[0])
 
         Teamwork().set_call(self.teamwork)
+        self._autorun_teamwork()
         SIReaderClient().set_call(self.add_sportident_result_from_sireader)
         SportiduinoClient().set_call(self.add_sportiduino_result_from_reader)
         ImpinjClient().set_call(self.add_impinj_result_from_reader)
@@ -306,6 +310,35 @@ class MainWindow(QMainWindow):
 
         live_client.init()
         self._menu_disable(self.current_tab)
+
+    def _autorun_teamwork(self) -> None:
+        if not bool(settings.SETTINGS.teamwork_autorun):
+            return
+
+        configure_teamwork_from_settings()
+        Teamwork().start()
+        if Teamwork().is_alive():
+            return
+
+        connection_type = str(settings.SETTINGS.teamwork_type_connection or "client")
+        if connection_type != "server":
+            return
+
+        fallback_hosts = [
+            str(settings.SETTINGS.teamwork_host or "localhost"),
+            "127.0.0.1",
+            "localhost",
+        ]
+        checked_hosts = set()
+        for host in fallback_hosts:
+            if not host or host in checked_hosts:
+                continue
+            checked_hosts.add(host)
+            configure_teamwork_from_settings(connection_type="client", host=host)
+            Teamwork().start()
+            if Teamwork().is_alive():
+                logging.info("Teamwork server is already running, connected as client")
+                return
 
     def _setup_ui(self):
         geom = bytearray.fromhex(str(settings.SETTINGS.window_geometry))

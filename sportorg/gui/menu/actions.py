@@ -78,7 +78,10 @@ from sportorg.modules.sfr.sfrreader import SFRReaderClient
 from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.modules.sportiduino.sportiduino import SportiduinoClient
 from sportorg.modules.srpid.srpid import SrpidClient
-from sportorg.modules.teamwork.teamwork import Teamwork
+from sportorg.modules.teamwork.teamwork import (
+    Teamwork,
+    configure_teamwork_from_settings,
+)
 from sportorg.modules.telegram.telegram import telegram_client
 from sportorg.modules.updater import checker
 from sportorg.modules.winorient import winorient
@@ -770,22 +773,7 @@ class TeamworkSettingsAction(Action, metaclass=ActionFactory):
 
 class TeamworkEnableAction(Action, metaclass=ActionFactory):
     def execute(self):
-        host = race().get_setting("teamwork_host", "localhost")
-        port = race().get_setting("teamwork_port", 50010)
-        connection_type = race().get_setting("teamwork_type_connection", "client")
-        encryption_enabled = bool(
-            race().get_setting("teamwork_encryption_enabled", False)
-        )
-        encryption_key = str(settings.SETTINGS.teamwork_encryption_key or "")
-        if connection_type == "server":
-            host = "0.0.0.0"
-        Teamwork().set_options(
-            host,
-            port,
-            connection_type,
-            encryption_enabled=encryption_enabled,
-            encryption_key=encryption_key,
-        )
+        configure_teamwork_from_settings()
         Teamwork().toggle()
 
 

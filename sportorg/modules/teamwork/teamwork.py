@@ -177,3 +177,31 @@ class Teamwork:
         except TeamworkCryptoError as e:
             self._logger.error(str(e))
             return None
+
+
+def configure_teamwork_from_settings(
+    connection_type: Optional[str] = None, host: Optional[str] = None
+) -> None:
+    from sportorg import settings
+
+    current_connection_type = str(
+        connection_type or settings.SETTINGS.teamwork_type_connection or "client"
+    )
+
+    current_host = str(settings.SETTINGS.teamwork_host or "localhost")
+    runtime_host = host if host is not None else current_host
+    if current_connection_type == "server" and host is None:
+        runtime_host = "0.0.0.0"
+
+    try:
+        port = int(settings.SETTINGS.teamwork_port)
+    except (TypeError, ValueError):
+        port = 50010
+
+    Teamwork().set_options(
+        runtime_host,
+        port,
+        current_connection_type,
+        encryption_enabled=bool(settings.SETTINGS.teamwork_encryption_enabled),
+        encryption_key=str(settings.SETTINGS.teamwork_encryption_key or ""),
+    )
