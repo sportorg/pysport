@@ -1417,6 +1417,18 @@ wheels = [
 ]
 
 [[package]]
+name = "importlib-resources"
+version = "6.4.5"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "zipp", marker = "python_full_version < '3.9'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/98/be/f3e8c6081b684f176b761e6a2fef02a0be939740ed6f54109a2951d806f3/importlib_resources-6.4.5.tar.gz", hash = "sha256:980862a1d16c9e147a59603677fa2aa5fd82b87f223b6cb870695bcfce830065", size = 43372, upload-time = "2024-09-09T17:03:14.677Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e1/6a/4604f9ae2fa62ef47b9de2fa5ad599589d28c9fd1d335f32759813dfa91e/importlib_resources-6.4.5-py3-none-any.whl", hash = "sha256:ac29d5f956f01d5e4bb63102a5a19957f1b9175e45649977264a1416783bb717", size = 36115, upload-time = "2024-09-09T17:03:13.39Z" },
+]
+
+[[package]]
 name = "iniconfig"
 version = "2.1.0"
 source = { registry = "https://pypi.org/simple" }
@@ -2458,7 +2470,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/89/a9/a9a2103e159fd65bffbc21ecc5c8c36e44eb34fe53b4ef85fb6d08c2a635/patchelf-0.17.2.4-py3-none-manylinux2014_armv7l.manylinux_2_17_armv7l.musllinux_1_1_armv7l.whl", hash = "sha256:ae44cb3c857d50f54b99e5697aa978726ada33a8a6129d4b8b7ffd28b996652d", size = 431226, upload-time = "2025-07-23T21:16:26.765Z" },
     { url = "https://files.pythonhosted.org/packages/87/93/897d612f6df7cfd987bdf668425127efeff8d8e4ad8bfbab1c69d2a0d861/patchelf-0.17.2.4-py3-none-manylinux2014_ppc64le.manylinux_2_17_ppc64le.musllinux_1_1_ppc64le.whl", hash = "sha256:680a266a70f60a7a4f4c448482c5bdba80cc8e6bb155a49dcc24238ba49927b0", size = 540276, upload-time = "2025-07-23T21:16:27.983Z" },
     { url = "https://files.pythonhosted.org/packages/5d/b8/2b92d11533482bac9ee989081d6880845287751b5f528adbd6bb27667fbd/patchelf-0.17.2.4-py3-none-manylinux2014_s390x.manylinux_2_17_s390x.musllinux_1_1_s390x.whl", hash = "sha256:d842b51f0401460f3b1f3a3a67d2c266a8f515a5adfbfa6e7b656cb3ac2ed8bc", size = 596632, upload-time = "2025-07-23T21:16:29.253Z" },
-    { url = "https://files.pythonhosted.org/packages/14/e2/975d4bdb418f942b53e6187b95bd9e0d5e0488b7bc214685a1e43e2c2751/patchelf-0.17.2.4-py3-none-manylinux_2_31_riscv64.musllinux_1_1_riscv64.whl", hash = "sha256:7076d9e127230982e20a81a6e2358d3343004667ba510d9f822d4fdee29b0d71", size = 508281, upload-time = "2025-07-23T21:16:30.865Z" },
 ]
 
 [[package]]
@@ -2859,8 +2870,8 @@ name = "pyimpinj"
 version = "1.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "libscrc" },
-    { name = "pyserial" },
+    { name = "libscrc", marker = "python_full_version < '3.9'" },
+    { name = "pyserial", marker = "python_full_version < '3.9'" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/ec/43/6fdadc122ea5ee614d58cd760820c24b7da67a35a0a712c59c7d18b984da/pyImpinj-1.2-py2.py3-none-any.whl", hash = "sha256:55e81a1cb9a263d99f2a242cbab022558ccf6ffd98dff2e44a420abef272d44b", size = 20608, upload-time = "2020-03-02T02:10:49.366Z" },
@@ -3549,7 +3560,7 @@ wheels = [
 
 [[package]]
 name = "sportorg"
-version = "1.7.1"
+version = "1.8.0b1"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp", version = "3.10.11", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
@@ -3557,6 +3568,7 @@ dependencies = [
     { name = "boltons" },
     { name = "chardet" },
     { name = "docxtpl" },
+    { name = "importlib-resources", marker = "python_full_version < '3.9'" },
     { name = "jinja2" },
     { name = "orjson", version = "3.10.15", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
     { name = "orjson", version = "3.11.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
@@ -3564,8 +3576,6 @@ dependencies = [
     { name = "playsound3", version = "3.2.8", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
     { name = "polib" },
     { name = "psutil" },
-    { name = "pyside6", version = "6.6.3.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
-    { name = "pyside6", version = "6.10.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
     { name = "python-dateutil" },
     { name = "pywinusb" },
     { name = "requests", version = "2.32.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
@@ -3574,6 +3584,10 @@ dependencies = [
 ]
 
 [package.optional-dependencies]
+gui = [
+    { name = "pyside6", version = "6.6.3.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
+    { name = "pyside6", version = "6.10.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
+]
 win = [
     { name = "pyimpinj", marker = "python_full_version < '3.9'" },
     { name = "pywin32" },
@@ -3613,20 +3627,21 @@ requires-dist = [
     { name = "boltons", specifier = ">=20,<21" },
     { name = "chardet", specifier = ">=5.2.0,<6" },
     { name = "docxtpl", specifier = ">=0,<1" },
+    { name = "importlib-resources", marker = "python_full_version < '3.9'", specifier = ">=5" },
     { name = "jinja2", specifier = ">=3,<4" },
     { name = "orjson", specifier = ">=3.9.5,<4" },
     { name = "playsound3", specifier = ">=3,<4" },
     { name = "polib", specifier = ">=1,<2" },
     { name = "psutil", specifier = ">=7,<8" },
     { name = "pyimpinj", marker = "python_full_version == '3.8.*' and extra == 'win'", specifier = "~=1.2" },
-    { name = "pyside6", specifier = ">=6,<7" },
+    { name = "pyside6", marker = "extra == 'gui'", specifier = ">=6,<7" },
     { name = "python-dateutil", specifier = ">=2,<3" },
     { name = "pywin32", marker = "extra == 'win'", specifier = ">=228" },
     { name = "pywinusb", specifier = ">=0,<1" },
     { name = "requests", specifier = ">=2,<3" },
     { name = "sportident", specifier = ">=1,<2" },
 ]
-provides-extras = ["win"]
+provides-extras = ["gui", "win"]
 
 [package.metadata.requires-dev]
 dev = [
@@ -4266,4 +4281,13 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/fd/58/d00f7cad9eba20c4eefac2682f34661d1d1b3a942fc0092eb60e78cfb733/yarl-1.22.0-cp39-cp39-win_amd64.whl", hash = "sha256:10619d9fdee46d20edc49d3479e2f8269d0779f1b031e6f7c2aa1c76be04b7ed", size = 87145, upload-time = "2025-10-06T14:12:50.241Z" },
     { url = "https://files.pythonhosted.org/packages/c2/a3/70904f365080780d38b919edd42d224b8c4ce224a86950d2eaa2a24366ad/yarl-1.22.0-cp39-cp39-win_arm64.whl", hash = "sha256:dd7afd3f8b0bfb4e0d9fc3c31bfe8a4ec7debe124cfd90619305def3c8ca8cd2", size = 82173, upload-time = "2025-10-06T14:12:51.869Z" },
     { url = "https://files.pythonhosted.org/packages/73/ae/b48f95715333080afb75a4504487cbe142cae1268afc482d06692d605ae6/yarl-1.22.0-py3-none-any.whl", hash = "sha256:1380560bdba02b6b6c90de54133c81c9f2a453dee9912fe58c1dcced1edb7cff", size = 46814, upload-time = "2025-10-06T14:12:53.872Z" },
+]
+
+[[package]]
+name = "zipp"
+version = "3.20.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/54/bf/5c0000c44ebc80123ecbdddba1f5dcd94a5ada602a9c225d84b5aaa55e86/zipp-3.20.2.tar.gz", hash = "sha256:bc9eb26f4506fda01b81bcde0ca78103b6e62f991b381fec825435c836edbc29", size = 24199, upload-time = "2024-09-13T13:44:16.101Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/62/8b/5ba542fa83c90e09eac972fc9baca7a88e7e7ca4b221a89251954019308b/zipp-3.20.2-py3-none-any.whl", hash = "sha256:a817ac80d6cf4b23bf7f2828b7cabf326f15a001bea8b1f9b49631780ba28350", size = 9200, upload-time = "2024-09-13T13:44:14.38Z" },
 ]

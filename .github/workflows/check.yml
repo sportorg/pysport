@@ -32,7 +32,7 @@ jobs:
           architecture: ${{ matrix.architecture }}
 
       - name: Install python dependencies
-        run: pip install uv && uv sync --frozen --extra win
+        run: pip install uv && uv sync --frozen --extra win --extra gui
 
       - name: Run linters
         run: uv run poe lint
@@ -51,7 +51,7 @@ jobs:
           architecture: ${{ matrix.architecture }}
 
       - name: Install python dependencies
-        run: pip install uv && uv sync --frozen --extra win
+        run: pip install uv && uv sync --frozen --extra win --extra gui
 
       - name: Run test
         run: uv run poe test
@@ -73,7 +73,7 @@ jobs:
           python-version: ${{ matrix.python_version }}
           architecture: ${{ matrix.architecture }}
       - name: Install python dependencies
-        run: pip install uv && uv sync --frozen --extra win
+        run: pip install uv && uv sync --frozen --extra win --extra gui
       - name: Generate mo files
         run: uv run poe generate-mo
       - name: Generate version file

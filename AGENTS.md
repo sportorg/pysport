@@ -13,7 +13,7 @@
 - After editing `.po` files, regenerate `.mo` files via `generate-mo`.
 
 ## Build, Test, and Development Commands
-- `uv sync --frozen [--extra win]`: install locked dependencies for Python 3.8 environments.
+- `uv sync --frozen --extra gui [--extra win]`: install locked dependencies for Python 3.8 environments.
 - `uv run poe run`: regenerate translations and launch `SportOrg.pyw` in debug mode.
 - `uv run poe format`: run Ruff formatting.
 - `uv run poe lint`: run Ruff linting and fixture sanity checks.
