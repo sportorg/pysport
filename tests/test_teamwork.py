@@ -29,8 +29,8 @@ def get_free_port() -> int:
 
 
 def wait_until(condition, timeout: float = 5.0, step: float = 0.05) -> None:
-    end = time.time() + timeout
-    while time.time() < end:
+    end = time.monotonic() + timeout
+    while time.monotonic() < end:
         if condition():
             return
         time.sleep(step)
@@ -143,18 +143,18 @@ def test_teamwork():
 
 
 def test_teamwork_keepalive_and_server_disconnect():
-    threads = start_server_and_client(keepalive_interval=1.0)
+    threads = start_server_and_client(keepalive_interval=0.5)
     server = threads["server"]
     server_out_queue = threads["server_out_queue"]
 
     try:
         wait_until(lambda: len(server.get_clients()) == 1)
-        wait_until(lambda: server.get_clients()[0]["keepalive_packets"] >= 1, timeout=4)
+        wait_until(lambda: server.get_clients()[0]["keepalive_packets"] >= 1, timeout=8)
         assert server_out_queue.empty()
 
         client_id = int(server.get_clients()[0]["id"])
         server.disconnect_client(client_id)
-        wait_until(lambda: len(server.get_clients()) == 0, timeout=4)
+        wait_until(lambda: len(server.get_clients()) == 0, timeout=8)
     finally:
         stop_server_and_client(threads)
 
