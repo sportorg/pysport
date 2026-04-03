@@ -1889,7 +1889,7 @@ class Race(Model):
             self.remove_person_from_indexes(person)
             del self.persons[i]
         return persons
-    
+
     def delete_persons_by_id(self, person_ids):
         person_ids_set = set(person_ids)
         persons = []
@@ -1934,7 +1934,7 @@ class Race(Model):
                 del self.result_index[result.id]
             del self.results[i]
         return results
-    
+
     def delete_results_by_id(self, result_ids):
         result_ids_set = set(result_ids)
         results = []
@@ -1962,7 +1962,7 @@ class Race(Model):
                 del self.group_index[self.groups[i].id]
             del self.groups[i]
         return groups
-    
+
     def delete_groups_by_id(self, group_ids):
         group_ids_set = set(group_ids)
         groups = []
@@ -1992,7 +1992,7 @@ class Race(Model):
                 del self.course_index[self.courses[i].id]
             del self.courses[i]
         return courses
-    
+
     def delete_courses_by_id(self, course_ids):
         course_ids_set = set(course_ids)
         courses = []
@@ -2022,7 +2022,7 @@ class Race(Model):
                 del self.organization_index[self.organizations[i].id]
             del self.organizations[i]
         return organizations
-    
+
     def delete_organizations_by_id(self, organization_ids):
         organization_ids_set = set(organization_ids)
         organizations = []
@@ -2332,7 +2332,7 @@ class Qualification(IntEnum):
         return qual[self.value]
 
     # get score for ranking, stored in config.ini file
-    def get_score(self, is_ardf = False):
+    def get_score(self, is_ardf=False):
         if is_ardf:
             return float(settings.SETTINGS.ranking_ardf.get(self.name.lower(), 0))
         else:
