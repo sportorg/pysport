@@ -31,7 +31,7 @@ OutputBaseFilename={#MyAppName}-{#MyAppVersion}
 Compression=lzma
 SolidCompression=yes
 LicenseFile=LICENSE
-SetupIconFile="img\icon\sportorg.ico"
+SetupIconFile="sportorg\data\img\icon\sportorg.ico"
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -50,9 +50,8 @@ Source: "{#AdditionalLib32}\*"; DestDir: {sys}; Flags: onlyifdoesntexist
 ; Source: "vc_redist\vc_redist.x86.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall;
 
 [Dirs]
-Name: "{app}\log"; Permissions: everyone-full
-Name: "{app}\templates"; Permissions: everyone-full
-Name: "{app}\example"; Permissions: everyone-full
+Name: "{app}\logs"; Permissions: everyone-full
+Name: "{app}\configs"; Permissions: everyone-full
 Name: "{app}\data"; Permissions: everyone-full
 ; NOTE: to allow start by non-privileged user from Program Files
 

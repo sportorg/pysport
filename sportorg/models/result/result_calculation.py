@@ -192,7 +192,7 @@ class ResultCalculation:
 
         is_ardf = self.race.get_setting("result_processing_mode", "time") == "ardf"
         is_rogaine = self.race.get_setting("result_processing_mode", "time") == "scores"
-        
+
         if is_ardf:
             RankingTable().set_current_type("ardf")
         else:
@@ -263,8 +263,11 @@ class ResultCalculation:
                 for j in qual_list:
                     if j.is_active:
                         if is_ardf:
-                            if (result_scores == max_scores_ardf and
-                                j.max_time and j.max_time >= result_time):
+                            if (
+                                result_scores == max_scores_ardf
+                                and j.max_time
+                                and j.max_time >= result_time
+                            ):
                                 i.assigned_rank = j.qual
                                 break
                         else:
@@ -274,7 +277,11 @@ class ResultCalculation:
                             if j.max_time and j.max_time >= result_time:
                                 i.assigned_rank = j.qual
                                 break
-                            if isinstance(result_scores, int) and isinstance(j.min_scores, int) and result_scores >= j.min_scores > 0:
+                            if (
+                                isinstance(result_scores, int)
+                                and isinstance(j.min_scores, int)
+                                and result_scores >= j.min_scores > 0
+                            ):
                                 i.assigned_rank = j.qual
                                 break
 
@@ -306,7 +313,7 @@ class ResultCalculation:
 
         is_ardf = self.race.get_setting("result_processing_mode", "time") == "ardf"
         scores_ardf = 0
-        
+
         if is_ardf:
             settings_ranking = settings.SETTINGS.ranking_ardf
         else:
@@ -329,7 +336,10 @@ class ResultCalculation:
                     scores_ardf = i.scores_ardf
 
                 started_count += 1
-                if i.is_status_ok() and (is_ardf == False or (i.scores_ardf > 0 and scores_ardf == i.scores_ardf)):
+                if i.is_status_ok() and (
+                    is_ardf == False
+                    or (i.scores_ardf > 0 and scores_ardf == i.scores_ardf)
+                ):
                     qual = person.qual
                     scores.append(qual.get_score(is_ardf))
 

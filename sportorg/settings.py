@@ -39,15 +39,13 @@ class Settings:
 
     telegram_token: str = ""
 
-    source_names_path: str = config.base_dir("configs", "names.txt")
-    source_middle_names_path: str = config.base_dir("configs", "middle_names.txt")
-    source_regions_path: str = config.base_dir("configs", "regions.txt")
-    source_status_comments_path: str = config.base_dir("configs", "status_comments.txt")
-    source_status_default_comments_path: str = config.base_dir(
-        "configs", "status_default.txt"
-    )
-    source_ranking_score_path: str = config.base_dir("configs", "ranking.txt")
-    source_ranking_ardf_score_path: str = config.base_dir("configs", "ranking_ardf.txt")
+    source_names_path: str = config.configs_dir("names.txt")
+    source_middle_names_path: str = config.configs_dir("middle_names.txt")
+    source_regions_path: str = config.configs_dir("regions.txt")
+    source_status_comments_path: str = config.configs_dir("status_comments.txt")
+    source_status_default_comments_path: str = config.configs_dir("status_default.txt")
+    source_ranking_score_path: str = config.configs_dir("ranking.txt")
+    source_ranking_ardf_score_path: str = config.configs_dir("ranking_ardf.txt")
     source_rent_cards_path: str = config.data_dir("rent_cards.txt")
 
 

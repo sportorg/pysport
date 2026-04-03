@@ -39,7 +39,7 @@ def generate_mo() -> None:
     import polib
 
     name = config.NAME.lower()
-    path = config.base_dir(config.LOCALE_DIR, locale_current, "LC_MESSAGES", name)
+    path = config.locale_dir(locale_current, "LC_MESSAGES", name)
     try:
         po = polib.pofile(path + ".po")
         po.save_as_mofile(path + ".mo")
@@ -55,7 +55,10 @@ if __name__ == "__main__":
 
 def locale() -> Callable[[str], str]:
     cat = gettext.Catalog(
-        config.NAME.lower(), config.LOCALE_DIR, languages=[locale_current]
+        config.NAME.lower(),
+        config.LOCALE_DIR,
+        languages=[locale_current],
+        fallback=True,
     )
 
     def get_text(message: str) -> str:

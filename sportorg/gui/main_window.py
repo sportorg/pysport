@@ -876,7 +876,7 @@ class MainWindow(QMainWindow):
 
     def _delete_object(self):
         tab = self.current_tab
-        
+
         obj_ids = []
         if tab == 0:
             for index in self.get_selected_rows():
@@ -898,7 +898,7 @@ class MainWindow(QMainWindow):
             for index in self.get_selected_rows():
                 if 0 <= index < len(race().organizations):
                     obj_ids.append(race().organizations[index].id)
-        
+
         if not len(obj_ids):
             return
 
@@ -910,7 +910,7 @@ class MainWindow(QMainWindow):
         )
         if confirm == QMessageBox.No:
             return
-        
+
         res = []
         if tab == 0:
             res = race().delete_persons_by_id(obj_ids)

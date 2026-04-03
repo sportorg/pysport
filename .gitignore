@@ -143,4 +143,9 @@ cython_debug/
 
 data
 !tests/data
+!sportorg/data/
+!sportorg/data/**
+sportorg/data/**/__pycache__/
+sportorg/data/**/*.py[cod]
+sportorg/data/**/*.mo
 version

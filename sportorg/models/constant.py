@@ -377,16 +377,16 @@ class RankingTable:
         Qualification.KMS: 7,
         Qualification.MS: 8,
     }
-        
+
     @classmethod
     def set_current_type(cls, table_type: str):
         cls._current_type = table_type
-    
+
     @classmethod
     def get_table(cls, table_type: str = None):
         table_type = table_type or cls._current_type
         return cls._RANKING_TABLES.get(table_type, [])
-    
+
     @classmethod
     def set_table(cls, items, table_type: str = "default"):
         table_data = []
@@ -398,7 +398,7 @@ class RankingTable:
                 else:
                     row.append(0)
             table_data.append(row)
-        
+
         cls._RANKING_TABLES[table_type] = table_data
 
     def get_all(self):
