@@ -1,6 +1,7 @@
 import logging
 import os
 import time
+import uuid
 from os import remove
 from os.path import exists
 from queue import Queue
@@ -65,8 +66,11 @@ from sportorg.modules.sportident.result_generation import ResultSportidentGenera
 from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.modules.sportiduino.sportiduino import SportiduinoClient
 from sportorg.modules.srpid.srpid import SrpidClient
-from sportorg.modules.teamwork.packet_header import ObjectTypes
-from sportorg.modules.teamwork.teamwork import Teamwork
+from sportorg.modules.teamwork.packet_header import ObjectTypes, Operations
+from sportorg.modules.teamwork.teamwork import (
+    Teamwork,
+    configure_teamwork_from_settings,
+)
 from sportorg.modules.telegram.telegram import telegram_client
 
 
@@ -147,6 +151,15 @@ class MainWindow(QMainWindow):
 
     def teamwork(self, command):
         try:
+            operation = Operations(command.header.op_type)
+
+            if operation == Operations.RaceIdMismatch:
+                self._handle_teamwork_race_id_mismatch(command)
+                return
+
+            if operation == Operations.SendRaceId:
+                return
+
             race().update_data(command.data)
             # if 'object' in command.data and command.data['object'] in
             # ['ResultManual', 'ResultSportident', 'ResultSFR', 'ResultSportiduino' etc.]:
@@ -165,6 +178,51 @@ class MainWindow(QMainWindow):
 
         except Exception as e:
             logging.error(str(e))
+
+    def _handle_teamwork_race_id_mismatch(self, command) -> None:
+        if not isinstance(command.data, dict):
+            logging.error("Invalid Teamwork mismatch payload")
+            Teamwork().stop()
+            return
+
+        server_race_id = str(command.data.get("id", "")).strip()
+        if not server_race_id:
+            logging.error("Empty race id in Teamwork mismatch notification")
+            Teamwork().stop()
+            return
+
+        question = translate(
+            "Race identifier does not match, do you want to continue and create a new file?"
+        )
+        answer = messageBoxQuestion(
+            self, translate("Question"), question, QMessageBox.Yes | QMessageBox.No
+        )
+        if answer != QMessageBox.Yes:
+            Teamwork().stop()
+            return
+
+        if not self._create_teamwork_race_file(server_race_id):
+            Teamwork().stop()
+            return
+
+        Teamwork().send_race_id()
+
+    def _create_teamwork_race_file(self, race_id: str) -> bool:
+        try:
+            race_uuid = uuid.UUID(race_id)
+        except ValueError:
+            logging.error("Invalid Teamwork race id from server: %s", race_id)
+            return False
+
+        self.unlock_file(self.file)
+        self.file = None
+        new_event([Race()])
+        set_current_race_index(0)
+        race().id = race_uuid
+        self.set_title()
+        self.init_model()
+        self.refresh()
+        return True
 
     teamwork_status = False
     teamwork_icon = {
@@ -288,6 +346,7 @@ class MainWindow(QMainWindow):
             self.open_file(self.recent_files[0])
 
         Teamwork().set_call(self.teamwork)
+        self._autorun_teamwork()
         SIReaderClient().set_call(self.add_sportident_result_from_sireader)
         SportiduinoClient().set_call(self.add_sportiduino_result_from_reader)
         ImpinjClient().set_call(self.add_impinj_result_from_reader)
@@ -306,6 +365,35 @@ class MainWindow(QMainWindow):
 
         live_client.init()
         self._menu_disable(self.current_tab)
+
+    def _autorun_teamwork(self) -> None:
+        if not bool(settings.SETTINGS.teamwork_autorun):
+            return
+
+        configure_teamwork_from_settings()
+        Teamwork().start()
+        if Teamwork().is_alive():
+            return
+
+        connection_type = str(settings.SETTINGS.teamwork_type_connection or "client")
+        if connection_type != "server":
+            return
+
+        fallback_hosts = [
+            str(settings.SETTINGS.teamwork_host or "localhost"),
+            "127.0.0.1",
+            "localhost",
+        ]
+        checked_hosts = set()
+        for host in fallback_hosts:
+            if not host or host in checked_hosts:
+                continue
+            checked_hosts.add(host)
+            configure_teamwork_from_settings(connection_type="client", host=host)
+            Teamwork().start()
+            if Teamwork().is_alive():
+                logging.info("Teamwork server is already running, connected as client")
+                return
 
     def _setup_ui(self):
         geom = bytearray.fromhex(str(settings.SETTINGS.window_geometry))

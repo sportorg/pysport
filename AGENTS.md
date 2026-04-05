@@ -9,6 +9,8 @@
 - Configuration defaults are in `configs/`.
 - CLI helpers are at the repository root: `SportOrg.pyw`, `builder.py`.
 - Tests are in `tests/`, with sample fixtures in `tests/data/`.
+- Teamwork protocol documentation is in [`docs/teamwork.md`](docs/teamwork.md).
+- Update [`docs/teamwork.md`](docs/teamwork.md) whenever the Teamwork protocol, packet format, or message flow changes.
 - Translation files are in `languages/<locale>/LC_MESSAGES/`.
 - After editing `.po` files, regenerate `.mo` files via `generate-mo`.
 

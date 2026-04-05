@@ -49,6 +49,8 @@ class Operations(Enum):
     SyncRace = 4
     GetLock = 5
     ReleaseLoc = 6
+    SendRaceId = 7
+    RaceIdMismatch = 8
 
     def __str__(self):
         return self._name_
@@ -81,6 +83,8 @@ class Header:
 
     header_struck = "=2s2H36sLQ"
     header_size = struct.calcsize(header_struck)
+    VERSION_PLAIN = 0
+    VERSION_AES256_GCM = 1
 
     def __init__(self, obj_data=None, op_type=Operations.Update.name):
         self.pack_tag = b"SO"
@@ -137,8 +141,10 @@ class Header:
         self.size = len(obj_data)
         return True
 
-    def pack_header(self, psize):
+    def pack_header(self, psize, version=None):
         self.size = psize
+        if version is not None:
+            self.version = version
         return struct.pack(
             Header.header_struck,
             self.pack_tag,
