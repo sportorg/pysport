@@ -66,6 +66,7 @@ from sportorg.modules.sportident.result_generation import ResultSportidentGenera
 from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.modules.sportiduino.sportiduino import SportiduinoClient
 from sportorg.modules.srpid.srpid import SrpidClient
+from sportorg.modules.huichang.huichang import HuichangClient
 from sportorg.modules.teamwork.packet_header import ObjectTypes, Operations
 from sportorg.modules.teamwork.teamwork import (
     Teamwork,
@@ -94,6 +95,7 @@ def is_reading_active():
         or ImpinjClient().is_alive()
         or SportiduinoClient().is_alive()
         or SrpidClient().is_alive()
+        or HuichangClient().is_alive()
     )
 
 
@@ -171,6 +173,7 @@ class MainWindow(QMainWindow):
                 ObjectTypes.ResultSportiduino.value,
                 ObjectTypes.ResultSrpid.value,
                 ObjectTypes.ResultRfidImpinj.value,
+                ObjectTypes.ResultHuichang.value,
             ]:
                 self.deleyed_res_recalculate(1000)
 
@@ -352,6 +355,7 @@ class MainWindow(QMainWindow):
         ImpinjClient().set_call(self.add_impinj_result_from_reader)
         SFRReaderClient().set_call(self.add_sfr_result_from_reader)
         SrpidClient().set_call(self.add_srpid_result_from_reader)
+        HuichangClient().set_call(self.add_huichang_result_from_reader)
 
         self.service_timer = QTimer(self)
         self.service_timer.timeout.connect(self.interval)
@@ -802,6 +806,9 @@ class MainWindow(QMainWindow):
         self.add_sportident_result_from_sireader(result)
 
     def add_srpid_result_from_reader(self, result):
+        self.add_sportident_result_from_sireader(result)
+
+    def add_huichang_result_from_reader(self, result):
         self.add_sportident_result_from_sireader(result)
 
     # Actions

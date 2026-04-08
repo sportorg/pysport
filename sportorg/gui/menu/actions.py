@@ -78,6 +78,7 @@ from sportorg.modules.sfr.sfrreader import SFRReaderClient
 from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.modules.sportiduino.sportiduino import SportiduinoClient
 from sportorg.modules.srpid.srpid import SrpidClient
+from sportorg.modules.huichang.huichang import HuichangClient
 from sportorg.modules.teamwork.teamwork import (
     Teamwork,
     configure_teamwork_from_settings,
@@ -614,6 +615,8 @@ class CardReadoutAction(Action, metaclass=ActionFactory):
             ImpinjClient().toggle()
         elif punch_system == SystemType.SRPID:
             SrpidClient().toggle()
+        elif punch_system == SystemType.HUICHANG:
+            HuichangClient().toggle()
         else:
             SIReaderClient().toggle()
         time.sleep(0.5)

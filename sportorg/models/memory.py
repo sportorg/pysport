@@ -34,6 +34,7 @@ class SystemType(Enum):
     SPORTIDUINO = 4
     RFID_IMPINJ = 5
     SRPID = 6
+    HUICHANG = 7
 
     def __str__(self) -> str:
         return self._name_
@@ -897,6 +898,7 @@ class Result(ABC):
             or self.is_sportiduino()
             or self.is_rfid_impinj()
             or self.is_srpid()
+            or self.is_huichang()
         )
 
     def is_sportident(self):
@@ -913,6 +915,9 @@ class Result(ABC):
 
     def is_srpid(self):
         return self.system_type == SystemType.SRPID
+
+    def is_huichang(self):
+        return self.system_type == SystemType.HUICHANG
 
     def is_manual(self):
         return self.system_type == SystemType.MANUAL
@@ -1313,6 +1318,10 @@ class ResultSrpid(ResultSportident):
     system_type = SystemType.SRPID
 
 
+class ResultHuichang(ResultSportident):
+    system_type = SystemType.HUICHANG
+
+
 class Person(Model):
     def __init__(self):
         self.id = uuid.uuid4()
@@ -1624,6 +1633,7 @@ class Race(Model):
         "ResultSportiduino": ResultSportiduino,
         "ResultRfidImpinj": ResultRfidImpinj,
         "ResultSrpid": ResultSrpid,
+        "ResultHuichang": ResultHuichang,
         "Group": Group,
         "Course": Course,
         "Organization": Organization,
@@ -1664,6 +1674,7 @@ class Race(Model):
             "ResultSportiduino": self.results,
             "ResultRfidImpinj": self.results,
             "ResultSrpid": self.results,
+            "ResultHuichang": self.results,
             "Group": self.groups,
             "Course": self.courses,
             "Organization": self.organizations,
@@ -1680,6 +1691,7 @@ class Race(Model):
             "ResultSportiduino": self.result_index,
             "ResultRfidImpinj": self.result_index,
             "ResultSrpid": self.result_index,
+            "ResultHuichang": self.result_index,
             "Group": self.group_index,
             "Course": self.course_index,
             "Organization": self.organization_index,
@@ -1827,6 +1839,7 @@ class Race(Model):
             "ResultSportiduino",
             "ResultRfidImpinj",
             "ResultSrpid",
+            "ResultHuichang",
         ]:
             obj.person = self.get_obj("Person", dict_obj["person_id"])
         elif dict_obj["object"] == "Group":
