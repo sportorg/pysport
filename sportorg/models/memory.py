@@ -511,6 +511,7 @@ class Result(ABC):
         self.final_result_time: Optional[OTime] = None  # real time, when nobody can win
 
         self.card_number = 0
+        self.card_battery_level = None  # 0-100%, Huichang contact-less card
         self.splits: List[Split] = []
         self.__start_time = None
         self.__finish_time = None
@@ -613,6 +614,7 @@ class Result(ABC):
             "assigned_rank": self.assigned_rank.value,
             "splits": [split.to_dict() for split in self.splits],
             "card_number": self.card_number,
+            "card_battery_level": self.card_battery_level,
             "speed": self.speed,  # readonly
             "scores": self.scores,  # readonly
             "rogaine_score": self.rogaine_score,  # readonly
@@ -674,6 +676,8 @@ class Result(ABC):
 
         if "card_number" in data:
             self.card_number = int(data["card_number"])
+        if "card_battery_level" in data and data["card_battery_level"] is not None:
+            self.card_battery_level = int(data["card_battery_level"])
         if "splits" in data:
             self.splits = []
             for item in data["splits"]:

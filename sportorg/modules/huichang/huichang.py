@@ -113,8 +113,8 @@ class ResultThread(QThread):
             result.start_time = time_to_otime(card_data["start"])
         if "finish" in card_data and card_data["finish"]:
             result.finish_time = time_to_otime(card_data["finish"])
-        # if 'battery_level' in card_data:
-        #    result.card_battery_level = max(0, min(100, card_data['battery_level']))
+        if "battery_level" in card_data:
+            result.card_battery_level = max(0, min(100, card_data["battery_level"]))
 
         return result
 
