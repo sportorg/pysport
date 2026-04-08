@@ -43,6 +43,7 @@ from sportorg.models.memory import (
     NotEmptyException,
     Race,
     RaceType,
+    SystemType,
     get_current_race_index,
     new_event,
     race,
@@ -107,6 +108,7 @@ class MainWindow(QMainWindow):
         self.menu_property = {}
         self.menu_list_for_disabled = []
         self.toolbar_property = {}
+        self.action_by_id = {}
         try:
             self.file = argv[1]
             self.add_recent_file(self.file)
@@ -248,6 +250,11 @@ class MainWindow(QMainWindow):
                     config.icon_dir(self.sportident_icon[self.sportident_status])
                 )
             )
+
+        huichang_management_action = self.action_by_id["huichang_management"]
+        huichang_management_action.setEnabled(
+            race().get_punch_system() == SystemType.HUICHANG
+        )
 
         if Teamwork().is_alive() != self.teamwork_status:
             self.toolbar_property["teamwork"].setIcon(
@@ -446,6 +453,8 @@ class MainWindow(QMainWindow):
                     "debug" in action_item and action_item["debug"]
                 ) or "debug" not in action_item:
                     parent.addAction(action)
+                if "id" in action_item:
+                    self.action_by_id[action_item["id"]] = action
             else:
                 menu = QtWidgets.QMenu(parent)
                 menu.setTitle(action_item["title"])
@@ -453,6 +462,8 @@ class MainWindow(QMainWindow):
                     menu.setIcon(QtGui.QIcon(action_item["icon"]))
                 if "tabs" in action_item:
                     self.menu_list_for_disabled.append((menu, action_item["tabs"]))
+                if "id" in action_item:
+                    self.action_by_id[action_item["id"]] = menu
                 self._create_menu(menu, action_item["actions"])
                 parent.addAction(menu.menuAction())
 
