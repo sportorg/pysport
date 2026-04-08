@@ -7,13 +7,13 @@ except ModuleNotFoundError:
         QDate = None
         QTime = None
 
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, time
 
 from sportorg.common.otime import OTime
 
 
 def time_to_otime(t) -> OTime:
-    if isinstance(t, datetime):
+    if isinstance(t, datetime) or isinstance(t, time):
         return OTime(0, t.hour, t.minute, t.second, round(t.microsecond / 1000))
     if QTime is not None and isinstance(t, QTime):
         return OTime(0, t.hour(), t.minute(), t.second(), t.msec())
