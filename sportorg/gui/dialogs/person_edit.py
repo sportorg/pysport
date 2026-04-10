@@ -148,7 +148,7 @@ class PersonEditDialog(BaseDialog):
                 key="card_number",
                 id="card_number",
                 minimum=0,
-                maximum=9999999,
+                maximum=99999999,
             ),
             LabelField(id="card_info"),
             CheckBoxField(
