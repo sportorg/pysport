@@ -279,6 +279,8 @@ class TimekeepingPropertiesDialog(QDialog):
         self.mr_max_penalty_by_cp = QCheckBox(translate("Max penalty = quantity of cp"))
         self.mr_max_penalty_by_cp.setToolTip(translate("Max penalty = quantity of cp"))
         self.mr_layout.addRow(self.mr_max_penalty_by_cp)
+        self.penalty_extra_cp_check = QCheckBox(translate("Penalty for extra cp"))
+        self.mr_layout.addRow(self.penalty_extra_cp_check)
         self.marked_route_tab.setLayout(self.mr_layout)
 
         # scores
@@ -441,6 +443,10 @@ class TimekeepingPropertiesDialog(QDialog):
         self.mr_max_penalty_by_cp.setDisabled(
             not (self.mr_laps_radio.isChecked() or self.mr_time_radio.isChecked())
         )
+        self.penalty_extra_cp_check.setDisabled(
+            not (self.mr_laps_radio.isChecked() or self.mr_time_radio.isChecked())
+        )
+
 
     def set_values_from_model(self):
         cur_race = race()
@@ -583,6 +589,7 @@ class TimekeepingPropertiesDialog(QDialog):
         mr_if_max_penalty_by_cp = obj.get_setting(
             "marked_route_max_penalty_by_cp", False
         )
+        penalty_extra_cp = obj.get_setting("penalty_extra_cp", True)
 
         if mr_mode == "off":
             self.mr_off_radio.setChecked(True)
@@ -597,6 +604,7 @@ class TimekeepingPropertiesDialog(QDialog):
         self.mr_lap_station_edit.setValue(mr_station_code)
         self.mr_dont_dqs_check.setChecked(mr_if_dont_dsq_check)
         self.mr_max_penalty_by_cp.setChecked(mr_if_max_penalty_by_cp)
+        self.penalty_extra_cp_check.setChecked(penalty_extra_cp)
 
         # score settings
 
@@ -778,6 +786,7 @@ class TimekeepingPropertiesDialog(QDialog):
         mr_station_code = self.mr_lap_station_edit.value()
         mr_if_dont_dsq = self.mr_dont_dqs_check.isChecked()
         mr_if_max_penalty_by_cp = self.mr_max_penalty_by_cp.isChecked()
+        penalty_extra_cp = self.penalty_extra_cp_check.isChecked()
 
         obj.set_setting("marked_route_mode", mr_mode)
         obj.set_setting("marked_route_penalty_time", mr_penalty_time)
@@ -786,6 +795,7 @@ class TimekeepingPropertiesDialog(QDialog):
         obj.set_setting("marked_route_penalty_lap_station_code", mr_station_code)
         obj.set_setting("marked_route_dont_dsq", mr_if_dont_dsq)
         obj.set_setting("marked_route_max_penalty_by_cp", mr_if_max_penalty_by_cp)
+        obj.set_setting("penalty_extra_cp", penalty_extra_cp)
 
         # score settings
 

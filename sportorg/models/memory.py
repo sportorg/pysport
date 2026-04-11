@@ -163,13 +163,14 @@ class CourseControl(Model):
         if not self.code:
             return "0"
 
-        tmp = str(self.code)
-        char = tmp[0]
-        if char == "*" or char == "%":
+        if self.is_free_order():
             return "0"
+
         res = ""
 
         index = 0
+        tmp = str(self.code).strip()
+        char = tmp[0]
         while char.isdigit() and index <= len(tmp) - 1:
             res += char
             index += 1
@@ -188,6 +189,9 @@ class CourseControl(Model):
         self.code = str(data["code"])
         self.length = int(data["length"])
 
+    def is_free_order(self):
+        code_str = "" + str(self.code).strip()
+        return code_str.startswith("*") or code_str.startswith("%")
 
 class ControlPoint(Model):
     """Description of independent control point. Used for score calculation in rogain"""

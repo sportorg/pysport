@@ -6,7 +6,7 @@ from sportorg.models.memory import (
     ResultSportident,
     ResultStatus,
     find,
-    race,
+    race, Split, CourseControl,
 )
 
 
@@ -96,8 +96,8 @@ class ResultChecker:
                         )
                     )
                     if (
-                        max_overrun_time.to_msec() > 0
-                        and result_time > max_time + max_overrun_time
+                            max_overrun_time.to_msec() > 0
+                            and result_time > max_time + max_overrun_time
                     ):
                         result.status = ResultStatus.OVERTIME
 
@@ -153,16 +153,12 @@ class ResultChecker:
 
         if mode == "laps" and race().get_setting("marked_route_if_station_check"):
             lap_station = race().get_setting("marked_route_penalty_lap_station_code")
-            splits, _ = ResultChecker.detach_penalty_laps2(splits, lap_station)
+            splits, _ = ResultChecker.detach_penalty_laps(splits, lap_station)
 
-        if race().get_setting("marked_route_dont_dsq", False):
-            # free order, don't penalty for extra cp
-            penalty = ResultChecker.penalty_calculation_free_order(splits, controls)
-        else:
-            # marked route with penalty
-            penalty = ResultChecker.penalty_calculation(
-                splits, controls, check_existence=True
-            )
+        penalty_extra = race().get_setting("penalty_extra_cp", True)
+        penalty = ResultChecker.penalty_calculation(
+            splits, controls, penalty_extra
+        )
 
         if race().get_setting("marked_route_max_penalty_by_cp", False):
             # limit the penalty by quantity of controls
@@ -204,79 +200,181 @@ class ResultChecker:
         return result_credit_time
 
     @staticmethod
-    def penalty_calculation(splits, controls, check_existence=False):
-        """:return quantity of incorrect or duplicated punches, order is ignored
+    def penalty_calculation(splits, controls, penalty_extra=True):
+        """:return quantity of penalty
+            marked route: quantity of wrong points (duplicates are ignored)
+            free-order: missed and extra punches (order-dependent)
+            standard course: missed and extra punches (order-dependent)
+
+            if we have several close points with the same code, they are recognized as a duplicate
         ```
         origin: 31,41,51; athlete: 31,41,51; result:0
-        origin: 31,41,51; athlete: 31; result:0
-        origin: 31,41,51; athlete: 41,31,51; result:0
-        origin: 31,41,51; athlete: 31,42,51; result:1
+        origin: 31,41,51; athlete: 31; result:2
+        origin: 31,41,51; athlete: 41,31,51; result:2
+        origin: 31,41,51; athlete: 31,42,51; result:2
         origin: 31,41,51; athlete: 31,41,51,52; result:1
-        origin: 31,41,51; athlete: 31,42,51,52; result:2
-        origin: 31,41,51; athlete: 31,31,41,51; result:1
-        origin: 31,41,51; athlete: 31,41,51,51; result:1
-        origin: 31,41,51; athlete: 32,42,52; result:3
+        origin: 31,41,51; athlete: 31,42,51,52; result:3
+        origin: 31,41,51; athlete: 31,31,41,51; result:0
+        origin: 31,41,51; athlete: 31,41,51,51; result:0
+        origin: 31,41,51; athlete: 32,42,52; result:6
+        origin: 31,41,51; athlete: 32,42,52 penalty_extra=False; result:3
         origin: 31,41,51; athlete: 31,41,51,61,71,81,91; result:4
-        origin: 31,41,51; athlete: 31,41,52,61,71,81,91; result:5
-        origin: 31,41,51; athlete: 51,61,71,81,91,31,41; result:4
-        origin: 31,41,51; athlete: 51,61,71,81,91,32,41; result:5
-        origin: 31,41,51; athlete: 51,61,71,81,91,32,42; result:6
-        origin: 31,41,51; athlete: 52,61,71,81,91,32,42; result:7
-        origin: 31,41,51; athlete: no punches; result:0
+        origin: 31,41,51; athlete: 31,41,51,61,71,81,91 penalty_extra=False; result:0
+        origin: 31,41,51; athlete: 31,41,52,61,71,81,91; result:6
+        origin: 31,41,51; athlete: 31,41,52,61,71,81,91 penalty_extra=False; result:1
+        origin: 31,41,51; athlete: 51,61,71,81,91,31,41; result:6
+        origin: 31,41,51; athlete: 51,61,71,81,91,31,41 penalty_extra=False; result:1
+        origin: 31,41,51; athlete: 51,61,71,81,91,32,41; result:8
+        origin: 31,41,51; athlete: 51,61,71,81,91,32,41 penalty_extra=False; result:2
+        origin: 31,41,51; athlete: 51,61,71,81,91,32,42; result:8
+        origin: 31,41,51; athlete: 51,61,71,81,91,32,42 penalty_extra=False; result:2
+        origin: 31,41,51; athlete: 52,61,71,81,91,32,42; result:10
+        origin: 31,41,51; athlete: 52,61,71,81,91,32,42 penalty_extra=False; result:3
+        origin: 31,41,51; athlete: no punches; result:3
 
-        with existence checking (if athlete has less punches, each missing add penalty):
+        with existence checking (if athlete has less punches, each missed adds penalty):
         origin: 31,41,51; athlete: 31; result:2
         origin: 31,41,51; athlete: no punches; result:3
 
         wildcard support for free order
-        origin: *,*,* athlete: 31; result:2          // wrong:
-                                                     // returns 0 if check_existence=False
-                                                     // returns 2 if check_existence=True
-        origin: *,*,* athlete: 31,31; result:2       // wrong:
-                                                     // returns 0 if check_existence=False
-                                                     // returns 1 if check_existence=True
-        origin: *,*,* athlete: 31,31,31,31; result:3 // wrong:
-                                                     // returns 1 if check_existence=False
-                                                     // returns 1 if check_existence=True
+        origin: *,*,* athlete: 31; result:2
+        origin: *,*,* athlete: 31,31; result:2
+        origin: *,*,* athlete: 31,31,31,31; result:2
+        origin: *,*,* athlete: 31,32,33; result:0
+        origin: *,*,* athlete: 31,32,33,34; result:1
+        origin: *,*,* athlete: 31,32,33,34 penalty_extra=False; result:0
+        origin: *,*,* athlete: 31,32,31; result:2
+        origin: *,*,* athlete: 31,32,31 penalty_extra=False; result:1
+        origin: *,*,* athlete: 31,31,32; result:1 (31,31 -> 31 as a duplicate)
+
         ```
         """
+        # first detect the mode
+        # 1. marked route with codes like 31(31,131)
+        # 2. free order with codes like *, %
+        # 3. standard course
 
-        user_array = [i.code for i in splits]
+        if len(ResultChecker.get_marked_route_incorrect_list(controls)) > 0:
+            return ResultChecker.penalty_calculation_marked_route(splits, controls)
+
         origin_array = [i.get_number_code() for i in controls]
+        if "0" in origin_array:
+            return ResultChecker.penalty_calculation_free_order(splits, controls, penalty_extra)
+
+        return ResultChecker.penalty_calculation_standard(splits, controls, penalty_extra)
+
+    @staticmethod
+    def penalty_calculation_standard(splits, controls, penalty_extra=True):
+        # penalty calculation for standard course
+        # penalty for each missed and extra point (if penalty_extra=True)
+
+        # Расчет штрафа для дистанции заданного направления
+        # Штраф начисляется за каждый пропущенный КП и за все лишние, если penalty_extra=True
+        # Порядок взятия КП влияет на расчет штрафа
+
+        allow_missed = True
+        skip_duplicates = True
+
+        origin_array = [i.get_number_code() for i in controls]
+        user_array = [i.code for i in splits]
+
+        origin_index = 0
+        user_index = 0
+        missed_count = 0
+        extra_count = 0
+
+        while origin_index < len(origin_array) or user_index < len(user_array):
+            if origin_index == len(origin_array):
+                # all user cp are extra
+                user_index += 1
+                extra_count += 1
+                if skip_duplicates and user_index > 1 and user_array[user_index - 2] == user_array[user_index - 1]:
+                    extra_count -= 1
+                continue
+
+            if user_index == len(user_array):
+                # all course cp are missed
+                origin_index += 1
+                missed_count += 1
+                continue
+
+            course_cp = origin_array[origin_index]
+            user_cp = user_array[user_index]
+            if course_cp == user_cp:
+                # matching
+                origin_index += 1
+                user_index += 1
+            else:
+                if course_cp not in user_array[user_index:]:
+                    if allow_missed:
+                        # missed cp
+                        origin_index += 1
+                        missed_count += 1
+                    else:
+                        missed_count = len(origin_array) - origin_index
+                        break
+                else:
+                    # extra user cp
+                    user_index += 1
+                    extra_count += 1
+                    if (skip_duplicates and
+                            user_index > 1 and
+                            user_array[user_index - 2] == user_array[user_index - 1]):
+                        extra_count -= 1
+
+                    # if user_cp not in origin_array[origin_index:] or not allow_missed:
+                    #     # extra user cp
+                    #     user_index += 1
+                    #     extra_count += 1
+                    #     if (skip_duplicates and
+                    #             user_index > 1 and
+                    #             user_array[user_index - 2] == user_array[user_index - 1]):
+                    #         extra_count -= 1
+                    # else:
+                        # # need additional check
+                        # pos_course = user_array[user_index:].index(course_cp)
+                        # pos_user = origin_array[origin_index:].index(user_cp)
+                        # if pos_course > pos_user:
+                        #     # missed cp
+                        #     origin_index += pos_user
+                        #     missed_count += pos_user
+                        # else:
+                        #     # extra user cp
+                        #     user_index += 1
+                        #     extra_count += 1
+                        #     if skip_duplicates and user_index > 1 and user_array[user_index - 2] == user_cp:
+                        #         extra_count -= 1
+
+        ret = missed_count
+        if penalty_extra:
+            ret += extra_count
+
+        return ret
+
+    @staticmethod
+    def penalty_calculation_marked_route(splits, controls):
+        # marked route with choice, controls like 31(31,131), penalty only wrong choice (once),
+        # ignoring controls from another courses, duplicates
+        # note, old punches from uncleared card can be calculated as wrong TODO: ignore old punches
+        # this mode allows combination of marked route and classic course, but please use different control codes
+
+        # Расчет штрафа для маркированной трассы со станциями ДА-НЕТ или с ТПР.
+        # Штраф начисляется только за неправильные КП, например, если прописано 31(31,131), то штрафуется только 131.
+        # Штраф не начисляется за чужие КП и за дубликаты.
+        # Сейчас штраф за неправильные КП начисляется, если они есть в данных неочищенного чипа. В будущем постараемся
+        # исправить, чтобы при выставлении опции "Игнорировать отметки до старта" старые отметки не учитывались.
+
         res = 0
-
-        # In theory can return less penalty for uncleaned card / может дать 0 штрафа при мусоре в чипе
-        if check_existence and len(user_array) < len(origin_array):
-            # add 1 penalty score for missing points
-            res = len(origin_array) - len(user_array)
-
         incorrect_array = ResultChecker.get_marked_route_incorrect_list(controls)
-
         if len(incorrect_array) > 0:
-            # marked route with choice, controls like 31(31,131), penalty only wrong choice (once),
-            # ignoring controls from another courses, previous punches on uncleared card, duplicates
-            # this mode allows combination of marked route and classic course, but please use different controls
+            user_array = [i.code for i in splits]
             for i in incorrect_array:
                 if i in user_array:
                     res += 1
-        else:
-            # classic penalty model - count correct control punch only once, others are recognized as incorrect
-            # used for orientathlon, corridor training with choice
-            for i in origin_array:
-                # remove correct points (only one object per loop)
-                if i == "0" and len(user_array):
-                    del user_array[0]
-
-                elif i in user_array:
-                    user_array.remove(i)
-
-            # now user_array contains only incorrect and duplicated values
-            res += len(user_array)
-
         return res
 
     @staticmethod
-    def penalty_calculation_free_order(splits, controls):
+    def penalty_calculation_free_order(splits, controls, penalty_extra=True):
         """:return quantity penalty, duplication checked
         ```
         origin: * ,* ,* ; athlete: 31,41,51; result:0
@@ -286,30 +384,40 @@ class ResultChecker:
 
         support of first/last mandatory cp
         origin: 40,* ,* ,90; athlete: 40,31,32,90; result:0
-        origin: 40,* ,* ,90; athlete: 40,31,40,90; result:1
-        origin: 40,* ,* ,90; athlete: 40,40,40,90; result:2
+        origin: 40,* ,* ,90; athlete: 40,31,40,90; result:0
+        origin: 40,* ,* ,90; athlete: 40,40,40,90; result:1
         origin: 40,* ,* ,90; athlete: 40,90,90,90; result:2
-        origin: 40,* ,* ,90; athlete: 31,32,33,90; result:4
-        origin: 40,* ,* ,90; athlete: 31,40,31,90; result:1
-        origin: 40,* ,* ,90; athlete: 31,40,90,41; result:1
-        origin: 40,* ,* ,90; athlete: 31,40,31,32; result:1
+        origin: 40,* ,* ,90; athlete: 31,32,33,90; result:8
+        origin: 40,* ,* ,90; athlete: 31,40,31,90; result:2
+        origin: 40,* ,* ,90; athlete: 31,40,90,41; result:2
+        origin: 40,* ,* ,90; athlete: 31,40,31,32; result:2
         origin: 40,* ,* ,90; athlete: 31,40,31,40; result:2
-        origin: 40,* ,* ,90; athlete: 40,40,90,90; result:2
-        origin: 40,* ,* ,90; athlete: 40,41,90,90; result:0 TODO:1 - only one incorrect case
+        origin: 40,* ,* ,90; athlete: 40,40,90,90; result:0
+        origin: 40,* ,* ,90; athlete: 40,41,90,90; result:0
         ```
         """
+        skip_duplicates = True
+
         res = 0
         correct_count = 0
-        for i in splits:
-            if not i.has_penalty:
+
+        for i in range(len(splits)):
+            if splits[i].is_correct:
                 correct_count += 1
+            else:
+                if skip_duplicates and i > 0 and splits[i].code == splits[i-1].code:
+                    pass
+                else:
+                    res += 1
+
+        if not penalty_extra:
+            return max(len(controls) - correct_count, 0)
 
         res += max(len(controls) - correct_count, 0)
-
         return res
 
     @staticmethod
-    def detach_penalty_laps(splits, lap_station):
+    def detach_penalty_laps_old(splits, lap_station):
         if not splits:
             return [], []
         for idx, punch in enumerate(reversed(splits)):
@@ -321,7 +429,7 @@ class ResultChecker:
         return splits[:idx], splits[idx:]
 
     @staticmethod
-    def detach_penalty_laps2(splits, lap_station):
+    def detach_penalty_laps(splits, lap_station):
         """Detaches penalty laps from the given list of splits
         based on the provided lap station code.
         """
@@ -348,7 +456,7 @@ class ResultChecker:
 
         if mode == "laps" and check_laps:
             lap_station = race().get_setting("marked_route_penalty_lap_station_code")
-            _, penalty_laps = ResultChecker.detach_penalty_laps2(
+            _, penalty_laps = ResultChecker.detach_penalty_laps(
                 result.splits, lap_station
             )
             num_penalty_laps = len(penalty_laps)
@@ -400,7 +508,7 @@ class ResultChecker:
 
     @staticmethod
     def calculate_rogaine_penalty(
-        result: Result, score: int, penalty_step: int = 1
+            result: Result, score: int, penalty_step: int = 1
     ) -> int:
         """
         Calculates the penalty for a given result based on the participant's excess of a race time.
