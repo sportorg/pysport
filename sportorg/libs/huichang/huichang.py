@@ -272,12 +272,15 @@ class Huichang(object):
 
     @staticmethod
     def _to_time(data: bytes) -> time:
-        if data[0] > 23 or data[1] > 59 or data[2] > 59:
+        if data[1] > 59 or data[2] > 59:
             return time()
+        h = data[0]
+        if h > 23:
+            h %= 24
         ms = 0
         if len(data) > 3:
             ms = data[3]
-        return time(hour=data[0], minute=data[1], second=data[2], microsecond=ms * 1000)
+        return time(hour=h, minute=data[1], second=data[2], microsecond=ms*1000)
 
     @staticmethod
     def crc8(data: bytes) -> int:
