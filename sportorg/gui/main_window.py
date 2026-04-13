@@ -307,6 +307,12 @@ class MainWindow(QMainWindow):
     def close(self):
         self.conf_write()
         self.unlock_file(self.file)
+        SIReaderClient().stop()
+        SportiduinoClient().stop()
+        ImpinjClient().stop()
+        SFRReaderClient().stop()
+        SrpidClient().stop()
+        HuichangClient().stop()
 
     def close_split_printer(self):
         if self.split_printer_thread:
