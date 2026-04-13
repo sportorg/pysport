@@ -280,7 +280,7 @@ class Huichang(object):
         ms = 0
         if len(data) > 3:
             ms = data[3]
-        return time(hour=h, minute=data[1], second=data[2], microsecond=ms*1000)
+        return time(hour=h, minute=data[1], second=data[2], microsecond=ms * 1000)
 
     @staticmethod
     def crc8(data: bytes) -> int:
