@@ -26,6 +26,7 @@
 + Optional Teamwork data encryption (AES-256-GCM) with local key storage and key generation in settings
 + Teamwork host/port/mode/encryption settings moved from race file to app settings; added "Run at startup" and auto-fallback to client on startup if server is already running
 + Teamwork race ID verification on server with client confirmation flow for mismatches and automatic Teamwork shutdown confirmation when switching multi-day race day
++ Added Huichang Timing System support ([#550](https://github.com/sportorg/pysport/pull/550))
 
 ### Fixes
 

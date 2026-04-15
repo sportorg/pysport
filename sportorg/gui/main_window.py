@@ -43,6 +43,7 @@ from sportorg.models.memory import (
     NotEmptyException,
     Race,
     RaceType,
+    SystemType,
     get_current_race_index,
     new_event,
     race,
@@ -66,6 +67,7 @@ from sportorg.modules.sportident.result_generation import ResultSportidentGenera
 from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.modules.sportiduino.sportiduino import SportiduinoClient
 from sportorg.modules.srpid.srpid import SrpidClient
+from sportorg.modules.huichang.huichang import HuichangClient
 from sportorg.modules.teamwork.packet_header import ObjectTypes, Operations
 from sportorg.modules.teamwork.teamwork import (
     Teamwork,
@@ -94,6 +96,7 @@ def is_reading_active():
         or ImpinjClient().is_alive()
         or SportiduinoClient().is_alive()
         or SrpidClient().is_alive()
+        or HuichangClient().is_alive()
     )
 
 
@@ -105,6 +108,7 @@ class MainWindow(QMainWindow):
         self.menu_property = {}
         self.menu_list_for_disabled = []
         self.toolbar_property = {}
+        self.action_by_id = {}
         try:
             self.file = argv[1]
             self.add_recent_file(self.file)
@@ -171,6 +175,7 @@ class MainWindow(QMainWindow):
                 ObjectTypes.ResultSportiduino.value,
                 ObjectTypes.ResultSrpid.value,
                 ObjectTypes.ResultRfidImpinj.value,
+                ObjectTypes.ResultHuichang.value,
             ]:
                 self.deleyed_res_recalculate(1000)
 
@@ -246,6 +251,11 @@ class MainWindow(QMainWindow):
                 )
             )
 
+        huichang_management_action = self.action_by_id["huichang_management"]
+        huichang_management_action.setEnabled(
+            race().get_punch_system() == SystemType.HUICHANG
+        )
+
         if Teamwork().is_alive() != self.teamwork_status:
             self.toolbar_property["teamwork"].setIcon(
                 QtGui.QIcon(config.icon_dir(self.teamwork_icon[Teamwork().is_alive()]))
@@ -297,6 +307,12 @@ class MainWindow(QMainWindow):
     def close(self):
         self.conf_write()
         self.unlock_file(self.file)
+        SIReaderClient().stop()
+        SportiduinoClient().stop()
+        ImpinjClient().stop()
+        SFRReaderClient().stop()
+        SrpidClient().stop()
+        HuichangClient().stop()
 
     def close_split_printer(self):
         if self.split_printer_thread:
@@ -352,6 +368,7 @@ class MainWindow(QMainWindow):
         ImpinjClient().set_call(self.add_impinj_result_from_reader)
         SFRReaderClient().set_call(self.add_sfr_result_from_reader)
         SrpidClient().set_call(self.add_srpid_result_from_reader)
+        HuichangClient().set_call(self.add_huichang_result_from_reader)
 
         self.service_timer = QTimer(self)
         self.service_timer.timeout.connect(self.interval)
@@ -442,6 +459,8 @@ class MainWindow(QMainWindow):
                     "debug" in action_item and action_item["debug"]
                 ) or "debug" not in action_item:
                     parent.addAction(action)
+                if "id" in action_item:
+                    self.action_by_id[action_item["id"]] = action
             else:
                 menu = QtWidgets.QMenu(parent)
                 menu.setTitle(action_item["title"])
@@ -449,6 +468,8 @@ class MainWindow(QMainWindow):
                     menu.setIcon(QtGui.QIcon(action_item["icon"]))
                 if "tabs" in action_item:
                     self.menu_list_for_disabled.append((menu, action_item["tabs"]))
+                if "id" in action_item:
+                    self.action_by_id[action_item["id"]] = menu
                 self._create_menu(menu, action_item["actions"])
                 parent.addAction(menu.menuAction())
 
@@ -802,6 +823,9 @@ class MainWindow(QMainWindow):
         self.add_sportident_result_from_sireader(result)
 
     def add_srpid_result_from_reader(self, result):
+        self.add_sportident_result_from_sireader(result)
+
+    def add_huichang_result_from_reader(self, result):
         self.add_sportident_result_from_sireader(result)
 
     # Actions

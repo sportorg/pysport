@@ -84,7 +84,7 @@ class ResultEditDialog(QDialog):
         self.item_created_at = AdvTimeEdit(display_format=self.time_format)
         self.item_created_at.setReadOnly(True)
 
-        self.item_card_number = AdvSpinBox(maximum=9999999)
+        self.item_card_number = AdvSpinBox(maximum=99999999)
 
         self.item_bib = AdvSpinBox(maximum=Limit.BIB)
         self.item_bib.valueChanged.connect(self.show_person_info)

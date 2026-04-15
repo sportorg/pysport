@@ -23,6 +23,7 @@ class ObjectTypes(Enum):
     ResultSportiduino = 9
     ResultRfidImpinj = 10
     ResultSrpid = 11
+    ResultHuichang = 12
     Unknown = 255
 
     def __str__(self):
