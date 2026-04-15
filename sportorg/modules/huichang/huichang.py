@@ -97,7 +97,7 @@ class ResultThread(QThread):
 
     @staticmethod
     def _get_result(card_data):
-        result = memory.race().new_result(memory.ResultSportiduino)
+        result = memory.race().new_result(memory.ResultHuichang)
         result.card_number = int(card_data["card_number"])
 
         for i in range(len(card_data["punches"])):

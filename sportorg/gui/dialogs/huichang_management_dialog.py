@@ -15,7 +15,7 @@ try:
         QStyle,
     )
 except ModuleNotFoundError:
-    from PySide6.QtCore import Qt
+    from PySide2.QtCore import Qt
     from PySide2.QtWidgets import (
         QDialog,
         QVBoxLayout,
