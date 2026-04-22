@@ -1814,10 +1814,10 @@ msgid "No port specified"
 msgstr "Порт не выбран"
 
 msgid "Disconnect from Huichang station"
-msgstr "Отключаю станцию Huichang"
+msgstr "Отключаю станцию ТаймКонтур"
 
 msgid "Not connected to Huichang station"
-msgstr "Станция Huichang не подключена"
+msgstr "Станция ТаймКонтур не подключена"
 
 msgid "Open port {}"
 msgstr "Открываю порт {}"
@@ -1829,16 +1829,19 @@ msgid "Not connected to master station"
 msgstr "Станция считывания не подключена"
 
 msgid "No response from Huichang station"
-msgstr "Нет ответа от станции Huichang"
+msgstr "Нет ответа от станции ТаймКонтур"
 
 msgid "Internal station data:"
 msgstr "Данные об отметках со станции:"
 
+msgid "Huichang"
+msgstr "ТаймКонтур"
+
 msgid "Huichang management"
-msgstr "Настройка Huichang"
+msgstr "Настройка ТаймКонтур"
 
 msgid "Huichang Management"
-msgstr "Настройка Huichang"
+msgstr "Настройка ТаймКонтур"
 
 msgid "Update list of available ports"
 msgstr "Обновить список доступных портов"
@@ -1886,5 +1889,5 @@ msgid "First select a valid port"
 msgstr "Сначала выберите действительный порт"
 
 msgid "Could not connect to Huichang station"
-msgstr "Не получается подключиться к станции Huichang"
+msgstr "Не получается подключиться к станции ТаймКонтур"
 
