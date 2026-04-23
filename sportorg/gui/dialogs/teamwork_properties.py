@@ -5,6 +5,7 @@ try:
     from PySide6.QtCore import QTimer
     from PySide6.QtWidgets import (
         QAbstractItemView,
+        QCheckBox,
         QDialog,
         QDialogButtonBox,
         QFormLayout,
@@ -24,6 +25,7 @@ except ModuleNotFoundError:
     from PySide2.QtCore import QTimer
     from PySide2.QtWidgets import (
         QAbstractItemView,
+        QCheckBox,
         QDialog,
         QDialogButtonBox,
         QFormLayout,
@@ -40,10 +42,15 @@ except ModuleNotFoundError:
         QWidget,
     )
 
+from sportorg import settings
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvSpinBox
 from sportorg.language import translate
-from sportorg.models.memory import race
+from sportorg.modules.teamwork.crypto import (
+    TeamworkCryptoError,
+    generate_teamwork_key,
+    normalize_teamwork_key,
+)
 from sportorg.modules.teamwork.teamwork import Teamwork
 
 
@@ -72,19 +79,45 @@ class TeamworkPropertiesDialog(QDialog):
         self.teamwork_layout = QFormLayout()
         self.teamwork_item_host = QLineEdit()
         self.teamwork_item_port = AdvSpinBox(0, 65535)
-        self.teamwork_item_token = QLineEdit()
+        self.teamwork_item_encryption_enabled = QCheckBox(
+            translate("Enable encryption (AES-256-GCM)")
+        )
+        self.teamwork_item_encryption_key = QLineEdit()
+        self.teamwork_encryption_key_validation_label = QLabel("")
+        self.teamwork_generate_key_button = QPushButton(translate("Generate key"))
+        self.teamwork_key_editor_container = QWidget()
+        self.teamwork_key_editor_layout = QHBoxLayout()
+        self.teamwork_key_editor_layout.setContentsMargins(0, 0, 0, 0)
+        self.teamwork_key_editor_layout.addWidget(self.teamwork_item_encryption_key)
+        self.teamwork_key_editor_layout.addWidget(self.teamwork_generate_key_button)
+        self.teamwork_key_editor_container.setLayout(self.teamwork_key_editor_layout)
         self.teamwork_groupbox = QGroupBox()
         self.teamwork_groupbox.setTitle(translate("Type connection"))
         self.teamwork_groupbox_layout = QFormLayout()
         self.teamwork_item_client = QRadioButton(translate("Client"))
         self.teamwork_item_server = QRadioButton(translate("Server"))
+        self.teamwork_item_autorun = QCheckBox(translate("Run at startup"))
         self.teamwork_groupbox_layout.addRow(self.teamwork_item_client)
         self.teamwork_groupbox_layout.addRow(self.teamwork_item_server)
         self.teamwork_groupbox.setLayout(self.teamwork_groupbox_layout)
+        self.server_settings_groupbox = QGroupBox(translate("Server settings"))
+        self.server_settings_groupbox_layout = QFormLayout()
+        self.teamwork_item_check_race_id = QCheckBox(translate("Check race identifier"))
+        self.server_settings_groupbox_layout.addRow(self.teamwork_item_check_race_id)
+        self.server_settings_groupbox.setLayout(self.server_settings_groupbox_layout)
 
         self.teamwork_layout.addRow(QLabel(translate("Host")), self.teamwork_item_host)
         self.teamwork_layout.addRow(QLabel(translate("Port")), self.teamwork_item_port)
+        self.teamwork_layout.addRow(self.teamwork_item_encryption_enabled)
+        self.teamwork_layout.addRow(
+            QLabel(translate("Encryption key")), self.teamwork_key_editor_container
+        )
+        self.teamwork_layout.addRow(
+            QLabel(""), self.teamwork_encryption_key_validation_label
+        )
         self.teamwork_layout.addRow(self.teamwork_groupbox)
+        self.teamwork_layout.addRow(self.server_settings_groupbox)
+        self.teamwork_layout.addRow(self.teamwork_item_autorun)
         self.teamwork_tab.setLayout(self.teamwork_layout)
 
         self.tab_widget.addTab(self.teamwork_tab, translate("Client/Server"))
@@ -147,6 +180,13 @@ class TeamworkPropertiesDialog(QDialog):
         self.connections_refresh_button.clicked.connect(self.refresh_connected_clients)
         self.connections_disconnect_button.clicked.connect(
             self.disconnect_selected_client
+        )
+        self.teamwork_generate_key_button.clicked.connect(self._generate_key)
+        self.teamwork_item_encryption_key.textChanged.connect(
+            self._validate_encryption_key
+        )
+        self.teamwork_item_encryption_enabled.stateChanged.connect(
+            self._validate_encryption_key
         )
 
         self.set_values_from_model()
@@ -245,32 +285,72 @@ class TeamworkPropertiesDialog(QDialog):
         self.refresh_connected_clients()
 
     def set_values_from_model(self):
-        obj = race()
-
-        teamwork_host = obj.get_setting("teamwork_host", "localhost")
-        teamwork_port = obj.get_setting("teamwork_port", 50010)
-        teamwork_token = obj.get_setting("teamwork_token", str(uuid.uuid4())[:8])
-        teamwork_type_connection = obj.get_setting("teamwork_type_connection", "client")
+        teamwork_host = str(settings.SETTINGS.teamwork_host or "localhost")
+        try:
+            teamwork_port = int(settings.SETTINGS.teamwork_port)
+        except (TypeError, ValueError):
+            teamwork_port = 50010
+        teamwork_type_connection = str(
+            settings.SETTINGS.teamwork_type_connection or "client"
+        )
+        teamwork_encryption_enabled = bool(
+            settings.SETTINGS.teamwork_encryption_enabled
+        )
+        teamwork_autorun = bool(settings.SETTINGS.teamwork_autorun)
+        teamwork_check_race_id = bool(settings.SETTINGS.teamwork_check_race_id)
 
         self.teamwork_item_host.setText(teamwork_host)
         self.teamwork_item_port.setValue(teamwork_port)
-        self.teamwork_item_token.setText(teamwork_token)
-        if teamwork_type_connection == "client":
-            self.teamwork_item_client.setChecked(True)
-        elif teamwork_type_connection == "server":
+        self.teamwork_item_encryption_enabled.setChecked(teamwork_encryption_enabled)
+        self.teamwork_item_autorun.setChecked(teamwork_autorun)
+        self.teamwork_item_check_race_id.setChecked(teamwork_check_race_id)
+        self.teamwork_item_encryption_key.setText(
+            str(settings.SETTINGS.teamwork_encryption_key or "")
+        )
+        self._validate_encryption_key()
+        if teamwork_type_connection == "server":
             self.teamwork_item_server.setChecked(True)
+        else:
+            self.teamwork_item_client.setChecked(True)
 
     def apply_changes_impl(self):
-        obj = race()
-
         teamwork_host = self.teamwork_item_host.text()
         teamwork_port = self.teamwork_item_port.value()
-        teamwork_token = self.teamwork_item_token.text()
+        teamwork_encryption_enabled = self.teamwork_item_encryption_enabled.isChecked()
+        teamwork_autorun = self.teamwork_item_autorun.isChecked()
+        teamwork_check_race_id = self.teamwork_item_check_race_id.isChecked()
         teamwork_type_connection = "client"
         if self.teamwork_item_server.isChecked():
             teamwork_type_connection = "server"
 
-        obj.set_setting("teamwork_host", teamwork_host)
-        obj.set_setting("teamwork_port", teamwork_port)
-        obj.set_setting("teamwork_token", teamwork_token)
-        obj.set_setting("teamwork_type_connection", teamwork_type_connection)
+        settings.SETTINGS.teamwork_host = teamwork_host
+        settings.SETTINGS.teamwork_port = teamwork_port
+        settings.SETTINGS.teamwork_type_connection = teamwork_type_connection
+        settings.SETTINGS.teamwork_encryption_enabled = teamwork_encryption_enabled
+        settings.SETTINGS.teamwork_autorun = teamwork_autorun
+        settings.SETTINGS.teamwork_check_race_id = teamwork_check_race_id
+
+        settings.SETTINGS.teamwork_encryption_key = (
+            self.teamwork_item_encryption_key.text()
+        )
+
+    def _generate_key(self):
+        self.teamwork_item_encryption_key.setText(generate_teamwork_key())
+
+    def _validate_encryption_key(self, *_):
+        if not self.teamwork_item_encryption_enabled.isChecked():
+            self.teamwork_encryption_key_validation_label.setText("")
+            self.button_ok.setEnabled(True)
+            return
+
+        try:
+            normalize_teamwork_key(self.teamwork_item_encryption_key.text())
+        except TeamworkCryptoError:
+            self.teamwork_encryption_key_validation_label.setText(
+                translate("Wrong key")
+            )
+            self.button_ok.setEnabled(False)
+            return
+
+        self.teamwork_encryption_key_validation_label.setText("")
+        self.button_ok.setEnabled(True)

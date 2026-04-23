@@ -1786,5 +1786,110 @@ msgstr "Присвоить"
 msgid "No free numbers available"
 msgstr "Свободных номеров нет"
 
+msgid "Enable encryption (AES-256-GCM)"
+msgstr "Включить шифрование (AES-256-GCM)"
+
+msgid "Encryption key"
+msgstr "Ключ шифрования"
+
+msgid "Generate key"
+msgstr "Сгенерировать ключ"
+
+msgid "Run at startup"
+msgstr "Запустить при старте"
+
+msgid "Server settings"
+msgstr "Настройки сервера"
+
+msgid "Check race identifier"
+msgstr "Проверять идентификатор соревнования"
+
+msgid "Race identifier does not match, do you want to continue and create a new file?"
+msgstr "Идентификатор соревнования не совпадает, хотите продолжить и создать новый файл?"
+
+msgid "Teamwork will be disabled, do you really want to continue?"
+msgstr "Командная работа будет выключена, вы действительно хотите продолжить?"
+
+msgid "No port specified"
+msgstr "Порт не выбран"
+
+msgid "Disconnect from Huichang station"
+msgstr "Отключаю станцию ТаймКонтур"
+
+msgid "Not connected to Huichang station"
+msgstr "Станция ТаймКонтур не подключена"
+
+msgid "Open port {}"
+msgstr "Открываю порт {}"
+
+msgid "Could not open port {}"
+msgstr "Не получается открыть порт {}"
+
+msgid "Not connected to master station"
+msgstr "Станция считывания не подключена"
+
+msgid "No response from Huichang station"
+msgstr "Нет ответа от станции ТаймКонтур"
+
+msgid "Internal station data:"
+msgstr "Данные об отметках со станции:"
+
+msgid "Huichang"
+msgstr "ТаймКонтур"
+
+msgid "Huichang management"
+msgstr "Настройка ТаймКонтур"
+
+msgid "Huichang Management"
+msgstr "Настройка ТаймКонтур"
+
+msgid "Update list of available ports"
+msgstr "Обновить список доступных портов"
+
+msgid "Time Calibration"
+msgstr "Калибровка времени"
+
+msgid "Time Sync"
+msgstr "Синхронизировать"
+
+msgid "Send current system time to the connected station"
+msgstr "Отправить текущее системное время на подключённую станцию"
+
+msgid "Station Number"
+msgstr "Номер станции"
+
+msgid "Clear (6)"
+msgstr "Очистка (6)"
+
+msgid "Superstart (11)"
+msgstr "Суперстарт (11)"
+
+msgid "Start (16)"
+msgstr "Старт (16)"
+
+msgid "Finish (21)"
+msgstr "Финиш (21)"
+
+msgid "Check (27)"
+msgstr "Проверка (27)"
+
+msgid "Master (250)"
+msgstr "Мастер (250)"
+
+msgid "Other (26-254)"
+msgstr "Другой (26-254)"
+
+msgid "Apply"
+msgstr "Применить"
+
+msgid "Set new number for the connected station"
+msgstr "Задать новый номер подключённой станции"
+
+msgid "First select a valid port"
+msgstr "Сначала выберите действительный порт"
+
+msgid "Could not connect to Huichang station"
+msgstr "Не получается подключиться к станции ТаймКонтур"
+
 msgid "Penalty for extra cp"
 msgstr "Штраф за лишние КП"

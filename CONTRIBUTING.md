@@ -34,8 +34,8 @@ uv python install 3.8
 Install requirements.
 
 ```
-uv sync --frozen
-uv sync --frozen --extra win  # for Windows
+uv sync --frozen --extra gui
+uv sync --frozen --extra win --extra gui  # for Windows
 ```
 
 ### Run SportOrg

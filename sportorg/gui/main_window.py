@@ -1,6 +1,7 @@
 import logging
 import os
 import time
+import uuid
 from os import remove
 from os.path import exists
 from queue import Queue
@@ -42,6 +43,7 @@ from sportorg.models.memory import (
     NotEmptyException,
     Race,
     RaceType,
+    SystemType,
     get_current_race_index,
     new_event,
     race,
@@ -65,8 +67,12 @@ from sportorg.modules.sportident.result_generation import ResultSportidentGenera
 from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.modules.sportiduino.sportiduino import SportiduinoClient
 from sportorg.modules.srpid.srpid import SrpidClient
-from sportorg.modules.teamwork.packet_header import ObjectTypes
-from sportorg.modules.teamwork.teamwork import Teamwork
+from sportorg.modules.huichang.huichang import HuichangClient
+from sportorg.modules.teamwork.packet_header import ObjectTypes, Operations
+from sportorg.modules.teamwork.teamwork import (
+    Teamwork,
+    configure_teamwork_from_settings,
+)
 from sportorg.modules.telegram.telegram import telegram_client
 
 
@@ -90,6 +96,7 @@ def is_reading_active():
         or ImpinjClient().is_alive()
         or SportiduinoClient().is_alive()
         or SrpidClient().is_alive()
+        or HuichangClient().is_alive()
     )
 
 
@@ -101,6 +108,7 @@ class MainWindow(QMainWindow):
         self.menu_property = {}
         self.menu_list_for_disabled = []
         self.toolbar_property = {}
+        self.action_by_id = {}
         try:
             self.file = argv[1]
             self.add_recent_file(self.file)
@@ -147,6 +155,15 @@ class MainWindow(QMainWindow):
 
     def teamwork(self, command):
         try:
+            operation = Operations(command.header.op_type)
+
+            if operation == Operations.RaceIdMismatch:
+                self._handle_teamwork_race_id_mismatch(command)
+                return
+
+            if operation == Operations.SendRaceId:
+                return
+
             race().update_data(command.data)
             # if 'object' in command.data and command.data['object'] in
             # ['ResultManual', 'ResultSportident', 'ResultSFR', 'ResultSportiduino' etc.]:
@@ -158,6 +175,7 @@ class MainWindow(QMainWindow):
                 ObjectTypes.ResultSportiduino.value,
                 ObjectTypes.ResultSrpid.value,
                 ObjectTypes.ResultRfidImpinj.value,
+                ObjectTypes.ResultHuichang.value,
             ]:
                 self.deleyed_res_recalculate(1000)
 
@@ -165,6 +183,51 @@ class MainWindow(QMainWindow):
 
         except Exception as e:
             logging.error(str(e))
+
+    def _handle_teamwork_race_id_mismatch(self, command) -> None:
+        if not isinstance(command.data, dict):
+            logging.error("Invalid Teamwork mismatch payload")
+            Teamwork().stop()
+            return
+
+        server_race_id = str(command.data.get("id", "")).strip()
+        if not server_race_id:
+            logging.error("Empty race id in Teamwork mismatch notification")
+            Teamwork().stop()
+            return
+
+        question = translate(
+            "Race identifier does not match, do you want to continue and create a new file?"
+        )
+        answer = messageBoxQuestion(
+            self, translate("Question"), question, QMessageBox.Yes | QMessageBox.No
+        )
+        if answer != QMessageBox.Yes:
+            Teamwork().stop()
+            return
+
+        if not self._create_teamwork_race_file(server_race_id):
+            Teamwork().stop()
+            return
+
+        Teamwork().send_race_id()
+
+    def _create_teamwork_race_file(self, race_id: str) -> bool:
+        try:
+            race_uuid = uuid.UUID(race_id)
+        except ValueError:
+            logging.error("Invalid Teamwork race id from server: %s", race_id)
+            return False
+
+        self.unlock_file(self.file)
+        self.file = None
+        new_event([Race()])
+        set_current_race_index(0)
+        race().id = race_uuid
+        self.set_title()
+        self.init_model()
+        self.refresh()
+        return True
 
     teamwork_status = False
     teamwork_icon = {
@@ -187,6 +250,11 @@ class MainWindow(QMainWindow):
                     config.icon_dir(self.sportident_icon[self.sportident_status])
                 )
             )
+
+        huichang_management_action = self.action_by_id["huichang_management"]
+        huichang_management_action.setEnabled(
+            race().get_punch_system() == SystemType.HUICHANG
+        )
 
         if Teamwork().is_alive() != self.teamwork_status:
             self.toolbar_property["teamwork"].setIcon(
@@ -239,6 +307,12 @@ class MainWindow(QMainWindow):
     def close(self):
         self.conf_write()
         self.unlock_file(self.file)
+        SIReaderClient().stop()
+        SportiduinoClient().stop()
+        ImpinjClient().stop()
+        SFRReaderClient().stop()
+        SrpidClient().stop()
+        HuichangClient().stop()
 
     def close_split_printer(self):
         if self.split_printer_thread:
@@ -288,11 +362,13 @@ class MainWindow(QMainWindow):
             self.open_file(self.recent_files[0])
 
         Teamwork().set_call(self.teamwork)
+        self._autorun_teamwork()
         SIReaderClient().set_call(self.add_sportident_result_from_sireader)
         SportiduinoClient().set_call(self.add_sportiduino_result_from_reader)
         ImpinjClient().set_call(self.add_impinj_result_from_reader)
         SFRReaderClient().set_call(self.add_sfr_result_from_reader)
         SrpidClient().set_call(self.add_srpid_result_from_reader)
+        HuichangClient().set_call(self.add_huichang_result_from_reader)
 
         self.service_timer = QTimer(self)
         self.service_timer.timeout.connect(self.interval)
@@ -306,6 +382,35 @@ class MainWindow(QMainWindow):
 
         live_client.init()
         self._menu_disable(self.current_tab)
+
+    def _autorun_teamwork(self) -> None:
+        if not bool(settings.SETTINGS.teamwork_autorun):
+            return
+
+        configure_teamwork_from_settings()
+        Teamwork().start()
+        if Teamwork().is_alive():
+            return
+
+        connection_type = str(settings.SETTINGS.teamwork_type_connection or "client")
+        if connection_type != "server":
+            return
+
+        fallback_hosts = [
+            str(settings.SETTINGS.teamwork_host or "localhost"),
+            "127.0.0.1",
+            "localhost",
+        ]
+        checked_hosts = set()
+        for host in fallback_hosts:
+            if not host or host in checked_hosts:
+                continue
+            checked_hosts.add(host)
+            configure_teamwork_from_settings(connection_type="client", host=host)
+            Teamwork().start()
+            if Teamwork().is_alive():
+                logging.info("Teamwork server is already running, connected as client")
+                return
 
     def _setup_ui(self):
         geom = bytearray.fromhex(str(settings.SETTINGS.window_geometry))
@@ -354,6 +459,8 @@ class MainWindow(QMainWindow):
                     "debug" in action_item and action_item["debug"]
                 ) or "debug" not in action_item:
                     parent.addAction(action)
+                if "id" in action_item:
+                    self.action_by_id[action_item["id"]] = action
             else:
                 menu = QtWidgets.QMenu(parent)
                 menu.setTitle(action_item["title"])
@@ -361,6 +468,8 @@ class MainWindow(QMainWindow):
                     menu.setIcon(QtGui.QIcon(action_item["icon"]))
                 if "tabs" in action_item:
                     self.menu_list_for_disabled.append((menu, action_item["tabs"]))
+                if "id" in action_item:
+                    self.action_by_id[action_item["id"]] = menu
                 self._create_menu(menu, action_item["actions"])
                 parent.addAction(menu.menuAction())
 
@@ -716,6 +825,9 @@ class MainWindow(QMainWindow):
     def add_srpid_result_from_reader(self, result):
         self.add_sportident_result_from_sireader(result)
 
+    def add_huichang_result_from_reader(self, result):
+        self.add_sportident_result_from_sireader(result)
+
     # Actions
     def create_file(self, *args, update_data=True, is_new=False):
         file_name = get_save_file_name(
@@ -876,7 +988,7 @@ class MainWindow(QMainWindow):
 
     def _delete_object(self):
         tab = self.current_tab
-        
+
         obj_ids = []
         if tab == 0:
             for index in self.get_selected_rows():
@@ -898,7 +1010,7 @@ class MainWindow(QMainWindow):
             for index in self.get_selected_rows():
                 if 0 <= index < len(race().organizations):
                     obj_ids.append(race().organizations[index].id)
-        
+
         if not len(obj_ids):
             return
 
@@ -910,7 +1022,7 @@ class MainWindow(QMainWindow):
         )
         if confirm == QMessageBox.No:
             return
-        
+
         res = []
         if tab == 0:
             res = race().delete_persons_by_id(obj_ids)

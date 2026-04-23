@@ -72,7 +72,7 @@ class MassEditDialog(QDialog):
 
         self.bib_checkbox = QtWidgets.QCheckBox(self)
         self.bib_spinbox = AdvSpinBox(
-            minimum=0, maximum=9999999, max_width=max_field_width
+            minimum=0, maximum=99999999, max_width=max_field_width
         )
         self.layout.addRow(self.bib_checkbox, self.bib_spinbox)
 

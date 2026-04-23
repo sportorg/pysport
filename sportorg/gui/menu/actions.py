@@ -48,6 +48,7 @@ from sportorg.gui.dialogs.teamwork_properties import TeamworkPropertiesDialog
 from sportorg.gui.dialogs.telegram_dialog import TelegramDialog
 from sportorg.gui.dialogs.text_io import TextExchangeDialog
 from sportorg.gui.dialogs.timekeeping_properties import TimekeepingPropertiesDialog
+from sportorg.gui.dialogs.huichang_management_dialog import HuichangManagementDialog
 from sportorg.gui.menu.action import Action
 from sportorg.gui.utils.custom_controls import messageBoxQuestion
 from sportorg.language import translate
@@ -78,7 +79,11 @@ from sportorg.modules.sfr.sfrreader import SFRReaderClient
 from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.modules.sportiduino.sportiduino import SportiduinoClient
 from sportorg.modules.srpid.srpid import SrpidClient
-from sportorg.modules.teamwork.teamwork import Teamwork
+from sportorg.modules.huichang.huichang import HuichangClient
+from sportorg.modules.teamwork.teamwork import (
+    Teamwork,
+    configure_teamwork_from_settings,
+)
 from sportorg.modules.telegram.telegram import telegram_client
 from sportorg.modules.updater import checker
 from sportorg.modules.winorient import winorient
@@ -611,6 +616,8 @@ class CardReadoutAction(Action, metaclass=ActionFactory):
             ImpinjClient().toggle()
         elif punch_system == SystemType.SRPID:
             SrpidClient().toggle()
+        elif punch_system == SystemType.HUICHANG:
+            HuichangClient().toggle()
         else:
             SIReaderClient().toggle()
         time.sleep(0.5)
@@ -770,13 +777,7 @@ class TeamworkSettingsAction(Action, metaclass=ActionFactory):
 
 class TeamworkEnableAction(Action, metaclass=ActionFactory):
     def execute(self):
-        host = race().get_setting("teamwork_host", "localhost")
-        port = race().get_setting("teamwork_port", 50010)
-        token = race().get_setting("teamwork_token", str(uuid.uuid4())[:8])
-        connection_type = race().get_setting("teamwork_type_connection", "client")
-        if connection_type == "server":
-            host = "0.0.0.0"
-        Teamwork().set_options(host, port, token, connection_type)
+        configure_teamwork_from_settings()
         Teamwork().toggle()
 
 
@@ -970,3 +971,8 @@ class ExtractPersonMiddleName(Action, metaclass=ActionFactory):
         for person in race().persons:
             person.extract_middle_name()
         self.app.refresh()
+
+
+class HuichangManagementAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        HuichangManagementDialog().exec_()

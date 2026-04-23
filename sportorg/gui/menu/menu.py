@@ -375,6 +375,11 @@ def menu_list():
                     "action": "CardReadoutAction",
                 },
                 {
+                    "title": translate("Huichang management"),
+                    "action": "HuichangManagementAction",
+                    "id": "huichang_management",
+                },
+                {
                     "title": translate("Teamwork"),
                     "icon": config.icon_dir("network.svg"),
                     "actions": [

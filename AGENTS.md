@@ -9,11 +9,13 @@
 - Configuration defaults are in `configs/`.
 - CLI helpers are at the repository root: `SportOrg.pyw`, `builder.py`.
 - Tests are in `tests/`, with sample fixtures in `tests/data/`.
+- Teamwork protocol documentation is in [`docs/teamwork.md`](docs/teamwork.md).
+- Update [`docs/teamwork.md`](docs/teamwork.md) whenever the Teamwork protocol, packet format, or message flow changes.
 - Translation files are in `languages/<locale>/LC_MESSAGES/`.
 - After editing `.po` files, regenerate `.mo` files via `generate-mo`.
 
 ## Build, Test, and Development Commands
-- `uv sync --frozen [--extra win]`: install locked dependencies for Python 3.8 environments.
+- `uv sync --frozen --extra gui [--extra win]`: install locked dependencies for Python 3.8 environments.
 - `uv run poe run`: regenerate translations and launch `SportOrg.pyw` in debug mode.
 - `uv run poe format`: run Ruff formatting.
 - `uv run poe lint`: run Ruff linting and fixture sanity checks.

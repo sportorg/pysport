@@ -1,16 +1,21 @@
 try:
     from PySide6.QtCore import QDate, QTime
 except ModuleNotFoundError:
-    from PySide2.QtCore import QDate, QTime
+    try:
+        from PySide2.QtCore import QDate, QTime
+    except ModuleNotFoundError:
+        QDate = None
+        QTime = None
 
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, time
+
 from sportorg.common.otime import OTime
 
 
 def time_to_otime(t) -> OTime:
-    if isinstance(t, datetime):
+    if isinstance(t, datetime) or isinstance(t, time):
         return OTime(0, t.hour, t.minute, t.second, round(t.microsecond / 1000))
-    if isinstance(t, QTime):
+    if QTime is not None and isinstance(t, QTime):
         return OTime(0, t.hour(), t.minute(), t.second(), t.msec())
     if isinstance(t, timedelta):
         return time_to_otime(datetime(2000, 1, 1, 0, 0, 0) + t)
@@ -34,27 +39,13 @@ def time_to_datetime(t) -> datetime:
     return datetime(2000, 1, 1, otime.hour, otime.minute, otime.sec, otime.msec * 1000)
 
 
-def time_to_qtime(t) -> OTime:
+def time_to_qtime(t):
+    if QTime is None:
+        raise RuntimeError("QTime is not available")
     otime = time_to_otime(t)
     time_ = QTime()
     time_.setHMS(otime.hour, otime.minute, otime.sec, otime.msec)
     return time_
-
-
-def _int_to_time(value) -> datetime:
-    """convert value from 1/100 s to time"""
-
-    today = datetime.now()
-    ret = datetime(
-        today.year,
-        today.month,
-        today.day,
-        value // 360000 % 24,
-        (value % 360000) // 6000,
-        (value % 6000) // 100,
-        (value % 100) * 10,
-    )
-    return ret
 
 
 def int_to_otime(value) -> OTime:
@@ -118,7 +109,7 @@ def hhmmss_to_time(value):
 
 
 def time_remove_day(value):
-    new_value = datetime.datetime(
+    new_value = datetime(
         year=2000,
         month=1,
         day=1,
@@ -128,24 +119,6 @@ def time_remove_day(value):
         microsecond=value.microsecond,
     )
     return new_value
-
-
-def _time_to_sec(value, max_val=86400):  # default max value = 24h
-    if isinstance(value, datetime.datetime):
-        ret = (
-            value.hour * 3600
-            + value.minute * 60
-            + value.second
-            + value.microsecond / 1000000
-        )
-        if max_val:
-            ret = ret % max_val
-        return ret
-
-    if isinstance(value, QTime):
-        return time_to_sec(time_to_datetime(value), max_val)
-
-    return 0
 
 
 def time_to_sec(value, max_val=86400):  # default max value = 24h
@@ -167,10 +140,17 @@ def get_speed_min_per_km(time, length_m):
 
 
 def qdate_to_date(value):
+    if QDate is None:
+        raise RuntimeError("QDate is not available")
+
+    if isinstance(value, date):
+        return value
     return date(year=value.year(), month=value.month(), day=value.day())
 
 
 def date_to_qdate(value):
+    if QDate is None:
+        raise RuntimeError("QDate is not available")
     return QDate(value.year, value.month, value.day)
 
 

@@ -34,6 +34,7 @@ class SystemType(Enum):
     SPORTIDUINO = 4
     RFID_IMPINJ = 5
     SRPID = 6
+    HUICHANG = 7
 
     def __str__(self) -> str:
         return self._name_
@@ -514,6 +515,7 @@ class Result(ABC):
         self.final_result_time: Optional[OTime] = None  # real time, when nobody can win
 
         self.card_number = 0
+        self.card_battery_level = None  # 0-100%, Huichang contact-less card
         self.splits: List[Split] = []
         self.__start_time = None
         self.__finish_time = None
@@ -616,6 +618,7 @@ class Result(ABC):
             "assigned_rank": self.assigned_rank.value,
             "splits": [split.to_dict() for split in self.splits],
             "card_number": self.card_number,
+            "card_battery_level": self.card_battery_level,
             "speed": self.speed,  # readonly
             "scores": self.scores,  # readonly
             "rogaine_score": self.rogaine_score,  # readonly
@@ -677,6 +680,8 @@ class Result(ABC):
 
         if "card_number" in data:
             self.card_number = int(data["card_number"])
+        if "card_battery_level" in data and data["card_battery_level"] is not None:
+            self.card_battery_level = int(data["card_battery_level"])
         if "splits" in data:
             self.splits = []
             for item in data["splits"]:
@@ -901,6 +906,7 @@ class Result(ABC):
             or self.is_sportiduino()
             or self.is_rfid_impinj()
             or self.is_srpid()
+            or self.is_huichang()
         )
 
     def is_sportident(self):
@@ -917,6 +923,9 @@ class Result(ABC):
 
     def is_srpid(self):
         return self.system_type == SystemType.SRPID
+
+    def is_huichang(self):
+        return self.system_type == SystemType.HUICHANG
 
     def is_manual(self):
         return self.system_type == SystemType.MANUAL
@@ -1317,6 +1326,10 @@ class ResultSrpid(ResultSportident):
     system_type = SystemType.SRPID
 
 
+class ResultHuichang(ResultSportident):
+    system_type = SystemType.HUICHANG
+
+
 class Person(Model):
     def __init__(self):
         self.id = uuid.uuid4()
@@ -1628,6 +1641,7 @@ class Race(Model):
         "ResultSportiduino": ResultSportiduino,
         "ResultRfidImpinj": ResultRfidImpinj,
         "ResultSrpid": ResultSrpid,
+        "ResultHuichang": ResultHuichang,
         "Group": Group,
         "Course": Course,
         "Organization": Organization,
@@ -1668,6 +1682,7 @@ class Race(Model):
             "ResultSportiduino": self.results,
             "ResultRfidImpinj": self.results,
             "ResultSrpid": self.results,
+            "ResultHuichang": self.results,
             "Group": self.groups,
             "Course": self.courses,
             "Organization": self.organizations,
@@ -1684,6 +1699,7 @@ class Race(Model):
             "ResultSportiduino": self.result_index,
             "ResultRfidImpinj": self.result_index,
             "ResultSrpid": self.result_index,
+            "ResultHuichang": self.result_index,
             "Group": self.group_index,
             "Course": self.course_index,
             "Organization": self.organization_index,
@@ -1831,6 +1847,7 @@ class Race(Model):
             "ResultSportiduino",
             "ResultRfidImpinj",
             "ResultSrpid",
+            "ResultHuichang",
         ]:
             obj.person = self.get_obj("Person", dict_obj["person_id"])
         elif dict_obj["object"] == "Group":
@@ -1893,7 +1910,7 @@ class Race(Model):
             self.remove_person_from_indexes(person)
             del self.persons[i]
         return persons
-    
+
     def delete_persons_by_id(self, person_ids):
         person_ids_set = set(person_ids)
         persons = []
@@ -1938,7 +1955,7 @@ class Race(Model):
                 del self.result_index[result.id]
             del self.results[i]
         return results
-    
+
     def delete_results_by_id(self, result_ids):
         result_ids_set = set(result_ids)
         results = []
@@ -1966,7 +1983,7 @@ class Race(Model):
                 del self.group_index[self.groups[i].id]
             del self.groups[i]
         return groups
-    
+
     def delete_groups_by_id(self, group_ids):
         group_ids_set = set(group_ids)
         groups = []
@@ -1996,7 +2013,7 @@ class Race(Model):
                 del self.course_index[self.courses[i].id]
             del self.courses[i]
         return courses
-    
+
     def delete_courses_by_id(self, course_ids):
         course_ids_set = set(course_ids)
         courses = []
@@ -2026,7 +2043,7 @@ class Race(Model):
                 del self.organization_index[self.organizations[i].id]
             del self.organizations[i]
         return organizations
-    
+
     def delete_organizations_by_id(self, organization_ids):
         organization_ids_set = set(organization_ids)
         organizations = []
@@ -2336,7 +2353,7 @@ class Qualification(IntEnum):
         return qual[self.value]
 
     # get score for ranking, stored in config.ini file
-    def get_score(self, is_ardf = False):
+    def get_score(self, is_ardf=False):
         if is_ardf:
             return float(settings.SETTINGS.ranking_ardf.get(self.name.lower(), 0))
         else:
