@@ -265,12 +265,11 @@ class ResultChecker:
 
     @staticmethod
     def penalty_calculation_standard(splits, controls, penalty_extra=True):
-        # penalty calculation for standard course
-        # penalty for each missed and extra point (if penalty_extra=True)
+        """Calculate penalty for a fixed-order course.
 
-        # Расчет штрафа для дистанции заданного направления
-        # Штраф начисляется за каждый пропущенный КП и за все лишние, если penalty_extra=True
-        # Порядок взятия КП влияет на расчет штрафа
+        Adds one penalty per missed control and, when enabled, per extra control.
+        """
+
 
         allow_missed = True
         skip_duplicates = True
@@ -353,16 +352,11 @@ class ResultChecker:
 
     @staticmethod
     def penalty_calculation_marked_route(splits, controls):
-        # marked route with choice, controls like 31(31,131), penalty only wrong choice (once),
-        # ignoring controls from another courses, duplicates
-        # note, old punches from uncleared card can be calculated as wrong TODO: ignore old punches
-        # this mode allows combination of marked route and classic course, but please use different control codes
+        """Calculate penalty for a marked route with YES/NO style alternatives.
 
-        # Расчет штрафа для маркированной трассы со станциями ДА-НЕТ или с ТПР.
-        # Штраф начисляется только за неправильные КП, например, если прописано 31(31,131), то штрафуется только 131.
-        # Штраф не начисляется за чужие КП и за дубликаты.
-        # Сейчас штраф за неправильные КП начисляется, если они есть в данных неочищенного чипа. В будущем постараемся
-        # исправить, чтобы при выставлении опции "Игнорировать отметки до старта" старые отметки не учитывались.
+        Counts only wrong-choice controls once, ignores duplicates and foreign controls.
+        """
+
 
         res = 0
         incorrect_array = ResultChecker.get_marked_route_incorrect_list(controls)
