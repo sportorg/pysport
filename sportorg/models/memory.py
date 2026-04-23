@@ -168,15 +168,14 @@ class CourseControl(Model):
             return "0"
 
         res = ""
-
         index = 0
         tmp = str(self.code).strip()
-        char = tmp[0]
-        while char.isdigit() and index <= len(tmp) - 1:
-            res += char
+        if not tmp:
+            return "0"
+
+        while index < len(tmp) and tmp[index].isdigit():
+            res += tmp[index]
             index += 1
-            if index < len(tmp):
-                char = tmp[index]
         return str(res)
 
     def to_dict(self):
@@ -191,8 +190,14 @@ class CourseControl(Model):
         self.length = int(data["length"])
 
     def is_free_order(self):
-        code_str = "" + str(self.code).strip()
-        return code_str.startswith("*") or code_str.startswith("%")
+        code_str = str(self.code).strip()
+        template = code_str.split("(", 1)[0].strip()
+        return (
+            template.startswith("*")
+            or template.startswith("%")
+            or template.endswith("*")
+            or template.endswith("%")
+        )
 
 class ControlPoint(Model):
     """Description of independent control point. Used for score calculation in rogain"""

@@ -167,6 +167,25 @@ def test_free_course_order_any_controls():
     assert ok(course, splits=[31, 31, 31, 31, 32])
 
 
+@pytest.mark.parametrize(
+    "course,splits",
+    [
+        (["31*", "31*", "31*"], [51, 61, 71]),
+        (["31%", "31%", "31%"], [51, 51, 51]),
+    ],
+)
+def test_penalty_calculation_supports_suffix_free_order_templates(course, splits):
+    course_object = make_course(course)
+    result = make_result(splits)
+    assert result.check(course_object)
+    assert ResultChecker.penalty_calculation(result.splits, course_object.controls) == 0
+
+
+def test_get_number_code_blank_string():
+    control = make_course_control("   ")
+    assert control.get_number_code() == "0"
+
+
 def test_course_pre_ordered():
     """Дистанция в заданном направлении. Спортсмену необходимо пройти
     контрольные пункты в заданном порядке. Лишние КП не учитываются.
