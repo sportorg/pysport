@@ -321,29 +321,6 @@ class ResultChecker:
                             user_array[user_index - 2] == user_array[user_index - 1]):
                         extra_count -= 1
 
-                    # if user_cp not in origin_array[origin_index:] or not allow_missed:
-                    #     # extra user cp
-                    #     user_index += 1
-                    #     extra_count += 1
-                    #     if (skip_duplicates and
-                    #             user_index > 1 and
-                    #             user_array[user_index - 2] == user_array[user_index - 1]):
-                    #         extra_count -= 1
-                    # else:
-                        # # need additional check
-                        # pos_course = user_array[user_index:].index(course_cp)
-                        # pos_user = origin_array[origin_index:].index(user_cp)
-                        # if pos_course > pos_user:
-                        #     # missed cp
-                        #     origin_index += pos_user
-                        #     missed_count += pos_user
-                        # else:
-                        #     # extra user cp
-                        #     user_index += 1
-                        #     extra_count += 1
-                        #     if skip_duplicates and user_index > 1 and user_array[user_index - 2] == user_cp:
-                        #         extra_count -= 1
-
         ret = missed_count
         if penalty_extra:
             ret += extra_count
