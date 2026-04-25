@@ -449,7 +449,6 @@ class TimekeepingPropertiesDialog(QDialog):
             not (self.mr_laps_radio.isChecked() or self.mr_time_radio.isChecked())
         )
 
-
     def set_values_from_model(self):
         cur_race = race()
         zero_time = cur_race.get_setting("system_zero_time", (8, 0, 0))

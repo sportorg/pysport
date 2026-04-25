@@ -6,7 +6,9 @@ from sportorg.models.memory import (
     ResultSportident,
     ResultStatus,
     find,
-    race, Split, CourseControl,
+    race,
+    Split,
+    CourseControl,
 )
 
 
@@ -96,8 +98,8 @@ class ResultChecker:
                         )
                     )
                     if (
-                            max_overrun_time.to_msec() > 0
-                            and result_time > max_time + max_overrun_time
+                        max_overrun_time.to_msec() > 0
+                        and result_time > max_time + max_overrun_time
                     ):
                         result.status = ResultStatus.OVERTIME
 
@@ -156,9 +158,7 @@ class ResultChecker:
             splits, _ = ResultChecker.detach_penalty_laps(splits, lap_station)
 
         penalty_extra = race().get_setting("penalty_extra_cp", True)
-        penalty = ResultChecker.penalty_calculation(
-            splits, controls, penalty_extra
-        )
+        penalty = ResultChecker.penalty_calculation(splits, controls, penalty_extra)
 
         if race().get_setting("marked_route_max_penalty_by_cp", False):
             # limit the penalty by quantity of controls
@@ -259,9 +259,13 @@ class ResultChecker:
 
         origin_array = [i.get_number_code() for i in controls]
         if "0" in origin_array:
-            return ResultChecker.penalty_calculation_free_order(splits, controls, penalty_extra)
+            return ResultChecker.penalty_calculation_free_order(
+                splits, controls, penalty_extra
+            )
 
-        return ResultChecker.penalty_calculation_standard(splits, controls, penalty_extra)
+        return ResultChecker.penalty_calculation_standard(
+            splits, controls, penalty_extra
+        )
 
     @staticmethod
     def penalty_calculation_standard(splits, controls, penalty_extra=True):
@@ -269,7 +273,6 @@ class ResultChecker:
 
         Adds one penalty per missed control and, when enabled, per extra control.
         """
-
 
         allow_missed = True
         skip_duplicates = True
@@ -287,7 +290,11 @@ class ResultChecker:
                 # all user cp are extra
                 user_index += 1
                 extra_count += 1
-                if skip_duplicates and user_index > 1 and user_array[user_index - 2] == user_array[user_index - 1]:
+                if (
+                    skip_duplicates
+                    and user_index > 1
+                    and user_array[user_index - 2] == user_array[user_index - 1]
+                ):
                     extra_count -= 1
                 continue
 
@@ -316,9 +323,11 @@ class ResultChecker:
                     # extra user cp
                     user_index += 1
                     extra_count += 1
-                    if (skip_duplicates and
-                            user_index > 1 and
-                            user_array[user_index - 2] == user_array[user_index - 1]):
+                    if (
+                        skip_duplicates
+                        and user_index > 1
+                        and user_array[user_index - 2] == user_array[user_index - 1]
+                    ):
                         extra_count -= 1
 
         ret = missed_count
@@ -333,7 +342,6 @@ class ResultChecker:
 
         Counts only wrong-choice controls once, ignores duplicates and foreign controls.
         """
-
 
         res = 0
         incorrect_array = ResultChecker.get_marked_route_incorrect_list(controls)
@@ -376,7 +384,7 @@ class ResultChecker:
             if splits[i].is_correct:
                 correct_count += 1
             else:
-                if skip_duplicates and i > 0 and splits[i].code == splits[i-1].code:
+                if skip_duplicates and i > 0 and splits[i].code == splits[i - 1].code:
                     pass
                 else:
                     res += 1
@@ -479,7 +487,7 @@ class ResultChecker:
 
     @staticmethod
     def calculate_rogaine_penalty(
-            result: Result, score: int, penalty_step: int = 1
+        result: Result, score: int, penalty_step: int = 1
     ) -> int:
         """
         Calculates the penalty for a given result based on the participant's excess of a race time.

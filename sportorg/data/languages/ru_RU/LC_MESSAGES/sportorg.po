@@ -108,6 +108,12 @@ msgstr "Результаты"
 msgid "Entry properties"
 msgstr "Редактирование спортсмена"
 
+msgid "Change bib"
+msgstr "Изменить номер"
+
+msgid "Change bib tooltip"
+msgstr "Присвоить участнику этот номер.\nИзменение сохранится при нажатии OK."
+
 msgid "Last name"
 msgstr "Фамилия"
 
