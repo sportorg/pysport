@@ -199,6 +199,7 @@ class CourseControl(Model):
             or template.endswith("%")
         )
 
+
 class ControlPoint(Model):
     """Description of independent control point. Used for score calculation in rogain"""
 
