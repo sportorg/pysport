@@ -20,6 +20,12 @@ msgstr ""
 msgid "SportOrg"
 msgstr "SportOrg"
 
+msgid "Change bib"
+msgstr "Change bib"
+
+msgid "Change bib tooltip"
+msgstr "Assign this bib to the participant.\nChange takes effect on OK."
+
 msgid "Qualification title"
 msgstr "Qual"
 

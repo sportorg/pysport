@@ -22,6 +22,7 @@
 + For ARDF, rank fulfillment according to the requirements of EVSK
 + Live (Online) toolbar button with state indicator and context menu (Enable/Disable, Send Selected, Settings)
 + A button has been added to the participant card for assigning a number (maximum existing number + 1)
++ Added a button in the result card to change the participant's bib to the entered number
 + Added connected clients to teamwork properties
 + Optional Teamwork data encryption (AES-256-GCM) with local key storage and key generation in settings
 + Teamwork host/port/mode/encryption settings moved from race file to app settings; added "Run at startup" and auto-fallback to client on startup if server is already running

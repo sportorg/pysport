@@ -11,8 +11,10 @@ try:
         QDialogButtonBox,
         QFormLayout,
         QGroupBox,
+        QHBoxLayout,
         QLabel,
         QLineEdit,
+        QPushButton,
         QScrollArea,
         QTextEdit,
         QVBoxLayout,
@@ -27,8 +29,10 @@ except ModuleNotFoundError:
         QDialogButtonBox,
         QFormLayout,
         QGroupBox,
+        QHBoxLayout,
         QLabel,
         QLineEdit,
+        QPushButton,
         QScrollArea,
         QTextEdit,
         QVBoxLayout,
@@ -60,6 +64,7 @@ class ResultEditDialog(QDialog):
         time_accuracy = race().get_setting("time_accuracy", 0)
         if time_accuracy:
             self.time_format = "hh:mm:ss.zzz"
+        self._pending_bib_for_person: int = 0
 
     def exec_(self):
         self.init_ui()
@@ -90,6 +95,10 @@ class ResultEditDialog(QDialog):
         self.item_bib.valueChanged.connect(self.show_person_info)
 
         self.label_person_info = QLabel("")
+
+        self.button_change_bib = QPushButton(translate("Change bib"))
+        self.button_change_bib.setToolTip(translate("Change bib tooltip"))
+        self.button_change_bib.setVisible(False)
 
         self.item_days = AdvSpinBox(maximum=365)
 
@@ -122,8 +131,15 @@ class ResultEditDialog(QDialog):
         form_layout.addRow(QLabel(translate("Created at")), self.item_created_at)
         if self.current_object.is_punch():
             form_layout.addRow(QLabel(translate("Card")), self.item_card_number)
+        person_info_container = QWidget()
+        person_info_layout = QHBoxLayout(person_info_container)
+        person_info_layout.setContentsMargins(0, 0, 0, 0)
+        person_info_layout.addWidget(self.label_person_info)
+        person_info_layout.addWidget(self.button_change_bib)
+        person_info_layout.addStretch()
+
         form_layout.addRow(QLabel(translate("Bib")), self.item_bib)
-        form_layout.addRow(QLabel(""), self.label_person_info)
+        form_layout.addRow(QLabel(""), person_info_container)
         if more24:
             form_layout.addRow(QLabel(translate("Days")), self.item_days)
         form_layout.addRow(QLabel(translate("Start")), self.item_start)
@@ -174,27 +190,49 @@ class ResultEditDialog(QDialog):
 
         vertical_layout.addWidget(button_box)
 
+        self.button_change_bib.clicked.connect(self._on_change_bib_clicked)
+        self.setTabOrder(self.item_bib, self.button_change_bib)
+
         self.show()
         self.item_bib.setFocus()
 
-    def show_person_info(self):
+    def show_person_info(self) -> None:
         bib = self.item_bib.value()
         self.label_person_info.setText("")
-        if bib:
-            person = race().find_person_by_bib(bib)
-            if person:
-                info = person.full_name
-                if person.group:
-                    info = "{}\n{}: {}".format(
-                        info, translate("Group"), person.group.name
-                    )
-                if person.card_number:
-                    info = "{}\n{}: {}".format(
-                        info, translate("Card"), person.card_number
-                    )
-                self.label_person_info.setText(info)
-            else:
-                self.label_person_info.setText(translate("not found"))
+        self.button_change_bib.setVisible(False)
+
+        if self._pending_bib_for_person != bib:
+            self._pending_bib_for_person = 0
+
+        if not bib:
+            return
+
+        if self._pending_bib_for_person and self.current_object.person:
+            person = self.current_object.person
+            info = person.full_name
+            if person.group:
+                info = "{}\n{}: {}".format(info, translate("Group"), person.group.name)
+            if person.card_number:
+                info = "{}\n{}: {}".format(info, translate("Card"), person.card_number)
+            self.label_person_info.setText(info)
+            return
+
+        person = race().find_person_by_bib(bib)
+        if person:
+            info = person.full_name
+            if person.group:
+                info = "{}\n{}: {}".format(info, translate("Group"), person.group.name)
+            if person.card_number:
+                info = "{}\n{}: {}".format(info, translate("Card"), person.card_number)
+            self.label_person_info.setText(info)
+        else:
+            self.label_person_info.setText(translate("not found"))
+            if self.current_object.person:
+                self.button_change_bib.setVisible(True)
+
+    def _on_change_bib_clicked(self) -> None:
+        self._pending_bib_for_person = self.item_bib.value()
+        self.show_person_info()
 
     def set_values_from_model(self):
         if self.current_object.is_punch():
@@ -268,6 +306,9 @@ class ResultEditDialog(QDialog):
 
         if result.penalty_laps != self.item_penalty_laps.value():
             result.penalty_laps = self.item_penalty_laps.value()
+
+        if self._pending_bib_for_person and result.person:
+            result.person.set_bib(self._pending_bib_for_person)
 
         cur_bib = -1
         new_bib = self.item_bib.value()
