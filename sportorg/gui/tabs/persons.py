@@ -1,4 +1,5 @@
 import logging
+import sys
 
 try:
     from PySide6 import QtCore, QtWidgets
@@ -19,6 +20,8 @@ class PersonsTableView(TableView):
         self.popup_items = []
         self._alt_pressed = False
         self._alt_input = ""
+        self._all_numpad = True
+        self._suppress_next_char = False
 
     def set_start_group(self, number):
         if -1 < self.currentIndex().row() < len(race().persons):
@@ -49,6 +52,12 @@ class PersonsTableView(TableView):
 
     def keyPressEvent(self, event):
         """Handle Alt + digits for quick start_group input."""
+        # Suppress the Windows alt-code char that arrives after Alt+numpad sequence
+        if self._suppress_next_char and event.text():
+            self._suppress_next_char = False
+            event.accept()
+            return
+
         # Check if only Alt is pressed (without Ctrl, Shift, Meta)
         if event.key() == QtCore.Qt.Key_Alt:
             modifiers = event.modifiers()
@@ -59,20 +68,25 @@ class PersonsTableView(TableView):
             ):
                 self._alt_pressed = True
                 self._alt_input = ""
+                self._all_numpad = True
                 return super().keyPressEvent(event)
 
         if self._alt_pressed:
-            key = self._get_numpad_value(event) or event.text()
-
-            if key.isdigit():
-                # If Alt is held and a digit is pressed
-                self._alt_input += key
-                event.accept()  # Suppress the event
+            numpad_val = self._get_numpad_value(event)
+            if numpad_val is not None:
+                self._alt_input += numpad_val
+                event.accept()
+                return
+            elif event.text().isdigit():
+                self._alt_input += event.text()
+                self._all_numpad = False
+                event.accept()
                 return
             else:
-                # If a non-digit key is pressed, cancel the input mode
+                # Non-digit key: cancel input mode
                 self._alt_pressed = False
                 self._alt_input = ""
+                self._all_numpad = True
                 return super().keyPressEvent(event)
 
         return super().keyPressEvent(event)
@@ -91,7 +105,13 @@ class PersonsTableView(TableView):
                 except (ValueError, AttributeError):
                     pass
 
+            # On Windows, swallow the alt-code WM_CHAR that arrives after
+            # a pure-numpad Alt sequence (e.g. Alt+400 → "Р")
+            if self._alt_input and self._all_numpad and sys.platform == "win32":
+                self._suppress_next_char = True
+
             self._alt_input = ""
+            self._all_numpad = True
             event.accept()
             return
 
