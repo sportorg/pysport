@@ -15,4 +15,5 @@ def test_get_qual_by_name_supports_common_aliases():
     assert Qualification.get_qual_by_name("3р") == Qualification.III
     assert Qualification.get_qual_by_name("1ю") == Qualification.I_Y
     assert Qualification.get_qual_by_name("IIIЮ") == Qualification.III_Y
+    assert Qualification.get_qual_by_name("IIIю") == Qualification.III_Y
     assert Qualification.get_qual_by_name("б.р.") == Qualification.NOT_QUALIFIED
