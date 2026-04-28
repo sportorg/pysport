@@ -2324,7 +2324,6 @@ class Qualification(IntEnum):
     def get_qual_by_name(cls, name):
         qual_reverse = {
             "": 0,
-            " ": 0,
             "б/р": 0,
             "IIIю": 3,
             "IIю": 2,
@@ -2337,10 +2336,44 @@ class Qualification(IntEnum):
             "МСМК": 9,
             "ЗМС": 9,
         }
-        if name not in qual_reverse:
-            return cls(0)
 
-        return cls(qual_reverse[name])
+        def normalize_qual(raw_name: str) -> str:
+            return (
+                str(raw_name)
+                .strip()
+                .casefold()
+                .replace(" ", "")
+                .replace(".", "")
+            )
+
+        aliases = {}
+        for title, code in qual_reverse.items():
+            aliases[normalize_qual(title)] = code
+
+        aliases.update(
+            {
+                "бр": 0,
+                "б\\р": 0,
+                "б-р": 0,
+                "notqualified": 0,
+                "1ю": 1,
+                "2ю": 2,
+                "3ю": 3,
+                "1": 4,
+                "2": 5,
+                "3": 6,
+                "1р": 4,
+                "2р": 5,
+                "3р": 6,
+                "kms": 7,
+                "ms": 8,
+                "msmk": 9,
+                "zms": 9,
+            }
+        )
+
+        normalized_name = normalize_qual(name)
+        return cls(aliases.get(normalized_name, 0))
 
     def get_title(self):
         qual = {
