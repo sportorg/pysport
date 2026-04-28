@@ -2355,7 +2355,6 @@ class Qualification(IntEnum):
                 "бр": 0,
                 "б\\р": 0,
                 "б-р": 0,
-                "notqualified": 0,
                 "1ю": 1,
                 "2ю": 2,
                 "3ю": 3,
@@ -2365,10 +2364,6 @@ class Qualification(IntEnum):
                 "1р": 4,
                 "2р": 5,
                 "3р": 6,
-                "kms": 7,
-                "ms": 8,
-                "msmk": 9,
-                "zms": 9,
             }
         )
 
