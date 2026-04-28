@@ -29,6 +29,7 @@
 + Teamwork race ID verification on server with client confirmation flow for mismatches and automatic Teamwork shutdown confirmation when switching multi-day race day
 + Added Huichang Timing System support ([#550](https://github.com/sportorg/pysport/pull/550))
 + Changed the principle of penalty calculation for standard course. Now if person just missed 1 point, it gives 1 penalty score
++ Added conversion of qualification names in various formats
 
 ### Fixes
 
