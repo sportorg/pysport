@@ -272,14 +272,14 @@ def _write_competitors(f, race: Race):
 
                 result_status = "н/с"
 
-        surname = person.surname or ""
-        first_name = person.name or ""
+        surname = person.surname or ""    
+        first_name = person.name +" " + person.middle_name or ""
         
         competitor_fields = [
             f"c{person_id_str}",
             str(person.bib or "0"),
             group_id,
-            surname,
+            surname,  #фамилия
             first_name,
             team_id,
             birthday,
