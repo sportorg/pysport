@@ -1,17 +1,29 @@
 name: Lint PR
 
 on:
-  pull_request_target:
+  push:
+    branches: [ master ]
+  pull_request:
     types:
       - opened
       - edited
       - synchronize
 
+permissions: read-all
+
 jobs:
-  main:
+  check:
     name: Validate PR title
     runs-on: ubuntu-latest
     steps:
-      - uses: amannn/action-semantic-pull-request@v6
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Checkout sources
+        uses: actions/checkout@v6
+
+      - name: Install python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+
+      - name: Validate PR title
+        run: |
+          python .github/scripts/commits.py "${{ github.event.pull_request.title }}"
