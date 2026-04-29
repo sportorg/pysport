@@ -10,20 +10,14 @@ from sportorg.models.memory import (
     Race,
     ResultStatus,
 )
-
-
 def export_sfrx(destination: str):
-
     race = memory.race()
     if not race:
         logging.error(translate("No race data found"))
         return False
-
     try:
-        # Важно: открываем без BOM и с табуляцией как разделитель
         base_name = os.path.splitext(destination)[0]
         with open(base_name + '.sfrx', 'w', encoding='utf-8', newline='') as f:
-
             _write_header(f, race)
             _write_days(f, race)
             _write_descriptions(f, race)
@@ -34,23 +28,20 @@ def export_sfrx(destination: str):
             _write_controls(f, race)
             _write_competitors(f, race)
             _write_splits(f, race)
-            
+        
         logging.info(translate("Export completed successfully to {}").format(destination))
         return True
-        
+       
     except Exception as e:
         logging.error(translate("Export error: {}").format(str(e)))
         return False
-
 
 def _write_header(f, race: Race):
 
     title = race.data.title or "Соревнования"
     location = race.data.location or "Место"
     name_style = "Фамилия и имя заглавными"
-    #Фамилия заглавными/Фамилия и имя заглавными/Заглавные начальные/Как введено
     punch_bib_style ="Номер команды и этап (последняя цифра)"
-    #Только номер команды/Номер команды + этап *1000
     days = 1  # пока экспорт только первого/одного дня, есть смысл делать мульти?
     race_type = "Индивидуальные"
     if race.data.race_type and hasattr(race.data.race_type, 'value'):
@@ -59,7 +50,6 @@ def _write_header(f, race: Race):
     write_from = "SportOrg Export " + config.VERSION
     Chief_referee = race.data.chief_referee 
     Chief_secretary = race.data.secretary 
-
     header_fields = [
         "SFRx_v2404",
         title,
@@ -71,13 +61,12 @@ def _write_header(f, race: Race):
         race_type,
         name_style, 
         punch_bib_style, 
-        "", "", "", "",  # 4 дополнительных неизвестных (неизвлеченные) поля
+        "", "", "", "",  # 4 дополнительных неизвестных поля
         write_from  
     ]
     f.write("\t".join(header_fields) + "\n")
 
 def _write_days(f, race: Race):
-    """Запись информации о днях соревнований"""
     first_url = ""
     url_list = race.get_setting("live_urls", [])
     if url_list and isinstance(url_list, list) and len(url_list) > 0:
@@ -96,24 +85,19 @@ def _write_days(f, race: Race):
     
     day_fields = [
         "p1",    
-        discipline, #Кросс - лонг (0830031811Я)  ? Первый день
+        discipline, 
         date_str,
-        w_url #write_url  # ссылка оргео!
-    ]
+        w_url 
+              ]
     f.write("\t".join(day_fields) + "\n")
-
-
-
 
 def _write_descriptions(f, race: Race):
     description_field = race.data.description 
-
     lines = [line.strip() for line in description_field.split('<br>')]
-    
     for i, line in enumerate(lines):
         f.write(f"h{i}\t{line}\n")
 
-# дополнения в шапку протокола (в спорторге это тоже в дескриптионс, но как разделить)
+# дублируем дополнения в шапку протокола (в спорторге это тоже в дескриптионс, но как разделить)
 def _write_clubs(f, race: Race):
     description_field = race.data.description 
     lines = [line.strip() for line in description_field.split('<br>')]
@@ -123,10 +107,8 @@ def _write_clubs(f, race: Race):
 def _write_groups(f, race: Race):
 
     for i, group in enumerate(race.groups):
-
         group_id_str = str(i).zfill(5)
         group_name = group.name or f"Group_{i}"
-        
         course_index = "0"
         if group.course and group.course in race.courses:
             course_index = str(race.courses.index(group.course))
@@ -185,7 +167,7 @@ def _write_courses(f, race: Race):
             "1", #  
             "0", #
             "0",  #
-            str(course.length or "0"),  # длина дистанции
+            str(course.   length or "0"),  # длина дистанции
             str(course.climb or "0"),  # набор высоты
             str(len(control_pairs) // 2)  # количество КП
         ]
