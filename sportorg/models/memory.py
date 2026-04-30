@@ -781,10 +781,14 @@ class Result(ABC):
         ret = self.get_result_otime()
         return self.status, ret.to_msec()
 
-    def get_result_otime(self):
-        race_type = RaceType.INDIVIDUAL_RACE
+    def get_race_type(self, fallback: RaceType = RaceType.INDIVIDUAL_RACE) -> RaceType:
+        race_type = fallback
         if self.person and self.person.group:
             race_type = self.person.group.race_type
+        return race_type
+
+    def get_result_otime(self):
+        race_type = self.get_race_type()
 
         if race_type == RaceType.INDIVIDUAL_RACE:
             return self.get_result_otime_current_day()
@@ -2338,13 +2342,7 @@ class Qualification(IntEnum):
         }
 
         def normalize_qual(raw_name: str) -> str:
-            return (
-                str(raw_name)
-                .strip()
-                .casefold()
-                .replace(" ", "")
-                .replace(".", "")
-            )
+            return str(raw_name).strip().casefold().replace(" ", "").replace(".", "")
 
         aliases = {}
         for title, code in qual_reverse.items():

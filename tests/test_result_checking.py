@@ -10,11 +10,14 @@ from sportorg.models.memory import (
     Group,
     Person,
     Race,
+    RaceType,
     ResultSportident,
+    ResultStatus,
     Split,
     create,
     new_event,
     race,
+    set_current_race_index,
 )
 from sportorg.models.result.result_checker import ResultChecker
 
@@ -508,6 +511,7 @@ def create_race():
     result = ResultSportident()
     result.person = person
     new_event([create(Race)])
+    set_current_race_index(0)
     race().courses.append(course)
     race().groups.append(group)
     race().persons.append(person)
@@ -564,3 +568,118 @@ def split_and_course_repr(course: List[Union[int, str]], splits: List[int]) -> s
     spl = splits
     crs = course
     return '\n'.join([f'{s:3}  {c}' for s, c in zip_longest(spl, crs, fillvalue='')])
+
+
+def test_overtime_multi_day_race_current_day_exceeds_max_time():
+    course = create(Course)
+
+    # Day 1 — current race, 45 min result
+    group1 = create(Group, course=course)
+    group1.name = "M21"
+    group1.race_type = RaceType.INDIVIDUAL_RACE
+    person1 = create(Person, group=group1)
+    person1.name = "Athlete"
+    person1.start_time = OTime(0, 10, 0, 0)
+    result1 = ResultSportident()
+    result1.person = person1
+    result1.finish_time = OTime(0, 10, 45, 0)
+    day1 = create(Race)
+    day1.groups.append(group1)
+    day1.persons.append(person1)
+    day1.results.append(result1)
+
+    # Day 2 — same athlete (matched by multi_day_id), 65 min result
+    group2 = create(Group, course=course)
+    group2.name = "M21"
+    group2.race_type = RaceType.MULTI_DAY_RACE
+    group2.max_time = OTime(0, 1, 0, 0)
+    person2 = create(Person, group=group2)
+    person2.name = "Athlete"
+    person2.start_time = OTime(0, 10, 0, 0)
+    result2 = ResultSportident()
+    result2.person = person2
+    result2.finish_time = OTime(0, 11, 5, 0)
+    day2 = create(Race)
+    day2.groups.append(group2)
+    day2.persons.append(person2)
+    day2.results.append(result2)
+
+    new_event([day1, day2])
+    set_current_race_index(1) # day2 is current (index 1)
+
+    ResultChecker.check_overtime(result2)
+
+    assert result2.status == ResultStatus.OVERTIME
+
+
+def test_overtime_multi_day_race_current_day_within_max_time():
+    """MULTI_DAY_RACE: OK when today's time is within max_time.
+
+    Cumulative result (45 + 55 = 100 min) exceeds max_time (60 min),
+    but only the current-day time (55 min) should be compared.
+    """
+    course = create(Course)
+
+    # Day 1 — current race, 45 min result
+    group1 = create(Group, course=course)
+    group1.name = "M21"
+    group1.race_type = RaceType.INDIVIDUAL_RACE
+    person1 = create(Person, group=group1)
+    person1.name = "Athlete"
+    person1.start_time = OTime(0, 10, 0, 0)
+    result1 = ResultSportident()
+    result1.person = person1
+    result1.finish_time = OTime(0, 10, 45, 0)
+    day1 = create(Race)
+    day1.groups.append(group1)
+    day1.persons.append(person1)
+    day1.results.append(result1)
+
+    # Day 2 — same athlete (matched by multi_day_id), 55 min result
+    group2 = create(Group, course=course)
+    group2.name = "M21"
+    group2.race_type = RaceType.MULTI_DAY_RACE
+    group2.max_time = OTime(0, 1, 0, 0)
+    person2 = create(Person, group=group2)
+    person2.name = "Athlete"
+    person2.start_time = OTime(0, 10, 0, 0)
+    result2 = ResultSportident()
+    result2.person = person2
+    result2.finish_time = OTime(0, 10, 55, 0)
+    day2 = create(Race)
+    day2.groups.append(group2)
+    day2.persons.append(person2)
+    day2.results.append(result2)
+
+    new_event([day1, day2])
+    set_current_race_index(1) # day2 is current (index 1)
+
+    ResultChecker.check_overtime(result2)
+
+    assert result2.status == ResultStatus.OK
+
+
+def test_overtime_individual_race_exceeds_max_time():
+    create_race()
+    group = race().groups[0]
+    result = race().results[0]
+    group.max_time = OTime(0, 1, 0, 0)
+    result.person.start_time = OTime(0, 10, 0, 0)
+    result.finish_time = OTime(0, 11, 5, 0)  # 65 min > 60 min
+
+    ResultChecker.check_overtime(result)
+
+    assert result.status == ResultStatus.OVERTIME
+
+
+def test_overtime_individual_race_within_max_time():
+    create_race()
+    group = race().groups[0]
+    result = race().results[0]
+    group.max_time = OTime(0, 1, 0, 0)
+    result.person.start_time = OTime(0, 10, 0, 0)
+    result.finish_time = OTime(0, 10, 55, 0)  # 55 min < 60 min
+
+    ResultChecker.check_overtime(result)
+
+    assert result.status == ResultStatus.OK
