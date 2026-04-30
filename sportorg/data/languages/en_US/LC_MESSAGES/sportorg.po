@@ -16,7 +16,6 @@ msgstr ""
 "X-Generator: Loco - https://localise.biz/\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Loco-Parser: loco_parse_po"
-msgstr "Fail for SFR"
 
 msgid "toSFR"
 msgstr "Fail for SFR"
