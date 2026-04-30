@@ -1,14 +1,15 @@
 from sportorg.common.otime import OTime
 from sportorg.models.constant import StatusComments
 from sportorg.models.memory import (
+    CourseControl,
     Person,
+    RaceType,
     Result,
     ResultSportident,
     ResultStatus,
+    Split,
     find,
     race,
-    Split,
-    CourseControl,
 )
 
 
@@ -62,7 +63,7 @@ class ResultChecker:
         return result.check(course)
 
     @classmethod
-    def checking(cls, result):
+    def checking(cls, result: Result):
         if result.person is None:
             raise ResultCheckerException("Not person")
         o = cls(result.person)
@@ -85,23 +86,7 @@ class ResultChecker:
                 result.status = ResultStatus.MISS_PENALTY_LAP
 
             elif result.person.group and result.person.group.max_time.to_msec():
-                rp_mode = race().get_setting("result_processing_mode", "time")
-                result_time = result.get_result_otime()
-                max_time = result.person.group.max_time
-                if rp_mode in ("time", "ardf"):
-                    if result_time > max_time:
-                        result.status = ResultStatus.OVERTIME
-                elif rp_mode == "scores":
-                    max_overrun_time = OTime(
-                        msec=race().get_setting(
-                            "result_processing_scores_max_overrun_time", 0
-                        )
-                    )
-                    if (
-                        max_overrun_time.to_msec() > 0
-                        and result_time > max_time + max_overrun_time
-                    ):
-                        result.status = ResultStatus.OVERTIME
+                cls.check_overtime(result)
 
             result.status_comment = StatusComments().get_status_default_comment(
                 result.status
@@ -174,6 +159,30 @@ class ResultChecker:
                 msec=race().get_setting("marked_route_penalty_time", 60000)
             )
             result.penalty_time = time_for_one_penalty * penalty
+
+    @classmethod
+    def check_overtime(cls, result: Result):
+        rp_mode = race().get_setting("result_processing_mode", "time")
+        race_type = result.get_race_type()
+
+        if race_type == RaceType.MULTI_DAY_RACE:
+            result_time = result.get_result_otime_current_day()
+        else:
+            result_time = result.get_result_otime()
+
+        max_time = result.person.group.max_time
+        if rp_mode in ("time", "ardf"):
+            if result_time > max_time:
+                result.status = ResultStatus.OVERTIME
+        elif rp_mode == "scores":
+            max_overrun_time = OTime(
+                msec=race().get_setting("result_processing_scores_max_overrun_time", 0)
+            )
+            if (
+                max_overrun_time.to_msec() > 0
+                and result_time > max_time + max_overrun_time
+            ):
+                result.status = ResultStatus.OVERTIME
 
     @staticmethod
     def get_marked_route_incorrect_list(controls):
