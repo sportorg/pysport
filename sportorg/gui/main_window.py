@@ -13,11 +13,13 @@ try:
     from PySide6 import QtCore, QtGui, QtWidgets
     from PySide6.QtCore import QTimer
     from PySide6.QtGui import QAction
-    from PySide6.QtWidgets import QMainWindow, QMessageBox
+    from PySide6.QtWidgets import QMainWindow, QMessageBox, QFileDialog
+    from PySide6.QtWidgets import QMainWindow, QMessageBox, QFileDialog
 except ModuleNotFoundError:
     from PySide2 import QtCore, QtGui, QtWidgets
     from PySide2.QtCore import QTimer
-    from PySide2.QtWidgets import QAction, QMainWindow, QMessageBox
+    from PySide2.QtWidgets import QAction, QMainWindow, QMessageBox, QFileDialog
+    from PySide2.QtWidgets import QAction, QMainWindow, QMessageBox, QFileDialog
 
 from sportorg import config, settings
 from sportorg.gui.dialogs.course_edit import CourseEditDialog
@@ -74,6 +76,7 @@ from sportorg.modules.teamwork.teamwork import (
     configure_teamwork_from_settings,
 )
 from sportorg.modules.telegram.telegram import telegram_client
+
 
 
 class ConsolePanelHandler(logging.Handler):
@@ -478,8 +481,10 @@ class MainWindow(QMainWindow):
         self.menubar.setGeometry(QtCore.QRect(0, 0, 880, 21))
         self.setMenuBar(self.menubar)
         self._create_menu(self.menubar, menu_list())
+        
+    
 
-    def _setup_toolbar(self) -> None:
+    def _setup_toolbar(self):
         self.toolbar = self.addToolBar(translate("Toolbar"))
         for tb in toolbar_list():
             if len(tb) == 5:
