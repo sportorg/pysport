@@ -122,6 +122,7 @@ class TestSFRxExporter:
         person = Mock(spec=Person)
         person.name = name
         person.surname = surname
+        person.middle_name = kwargs.get('middle_name', '')
         person.bib = bib
         person.group = group
         person.organization = organization

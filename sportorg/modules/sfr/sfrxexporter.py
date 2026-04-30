@@ -416,7 +416,6 @@ def _format_time(dt):
             
     except Exception as e:
         logging.debug(f"Time formatting error for {type(dt)}: {e}")
-    
     return ""
 
 def _convert_to_datetime(time_obj):
@@ -445,7 +444,6 @@ def _convert_to_datetime(time_obj):
     
     except Exception as e:
         logging.debug(f"Time conversion error: {e}")
-    
     return None
 
 def _calculate_result_time(start_time, finish_time):
@@ -472,7 +470,6 @@ def _calculate_result_time(start_time, finish_time):
             
     except Exception as e:
         logging.debug(f"Result time calculation error: {e}")
-    
     return ""
 
 def sportorg_qual_to_sfr(qual: Qualification) -> str:
