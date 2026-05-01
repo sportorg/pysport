@@ -33,7 +33,7 @@ from sportorg.common.otime import OTime
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox, AdvSpinBox, AdvTimeEdit
 from sportorg.language import translate
-from sportorg.models.memory import race, SystemType
+from sportorg.models.memory import SystemType, race
 from sportorg.models.result.result_tools import recalculate_results
 from sportorg.modules.sportident.sireader import SIReaderClient
 
@@ -179,7 +179,9 @@ class TimekeepingPropertiesDialog(QDialog):
         self.rp_scores_layout.addRow(
             self.rp_scores_max_overrun_time_label, self.rp_scores_max_overrun_time
         )
-        self.rp_scores_allow_duplicates = QCheckBox(translate("allow duplicates"))
+        self.rp_scores_allow_duplicates = QCheckBox(
+            translate("allow duplicates") + " 🛈"
+        )
         self.rp_scores_allow_duplicates.setToolTip(
             translate(
                 "Use this option to count one punch several times,"
@@ -241,20 +243,20 @@ class TimekeepingPropertiesDialog(QDialog):
         self.mr_off_radio.setToolTip(translate("No penalty"))
         self.mr_off_radio.toggled.connect(self.penalty_calculation_mode)
         self.mr_layout.addRow(self.mr_off_radio)
-        self.mr_time_radio = QRadioButton(translate("penalty time"))
+        self.mr_time_radio = QRadioButton(translate("penalty time") + " 🛈")
         self.mr_time_radio.setToolTip(
             translate("Penalty calculation mode: penalty time")
         )
         self.mr_time_radio.toggled.connect(self.penalty_calculation_mode)
         self.mr_time_edit = AdvTimeEdit(display_format=self.time_format)
         self.mr_layout.addRow(self.mr_time_radio, self.mr_time_edit)
-        self.mr_laps_radio = QRadioButton(translate("penalty laps"))
+        self.mr_laps_radio = QRadioButton(translate("penalty laps") + " 🛈")
         self.mr_laps_radio.setToolTip(
             translate("Penalty calculation mode: penalty laps")
         )
         self.mr_laps_radio.toggled.connect(self.penalty_calculation_mode)
         self.mr_layout.addRow(self.mr_laps_radio)
-        self.mr_counting_lap_check = QCheckBox(translate("counting lap"))
+        self.mr_counting_lap_check = QCheckBox(translate("counting lap") + " 🛈")
         self.mr_counting_lap_check.setToolTip(
             translate(
                 "Operating mode: evaluation point\n"
@@ -264,7 +266,7 @@ class TimekeepingPropertiesDialog(QDialog):
         )
         self.mr_counting_lap_check.stateChanged.connect(self.penalty_calculation_mode)
         self.mr_layout.addRow(self.mr_counting_lap_check)
-        self.mr_lap_station_check = QCheckBox(translate("lap station"))
+        self.mr_lap_station_check = QCheckBox(translate("lap station") + " 🛈")
         self.mr_lap_station_check.setToolTip(
             translate(
                 "Station number on the penalty lap\n"
