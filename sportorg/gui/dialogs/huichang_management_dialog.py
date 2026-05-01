@@ -1,38 +1,38 @@
-import logging
 import functools
+import logging
 
 try:
     from PySide6.QtCore import Qt
     from PySide6.QtWidgets import (
         QDialog,
-        QVBoxLayout,
-        QHBoxLayout,
         QGroupBox,
-        QPushButton,
-        QSpinBox,
-        QRadioButton,
+        QHBoxLayout,
         QLabel,
+        QPushButton,
+        QRadioButton,
+        QSpinBox,
         QStyle,
+        QVBoxLayout,
     )
 except ModuleNotFoundError:
     from PySide2.QtCore import Qt
     from PySide2.QtWidgets import (
         QDialog,
-        QVBoxLayout,
-        QHBoxLayout,
         QGroupBox,
-        QPushButton,
-        QSpinBox,
-        QRadioButton,
+        QHBoxLayout,
         QLabel,
+        QPushButton,
+        QRadioButton,
+        QSpinBox,
         QStyle,
+        QVBoxLayout,
     )
 
-from sportorg.libs.huichang.huichang import Huichang, HuichangException
-from sportorg.modules.sportident.sireader import SIReaderClient
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import AdvComboBox
 from sportorg.language import translate
+from sportorg.libs.huichang.huichang import Huichang, HuichangException
+from sportorg.modules.sportident.sireader import SIReaderClient
 
 
 class HuichangManagementDialog(QDialog):
@@ -51,7 +51,7 @@ class HuichangManagementDialog(QDialog):
         self.setWindowTitle(translate("Huichang Management"))
         self.layout = QVBoxLayout(self)
 
-        self.label_port = QLabel(translate("Port"))
+        self.label_port = QLabel(translate("Port") + " 🛈")
         self.item_port = AdvComboBox()
         self.scan_port_button = QPushButton()
         pixmapi = QStyle.SP_BrowserReload
@@ -71,7 +71,7 @@ class HuichangManagementDialog(QDialog):
         self.time_group_box = QGroupBox(translate("Time Calibration"))
         self.time_layout = QVBoxLayout(self.time_group_box)
 
-        self.time_sync_button = QPushButton(translate("Time Sync"))
+        self.time_sync_button = QPushButton(translate("Time Sync") + " 🛈")
         self.time_sync_button.clicked.connect(self.time_sync)
         self.time_sync_button.setToolTip(
             translate("Send current system time to the connected station")
@@ -97,7 +97,7 @@ class HuichangManagementDialog(QDialog):
         self.station_spin.setValue(31)
         self.station_manual_rb.toggled.connect(self.station_spin.setEnabled)
 
-        self.station_number_apply_button = QPushButton(translate("Apply"))
+        self.station_number_apply_button = QPushButton(translate("Apply") + " 🛈")
         self.station_number_apply_button.setToolTip(
             translate("Set new number for the connected station")
         )
