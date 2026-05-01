@@ -1583,6 +1583,7 @@ class RaceData(Model):
     def __init__(self):
         self.title = ""
         self.description = ""
+        self.short_title: str = ""
         self.location = ""
         self.chief_referee = ""
         self.secretary = ""
@@ -1616,6 +1617,7 @@ class RaceData(Model):
         return {
             "title": self.title,
             "description": self.description,
+            "short_title": self.short_title,
             "location": self.location,
             "chief_referee": self.chief_referee,
             "secretary": self.secretary,
@@ -1629,6 +1631,7 @@ class RaceData(Model):
     def update_data(self, data):
         self.title = str(data["title"])
         self.description = str(data["description"])
+        self.short_title = str(data.get("short_title", ""))
         self.location = str(data["location"])
         self.chief_referee = str(data["chief_referee"])
         self.secretary = str(data["secretary"])

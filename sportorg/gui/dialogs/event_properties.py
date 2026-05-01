@@ -48,15 +48,34 @@ class EventPropertiesDialog(QDialog):
 
         self.layout = QFormLayout(self)
 
-        self.label_main_title = QLabel(translate("Main title"))
+        self.label_main_title = QLabel(translate("Main title") + " 🛈")
+        self.label_main_title.setToolTip(
+            translate(
+                "Main event name. This will be used in the printout\nsplit header and in some printed protocols."
+            )
+        )
         self.item_main_title = QLineEdit()
         self.layout.addRow(self.label_main_title, self.item_main_title)
 
-        self.label_sub_title = QLabel(translate("Sub title"))
+        self.label_sub_title = QLabel(translate("Sub title") + " 🛈")
+        self.label_sub_title.setToolTip(
+            translate(
+                "The sub title of the event. It will be used\nin the header of the printed protocol."
+            )
+        )
         self.item_sub_title = QTextEdit()
         self.item_sub_title.setMaximumHeight(100)
         self.item_sub_title.setTabChangesFocus(True)
         self.layout.addRow(self.label_sub_title, self.item_sub_title)
+
+        self.label_short_title = QLabel(translate("Short title") + " 🛈")
+        self.label_short_title.setToolTip(
+            translate(
+                "Brief operator-only label. Shown in the window\ntitle and event list, not printed in protocols."
+            )
+        )
+        self.item_short_title = QLineEdit()
+        self.layout.addRow(self.label_short_title, self.item_short_title)
 
         self.label_start_date = QLabel(translate("Start date"))
         self.item_start_date = QDateTimeEdit()
@@ -128,6 +147,10 @@ class EventPropertiesDialog(QDialog):
         obj = race()
         self.item_main_title.setText(str(obj.data.title))
         self.item_sub_title.setText(str(obj.data.description))
+        self.item_short_title.setText(str(obj.data.short_title))
+        self.item_short_title.setPlaceholderText(
+            obj.data.get_start_datetime().strftime("%Y-%m-%d")
+        )
         self.item_location.setText(str(obj.data.location))
         self.item_url.setText(str(obj.data.url))
         self.item_refery.setText(str(obj.data.chief_referee))
@@ -146,6 +169,7 @@ class EventPropertiesDialog(QDialog):
 
         obj.data.title = self.item_main_title.text()
         obj.data.description = self.item_sub_title.toPlainText()
+        obj.data.short_title = self.item_short_title.text()
         obj.data.description = obj.data.description.replace("\n", "<br>\n")
         obj.data.location = self.item_location.text()
         obj.data.url = self.item_url.text()
