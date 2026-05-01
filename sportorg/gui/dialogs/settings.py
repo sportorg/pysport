@@ -294,7 +294,9 @@ class MultidayTab(Tab):
 
         self.item_races.clear()
         for cur_race in races():
-            race_list.append(str(cur_race.data.get_start_datetime()))
+            race_list.append(
+                cur_race.data.short_title or str(cur_race.data.get_start_datetime())
+            )
         self.item_races.addItems(race_list)
 
         self.item_races.setCurrentIndex(index)

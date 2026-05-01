@@ -566,10 +566,13 @@ class MainWindow(QMainWindow):
     def set_title(self, title=None):
         main_title = "{} {}".format(config.NAME, config.VERSION)
         if title:
-            self.setWindowTitle("{} - {}".format(title, main_title))
+            self.setWindowTitle("{} — {}".format(title, main_title))
         elif self.file:
+            label = race().data.short_title or os.path.basename(self.file)
             self.set_title(
-                "{} [{}]".format(race().data.get_start_datetime(), self.file)
+                "{} [{}] [{}]".format(
+                    label, race().data.get_start_datetime(), self.file
+                )
             )
         else:
             self.setWindowTitle(main_title)

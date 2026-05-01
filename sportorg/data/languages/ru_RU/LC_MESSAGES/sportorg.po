@@ -180,6 +180,18 @@ msgstr "Название соревнований"
 msgid "Sub title"
 msgstr "Заголовок"
 
+msgid "Main event name. This will be used in the printout\nsplit header and in some printed protocols."
+msgstr "Основное название соревнований. Используется\nв заголовке печатных протоколов и карточках с результатами."
+
+msgid "The sub title of the event. It will be used\nin the header of the printed protocol."
+msgstr "Подзаголовок соревнований. Используется\nв шапке печатных протоколов."
+
+msgid "Short title"
+msgstr "Короткое название"
+
+msgid "Brief operator-only label. Shown in the window\ntitle and event list, not printed in protocols."
+msgstr "Только для оператора. Отображается в заголовке\nокна и списке соревнований, в протоколах не печатается."
+
 msgid "Start date"
 msgstr "Дата начала"
 
