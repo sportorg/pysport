@@ -30,6 +30,7 @@
 + Added Huichang Timing System support ([#550](https://github.com/sportorg/pysport/pull/550))
 + Changed the principle of penalty calculation for standard course. Now if person just missed 1 point, it gives 1 penalty score
 + Added conversion of qualification names in various formats
++ Added short title field in event properties: shown in the window title and multi-day race selector
 
 ### Fixes
 
