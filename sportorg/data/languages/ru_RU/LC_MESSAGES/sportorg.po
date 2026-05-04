@@ -1587,6 +1587,12 @@ msgstr "Максимум промежуточных КП"
 msgid "IOF xml"
 msgstr "Файл IOF XML v.3"
 
+msgid "toSFR"
+msgstr "Файл SFRX"
+
+msgid "Export completed successfully"
+msgstr "Экспорт выполнен успешно"
+
 msgid "EntrytList"
 msgstr "EntrytList (заявки)"
 
