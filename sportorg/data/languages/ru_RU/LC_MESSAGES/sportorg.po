@@ -1590,8 +1590,29 @@ msgstr "Файл IOF XML v.3"
 msgid "toSFR"
 msgstr "Файл SFRX"
 
+msgid "Export to SFR"
+msgstr "Экспорт в SFR"
+
+msgid "SFR files (*.sfrx)"
+msgstr "Файлы SFR (*.sfrx)"
+
+msgid "SFR export not available"
+msgstr "Экспорт SFR недоступен"
+
 msgid "Export completed successfully"
 msgstr "Экспорт выполнен успешно"
+
+msgid "Export completed successfully to {}"
+msgstr "Экспорт выполнен успешно в {}"
+
+msgid "Export failed"
+msgstr "Ошибка экспорта"
+
+msgid "No race data found"
+msgstr "Данные соревнования не найдены"
+
+msgid "Export error: {}"
+msgstr "Ошибка экспорта: {}"
 
 msgid "EntrytList"
 msgstr "EntrytList (заявки)"

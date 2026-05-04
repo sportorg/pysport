@@ -9,6 +9,7 @@
 + Import of full date of birth
 + Optional build on Pyside2 (Qt5) / Pyside6 (Qt6)
 + Import form SFRX files (SFR)
++ Export to SFRX files with event data, courses, competitors, results, and splits
 + Course indexing by name
 + New "in list" operator in table filtering
 + Default value for auto-save has been increased from 5 seconds to 5 minutes ([#497](https://github.com/sportorg/pysport/pull/497))
