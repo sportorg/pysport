@@ -6,6 +6,11 @@ from typing import Any, Dict, Optional, Tuple
 from sportorg import config
 from sportorg.libs.settings import load_settings, save_settings
 
+FEATURE_SFR = "sfr"
+DEFAULT_FEATURES = {
+    FEATURE_SFR: True,
+}
+
 
 @dataclass
 class Settings:
@@ -36,6 +41,7 @@ class Settings:
     ranking: Dict[str, Any] = field(default_factory=dict)
     ranking_ardf: Dict[str, Any] = field(default_factory=dict)
     live_gzip_enabled: bool = True
+    features: Dict[str, bool] = field(default_factory=lambda: DEFAULT_FEATURES.copy())
 
     telegram_token: str = ""
     teamwork_host: str = "localhost"
@@ -75,6 +81,22 @@ def load_settings_from_file(path: str = config.SETTINGS_JSON) -> Tuple[Settings,
 
 def save_settings_to_file(path: str = config.SETTINGS_JSON) -> None:
     save_settings(SETTINGS, Path(path))
+
+
+def get_feature_flags() -> Dict[str, bool]:
+    feature_flags = DEFAULT_FEATURES.copy()
+    stored_features = SETTINGS.features if isinstance(SETTINGS.features, dict) else {}
+    feature_flags.update(stored_features)
+    return feature_flags
+
+
+def is_feature_enabled(feature: str) -> bool:
+    return bool(get_feature_flags().get(feature, True))
+
+
+def set_feature_enabled(feature: str, enabled: bool) -> None:
+    SETTINGS.features = get_feature_flags()
+    SETTINGS.features[feature] = bool(enabled)
 
 
 def template_dir(*paths) -> str:

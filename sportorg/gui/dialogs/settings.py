@@ -198,6 +198,25 @@ class SoundTab(Tab):
         settings.SETTINGS.sound_enter_number_path = self.item_enter_number.currentText()
 
 
+class FunctionsTab(Tab):
+    def __init__(self, parent):
+        self.widget = QWidget()
+        self.layout = QFormLayout(parent)
+
+        self.widget.setLayout(self.layout)
+
+        self.item_sfr_support = QCheckBox(translate("SFR support"))
+        self.item_sfr_support.setChecked(
+            settings.is_feature_enabled(settings.FEATURE_SFR)
+        )
+        self.layout.addRow(self.item_sfr_support)
+
+    def save(self):
+        settings.set_feature_enabled(
+            settings.FEATURE_SFR, self.item_sfr_support.isChecked()
+        )
+
+
 class MultidayTab(Tab):
     def __init__(self, parent):
         self.widget = QWidget()
@@ -380,6 +399,7 @@ class SettingsDialog(QDialog):
         super().__init__(GlobalAccess().get_main_window())
         self.widgets = [
             (MainTab(self), translate("Main settings")),
+            (FunctionsTab(self), translate("Functions")),
             (SoundTab(self), translate("Sounds")),
             (MultidayTab(self), translate("Multi day")),
             (TemplateTab(self), translate("Templates directory")),
@@ -427,5 +447,7 @@ class SettingsDialog(QDialog):
     def apply_changes_impl(self):
         for tab, _ in self.widgets:
             tab.save()
-        GlobalAccess().get_main_window().refresh()
+        main_window = GlobalAccess().get_main_window()
+        main_window.refresh_menu()
+        main_window.refresh()
         settings.save_settings_to_file()

@@ -471,6 +471,12 @@ msgstr "Звук при запросе номера"
 msgid "Main settings"
 msgstr "Основные настройки"
 
+msgid "Functions"
+msgstr "Функции"
+
+msgid "SFR support"
+msgstr "Поддержка SFR"
+
 msgid "Sounds"
 msgstr "Звуки"
 
@@ -905,9 +911,6 @@ msgstr "Открыть файл CSV Winorient"
 
 msgid "CSV Winorient (*.csv)"
 msgstr "Файл CSV Winorient (*.csv)"
-
-msgid "file SFRX"
-msgstr "Файл SFRX"
 
 msgid "Open SFRX file"
 msgstr "Открыть файл SFRX"
@@ -1587,14 +1590,8 @@ msgstr "Максимум промежуточных КП"
 msgid "IOF xml"
 msgstr "Файл IOF XML v.3"
 
-msgid "toSFR"
-msgstr "Файл SFRX"
-
 msgid "Export to SFR"
 msgstr "Экспорт в SFR"
-
-msgid "SFR files (*.sfrx)"
-msgstr "Файлы SFR (*.sfrx)"
 
 msgid "SFR export not available"
 msgstr "Экспорт SFR недоступен"

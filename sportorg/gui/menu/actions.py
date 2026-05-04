@@ -982,7 +982,7 @@ class SFRExportAction(Action, metaclass=ActionFactory):
     def execute(self):
         file_name = get_save_file_name(
             translate("Export to SFR"),
-            translate("SFR files (*.sfrx)"),
+            translate("SFRX (*.sfrx)"),
             "{}_sfr_export".format(race().data.get_start_datetime().strftime("%Y%m%d")),
         )
         if file_name:

@@ -428,12 +428,14 @@ class MainWindow(QMainWindow):
         )
 
     def _create_menu(self, parent, actions_list):
+        has_visible_items = False
         for action_item in actions_list:
             if "show" in action_item and not action_item["show"]:
-                return
+                continue
             if "type" in action_item:
                 if action_item["type"] == "separator":
                     parent.addSeparator()
+                    has_visible_items = True
             elif "action" in action_item:
                 action = QAction(self)
                 action.setText(action_item["title"])
@@ -461,6 +463,7 @@ class MainWindow(QMainWindow):
                     parent.addAction(action)
                 if "id" in action_item:
                     self.action_by_id[action_item["id"]] = action
+                has_visible_items = True
             else:
                 menu = QtWidgets.QMenu(parent)
                 menu.setTitle(action_item["title"])
@@ -470,14 +473,25 @@ class MainWindow(QMainWindow):
                     self.menu_list_for_disabled.append((menu, action_item["tabs"]))
                 if "id" in action_item:
                     self.action_by_id[action_item["id"]] = menu
-                self._create_menu(menu, action_item["actions"])
-                parent.addAction(menu.menuAction())
+                if self._create_menu(menu, action_item["actions"]):
+                    parent.addAction(menu.menuAction())
+                    has_visible_items = True
+        return has_visible_items
 
     def _setup_menu(self):
         self.menubar = QtWidgets.QMenuBar(self)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 880, 21))
         self.setMenuBar(self.menubar)
         self._create_menu(self.menubar, menu_list())
+
+    def refresh_menu(self):
+        self.menu_property = {}
+        self.menu_list_for_disabled = []
+        self.action_by_id = {}
+        self.menubar.clear()
+        self._create_menu(self.menubar, menu_list())
+        if hasattr(self, "tabwidget"):
+            self._menu_disable(self.current_tab)
 
     def _setup_toolbar(self) -> None:
         self.toolbar = self.addToolBar(translate("Toolbar"))

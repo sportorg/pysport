@@ -1,9 +1,55 @@
-from sportorg import config
+from typing import Any, Dict, List
+
+from sportorg import config, settings
 from sportorg.language import translate
+
+MenuItem = Dict[str, Any]
+
+
+def _is_menu_item_visible(item: MenuItem) -> bool:
+    if item.get("show") is False:
+        return False
+
+    feature = item.get("feature")
+    if feature and not settings.is_feature_enabled(feature):
+        return False
+
+    return True
+
+
+def filter_menu_items(menu_items: List[MenuItem]) -> List[MenuItem]:
+    filtered_items = []
+    previous_is_separator = False
+
+    for item in menu_items:
+        if not _is_menu_item_visible(item):
+            continue
+
+        item_copy = item.copy()
+        if "actions" in item:
+            nested_actions = filter_menu_items(item["actions"])
+            if not nested_actions:
+                continue
+            item_copy["actions"] = nested_actions
+
+        is_separator = item_copy.get("type") == "separator"
+        if is_separator:
+            if not filtered_items or previous_is_separator:
+                continue
+            previous_is_separator = True
+        else:
+            previous_is_separator = False
+
+        filtered_items.append(item_copy)
+
+    if filtered_items and filtered_items[-1].get("type") == "separator":
+        filtered_items.pop()
+
+    return filtered_items
 
 
 def menu_list():
-    return [
+    items = [
         {
             "title": translate("File"),
             "actions": [
@@ -66,8 +112,9 @@ def menu_list():
                             "action": "WDBWinorientImportAction",
                         },
                         {
-                            "title": translate("file SFRX"),
+                            "title": translate("SFRX"),
                             "action": "SFRXImportAction",
+                            "feature": settings.FEATURE_SFR,
                         },
                         {
                             "title": translate("Ocad txt v8"),
@@ -132,8 +179,9 @@ def menu_list():
                             ],
                         },
                         {
-                            "title": translate("toSFR"),
+                            "title": translate("SFRX"),
                             "action": "SFRExportAction",
+                            "feature": settings.FEATURE_SFR,
                         },
                     ],
                 },
@@ -254,7 +302,10 @@ def menu_list():
                     "shortcut": "F6",
                     "action": "StartPreparationAction",
                 },
-                {"title": translate("Guess courses"), "action": "GuessCoursesAction"},
+                {
+                    "title": translate("Guess courses"),
+                    "action": "GuessCoursesAction",
+                },
                 {
                     "title": translate("Guess corridors"),
                     "action": "GuessCorridorsAction",
@@ -272,7 +323,10 @@ def menu_list():
                     "title": translate("Handicap start time"),
                     "action": "StartHandicapAction",
                 },
-                {"title": translate("Clone relay legs"), "action": "RelayCloneAction"},
+                {
+                    "title": translate("Clone relay legs"),
+                    "action": "RelayCloneAction",
+                },
                 {
                     "title": translate("Use bib as card number"),
                     "action": "CopyBibToCardNumber",
@@ -358,7 +412,10 @@ def menu_list():
                 },
                 {"title": translate("Delete CP"), "action": "CPDeleteAction"},
                 {"title": translate("Delete Split"), "action": "SplitDeleteAction"},
-                {"title": translate("Merge results"), "action": "MergeResultsAction"},
+                {
+                    "title": translate("Merge results"),
+                    "action": "MergeResultsAction",
+                },
                 {
                     "title": translate("Assign result by bib"),
                     "action": "AssignResultByBibAction",
@@ -467,7 +524,11 @@ def menu_list():
                     "shortcut": "F1",
                     "action": "AboutAction",
                 },
-                {"title": translate("Check updates"), "action": "CheckUpdatesAction"},
+                {
+                    "title": translate("Check updates"),
+                    "action": "CheckUpdatesAction",
+                },
             ],
         },
     ]
+    return filter_menu_items(items)
