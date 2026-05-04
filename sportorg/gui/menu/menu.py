@@ -106,10 +106,12 @@ def menu_list():
                             "title": translate("CSV Winorient"),
                             "icon": config.icon_dir("csv.svg"),
                             "action": "CSVWinorientImportAction",
+                            "feature": settings.FEATURE_WINORIENT,
                         },
                         {
                             "title": translate("WDB Winorient"),
                             "action": "WDBWinorientImportAction",
+                            "feature": settings.FEATURE_WINORIENT,
                         },
                         {
                             "title": translate("SFRX"),
@@ -127,10 +129,12 @@ def menu_list():
                         {
                             "title": translate("SPORTident master station CSV"),
                             "action": "RecoverySportidentMasterCsvAction",
+                            "feature": settings.FEATURE_SPORTIDENT,
                         },
                         {
                             "title": translate("SportOrg SI log"),
                             "action": "RecoverySportorgSiLogAction",
+                            "feature": settings.FEATURE_SPORTIDENT,
                         },
                         {
                             "title": translate("Orgeo.ru CSV"),
@@ -152,6 +156,7 @@ def menu_list():
                         {
                             "title": translate("WDB Winorient"),
                             "action": "WDBWinorientExportAction",
+                            "feature": settings.FEATURE_WINORIENT,
                         },
                         {
                             "title": translate("IOF xml"),
@@ -358,6 +363,7 @@ def menu_list():
                     "title": translate("Add SPORTident result"),
                     "shortcut": "F7",
                     "action": "AddSPORTidentResultAction",
+                    "feature": settings.FEATURE_SPORTIDENT,
                 },
             ],
         },
@@ -434,11 +440,13 @@ def menu_list():
                     "icon": config.icon_dir("sportident.png"),
                     "shortcut": "F8",
                     "action": "CardReadoutAction",
+                    "feature": settings.FEATURE_SPORTIDENT,
                 },
                 {
                     "title": translate("Huichang management"),
                     "action": "HuichangManagementAction",
                     "id": "huichang_management",
+                    "feature": settings.FEATURE_HUICHANG,
                 },
                 {
                     "title": translate("Teamwork"),
@@ -461,6 +469,7 @@ def menu_list():
                 },
                 {
                     "title": translate("Telegram"),
+                    "feature": settings.FEATURE_TELEGRAM,
                     "actions": [
                         {
                             "title": translate("Send results"),
@@ -509,6 +518,7 @@ def menu_list():
                 {
                     "title": translate("Telegram"),
                     "action": "TelegramSettingsAction",
+                    "feature": settings.FEATURE_TELEGRAM,
                 },
                 {
                     "title": translate("Rent cards"),

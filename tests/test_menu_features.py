@@ -1,6 +1,8 @@
 import importlib.util
 from pathlib import Path
 
+import pytest
+
 from sportorg import settings
 
 
@@ -22,21 +24,81 @@ def _action_names(menu_items):
     return names
 
 
-def test_sfr_menu_items_visible_by_default():
+def test_punch_system_features_enabled_by_default():
     old_features = settings.SETTINGS.features
     try:
         settings.SETTINGS.features = {}
 
-        assert "SFRXImportAction" in _action_names(_load_menu_module().menu_list())
+        for feature in (
+            settings.FEATURE_SPORTIDENT,
+            settings.FEATURE_SFR,
+            settings.FEATURE_SPORTIDUINO,
+            settings.FEATURE_RFID_IMPINJ,
+            settings.FEATURE_SRPID,
+            settings.FEATURE_HUICHANG,
+        ):
+            assert settings.is_feature_enabled(feature)
     finally:
         settings.SETTINGS.features = old_features
 
 
-def test_sfr_menu_items_hidden_when_feature_disabled():
+def test_feature_menu_items_visible_by_default():
     old_features = settings.SETTINGS.features
     try:
-        settings.set_feature_enabled(settings.FEATURE_SFR, False)
+        settings.SETTINGS.features = {}
+        action_names = _action_names(_load_menu_module().menu_list())
 
-        assert "SFRXImportAction" not in _action_names(_load_menu_module().menu_list())
+        assert "SFRXImportAction" in action_names
+        assert "SFRExportAction" in action_names
+        assert "HuichangManagementAction" in action_names
+        assert "AddSPORTidentResultAction" in action_names
+        assert "CSVWinorientImportAction" in action_names
+        assert "TelegramSendAction" in action_names
+        assert "TelegramSettingsAction" in action_names
+    finally:
+        settings.SETTINGS.features = old_features
+
+
+@pytest.mark.parametrize(
+    ("feature", "actions"),
+    [
+        (
+            settings.FEATURE_SFR,
+            ("SFRXImportAction", "SFRExportAction"),
+        ),
+        (
+            settings.FEATURE_HUICHANG,
+            ("HuichangManagementAction",),
+        ),
+        (
+            settings.FEATURE_SPORTIDENT,
+            (
+                "AddSPORTidentResultAction",
+                "RecoverySportidentMasterCsvAction",
+                "RecoverySportorgSiLogAction",
+            ),
+        ),
+        (
+            settings.FEATURE_WINORIENT,
+            (
+                "CSVWinorientImportAction",
+                "WDBWinorientImportAction",
+                "WDBWinorientExportAction",
+            ),
+        ),
+        (
+            settings.FEATURE_TELEGRAM,
+            ("TelegramSendAction", "TelegramSettingsAction"),
+        ),
+    ],
+)
+def test_menu_items_hidden_when_feature_disabled(feature, actions):
+    old_features = settings.SETTINGS.features
+    try:
+        settings.set_feature_enabled(feature, False)
+        action_names = _action_names(_load_menu_module().menu_list())
+
+        for action in actions:
+            assert action not in action_names
     finally:
         settings.SETTINGS.features = old_features

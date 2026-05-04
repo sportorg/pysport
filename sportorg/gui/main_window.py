@@ -251,10 +251,11 @@ class MainWindow(QMainWindow):
                 )
             )
 
-        huichang_management_action = self.action_by_id["huichang_management"]
-        huichang_management_action.setEnabled(
-            race().get_punch_system() == SystemType.HUICHANG
-        )
+        huichang_management_action = self.action_by_id.get("huichang_management")
+        if huichang_management_action is not None:
+            huichang_management_action.setEnabled(
+                race().get_punch_system() == SystemType.HUICHANG
+            )
 
         if Teamwork().is_alive() != self.teamwork_status:
             self.toolbar_property["teamwork"].setIcon(

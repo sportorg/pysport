@@ -474,8 +474,6 @@ msgstr "Основные настройки"
 msgid "Functions"
 msgstr "Функции"
 
-msgid "SFR support"
-msgstr "Поддержка SFR"
 
 msgid "Sounds"
 msgstr "Звуки"
@@ -1073,6 +1071,9 @@ msgstr "Запустить/остановить чтение чипов SFR"
 
 msgid "Punch system"
 msgstr "Система отметки"
+
+msgid "Punch system features are disabled"
+msgstr "Функции систем отметки выключены"
 
 msgid "Send selected"
 msgstr "Отправить выбранные"

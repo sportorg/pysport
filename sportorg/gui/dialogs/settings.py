@@ -205,16 +205,25 @@ class FunctionsTab(Tab):
 
         self.widget.setLayout(self.layout)
 
-        self.item_sfr_support = QCheckBox(translate("SFR support"))
-        self.item_sfr_support.setChecked(
-            settings.is_feature_enabled(settings.FEATURE_SFR)
-        )
-        self.layout.addRow(self.item_sfr_support)
+        self.feature_checkboxes = {}
+        for feature, title in (
+            (settings.FEATURE_SPORTIDENT, "SPORTident"),
+            (settings.FEATURE_SFR, "SFR"),
+            (settings.FEATURE_SPORTIDUINO, "Sportiduino (Clever)"),
+            (settings.FEATURE_RFID_IMPINJ, "RFID Impinj"),
+            (settings.FEATURE_SRPID, "SRPID"),
+            (settings.FEATURE_HUICHANG, "Huichang"),
+            (settings.FEATURE_WINORIENT, "Winorient"),
+            (settings.FEATURE_TELEGRAM, "Telegram"),
+        ):
+            checkbox = QCheckBox(translate(title))
+            checkbox.setChecked(settings.is_feature_enabled(feature))
+            self.feature_checkboxes[feature] = checkbox
+            self.layout.addRow(checkbox)
 
     def save(self):
-        settings.set_feature_enabled(
-            settings.FEATURE_SFR, self.item_sfr_support.isChecked()
-        )
+        for feature, checkbox in self.feature_checkboxes.items():
+            settings.set_feature_enabled(feature, checkbox.isChecked())
 
 
 class MultidayTab(Tab):

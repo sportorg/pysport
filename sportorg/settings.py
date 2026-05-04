@@ -7,8 +7,22 @@ from sportorg import config
 from sportorg.libs.settings import load_settings, save_settings
 
 FEATURE_SFR = "sfr"
+FEATURE_SPORTIDENT = "sportident"
+FEATURE_SPORTIDUINO = "sportiduino"
+FEATURE_RFID_IMPINJ = "rfid_impinj"
+FEATURE_SRPID = "srpid"
+FEATURE_HUICHANG = "huichang"
+FEATURE_WINORIENT = "winorient"
+FEATURE_TELEGRAM = "telegram"
 DEFAULT_FEATURES = {
+    FEATURE_SPORTIDENT: True,
     FEATURE_SFR: True,
+    FEATURE_SPORTIDUINO: True,
+    FEATURE_RFID_IMPINJ: True,
+    FEATURE_SRPID: True,
+    FEATURE_HUICHANG: True,
+    FEATURE_WINORIENT: True,
+    FEATURE_TELEGRAM: True,
 }
 
 
