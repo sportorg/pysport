@@ -33,7 +33,7 @@ class ReserveManager:
             persons = current_race.get_persons_by_group(current_group)
 
             existing_reserves = 0
-            if count > 0:
+            if count > 0 and persons:
                 for current_person in persons:
                     str_name = (
                         "" + str(current_person.surname) + str(current_person.name)

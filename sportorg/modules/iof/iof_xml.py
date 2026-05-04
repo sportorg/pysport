@@ -122,9 +122,11 @@ def import_from_variation_data(course_assignments) -> None:
                 course = find(obj.courses, name=course_name)
                 if course:
                     new_course = Course()
-                    new_course.name = (
-                        str(course_assignment["bib_number"]) + "." + str(leg_number)
-                    )
+                    if len(course_assignment["legs"]) > 1:
+                        new_course.name = f"{course_assignment['bib_number']}.{leg_number}"
+                    else:
+                        # one man relay is a kind of relay with 1 leg (Purple Pen)
+                        new_course.name = str(course_assignment["bib_number"])
                     new_course.length = course.length
                     new_course.controls = copy.deepcopy(course.controls)
                     obj.courses.append(new_course)
