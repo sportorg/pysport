@@ -1,0 +1,8 @@
+edition = "2024"
+format_strings = true
+group_imports = "StdExternalCrate"
+imports_granularity = "Crate"
+indent_style = "Block"
+merge_derives = true
+reorder_imports = true
+unstable_features = true

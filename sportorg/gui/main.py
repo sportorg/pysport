@@ -22,6 +22,7 @@ from sportorg.models.constant import (
     RentCards,
     StatusComments,
 )
+from sportorg.rust_example import log_rust_status
 
 
 class Application(metaclass=Singleton):
@@ -38,6 +39,7 @@ class Application(metaclass=Singleton):
         if config.DEBUG:
             generate_mo()
         freeze_support()
+        log_rust_status()
         try:
             self.load_settings()
         except Exception as e:

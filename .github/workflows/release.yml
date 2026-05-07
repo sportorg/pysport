@@ -23,8 +23,12 @@ jobs:
         with:
           python-version: '3.8'
           architecture: ${{ matrix.architecture }}
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
       - name: Install python dependencies
         run: pip install uv && uv sync --frozen --extra win --extra gui
+      - name: Build Rust extension
+        run: uv run poe develop-rust
       - name: Generate mo files
         run: uv run poe generate-mo
       - name: Generate version file
