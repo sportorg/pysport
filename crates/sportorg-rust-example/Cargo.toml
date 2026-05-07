@@ -1,0 +1,13 @@
+[package]
+name = "sportorg-rust-example"
+version = "0.1.0"
+edition.workspace = true
+publish = false
+
+[lib]
+name = "sportorg_rust_example"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = "0.28.3"
+

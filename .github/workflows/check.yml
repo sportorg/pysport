@@ -4,6 +4,12 @@ on:
   push:
     paths:
       - ".github/workflows/**"
+      - "Cargo.lock"
+      - "Cargo.toml"
+      - "crates/**"
+      - "pyproject.toml"
+      - "rust-toolchain.toml"
+      - "rustfmt.toml"
       - "sportorg/**"
       - "tests/**"
       - "uv.lock"
@@ -11,6 +17,12 @@ on:
   pull_request:
     paths:
       - ".github/workflows/**"
+      - "Cargo.lock"
+      - "Cargo.toml"
+      - "crates/**"
+      - "pyproject.toml"
+      - "rust-toolchain.toml"
+      - "rustfmt.toml"
       - "sportorg/**"
       - "tests/**"
       - "uv.lock"
@@ -30,9 +42,14 @@ jobs:
         with:
           python-version: ${{ matrix.python_version }}
           architecture: ${{ matrix.architecture }}
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
 
       - name: Install python dependencies
         run: pip install uv && uv sync --frozen --extra win --extra gui
+
+      - name: Build Rust extension
+        run: uv run poe build-rust
 
       - name: Run linters
         run: uv run poe lint
@@ -49,9 +66,14 @@ jobs:
         with:
           python-version: ${{ matrix.python_version }}
           architecture: ${{ matrix.architecture }}
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
 
       - name: Install python dependencies
         run: pip install uv && uv sync --frozen --extra win --extra gui
+
+      - name: Build Rust extension
+        run: uv run poe develop-rust
 
       - name: Run test
         run: uv run poe test
@@ -72,8 +94,12 @@ jobs:
         with:
           python-version: ${{ matrix.python_version }}
           architecture: ${{ matrix.architecture }}
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
       - name: Install python dependencies
         run: pip install uv && uv sync --frozen --extra win --extra gui
+      - name: Build Rust extension
+        run: uv run poe develop-rust
       - name: Generate mo files
         run: uv run poe generate-mo
       - name: Generate version file
