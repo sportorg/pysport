@@ -12,7 +12,7 @@ import dateutil.parser
 
 from sportorg import settings
 from sportorg.common.model import Model
-from sportorg.common.otime import OTime, TimeRounding
+from sportorg.common.otime import OTime, parse_time_rounding
 from sportorg.language import translate
 from sportorg.utils.time import date_to_ddmmyyyy, hhmmss_to_time
 
@@ -803,7 +803,9 @@ class Result(ABC):
         ret_ms = self.get_finish_time().to_msec() - self.get_start_time().to_msec()
         ret_ms += self.get_penalty_time().to_msec()
         ret_ms -= self.get_credit_time().to_msec()
-        return OTime(msec=ret_ms).round(time_accuracy, TimeRounding[time_rounding])
+        return OTime(msec=ret_ms).round(
+            time_accuracy, parse_time_rounding(time_rounding)
+        )
 
     def get_result_otime_relay(self):
         time_accuracy = race().get_setting("time_accuracy", 0)
@@ -826,7 +828,9 @@ class Result(ABC):
                     ret_ms -= res.get_credit_time().to_msec()
                 cur_bib -= 1000
 
-        return OTime(msec=ret_ms).round(time_accuracy, TimeRounding[time_rounding])
+        return OTime(msec=ret_ms).round(
+            time_accuracy, parse_time_rounding(time_rounding)
+        )
 
     def get_result_otime_multi_day(self):
         person_id = self.person.multi_day_id

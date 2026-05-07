@@ -1,16 +1,37 @@
 import datetime
-from enum import Enum
 from math import trunc
-from typing import Optional
+from typing import Optional, Type, TypeVar
+
+try:
+    from sportorg_core import OTime as _RustOTime
+except ModuleNotFoundError:
+    _RustOTime = None
 
 
-class TimeRounding(Enum):
+class TimeRounding:
     math = 0
     down = 1
     up = 2
 
 
-class OTime:
+_TIME_ROUNDING_BY_NAME = {
+    "math": TimeRounding.math,
+    "down": TimeRounding.down,
+    "up": TimeRounding.up,
+}
+
+
+def parse_time_rounding(value: str) -> int:
+    try:
+        return _TIME_ROUNDING_BY_NAME[value]
+    except KeyError as exc:
+        raise ValueError("time_rounding is invalid") from exc
+
+
+_PythonOTimeT = TypeVar("_PythonOTimeT", bound="PythonOTime")
+
+
+class PythonOTime:
     def __init__(
         self, day: int = 0, hour: int = 0, minute: int = 0, sec: int = 0, msec: int = 0
     ):
@@ -51,31 +72,25 @@ class OTime:
         return self._args
 
     def __eq__(self, other):
-        if not isinstance(other, OTime):
-            return False
         return self.to_msec() == other.to_msec()
 
     def __gt__(self, other):
-        if not isinstance(other, OTime):
-            return True
         return self.to_msec() > other.to_msec()
 
     def __ge__(self, other):
-        if not isinstance(other, OTime):
-            return False
         return self.to_msec() >= other.to_msec()
 
     def __add__(self, other):
-        return OTime(msec=(self.to_msec() + other.to_msec()))
+        return type(self)(msec=(self.to_msec() + other.to_msec()))
 
     def __sub__(self, other):
-        return OTime(msec=(self.to_msec() - other.to_msec()))
+        return type(self)(msec=(self.to_msec() - other.to_msec()))
 
     def __mul__(self, mlt):
-        return OTime(msec=int(self.to_msec() * mlt))
+        return type(self)(msec=int(self.to_msec() * mlt))
 
     def __truediv__(self, div):
-        return OTime(msec=int(self.to_msec() / div))
+        return type(self)(msec=int(self.to_msec() / div))
 
     def __int__(self):
         return self.to_msec()
@@ -90,12 +105,14 @@ class OTime:
         return self.to_msec() != 0
 
     @classmethod
-    def now(cls) -> "OTime":
+    def now(cls: Type[_PythonOTimeT]) -> _PythonOTimeT:
         now = datetime.datetime.now()
-        return OTime(0, now.hour, now.minute, now.second, round(now.microsecond / 1000))
+        return cls(0, now.hour, now.minute, now.second, round(now.microsecond / 1000))
 
-    def replace(self, day=None, hour=None, minute=None, sec=None, msec=None) -> "OTime":
-        return OTime(
+    def replace(
+        self: _PythonOTimeT, day=None, hour=None, minute=None, sec=None, msec=None
+    ) -> _PythonOTimeT:
+        return type(self)(
             self.if_none(day, self.day),
             self.if_none(hour, self.hour),
             self.if_none(minute, self.minute),
@@ -103,8 +120,8 @@ class OTime:
             self.if_none(msec, self.msec),
         )
 
-    def copy(self) -> "OTime":
-        return OTime(msec=self.to_msec())
+    def copy(self: _PythonOTimeT) -> _PythonOTimeT:
+        return type(self)(msec=self.to_msec())
 
     def to_minute(self):
         return trunc(self.to_msec() / (1000 * 60))
@@ -155,8 +172,10 @@ class OTime:
         raise ValueError("time_accuracy is invalid")
 
     def round(
-        self, time_accuracy: int = 0, time_rounding: TimeRounding = TimeRounding.math
-    ) -> "OTime":
+        self: _PythonOTimeT,
+        time_accuracy: int = 0,
+        time_rounding: int = TimeRounding.math,
+    ) -> _PythonOTimeT:
         ms = self.to_msec()
         multiplier = 10 ** (3 - time_accuracy)
         if time_rounding == TimeRounding.math:
@@ -166,4 +185,9 @@ class OTime:
         else:
             new_ms = -(-ms // multiplier) * multiplier  # math.ceil is slower
 
-        return OTime(msec=new_ms)
+        return type(self)(msec=new_ms)
+
+
+OTime = _RustOTime or PythonOTime
+
+__all__ = ["OTime", "PythonOTime", "TimeRounding", "parse_time_rounding"]

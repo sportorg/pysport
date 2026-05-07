@@ -1,0 +1,12 @@
+[package]
+name = "sportorg-core"
+version = "0.1.0"
+edition.workspace = true
+publish = false
+
+[lib]
+name = "sportorg_core"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = "0.28.3"

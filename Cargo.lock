@@ -103,6 +103,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "sportorg-core"
+version = "0.1.0"
+dependencies = [
+ "pyo3",
+]
+
+[[package]]
 name = "sportorg-rust-example"
 version = "0.1.0"
 dependencies = [

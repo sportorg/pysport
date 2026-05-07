@@ -20,6 +20,8 @@ include_files = [
 includes = ["atexit", "codecs", "playsound3", "pyImpinj"]
 if find_spec("sportorg_rust_example") is not None:
     includes.append("sportorg_rust_example")
+if find_spec("sportorg_core") is not None:
+    includes.append("sportorg_core")
 excludes = ["Tkinter", "unittest", "test", "pydoc"]
 
 build_exe_options = {

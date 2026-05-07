@@ -40,6 +40,7 @@ dev = [
   "mypy>=1.4; python_version >= '3.14'",
   "poethepoet>=0.22,<0.31",
   "pytest>=7.4,<9.0",
+  "pytest-benchmark>=4,<5",
   "pytest-cov",
   "pytest-deadfixtures",
   "pytest-mock",
@@ -74,7 +75,7 @@ module = [".venv.*"]
 ignore_errors = true
 
 [tool.coverage.run]
-omit = ["tests/*", "**/__main__.py", "**/.venv/*", "**/site-packages/*"]
+omit = ["benches/*", "tests/*", "**/__main__.py", "**/.venv/*", "**/site-packages/*"]
 branch = true
 
 [tool.coverage.report]
@@ -85,6 +86,7 @@ fail_under = 42
 [tool.pytest.ini_options]
 addopts = "--strict-markers --showlocals --verbosity 2"
 log_level = "DEBUG"
+testpaths = ["tests"]
 
 [tool.ruff.lint]
 select = []
@@ -95,7 +97,7 @@ exclude = []
 "tests/*" = ["S101"]
 
 [tool.poe.env]
-CODE = "tests sportorg builder.py"
+CODE = "tests benches sportorg builder.py"
 SPORTORG_DEBUG = "true"
 
 [tool.poe.tasks.all]
@@ -114,6 +116,10 @@ cmd = "pytest -vv --exitfirst"
 [tool.poe.tasks.test-failed]
 help = "Test failed"
 cmd = "pytest -vv --last-failed"
+
+[tool.poe.tasks.bench]
+help = "Run benchmarks"
+sequence = [{ ref = "develop-rust" }, { cmd = "pytest -vv benches --benchmark-only" }]
 
 [tool.poe.tasks.lint]
 help = "Check code"
@@ -142,8 +148,14 @@ sequence = [{ ref = "generate-mo" }, { cmd = "python SportOrg.pyw" }]
 
 [tool.poe.tasks.build-rust]
 help = "Build rust extension"
-cmd = "maturin build --release --manifest-path crates/sportorg-rust-example/Cargo.toml"
+sequence = [
+  { cmd = "maturin build --release --manifest-path crates/sportorg-rust-example/Cargo.toml" },
+  { cmd = "maturin build --release --manifest-path crates/sportorg-core/Cargo.toml" },
+]
 
 [tool.poe.tasks.develop-rust]
 help = "Dev rust extension"
-cmd = "maturin develop --release --manifest-path crates/sportorg-rust-example/Cargo.toml"
+sequence = [
+  { cmd = "maturin develop --release --manifest-path crates/sportorg-rust-example/Cargo.toml" },
+  { cmd = "maturin develop --release --manifest-path crates/sportorg-core/Cargo.toml" },
+]
