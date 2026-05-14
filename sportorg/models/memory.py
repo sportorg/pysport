@@ -499,13 +499,13 @@ class Result(ABC):
         self.id = uuid.uuid4()
         self.days = 0
         self.bib = 0
-        self.start_time: Optional[OTime] = None
+        self.start_time: OTime = OTime()
         self.finish_time: OTime = OTime.now()
         self.person: Optional[Person] = None
         self.status = ResultStatus.OK
         self.status_comment = ""
-        self.penalty_time: Optional[OTime] = None
-        self.credit_time: Optional[OTime] = None
+        self.penalty_time: OTime = OTime()
+        self.credit_time: OTime = OTime()
         self.penalty_laps = 0  # count of penalty legs (marked route)
         self.place = 0
         self.scores = 0
@@ -513,18 +513,18 @@ class Result(ABC):
         self.rogaine_penalty = 0
         self.scores_ardf = 0
         self.assigned_rank = Qualification.NOT_QUALIFIED
-        self.diff: Optional[OTime] = None  # readonly
+        self.diff: OTime = OTime()  # readonly
         self.diff_scores = 0  # readonly
         self.created_at = time.time()
         self.speed = ""
         self.can_win_count = 0  # quantity of athletes who can win at current time
-        self.final_result_time: Optional[OTime] = None  # real time, when nobody can win
+        self.final_result_time: OTime = OTime()  # real time, when nobody can win
 
         self.card_number = 0
         self.card_battery_level = None  # 0-100%, Huichang contact-less card
         self.splits: List[Split] = []
-        self.__start_time = None
-        self.__finish_time = None
+        self.__start_time = OTime()
+        self.__finish_time = OTime()
 
         self.current_result = (
             None  # Keep current day result (multi day), general result will have sum
@@ -1006,8 +1006,8 @@ class ResultSportident(Result):
 
     def __init__(self):
         super(ResultSportident, self).__init__()
-        self.__start_time = None
-        self.__finish_time = None
+        self.__start_time = OTime()
+        self.__finish_time = OTime()
 
     def __repr__(self) -> str:
         splits = "\n".join(
@@ -1101,8 +1101,8 @@ class ResultSportident(Result):
         return OTime()
 
     def clear(self):
-        self.__start_time = None
-        self.__finish_time = None
+        self.__start_time = OTime()
+        self.__finish_time = OTime()
 
     def get_course_splits(self, course=None):
         splits = []
@@ -2550,7 +2550,7 @@ class RelayLeg:
 
         # get course via group
         person = self.get_person()
-        if person and isinstance(person, Person):
+        if person:
             if person.group:
                 return person.group.course
 
@@ -2640,20 +2640,20 @@ class RelayLeg:
 
     def set_start_time(self, time):
         person = self.get_person()
-        if person and isinstance(person, Person):
+        if person:
             person.start_time = time
 
     def get_finish_time(self):
         res = self.get_result()
         if res:
             return res.get_finish_time()
-        return None
+        return OTime()
 
     def get_start_time(self):
         res = self.get_result()
         if res:
             return res.get_start_time()
-        return None
+        return OTime()
 
     def set_start_time_from_previous(self):
         if self.leg > 1:
@@ -2666,12 +2666,12 @@ class RelayLeg:
 
     def set_place(self, place):
         res = self.get_result()
-        if res and isinstance(res, Result):
+        if res:
             res.place = place
 
     def set_order(self, order):
         res = self.get_result()
-        if res and isinstance(res, Result):
+        if res:
             res.order = order
 
 

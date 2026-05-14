@@ -3,9 +3,7 @@ import pytest
 from sportorg.common.otime import OTime, PythonOTime, TimeRounding
 
 
-OTIME_IMPLEMENTATIONS = (
-    (PythonOTime,) if OTime is PythonOTime else (PythonOTime, OTime)
-)
+OTIME_IMPLEMENTATIONS = (PythonOTime,) if OTime is PythonOTime else (PythonOTime, OTime)
 
 
 def _exercise_otime(cls):
@@ -33,7 +31,9 @@ def _exercise_otime(cls):
     return total
 
 
-@pytest.mark.parametrize("otime_cls", OTIME_IMPLEMENTATIONS, ids=lambda cls: cls.__name__)
+@pytest.mark.parametrize(
+    "otime_cls", OTIME_IMPLEMENTATIONS, ids=lambda cls: cls.__name__
+)
 def test_otime_operations(benchmark, otime_cls):
     expected = _exercise_otime(PythonOTime)
     result = benchmark(_exercise_otime, otime_cls)
