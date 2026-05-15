@@ -15,6 +15,8 @@ from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.main_window import MainWindow
 from sportorg.language import generate_mo
 from sportorg.models.constant import (
+    Countries,
+    Groups,
     PersonMiddleNames,
     PersonNames,
     RankingTable,
@@ -45,6 +47,8 @@ class Application(metaclass=Singleton):
         except Exception as e:
             logging.exception("Error loading settings: %s", str(e))
         self.set_status_comments()
+        self.set_countries()
+        self.set_groups()
         self.set_names()
         self.set_middle_names()
         self.set_regions()
@@ -140,6 +144,24 @@ class Application(metaclass=Singleton):
             ) as f:
                 content = f.readlines()
             StatusComments().set_default_statuses(content)
+        except Exception as e:
+            logging.exception(str(e))
+
+    @staticmethod
+    def set_countries():
+        try:
+            with open(settings.SETTINGS.source_countries_path, encoding="utf-8") as f:
+                content = f.readlines()
+            Countries().set([x.strip() for x in content])
+        except Exception as e:
+            logging.exception(str(e))
+
+    @staticmethod
+    def set_groups():
+        try:
+            with open(settings.SETTINGS.source_groups_path, encoding="utf-8") as f:
+                content = f.readlines()
+            Groups().set([x.strip() for x in content])
         except Exception as e:
             logging.exception(str(e))
 

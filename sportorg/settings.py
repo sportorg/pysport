@@ -68,6 +68,8 @@ class Settings:
 
     source_names_path: str = config.configs_dir("names.txt")
     source_middle_names_path: str = config.configs_dir("middle_names.txt")
+    source_countries_path: str = config.configs_dir("countries.txt")
+    source_groups_path: str = config.configs_dir("groups.txt")
     source_regions_path: str = config.configs_dir("regions.txt")
     source_status_comments_path: str = config.configs_dir("status_comments.txt")
     source_status_default_comments_path: str = config.configs_dir("status_default.txt")
