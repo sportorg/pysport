@@ -11,7 +11,6 @@ from typing import Any, Dict, List, Optional
 import dateutil.parser
 
 from sportorg import settings
-from sportorg.common.model import Model
 from sportorg.common.otime import OTime, parse_time_rounding
 from sportorg.language import translate
 from sportorg.utils.time import date_to_ddmmyyyy, hhmmss_to_time
@@ -97,7 +96,7 @@ class ResultStatus(_TitleType):
     MULTI_DAY_ISSUE = 18
 
 
-class Organization(Model):
+class Organization:
     def __init__(self):
         self.id = uuid.uuid4()
         self.name = ""
@@ -139,7 +138,7 @@ class Organization(Model):
         self.contact = str(data["contact"]) if "contact" in data else ""
 
 
-class CourseControl(Model):
+class CourseControl:
     def __init__(self):
         self.code = ""
         self.length = 0
@@ -200,7 +199,7 @@ class CourseControl(Model):
         )
 
 
-class ControlPoint(Model):
+class ControlPoint:
     """Description of independent control point. Used for score calculation in rogain"""
 
     def __init__(self):
@@ -212,7 +211,7 @@ class ControlPoint(Model):
         self.altitude = 0.0
 
 
-class Course(Model):
+class Course:
     def __init__(self):
         self.id = uuid.uuid4()
         self._name = ""
@@ -304,7 +303,7 @@ class Course(Model):
         self._name = new_name
 
 
-class Group(Model):
+class Group:
     def __init__(self):
         self.id = uuid.uuid4()
         self.name = ""
@@ -418,7 +417,7 @@ class Group(Model):
         )
 
 
-class Split(Model):
+class Split:
     def __init__(self):
         self.index = 0
         self.course_index = -1
@@ -1344,7 +1343,7 @@ class ResultHuichang(ResultSportident):
     system_type = SystemType.HUICHANG
 
 
-class Person(Model):
+class Person:
     def __init__(self):
         self.id = uuid.uuid4()
         self.name = ""
@@ -1583,7 +1582,7 @@ class Person(Model):
             self.middle_name = arr[1]
 
 
-class RaceData(Model):
+class RaceData:
     def __init__(self):
         self.title = ""
         self.description = ""
@@ -1648,7 +1647,7 @@ class RaceData(Model):
             self.end_datetime = dateutil.parser.parse(data["end_datetime"])
 
 
-class Race(Model):
+class Race:
     support_obj = {
         "Person": Person,
         "Result": Result,
@@ -2826,14 +2825,6 @@ class RelayTeam:
             i.set_order(order)
 
 
-def create(obj, **kwargs):
-    return obj.create(**kwargs)
-
-
-def update(obj, **kwargs):
-    obj.update(**kwargs)
-
-
 def find(iterable: list, **kwargs):
     if len(kwargs.items()) == 0:
         return None
@@ -2855,7 +2846,7 @@ def find(iterable: list, **kwargs):
         return None
 
 
-_event = [create(Race)]
+_event = [Race()]
 current_race = 0
 
 
@@ -2866,7 +2857,7 @@ def new_event(event):
 
 
 def add_race():
-    _event.append(create(Race))
+    _event.append(Race())
 
 
 def copy_race():

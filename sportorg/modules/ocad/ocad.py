@@ -18,23 +18,18 @@ def import_txt_v8(source):
             else:
                 name = course.course
             if name not in race().course_index_name:
-                c = memory.create(
-                    memory.Course,
-                    name=name,
-                    length=int(course.length * 1000),
-                    climb=course.climb,
-                )
+                c = memory.Course()
+                c.name = name
+                c.length = int(course.length * 1000)
+                c.climb = course.climb
                 controls = []
                 for order, control in course.controls.items():
                     if str(control.code).isdecimal():  # don't use start and finish
-                        controls.append(
-                            memory.create(
-                                memory.CourseControl,
-                                code=control.code,
-                                order=control.order,
-                                length=int(control.length * 1000),
-                            )
-                        )
+                        course_control = memory.CourseControl()
+                        course_control.code = control.code
+                        course_control.order = control.order
+                        course_control.length = int(control.length * 1000)
+                        controls.append(course_control)
                 c.controls = controls
                 memory.race().courses.append(c)
     except Exception as e:

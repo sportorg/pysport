@@ -11,7 +11,6 @@ from sportorg.models.memory import (
     ResultSportident,
     ResultStatus,
     Split,
-    create,
     new_event,
     race,
 )
@@ -25,12 +24,14 @@ from sportorg.utils.time import hhmmss_to_time
 
 @pytest.fixture
 def new_race():
-    course = create(Course)
-    group = create(Group, course=course)
-    person = create(Person, group=group)
+    course = Course()
+    group = Group()
+    group.course = course
+    person = Person()
+    person.group = group
     result = ResultSportident()
     result.person = person
-    new_event([create(Race)])
+    new_event([Race()])
     race().courses.append(course)
     race().groups.append(group)
     race().persons.append(person)
@@ -65,10 +66,13 @@ def new_split2() -> List[Split]:
 
 
 def make_split(splits: List[Tuple[str, str]]) -> List[Split]:
-    return [
-        create(Split, code=str(code), time=hhmmss_to_time(time))
-        for code, time in splits
-    ]
+    ret = []
+    for code, time in splits:
+        split = Split()
+        split.code = str(code)
+        split.time = hhmmss_to_time(time)
+        ret.append(split)
+    return ret
 
 
 def test_credit_calculation_when_credit_time_disabled(

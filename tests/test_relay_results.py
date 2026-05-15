@@ -10,7 +10,6 @@ from sportorg.models.memory import (
     RelayTeam,
     ResultManual,
     ResultStatus,
-    create,
     new_event,
     race,
 )
@@ -19,7 +18,7 @@ from sportorg.models.result.result_tools import recalculate_results
 
 @pytest.fixture
 def prepare_race():
-    new_event([create(Race)])
+    new_event([Race()])
     race().add_new_group(append_to_race=True)
     get_group().name = "Group1"
     get_group().set_type(RaceType.RELAY)

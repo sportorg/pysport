@@ -24,7 +24,6 @@ from sportorg.models.memory import (
     ResultSportident,
     ResultStatus,
     Split,
-    create,
     find,
     race,
 )
@@ -88,24 +87,19 @@ def import_from_course_data(courses) -> None:
     for course in courses:
         if "name" in course:
             if find(obj.courses, name=course["name"]) is None:
-                c = create(
-                    Course,
-                    name=course["name"],
-                    length=course["length"],
-                    climb=course["climb"],
-                )
+                c = Course()
+                c.name = course["name"]
+                c.length = course["length"]
+                c.climb = course["climb"]
                 controls = []
                 i = 1
                 for control in course["controls"]:
                     if control["type"] == "Control":
-                        controls.append(
-                            create(
-                                CourseControl,
-                                code=control["control"],
-                                order=i,
-                                length=control["leg_length"],
-                            )
-                        )
+                        course_control = CourseControl()
+                        course_control.code = control["control"]
+                        course_control.order = i
+                        course_control.length = control["leg_length"]
+                        controls.append(course_control)
                         i += 1
                 c.controls = controls
                 obj.courses.append(c)

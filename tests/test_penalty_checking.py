@@ -22,7 +22,6 @@ from sportorg.models.memory import (
     ResultSportident,
     ResultStatus,
     Split,
-    create,
     new_event,
     race,
 )
@@ -246,12 +245,14 @@ def check(
 
 
 def create_race():
-    course = create(Course)
-    group = create(Group, course=course)
-    person = create(Person, group=group)
+    course = Course()
+    group = Group()
+    group.course = course
+    person = Person()
+    person.group = group
     result = ResultSportident()
     result.person = person
-    new_event([create(Race)])
+    new_event([Race()])
     race().courses.append(course)
     race().groups.append(group)
     race().persons.append(person)
@@ -275,7 +276,12 @@ def make_course_control(code: Union[int, str]) -> CourseControl:
 
 
 def make_splits(splits: List[int]) -> List[Split]:
-    return [create(Split, code=str(code)) for code in splits]
+    ret = []
+    for code in splits:
+        split = Split()
+        split.code = str(code)
+        ret.append(split)
+    return ret
 
 
 def get_penalty(result: ResultSportident) -> int:

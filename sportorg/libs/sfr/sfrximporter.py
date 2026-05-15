@@ -53,24 +53,19 @@ def import_sfrx(source: str):
             if bib != 0:
                 name = str(bib)
             if name not in cur_race.course_index_name:
-                c = memory.create(
-                    memory.Course,
-                    bib=bib,
-                    name=name,
-                    length=int(course["length"]),
-                    climb=int(course["climb"]),
-                )
+                c = memory.Course()
+                c.bib = bib
+                c.name = name
+                c.length = int(course["length"])
+                c.climb = int(course["climb"])
                 controls = []
                 for order, control in enumerate(course["controls"]):
                     if str(control["code"]).isdecimal():  # don't use start and finish
-                        controls.append(
-                            memory.create(
-                                memory.CourseControl,
-                                code=control["code"],
-                                order=order,
-                                length=int(control["length"]),
-                            )
-                        )
+                        course_control = memory.CourseControl()
+                        course_control.code = control["code"]
+                        course_control.order = order
+                        course_control.length = int(control["length"])
+                        controls.append(course_control)
                 c.controls = controls
                 cur_race.courses.append(c)
 

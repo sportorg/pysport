@@ -14,7 +14,6 @@ from sportorg.models.memory import (
     ResultSportident,
     ResultStatus,
     Split,
-    create,
     new_event,
     race,
     set_current_race_index,
@@ -505,12 +504,14 @@ def check(
 
 
 def create_race():
-    course = create(Course)
-    group = create(Group, course=course)
-    person = create(Person, group=group)
+    course = Course()
+    group = Group()
+    group.course = course
+    person = Person()
+    person.group = group
     result = ResultSportident()
     result.person = person
-    new_event([create(Race)])
+    new_event([Race()])
     set_current_race_index(0)
     race().courses.append(course)
     race().groups.append(group)
@@ -571,35 +572,39 @@ def split_and_course_repr(course: List[Union[int, str]], splits: List[int]) -> s
 
 
 def test_overtime_multi_day_race_current_day_exceeds_max_time():
-    course = create(Course)
+    course = Course()
 
     # Day 1 — current race, 45 min result
-    group1 = create(Group, course=course)
+    group1 = Group()
+    group1.course = course
     group1.name = "M21"
     group1.race_type = RaceType.INDIVIDUAL_RACE
-    person1 = create(Person, group=group1)
+    person1 = Person()
+    person1.group = group1
     person1.name = "Athlete"
     person1.start_time = OTime(0, 10, 0, 0)
     result1 = ResultSportident()
     result1.person = person1
     result1.finish_time = OTime(0, 10, 45, 0)
-    day1 = create(Race)
+    day1 = Race()
     day1.groups.append(group1)
     day1.persons.append(person1)
     day1.results.append(result1)
 
     # Day 2 — same athlete (matched by multi_day_id), 65 min result
-    group2 = create(Group, course=course)
+    group2 = Group()
+    group2.course = course
     group2.name = "M21"
     group2.race_type = RaceType.MULTI_DAY_RACE
     group2.max_time = OTime(0, 1, 0, 0)
-    person2 = create(Person, group=group2)
+    person2 = Person()
+    person2.group = group2
     person2.name = "Athlete"
     person2.start_time = OTime(0, 10, 0, 0)
     result2 = ResultSportident()
     result2.person = person2
     result2.finish_time = OTime(0, 11, 5, 0)
-    day2 = create(Race)
+    day2 = Race()
     day2.groups.append(group2)
     day2.persons.append(person2)
     day2.results.append(result2)
@@ -618,35 +623,39 @@ def test_overtime_multi_day_race_current_day_within_max_time():
     Cumulative result (45 + 55 = 100 min) exceeds max_time (60 min),
     but only the current-day time (55 min) should be compared.
     """
-    course = create(Course)
+    course = Course()
 
     # Day 1 — current race, 45 min result
-    group1 = create(Group, course=course)
+    group1 = Group()
+    group1.course = course
     group1.name = "M21"
     group1.race_type = RaceType.INDIVIDUAL_RACE
-    person1 = create(Person, group=group1)
+    person1 = Person()
+    person1.group = group1
     person1.name = "Athlete"
     person1.start_time = OTime(0, 10, 0, 0)
     result1 = ResultSportident()
     result1.person = person1
     result1.finish_time = OTime(0, 10, 45, 0)
-    day1 = create(Race)
+    day1 = Race()
     day1.groups.append(group1)
     day1.persons.append(person1)
     day1.results.append(result1)
 
     # Day 2 — same athlete (matched by multi_day_id), 55 min result
-    group2 = create(Group, course=course)
+    group2 = Group()
+    group2.course = course
     group2.name = "M21"
     group2.race_type = RaceType.MULTI_DAY_RACE
     group2.max_time = OTime(0, 1, 0, 0)
-    person2 = create(Person, group=group2)
+    person2 = Person()
+    person2.group = group2
     person2.name = "Athlete"
     person2.start_time = OTime(0, 10, 0, 0)
     result2 = ResultSportident()
     result2.person = person2
     result2.finish_time = OTime(0, 10, 55, 0)
-    day2 = create(Race)
+    day2 = Race()
     day2.groups.append(group2)
     day2.persons.append(person2)
     day2.results.append(result2)
