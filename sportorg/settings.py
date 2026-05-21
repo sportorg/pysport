@@ -1,7 +1,7 @@
 import os
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from sportorg import config
 from sportorg.libs.settings import load_settings, save_settings
@@ -56,6 +56,8 @@ class Settings:
     ranking_ardf: Dict[str, Any] = field(default_factory=dict)
     live_gzip_enabled: bool = True
     features: Dict[str, bool] = field(default_factory=lambda: DEFAULT_FEATURES.copy())
+    plugins: List[Dict[str, Any]] = field(default_factory=list)
+    plugin_settings: Dict[str, Dict[str, Any]] = field(default_factory=dict)
 
     telegram_token: str = ""
     teamwork_host: str = "localhost"
@@ -113,6 +115,71 @@ def is_feature_enabled(feature: str) -> bool:
 def set_feature_enabled(feature: str, enabled: bool) -> None:
     SETTINGS.features = get_feature_flags()
     SETTINGS.features[feature] = bool(enabled)
+
+
+def get_plugin_configs() -> List[Dict[str, Any]]:
+    raw_plugins = SETTINGS.plugins if isinstance(SETTINGS.plugins, list) else []
+    plugin_configs = []
+    for item in raw_plugins:
+        if not isinstance(item, dict):
+            continue
+
+        executable_path = str(item.get("executable_path", item.get("path", "")))
+        arguments = str(item.get("arguments", ""))
+        plugin_id = str(item.get("plugin_id", ""))
+        plugin_configs.append(
+            {
+                "executable_path": executable_path,
+                "arguments": arguments,
+                "enabled": bool(item.get("enabled", False)),
+                "plugin_id": plugin_id,
+            }
+        )
+    return plugin_configs
+
+
+def set_plugin_configs(plugin_configs: List[Dict[str, Any]]) -> None:
+    SETTINGS.plugins = []
+    for item in plugin_configs:
+        if not isinstance(item, dict):
+            continue
+        SETTINGS.plugins.append(
+            {
+                "executable_path": str(item.get("executable_path", "")),
+                "arguments": str(item.get("arguments", "")),
+                "enabled": bool(item.get("enabled", False)),
+                "plugin_id": str(item.get("plugin_id", "")),
+            }
+        )
+
+
+def set_plugin_config_plugin_id(index: int, plugin_id: str) -> None:
+    plugin_configs = get_plugin_configs()
+    if index < 0 or index >= len(plugin_configs):
+        return
+
+    plugin_configs[index]["plugin_id"] = plugin_id
+    set_plugin_configs(plugin_configs)
+
+
+def get_plugin_saved_settings(plugin_id: str) -> Dict[str, Any]:
+    if not plugin_id or not isinstance(SETTINGS.plugin_settings, dict):
+        return {}
+
+    plugin_data = SETTINGS.plugin_settings.get(plugin_id, {})
+    if isinstance(plugin_data, dict):
+        return plugin_data.copy()
+    return {}
+
+
+def set_plugin_saved_settings(plugin_id: str, plugin_data: Dict[str, Any]) -> None:
+    if not plugin_id:
+        return
+
+    if not isinstance(SETTINGS.plugin_settings, dict):
+        SETTINGS.plugin_settings = {}
+
+    SETTINGS.plugin_settings[plugin_id] = plugin_data.copy()
 
 
 def template_dir(*paths) -> str:

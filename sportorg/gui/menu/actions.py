@@ -30,6 +30,7 @@ from sportorg.gui.dialogs.merge_results import MergeResultsDialog
 from sportorg.gui.dialogs.not_start_dialog import InputStartNumbersDialog
 from sportorg.gui.dialogs.organization_mass_edit import OrganizationMassEditDialog
 from sportorg.gui.dialogs.print_properties import PrintPropertiesDialog
+from sportorg.gui.dialogs.plugins import PluginsDialog
 from sportorg.gui.dialogs.relay_clone_dialog import RelayCloneDialog
 from sportorg.gui.dialogs.relay_number_dialog import RelayNumberDialog
 from sportorg.gui.dialogs.rent_cards_dialog import RentCardsDialog
@@ -817,6 +818,11 @@ class LiveSettingsAction(Action, metaclass=ActionFactory):
     def execute(self):
         LiveDialog().exec_()
         self.app.refresh()
+
+
+class PluginsSettingsAction(Action, metaclass=ActionFactory):
+    def execute(self):
+        PluginsDialog().exec_()
 
 
 class LiveToggleAction(Action, metaclass=ActionFactory):

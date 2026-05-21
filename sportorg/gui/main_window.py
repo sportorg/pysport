@@ -54,6 +54,7 @@ from sportorg.models.result.result_tools import recalculate_results
 from sportorg.models.result.split_calculation import GroupSplits
 from sportorg.modules.backup.file import File
 from sportorg.modules.live.live import live_client
+from sportorg.modules.plugins import plugin_client
 from sportorg.modules.printing.model import (
     NoPrinterSelectedException,
     NoResultToPrintException,
@@ -109,6 +110,7 @@ class MainWindow(QMainWindow):
         self.menu_list_for_disabled = []
         self.toolbar_property = {}
         self.action_by_id = {}
+        self.plugin_menu_revision = 0
         try:
             self.file = argv[1]
             self.add_recent_file(self.file)
@@ -305,6 +307,8 @@ class MainWindow(QMainWindow):
                         self.logging_tab.error_color,
                     )
 
+        self._handle_plugin_events()
+
     def close(self):
         self.conf_write()
         self.unlock_file(self.file)
@@ -314,6 +318,49 @@ class MainWindow(QMainWindow):
         SFRReaderClient().stop()
         SrpidClient().stop()
         HuichangClient().stop()
+        plugin_client.stop()
+
+    def _handle_plugin_events(self):
+        race_updated = False
+        for update in plugin_client.pull_entity_updates():
+            try:
+                result = plugin_client.apply_entity_update(update)
+                try:
+                    update.process.respond_result(update.request_id, result)
+                except Exception as e:
+                    logging.debug("Cannot send plugin update response: %s", e)
+                race_updated = True
+            except Exception as e:
+                logging.exception(e)
+                try:
+                    update.process.respond_error(update.request_id, -32000, str(e))
+                except Exception as response_error:
+                    logging.debug(
+                        "Cannot send plugin update error response: %s", response_error
+                    )
+
+        for notification in plugin_client.pull_notifications():
+            message = notification.get("message", "")
+            level = notification.get("level", "info")
+            if not message:
+                continue
+
+            if level == "error":
+                logging.error(message)
+            elif level == "warning":
+                logging.warning(message)
+            else:
+                logging.info(message)
+            self.statusbar_message(message)
+
+        if race_updated:
+            recalculate_results(recheck_results=False)
+            self.refresh()
+
+        menu_revision = plugin_client.menu_revision()
+        if menu_revision != self.plugin_menu_revision:
+            self.plugin_menu_revision = menu_revision
+            self.refresh_menu()
 
     def close_split_printer(self):
         if self.split_printer_thread:
@@ -382,6 +429,7 @@ class MainWindow(QMainWindow):
         self.res_recalculate.timeout.connect(self.res_recalculate_by_timer)
 
         live_client.init()
+        plugin_client.start()
         self._menu_disable(self.current_tab)
 
     def _autorun_teamwork(self) -> None:
@@ -454,6 +502,8 @@ class MainWindow(QMainWindow):
                     action.setIcon(QtGui.QIcon(action_item["icon"]))
                 if "status_tip" in action_item:
                     action.setStatusTip(action_item["status_tip"])
+                if "enabled" in action_item:
+                    action.setEnabled(bool(action_item["enabled"]))
                 if "tabs" in action_item:
                     self.menu_list_for_disabled.append((action, action_item["tabs"]))
                 if "property" in action_item:
@@ -472,6 +522,8 @@ class MainWindow(QMainWindow):
                     menu.setIcon(QtGui.QIcon(action_item["icon"]))
                 if "tabs" in action_item:
                     self.menu_list_for_disabled.append((menu, action_item["tabs"]))
+                if "enabled" in action_item:
+                    menu.setEnabled(bool(action_item["enabled"]))
                 if "id" in action_item:
                     self.action_by_id[action_item["id"]] = menu
                 if self._create_menu(menu, action_item["actions"]):
@@ -687,6 +739,7 @@ class MainWindow(QMainWindow):
 
             logging.debug("Refresh in %s seconds", "{:.3f}".format(time.time() - t))
             self.get_result_table().update_splits()
+            plugin_client.sync_current_race()
         except Exception as e:
             logging.error(str(e))
 
@@ -917,6 +970,7 @@ class MainWindow(QMainWindow):
                 self.add_recent_file(self.file)
                 self.init_model()
                 self.last_update = time.time()
+                plugin_client.sync_current_race()
             except Exception as e:
                 logging.exception(e)
                 self.file = None

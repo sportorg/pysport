@@ -600,6 +600,70 @@ Request from plugin:
 
 Supported `level` values are `info`, `warning`, and `error`.
 
+### Plugin-Initiated Entity Updates
+
+Plugins may request changes to SportOrg entities using the same per-type update
+methods used by host notifications:
+
+- `sportorg.race.update`
+- `sportorg.result.update`
+- `sportorg.person.update`
+- `sportorg.group.update`
+- `sportorg.organization.update`
+- `sportorg.course.update`
+- `sportorg.entity.update`
+
+The request `params` use the common update envelope from the Entity Updates
+section. `operation` may be `created`, `updated`, `deleted`, or `snapshot`.
+For `deleted`, `entity` must include at least `object` and `id`.
+
+Request from plugin:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": "plugin-3",
+  "method": "sportorg.person.update",
+  "params": {
+    "operation": "updated",
+    "race_id": "37a31618-47d0-4120-a11c-2d113df839a0",
+    "entity": {
+      "object": "Person",
+      "id": "bb280db8-dce1-4245-9e65-b4e8b234e7db",
+      "name": "John",
+      "surname": "Smith",
+      "middle_name": "",
+      "card_number": 123456,
+      "bib": 101,
+      "birth_date": "1990-01-01",
+      "group_id": "6245b064-cc9f-4fa7-a80f-ec34a730973e",
+      "organization_id": "a90ac671-ea03-4187-b380-4d2305ec6b8b"
+    }
+  }
+}
+```
+
+Response from SportOrg:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": "plugin-3",
+  "result": {
+    "updated": true,
+    "operation": "updated",
+    "object": "Person",
+    "id": "bb280db8-dce1-4245-9e65-b4e8b234e7db"
+  }
+}
+```
+
+The method-specific update must match `entity.object`; for example
+`sportorg.result.update` accepts `Result`, `ResultManual`,
+`ResultSportident`, `ResultSFR`, `ResultSportiduino`, `ResultRfidImpinj`,
+`ResultSrpid`, and `ResultHuichang`. `sportorg.entity.update` is the generic
+fallback for future entity types.
+
 ## Settings Persistence
 
 SportOrg keeps plugin settings in the host configuration store under the plugin

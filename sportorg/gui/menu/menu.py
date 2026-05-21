@@ -48,6 +48,21 @@ def filter_menu_items(menu_items: List[MenuItem]) -> List[MenuItem]:
     return filtered_items
 
 
+def plugin_menu_items() -> List[MenuItem]:
+    from sportorg.modules.plugins import plugin_client
+
+    plugin_actions = plugin_client.get_menu_tree()
+    if not plugin_actions:
+        return []
+
+    return [
+        {
+            "title": translate("Plugins"),
+            "actions": plugin_actions,
+        }
+    ]
+
+
 def menu_list():
     items = [
         {
@@ -524,6 +539,10 @@ def menu_list():
                     "title": translate("Rent cards"),
                     "action": "RentCardsAction",
                 },
+                {
+                    "title": translate("Plugins"),
+                    "action": "PluginsSettingsAction",
+                },
             ],
         },
         {
@@ -541,4 +560,5 @@ def menu_list():
             ],
         },
     ]
+    items.extend(plugin_menu_items())
     return filter_menu_items(items)
