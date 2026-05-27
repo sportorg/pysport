@@ -216,9 +216,15 @@ class Widget(QtWidgets.QWidget):
                 last_correct_time = split.time
 
             if split.code == code:
-                s = '<span style="background: red">{}</span>'.format(s)
+                # &nbsp; preserves the trailing/inline whitespace that Qt's
+                # rich-text engine would otherwise collapse inside <span>.
+                s = '<span style="background: red; color: white">{}</span>'.format(
+                    s.replace(" ", "&nbsp;")
+                )
             if is_highlight and len(control_codes) and split.code not in control_codes:
-                s = '<span style="background: yellow">{}</span>'.format(s)
+                s = '<span style="background: yellow; color: black">{}</span>'.format(
+                    s.replace(" ", "&nbsp;")
+                )
 
             self.result_card_details.append(s)
             code = split.code
@@ -251,7 +257,9 @@ class Widget(QtWidgets.QWidget):
                     length=control.length if control.length else "",
                 )
                 if is_highlight and str(control.code) not in split_codes:
-                    s = '<span style="background: yellow">{}</span>'.format(s)
+                    s = '<span style="background: yellow; color: black">{}</span>'.format(
+                        s.replace(" ", "&nbsp;")
+                    )
                 self.result_course_details.append(s)
                 index += 1
 

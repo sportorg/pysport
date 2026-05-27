@@ -12,7 +12,6 @@ class Widget(QtWidgets.QWidget):
         self.layout = None
         self.textEdit = None
         self.setup_ui()
-        self.common_color = QtGui.QColor(0, 0, 0, 255)
         self.error_color = QtGui.QColor(255, 0, 0, 240)
 
     def setup_ui(self):

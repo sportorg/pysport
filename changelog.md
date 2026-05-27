@@ -33,6 +33,7 @@
 + Added conversion of qualification names in various formats
 + Added short title field in event properties: shown in the window title and multi-day race selector
 + Added feature flags in settings with SFR support toggle for menu visibility
++ Added Light / Dark / System theme switcher
 
 ### Fixes
 

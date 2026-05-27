@@ -29,6 +29,7 @@ DEFAULT_FEATURES = {
 @dataclass
 class Settings:
     app_check_updates: bool = True
+    theme: str = "system"
     locale: str = "ru_RU"
     logging_level: str = "INFO"
     logging_window_row_count: int = 1000
