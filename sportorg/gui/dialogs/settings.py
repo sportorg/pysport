@@ -4,6 +4,7 @@ import webbrowser
 try:
     from PySide6.QtGui import QIcon
     from PySide6.QtWidgets import (
+        QApplication,
         QCheckBox,
         QCommandLinkButton,
         QDialog,
@@ -19,6 +20,7 @@ try:
 except ModuleNotFoundError:
     from PySide2.QtGui import QIcon
     from PySide2.QtWidgets import (
+        QApplication,
         QCheckBox,
         QCommandLinkButton,
         QDialog,
@@ -36,6 +38,7 @@ from sportorg import config, settings
 from sportorg.common.audio import get_sounds
 from sportorg.common.template import get_templates
 from sportorg.gui.dialogs.file_dialog import get_existing_directory
+from sportorg.gui import theme
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.utils.custom_controls import messageBoxQuestion
 from sportorg.gui.utils.custom_controls import AdvComboBox, AdvSpinBox
@@ -70,6 +73,25 @@ class MainTab(Tab):
         self.item_lang.addItems(get_languages())
         self.item_lang.setCurrentText(settings.SETTINGS.locale)
         self.layout.addRow(self.label_lang, self.item_lang)
+
+        self.label_theme = QLabel(translate("Theme"))
+        self.item_theme = AdvComboBox()
+        self._theme_options = [
+            (theme.THEME_SYSTEM, translate("System")),
+            (theme.THEME_LIGHT, translate("Light")),
+            (theme.THEME_DARK, translate("Dark")),
+        ]
+        self.item_theme.addItems([label for _, label in self._theme_options])
+        current_index = next(
+            (
+                i
+                for i, (key, _) in enumerate(self._theme_options)
+                if key == settings.SETTINGS.theme
+            ),
+            0,
+        )
+        self.item_theme.setCurrentIndex(current_index)
+        self.layout.addRow(self.label_theme, self.item_theme)
 
         self.item_auto_save = AdvSpinBox(
             maximum=3600 * 24, value=settings.SETTINGS.file_autosave_interval
@@ -120,6 +142,7 @@ class MainTab(Tab):
         settings.SETTINGS.file_save_in_utf8 = self.item_save_in_utf8.isChecked()
         settings.SETTINGS.file_save_in_gzip = self.item_save_in_gzip.isChecked()
         settings.SETTINGS.file_generate_srb = self.item_generate_srb.isChecked()
+        settings.SETTINGS.theme = self._theme_options[self.item_theme.currentIndex()][0]
 
         if old_window_show_toolbar != self.item_show_toolbar.isChecked():
             if self.item_show_toolbar.isChecked():
@@ -456,6 +479,7 @@ class SettingsDialog(QDialog):
     def apply_changes_impl(self):
         for tab, _ in self.widgets:
             tab.save()
+        theme.apply_theme(QApplication.instance(), settings.SETTINGS.theme)
         main_window = GlobalAccess().get_main_window()
         main_window.refresh_menu()
         main_window.refresh()

@@ -79,7 +79,6 @@ class AboutDialog(QDialog):
         self.layout.addRow(licence_title)
 
         licence_text = QTextEdit()
-        licence_text.setStyleSheet("QScrollBar:vertical {background: #bfbfbf}")
         licence_text.setMinimumHeight(220)
         licence_text.setMaximumHeight(220)
         licence_text.setReadOnly(True)

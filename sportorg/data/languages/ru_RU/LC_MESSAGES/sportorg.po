@@ -438,6 +438,18 @@ msgstr "Поиск не дал результатов"
 msgid "Languages"
 msgstr "Язык интерфейса"
 
+msgid "Theme"
+msgstr "Тема оформления"
+
+msgid "System"
+msgstr "Системная"
+
+msgid "Light"
+msgstr "Светлая"
+
+msgid "Dark"
+msgstr "Тёмная"
+
 msgid "Show toolbar"
 msgstr "Показать панель инструментов"
 

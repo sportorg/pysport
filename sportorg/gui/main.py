@@ -11,6 +11,7 @@ except ModuleNotFoundError:
 
 from sportorg import config, settings
 from sportorg.common.singleton import Singleton
+from sportorg.gui import theme
 from sportorg.gui.global_access import GlobalAccess
 from sportorg.gui.main_window import MainWindow
 from sportorg.language import generate_mo
@@ -46,6 +47,7 @@ class Application(metaclass=Singleton):
             self.load_settings()
         except Exception as e:
             logging.exception("Error loading settings: %s", str(e))
+        theme.apply_theme(self.app, settings.SETTINGS.theme)
         self.set_status_comments()
         self.set_countries()
         self.set_groups()

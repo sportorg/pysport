@@ -127,19 +127,11 @@ class MainWindow(QMainWindow):
         self.split_printer_thread = None
         self.split_printer_queue = None
 
-    def _set_style(self):
-        try:
-            with open(config.style_dir("default.qss")) as s:
-                self.setStyleSheet(s.read())
-        except FileNotFoundError:
-            pass
-
     def show_window(self):
         try:
             self.conf_read()
         except Exception as e:
             logging.error(e)
-        self._set_style()
         self._setup_ui()
         self._setup_menu()
         if settings.SETTINGS.window_show_toolbar:
@@ -621,8 +613,9 @@ class MainWindow(QMainWindow):
             else:
                 item[0].setDisabled(False)
         if tab_index == self.tabwidget.indexOf(self.logging_tab):
-            # if self.tabbar.tabTextColor(i) == common_color:
-            self.tabbar.setTabTextColor(tab_index, self.logging_tab.common_color)
+            # Pass an invalid QColor so QTabBar resets to the palette foreground
+            # instead of a hardcoded color that would be unreadable on dark theme.
+            self.tabbar.setTabTextColor(tab_index, QtGui.QColor())
 
     def _update_counters(self, tab_index):
         if tab_index > 1:
