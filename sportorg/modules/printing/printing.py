@@ -70,7 +70,7 @@ class PrintProcess(Process):
 
             text_document = QTextDocument()
 
-            printer.setFullPage(True)
+            printer.setFullPage(False)
             if qt_version == 5:
                 printer.setPageMargins(
                     self.margin_left,
