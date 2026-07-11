@@ -1734,91 +1734,60 @@ class Race:
             "persons": [item.to_dict() for item in self.persons],
         }
 
-    def to_dict_partial(
-        self,
-        person_list=None,
-        group_list=None,
-        course_list=None,
-        orgs_list=None,
-        result_list=None,
-    ):
-        if course_list and len(course_list) > 0:
-            for group in self.groups:
-                if group.course and group.course in course_list:
-                    group_list.append(group.name)
+    def _build_partial(self, persons: List[Person]) -> Optional[Dict[str, Any]]:
+        if not persons:
+            return None
 
-        if group_list and len(group_list) > 0:
-            for person in self.persons:
-                if (
-                    person.group
-                    and person.group.name in group_list
-                    and person not in person_list
-                ):
-                    person_list.append(person)
+        person_set = set(persons)
+        person_groups = {p.group for p in persons if p.group}
+        person_orgs = {p.organization for p in persons if p.organization}
 
-        if orgs_list and len(orgs_list) > 0:
-            person_list = []
-            for person in self.persons:
-                if (
-                    person.organization
-                    and person.organization in orgs_list
-                    and person not in person_list
-                ):
-                    person_list.append(person)
+        return_groups = [g for g in self.groups if g in person_groups]
+        # Course has no __hash__ (its __eq__ compares controls), so containment
+        # is keyed on the immutable .id instead of putting Course in a set/list scan.
+        group_course_ids = {g.course.id for g in return_groups if g.course}
 
-        if result_list and len(result_list) > 0:
-            person_list = []
-            for result in result_list:
-                if result.person and result.person not in person_list:
-                    person_list.append(result.person)
+        return_courses = [c for c in self.courses if c.id in group_course_ids]
+        return_orgs = [o for o in self.organizations if o in person_orgs]
+        return_results = [r for r in self.results if r.person in person_set]
 
-        if person_list and len(person_list) > 0:
-            # person list to filter specified
-            return_groups = set()
-            return_orgs = set()
-            return_results = list()
-            return_courses = list()
-            for person in person_list:
-                if person.group:
-                    return_groups.add(person.group)
-                if person.organization:
-                    return_orgs.add(person.organization)
-            for group in return_groups:
-                if group.course and group.course not in return_courses:
-                    return_courses.append(group.course)
-            for result in self.results:
-                if result.person in person_list:
-                    return_results.append(result)
+        return {
+            "object": self.__class__.__name__,
+            "id": str(self.id),
+            "data": self.data.to_dict(),
+            "settings": self.settings.copy(),
+            "organizations": [item.to_dict() for item in return_orgs],
+            "courses": [item.to_dict() for item in return_courses],
+            "groups": [item.to_dict() for item in return_groups],
+            "results": [item.to_dict() for item in return_results],
+            "persons": [item.to_dict() for item in persons],
+        }
 
-            # person list to filter specified
-            return_groups = set()
-            return_orgs = set()
-            return_results = list()
-            return_courses = list()
-            for person in person_list:
-                if person.group:
-                    return_groups.add(person.group)
-                if person.organization:
-                    return_orgs.add(person.organization)
-            for group in return_groups:
-                if group.course and group.course not in return_courses:
-                    return_courses.append(group.course)
-            for result in self.results:
-                if result.person in person_list:
-                    return_results.append(result)
+    def partial_for_persons(self, persons: List[Person]) -> Optional[Dict[str, Any]]:
+        persons_set = set(persons)
+        ordered = [p for p in self.persons if p in persons_set]
+        return self._build_partial(ordered)
 
-            return {
-                "object": self.__class__.__name__,
-                "id": str(self.id),
-                "data": self.data.to_dict(),
-                "settings": self.settings.copy(),
-                "organizations": [item.to_dict() for item in return_orgs],
-                "courses": [item.to_dict() for item in return_courses],
-                "groups": [item.to_dict() for item in return_groups],
-                "results": [item.to_dict() for item in return_results],
-                "persons": [item.to_dict() for item in person_list],
-            }
-        return None
+    def partial_for_groups(self, groups: List[Group]) -> Optional[Dict[str, Any]]:
+        groups_set = set(groups)
+        ordered = [p for p in self.persons if p.group in groups_set]
+        return self._build_partial(ordered)
+
+    def partial_for_courses(self, courses: List[Course]) -> Optional[Dict[str, Any]]:
+        course_ids = {c.id for c in courses}
+        groups_set = {g for g in self.groups if g.course and g.course.id in course_ids}
+        ordered = [p for p in self.persons if p.group in groups_set]
+        return self._build_partial(ordered)
+
+    def partial_for_orgs(self, orgs: List[Organization]) -> Optional[Dict[str, Any]]:
+        orgs_set = set(orgs)
+        ordered = [p for p in self.persons if p.organization in orgs_set]
+        return self._build_partial(ordered)
+
+    def partial_for_results(self, results: List[Result]) -> Optional[Dict[str, Any]]:
+        result_persons = {r.person for r in results if r.person}
+        ordered = [p for p in self.persons if p in result_persons]
+        return self._build_partial(ordered)
 
     def update_data(self, dict_obj):
         if "object" not in dict_obj:
