@@ -6,7 +6,7 @@ import uuid
 from abc import ABC, abstractmethod
 from datetime import date
 from enum import Enum, IntEnum
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Set
 
 import dateutil.parser
 
@@ -1796,6 +1796,30 @@ class Race:
         result_persons = {r.person for r in results if r.person}
         ordered = [p for p in self.persons if p in result_persons]
         return self._build_partial(ordered, results=results)
+
+    def _empty_partial(self) -> Dict[str, Any]:
+        # A structurally valid but empty partial. Used for multi-day days where
+        # none of the selected athletes competed: returning None here would put a
+        # null into `races` and crash templates that iterate every day
+        # (racePreparation touches race.persons -> "race is null").
+        return {
+            "object": self.__class__.__name__,
+            "id": str(self.id),
+            "data": self.data.to_dict(),
+            "settings": self.settings.copy(),
+            "organizations": [],
+            "courses": [],
+            "groups": [],
+            "results": [],
+            "persons": [],
+        }
+
+    def partial_for_multi_day_ids(self, ids: Set[str]) -> Dict[str, Any]:
+        # Identity-independent selection for multi-day events: each day is a
+        # separate Race, so persons are matched by multi_day_id (name + group),
+        # not by object identity. Never returns None.
+        persons = [p for p in self.persons if p.multi_day_id in ids]
+        return self._build_partial(persons) or self._empty_partial()
 
     def update_data(self, dict_obj):
         if "object" not in dict_obj:

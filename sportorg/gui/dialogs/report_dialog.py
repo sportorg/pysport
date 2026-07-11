@@ -137,21 +137,59 @@ class ReportDialog(QDialog):
 
         races_dict = []
         if _settings["selected"]:
+            rows = mw.get_selected_rows()
+            # Multi-day events are separate Race objects per day; a current-day
+            # selection can't match other days by object identity, so resolve it
+            # to a set of multi_day_id keys and select on every day.
+            multiday = len(races()) > 1
             if mw.current_tab == 0:
-                person_list = [obj.persons[i] for i in mw.get_selected_rows()]
-                races_dict = [r.partial_for_persons(person_list) for r in races()]
+                person_list = [obj.persons[i] for i in rows]
+                if multiday:
+                    ids = {p.multi_day_id for p in person_list}
+                    races_dict = [r.partial_for_multi_day_ids(ids) for r in races()]
+                else:
+                    races_dict = [r.partial_for_persons(person_list) for r in races()]
             elif mw.current_tab == 1:
-                result_list = [obj.results[i] for i in mw.get_selected_rows()]
-                races_dict = [r.partial_for_results(result_list) for r in races()]
+                result_list = [obj.results[i] for i in rows]
+                if multiday:
+                    ids = {res.person.multi_day_id for res in result_list if res.person}
+                    races_dict = [r.partial_for_multi_day_ids(ids) for r in races()]
+                else:
+                    races_dict = [r.partial_for_results(result_list) for r in races()]
             elif mw.current_tab == 2:
-                group_list = [obj.groups[i] for i in mw.get_selected_rows()]
-                races_dict = [r.partial_for_groups(group_list) for r in races()]
+                group_list = [obj.groups[i] for i in rows]
+                if multiday:
+                    group_set = set(group_list)
+                    ids = {p.multi_day_id for p in obj.persons if p.group in group_set}
+                    races_dict = [r.partial_for_multi_day_ids(ids) for r in races()]
+                else:
+                    races_dict = [r.partial_for_groups(group_list) for r in races()]
             elif mw.current_tab == 3:
-                course_list = [obj.courses[i] for i in mw.get_selected_rows()]
-                races_dict = [r.partial_for_courses(course_list) for r in races()]
+                course_list = [obj.courses[i] for i in rows]
+                if multiday:
+                    course_ids = {c.id for c in course_list}
+                    ids = {
+                        p.multi_day_id
+                        for p in obj.persons
+                        if p.group
+                        and p.group.course
+                        and p.group.course.id in course_ids
+                    }
+                    races_dict = [r.partial_for_multi_day_ids(ids) for r in races()]
+                else:
+                    races_dict = [r.partial_for_courses(course_list) for r in races()]
             elif mw.current_tab == 4:
-                orgs_list = [obj.organizations[i] for i in mw.get_selected_rows()]
-                races_dict = [r.partial_for_orgs(orgs_list) for r in races()]
+                orgs_list = [obj.organizations[i] for i in rows]
+                if multiday:
+                    orgs_set = set(orgs_list)
+                    ids = {
+                        p.multi_day_id
+                        for p in obj.persons
+                        if p.organization in orgs_set
+                    }
+                    races_dict = [r.partial_for_multi_day_ids(ids) for r in races()]
+                else:
+                    races_dict = [r.partial_for_orgs(orgs_list) for r in races()]
         else:
             races_dict = [r.to_dict() for r in races()]
 

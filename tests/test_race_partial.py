@@ -307,3 +307,66 @@ def test_partial_for_results_output_in_model_order(r: Race) -> None:
     actual_ids = [res["id"] for res in result["results"]]
     expected_ids = [str(r.results[0].id), str(r.results[2].id)]
     assert actual_ids == expected_ids
+
+
+# --- partial_for_multi_day_ids ---
+
+
+def test_partial_for_multi_day_ids_matches_selected_athlete(r: Race) -> None:
+    p0, p1 = r.persons[0], r.persons[1]
+    p0.surname, p0.name = "Ivanov", "Ivan"
+    p1.surname, p1.name = "Petrov", "Petr"
+    result = r.partial_for_multi_day_ids({p0.multi_day_id})
+    assert result is not None
+    assert [p["id"] for p in result["persons"]] == [str(p0.id)]
+    assert [res["person_id"] for res in result["results"]] == [str(p0.id)]
+
+
+def test_partial_for_multi_day_ids_no_match_returns_empty_valid_dict(r: Race) -> None:
+    # A day where none of the selected athletes competed must return a valid,
+    # non-None dict so the multi-day template's racePreparation() does not crash.
+    result = r.partial_for_multi_day_ids({"Nobody Here M99"})
+    assert result is not None
+    assert result["persons"] == []
+    assert result["results"] == []
+    assert result["groups"] == []
+    assert result["id"] == str(r.id)
+    assert "data" in result
+    assert "settings" in result
+
+
+def test_partial_for_multi_day_ids_matches_across_race_objects() -> None:
+    # The same athlete lives on two separate Race objects (two days). Selection
+    # by multi_day_id must resolve on each day independently of object identity.
+    def make_day() -> Race:
+        day = Race()
+        g = Group()
+        g.name = "M21"
+        day.groups.append(g)
+        p = Person()
+        p.surname, p.name = "Ivanov", "Ivan"
+        p.group = g
+        day.persons.append(p)
+        res = ResultManual()
+        res.person = p
+        day.results.append(res)
+        return day
+
+    day1, day2 = make_day(), make_day()
+    athlete_id = day1.persons[0].multi_day_id
+    assert athlete_id == day2.persons[0].multi_day_id  # identical key across days
+
+    r1 = day1.partial_for_multi_day_ids({athlete_id})
+    r2 = day2.partial_for_multi_day_ids({athlete_id})
+    assert [res["id"] for res in r1["results"]] == [str(day1.results[0].id)]
+    assert [res["id"] for res in r2["results"]] == [str(day2.results[0].id)]
+
+
+def test_partial_for_multi_day_ids_person_order_follows_model(r: Race) -> None:
+    p0, p2 = r.persons[0], r.persons[2]
+    p0.surname, p0.name = "Bbb", "B"
+    p2.surname, p2.name = "Aaa", "A"
+    result = r.partial_for_multi_day_ids({p0.multi_day_id, p2.multi_day_id})
+    # Output order is self.persons order (p0 at index 0 before p2 at index 2),
+    # not the set's arbitrary order.
+    assert [p["id"] for p in result["persons"]] == [str(p0.id), str(p2.id)]
