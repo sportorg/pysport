@@ -280,3 +280,30 @@ def test_partial_for_results_subset(r: Race) -> None:
     result = r.partial_for_results([r.results[0]])
     assert result is not None
     assert len(result["persons"]) == 1
+
+
+def test_partial_for_results_excludes_unselected_result_of_same_person(
+    r: Race,
+) -> None:
+    # p0 has two results (e.g. multi-day race); selecting only the first must
+    # not pull in the second result of the same person.
+    p0 = r.persons[0]
+    extra = ResultManual()
+    extra.person = p0
+    r.results.append(extra)
+
+    result = r.partial_for_results([r.results[0]])
+    assert result is not None
+    assert len(result["results"]) == 1
+    assert result["results"][0]["id"] == str(r.results[0].id)
+
+
+def test_partial_for_results_output_in_model_order(r: Race) -> None:
+    # Selected out of self.results order — output "results" must follow
+    # self.results order, not selection order.
+    selected = [r.results[2], r.results[0]]
+    result = r.partial_for_results(selected)
+    assert result is not None
+    actual_ids = [res["id"] for res in result["results"]]
+    expected_ids = [str(r.results[0].id), str(r.results[2].id)]
+    assert actual_ids == expected_ids

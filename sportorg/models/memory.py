@@ -1734,7 +1734,9 @@ class Race:
             "persons": [item.to_dict() for item in self.persons],
         }
 
-    def _build_partial(self, persons: List[Person]) -> Optional[Dict[str, Any]]:
+    def _build_partial(
+        self, persons: List[Person], results: Optional[List[Result]] = None
+    ) -> Optional[Dict[str, Any]]:
         if not persons:
             return None
 
@@ -1749,7 +1751,13 @@ class Race:
 
         return_courses = [c for c in self.courses if c.id in group_course_ids]
         return_orgs = [o for o in self.organizations if o in person_orgs]
-        return_results = [r for r in self.results if r.person in person_set]
+        if results is None:
+            return_results = [r for r in self.results if r.person in person_set]
+        else:
+            # Result has no __hash__ either (its __eq__ compares timing data), so
+            # containment is keyed on the immutable .id, same as Course above.
+            result_ids = {r.id for r in results}
+            return_results = [r for r in self.results if r.id in result_ids]
 
         return {
             "object": self.__class__.__name__,
@@ -1787,7 +1795,7 @@ class Race:
     def partial_for_results(self, results: List[Result]) -> Optional[Dict[str, Any]]:
         result_persons = {r.person for r in results if r.person}
         ordered = [p for p in self.persons if p in result_persons]
-        return self._build_partial(ordered)
+        return self._build_partial(ordered, results=results)
 
     def update_data(self, dict_obj):
         if "object" not in dict_obj:
