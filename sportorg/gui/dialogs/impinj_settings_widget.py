@@ -52,7 +52,7 @@ class ImpinjSettingsWidget(QWidget):
         form.addRow("Мощность излучения:", self.power_spin)
         
         # 5. Чекбокс защиты (Детекция антенны)
-        self.check_ant_box = QCheckBox("Включить безопасный режим (Авто-детекция подключенной антенны)")
+        self.check_ant_box = QCheckBox("Защитный режим выключения не подключенной антенны")
         self.check_ant_box.setChecked(bool(race().get_setting("impinj_check_ant", True)))
         form.addRow(self.check_ant_box)
         

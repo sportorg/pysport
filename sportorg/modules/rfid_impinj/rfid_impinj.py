@@ -44,7 +44,7 @@ class ImpinjThread(QThread):
         try:
             # 1. Задаем переносимый путь относительно текущего файла скрипта
             base_dir = os.path.dirname(os.path.abspath(__file__))
-            dll_path = os.path.abspath(os.path.join(base_dir, "libs", "rfid_impinj", "UHFReader288.dll"))
+            dll_path = os.path.abspath(os.path.join(base_dir, "..", "..", "libs", "rfid_impinj", "UHFReader288.dll"))
             
             self._logger.info(f"[RFID-DEBUG] Попытка загрузки DLL по пути: {dll_path}")
             
@@ -65,9 +65,19 @@ class ImpinjThread(QThread):
 
 
     def _connect_reader(self):
-        # Пробуем извлечь цифры из имени порта (например "COM3" -> 3)
+        # 1. Извлекаем параметры из базы данных гонки SportOrg
         port_num = int("".join(filter(str.isdigit, str(self.port)))) if self.port and "".join(filter(str.isdigit, str(self.port))) else 0
-        baud_rate = BYTE(6) # Стандартная скорость для SDK 115200
+        
+        # Динамическая скорость (исправление из прошлого шага)
+        saved_baud_idx = race().get_setting("impinj_baud_rate_idx", 6)
+        baud_rate = BYTE(int(saved_baud_idx))
+        
+        # Безопасный режим (исправление из прошлого шага)
+        check_ant_val = BYTE(1 if bool(race().get_setting("impinj_check_ant", True)) else 0)
+        
+        # --- НОВЫЙ БЛОК: Получаем мощность из виджета (по умолчанию 26 dBm) ---
+        saved_power = race().get_setting("impinj_rf_power", 26)
+        rf_power_val = BYTE(int(saved_power))
         
         if port_num > 0:
             self._logger.info(f"[RFID-DEBUG] Пробуем открыть конкретный порт: COM{port_num} (Baud: {baud_rate.value})")
@@ -76,10 +86,22 @@ class ImpinjThread(QThread):
                 self._logger.info(f"[RFID-DEBUG] Результат OpenComPort: {res}, полученный FrmHandle: {self.frm_handle.value}")
                 if res == 0 and self.frm_handle.value >= 0:
                     self._logger.info(f"[RFID-DEBUG] Успешное подключение к COM{port_num}!")
+                    
+                    # Передаем безопасный режим антенн
+                    try: self.dll.SetCheckAnt(ctypes.byref(self.com_adr), check_ant_val, self.frm_handle)
+                    except Exception: pass
+                    
+                    # --- НОВЫЙ БЛОК: Передаем мощность излучения в контроллер ---
+                    try:
+                        pow_res = self.dll.SetRfPower(ctypes.byref(self.com_adr), rf_power_val, self.frm_handle)
+                        self._logger.info(f"[RFID-DEBUG] Установка мощности (SetRfPower={rf_power_val.value} dBm) вернула код: {pow_res}")
+                    except Exception as e:
+                        self._logger.warning(f"[RFID-DEBUG] Не удалось вызвать SetRfPower через DLL: {e}")
+                        
                     return True
             except Exception as e:
                 self._logger.error(f"[RFID-DEBUG] Сбой при вызове OpenComPort: {e}")
-
+                
         self._logger.info("[RFID-DEBUG] Конкретный порт не ответил или не задан. Запуск AutoOpenComPort...")
         try:
             auto_port = ctypes.c_int(0)
@@ -87,12 +109,25 @@ class ImpinjThread(QThread):
             self._logger.info(f"[RFID-DEBUG] Результат AutoOpenComPort: {res}. Найден порт: COM{auto_port.value}, FrmHandle: {self.frm_handle.value}")
             if res == 0 and self.frm_handle.value >= 0:
                 self._logger.info(f"[RFID-DEBUG] Успешное авто-подключение к COM{auto_port.value}!")
+                
+                # Передаем безопасный режим антенн
+                try: self.dll.SetCheckAnt(ctypes.byref(self.com_adr), check_ant_val, self.frm_handle)
+                except Exception: pass
+                
+                # --- НОВЫЙ БЛОК: Передаем мощность при автоподключении ---
+                try:
+                    pow_res = self.dll.SetRfPower(ctypes.byref(self.com_adr), rf_power_val, self.frm_handle)
+                    self._logger.info(f"[RFID-DEBUG] Установка мощности (SetRfPower={rf_power_val.value} dBm) вернула код: {pow_res}")
+                except Exception as e:
+                    self._logger.warning(f"[RFID-DEBUG] Не удалось вызвать SetRfPower через DLL: {e}")
+                    
                 return True
         except Exception as e:
             self._logger.error(f"[RFID-DEBUG] Сбой при вызове AutoOpenComPort: {e}")
-
+            
         self._logger.error("[RFID-DEBUG] Не удалось подключиться к RFID-считывателю ни одним из способов.")
         return False
+
 
     def run(self):
         self._logger.info("[RFID-DEBUG] Метод run() запущен. Начинаем инициализацию...")
