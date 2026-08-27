@@ -1,7 +1,10 @@
 import logging
 from typing import Optional
 
-from sportorg.models.memory import Course, Group, Qualification, ResultStatus
+from numpy.matlib import zeros
+from pandas import DataFrame
+
+from sportorg.models.memory import Course, Group, Qualification, ResultStatus, ResultSportident, race, Split
 from sportorg.models.result.result_calculation import ResultCalculation
 from sportorg.utils.time import get_speed_min_per_km
 
@@ -126,7 +129,7 @@ class GroupSplits:
 
         self.leader = {}
 
-    def generate(self, logged=False):
+    def generate_orig(self, logged=False):
         if logged:
             logging.debug("Group splits generate for " + self.group.name)
         # to have group count
@@ -136,6 +139,171 @@ class GroupSplits:
             self.person_splits.append(PersonSplits(self.race, i).generate())
 
         self.set_places()
+        if self.group.is_relay():
+            self.sort_by_place()
+        else:
+            self.sort_by_result()
+        return self
+
+    # Pandas realisation of split generation
+    def generate(self, logged=False):
+        if logged:
+            logging.debug("Group splits generate for " + self.group.name)
+        # to have group count
+        ResultCalculation(self.race).get_group_persons(self.group)
+
+        group_results = ResultCalculation(self.race).get_group_finishes(self.group)
+        row_count = len(group_results)
+        if row_count < 1:
+            return
+
+        res1 = group_results[0]
+        assert isinstance(res1, ResultSportident)
+
+        course =  race().find_course(res1)
+        # splits, relative_splits, places, relative places, index
+        control_count = len(course.controls)
+
+        df = DataFrame({'ID':range(row_count)})
+        for i in range(control_count):
+            df.insert(0, 'time' + str(i), 0 * row_count)
+            df.insert(0, 'time_rel' + str(i), 0 * row_count)
+            df.insert(0, 'place' + str(i), 0 * row_count)
+            df.insert(0, 'place_rel' + str(i), 0 * row_count)
+
+        sub_sec = 3
+        for i in range(row_count):
+            cur_res = group_results[i]
+
+            self.person_splits.append(PersonSplits(self.race, cur_res).generate())
+
+            for split in cur_res.splits:
+                assert isinstance(split, Split)
+                course_index = split.course_index
+                if course_index < 0:
+                    continue
+                time = split.leg_time
+                rel_time = split.relative_time
+                df._set_value(i, 'time' + str(course_index), time.to_msec(sub_sec))
+                df._set_value(i, 'time_rel' + str(course_index), rel_time.to_msec(sub_sec))
+
+        # sort for leg time and set places
+        for i in range(control_count):
+
+            df.sort_values(by='time' + str(i), inplace=True)
+
+            place = 0
+            prev_val = 0
+            double_count = 0
+            for j in range(row_count):
+                val = df._get_value(df.index[j], 'time' + str(i))
+                if val > 0:
+                    if val != prev_val:
+                        place += 1 + double_count
+                        double_count = 0
+                    else:
+                        double_count += 1
+                    df._set_value(df.index[j], 'place' + str(i), place)
+
+            df.sort_values(by='time_rel' + str(i), inplace=True)
+
+            place = 0
+            prev_val = 0
+            double_count = 0
+            for j in range(row_count):
+                val = df._get_value(df.index[j], 'time_rel' + str(i))
+                if val > 0:
+                    if val != prev_val:
+                        place += 1 + double_count
+                        double_count = 0
+                    else:
+                        double_count += 1
+                    df._set_value(df.index[j], 'place_rel' + str(i), place)
+
+        df.sort_values(by='ID', inplace=True)
+
+        # set places from DataFrame
+        for i in range(row_count):
+            cur_res = group_results[i]
+            for split in cur_res.splits:
+                assert isinstance(split, Split)
+                course_index = split.course_index
+                if course_index < 0:
+                    continue
+                split.leg_place = int(df._get_value(i, 'place' + str(course_index)))
+                split.relative_place = int(df._get_value(i, 'place_rel' + str(course_index)))
+
+        if self.group.is_relay():
+            self.sort_by_place()
+        else:
+            self.sort_by_result()
+        return self
+
+    # numpy split generation. TODO: sorting changes the 2d array type
+    def generate_numpy_test(self, logged=False):
+        if logged:
+            logging.debug("Group splits generate for " + self.group.name)
+        # to have group count
+        ResultCalculation(self.race).get_group_persons(self.group)
+
+        group_results = ResultCalculation(self.race).get_group_finishes(self.group)
+        row_count = len(group_results)
+        if row_count < 1:
+            return
+
+        res1 = group_results[0]
+        assert isinstance(res1, ResultSportident)
+
+        course =  race().find_course(res1)
+        # splits, relative_splits, places, relative places, index
+        control_count = len(course.controls)
+        column_count = control_count * 4 + 1
+        table = zeros((row_count, column_count))
+
+        sub_sec = 3
+        for i in range(row_count):
+            cur_res = group_results[i]
+            table[i, column_count-1] = i
+            table[0,0] = 122
+            for split in cur_res.splits:
+                assert isinstance(split, Split)
+                course_index = split.course_index
+                if course_index < 0:
+                    continue
+                time = split.leg_time
+                rel_time = split.relative_time
+                table[i, course_index] = time.to_msec(sub_sec)
+                table[i, course_index + control_count] = rel_time.to_msec(sub_sec)
+
+        # sort for leg time and set places
+        for i in range(control_count * 2):
+
+            table = table[table[:, i].argsort()]
+
+            place = 0
+            prev_val = 0
+            double_count = 0
+            for j in range(row_count):
+                val = table[j,i]
+                if val > 0:
+                    if val != prev_val:
+                        place += 1 + double_count
+                        double_count = 0
+                    else:
+                        double_count += 1
+                    table[j, i + control_count * 2] = place
+
+        table = table[table[:, 0].argsort()]
+
+        # set places from table
+        for i in range(row_count):
+            cur_res = group_results[i]
+            for split in cur_res.splits:
+                assert isinstance(split, Split)
+                course_index = split.course_index
+                split.leg_place = table[i][course_index + control_count * 2]
+                split.relative_place = table[i][course_index + control_count * 3]
+
         if self.group.is_relay():
             self.sort_by_place()
         else:
