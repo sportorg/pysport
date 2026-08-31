@@ -11,6 +11,7 @@ class PersonSplits:
         self.race = r
         self.result = result
         self._course = None
+        self._legs = []
 
         self.assigned_rank = ""
         if (
@@ -77,6 +78,7 @@ class PersonSplits:
                 cur_split.leg_place = 0
 
                 course_index += 1
+                self._legs.append(cur_split)
 
             split_index += 1
 
@@ -90,9 +92,8 @@ class PersonSplits:
         if index > self.get_last_correct_index():
             return None
 
-        for i in self.result.splits:
-            if i.course_index == index:
-                return i
+        if 0 <= index < len(self._legs):
+            return self._legs[index]
 
         return None
 
@@ -143,34 +144,46 @@ class GroupSplits:
         return self
 
     def set_places(self):
-        len_persons = len(self.person_splits)
-        for i in range(self.cp_count):
-            self.sort_by_leg(i)
-            self.set_places_for_leg(i)
-            if not len_persons > 0:
+        for index in range(self.cp_count):
+            entries = []
+            missing = []
+            for person_split in self.person_splits:
+                leg = person_split.get_leg_by_course_index(index)
+                if leg is not None:
+                    entries.append((person_split, leg))
+                else:
+                    missing.append(person_split)
+
+            if not entries:
                 continue
-            self.set_leg_leader(i, self.person_splits[0])
 
-            self.sort_by_leg(i, relative=True)
-            self.set_places_for_leg(i, relative=True)
+            entries.sort(key=lambda entry: entry[1].leg_time)
+            self._assign_places(entries, "leg_time", "leg_place")
+            self.set_leg_leader(index, entries[0][0])
+            self.person_splits = [entry[0] for entry in entries] + missing
 
-    def sort_by_leg(self, index, relative=False):
-        if relative:
-            self.person_splits = sorted(
-                self.person_splits,
-                key=lambda item: (
-                    item.get_leg_relative_time(index) is None,
-                    item.get_leg_relative_time(index),
-                ),
-            )
-        else:
-            self.person_splits = sorted(
-                self.person_splits,
-                key=lambda item: (
-                    item.get_leg_time(index) is None,
-                    item.get_leg_time(index),
-                ),
-            )
+            entries.sort(key=lambda entry: entry[1].relative_time)
+            self._assign_places(entries, "relative_time", "relative_place")
+            self.person_splits = [entry[0] for entry in entries] + missing
+
+    @staticmethod
+    def _assign_places(entries, time_attr, place_attr):
+        # competition ranking: equal times share a place, next place skips
+        leader_time = getattr(entries[0][1], time_attr)
+        double_places_counter = 0
+        prev_time = leader_time
+        for i, entry in enumerate(entries):
+            leg = entry[1]
+            leg_time = getattr(leg, time_attr)
+            if i != 0 and prev_time == leg_time:
+                double_places_counter += 1
+            else:
+                double_places_counter = 0
+
+            setattr(leg, place_attr, i + 1 - double_places_counter)
+            if place_attr == "leg_place":
+                leg.leader_time = leader_time
+            prev_time = leg_time
 
     def sort_by_result(self):
         status_priority = [
@@ -199,44 +212,6 @@ class GroupSplits:
             ),
         )
 
-    def set_places_for_leg(self, index, relative=False):
-        if not len(self.person_splits):
-            return
-
-        if relative:
-            # calculate places for relative (cumulative from start) times
-            leader_time = self.person_splits[0].get_leg_relative_time(index)
-
-            double_places_counter = 0
-            prev_split_time = leader_time
-            for i, person in enumerate(self.person_splits):
-                leg = person.get_leg_by_course_index(index)
-                if leg:
-                    if i != 0 and prev_split_time == leg.relative_time:
-                        double_places_counter += 1
-                    else:
-                        double_places_counter = 0
-
-                    leg.relative_place = i + 1 - double_places_counter
-                    prev_split_time = leg.relative_time
-        else:
-            # calculate places for specified leg
-            leader_time = self.person_splits[0].get_leg_time(index)
-
-            double_places_counter = 0
-            prev_split_time = leader_time
-            for i, person in enumerate(self.person_splits):
-                leg = person.get_leg_by_course_index(index)
-                if leg:
-                    if i != 0 and prev_split_time == leg.leg_time:
-                        double_places_counter += 1
-                    else:
-                        double_places_counter = 0
-
-                    leg.leg_place = i + 1 - double_places_counter
-                    leg.leader_time = leader_time
-                    prev_split_time = leg.leg_time
-
     def set_leg_leader(self, index, person_split):
         self.leader[str(index)] = (
             person_split.person.name,
@@ -247,11 +222,6 @@ class GroupSplits:
         if str(index) in self.leader.keys():
             return self.leader[str(index)]
         return "", ""
-
-    def set_places_relative(self):
-        for i in range(self.cp_count):
-            self.sort_by_leg(i, True)
-            self.set_places_for_leg(i, True)
 
     def to_dict(self):
         return [ps.to_dict() for ps in self.person_splits]
