@@ -1,14 +1,21 @@
 import logging
 
 from sportorg.common.otime import OTime
+from typing import Optional
+
 from sportorg.models.memory import RaceType, Result
-from sportorg.models.result.result_calculation import ResultCalculation
+from sportorg.models.result.result_calculation import (
+    RaceCalculationContext,
+    ResultCalculation,
+)
 from sportorg.models.start.relay import get_team_result
 
 
 class ScoreCalculation:
-    def __init__(self, r):
+    def __init__(self, r, shared: Optional[RaceCalculationContext] = None):
         self.race = r
+        self._calculation = ResultCalculation(r, shared)
+        self._leader_times = shared._group_leader_times if shared is not None else {}
         self.formula = None
         self.wrong_formula = False
         if self.race.get_setting("scores_mode", "off") == "formula":
@@ -70,7 +77,9 @@ class ScoreCalculation:
         if result and isinstance(result, Result):
             if result.person and result.person.group:
                 group = result.person.group
-                results = ResultCalculation(self.race).get_group_finishes(group)
+                if group in self._leader_times:
+                    return self._leader_times[group]
+                results = self._calculation.get_group_finishes(group)
                 best_time = None
                 for cur_result in results:
                     if not cur_result.is_status_ok():
@@ -82,6 +91,7 @@ class ScoreCalculation:
                     if not best_time or cur_time < best_time:
                         if cur_time > OTime(0):
                             best_time = cur_time
+                self._leader_times[group] = best_time
                 return best_time
         return None
 

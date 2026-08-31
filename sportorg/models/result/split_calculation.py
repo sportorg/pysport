@@ -118,7 +118,7 @@ class PersonSplits:
 
 
 class GroupSplits:
-    def __init__(self, r, group):
+    def __init__(self, r, group, calculation: Optional[ResultCalculation] = None):
         self.race = r
         self.group = group
         self.cp_count = len(self.group.course.controls) if self.group.course else 0
@@ -127,13 +127,17 @@ class GroupSplits:
 
         self.leader = {}
 
+        if calculation is None:
+            calculation = ResultCalculation(r)
+        self._calculation = calculation
+
     def generate(self, logged=False):
         if logged:
             logging.debug("Group splits generate for " + self.group.name)
         # to have group count
-        ResultCalculation(self.race).get_group_persons(self.group)
+        self._calculation.get_group_persons(self.group)
 
-        for i in ResultCalculation(self.race).get_group_finishes(self.group):
+        for i in self._calculation.get_group_finishes(self.group):
             self.person_splits.append(PersonSplits(self.race, i).generate())
 
         self.set_places()
@@ -228,14 +232,17 @@ class GroupSplits:
 
 
 class RaceSplits:
-    def __init__(self, r):
+    def __init__(self, r, calculation: Optional[ResultCalculation] = None):
         self.race = r
+        if calculation is None:
+            calculation = ResultCalculation(r)
+        self._calculation = calculation
 
     def generate(self, group: Optional[Group] = None):
         if group is None:
             for group in self.race.groups:
-                GroupSplits(self.race, group).generate()
+                GroupSplits(self.race, group, self._calculation).generate()
         else:
-            GroupSplits(self.race, group).generate()
+            GroupSplits(self.race, group, self._calculation).generate()
 
         return self
