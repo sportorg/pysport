@@ -14,8 +14,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## Screenshots
 
-![Mainwindow sportorg](img/mainwindow.png)
+![Mainwindow sportorg](sportorg/data/img/mainwindow.png)
 
-![Dialogedit sportorg](img/dialogedit.png)
+![Dialogedit sportorg](sportorg/data/img/dialogedit.png)
 
-![Bibprintout sportorg](img/bibprintout.png)
+![Bibprintout sportorg](sportorg/data/img/bibprintout.png)
