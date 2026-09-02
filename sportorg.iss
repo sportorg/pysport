@@ -2,14 +2,21 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "SportOrg"
-#define MyAppVersion "v1.8.0"
-#define MyVersionInfoVersion "1.8.0.0"
 #define MyAppPublisher "SportOrg Team"
 #define MyAppURL "https://sportorg.readthedocs.io"
 #define MyAppExeName "SportOrg.exe"
 
-#define BuildDir "build/exe.win32-3.8" ; !!replace with your build path!!
-#define AdditionalLib32 "data/additional_lib_32" ; !!replace with your lib path!!
+; The release workflow passes these with ISCC /D.  The values below are only
+; fallbacks for a local compile.
+#ifndef MyAppVersion
+  #define MyAppVersion "v1.8.0b2"
+#endif
+#ifndef MyVersionInfoVersion
+  #define MyVersionInfoVersion "1.8.0.0"
+#endif
+#ifndef BuildDir
+  #define BuildDir "build\exe.win-amd64-3.8"
+#endif
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -24,9 +31,15 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-DefaultDirName={pf}\{#MyAppName}
+; The payload is a 64-bit cx_Freeze build, so put the installer into 64-bit
+; install mode; otherwise {autopf} resolves to "Program Files (x86)".
+; Requires Inno Setup 6.3 or newer for the "x64compatible" spelling.
+ArchitecturesAllowed=x64compatible
+ArchitecturesInstallIn64BitMode=x64compatible
+DefaultDirName={autopf}\{#MyAppName}
 UsePreviousAppDir=no
 DisableProgramGroupPage=yes
+OutputDir=dist
 OutputBaseFilename={#MyAppName}-{#MyAppVersion}
 Compression=lzma
 SolidCompression=yes
@@ -44,16 +57,14 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Source: "{#BuildDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
-Source: "{#AdditionalLib32}\*"; DestDir: {sys}; Flags: onlyifdoesntexist
-; Taken here for Win7: http://www.skaip.su/na-kompyutere-otsutstvuet-api-ms-win-crt-runtime-l1-1-0-dll
-
 ; Source: "vc_redist\vc_redist.x86.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall;
 
 [Dirs]
-Name: "{app}\logs"; Permissions: everyone-full
-Name: "{app}\configs"; Permissions: everyone-full
 Name: "{app}\data"; Permissions: everyone-full
-; NOTE: to allow start by non-privileged user from Program Files
+Name: "{app}\logs"; Permissions: everyone-full
+; NOTE: to allow start by non-privileged user from Program Files.
+; configs, templates and sounds are created inside data\ on first run and
+; inherit these permissions.
 
 [Icons]
 Name: "{commonprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"

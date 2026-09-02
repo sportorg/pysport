@@ -20,7 +20,7 @@ def play(sound):
 
 def get_sounds(path=None):
     if path is None:
-        path = config.SOUND_DIR
+        path = config.sound_dir()
     files = []
     for p in os.listdir(path):
         full_path = os.path.join(path, p)
