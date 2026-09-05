@@ -1,4 +1,7 @@
+import os
+import shutil
 import sys
+import tempfile
 from importlib.util import find_spec
 
 import cx_Freeze
@@ -28,13 +31,16 @@ if find_spec("sportorg_rust_example") is not None:
 if find_spec("sportorg_core") is not None:
     includes.append("sportorg_core")
 excludes = ["Tkinter", "unittest", "test", "pydoc"]
+# Qt6 needs Windows 10; the Win7 build falls back to PySide2 (see sportorg/gui/main.py)
+qt_binding = "PySide6" if find_spec("PySide6") is not None else "PySide2"
+excludes.append("PySide2" if qt_binding == "PySide6" else "PySide6")
 
 build_exe_options = {
     "includes": includes,
     "excludes": excludes,
     "packages": ["idna", "requests", "encodings", "asyncio", "pywinusb"],
     "include_files": include_files,
-    "zip_include_packages": ["PySide6"],
+    "zip_include_packages": [qt_binding],
     "optimize": 2,
     "include_msvcr": True,
     "silent": 1,
@@ -113,10 +119,65 @@ executables = [
     )
 ]
 
+
+if sys.platform == "win32":
+    from cx_Freeze.command.bdist_msi import BdistMSI
+
+    class BdistMSINonAscii(BdistMSI):
+        """bdist_msi that can pack files whose names are not ASCII.
+
+        msilib hands FCI the source path encoded as UTF-8, but FCI opens it
+        with the ANSI CRT, so a non-ASCII name is reported as missing and the
+        build dies with "FCI error 1". Stage those files under ASCII names --
+        the name the user ends up with comes from the MSI File table and is
+        not affected.
+
+        Patching here rather than at import time is deliberate: freezing
+        reloads msilib, which would discard a module-level monkeypatch.
+        """
+
+        def add_files(self):
+            import msilib
+
+            original = msilib.FCICreate
+
+            def fcicreate(cabname, files):
+                stage = None
+                staged = []
+                try:
+                    for source, logical in files:
+                        try:
+                            source.encode("ascii")
+                        except UnicodeEncodeError:
+                            if stage is None:
+                                stage = tempfile.mkdtemp(prefix="cxfreeze-cab-")
+                            ascii_source = os.path.join(
+                                stage, "%05d.bin" % len(staged)
+                            )
+                            shutil.copyfile(source, ascii_source)
+                            source = ascii_source
+                        staged.append((source, logical))
+                    return original(cabname, staged)
+                finally:
+                    if stage is not None:
+                        shutil.rmtree(stage, ignore_errors=True)
+
+            msilib.FCICreate = fcicreate
+            try:
+                super().add_files()
+            finally:
+                msilib.FCICreate = original
+
+    cmdclass = {"bdist_msi": BdistMSINonAscii}
+else:
+    cmdclass = {}
+
+
 setup(
     name=config.NAME,
     version=config.VERSION,
     description=config.NAME,
     options=options,
     executables=executables,
+    cmdclass=cmdclass,
 )
