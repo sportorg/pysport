@@ -35,13 +35,58 @@ jobs:
         run: uv run poe generate-version
       - name: Build
         run: uv run python builder.py build
-      - name: Generate installer
+      - name: Generate MSI installer
         run: uv run python builder.py bdist_msi
+      - name: Generate Inno Setup installer
+        shell: pwsh
+        run: |
+          $version = (uv run python -c "from sportorg.config import VERSION; print(VERSION)").Trim()
+          $numeric = [regex]::Match($version, '\d+\.\d+\.\d+').Value
+          if (-not $numeric) { $numeric = '0.0.0' }
+          $buildDir = (Get-ChildItem build -Directory -Filter 'exe.*' | Select-Object -First 1).FullName
+          $iscc = 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe'
+          if (-not (Test-Path $iscc)) {
+            choco install innosetup -y --no-progress
+          }
+          & $iscc "/DMyAppVersion=$version" "/DMyVersionInfoVersion=$numeric.0" "/DBuildDir=$buildDir" sportorg.iss
+      - name: Generate portable archive
+        shell: pwsh
+        run: |
+          $version = (uv run python -c "from sportorg.config import VERSION; print(VERSION)").Trim()
+          $buildDir = (Get-ChildItem build -Directory -Filter 'exe.*' | Select-Object -First 1).FullName
+          New-Item -ItemType Directory -Force dist | Out-Null
+          Compress-Archive -Path "$buildDir\*" -DestinationPath "dist\SportOrg-$version-portable.zip" -Force
       - name: Upload the artifact
         uses: actions/upload-artifact@v7
         with:
-          path: dist/*.msi
+          path: |
+            dist/*.msi
+            dist/*.exe
+            dist/*.zip
           name: ${{ runner.os }}-${{ matrix.architecture }}
+      - name: Remove previous nightly assets
+        # Every artifact carries the version in its name, and the release action
+        # only overwrites assets whose name matches, so nightly would otherwise
+        # keep one set per build.  Clear it so the tag always holds exactly the
+        # current build.  Failure here is not worth losing the release over.
+        if: github.ref == 'refs/tags/nightly'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference = 'Continue'
+          $PSNativeCommandUseErrorActionPreference = $false
+          $assets = gh release view nightly --json assets --jq '.assets[].name'
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host 'No nightly release yet - nothing to remove.'
+            exit 0
+          }
+          foreach ($name in $assets) {
+            Write-Host "Deleting $name"
+            gh release delete-asset nightly $name --yes
+            if ($LASTEXITCODE -ne 0) { Write-Warning "Could not delete $name" }
+          }
+          exit 0
       - name: Release
         uses: softprops/action-gh-release@v3
         if: startsWith(github.ref, 'refs/tags/')
@@ -49,3 +94,5 @@ jobs:
           make_latest: ${{ github.ref_name != 'nightly' }}
           files: |
             dist/*.msi
+            dist/*.exe
+            dist/*.zip

@@ -172,17 +172,13 @@ class SoundTab(Tab):
         self.label_successful = QLabel(translate("Successful result"))
         self.item_successful = AdvComboBox()
         self.item_successful.addItems(self.sounds)
-        self.item_successful.setCurrentText(
-            settings.SETTINGS.sound_successful_path or config.sound_dir("ok.wav")
-        )
+        self.item_successful.setCurrentText(settings.successful_sound_path())
         self.layout.addRow(self.label_successful, self.item_successful)
 
         self.label_unsuccessful = QLabel(translate("Unsuccessful result"))
         self.item_unsuccessful = AdvComboBox()
         self.item_unsuccessful.addItems(self.sounds)
-        self.item_unsuccessful.setCurrentText(
-            settings.SETTINGS.sound_unsuccessful_path or config.sound_dir("failure.wav")
-        )
+        self.item_unsuccessful.setCurrentText(settings.unsuccessful_sound_path())
         self.layout.addRow(self.label_unsuccessful, self.item_unsuccessful)
 
         self.item_enabled_rented_card = QCheckBox(translate("Enable rented card sound"))
@@ -195,19 +191,13 @@ class SoundTab(Tab):
         self.label_rented_card = QLabel(translate("Rented card sound"))
         self.item_rented_card = AdvComboBox()
         self.item_rented_card.addItems(self.sounds)
-        self.item_rented_card.setCurrentText(
-            settings.SETTINGS.sound_rented_card_path
-            or config.sound_dir("rented_card.wav")
-        )
+        self.item_rented_card.setCurrentText(settings.rented_card_sound_path())
         self.layout.addRow(self.label_rented_card, self.item_rented_card)
 
         self.label_enter_number = QLabel(translate("Enter number sound"))
         self.item_enter_number = AdvComboBox()
         self.item_enter_number.addItems(self.sounds)
-        self.item_enter_number.setCurrentText(
-            settings.SETTINGS.sound_enter_number_path
-            or config.sound_dir("enter_number.wav")
-        )
+        self.item_enter_number.setCurrentText(settings.enter_number_sound_path())
         self.layout.addRow(self.label_enter_number, self.item_enter_number)
 
     def save(self):

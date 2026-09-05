@@ -1,20 +1,28 @@
+import os
+import shutil
 import sys
+import tempfile
 from importlib.util import find_spec
 
+import cx_Freeze
 from cx_Freeze import Executable, setup
 
 from sportorg import config
 
+CXFREEZE_MAJOR = int(cx_Freeze.__version__.split(".")[0])
+
 base = None
 if sys.platform == "win32":
-    base = "Win32GUI"
+    # The GUI base was renamed in cx_Freeze 8.0 and no fallback ships: 6.x/7.x
+    # only have "Win32GUI", 8.x only has "gui".  This file has to serve both --
+    # 6.15 under Python 3.8, 8.x under 3.14 -- so pick the name by version.
+    base = "gui" if CXFREEZE_MAJOR >= 8 else "Win32GUI"
 
 include_files = [
     (config.base_dir("sportorg", "data"), "lib/sportorg/data"),
     config.base_dir("LICENSE"),
     config.base_dir("changelog.md"),
     config.base_dir("changelog_ru.md"),
-    (config.base_dir("configs"), "configs"),
     config.COMMIT_VERSION_FILE,
 ]
 includes = ["atexit", "codecs", "playsound3", "pyImpinj"]
@@ -23,21 +31,53 @@ if find_spec("sportorg_rust_example") is not None:
 if find_spec("sportorg_core") is not None:
     includes.append("sportorg_core")
 excludes = ["Tkinter", "unittest", "test", "pydoc"]
+# Qt6 needs Windows 10; the Win7 build falls back to PySide2 (see sportorg/gui/main.py)
+qt_binding = "PySide6" if find_spec("PySide6") is not None else "PySide2"
+excludes.append("PySide2" if qt_binding == "PySide6" else "PySide6")
 
 build_exe_options = {
     "includes": includes,
     "excludes": excludes,
     "packages": ["idna", "requests", "encodings", "asyncio", "pywinusb"],
     "include_files": include_files,
-    "zip_include_packages": ["PySide6"],
+    "zip_include_packages": [qt_binding],
     "optimize": 2,
     "include_msvcr": True,
     "silent": 1,
 }
 
+# SportOrg stores its races, settings and logs next to the executable, so an
+# operator without administrative rights has to be able to write there.  The
+# installer creates both directories and grants Everyone full control; MSI
+# maps the name "Everyone" to the well-known SID itself, so this also works on
+# a localised Windows.
+GENERIC_ALL = 0x10000000
+WRITABLE_DIRS = [
+    ("DataDir", "data"),
+    ("LogDir", "logs"),
+]
+
+# Identifies the product across releases so that installing a new version
+# removes the old one instead of registering a second entry beside it.  This
+# GUID is product identity: generated once, it must never change again, or
+# every already-installed copy becomes un-upgradable.  It is deliberately not
+# the AppId from sportorg.iss -- Inno keeps its own uninstall registry and the
+# two never consult each other.
+#
+# ProductCode stays random per build, which is what a major upgrade requires.
+UPGRADE_CODE = "{D652DEE1-13E6-4D7A-B8FC-334FF475E5FD}"
+
 bdist_msi_options = {
-    "all_users": False,
+    "all_users": True,
+    "upgrade_code": UPGRADE_CODE,
+    "initial_target_dir": r"[ProgramFiles64Folder]\{}".format(config.NAME),
     "data": {
+        "Directory": [(logical, "TARGETDIR", name) for logical, name in WRITABLE_DIRS],
+        "CreateFolder": [(logical, "TARGETDIR") for logical, _ in WRITABLE_DIRS],
+        "LockPermissions": [
+            (logical, "CreateFolder", None, "Everyone", GENERIC_ALL)
+            for logical, _ in WRITABLE_DIRS
+        ],
         "Shortcut": [
             (
                 "DesktopShortcut",  # Shortcut
@@ -53,9 +93,20 @@ bdist_msi_options = {
                 None,  # ShowCmd
                 "TARGETDIR",  # WkDir
             ),
-        ]
+        ],
     },
 }
+
+
+if CXFREEZE_MAJOR >= 8:
+    # 8.x names the installer after ProductVersion, which MSI forces to be
+    # strictly numeric, so "v1.8.0b2" would ship as SportOrg-1.8.0-win64.msi and
+    # collide with the eventual 1.8.0.  Keep the name 6.x produced.
+    from cx_Freeze.command.bdist_msi import MSI_PLATFORM
+
+    bdist_msi_options["output_name"] = "{}-{}-{}.msi".format(
+        config.NAME.lower(), config.VERSION.lstrip("v"), MSI_PLATFORM
+    )
 
 options = {"build_exe": build_exe_options, "bdist_msi": bdist_msi_options}
 
@@ -68,10 +119,65 @@ executables = [
     )
 ]
 
+
+if sys.platform == "win32":
+    from cx_Freeze.command.bdist_msi import BdistMSI
+
+    class BdistMSINonAscii(BdistMSI):
+        """bdist_msi that can pack files whose names are not ASCII.
+
+        msilib hands FCI the source path encoded as UTF-8, but FCI opens it
+        with the ANSI CRT, so a non-ASCII name is reported as missing and the
+        build dies with "FCI error 1". Stage those files under ASCII names --
+        the name the user ends up with comes from the MSI File table and is
+        not affected.
+
+        Patching here rather than at import time is deliberate: freezing
+        reloads msilib, which would discard a module-level monkeypatch.
+        """
+
+        def add_files(self):
+            import msilib
+
+            original = msilib.FCICreate
+
+            def fcicreate(cabname, files):
+                stage = None
+                staged = []
+                try:
+                    for source, logical in files:
+                        try:
+                            source.encode("ascii")
+                        except UnicodeEncodeError:
+                            if stage is None:
+                                stage = tempfile.mkdtemp(prefix="cxfreeze-cab-")
+                            ascii_source = os.path.join(
+                                stage, "%05d.bin" % len(staged)
+                            )
+                            shutil.copyfile(source, ascii_source)
+                            source = ascii_source
+                        staged.append((source, logical))
+                    return original(cabname, staged)
+                finally:
+                    if stage is not None:
+                        shutil.rmtree(stage, ignore_errors=True)
+
+            msilib.FCICreate = fcicreate
+            try:
+                super().add_files()
+            finally:
+                msilib.FCICreate = original
+
+    cmdclass = {"bdist_msi": BdistMSINonAscii}
+else:
+    cmdclass = {}
+
+
 setup(
     name=config.NAME,
     version=config.VERSION,
     description=config.NAME,
     options=options,
     executables=executables,
+    cmdclass=cmdclass,
 )

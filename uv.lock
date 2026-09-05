@@ -3899,7 +3899,7 @@ wheels = [
 
 [[package]]
 name = "sportorg"
-version = "1.8.0b1"
+version = "1.8.0b2"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp", version = "3.10.11", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },

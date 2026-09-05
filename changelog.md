@@ -34,6 +34,8 @@
 + Added short title field in event properties: shown in the window title and multi-day race selector
 + Added feature flags in settings with SFR support toggle for menu visibility
 + Added Light / Dark / System theme switcher
++ Releases now publish an Inno Setup EXE-installer and a portable archive alongside the MSI, installers now offer the 64-bit `Program Files` directory, create `{app}\data` and `{app}\logs` and grant write access
++ Added instructions for building a package compatible with Windows 7
 
 ### Fixes
 
@@ -56,6 +58,11 @@
 + Fixed duplicate results in teamwork
 + Fixed: groups and organizations lost their sort order when sending selected items to a report template (HTML/DOCX/CSV)
 + Fixed: lost results in a multiday race when sending selected items to a report template (HTML/DOCX/CSV)
++ Fixed: data, logs, configs, templates and sounds are now resolved relative to the program instead of the working directory
++ Fixed: a first run no longer replaces the shipped defaults with the pre-1.6 `config.ini` ones. The `config.ini` import now runs only when that file exists
++ Fixed: the default sounds are resolved from the package when played, instead of being written into `settings.json` as absolute paths on first run
++ Fixed: `uv run poe run` also runs `generate-mo` and `generate-version`
++ Fixed: `builder.py bdist_msi` failed with `FCI error 1` when a packaged file had a non-ASCII name, such as a Cyrillic report template
 
 ## 2025-04-01
 
