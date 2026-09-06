@@ -37,7 +37,7 @@ jobs:
         python_version: [3.8, 3.14]
         architecture: [x64]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python_version }}
@@ -61,7 +61,7 @@ jobs:
         python_version: [3.8, 3.14]
         architecture: [x64]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python_version }}
@@ -87,7 +87,7 @@ jobs:
     name: Build on Windows ${{ matrix.architecture }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Set up Python
         id: set_up_python
         uses: actions/setup-python@v5
