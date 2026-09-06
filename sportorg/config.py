@@ -1,18 +1,13 @@
-import atexit
-import logging.config
+import logging
 import os
 import sys
-from contextlib import ExitStack
 from pathlib import Path
-from typing import Dict, Tuple
+from typing import Any, Dict
 
-try:
-    from importlib.resources import as_file, files
-except ImportError:
-    from importlib_resources import as_file, files
+from sportorg import paths
 
 NAME = "SportOrg"
-VERSION = "v1.8.0b1"
+VERSION = "v1.8.0b2"
 PYTHON_VERSION = (
     f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
 )
@@ -23,95 +18,62 @@ TEMPLATES_PATH = os.getenv(f"{ENV_PREFIX}TEMPLATES_PATH", "")
 
 
 def is_executable() -> bool:
-    return hasattr(sys, "frozen")
+    return paths.is_executable()
 
 
 def module_path() -> str:
-    if is_executable():
-        return os.path.dirname(sys.executable)
-
-    return os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
+    return paths.app_dir()
 
 
-BASE_DIR = module_path()
+BASE_DIR = paths.app_dir()
 
 
-def base_dir(*paths) -> str:
-    return os.path.join(BASE_DIR, *paths)
+def base_dir(*parts) -> str:
+    return paths.app_dir(*parts)
 
 
-def runtime_dir(*paths) -> str:
-    return os.path.join(os.path.abspath(os.getcwd()), *paths)
-
-
-_RESOURCE_STACK = ExitStack()
-atexit.register(_RESOURCE_STACK.close)
-_RESOURCE_PATH_CACHE: Dict[Tuple[str, ...], str] = {}
-_RESOURCE_ROOT = files("sportorg.data")
-
-
-def package_data_path(*paths) -> str:
-    key = tuple(paths)
-    if key not in _RESOURCE_PATH_CACHE:
-        resource = _RESOURCE_ROOT.joinpath(*paths)
-        _RESOURCE_PATH_CACHE[key] = str(
-            _RESOURCE_STACK.enter_context(as_file(resource))
-        )
-
-    return _RESOURCE_PATH_CACHE[key]
+def package_data_path(*parts) -> str:
+    return paths.package_dir(*parts)
 
 
 IMG_DIR = package_data_path("img")
 
 
-def img_dir(*paths) -> str:
-    return os.path.join(IMG_DIR, *paths)
+def img_dir(*parts) -> str:
+    return os.path.join(IMG_DIR, *parts)
 
 
 ICON_DIR = img_dir("icon")
 
 
-def icon_dir(*paths) -> str:
-    return os.path.join(ICON_DIR, *paths)
+def icon_dir(*parts) -> str:
+    return os.path.join(ICON_DIR, *parts)
 
 
-LOG_DIR = runtime_dir("logs")
+LOG_DIR = paths.log_dir()
 
 
-def log_dir(*paths) -> str:
-    return os.path.join(LOG_DIR, *paths)
+def log_dir(*parts) -> str:
+    return paths.log_dir(*parts)
 
 
-DATA_DIR = runtime_dir("data")
+DATA_DIR = paths.data_dir()
 
 
-def data_dir(*paths) -> str:
-    return os.path.join(DATA_DIR, *paths)
+def data_dir(*parts) -> str:
+    return paths.data_dir(*parts)
 
 
-CONFIGS_DIR = runtime_dir("configs")
-
-
-def configs_dir(*paths) -> str:
-    return os.path.join(CONFIGS_DIR, *paths)
-
-
-DEFAULT_TEMPLATE_DIR = package_data_path("templates")
-TEMPLATE_DIR = TEMPLATES_PATH or DEFAULT_TEMPLATE_DIR
-
-
-SOUND_DIR = package_data_path("sounds")
-
-
-def sound_dir(*paths) -> str:
-    return os.path.join(SOUND_DIR, *paths)
+def sound_dir(*parts) -> str:
+    """Sounds resolve through ``data/sounds`` and fall back to the package."""
+    return paths.resolve_seeded("sounds", *parts)
 
 
 STYLE_DIR = package_data_path("styles")
 
 
-def style_dir(*paths) -> str:
-    return os.path.join(STYLE_DIR, *paths)
+def style_dir(*parts) -> str:
+    return os.path.join(STYLE_DIR, *parts)
 
 
 COMMIT_VERSION_FILE = base_dir("version")
@@ -133,60 +95,53 @@ SETTINGS_JSON = data_dir("settings.json")
 LOCALE_DIR = package_data_path("languages")
 
 
-def locale_dir(*paths) -> str:
-    return os.path.join(LOCALE_DIR, *paths)
+def locale_dir(*parts) -> str:
+    return os.path.join(LOCALE_DIR, *parts)
 
 
-DIRS = [
-    DATA_DIR,
-    CONFIGS_DIR,
-    LOG_DIR,
-]
+def build_log_config() -> Dict[str, Any]:
+    """Build the logging configuration.
 
-if TEMPLATES_PATH:
-    DIRS.append(TEMPLATE_DIR)
-
-for _DIR in DIRS:
-    os.makedirs(_DIR, exist_ok=True)
-
-LOG_CONFIG = {
-    "version": 1,
-    "formatters": {
-        "detailed": {
-            "class": "logging.Formatter",
-            "format": "%(levelname)s %(asctime)-15s %(threadName)s@%(filename)s:%(lineno)d %(message)s",
+    Built on demand rather than at import time: the file handlers name paths
+    inside ``logs/``, which only exists once :func:`sportorg.startup.init` has
+    created it.
+    """
+    return {
+        "version": 1,
+        "formatters": {
+            "detailed": {
+                "class": "logging.Formatter",
+                "format": "%(levelname)s %(asctime)-15s %(threadName)s@%(filename)s:%(lineno)d %(message)s",
+            },
+            "cls": {
+                "class": "logging.Formatter",
+                "format": "%(levelname)s %(threadName)s@%(filename)s:%(lineno)d %(message)s",
+            },
         },
-        "cls": {
-            "class": "logging.Formatter",
-            "format": "%(levelname)s %(threadName)s@%(filename)s:%(lineno)d %(message)s",
+        "handlers": {
+            "console": {
+                "class": "logging.StreamHandler",
+                "level": logging.DEBUG,
+                "formatter": "cls",
+                "stream": sys.stdout,
+            },
+            "file": {
+                "class": "logging.FileHandler",
+                "filename": log_dir(NAME.lower() + ".log"),
+                "mode": "a",
+                "formatter": "detailed",
+            },
+            "errors": {
+                "class": "logging.FileHandler",
+                "filename": log_dir(NAME.lower() + "-errors.log"),
+                "mode": "a",
+                "level": logging.ERROR,
+                "formatter": "detailed",
+            },
         },
-    },
-    "handlers": {
-        "console": {
-            "class": "logging.StreamHandler",
-            "level": logging.DEBUG,
-            "formatter": "cls",
-            "stream": sys.stdout,
-        },
-        "file": {
-            "class": "logging.FileHandler",
-            "filename": log_dir(NAME.lower() + ".log"),
-            "mode": "a",
-            "formatter": "detailed",
-        },
-        "errors": {
-            "class": "logging.FileHandler",
-            "filename": log_dir(NAME.lower() + "-errors.log"),
-            "mode": "a",
-            "level": logging.ERROR,
-            "formatter": "detailed",
-        },
-    },
-    "loggers": {"main": {"handlers": ["file"]}},
-    "root": {"level": logging.DEBUG, "handlers": ["console", "file", "errors"]},
-}
-
-logging.config.dictConfig(LOG_CONFIG)
+        "loggers": {"main": {"handlers": ["file"]}},
+        "root": {"level": logging.DEBUG, "handlers": ["console", "file", "errors"]},
+    }
 
 
 def get_creator_name() -> str:

@@ -58,6 +58,63 @@ uv run poe test
 
 `python builder.py build`
 
+### Windows 7
+
+Windows 7 needs an environment of its own. The build follows whichever Qt
+binding is installed, so no separate builder command exists — prepare the
+environment, then build as usual.
+
+Three dependencies must be held back. Anything built with Rust 1.78 or newer
+links `WaitOnAddress` / `WakeByAddressAll` from `api-ms-win-core-synch-l1-2-0.dll`
+statically instead of resolving them at run time; Windows 7 does not export
+them, so the module fails to load with "the specified procedure could not be
+found":
+
+| Dependency   | Last version that runs on Windows 7 | First broken version |
+|--------------|-------------------------------------|----------------------|
+| orjson       | `3.10.13`                           | `3.10.14`            |
+| cryptography | `42.0.8`                            | `43.0.3`             |
+| Qt           | `PySide2` (Qt5)                     | any `PySide6` (Qt6)  |
+
+`cryptography` 43 and newer additionally call `ProcessPrng`, which is Windows 10
+only. Qt6 needs Windows 10 as well, so Qt5 is the last usable toolkit.
+
+Pin them in `pyproject.toml` before syncing:
+
+```toml
+gui = [
+  "PySide2>=5.15,<6",
+]
+```
+
+```toml
+  "cryptography>=41,<=42.0.8",
+  "orjson>=3.9.5,<=3.10.13",
+```
+
+Then build:
+
+```
+uv sync --all-extras --python 3.8
+uv run poe generate-mo
+uv run poe generate-version
+uv run python builder.py build
+```
+
+Package the result as a portable archive:
+
+```powershell
+$version = (uv run python -c "from sportorg.config import VERSION; print(VERSION)").Trim()
+$buildDir = (Get-ChildItem build -Directory -Filter 'exe.*' | Select-Object -First 1).FullName
+New-Item -ItemType Directory -Force dist | Out-Null
+Compress-Archive -Path "$buildDir\*" -DestinationPath "dist\sportorg-$version-win7-64.zip" -Force
+```
+
+`uv run python builder.py bdist_msi` also works and produces an installer.
+
+Do not commit the pins: the released artifacts are built against PySide6 and
+current dependencies, and these ceilings would silently downgrade them.
+
 ## Commit Message Format
 
 This project adheres to [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
