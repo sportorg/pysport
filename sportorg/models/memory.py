@@ -1,4 +1,5 @@
 import datetime
+import itertools
 import logging
 import re
 import time
@@ -1647,6 +1648,94 @@ class RaceData:
             self.end_datetime = dateutil.parser.parse(data["end_datetime"])
 
 
+class _IdCounter:
+    """Multiset of ids: `take(id)` succeeds once per requested occurrence.
+
+    Deletion is driven by selected table rows, so two selected rows sharing an
+    id (which files written before the index fix may contain) must delete two
+    objects, and one selected row must delete exactly one.
+    """
+
+    def __init__(self, ids):
+        self._left: Dict[Any, int] = {}
+        for obj_id in ids:
+            self._left[obj_id] = self._left.get(obj_id, 0) + 1
+
+    def take(self, obj_id):
+        left = self._left.get(obj_id, 0)
+        if left <= 0:
+            return False
+        self._left[obj_id] = left - 1
+        return True
+
+
+class _TrackedList(list):
+    """List that stamps a new version on every mutation.
+
+    `Race` keeps id->object indexes for teamwork and plugin lookups. Objects are
+    added to `Race.persons`, `Race.results` and the other race lists from dozens
+    of places (GUI dialogs, importers, chip readers), so the indexes cannot be
+    kept in sync by hand. The version lets `Race` notice any change and refresh
+    the index lazily, at O(1) cost when nothing moved.
+    """
+
+    _versions = itertools.count()
+    version = None  # set per instance; copies made without __init__ start here
+
+    def __init__(self, iterable=()):
+        super().__init__(iterable)
+        self._touch()
+
+    def _touch(self):
+        self.version = next(self._versions)
+
+    def append(self, value):
+        super().append(value)
+        self._touch()
+
+    def insert(self, index, value):
+        super().insert(index, value)
+        self._touch()
+
+    def extend(self, iterable):
+        super().extend(iterable)
+        self._touch()
+
+    def remove(self, value):
+        super().remove(value)
+        self._touch()
+
+    def pop(self, index=-1):
+        value = super().pop(index)
+        self._touch()
+        return value
+
+    def clear(self):
+        super().clear()
+        self._touch()
+
+    def sort(self, **kwargs):
+        super().sort(**kwargs)
+        self._touch()
+
+    def reverse(self):
+        super().reverse()
+        self._touch()
+
+    def __setitem__(self, key, value):
+        super().__setitem__(key, value)
+        self._touch()
+
+    def __delitem__(self, key):
+        super().__delitem__(key)
+        self._touch()
+
+    def __iadd__(self, other):
+        result = super().__iadd__(other)
+        self._touch()
+        return result
+
+
 class Race:
     support_obj = {
         "Person": Person,
@@ -1666,11 +1755,11 @@ class Race:
     def __init__(self):
         self.id = uuid.uuid4()
         self.data = RaceData()
-        self.organizations: List[Organization] = []
-        self.courses: List[Course] = []
-        self.groups: List[Group] = []
-        self.results: List[Result] = []
-        self.persons: List[Person] = []
+        self.organizations: List[Organization] = _TrackedList()
+        self.courses: List[Course] = _TrackedList()
+        self.groups: List[Group] = _TrackedList()
+        self.results: List[Result] = _TrackedList()
+        self.persons: List[Person] = _TrackedList()
         self.relay_teams: List[RelayTeam] = []
         self.settings: Dict[str, Any] = {}
         self.controls: List[ControlPoint] = []
@@ -1683,6 +1772,8 @@ class Race:
         self.organization_index: Dict[str, Organization] = {}
         self.course_index: Dict[str, Course] = {}
         self.course_index_name: Dict[str, Course] = {}
+        # version of the object list each id index was last built from
+        self._index_versions: Dict[str, Any] = {}
 
     def __repr__(self) -> str:
         return repr(self.data)
@@ -1844,12 +1935,66 @@ class Race:
         else:
             self.update_obj(obj, dict_obj)
 
+    # object list attribute backing each id index, by object name
+    _index_list_attr = {
+        "Person": "persons",
+        "Result": "results",
+        "Group": "groups",
+        "Course": "courses",
+        "Organization": "organizations",
+    }
+
+    def _index_bucket(self, obj_name):
+        return "Result" if obj_name.startswith("Result") else obj_name
+
+    def _get_index(self, obj_name):
+        """id -> object index for `obj_name`, merged with the current list.
+
+        The index must not miss an object of the race, or teamwork creates a
+        duplicate under the same id, and it must not keep a deleted one, or a
+        teamwork update lands on a detached object and is silently lost.
+
+        Objects are added to the race from dozens of places, so entries are
+        merged in lazily from the list instead of being registered at every call
+        site. Entries are dropped only by the delete methods: table filtering
+        temporarily moves rows out of the race lists without deleting them, and
+        those objects must stay reachable by id.
+        """
+        bucket = self._index_bucket(obj_name)
+        index = self.index_obj[obj_name]
+        cur_list = getattr(self, self._index_list_attr[bucket])
+        if not isinstance(cur_list, _TrackedList):
+            # a plain list was assigned to the race (e.g. table sorting)
+            cur_list = _TrackedList(cur_list)
+            setattr(self, self._index_list_attr[bucket], cur_list)
+        elif cur_list.version is None:
+            cur_list._touch()
+        if self._index_versions.get(bucket) != cur_list.version:
+            for item in cur_list:
+                index[str(item.id)] = item
+            self._index_versions[bucket] = cur_list.version
+        return index
+
+    def _unregister_obj(self, obj_name, obj):
+        """Drop a deleted object from its id index."""
+        self.index_obj[obj_name].pop(str(obj.id), None)
+
+    def _register_obj(self, obj_name, obj, at_start=False):
+        """Add `obj` to its race list and to the id index, keeping both in sync."""
+        bucket = self._index_bucket(obj_name)
+        index = self._get_index(obj_name)
+        cur_list = getattr(self, self._index_list_attr[bucket])
+        if at_start:
+            cur_list.insert(0, obj)
+        else:
+            cur_list.append(obj)
+        index[str(obj.id)] = obj
+        self._index_versions[bucket] = cur_list.version
+
     def get_obj(self, obj_name, obj_id):
-        cur_dict = self.index_obj[obj_name]
-        try:
-            return cur_dict[obj_id]
-        except KeyError:
+        if obj_id is None:
             return None
+        return self._get_index(obj_name).get(str(obj_id))
 
     def update_obj(self, obj, dict_obj):
         obj.update_data(dict_obj)
@@ -1874,8 +2019,7 @@ class Race:
         obj = self.support_obj[dict_obj["object"]]()
         obj.id = uuid.UUID(dict_obj["id"])
         self.update_obj(obj, dict_obj)
-        self.list_obj[dict_obj["object"]].append(obj)
-        self.index_obj[dict_obj["object"]][dict_obj["id"]] = obj
+        self._register_obj(dict_obj["object"], obj)
 
     def get_type(self, group: Group):
         if group.get_type():
@@ -1929,11 +2073,11 @@ class Race:
         return persons
 
     def delete_persons_by_id(self, person_ids):
-        person_ids_set = set(person_ids)
+        person_ids_set = _IdCounter(person_ids)
         persons = []
         i = 0
         while i < len(self.persons):
-            if self.persons[i].id in person_ids_set:
+            if person_ids_set.take(self.persons[i].id):
                 person = self.persons[i]
                 persons.append(person)
                 self.remove_person_from_indexes(person)
@@ -1943,12 +2087,11 @@ class Race:
         return persons
 
     def remove_person_from_indexes(self, person: Person):
+        self._unregister_obj("Person", person)
         for result in self.results:
             if result.person is person:
                 result.person = None
                 result.bib = person.bib
-        if person.id in self.person_index:
-            del self.person_index[person.id]
         if (
             person.bib
             and person.bib in self.person_index_bib
@@ -1968,19 +2111,19 @@ class Race:
         for i in indexes:
             result = self.results[i]
             results.append(result)
-            if result.id in self.result_index:
-                del self.result_index[result.id]
+            self._unregister_obj("Result", result)
             del self.results[i]
         return results
 
     def delete_results_by_id(self, result_ids):
-        result_ids_set = set(result_ids)
+        result_ids_set = _IdCounter(result_ids)
         results = []
         i = 0
         while i < len(self.results):
-            if self.results[i].id in result_ids_set:
+            if result_ids_set.take(self.results[i].id):
                 result = self.results[i]
                 results.append(result)
+                self._unregister_obj("Result", result)
                 del self.results[i]
             else:
                 i += 1
@@ -1996,21 +2139,21 @@ class Race:
 
         indexes = sorted(indexes, reverse=True)
         for i in indexes:
-            if self.groups[i].id in self.group_index:
-                del self.group_index[self.groups[i].id]
+            self._unregister_obj("Group", self.groups[i])
             del self.groups[i]
         return groups
 
     def delete_groups_by_id(self, group_ids):
-        group_ids_set = set(group_ids)
+        group_ids_set = _IdCounter(group_ids)
         groups = []
         i = 0
         while i < len(self.groups):
-            if self.groups[i].id in group_ids_set:
+            if group_ids_set.take(self.groups[i].id):
                 group = self.groups[i]
                 if group.count_person > 0:
                     raise NotEmptyException("Cannot remove group")
                 groups.append(group)
+                self._unregister_obj("Group", group)
                 del self.groups[i]
             else:
                 i += 1
@@ -2026,21 +2169,21 @@ class Race:
 
         indexes = sorted(indexes, reverse=True)
         for i in indexes:
-            if self.courses[i].id in self.course_index:
-                del self.course_index[self.courses[i].id]
+            self._unregister_obj("Course", self.courses[i])
             del self.courses[i]
         return courses
 
     def delete_courses_by_id(self, course_ids):
-        course_ids_set = set(course_ids)
+        course_ids_set = _IdCounter(course_ids)
         courses = []
         i = 0
         while i < len(self.courses):
-            if self.courses[i].id in course_ids_set:
+            if course_ids_set.take(self.courses[i].id):
                 course = self.courses[i]
                 if course.count_group > 0:
                     raise NotEmptyException("Cannot remove course")
                 courses.append(course)
+                self._unregister_obj("Course", course)
                 del self.courses[i]
             else:
                 i += 1
@@ -2056,21 +2199,21 @@ class Race:
         indexes = sorted(indexes, reverse=True)
 
         for i in indexes:
-            if self.organizations[i].id in self.organization_index:
-                del self.organization_index[self.organizations[i].id]
+            self._unregister_obj("Organization", self.organizations[i])
             del self.organizations[i]
         return organizations
 
     def delete_organizations_by_id(self, organization_ids):
-        organization_ids_set = set(organization_ids)
+        organization_ids_set = _IdCounter(organization_ids)
         organizations = []
         i = 0
         while i < len(self.organizations):
-            if self.organizations[i].id in organization_ids_set:
+            if organization_ids_set.take(self.organizations[i].id):
                 organization = self.organizations[i]
                 if organization.count_person > 0:
                     raise NotEmptyException("Cannot remove organization")
                 organizations.append(organization)
+                self._unregister_obj("Organization", organization)
                 del self.organizations[i]
             else:
                 i += 1
@@ -2247,11 +2390,10 @@ class Race:
                 )
                 return
 
-        self.results.insert(0, result)
-        self.index_obj[result.__class__.__name__][str(result.id)] = result
+        self._register_obj(result.__class__.__name__, result, at_start=True)
 
     def add_result(self, result):
-        if not self.index_obj[result.__class__.__name__].get(str(result.id), None):
+        if self.get_obj(result.__class__.__name__, result.id) is None:
             self.add_new_result(result)
 
     def clear_results(self):
