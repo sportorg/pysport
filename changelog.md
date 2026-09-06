@@ -53,7 +53,7 @@
 + Fixed a split printout error when a participant’s group or course was not found ([#526](https://github.com/sportorg/pysport/issues/526))
 + Fixed quick start group input using Alt+number ([#536](https://github.com/sportorg/pysport/issues/536))
 + Fixed: incorrect row deletion when records table are update during confirmation
-+ Fixed duplicate results in teamwork
++ Fixed teamwork: a duplicate results when it is sent again; a deleted object not reappearing when it is sent again
 + Fixed: groups and organizations lost their sort order when sending selected items to a report template (HTML/DOCX/CSV)
 + Fixed: lost results in a multiday race when sending selected items to a report template (HTML/DOCX/CSV)
 
