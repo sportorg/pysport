@@ -273,7 +273,7 @@ class Huichang(object):
     @staticmethod
     def _to_time(data: bytes) -> time:
         if data[1] > 59 or data[2] > 59:
-            return time()
+            return None
         h = data[0]
         if h > 23:
             h %= 24
