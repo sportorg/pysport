@@ -56,6 +56,8 @@
 + Fixed duplicate results in teamwork
 + Fixed: groups and organizations lost their sort order when sending selected items to a report template (HTML/DOCX/CSV)
 + Fixed: lost results in a multiday race when sending selected items to a report template (HTML/DOCX/CSV)
++ Fixed: missed finish always was 00:00:00 for Huichang
++ Fixed: reading Huichang contactless cards if not received battery level packet
 
 ## 2025-04-01
 
