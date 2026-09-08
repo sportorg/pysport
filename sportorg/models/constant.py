@@ -92,7 +92,7 @@ class Countries:
 
     def get_all(self):
         if not self._LOADED:
-            self.set(_read_config_items(settings.SETTINGS.source_countries_path))
+            self.set(_read_config_items(settings.countries_path()))
         return self.COUNTRIES
 
     def set(self, items):
@@ -107,7 +107,7 @@ class Groups:
 
     def get_all(self):
         if not self._LOADED:
-            self.set(_read_config_items(settings.SETTINGS.source_groups_path))
+            self.set(_read_config_items(settings.groups_path()))
         return self.GROUPS
 
     def set(self, items):
