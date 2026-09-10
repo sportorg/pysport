@@ -2,7 +2,7 @@ import logging
 import os
 import ctypes
 import configparser
-from sportorg.language import translate
+
 from queue import Empty, Queue
 from random import randint
 from threading import Event, main_thread
@@ -17,6 +17,7 @@ from sportorg.common.otime import OTime
 from sportorg.common.singleton import singleton
 from sportorg.models import memory
 from sportorg.models.memory import race
+from sportorg.language import translate
 
 BYTE = ctypes.c_ubyte
 
@@ -26,21 +27,21 @@ class ImpinjCommand:
         self.data = data
 
 class ImpinjThread(QThread):
-    def __init__(self, port, queue, stop_event, logger, debug=False):
+    def __init__(self, port, queue, stop_event, logger, INFO=False):
         self.port = port
         super().__init__()
         self.setObjectName(self.__class__.__name__)
         self._queue = queue
         self._stop_event = stop_event
         self._logger = logger
-        self._debug = debug
+        self._INFO = INFO
         self.timeout_list = {}
         self.timeout = race().get_setting("readout_duplicate_timeout", 15000)
         
         self.dll = None
         self.frm_handle = ctypes.c_int(-1)
         self.com_adr = BYTE(0xFF)
-        self._logger.info(f"[RFID-DEBUG] Thread initialized. Assigned port from configurations: {self.port}")
+        self._logger.info(f"[RFID-INFO] Thread initialized. Assigned port from configurations: {self.port}")
 
     def _init_dll(self):
         try:
@@ -48,7 +49,7 @@ class ImpinjThread(QThread):
             base_dir = os.path.dirname(os.path.abspath(__file__))
             dll_path = os.path.abspath(os.path.join(base_dir, "..", "..", "libs", "rfid_impinj", "UHFReader288.dll"))
             
-            self._logger.info(f"[RFID-DEBUG] Attempting to load DLL at path: {dll_path}")
+            self._logger.info(f"[RFID-INFO] Attempting to load DLL at path: {dll_path}")
             
             # 2. Add folder to Windows search paths for linked DLL dependencies (required for Python 3.8+)
             if hasattr(os, 'add_dll_directory'):
@@ -59,10 +60,10 @@ class ImpinjThread(QThread):
             
             # 3. Load the library context structure
             self.dll = ctypes.WinDLL(dll_path, winmode=0)
-            self._logger.info("[RFID-DEBUG] Library UHFReader288.dll successfully loaded into memory.")
+            self._logger.info("[RFID-INFO] Library UHFReader288.dll successfully loaded into memory.")
             return True
         except Exception as e:
-            self._logger.error(f"[RFID-DEBUG] CRITICAL ERROR loading UHFReader288.dll: {e}")
+            self._logger.error(f"[RFID-INFO] CRITICAL ERROR loading UHFReader288.dll: {e}")
             return False
 
     def _connect_reader(self):
@@ -81,65 +82,65 @@ class ImpinjThread(QThread):
         rf_power_val = BYTE(int(saved_power))
         
         if port_num > 0:
-            self._logger.info(f"[RFID-DEBUG] Attempting to open specific target port: COM{port_num} (Baud: {baud_rate.value})")
+            self._logger.info(f"[RFID-INFO] Attempting to open specific target port: COM{port_num} (Baud: {baud_rate.value})")
             try:
                 res = self.dll.OpenComPort(ctypes.c_int(port_num), ctypes.byref(self.com_adr), baud_rate, ctypes.byref(self.frm_handle))
-                self._logger.info(f"[RFID-DEBUG] OpenComPort execution response payload: {res}, retrieved FrmHandle: {self.frm_handle.value}")
+                self._logger.info(f"[RFID-INFO] OpenComPort execution response payload: {res}, retrieved FrmHandle: {self.frm_handle.value}")
                 if res == 0 and self.frm_handle.value >= 0:
-                    self._logger.info(f"[RFID-DEBUG] Connection successfully established on target port COM{port_num}!")
+                    self._logger.info(f"[RFID-INFO] Connection successfully established on target port COM{port_num}!")
                     
                     # Apply antenna validation protection context profiles
                     try: self.dll.SetCheckAnt(ctypes.byref(self.com_adr), check_ant_val, self.frm_handle)
                     except Exception: pass
                     
-                    # --- NEW BLOCK: Transmit RF power calibration payload parameters to controller ---
+                    #  Transmit RF power calibration payload parameters to controller 
                     try:
                         pow_res = self.dll.SetRfPower(ctypes.byref(self.com_adr), rf_power_val, self.frm_handle)
-                        self._logger.info(f"[RFID-DEBUG] Power initialization (SetRfPower={rf_power_val.value} dBm) returned code: {pow_res}")
+                        self._logger.info(f"[RFID-INFO] Power initialization (SetRfPower={rf_power_val.value} dBm) returned code: {pow_res}")
                     except Exception as e:
-                        self._logger.warning(f"[RFID-DEBUG] Failed to call SetRfPower via DLL: {e}")
+                        self._logger.warning(f"[RFID-INFO] Failed to call SetRfPower via DLL: {e}")
                         
                     return True
             except Exception as e:
-                self._logger.error(f"[RFID-DEBUG] Failed to call OpenComPort: {e}")
+                self._logger.error(f"[RFID-INFO] Failed to call OpenComPort: {e}")
                 
-        self._logger.info("[RFID-DEBUG] The specific port did not respond or is not specified. Launching AutoOpenComPort...")
+        self._logger.info("[RFID-INFO] The specific port did not respond or is not specified. Launching AutoOpenComPort...")
         try:
             auto_port = ctypes.c_int(0)
             res = self.dll.AutoOpenComPort(ctypes.byref(auto_port), ctypes.byref(self.com_adr), baud_rate, ctypes.byref(self.frm_handle))
-            self._logger.info(f"[RFID-DEBUG] AutoOpenComPort execution response payload: {res}. Autodetected port: COM{auto_port.value}, FrmHandle: {self.frm_handle.value}")
+            self._logger.info(f"[RFID-INFO] AutoOpenComPort execution response payload: {res}. Autodetected port: COM{auto_port.value}, FrmHandle: {self.frm_handle.value}")
             if res == 0 and self.frm_handle.value >= 0:
-                self._logger.info(f"[RFID-DEBUG] Connection successfully established via autodetected port COM{auto_port.value}!")
+                self._logger.info(f"[RFID-INFO] Connection successfully established via autodetected port COM{auto_port.value}!")
                 
                 # Apply antenna validation protection context profiles
                 try: self.dll.SetCheckAnt(ctypes.byref(self.com_adr), check_ant_val, self.frm_handle)
                 except Exception: pass
                 
-                # --- NEW BLOCK: Transmit RF power calibration payload parameters during auto connection setup ---
+                # Transmit RF power calibration payload parameters during auto connection setup 
                 try:
                     pow_res = self.dll.SetRfPower(ctypes.byref(self.com_adr), rf_power_val, self.frm_handle)
-                    self._logger.info(f"[RFID-DEBUG] Power initialization (SetRfPower={rf_power_val.value} dBm) returned code: {pow_res}")
+                    self._logger.info(f"[RFID-INFO] Power initialization (SetRfPower={rf_power_val.value} dBm) returned code: {pow_res}")
                 except Exception as e:
-                    self._logger.warning(f"[RFID-DEBUG] Error calling SetRfPower by DLL: {e}")
+                    self._logger.warning(f"[RFID-INFO] Error calling SetRfPower by DLL: {e}")
                     
                 return True
         except Exception as e:
-            self._logger.error(f"[RFID-DEBUG] Error calling AutoOpenComPort: {e}")
+            self._logger.error(f"[RFID-INFO] Error calling AutoOpenComPort: {e}")
             
-        self._logger.error("[RFID-DEBUG] Error connect to RFID controller")
+        self._logger.error("[RFID-INFO] Error connect to RFID controller")
         return False
     def run(self):
-        self._logger.info("[RFID-DEBUG] run() method invoked. Initializing tracking pipeline...")
+        self._logger.info("[RFID-INFO] run() method invoked. Initializing tracking pipeline...")
         
         if not self._init_dll():
-            self._logger.error("[RFID-DEBUG] Error calling DLL from start")
+            self._logger.error("[RFID-INFO] Error calling DLL from start")
             return
             
         if not self._connect_reader():
-            self._logger.error("[RFID-DEBUG] Not startig , controller not connect")
+            self._logger.error("[RFID-INFO] Not startig , controller not connect")
             return
             
-        self._logger.info("[RFID-DEBUG] Start SingleTagInventory_G2...")
+        self._logger.info("[RFID-INFO] Start SingleTagInventory_G2...")
         
         loop_counter = 0
         while main_thread().is_alive() and not self._stop_event.is_set():
@@ -191,22 +192,22 @@ class ImpinjThread(QThread):
                     if card_data["epc"] not in self.timeout_list or card_data["time"] - self.timeout_list[card_data["epc"]] >= OTime(msec=self.timeout):
                         self.timeout_list[card_data["epc"]] = card_data["time"]
                         self._queue.put(ImpinjCommand("card_data", card_data), timeout=1)
-                        self._logger.info(f"[RFID-DEBUG] Tag {card_data['epc']} successfully dispatched to Sportorg routing queue.")
+                        self._logger.info(f"[RFID-INFO] Tag {card_data['epc']} successfully dispatched to Sportorg routing queue.")
                         
                 else:
                     # Periodic idle log to show that the thread is alive
                     if loop_counter % 150 == 0:
-                        self._logger.info(f"[RFID-DEBUG] Polling active. DLL response: {res}, Cards found: {card_num.value}")
+                        self._logger.info(f"[RFID-INFO] Polling active. DLL response: {res}, Cards found: {card_num.value}")
                         
             except Exception as e:
-                self._logger.error(f"[RFID-DEBUG] Error inside the polling loop: {e}")
+                self._logger.error(f"[RFID-INFO] Error inside the polling loop: {e}")
                 
             sleep(0.02)
             
-        self._logger.info("[RFID-DEBUG] Exiting the polling loop. Shutting down.")
+        self._logger.info("[RFID-INFO] Exiting the polling loop. Shutting down.")
         if self.frm_handle.value >= 0:
             self.dll.CloseSpecComPort(self.frm_handle)
-            self._logger.info("[RFID-DEBUG] COM-port closed")
+            self._logger.info("[RFID-INFO] COM-port closed")
 class ResultThread(QThread):
     data_sender = Signal(object)
     def __init__(self, queue, stop_event, logger):
@@ -238,7 +239,7 @@ class ResultThread(QThread):
         else:
             result.card_number = (int(epc, 16) + 5000000) % 10**8
         
-        logging.root.info(f"[RFID-DEBUG] >>> Final processed chip card number in Sportorg: {result.card_number} <<<")
+        logging.root.info(f"[RFID-INFO] >>> Final processed chip card number in Sportorg: {result.card_number} <<<")
         
         result.finish_time = card_data["time"]
         
@@ -260,14 +261,14 @@ class ImpinjClient:
         self.port = memory.race().get_setting("system_port", None)
         self._stop_event.clear()
         
-        self._logger.info(f"[RFID-DEBUG] Impinj Client - START button pressed. Current port:{self.port}")
+        self._logger.info(f"[RFID-INFO] Impinj Client - START button pressed. Current port:{self.port}")
         
         if not self._impinj_thread or self._impinj_thread.isFinished():
-            self._logger.info("[RFID-DEBUG] Initializing and launching ImpinjThread execution sequence...")
-            self._impinj_thread = ImpinjThread(self.port, self._queue, self._stop_event, self._logger, debug=True)
+            self._logger.info("[RFID-INFO] Initializing and launching ImpinjThread execution sequence...")
+            self._impinj_thread = ImpinjThread(self.port, self._queue, self._stop_event, self._logger, INFO=True)
             self._impinj_thread.start()
         else:
-            self._logger.warning("[RFID-DEBUG] Start attempt rejected: ImpinjThread is already up and running.")
+            self._logger.warning("[RFID-INFO] Start attempt rejected: ImpinjThread is already up and running.")
             
         if not self._result_thread or self._result_thread.isFinished():
             self._result_thread = ResultThread(self._queue, self._stop_event, self._logger)
@@ -276,7 +277,7 @@ class ImpinjClient:
             self._result_thread.start()
 
     def stop(self):
-        self._logger.info("[RFID-DEBUG] Impinj Client - STOP button pressed..")
+        self._logger.info("[RFID-INFO] Impinj Client - STOP button pressed..")
         self._stop_event.set()
 
     def toggle(self):
@@ -291,20 +292,13 @@ class ImpinjClient:
         )
 
 def detect_impinj_hardware(port_str, baud_idx):
-    """
-    Connection check and controller port auto-detection based on 
-    the external reader_types.ini configuration file.
-    """
+
     try:
         # Base directory where the current script is located
         base_dir = os.path.dirname(os.path.abspath(__file__))
-        # Move up to the project root (3 levels up to sportorg)
-        # root_dir = os.path.dirname(os.path.dirname(os.path.dirname(base_dir)))
-        # Target folder in the root directory
-        # libs_dir = os.path.join(root_dir, "libs", "rfid_impinj")
         libs_dir = os.path.abspath(os.path.join(base_dir, "..", "..", "libs", "rfid_impinj"))
 
-        # 1. Initializing the UHFReader288 DLL from the libs folder.
+        # Initializing the UHFReader288 DLL from the libs folder.
         # Loading the external ReaderType.ini configuration file from the libs folder.
         ini_path = os.path.join(libs_dir, "ReaderType.ini")
         dll_path = os.path.join(libs_dir, "UHFReader288.dll")
