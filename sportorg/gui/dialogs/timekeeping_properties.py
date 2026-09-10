@@ -40,9 +40,8 @@ from sportorg.language import translate
 from sportorg.models.memory import SystemType, race
 from sportorg.models.result.result_tools import recalculate_results
 from sportorg.modules.sportident.sireader import SIReaderClient
-from sportorg.gui.dialogs.impinj_settings_widget import ImpinjSettingsWidget
-from sportorg.modules.rfid_impinj.rfid_impinj import detect_impinj_hardware  
-
+from sportorg.gui.dialogs.impinj_settings_dialog import ImpinjSettingsWidget  
+from sportorg.modules.rfid_impinj.rfid_impinj import check_impinj_connection 
 class TimekeepingPropertiesDialog(QDialog):
     def __init__(self):
         super().__init__(GlobalAccess().get_main_window())
@@ -87,20 +86,12 @@ class TimekeepingPropertiesDialog(QDialog):
         self.punch_system_layout.addRow(self.punch_system_impinj)
 
 
-        # Создаем кнопку-ссылку для перехода в настройки
-        self.btn_go_to_impinj = QPushButton("⚙️ Настроить Impinj...")
-        self.btn_go_to_impinj.setFlat(True)  # Делаем её плоской
-        # Сдвигаем чуть вправо (margin-left), чтобы она стояла ровно под текстом радиокнопки
+        self.btn_go_to_impinj = QPushButton(translate ("Configure Impinj..."))
+        self.btn_go_to_impinj.setFlat(True)  
         self.btn_go_to_impinj.setStyleSheet("color: #0066cc; text-align: left; font-weight: bold; margin-left: 20px;")
-        self.btn_go_to_impinj.setVisible(False)  # Скрыта по умолчанию
-        
-        # Добавляем её в ту же форму в качестве отдельной строки
+        self.btn_go_to_impinj.setVisible(False)
         self.punch_system_layout.addRow(self.btn_go_to_impinj)
-        
-        # Привязываем появление кнопки к выбору радиокнопки
         self.punch_system_impinj.toggled.connect(lambda checked: self.btn_go_to_impinj.setVisible(checked))
-        
-        # Привязываем клик к мгновенному переключению на вкладку настроек
         self.btn_go_to_impinj.clicked.connect(lambda: self.tab_widget.setCurrentWidget(self.impinj_tab))
 
         self.punch_system_srpid = QRadioButton(translate("SRPID"))
@@ -404,20 +395,15 @@ class TimekeepingPropertiesDialog(QDialog):
         self.tab_widget.addTab(self.time_settings_tab, translate("Time settings"))
         self.tab_widget.addTab(self.credit_time_settings_tab, translate("Credit"))
 
-        #добавляем вкладку impinj
-        # 1. Создаем контейнер-виджет для вкладки
         self.impinj_tab = QWidget()
-        impinj_layout = QVBoxLayout(self.impinj_tab)
-
-        # 2. Добавляем  виджет настроек 
+        impinj_layout = QVBoxLayout(self.impinj_tab) 
         self.impinj_settings_widget = ImpinjSettingsWidget()
         impinj_layout.addWidget(self.impinj_settings_widget)
-
-        # 3. Создаем строку управления (кнопка + статус) внизу
         status_layout = QHBoxLayout()
 
-        self.btn_check_connect = QPushButton("Проверить подключение")
-        self.lbl_connect_status = QLabel("Статус: Не проверено")
+        self.btn_check_connect = QPushButton(translate("Test connect"))
+        self.lbl_connect_status = QLabel(translate("Status: not connect"))
+
         
         font = self.lbl_connect_status.font()
         font.setBold(True)
@@ -428,32 +414,27 @@ class TimekeepingPropertiesDialog(QDialog):
         status_layout.addStretch()
 
         impinj_layout.addLayout(status_layout)
-
-        # 4. Привязываем кнопку к обработчику проверки
-        self.btn_check_connect.clicked.connect(self.check_impinj_connection)
-
-        # 5. Добавляем готовую вкладку в общий TabWidget программы
+        self.btn_check_connect.clicked.connect(lambda: check_impinj_connection(self))
         self.tab_widget.addTab(self.impinj_tab, "RFID Impinj")
+
 
         
         def cancel_changes():
             self.close()
 
         def apply_changes():
-            # --- КРИТИЧЕСКАЯ ЗАЩИТА: ПРОВЕРЯЕМ ПОРТ ЗДЕСЬ ПЕРЕД СОХРАНЕНИЕМ ---
             if hasattr(self, 'punch_system_impinj') and self.punch_system_impinj.isChecked():
                 if self.impinj_settings_widget.port_combo.currentData() == "auto":
-                    # Переключаем пользователя на вкладку настроек Импинж
                     self.tab_widget.setCurrentWidget(self.impinj_tab)
                     
-                    # Показываем предупреждение
                     QMessageBox.warning(
                         self, 
-                        "Настройки не завершены", 
-                        "Вы выбрали систему хронометража RFID Impinj, но не настроили контроллер.\n"
-                        "Пожалуйста, проверьте подключение и выберете подключенные антенны."
+                        translate("Configuration incomplete"), 
+                        translate("Impinj RFID system selected, but controller not configured \n.") +
+                        translate("Please check the connection and select the connected antennas.")
                     )
-                    return  # МЯГКИЙ ВЫХОД! Код ниже не выполнится, окно НЕ закроется.
+                    return
+
             try:
                 self.apply_changes_impl()
             except Exception as e:
@@ -965,54 +946,4 @@ class TimekeepingPropertiesDialog(QDialog):
         obj.set_setting("credit_time_cp", self.credit_time_cp_value.value())
 
         recalculate_results(recheck_results=False)
-
-        #self.impinj_settings_widget.save_settings()
-
-    def check_impinj_connection(self):
-        """Метод проверки связи с RFID-ридером (UI-обертка над аппаратным детектором)"""
-        current_port = self.impinj_settings_widget.port_combo.currentData()
-        current_baud_idx = self.impinj_settings_widget.baud_combo.currentData()
-        
-        # Готовим список портов для проверки
-        ports_to_check = [f"COM{i}" for i in range(1, 21)] if current_port == "auto" else [current_port]
-        
-        if current_port == "auto":
-            self.lbl_connect_status.setText("Сканирование COM-портов...")
-            self.lbl_connect_status.setStyleSheet("color: orange;")
-        else:
-            self.lbl_connect_status.setText(f"Проверка {current_port}...")
-            self.lbl_connect_status.setStyleSheet("color: gray;")
-            
-        from PySide6.QtWidgets import QApplication
-        QApplication.processEvents()
-        
-        device_info = None
-        
-        # Бежим по портам и вызываем внешнюю функцию детекции
-        for port_str in ports_to_check:
-            res = detect_impinj_hardware(port_str, current_baud_idx)
-            if res is not None:
-                device_info = res
-                break
-                
-        if device_info:
-            # Нашли ридер! Фиксируем порт в комбобоксе интерфейса
-            idx = self.impinj_settings_widget.port_combo.findData(device_info["port"])
-            if idx >= 0:
-                self.impinj_settings_widget.port_combo.setCurrentIndex(idx)
-                
-            # Перестраиваем сетку чекбосов под реальное число портов ридера
-            self.impinj_settings_widget.rebuild_antenna_checkboxes(device_info["ports_count"])
-            
-            # Выводим красивую строку статуса на форму
-            status_text = f"СТАТУС: OK ({device_info['port']} | Тип: 0x{device_info['type']} | FW: v{device_info['version']} | Портов: {device_info['ports_count']})"
-            self.lbl_connect_status.setText(status_text)
-            self.lbl_connect_status.setStyleSheet("color: green;")
-        else:
-            # Ридер не ответил ни на одном порту
-            if current_port == "auto":
-                self.lbl_connect_status.setText("СТАТУС: Ридер не найден на COM1-COM20")
-            else:
-                self.lbl_connect_status.setText(f"СТАТУС: Ошибка подключения к {current_port}")
-            self.lbl_connect_status.setStyleSheet("color: red;")
 

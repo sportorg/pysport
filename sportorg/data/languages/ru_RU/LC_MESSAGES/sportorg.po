@@ -1948,3 +1948,162 @@ msgstr "Не получается подключиться к станции Т�
 
 msgid "Penalty for extra cp"
 msgstr "Штраф за лишние КП"
+
+msgid "Impinj RFID controller settings"
+msgstr "Настройки RFID-контроллера Impinj"
+
+msgid "Autodetect"
+msgstr "Автопоиск"
+
+msgid "COM port"
+msgstr "Последовательный порт:"
+
+msgid "Baud Rate" 
+msgstr "Скорость соединения:"
+
+msgid "Available RFID Antennas" 
+msgstr "Доступные антенны RFID-контроллера"
+
+msgid "RF Power:" 
+msgstr "Мощность излучения:"
+
+msgid "Safe antenna mode" 
+msgstr "Защитный режим антенны"
+
+msgid "Ant. {}"
+msgstr "Ант. {}"
+
+msgid "Test connect"
+msgstr "Проверить подключение"
+
+msgid "Status: not connect"
+msgstr "Статус: Не проверено"
+
+msgid "Configure Impinj..."
+msgstr "Настроить Impinj..."
+
+msgid "Configuration incomplete" 
+msgstr "Настройки не завершены"
+
+msgid "Impinj RFID system selected, but controller not configured \n."
+msgstr "Вы выбрали систему хронометража RFID Impinj, но не настроили контроллер \n."
+
+msgid "Please check the connection and select the connected antennas."
+msgstr "Пожалуйста, проверьте подключение и выберите подключенные антенны."
+
+msgid "Scaninig COM ports..."
+msgstr "Сканирование COM-портов..."
+
+msgid "Checking"
+msgstr "Проверка"
+
+msgid "STATUS: Impinj Reader not found on COM1-COM20"
+msgstr "ТАТУС: Impinj Ридер не найден на COM1-COM20"
+
+msgid "STATUS: Connection error to"
+msgstr "СТАТУС: Ошибка подключения к"
+
+msgid "STATUS: OK"
+msgstr "СТАТУС: ОК"
+
+msgid "TAG READ:"
+msgstr "НОМЕР СЧИТАН"
+
+msgid "Antenna :"
+msgstr "Антенна :"
+
+msgid "HW DLL response:"
+msgstr "Ответ ридера:"
+
+msgid "RFID Chip Programmer"
+msgstr "Программатор RFID-чипов"
+
+msgid "Database Source Selection"
+msgstr "Выбор источника базы данных"
+
+msgid "Select Category / Group:"
+msgstr "Выберите группу / категорию:"
+
+msgid "No data loaded"
+msgstr "Данные не загружены"
+
+msgid "Target Participant Data"
+msgstr "Целевые данные участника"
+
+msgid "Target ID: ---"
+msgstr "Целевой ID: ---"
+
+msgid "Name: ---"
+msgstr "ФИО: ---"
+
+msgid "Team: ---"
+msgstr "Команда: ---"
+
+msgid "System Status: Idle"
+msgstr "Статус системы: Ожидание"
+
+msgid "Start Session"
+msgstr "Запустить сессию"
+
+msgid "Stop Session"
+msgstr "Остановить сессию"
+
+msgid "Skip Current"
+msgstr "Пропустить текущего"
+
+msgid "Loaded entries"
+msgstr "Записей загружено"
+
+msgid "Range"
+msgstr "Диапазон"
+
+msgid "No active records found in group"
+msgstr "В группе нет активных записей"
+
+msgid "Target ID"
+msgstr "Целевой ID"
+
+msgid "Name"
+msgstr "ФИО"
+
+msgid "Team"
+msgstr "Команда"
+
+msgid "Session Finished"
+msgstr "Сессия завершена"
+
+msgid "All targets processed inside this group!"
+msgstr "Все участники в этой группе успешно обработаны!"
+
+msgid "Action Blocked"
+msgstr "Действие заблокировано"
+
+msgid "Load valid dataset records first."
+msgstr "Сначала загрузите корректный набор данных."
+
+msgid "STATUS: Waiting for clean chip in field..."
+msgstr "СТАТУС: Ожидание чистого чипа в поле..."
+
+msgid "ERROR: Hardware Interface Offline"
+msgstr "ОШИБКА: Модуль считывателя оффлайн"
+
+msgid "Duplicate Detected"
+msgstr "Обнаружен дубликат"
+
+msgid "This chip already contains data or has been processed. Overwrite?"
+msgstr "Этот чип уже содержит данные или был обработан. Перезаписать?"
+
+msgid "STATUS: Remove target chip from field!"
+msgstr "СТАТУС: Уберите обработанный чип из поля!"
+
+msgid "STATUS: Transmitting payloads..."
+msgstr "СТАТУС: Передача пакетов данных..."
+
+msgid "STATUS: OK (Verified)"
+msgstr "СТАТУС: УСПЕШНО (Записано и проверено)"
+
+msgid "STATUS: Execution Error. Retry."
+msgstr "СТАТУС: Ошибка выполнения. Попробуйте еще раз."
+
+msgid "STATUS: Waiting for next clean chip..."
+msgstr "СТАТУС: Ожидание следующего пустого чипа..."
