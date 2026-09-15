@@ -106,7 +106,6 @@ class Teamwork:
             if self._call_back is not None:
                 self._result_thread.data_sender.connect(self._call_back)
             self._result_thread.start()
-        # elif not self._result_thread.is_alive():
         elif self._result_thread.isFinished():
             self._result_thread = None
             self._start_result_thread()

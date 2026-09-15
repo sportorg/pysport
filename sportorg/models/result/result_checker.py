@@ -210,7 +210,7 @@ class ResultChecker:
 
     @staticmethod
     def penalty_calculation(splits, controls, penalty_extra=True):
-        """:return quantity of penalty
+        """Calculate quantity of penalty
             marked route: quantity of wrong points (duplicates are ignored)
             free-order: missed and extra punches (order-dependent)
             standard course: missed and extra punches (order-dependent)
@@ -363,7 +363,7 @@ class ResultChecker:
 
     @staticmethod
     def penalty_calculation_free_order(splits, controls, penalty_extra=True):
-        """:return quantity penalty, duplication checked
+        """Calculate penalty quantity, duplication checked
         ```
         origin: * ,* ,* ; athlete: 31,41,51; result:0
         origin: * ,* ,* ; athlete: 31,31,51; result:1
@@ -520,7 +520,7 @@ class ResultChecker:
                 minutes_diff = (seconds_diff + 59) // 60  # note, 1:01 = 2 minutes
                 penalty = minutes_diff * penalty_step
 
-        # result = score - penalty >= 0
+        # limit penalty to the gained score, so the result is never negative
         penalty = min(penalty, score)
 
         return penalty

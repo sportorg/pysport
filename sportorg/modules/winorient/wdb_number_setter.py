@@ -5,15 +5,11 @@ from PySide6.QtWidgets import QApplication
 
 from sportorg.gui.dialogs.file_dialog import get_open_file_name, get_save_file_name
 from sportorg.language import translate
-from sportorg.libs.winorient.wdb import write_wdb
+from sportorg.libs.winorient.wdb import WDB, write_wdb
 from sportorg.modules.winorient.wdb import WinOrientBinary
 
 
-def set_numbers(wdb_target, wdb_source):
-    """
-    :type wdb_target: WDB
-    :type wdb_source: WDB
-    """
+def set_numbers(wdb_target: WDB, wdb_source: WDB) -> bool:
     changed = False
     for i in wdb_target.man:
         name = i.name

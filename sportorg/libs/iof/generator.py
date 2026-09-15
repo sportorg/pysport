@@ -307,7 +307,6 @@ def generate_result(obj, result, all_controls=False):
         E.StartTime(otime_to_str(obj, result.get_start_time())),
         E.FinishTime(otime_to_str(obj, result.get_finish_time())),
         E.Time(str(result.get_result_otime().to_sec()) + ".0"),
-        # E.TimeBehind(otime_to_str(obj, result.diff)),
         E.Position(str(result.place)),
         E.Status(get_iof_status(result.status)),
     )
@@ -318,8 +317,5 @@ def generate_result(obj, result, all_controls=False):
             ret.append(generate_split(split))
 
     ret.append(E.ControlCard(str(result.card_number)))
-
-    # course = obj.find_course(result)
-    # ret.append(generate_course(course))  # Livelox compatibility - moved to Class
 
     return ret

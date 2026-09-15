@@ -3,29 +3,20 @@ import logging
 VERSION = 2018
 
 
-def get_wdb_encoding():
-    """
-    Get standard encoding, used in WinOrient files - Windows-1251 (Cyrillic)
-    :return:
-    """
+def get_wdb_encoding() -> str:
+    """Get standard encoding, used in WinOrient files - Windows-1251 (Cyrillic)."""
     return "windows-1251"
 
 
-def get_wdb_byteorder():
-    """
-    Get standard byteorder for WinOrient files, on Windows it's little-endian.
-    :return:
-    """
+def get_wdb_byteorder() -> str:
+    """Get standard byteorder for WinOrient files, on Windows it's little-endian."""
     return "little"
 
 
-def format_string_to_bytes(string, length):
-    """
-    Format string into byte array, according to length of target array.
-    If necessary, fill the gap between last string char and the end of array with \0
-    :param string:
-    :param length:
-    :return:
+def format_string_to_bytes(string: str, length: int) -> bytearray:
+    """Format string into byte array, according to length of target array.
+
+    If necessary, fill the gap between last string char and the end of array with \0.
     """
     if string is None:
         string = ""
@@ -37,12 +28,10 @@ def format_string_to_bytes(string, length):
     return ret
 
 
-def encode(byte_array):
-    """
-    Get string from byte array. Note, that \0 is a line end char.
-    e.g. b'\xc4\xeb\xe8\xed\xed\xe0\xff 2\x00\x00\x00' -> b'\xc4\xeb\xe8\xed\xed\xe0\xff 2' -> 'Длинная 2'
-    :param byte_array:
-    :return:
+def encode(byte_array: bytes) -> str:
+    """Get string from byte array. Note, that \0 is a line end char.
+
+    e.g. b'\xc4\xeb\xe8\xed\xed\xe0\xff 2\x00\x00\x00' (windows-1251) -> 'Длинная 2'
     """
     obj = byte_array
     null_index = obj.find(0x00)
@@ -58,12 +47,8 @@ def encode(byte_array):
     return ret
 
 
-def bytes_compare(obj1, obj2):
-    """
-    Compare 2 objects byte-2-byte. Will be removed in release version =)
-    :param obj1:
-    :param obj2:
-    """
+def bytes_compare(obj1: bytes, obj2: bytes) -> bool:
+    """Compare 2 objects byte-2-byte. Debug helper, disabled in release."""
 
     # turn on / off debug
     release = 1
@@ -91,15 +76,12 @@ class WDBPunch:
     Used for start, finish, check, clear and control point.
     """
 
-    def __init__(self, code=0, time=0):
+    def __init__(self, code: int = 0, time: int = 0):
         self.code = code  # number 0-255
         self.time = time  # seconds * 100, e.g. 01:01:01 = 366100
 
-    def parse_bytes(self, byte_array):
-        """
-        Read object from the byte array
-        :param byte_array:
-        """
+    def parse_bytes(self, byte_array: bytes) -> None:
+        """Read object from the byte array."""
         byteorder = get_wdb_byteorder()
         self.code = int.from_bytes(byte_array[0:1], byteorder)
         self.time = int.from_bytes(byte_array[4:8], byteorder)
@@ -118,11 +100,8 @@ class WDBFinish:
         self.time = 0
         self.sound = 0
 
-    def parse_bytes(self, byte_array):
-        """
-        Read object from the byte array
-        :param byte_array:
-        """
+    def parse_bytes(self, byte_array: bytes) -> None:
+        """Read object from the byte array."""
         byteorder = get_wdb_byteorder()
         self.number = int.from_bytes(byte_array[0:4], byteorder)
         self.time = int.from_bytes(byte_array[4:8], byteorder)
@@ -153,12 +132,8 @@ class WDBChip:
         self.clear = WDBPunch()
         self.punch = []
 
-    def parse_bytes(self, byte_array, is_new_format=True):
-        """
-        Read object from the byte array
-        :param is_new_format:
-        :param byte_array:
-        """
+    def parse_bytes(self, byte_array: bytes, is_new_format: bool = True) -> None:
+        """Read object from the byte array."""
         byteorder = get_wdb_byteorder()
         self.id = int.from_bytes(byte_array[0:4], byteorder)
         self.start_number = int.from_bytes(byte_array[4:8], byteorder)
@@ -213,11 +188,8 @@ class WDBTeam:
         self.is_selected = False
         self.unused = 0  # most likely it's region code
 
-    def parse_bytes(self, byte_array):
-        """
-        Read object from the byte array
-        :param byte_array:
-        """
+    def parse_bytes(self, byte_array: bytes) -> None:
+        """Read object from the byte array."""
         byteorder = get_wdb_byteorder()
 
         self.id = int.from_bytes(byte_array[0:4], byteorder)
@@ -267,11 +239,8 @@ class WDBDistance:
         self.people_selected = 0
         self.is_selected = False
 
-    def parse_bytes(self, byte_array):
-        """
-        Read object from the byte array
-        :param byte_array:
-        """
+    def parse_bytes(self, byte_array: bytes) -> None:
+        """Read object from the byte array."""
         byteorder = get_wdb_byteorder()
         max_point_qty = 100
 
@@ -349,11 +318,8 @@ class WDBGroup:
         self.unused1 = 0
         self.wdb = None
 
-    def parse_bytes(self, byte_array):
-        """
-        Read object from the byte array
-        :param byte_array:
-        """
+    def parse_bytes(self, byte_array: bytes) -> None:
+        """Read object from the byte array."""
         byteorder = get_wdb_byteorder()
 
         self.id = int.from_bytes(byte_array[0:4], byteorder)
@@ -424,11 +390,8 @@ class WDBMan:
         self.penalty_second = 0
         self.wdb = wdb
 
-    def parse_bytes(self, byte_array):
-        """
-        Read object from the byte array
-        :param byte_array:
-        """
+    def parse_bytes(self, byte_array: bytes) -> None:
+        """Read object from the byte array."""
         byteorder = get_wdb_byteorder()
 
         self.name = encode(byte_array[0:25])
@@ -638,11 +601,8 @@ class WDBInfo:
         self.unknown1 = 0
         self.is_labirint_mode = False
 
-    def parse_bytes(self, byte_array):
-        """
-        Read object from the byte array
-        :param byte_array:
-        """
+    def parse_bytes(self, byte_array: bytes) -> None:
+        """Read object from the byte array."""
         byteorder = get_wdb_byteorder()
 
         self.title.clear()
@@ -855,7 +815,6 @@ class WDBInfo:
         ret[1099:1100] = self.is_chip_warning.to_bytes(1, byteorder)
         ret[1100:1101] = self.who_perfomance.to_bytes(1, byteorder)
         ret[1101:1102] = self.who_print_results.to_bytes(1, byteorder)
-        # ret[1102] = self.reserve.to_bytes(1, byteorder)
         ret[1103:1104] = self.is_limit_time_dsq.to_bytes(1, byteorder)
         ret[1104:1105] = self.is_print_result_new_page.to_bytes(1, byteorder)
         ret[1105:1106] = self.is_print_relay_variant.to_bytes(1, byteorder)
@@ -923,11 +882,8 @@ class WDBAdventure:
         self.scores_cart_mode = 0
         self.correct_minutes = 0
 
-    def parse_bytes(self, byte_array):
-        """
-        Read object from the byte array
-        :param byte_array:
-        """
+    def parse_bytes(self, byte_array: bytes) -> None:
+        """Read object from the byte array."""
         byteorder = get_wdb_byteorder()
         self.group = int.from_bytes(byte_array[0:1], byteorder)
 
@@ -991,11 +947,8 @@ class WDB:
         self.adv = []
         self.info = WDBInfo()
 
-    def parse_bytes(self, byte_array):
-        """
-        Read object from the byte array
-        :param byte_array:
-        """
+    def parse_bytes(self, byte_array: bytes) -> None:
+        """Read object from the byte array."""
         byteorder = get_wdb_byteorder()
         self.version = int.from_bytes(byte_array[0:4], byteorder)
 
@@ -1176,9 +1129,7 @@ class WDB:
             ret += i.get_bytes()
 
         if is_new_format:  # format changing of 2009/03-2010/09: 64 -> 200 punches + added Adventure block
-            # ret += len(self.chip).to_bytes(4, byteorder)
             ret += int(0).to_bytes(4, byteorder)
-            # ret += int(257).to_bytes(4, byteorder)
 
             ret += len(self.adv).to_bytes(4, byteorder)
             for i in self.adv:

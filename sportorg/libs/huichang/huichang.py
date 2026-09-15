@@ -211,7 +211,6 @@ class Huichang(object):
             if cmd_code != Huichang.CMD_CARD_BATTERY_LEVEL:
                 crc_calc = self.crc8(payload)
                 if not crc_calc == crc[0]:
-                    # self._log_debug("CRC mismatch: 0x{:02x} != 0x{:02x}".format(crc_calc, crc[0]))
                     raise HuichangException("CRC mismatch")
 
         except (SerialException, OSError) as msg:

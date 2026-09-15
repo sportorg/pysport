@@ -66,11 +66,8 @@ class _TitleType(Enum):
 
 class RaceType(_TitleType):
     INDIVIDUAL_RACE = 0
-    # MASS_START = 1
     PURSUIT = 2
     RELAY = 3
-    # ONE_MAN_RELAY = 4
-    # SPRINT_RELAY = 5
     MULTI_DAY_RACE = 6
 
 
@@ -736,7 +733,6 @@ class Result(ABC):
         elif race().get_setting("result_processing_mode", "time") == "scores":
             ret += f"{self.rogaine_score} {translate('points')} "
 
-        # time_accuracy = race().get_setting('time_accuracy', 0)
         start = hhmmss_to_time(self.person.comment)
         if start == OTime():
             raise ValueError
@@ -2552,11 +2548,11 @@ class RelayLeg:
         return None
 
     def get_relay_team(self):
-        """:return relay team object"""
+        """Return relay team object."""
         return self.team
 
     def get_next_leg(self):
-        """:return next leg of relay team, None if this leg is last"""
+        """Return next leg of relay team, None if this leg is last."""
         team = self.get_relay_team()
         if team and isinstance(team, RelayTeam):
             if len(team.legs) > self.leg + 1:
@@ -2564,7 +2560,7 @@ class RelayLeg:
         return None
 
     def get_prev_leg(self):
-        """:return previous leg of relay team, None if this leg is first"""
+        """Return previous leg of relay team, None if this leg is first."""
         if self.leg > 1:
             team = self.get_relay_team()
             if team and isinstance(team, RelayTeam):
@@ -2574,13 +2570,13 @@ class RelayLeg:
         return None
 
     def get_bib(self):
-        """:return person bib, e.g. 1.1 or 1001 depending on settings"""
+        """Return person bib, e.g. 1.1 or 1001 depending on settings."""
         if self.number < 1000:
             return 1000 * self.leg + self.number
         return "{}.{}".format(self.number, self.leg)
 
     def get_variant(self):
-        """:return person distribution variant e.g. ABCA"""
+        """Return person distribution variant e.g. ABCA."""
         return self.variant
 
     def parse_variant_text(self, text):

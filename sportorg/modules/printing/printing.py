@@ -66,8 +66,6 @@ class PrintProcess(Process):
                 "print_html: got Printer done: {}".format(time.process_time() - t)
             )
 
-            # printer.setResolution(96)
-
             text_document = QTextDocument()
 
             printer.setFullPage(False)

@@ -1,21 +1,20 @@
-#!/usr/bin/env python
-#
-#    Copyright 2023 SRPgroup <SRPgroup@yandex.ru>
-#
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
-#
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
-#
-#    You should have received a copy of the GNU General Public License
-#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""srpid.py - Classes SRPid v1.5.
 
-"""srpid.py - Classes SRPid v1.5"""
+Copyright 2023 SRPgroup <SRPgroup@yandex.ru>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
 
 import time
 from datetime import datetime
@@ -25,16 +24,7 @@ from serial.serialutil import SerialException
 from six import PY3, byte2int, int2byte, iterbytes, print_
 
 
-# ================================================
-#                                         Classs  SRPid
-#                                  for master station connect
-# ================================================
 class SRPid:
-    # ------------------------------------------------------------------------------------
-    #                                                 INIT
-    #                              communication with master station
-    #                                  by possible scan COMports
-    # ------------------------------------------------------------------------------------
     def __init__(self, port=None, debug=False, logger=None):
         self._serial = None
         self._log_info = print_
@@ -68,9 +58,6 @@ class SRPid:
 
         raise SRPidException("Not Station \n%s" % porterrors)
 
-    # ------------------------------------------------------------------------------------
-    #                                          TRY CONNECT
-    # ------------------------------------------------------------------------------------
     def _conn_m_station(self, port):
         try:
             self._serial = Serial(port, baudrate=9600, timeout=5)
@@ -91,19 +78,12 @@ class SRPid:
             self._log_info("port '%s' connect" % port)
             self._log_info("Ver '%s' " % msver)
 
-    # ------------------------------------------------------------------------------------
-    #                                        RD  VERSION
-    # ------------------------------------------------------------------------------------
     def read_ver(self):
         """master station fw ver"""
         code, data = self._send_command(b"\x32")
         if code == b"\x72":
             return byte2int(data)
         return None
-
-    # ------------------------------------------------------------------------------------
-    #                                        SEND COMMAND
-    # ------------------------------------------------------------------------------------
 
     def _send_command(self, code, wait_response=True, timeout=None):
         cs = self._CRCsum(
@@ -122,7 +102,6 @@ class SRPid:
             + cs
         )
 
-        #        self._log_debug("%s" % ' '.join(hex(byte2int(c)) for c in cmd))
         self._log_debug("request")
 
         self._serial.flushInput()
@@ -134,9 +113,6 @@ class SRPid:
 
         return None
 
-    # ------------------------------------------------------------------------------------
-    #                                                SEARCH CHIP
-    # ------------------------------------------------------------------------------------
     def search_chip(self):
         """search_chip   self.chip_data  return status"""
 
@@ -151,9 +127,6 @@ class SRPid:
             self._log_debug("Warning: %s" % msg)
         return False
 
-    # ------------------------------------------------------------------------------------
-    #                                             READ CHIP
-    # ------------------------------------------------------------------------------------
     def read_chip(self, timeout=None):
         """Timeout  pyserial doc
         return    dict  chip_data
@@ -164,9 +137,6 @@ class SRPid:
         else:
             raise SRPidException("Read chip failed.")
 
-    # ------------------------------------------------------------------------------------
-    #                                         GET RESPONSE
-    # ------------------------------------------------------------------------------------
     def _get_response(self, timeout=None, wait_part=None):
         try:
             if timeout is not None:
@@ -201,34 +171,22 @@ class SRPid:
 
         return code, data
 
-    # ------------------------------------------------------------------------------------
-    #                                             BEEP   OK
-    # ------------------------------------------------------------------------------------
     def beep_ok(self):
         self._send_command(b"\x36", wait_response=False)
 
-    # ------------------------------------------------------------------------------------
-    # ------------------------------------------------------------------------------------
     def disconnect(self):
         """Close the serial port an disconnect from the station."""
         self._serial.close()
 
-    # ------------------------------------------------------------------------------------
-    # ------------------------------------------------------------------------------------
     def reconnect(self):
         """Close the serial port and reopen again."""
         self.disconnect()
         self._conn_m_station(self._serial.port)
 
-    # ------------------------------------------------------------------------------------
-    # ------------------------------------------------------------------------------------
     def __del__(self):
         if self._serial is not None:
             self._serial.close()
 
-    # ------------------------------------------------------------------------------------
-    #                                           staticmethods
-    # ------------------------------------------------------------------------------------
     @staticmethod
     def _to_int(s):
         """Compute the integer value of a raw byte string (big endianes)."""
@@ -237,9 +195,6 @@ class SRPid:
             value += c << offset * 8
         return value
 
-    # ------------------------------------------------------------------------------------
-    #                                           staticmethods
-    # ------------------------------------------------------------------------------------
     @staticmethod
     def _to_str(i, len):
         """
@@ -256,9 +211,6 @@ class SRPid:
             string += int2byte((i >> offset * 8) & 0xFF)
         return string
 
-    # ------------------------------------------------------------------------------------
-    #                                           staticmethods
-    # ------------------------------------------------------------------------------------
     @staticmethod
     def _preprocess_response(code, data, log_debug):
         if code == b"\x76":  # _ERROR
@@ -274,9 +226,6 @@ class SRPid:
             log_debug("Ok")
         return code, data
 
-    # ------------------------------------------------------------------------------------
-    #                                           staticmethods
-    # ------------------------------------------------------------------------------------
     @staticmethod
     def _CRCsum(s):
         """Compute chk_sum of value.
@@ -288,21 +237,13 @@ class SRPid:
         sum &= 0xFF
         return int2byte(sum)
 
-    # ------------------------------------------------------------------------------------
-    #                                           staticmethods
-    # ------------------------------------------------------------------------------------
     @staticmethod
     def _cs_check(s, chk_sum):
         return SRPid._CRCsum(s) == chk_sum
 
-    # ------------------------------------------------------------------------------------
-    #                                           staticmethods
-    # ------------------------------------------------------------------------------------
     @staticmethod
     def _parse_chip_data(data):
         # TODO check data length
-        #       result['SerialNum'] = SRPid._to_int(data[0:4])
-        #       result['Reserv'] = data[6:14]
         result = {"ChipNum": SRPid._to_int(data[4:6]), "CP": []}
         for i in range(14, len(data), 5):
             cp = data[i]
@@ -311,15 +252,9 @@ class SRPid:
         return result
 
 
-# ================================================
-#                                             Classs
-# ================================================
 class SRPidException(Exception):
     pass
 
 
-# ================================================
-#                                             Classs
-# ================================================
 class SRPidTimeout(SRPidException):
     pass

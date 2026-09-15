@@ -92,7 +92,6 @@ class Header:
         if obj_data:
             try:
                 obj_type = obj_data["object"]
-                # obj_ver = obj_data['version']
                 obj_uuid = obj_data["id"]
             except AttributeError:
                 raise ValueError
@@ -126,7 +125,6 @@ class Header:
     def prepare_header(self, obj_data, op_type):
         try:
             obj_type = obj_data["object"]
-            # obj_ver = obj_data['version']
             obj_uuid = obj_data["id"]
         except AttributeError:
             return False

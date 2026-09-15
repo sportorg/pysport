@@ -111,13 +111,11 @@ class StartPreparationDialog(QDialog):
         )
         self.draw_regions_check_box = QtWidgets.QCheckBox(self.widget_draw)
         self.draw_regions_check_box.setEnabled(False)
-        # self.draw_regions_check_box.setMinimumHeight(15)
         self.draw_layout.setWidget(
             3, QtWidgets.QFormLayout.LabelRole, self.draw_regions_check_box
         )
         self.draw_mix_groups_check_box = QtWidgets.QCheckBox(self.widget_draw)
         self.draw_mix_groups_check_box.setEnabled(False)
-        # self.draw_mix_groups_check_box.setMinimumHeight(15)
         self.draw_layout.setWidget(
             4, QtWidgets.QFormLayout.LabelRole, self.draw_mix_groups_check_box
         )

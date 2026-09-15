@@ -142,7 +142,6 @@ class Widget(QtWidgets.QWidget):
         self.person_table.setModel(PersonMemoryModel())
 
         def entry_double_clicked(index):
-            # show_edit_dialog(index)
             try:
                 if index.row() < len(race().persons):
                     dialog = PersonEditDialog(race().persons[index.row()])
