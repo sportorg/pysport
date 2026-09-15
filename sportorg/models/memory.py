@@ -1678,10 +1678,10 @@ class Race:
         self.result_index_by_multi_day_id: Dict[str, Result] = {}
         self.person_index_bib: Dict[int, Person] = {}
         self.person_index_card: Dict[int, Person] = {}
-        self.person_index: Dict[str, Result] = {}
-        self.group_index: Dict[str, Group] = {}
-        self.organization_index: Dict[str, Organization] = {}
-        self.course_index: Dict[str, Course] = {}
+        self.person_index: Dict[uuid.UUID, Result] = {}
+        self.group_index: Dict[uuid.UUID, Group] = {}
+        self.organization_index: Dict[uuid.UUID, Organization] = {}
+        self.course_index: Dict[uuid.UUID, Course] = {}
         self.course_index_name: Dict[str, Course] = {}
 
     def __repr__(self) -> str:
