@@ -438,18 +438,6 @@ msgstr "Поиск не дал результатов"
 msgid "Languages"
 msgstr "Язык интерфейса"
 
-msgid "Theme"
-msgstr "Тема оформления"
-
-msgid "System"
-msgstr "Системная"
-
-msgid "Light"
-msgstr "Светлая"
-
-msgid "Dark"
-msgstr "Тёмная"
-
 msgid "Show toolbar"
 msgstr "Показать панель инструментов"
 
@@ -1948,3 +1936,69 @@ msgstr "Не получается подключиться к станции Т�
 
 msgid "Penalty for extra cp"
 msgstr "Штраф за лишние КП"
+
+msgid "Impinj RFID controller settings"
+msgstr "Настройки RFID-контроллера Impinj"
+
+msgid "Autodetect"
+msgstr "Автопоиск"
+
+msgid "COM port"
+msgstr "Последовательный порт:"
+
+msgid "Baud Rate" 
+msgstr "Скорость соединения:"
+
+msgid "Available RFID Antennas" 
+msgstr "Доступные антенны RFID-контроллера"
+
+msgid "RF Power:" 
+msgstr "Мощность излучения:"
+
+msgid "Safe antenna mode" 
+msgstr "Защитный режим антенны"
+
+msgid "Ant. {}"
+msgstr "Ант. {}"
+
+msgid "Test connect"
+msgstr "Проверить подключение"
+
+msgid "Status: not connect"
+msgstr "Статус: Не проверено"
+
+msgid "Configure Impinj..."
+msgstr "Настроить Impinj..."
+
+msgid "Configuration incomplete" 
+msgstr "Настройки не завершены"
+
+msgid "Impinj RFID system selected, but controller not configured \n."
+msgstr "Вы выбрали систему хронометража RFID Impinj, но не настроили контроллер \n."
+
+msgid "Please check the connection and select the connected antennas."
+msgstr "Пожалуйста, проверьте подключение и выберите подключенные антенны."
+
+msgid "Scaninig COM ports..."
+msgstr "Сканирование COM-портов..."
+
+msgid "Checking"
+msgstr "Проверка"
+
+msgid "STATUS: Impinj Reader not found on COM1-COM20"
+msgstr "ТАТУС: Impinj Ридер не найден на COM1-COM20"
+
+msgid "STATUS: Connection error to"
+msgstr "СТАТУС: Ошибка подключения к"
+
+msgid "STATUS: OK"
+msgstr "СТАТУС: ОК"
+
+msgid "TAG READ:"
+msgstr "НОМЕР СЧИТАН"
+
+msgid "Antenna :"
+msgstr "Антенна :"
+
+msgid "HW DLL response:"
+msgstr "Ответ ридера:"						   

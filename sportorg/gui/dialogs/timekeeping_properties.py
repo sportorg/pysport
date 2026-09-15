@@ -1,4 +1,6 @@
+import ctypes
 import logging
+from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QWidget , QMessageBox
 
 from sportorg import settings
 
@@ -38,8 +40,8 @@ from sportorg.language import translate
 from sportorg.models.memory import SystemType, race
 from sportorg.models.result.result_tools import recalculate_results
 from sportorg.modules.sportident.sireader import SIReaderClient
-
-
+from sportorg.gui.dialogs.impinj_settings_dialog import ImpinjSettingsWidget  
+from sportorg.modules.rfid_impinj.rfid_impinj import check_impinj_connection 
 class TimekeepingPropertiesDialog(QDialog):
     def __init__(self):
         super().__init__(GlobalAccess().get_main_window())
@@ -82,6 +84,16 @@ class TimekeepingPropertiesDialog(QDialog):
         self.punch_system_layout.addRow(self.punch_system_sportiduino)
         self.punch_system_impinj = QRadioButton(translate("RFID Impinj"))
         self.punch_system_layout.addRow(self.punch_system_impinj)
+
+
+        self.btn_go_to_impinj = QPushButton(translate ("Configure Impinj..."))
+        self.btn_go_to_impinj.setFlat(True)  
+        self.btn_go_to_impinj.setStyleSheet("color: #0066cc; text-align: left; font-weight: bold; margin-left: 20px;")
+        self.btn_go_to_impinj.setVisible(False)
+        self.punch_system_layout.addRow(self.btn_go_to_impinj)
+        self.punch_system_impinj.toggled.connect(lambda checked: self.btn_go_to_impinj.setVisible(checked))
+        self.btn_go_to_impinj.clicked.connect(lambda: self.tab_widget.setCurrentWidget(self.impinj_tab))
+
         self.punch_system_srpid = QRadioButton(translate("SRPID"))
         self.punch_system_layout.addRow(self.punch_system_srpid)
         self.punch_system_huichang = QRadioButton(translate("Huichang"))
@@ -383,10 +395,46 @@ class TimekeepingPropertiesDialog(QDialog):
         self.tab_widget.addTab(self.time_settings_tab, translate("Time settings"))
         self.tab_widget.addTab(self.credit_time_settings_tab, translate("Credit"))
 
+        self.impinj_tab = QWidget()
+        impinj_layout = QVBoxLayout(self.impinj_tab) 
+        self.impinj_settings_widget = ImpinjSettingsWidget()
+        impinj_layout.addWidget(self.impinj_settings_widget)
+        status_layout = QHBoxLayout()
+
+        self.btn_check_connect = QPushButton(translate("Test connect"))
+        self.lbl_connect_status = QLabel(translate("Status: not connect"))
+
+        
+        font = self.lbl_connect_status.font()
+        font.setBold(True)
+        self.lbl_connect_status.setFont(font)
+
+        status_layout.addWidget(self.btn_check_connect)
+        status_layout.addWidget(self.lbl_connect_status)
+        status_layout.addStretch()
+
+        impinj_layout.addLayout(status_layout)
+        self.btn_check_connect.clicked.connect(lambda: check_impinj_connection(self))
+        self.tab_widget.addTab(self.impinj_tab, "RFID Impinj")
+
+
+        
         def cancel_changes():
             self.close()
 
         def apply_changes():
+            if hasattr(self, 'punch_system_impinj') and self.punch_system_impinj.isChecked():
+                if self.impinj_settings_widget.port_combo.currentData() == "auto":
+                    self.tab_widget.setCurrentWidget(self.impinj_tab)
+                    
+                    QMessageBox.warning(
+                        self, 
+                        translate("Configuration incomplete"), 
+                        translate("Impinj RFID system selected, but controller not configured \n.") +
+                        translate("Please check the connection and select the connected antennas.")
+                    )
+                    return
+
             try:
                 self.apply_changes_impl()
             except Exception as e:
@@ -721,6 +769,10 @@ class TimekeepingPropertiesDialog(QDialog):
         self.credit_time_cp_value.setValue(credit_time_cp)
 
     def apply_changes_impl(self):
+	    # --- СОХРАНЯЕМ НАСТРОЙКИ IMPINJ ПРИ НАЖАТИИ ОК ---
+        if hasattr(self, 'impinj_tab'):
+         self.impinj_settings_widget.save_settings()
+		
         obj = race()
 
         start_source = "protocol"
@@ -894,3 +946,4 @@ class TimekeepingPropertiesDialog(QDialog):
         obj.set_setting("credit_time_cp", self.credit_time_cp_value.value())
 
         recalculate_results(recheck_results=False)
+
