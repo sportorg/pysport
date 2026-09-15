@@ -438,18 +438,6 @@ msgstr "Поиск не дал результатов"
 msgid "Languages"
 msgstr "Язык интерфейса"
 
-msgid "Theme"
-msgstr "Тема оформления"
-
-msgid "System"
-msgstr "Системная"
-
-msgid "Light"
-msgstr "Светлая"
-
-msgid "Dark"
-msgstr "Тёмная"
-
 msgid "Show toolbar"
 msgstr "Показать панель инструментов"
 
@@ -2013,97 +2001,4 @@ msgid "Antenna :"
 msgstr "Антенна :"
 
 msgid "HW DLL response:"
-msgstr "Ответ ридера:"
-
-msgid "RFID Chip Programmer"
-msgstr "Программатор RFID-чипов"
-
-msgid "Database Source Selection"
-msgstr "Выбор источника базы данных"
-
-msgid "Select Category / Group:"
-msgstr "Выберите группу / категорию:"
-
-msgid "No data loaded"
-msgstr "Данные не загружены"
-
-msgid "Target Participant Data"
-msgstr "Целевые данные участника"
-
-msgid "Target ID: ---"
-msgstr "Целевой ID: ---"
-
-msgid "Name: ---"
-msgstr "ФИО: ---"
-
-msgid "Team: ---"
-msgstr "Команда: ---"
-
-msgid "System Status: Idle"
-msgstr "Статус системы: Ожидание"
-
-msgid "Start Session"
-msgstr "Запустить сессию"
-
-msgid "Stop Session"
-msgstr "Остановить сессию"
-
-msgid "Skip Current"
-msgstr "Пропустить текущего"
-
-msgid "Loaded entries"
-msgstr "Записей загружено"
-
-msgid "Range"
-msgstr "Диапазон"
-
-msgid "No active records found in group"
-msgstr "В группе нет активных записей"
-
-msgid "Target ID"
-msgstr "Целевой ID"
-
-msgid "Name"
-msgstr "ФИО"
-
-msgid "Team"
-msgstr "Команда"
-
-msgid "Session Finished"
-msgstr "Сессия завершена"
-
-msgid "All targets processed inside this group!"
-msgstr "Все участники в этой группе успешно обработаны!"
-
-msgid "Action Blocked"
-msgstr "Действие заблокировано"
-
-msgid "Load valid dataset records first."
-msgstr "Сначала загрузите корректный набор данных."
-
-msgid "STATUS: Waiting for clean chip in field..."
-msgstr "СТАТУС: Ожидание чистого чипа в поле..."
-
-msgid "ERROR: Hardware Interface Offline"
-msgstr "ОШИБКА: Модуль считывателя оффлайн"
-
-msgid "Duplicate Detected"
-msgstr "Обнаружен дубликат"
-
-msgid "This chip already contains data or has been processed. Overwrite?"
-msgstr "Этот чип уже содержит данные или был обработан. Перезаписать?"
-
-msgid "STATUS: Remove target chip from field!"
-msgstr "СТАТУС: Уберите обработанный чип из поля!"
-
-msgid "STATUS: Transmitting payloads..."
-msgstr "СТАТУС: Передача пакетов данных..."
-
-msgid "STATUS: OK (Verified)"
-msgstr "СТАТУС: УСПЕШНО (Записано и проверено)"
-
-msgid "STATUS: Execution Error. Retry."
-msgstr "СТАТУС: Ошибка выполнения. Попробуйте еще раз."
-
-msgid "STATUS: Waiting for next clean chip..."
-msgstr "СТАТУС: Ожидание следующего пустого чипа..."
+msgstr "Ответ ридера:"						   

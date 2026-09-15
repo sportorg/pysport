@@ -25,13 +25,12 @@ class ImpinjSettingsWidget(QWidget):
         
         # 2. Connection speed selection (Baud Rate)
         self.baud_combo = QComboBox()
-        self.baud_combo.addItem("9600 bps", 3)
-        self.baud_combo.addItem("19200 bps", 4)
-        self.baud_combo.addItem("38400 bps", 5)
-        # Слово (Стандарт) заменено на системное "System" из po-файла
-        self.baud_combo.addItem(f"57600 bps ({translate('System')})", 6)
-        self.baud_combo.addItem("115200 bps", 7)
-        
+        self.baud_combo.addItem("9600 bps", 0)        
+        self.baud_combo.addItem("19200 bps", 1)
+        self.baud_combo.addItem("38400 bps", 2)
+        self.baud_combo.addItem("56200 bps", 5)
+        self.baud_combo.addItem(f"115200 bps ({translate('System')})", 6)
+         
         self.baud_combo.setCurrentIndex(self.baud_combo.findData(race().get_setting("impinj_baud_rate_idx", 6)))
         form.addRow(translate("Baud Rate"), self.baud_combo)
         
@@ -60,11 +59,7 @@ class ImpinjSettingsWidget(QWidget):
         self.check_ant_box.setChecked(bool(race().get_setting("impinj_check_ant", True)))
         form.addRow(self.check_ant_box)
 
-        #beeper check-box
-        self.beep_en_box = QCheckBox(translate("Enable buzzer / beep sound")) # Ключ для бипера в UI
-        # reed from base , default is Enable
-        self.beep_en_box.setChecked(bool(race().get_setting("impinj_beep_en", True)))
-        form.addRow(self.beep_en_box)
+
 
         layout.addWidget(group_box)
 
