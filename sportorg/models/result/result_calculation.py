@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, Iterable, List, Optional, Tuple
 
 from sportorg import settings
 from sportorg.common.otime import OTime
@@ -15,14 +15,50 @@ from sportorg.models.memory import (
 )
 
 
-class ResultCalculation:
+class RaceCalculationContext:
+    """Shared caches for one full recalculation pass (process + splits + scores).
+
+    All cached data is derived from race state that does not change during a
+    recalculation, so the context must not be reused after results or persons
+    are modified.
+    """
+
     def __init__(self, r: Race):
         self.race = r
-        self._group_finishes = {}
-        self._group_persons = {}
+        self.sort_keys: Dict[int, Tuple] = {}
+        self._group_finishes: Dict[Group, List[Result]] = {}
+        self._group_persons: Dict[Group, List] = {}
+        self._group_leader_times: Dict[Group, Optional[OTime]] = {}
 
-    def process_results(self):
-        self.race.relay_teams.clear()
+    def invalidate_group(self, group: Group) -> None:
+        group_results = self._group_finishes.pop(group, [])
+        for result in group_results:
+            self.sort_keys.pop(id(result), None)
+        self._group_persons.pop(group, None)
+        self._group_leader_times.pop(group, None)
+
+    def invalidate_groups(self, groups: Iterable[Group]) -> None:
+        for group in groups:
+            self.invalidate_group(group)
+
+
+class ResultCalculation:
+    def __init__(self, r: Race, shared: "Optional[RaceCalculationContext]" = None):
+        self.race = r
+        self._group_finishes = shared._group_finishes if shared else {}
+        self._group_persons = shared._group_persons if shared else {}
+        self._sort_keys = shared.sort_keys if shared else None
+
+    def process_results(self, groups: Optional[Iterable[Group]] = None):
+        if groups is None:
+            groups = self.race.groups
+            self.race.relay_teams.clear()
+        else:
+            groups = list(groups)
+            groups_set = set(groups)
+            self.race.relay_teams[:] = [
+                team for team in self.race.relay_teams if team.group not in groups_set
+            ]
         self.race.result_index = {}
 
         self.race.result_index_by_multi_day_id = {}
@@ -39,7 +75,7 @@ class ResultCalculation:
         for result in self.race.results:
             if result.person:
                 result.person.result_count += 1
-        for i in self.race.groups:
+        for i in groups:
             if not self.race.get_type(i) == RaceType.RELAY:
                 # single race
                 array = self.get_group_finishes(i)
@@ -51,8 +87,28 @@ class ResultCalculation:
                     self.race.relay_teams.append(a)
             self.set_rank(i)
 
-    def get_group_finishes(self, group: Group) -> Result:
+    def _result_sort_key(self, result: Result) -> Tuple:
+        # Replicates Result.__gt__ ordering without repeated OTime arithmetic
+        status_ok = result.is_status_ok()
+        status_key = 0 if status_ok else 1
+        status_value = 0 if status_ok else result.status.value
+
+        processing_mode = self.race.get_setting("result_processing_mode", "time")
+        result_msec = result.get_result_otime().to_msec()
+        if processing_mode == "ardf":
+            scores = result.scores_ardf
+        elif processing_mode == "scores":
+            scores = result.rogaine_score
+        else:
+            scores = None
+
+        if scores is not None:
+            return (status_key, status_value, 0, -scores, result_msec)
+        return (status_key, status_value, result_msec == 0, 0, result_msec)
+
+    def get_group_finishes(self, group: Group) -> List[Result]:
         if group in self._group_finishes:
+            group.count_finished = len(self._group_finishes[group])
             return self._group_finishes[group]
         ret = []
         for i in self.race.results:
@@ -60,13 +116,21 @@ class ResultCalculation:
             if person:
                 if person.group is group:
                     ret.append(i)
-        ret.sort()
+        if self._sort_keys is None:
+            self._sort_keys = {}
+        keys = self._sort_keys
+        ret.sort(
+            key=lambda result: keys.setdefault(
+                id(result), self._result_sort_key(result)
+            )
+        )
         group.count_finished = len(ret)
         self._group_finishes[group] = ret
         return ret
 
     def get_group_persons(self, group):
         if group in self._group_persons:
+            group.count_person = len(self._group_persons[group])
             return self._group_persons[group]
         ret = []
         for i in self.race.persons:

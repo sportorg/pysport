@@ -18,14 +18,14 @@ class Sound:
             Audio().play(sound_path)
 
     def ok(self):
-        self._play(settings.SETTINGS.sound_successful_path or "")
+        self._play(settings.successful_sound_path())
 
     def fail(self):
-        self._play(settings.SETTINGS.sound_unsuccessful_path or "")
+        self._play(settings.unsuccessful_sound_path())
 
     def rented_card(self):
         if self.is_enabled_rented_card():
-            self._play(settings.SETTINGS.sound_rented_card_path or "")
+            self._play(settings.rented_card_sound_path())
 
     def enter_number(self):
-        self._play(settings.SETTINGS.sound_enter_number_path or "")
+        self._play(settings.enter_number_sound_path())

@@ -274,6 +274,7 @@ class ResultEditDialog(QDialog):
 
     def apply_changes_impl(self):
         result = self.current_object
+        previous_group = result.person.group if result.person else None
         if self.is_new:
             race().results.insert(0, result)
 
@@ -351,7 +352,12 @@ class ResultEditDialog(QDialog):
             except ResultCheckerException as e:
                 logging.error(str(e))
         group = result.person.group if result.person else None
-        recalculate_results(recheck_results=False, group=group)
+        groups = []
+        if previous_group is not None:
+            groups.append(previous_group)
+        if group is not None and group not in groups:
+            groups.append(group)
+        recalculate_results(recheck_results=False, groups=groups)
         live_client.send(result)
         Teamwork().send(result.to_dict())
 

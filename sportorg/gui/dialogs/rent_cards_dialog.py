@@ -78,5 +78,5 @@ class RentCardsDialog(QDialog):
     def apply_changes_impl(self):
         text = self.item_cards.toPlainText()
         RentCards().set_from_text(text)
-        with open(settings.SETTINGS.source_rent_cards_path, "w", encoding="utf-8") as f:
+        with open(settings.rent_cards_path(), "w", encoding="utf-8") as f:
             f.write(RentCards().to_text())
