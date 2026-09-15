@@ -123,15 +123,13 @@ class ImpinjThread(QThread):
                 return
             try:
                 sleep(1)
-                card_data = {}
-                card_data["time"] = OTime.now()
                 epc_list = [
                     "00 00 00 01",
                     "00 00 00 14",
                     "00 00 00 0E",
                     "BFACACACACACACACACA",
                 ]
-                card_data["epc"] = epc_list[randint(0, 3)]
+                card_data = {"time": OTime.now(), "epc": epc_list[randint(0, 3)]}
                 self._queue.put(ImpinjCommand("card_data", card_data), timeout=1)
 
             except Exception as e:

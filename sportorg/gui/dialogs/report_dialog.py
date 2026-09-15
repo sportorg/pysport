@@ -211,10 +211,11 @@ class ReportDialog(QDialog):
             # DOCX template processing
             full_path = settings.template_dir() + template_path
             doc = DocxTemplate(full_path)
-            context = {}
-            context["race"] = races_dict[get_current_race_index()]
-            context["name"] = config.NAME
-            context["version"] = str(config.VERSION)
+            context = {
+                "race": races_dict[get_current_race_index()],
+                "name": config.NAME,
+                "version": str(config.VERSION),
+            }
             doc.render(context)
 
             if _settings["save_to_last_file"]:

@@ -240,12 +240,13 @@ class Huichang(object):
             elif data == b"\xee":
                 raise HuichangException("Device returned error")
         elif cmd_code in [Huichang.CMD_CARD_DATA, Huichang.CMD_CONTACT_CARD_DATA]:
-            ret = {}
-            ret["card_number"] = int(data[0:4].hex())
-            ret["start"] = self._to_time(data[5:9])
-            ret["finish"] = self._to_time(data[10:14])
-            ret["clear"] = self._to_time(data[15:18])
-            ret["punches"] = []
+            ret = {
+                "card_number": int(data[0:4].hex()),
+                "start": self._to_time(data[5:9]),
+                "finish": self._to_time(data[10:14]),
+                "clear": self._to_time(data[15:18]),
+                "punches": [],
+            }
             for i in range(18, len(data), 4):
                 cp_code = data[i]
                 cp_time = self._to_time(data[i + 1 : i + 4])

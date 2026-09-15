@@ -301,11 +301,9 @@ class SRPid:
     @staticmethod
     def _parse_chip_data(data):
         # TODO check data length
-        result = {}
-        #        result['SerialNum'] = SRPid._to_int(data[0:4])
-        result["ChipNum"] = SRPid._to_int(data[4:6])
-        #        result['Reserv'] = data[6:14]
-        result["CP"] = []
+        #       result['SerialNum'] = SRPid._to_int(data[0:4])
+        #       result['Reserv'] = data[6:14]
+        result = {"ChipNum": SRPid._to_int(data[4:6]), "CP": []}
         for i in range(14, len(data), 5):
             cp = data[i]
             time = datetime.fromtimestamp(SRPid._to_int(data[i + 1 : i + 5]))

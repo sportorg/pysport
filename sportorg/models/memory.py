@@ -2351,9 +2351,7 @@ class Qualification(IntEnum):
         def normalize_qual(raw_name: str) -> str:
             return str(raw_name).strip().casefold().replace(" ", "").replace(".", "")
 
-        aliases = {}
-        for title, code in qual_reverse.items():
-            aliases[normalize_qual(title)] = code
+        aliases = {normalize_qual(title): code for title, code in qual_reverse.items()}
 
         aliases.update(
             {
@@ -2421,24 +2419,24 @@ class RankingItem:
         self.min_scores = 0
 
     def get_dict_data(self):
-        ret = {}
-        ret["qual"] = self.qual.get_title()
-        ret["max_place"] = self.max_place
-        ret["max_time"] = str(self.max_time)
-        ret["min_scores"] = str(self.min_scores) if self.min_scores else None
-        ret["percent"] = self.percent
-        return ret
+        return {
+            "qual": self.qual.get_title(),
+            "max_place": self.max_place,
+            "max_time": str(self.max_time),
+            "min_scores": str(self.min_scores) if self.min_scores else None,
+            "percent": self.percent,
+        }
 
     def to_dict(self):
-        ret = {}
-        ret["qual"] = self.qual.value
-        ret["use_scores"] = self.use_scores
-        ret["max_place"] = str(self.max_place)
-        ret["max_time"] = self.max_time.to_msec() if self.max_time else None
-        ret["min_scores"] = str(self.min_scores) if self.min_scores else None
-        ret["is_active"] = self.is_active
-        ret["percent"] = self.percent
-        return ret
+        return {
+            "qual": self.qual.value,
+            "use_scores": self.use_scores,
+            "max_place": str(self.max_place),
+            "max_time": self.max_time.to_msec() if self.max_time else None,
+            "min_scores": str(self.min_scores) if self.min_scores else None,
+            "is_active": self.is_active,
+            "percent": self.percent,
+        }
 
     def update_data(self, data):
         self.qual = Qualification.get_qual_by_code(int(data["qual"]))
@@ -2480,31 +2478,28 @@ class Ranking:
         return max_qual
 
     def get_dict_data(self):
-        ret = {}
-        ret["is_active"] = self.is_active
+        ret: Dict[str, Any] = {"is_active": self.is_active}
         if self.is_active:
-            ret["rank_scores"] = self.rank_scores
-            ret["max_qual"] = self.get_max_qual().get_title()
-            rank_array = []
-
-            for i in self.rank.values():
-                if i.is_active:
-                    if i.max_place or (i.max_time and i.max_time.to_msec() > 0):
-                        rank_array.append(i.get_dict_data())
-
-            ret["rank"] = rank_array
+            ret.update(
+                {
+                    "rank_scores": self.rank_scores,
+                    "max_qual": self.get_max_qual().get_title(),
+                    "rank": [
+                        i.get_dict_data()
+                        for i in self.rank.values()
+                        if i.is_active
+                        and (i.max_place or (i.max_time and i.max_time.to_msec() > 0))
+                    ],
+                }
+            )
         return ret
 
     def to_dict(self):
-        ret = {}
-        ret["is_active"] = self.is_active
-        ret["rank_scores"] = self.rank_scores
-        ret["rank"] = []
-        for i in self.rank:
-            obj = self.rank[i]
-            rank = obj.to_dict()
-            ret["rank"].append(rank)
-        return ret
+        return {
+            "is_active": self.is_active,
+            "rank_scores": self.rank_scores,
+            "rank": [rank_item.to_dict() for rank_item in self.rank.values()],
+        }
 
     def update_data(self, data):
         self.is_active = bool(data["is_active"])
