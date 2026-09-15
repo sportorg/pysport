@@ -2622,10 +2622,6 @@ class RelayLeg:
             return res.person.is_out_of_competition
         return False
 
-    def set_bib(self):
-        if self.person:
-            self.person.set_bib(self.get_bib())
-
     def set_person(self, person):
         self.person = person
 
