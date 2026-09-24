@@ -22,6 +22,7 @@ from serial import Serial
 from serial.serialutil import SerialException
 
 from sportorg.language import translate
+from sportorg.common.otime import OTime
 
 
 class Huichang(object):
@@ -248,7 +249,7 @@ class Huichang(object):
             }
             for i in range(18, len(data), 4):
                 cp_code = data[i]
-                cp_time = self._to_time(data[i + 1 : i + 4])
+                cp_time = self._to_otime(data[i + 1 : i + 4])
                 ret["punches"].append((cp_code, cp_time))
 
             if cmd_code == Huichang.CMD_CARD_DATA:
@@ -271,16 +272,16 @@ class Huichang(object):
         return None
 
     @staticmethod
-    def _to_time(data: bytes) -> time:
+    def _to_otime(data: bytes) -> OTime:
         if data[1] > 59 or data[2] > 59:
-            return time()
+            return OTime()
         h = data[0]
         if h > 23:
             h %= 24
         ms = 0
         if len(data) > 3:
             ms = data[3]
-        return time(hour=h, minute=data[1], second=data[2], microsecond=ms * 1000)
+        return OTime(hour=h, minute=data[1], sec=data[2], msec=ms)
 
     @staticmethod
     def crc8(data: bytes) -> int:

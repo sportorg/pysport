@@ -18,9 +18,9 @@ from sportorg.libs.huichang.huichang import (
 )
 
 from sportorg.common.singleton import singleton
+from sportorg.common.otime import OTime
 from sportorg.models import memory
 from sportorg.modules.sportident import backup
-from sportorg.utils.time import time_to_otime
 
 
 class HuichangCommand:
@@ -105,15 +105,15 @@ class ResultThread(QThread):
             if t:
                 split = memory.Split()
                 split.code = str(card_data["punches"][i][0])
-                split.time = time_to_otime(t)
+                split.time = t
                 split.days = 0
                 result.splits.append(split)
 
-        if "start" in card_data and card_data["start"]:
-            result.start_time = time_to_otime(card_data["start"])
-        if "finish" in card_data and card_data["finish"]:
-            result.finish_time = time_to_otime(card_data["finish"])
-        if "battery_level" in card_data:
+        if "start" in card_data and card_data["start"] and card_data["start"] != OTime():
+            result.start_time = card_data["start"]
+        if "finish" in card_data and card_data["finish"] and card_data["finish"] != OTime():
+            result.finish_time = card_data["finish"]
+        if "battery_level" in card_data and card_data["battery_level"]:
             result.card_battery_level = max(0, min(100, card_data["battery_level"]))
 
         return result
