@@ -133,11 +133,6 @@ class PrintPropertiesDialog(QDialog):
         default_printer_name = QPrinter().printerName()
 
         printer_name = settings.SETTINGS.printer_split or default_printer_name
-        # try:
-        #     QPrinter().setPrinterName(printer_name)
-        # except Exception as e:
-        #     logging.error(str(e))
-        #     printer_name = default_printer_name
         self.selected_split_printer.setText(printer_name)
 
         self.print_splits_checkbox.setChecked(obj.get_setting("split_printout", False))

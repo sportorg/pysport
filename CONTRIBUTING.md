@@ -52,6 +52,38 @@ uv run poe lint
 uv run poe test
 ```
 
+### Comments
+
+- Write all code comments in English.
+- Express parameter and return types with Python type hints, not in comments or docstrings (no `:param:`/`:return:`/`:type:` fields).
+- Comments explain why, not what; keep them in sync with the code when behavior changes.
+- Delete commented-out code instead of leaving it.
+
+Examples:
+
+```python
+MAX_START_INTERVAL_SECONDS = 120  # The interval is capped to avoid oversized start waves.
+
+
+def normalize_name(full_name: str) -> str:
+    """Normalize participant names for stable comparisons.
+
+    Names may arrive in mixed case or with repeated whitespace from imported
+    files. Normalizing them before lookup keeps matching deterministic and
+    prevents duplicate participants after repeated imports.
+    """
+    return " ".join(full_name.casefold().split())
+```
+
+For variables that need more context, use a short comment block above the declaration:
+
+```python
+# Card numbers can be re-entered when a replacement card is issued.
+# Keeping the original number here preserves result links to earlier reads.
+original_card_number = imported_card_number
+```
+
+
 ## Build
 
 ### cx_Freeze

@@ -41,7 +41,6 @@ class SIReaderThread(QThread):
     def __init__(self, port, queue, stop_event, logger, debug=False):
         self.port = port
         super().__init__()
-        # self.setName(self.__class__.__name__)
         self.setObjectName(self.__class__.__name__)
         self._queue = queue
         self._stop_event = stop_event
@@ -106,7 +105,6 @@ class ResultThread(QThread):
 
     def __init__(self, queue, stop_event, logger, start_time=None):
         super().__init__()
-        # self.setName(self.__class__.__name__)
         self.setObjectName(self.__class__.__name__)
         self._queue = queue
         self._stop_event = stop_event
@@ -215,7 +213,6 @@ class SIReaderClient:
                 self.port, self._queue, self._stop_event, self._logger, debug=True
             )
             self._si_reader_thread.start()
-        # elif not self._si_reader_thread.is_alive():
         elif self._si_reader_thread.isFinished():
             self._si_reader_thread = None
             self._start_si_reader_thread()
@@ -228,14 +225,12 @@ class SIReaderClient:
             if self._call_back:
                 self._result_thread.data_sender.connect(self._call_back)
             self._result_thread.start()
-        # elif not self._result_thread.is_alive():
         elif self._result_thread.isFinished():
             self._result_thread = None
             self._start_result_thread()
 
     def is_alive(self):
         if self._si_reader_thread and self._result_thread:
-            # return self._si_reader_thread.is_alive() and self._result_thread.is_alive()
             return (
                 not self._si_reader_thread.isFinished()
                 and not self._result_thread.isFinished()

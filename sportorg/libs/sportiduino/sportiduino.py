@@ -500,19 +500,16 @@ class Sportiduino:
                 Sportiduino._translate("sportiduino", "The state-card not found")
             )
 
-        state = {}
-        state["version"] = pageData[8][0:3]
-        state["config"] = pageData[9]
-        state["battery"] = byte2int(pageData[10][0])
-        state["mode"] = byte2int(pageData[10][1])
-        state["timestamp"] = datetime.fromtimestamp(
-            Sportiduino._to_int(pageData[11][0:4])
-        )
-        state["wakeuptime"] = datetime.fromtimestamp(
-            Sportiduino._to_int(pageData[12][0:4])
-        )
-
-        return state
+        return {
+            "version": pageData[8][0:3],
+            "config": pageData[9],
+            "battery": byte2int(pageData[10][0]),
+            "mode": byte2int(pageData[10][1]),
+            "timestamp": datetime.fromtimestamp(Sportiduino._to_int(pageData[11][0:4])),
+            "wakeuptime": datetime.fromtimestamp(
+                Sportiduino._to_int(pageData[12][0:4])
+            ),
+        }
 
     def apply_pwd(self, pwd=(0, 0, 0), flags=0):
         params = b""
@@ -727,11 +724,12 @@ class Sportiduino:
     @staticmethod
     def _parse_card_data(data):
         # TODO check data length
-        ret = {}
-        ret["card_number"] = Sportiduino._to_int(data[0:2])
-        ret["page6"] = data[2:6]
-        ret["page7"] = data[6:10]
-        ret["punches"] = []
+        ret = {
+            "card_number": Sportiduino._to_int(data[0:2]),
+            "page6": data[2:6],
+            "page7": data[6:10],
+            "punches": [],
+        }
         for i in range(10, len(data), 5):
             cp = byte2int(data[i])
             time = datetime.fromtimestamp(Sportiduino._to_int(data[i + 1 : i + 5]))
@@ -746,18 +744,17 @@ class Sportiduino:
 
     @staticmethod
     def raw_data_to_card_data(data):
-        ret = {}
-        master_card_byte = byte2int(data[4][2])
-        if master_card_byte == 0xFF:
-            ret["master_card_flag"] = True
-        ret["master_card_type"] = data[4][1]
-        ret["card_number"] = Sportiduino._to_int(data[4][0:2])
-        ret["init_timestamp"] = Sportiduino._to_int(data[5][0:4])
-        ret["page6"] = data[6][0:4]
-        ret["page7"] = data[7][0:4]
-        ret["punches"] = []
+        ret = {
+            "master_card_type": data[4][1],
+            "card_number": Sportiduino._to_int(data[4][0:2]),
+            "init_timestamp": Sportiduino._to_int(data[5][0:4]),
+            "page6": data[6][0:4],
+            "page7": data[7][0:4],
+            "punches": [],
+        }
 
-        if "master_card_flag" in ret:
+        if byte2int(data[4][2]) == 0xFF:
+            ret["master_card_flag"] = True
             return ret
 
         init_time_low = Sportiduino._to_int(data[5][1:4])
@@ -793,10 +790,7 @@ class Sportiduino:
 
     @staticmethod
     def _parse_card_raw_data(data, log_debug):
-        ret = {}
-        for i in range(0, len(data), 5):
-            page_num = byte2int(data[i])
-            ret[page_num] = data[i + 1 : i + 5]
+        ret = {byte2int(data[i]): data[i + 1 : i + 5] for i in range(0, len(data), 5)}
 
         log_debug("Card raw data:")
         for p in ret:
@@ -812,9 +806,7 @@ class Sportiduino:
         if len(data) < 1:
             return None
 
-        ret = {}
-        ret["cp"] = byte2int(data[0])
-        ret["cards"] = []
+        ret = {"cp": byte2int(data[0]), "cards": []}
 
         if len(data) > 1:
             if data[1] == 0xFF:  # with timestamps

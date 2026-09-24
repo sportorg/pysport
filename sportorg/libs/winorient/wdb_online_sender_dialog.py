@@ -37,7 +37,6 @@ class WdbOnlineSenderDialog(QDialog):
         self.layout.addRow(self.file_button, self.file_path)
 
         self.url_label = QLabel("URL")
-        # self.url_item = QLineEdit('http://orgeo.ru/online/sv?id=20000&sk=20000&sub=1&')
         self.url_item = QLineEdit("http://orgeo.ru/online/sv?id=5651&sk=05c15&sub=1&")
         self.url_item.setMinimumWidth(300)
         self.layout.addRow(self.url_label, self.url_item)

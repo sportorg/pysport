@@ -95,14 +95,10 @@ class ResultThread(QThread):
         for i in range(len(card_data["CP"])):
             t = card_data["CP"][i][1]
             if t:
-                # !
-                # НОМЕРА СТАНЦИЙ SRPid
-                # ------------------------------
-                # 1...200 ОТМЕТКА
-                #
-                # 241  СТАРТ
-                # 242  ФИНИШ
-                # !
+                # SRPid station codes
+                # 1...200 - control punch
+                # 241 - start
+                # 242 - finish
 
                 split = memory.Split()
                 split.code = str(card_data["CP"][i][0])
@@ -155,7 +151,6 @@ class SrpidClient:
             if self._call_back:
                 self._result_thread.data_sender.connect(self._call_back)
             self._result_thread.start()
-        # elif not self._result_thread.is_alive():
         elif self._result_thread.isFinished():
             self._result_thread = None
             self._start_result_thread()

@@ -113,7 +113,6 @@ class MainTab(Tab):
 
         self.item_check_updates = QCheckBox(translate("Check updates"))
         self.item_check_updates.setChecked(settings.SETTINGS.app_check_updates)
-        # self.layout.addRow(self.item_check_updates)
 
         self.item_save_in_utf8 = QCheckBox(translate("Save in UTF-8 encoding"))
         self.item_save_in_utf8.setChecked(settings.SETTINGS.file_save_in_utf8)

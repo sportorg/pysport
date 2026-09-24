@@ -283,5 +283,4 @@ class RankingTable:
             my_items = operator.itemgetter(*columns)
             return [my_items(x) for x in table_data]
         except Exception:
-            # logging.exception(e)
             return [[0, 0]]

@@ -553,7 +553,6 @@ class StartNumberManager:
         current_race = self.race
         # get persons of current corridor
         persons = current_race.get_persons_by_corridor(corridor)
-        # persons = sorted(persons, key=lambda item: item.start_time)  # sort by start time
         return self.set_numbers_by_order(persons, first_number, interval)
 
     def process_corridor_by_minute(self, corridor, first_number=1):

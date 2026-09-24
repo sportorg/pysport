@@ -60,7 +60,6 @@ class ResultsTable(TableView):
                 dialog = ResultEditDialog(race().results[index.row()])
                 dialog.exec_()
                 GlobalAccess().get_main_window().refresh()
-                # self.selectRow(index.row()+1)
         except Exception as e:
             logging.error(str(e))
 

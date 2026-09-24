@@ -207,10 +207,8 @@ class PluginsDialog(QDialog):
         return item.text().strip()
 
     def _rebuild_plugin_ids_after_remove(self, removed_row: int) -> None:
-        plugin_ids = {}
-        for row, plugin_id in self._plugin_ids.items():
-            if row < removed_row:
-                plugin_ids[row] = plugin_id
-            elif row > removed_row:
-                plugin_ids[row - 1] = plugin_id
-        self._plugin_ids = plugin_ids
+        self._plugin_ids = {
+            row if row < removed_row else row - 1: plugin_id
+            for row, plugin_id in self._plugin_ids.items()
+            if row != removed_row
+        }

@@ -59,7 +59,6 @@ class ImpinjThread(QThread):
                 return
 
             impinj_reader.worker_start()
-            # impinj_reader.fast_power(22)
 
         except Exception as e:
             self._logger.error(str(e))
@@ -123,15 +122,13 @@ class ImpinjThread(QThread):
                 return
             try:
                 sleep(1)
-                card_data = {}
-                card_data["time"] = OTime.now()
                 epc_list = [
                     "00 00 00 01",
                     "00 00 00 14",
                     "00 00 00 0E",
                     "BFACACACACACACACACA",
                 ]
-                card_data["epc"] = epc_list[randint(0, 3)]
+                card_data = {"time": OTime.now(), "epc": epc_list[randint(0, 3)]}
                 self._queue.put(ImpinjCommand("card_data", card_data), timeout=1)
 
             except Exception as e:
@@ -148,30 +145,10 @@ class ResultThread(QThread):
         self._stop_event = stop_event
         self._logger = logger
 
-        # self.timeout_list = {}
-        # self.timeout = race().get_setting('readout_duplicate_timeout', 15000)  # timeout in milliseconds
-
     def run(self):
         time.sleep(1)
         while True:
             try:
-                # time.sleep(0.1)
-                # logging.debug('timeout = ' + str(self.timeout))
-                # dummy_data = {'epc':'00 00 00 01', 'time':OTime.now()}
-                # result = self._get_result(dummy_data)
-                # # don't create new result if we already have fresh result for this tag (timeout 15s)
-                # create_result= True
-                # card_id = result.card_number
-                # card_time = result.finish_time
-                # if card_id in self.timeout_list:
-                #     old_time = self.timeout_list[card_id]
-                #     if card_time - old_time < OTime(msec=self.timeout):
-                #         self._logger.debug('Duplicated result for tag {}, ignoring'.format(card_id))
-                #         create_result = False
-                # if create_result:
-                #     self.timeout_list[card_id] = card_time
-                #     self.data_sender.emit(result)
-
                 cmd = self._queue.get(timeout=5)
                 if cmd.command == "card_data":
                     result = self._get_result(cmd.data)
@@ -241,7 +218,6 @@ class ImpinjClient:
             if self._call_back is not None:
                 self._result_thread.data_sender.connect(self._call_back)
             self._result_thread.start()
-        # elif not self._result_thread.is_alive():
         elif self._result_thread.isFinished():
             self._result_thread = None
             self._start_result_thread()

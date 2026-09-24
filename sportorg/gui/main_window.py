@@ -159,8 +159,6 @@ class MainWindow(QMainWindow):
                 return
 
             race().update_data(command.data)
-            # if 'object' in command.data and command.data['object'] in
-            # ['ResultManual', 'ResultSportident', 'ResultSFR', 'ResultSportiduino' etc.]:
             if command.header.obj_type in [
                 ObjectTypes.Result.value,
                 ObjectTypes.ResultManual.value,
@@ -276,7 +274,6 @@ class MainWindow(QMainWindow):
                         logging.info(translate("Auto save"))
                 else:
                     pass
-                    # logging.debug(translate('No file to auto save'))
         except Exception as e:
             logging.error(str(e))
 
@@ -987,7 +984,6 @@ class MainWindow(QMainWindow):
                     continue
                 if index >= len(obj.results):
                     pass
-                # self.split_printout(obj.results[index])
                 print_results.append(obj.results[index])
 
             confirm_printing = True

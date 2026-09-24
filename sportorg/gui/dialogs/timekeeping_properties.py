@@ -50,9 +50,7 @@ class TimekeepingPropertiesDialog(QDialog):
         return super().exec_()
 
     def init_ui(self):
-        # self.setFixedWidth(500)
         self.setWindowTitle(translate("Timekeeping settings"))
-        # self.setWindowIcon(QIcon(icon_dir('sportident.png')))
         self.setSizeGripEnabled(False)
         self.setModal(True)
         self.setMinimumWidth(400)

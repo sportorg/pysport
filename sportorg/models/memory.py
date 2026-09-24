@@ -66,11 +66,8 @@ class _TitleType(Enum):
 
 class RaceType(_TitleType):
     INDIVIDUAL_RACE = 0
-    # MASS_START = 1
     PURSUIT = 2
     RELAY = 3
-    # ONE_MAN_RELAY = 4
-    # SPRINT_RELAY = 5
     MULTI_DAY_RACE = 6
 
 
@@ -736,7 +733,6 @@ class Result(ABC):
         elif race().get_setting("result_processing_mode", "time") == "scores":
             ret += f"{self.rogaine_score} {translate('points')} "
 
-        # time_accuracy = race().get_setting('time_accuracy', 0)
         start = hhmmss_to_time(self.person.comment)
         if start == OTime():
             raise ValueError
@@ -1678,10 +1674,10 @@ class Race:
         self.result_index_by_multi_day_id: Dict[str, Result] = {}
         self.person_index_bib: Dict[int, Person] = {}
         self.person_index_card: Dict[int, Person] = {}
-        self.person_index: Dict[str, Result] = {}
-        self.group_index: Dict[str, Group] = {}
-        self.organization_index: Dict[str, Organization] = {}
-        self.course_index: Dict[str, Course] = {}
+        self.person_index: Dict[uuid.UUID, Result] = {}
+        self.group_index: Dict[uuid.UUID, Group] = {}
+        self.organization_index: Dict[uuid.UUID, Organization] = {}
+        self.course_index: Dict[uuid.UUID, Course] = {}
         self.course_index_name: Dict[str, Course] = {}
 
     def __repr__(self) -> str:
@@ -2351,9 +2347,7 @@ class Qualification(IntEnum):
         def normalize_qual(raw_name: str) -> str:
             return str(raw_name).strip().casefold().replace(" ", "").replace(".", "")
 
-        aliases = {}
-        for title, code in qual_reverse.items():
-            aliases[normalize_qual(title)] = code
+        aliases = {normalize_qual(title): code for title, code in qual_reverse.items()}
 
         aliases.update(
             {
@@ -2421,24 +2415,24 @@ class RankingItem:
         self.min_scores = 0
 
     def get_dict_data(self):
-        ret = {}
-        ret["qual"] = self.qual.get_title()
-        ret["max_place"] = self.max_place
-        ret["max_time"] = str(self.max_time)
-        ret["min_scores"] = str(self.min_scores) if self.min_scores else None
-        ret["percent"] = self.percent
-        return ret
+        return {
+            "qual": self.qual.get_title(),
+            "max_place": self.max_place,
+            "max_time": str(self.max_time),
+            "min_scores": str(self.min_scores) if self.min_scores else None,
+            "percent": self.percent,
+        }
 
     def to_dict(self):
-        ret = {}
-        ret["qual"] = self.qual.value
-        ret["use_scores"] = self.use_scores
-        ret["max_place"] = str(self.max_place)
-        ret["max_time"] = self.max_time.to_msec() if self.max_time else None
-        ret["min_scores"] = str(self.min_scores) if self.min_scores else None
-        ret["is_active"] = self.is_active
-        ret["percent"] = self.percent
-        return ret
+        return {
+            "qual": self.qual.value,
+            "use_scores": self.use_scores,
+            "max_place": str(self.max_place),
+            "max_time": self.max_time.to_msec() if self.max_time else None,
+            "min_scores": str(self.min_scores) if self.min_scores else None,
+            "is_active": self.is_active,
+            "percent": self.percent,
+        }
 
     def update_data(self, data):
         self.qual = Qualification.get_qual_by_code(int(data["qual"]))
@@ -2480,31 +2474,28 @@ class Ranking:
         return max_qual
 
     def get_dict_data(self):
-        ret = {}
-        ret["is_active"] = self.is_active
+        ret: Dict[str, Any] = {"is_active": self.is_active}
         if self.is_active:
-            ret["rank_scores"] = self.rank_scores
-            ret["max_qual"] = self.get_max_qual().get_title()
-            rank_array = []
-
-            for i in self.rank.values():
-                if i.is_active:
-                    if i.max_place or (i.max_time and i.max_time.to_msec() > 0):
-                        rank_array.append(i.get_dict_data())
-
-            ret["rank"] = rank_array
+            ret.update(
+                {
+                    "rank_scores": self.rank_scores,
+                    "max_qual": self.get_max_qual().get_title(),
+                    "rank": [
+                        i.get_dict_data()
+                        for i in self.rank.values()
+                        if i.is_active
+                        and (i.max_place or (i.max_time and i.max_time.to_msec() > 0))
+                    ],
+                }
+            )
         return ret
 
     def to_dict(self):
-        ret = {}
-        ret["is_active"] = self.is_active
-        ret["rank_scores"] = self.rank_scores
-        ret["rank"] = []
-        for i in self.rank:
-            obj = self.rank[i]
-            rank = obj.to_dict()
-            ret["rank"].append(rank)
-        return ret
+        return {
+            "is_active": self.is_active,
+            "rank_scores": self.rank_scores,
+            "rank": [rank_item.to_dict() for rank_item in self.rank.values()],
+        }
 
     def update_data(self, data):
         self.is_active = bool(data["is_active"])
@@ -2557,11 +2548,11 @@ class RelayLeg:
         return None
 
     def get_relay_team(self):
-        """:return relay team object"""
+        """Return relay team object."""
         return self.team
 
     def get_next_leg(self):
-        """:return next leg of relay team, None if this leg is last"""
+        """Return next leg of relay team, None if this leg is last."""
         team = self.get_relay_team()
         if team and isinstance(team, RelayTeam):
             if len(team.legs) > self.leg + 1:
@@ -2569,7 +2560,7 @@ class RelayLeg:
         return None
 
     def get_prev_leg(self):
-        """:return previous leg of relay team, None if this leg is first"""
+        """Return previous leg of relay team, None if this leg is first."""
         if self.leg > 1:
             team = self.get_relay_team()
             if team and isinstance(team, RelayTeam):
@@ -2579,13 +2570,13 @@ class RelayLeg:
         return None
 
     def get_bib(self):
-        """:return person bib, e.g. 1.1 or 1001 depending on settings"""
+        """Return person bib, e.g. 1.1 or 1001 depending on settings."""
         if self.number < 1000:
             return 1000 * self.leg + self.number
         return "{}.{}".format(self.number, self.leg)
 
     def get_variant(self):
-        """:return person distribution variant e.g. ABCA"""
+        """Return person distribution variant e.g. ABCA."""
         return self.variant
 
     def parse_variant_text(self, text):
@@ -2621,10 +2612,6 @@ class RelayLeg:
         if res and res.person:
             return res.person.is_out_of_competition
         return False
-
-    def set_bib(self):
-        if self.person:
-            self.person.set_bib(self.get_bib())
 
     def set_person(self, person):
         self.person = person

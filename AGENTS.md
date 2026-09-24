@@ -34,6 +34,9 @@
 - Keep templates and translation IDs aligned with GUI object names.
 - Regenerate `.mo` files after editing `.po` resources via `uv run poe generate-mo`.
 - Write all code comments in English.
+- Express parameter and return types with Python type hints, not in comments or docstrings (no `:param:`/`:return:`/`:type:` fields).
+- Comments explain why, not what; keep them in sync with the code when behavior changes.
+- Delete commented-out code instead of leaving it.
 
 ## Python Compatibility
 - Keep all code compatible with Python 3.8 and the latest stable Python release (currently Python 3.14).

@@ -151,9 +151,7 @@ if sys.platform == "win32":
                         except UnicodeEncodeError:
                             if stage is None:
                                 stage = tempfile.mkdtemp(prefix="cxfreeze-cab-")
-                            ascii_source = os.path.join(
-                                stage, "%05d.bin" % len(staged)
-                            )
+                            ascii_source = os.path.join(stage, "%05d.bin" % len(staged))
                             shutil.copyfile(source, ascii_source)
                             source = ascii_source
                         staged.append((source, logical))

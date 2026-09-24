@@ -212,7 +212,6 @@ class Huichang(object):
             if cmd_code != Huichang.CMD_CARD_BATTERY_LEVEL:
                 crc_calc = self.crc8(payload)
                 if not crc_calc == crc[0]:
-                    # self._log_debug("CRC mismatch: 0x{:02x} != 0x{:02x}".format(crc_calc, crc[0]))
                     raise HuichangException("CRC mismatch")
 
         except (SerialException, OSError) as msg:
@@ -241,12 +240,13 @@ class Huichang(object):
             elif data == b"\xee":
                 raise HuichangException("Device returned error")
         elif cmd_code in [Huichang.CMD_CARD_DATA, Huichang.CMD_CONTACT_CARD_DATA]:
-            ret = {}
-            ret["card_number"] = int(data[0:4].hex())
-            ret["start"] = self._to_otime(data[5:9])
-            ret["finish"] = self._to_otime(data[10:14])
-            ret["clear"] = self._to_otime(data[15:18])
-            ret["punches"] = []
+            ret = {
+                "card_number": int(data[0:4].hex()),
+                "start": self._to_time(data[5:9]),
+                "finish": self._to_time(data[10:14]),
+                "clear": self._to_time(data[15:18]),
+                "punches": [],
+            }
             for i in range(18, len(data), 4):
                 cp_code = data[i]
                 cp_time = self._to_otime(data[i + 1 : i + 4])

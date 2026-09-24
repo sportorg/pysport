@@ -65,6 +65,7 @@
 + Fixed: the default sounds are resolved from the package when played, instead of being written into `settings.json` as absolute paths on first run
 + Fixed: `uv run poe run` also runs `generate-mo` and `generate-version`
 + Fixed: `builder.py bdist_msi` failed with `FCI error 1` when a packaged file had a non-ASCII name, such as a Cyrillic report template
++ Result calculation speed increased 3x
 
 ## 2025-04-01
 

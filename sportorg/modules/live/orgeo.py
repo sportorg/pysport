@@ -204,11 +204,9 @@ def _get_person_obj(data, race_data, result=None):
     return obj
 
 
-def make_nice(s):
-    """
-    Converts unicode point string to urf8
-    :param s: unicode point string
-    :return: utf8 string
+def make_nice(s: str) -> str:
+    """Convert unicode point string to utf8.
+
     example:
     in: b'{"response":"OK: \\u00ab\\u043a\\u0440\\u043e\\u0441\\u0441-\\u0441\\u043f\\ ...
     out: b'{"response":"OK: «кросс-спринт» - Стартовый успешно загружен | Start list loaded"}'

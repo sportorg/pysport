@@ -110,10 +110,9 @@ class MarkedRouteDialog(QDialog):
 
     def apply_changes_impl(self):
         text = self.item_table.toPlainText()
-        code_dict = {}
-        for line in text.split("\n"):
-            for code in str(line).split(","):
-                code_dict[code] = line
+        code_dict = {
+            code: line for line in text.split("\n") for code in str(line).split(",")
+        }
         for course in race().courses:
             for control in course.controls:
                 code = control.code.split("(")[0]

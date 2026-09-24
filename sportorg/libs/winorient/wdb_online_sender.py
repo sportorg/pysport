@@ -111,12 +111,12 @@ class WdbOnlineSender:
             _ = requests.get(ret)
 
     def get_splits(self, wdb, man):
-        """
-        строка со сплитами. WinOrient передает её в закодированном бинарном формате
-        Формат: [SSSSSSTTTTTTCC]*
-        SSSSSS - номер чипа в 16-чной системе
-        TTTTTT - время в 16-чной системе
-        СС - номер КП в 16-чной системе
+        """Build the splits string in the binary-encoded format used by WinOrient.
+
+        Format: [SSSSSSTTTTTTCC]*
+        SSSSSS - card number in hexadecimal
+        TTTTTT - time in hexadecimal
+        CC - control point number in hexadecimal
         """
 
         chip = man.get_chip()
