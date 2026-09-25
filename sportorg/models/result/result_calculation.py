@@ -59,8 +59,6 @@ class ResultCalculation:
             self.race.relay_teams[:] = [
                 team for team in self.race.relay_teams if team.group not in groups_set
             ]
-        self.race.result_index = {}
-
         self.race.result_index_by_multi_day_id = {}
         for person in self.race.persons:
             person.result_count = 0
