@@ -28,7 +28,7 @@ jobs:
       - name: Install python dependencies
         run: pip install uv && uv sync --frozen --extra win --extra gui
       - name: Build Rust extension
-        run: uv run poe develop-rust
+        run: uv run poe build-rust
       - name: Generate mo files
         run: uv run poe generate-mo
       - name: Generate version file
