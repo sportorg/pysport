@@ -40,7 +40,7 @@ dev = [
   "mypy>=1.4; python_version >= '3.14'",
   "poethepoet>=0.22,<0.31",
   "pytest>=7.4,<9.0",
-  "pytest-benchmark>=4,<5",
+  "pytest-benchmark>=4,<6",
   "pytest-cov",
   "pytest-deadfixtures",
   "pytest-mock",
