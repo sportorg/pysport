@@ -38,7 +38,7 @@ dev = [
   "maturin>=1.9.4,<2",
   "mypy~=1.4; python_version == '3.8'",
   "mypy>=1.4; python_version >= '3.14'",
-  "poethepoet>=0.22,<0.31",
+  "poethepoet>=0.22,<0.49",
   "pytest>=7.4,<9.0",
   "pytest-benchmark>=4,<5",
   "pytest-cov",
