@@ -24,8 +24,50 @@ class ScoreCalculation:
         return 0
 
     def calculate_scores(self):
-        for i in self.race.results:
-            self.calculate_scores_result(i)
+        scores_team_limit = self.race.get_setting("scores_team_limit", "0")
+        scores_mode = self.race.get_setting("scores_mode", "off")
+        if scores_team_limit == 0 or scores_mode != "array":
+            for i in self.race.results:
+                self.calculate_scores_result(i)
+        else:
+            self.calculate_scores_team_limit()
+
+    def calculate_scores_team_limit(self):
+        scores_team_limit = (self.race.get_setting("scores_team_limit", 0))
+        scores_array = str(
+            self.race.get_setting("scores_array", "0")
+        ).split(",")
+
+        for gr in self.race.groups:
+            results = []
+            for res in self.race.results:
+                if res.person and res.person.group and res.person.group == gr:
+                    results.append(res)
+            results.sort()
+
+            team_counters = dict()
+            skipped_persons = 0
+            for res in results:
+
+                if res.place < 0:
+                    continue
+
+                team = res.person.organization
+                if team not in team_counters.keys():
+                    team_counters[team] = 1
+                else:
+                    team_counters[team] = team_counters[team] + 1
+                if team_counters[team] > scores_team_limit:
+                    res.scores = 0
+                    skipped_persons += 1
+                else:
+                    pos = res.place - skipped_persons
+                    if  pos >= len(scores_array):
+                        if scores_array[-1].isdigit():
+                            res.scores = int(scores_array[-1])
+                    else:
+                        if scores_array[pos].isdigit():
+                            res.scores = int(scores_array[pos])
 
     def calculate_scores_result(self, result):
         if isinstance(result, Result) and result.person and result.person.group:

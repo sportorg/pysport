@@ -312,12 +312,19 @@ class TimekeepingPropertiesDialog(QDialog):
         self.scores_formula_edit = QLineEdit()
         self.scores_formula_hint = QLabel(translate("scores formula hint"))
         self.scores_formula_hint.setWordWrap(True)
+        self.scores_team_limit_label = QLabel(translate("Assign scores to first N athletes of each team"))
+        self.scores_team_limit_edit = AdvSpinBox(minimum=0)
+        self.scores_dsq_label = QLabel(translate("Scores for DSQ"))
+        self.scores_dsq_edit = AdvSpinBox(minimum=0)
+
         self.scores_layout.addRow(self.scores_off)
         self.scores_layout.addRow(self.scores_array)
         self.scores_layout.addRow(self.scores_array_edit)
         self.scores_layout.addRow(self.scores_formula)
         self.scores_layout.addRow(self.scores_formula_edit)
         self.scores_layout.addRow(self.scores_formula_hint)
+        self.scores_layout.addRow(self.scores_team_limit_label, self.scores_team_limit_edit)
+        self.scores_layout.addRow(self.scores_dsq_label, self.scores_dsq_edit)
         self.scores_tab.setLayout(self.scores_layout)
 
         # time settings
@@ -683,6 +690,9 @@ class TimekeepingPropertiesDialog(QDialog):
         )
         scores_formula = obj.get_setting("scores_formula", "200 - 100 * time / leader")
 
+        scores_dsq = obj.get_setting("scores_dsq", 0)
+        scores_team_limit = obj.get_setting("scores_team_limit", 0)
+
         if scores_mode == "off":
             self.scores_off.setChecked(True)
         elif scores_mode == "array":
@@ -692,6 +702,8 @@ class TimekeepingPropertiesDialog(QDialog):
 
         self.scores_array_edit.setText(scores_array)
         self.scores_formula_edit.setText(scores_formula)
+        self.scores_dsq_edit.setValue(scores_dsq)
+        self.scores_team_limit_edit.setValue(scores_team_limit)
 
         # time settings
         time_accuracy = obj.get_setting("time_accuracy", 0)
@@ -867,10 +879,14 @@ class TimekeepingPropertiesDialog(QDialog):
 
         scores_array = self.scores_array_edit.text()
         scores_formula = self.scores_formula_edit.text()
+        scores_dsq = self.scores_dsq_edit.value()
+        scores_team_limit = self.scores_team_limit_edit.value()
 
         obj.set_setting("scores_mode", scores_mode)
         obj.set_setting("scores_array", scores_array)
         obj.set_setting("scores_formula", scores_formula)
+        obj.set_setting("scores_dsq", scores_dsq)
+        obj.set_setting("scores_team_limit", scores_team_limit)
 
         # time settings
         time_accuracy = self.time_settings_accuracy_edit.value()
