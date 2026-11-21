@@ -3,9 +3,7 @@ import pytest
 from sportorg.common.otime import OTime, PythonOTime, TimeRounding, parse_time_rounding
 
 
-OTIME_IMPLEMENTATIONS = (
-    (PythonOTime,) if OTime is PythonOTime else (PythonOTime, OTime)
-)
+OTIME_IMPLEMENTATIONS = (PythonOTime,) if OTime is PythonOTime else (PythonOTime, OTime)
 
 
 @pytest.fixture(params=OTIME_IMPLEMENTATIONS, ids=lambda cls: cls.__name__)

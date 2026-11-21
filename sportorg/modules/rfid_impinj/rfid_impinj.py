@@ -8,7 +8,10 @@ from time import sleep
 
 import serial
 
-from sportorg.libs.rfid_impinj.pyImpinj import ImpinjR2KReader, ImpinjR2KFastSwitchInventory
+from sportorg.libs.rfid_impinj.pyImpinj import (
+    ImpinjR2KReader,
+    ImpinjR2KFastSwitchInventory,
+)
 
 try:
     from PySide6.QtCore import QThread, Signal
@@ -40,7 +43,6 @@ class ImpinjThread(QThread):
         self._stop_event = stop_event
         self._logger = logger
         self._debug = debug
-
 
     def run(self):
         if not ImpinjR2KReader or not ImpinjR2KFastSwitchInventory:
@@ -163,9 +165,9 @@ class ResultThread(QThread):
     # test generation of punches without equipment
     def test_offline(self):
         time.sleep(0.1)
-        dummy_data = {'epc':'00 00 00 01', 'time':OTime.now()}
+        dummy_data = {"epc": "00 00 00 01", "time": OTime.now()}
         result = self._get_result(dummy_data)
-        create_result= True
+        create_result = True
         if create_result:
             self.data_sender.emit(result)
 

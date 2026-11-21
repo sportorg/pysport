@@ -40,9 +40,7 @@ def get_srb_line_for_result(result, sep, is_rogaine, is_ardf, is_relay) -> str:
             leg_for_sort = 99 - (int(person.bib) // 1000)
             if result.place < 1:
                 leg_for_sort = 99
-        sort = (
-            str(leg_for_sort) + str(scores_for_sort) + result.get_result()
-        )
+        sort = str(leg_for_sort) + str(scores_for_sort) + result.get_result()
 
         place = "1"
         if not result.is_status_ok():

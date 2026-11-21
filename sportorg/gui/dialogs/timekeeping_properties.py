@@ -312,7 +312,9 @@ class TimekeepingPropertiesDialog(QDialog):
         self.scores_formula_edit = QLineEdit()
         self.scores_formula_hint = QLabel(translate("scores formula hint"))
         self.scores_formula_hint.setWordWrap(True)
-        self.scores_team_limit_label = QLabel(translate("Assign scores to first N athletes of each team"))
+        self.scores_team_limit_label = QLabel(
+            translate("Assign scores to first N athletes of each team")
+        )
         self.scores_team_limit_edit = AdvSpinBox(minimum=0)
         self.scores_dsq_label = QLabel(translate("Scores for DSQ"))
         self.scores_dsq_edit = AdvSpinBox(minimum=0)
@@ -323,7 +325,9 @@ class TimekeepingPropertiesDialog(QDialog):
         self.scores_layout.addRow(self.scores_formula)
         self.scores_layout.addRow(self.scores_formula_edit)
         self.scores_layout.addRow(self.scores_formula_hint)
-        self.scores_layout.addRow(self.scores_team_limit_label, self.scores_team_limit_edit)
+        self.scores_layout.addRow(
+            self.scores_team_limit_label, self.scores_team_limit_edit
+        )
         self.scores_layout.addRow(self.scores_dsq_label, self.scores_dsq_edit)
         self.scores_tab.setLayout(self.scores_layout)
 
