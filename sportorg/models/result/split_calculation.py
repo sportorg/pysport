@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 from typing import Optional
 
 from numpy.matlib import zeros
@@ -129,7 +130,7 @@ class GroupSplits:
 
         self.leader = {}
 
-    def generate_orig(self, logged=False):
+    def generate(self, logged=False):
         if logged:
             logging.debug("Group splits generate for " + self.group.name)
         # to have group count
@@ -146,7 +147,10 @@ class GroupSplits:
         return self
 
     # Pandas realisation of split generation
-    def generate(self, logged=False):
+    def generate1(self, logged=False):
+
+        logging.debug(datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f') + " generate started")
+
         if logged:
             logging.debug("Group splits generate for " + self.group.name)
         # to have group count
@@ -163,6 +167,8 @@ class GroupSplits:
         course =  race().find_course(res1)
         # splits, relative_splits, places, relative places, index
         control_count = len(course.controls)
+
+        logging.debug(datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f') + " Data frame creating")
 
         df = DataFrame({'ID':range(row_count)})
         for i in range(control_count):
@@ -187,6 +193,7 @@ class GroupSplits:
                 df._set_value(i, 'time' + str(course_index), time.to_msec(sub_sec))
                 df._set_value(i, 'time_rel' + str(course_index), rel_time.to_msec(sub_sec))
 
+        logging.debug(datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f') + " Data frame processing")
         # sort for leg time and set places
         for i in range(control_count):
 
@@ -222,6 +229,7 @@ class GroupSplits:
 
         df.sort_values(by='ID', inplace=True)
 
+        logging.debug(datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f') + " Getting data from Data Frame")
         # set places from DataFrame
         for i in range(row_count):
             cur_res = group_results[i]
@@ -237,6 +245,9 @@ class GroupSplits:
             self.sort_by_place()
         else:
             self.sort_by_result()
+
+        logging.debug(datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f') + " generate ended")
+
         return self
 
     # numpy split generation. TODO: sorting changes the 2d array type

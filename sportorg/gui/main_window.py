@@ -9,6 +9,8 @@ from queue import Queue
 import psutil
 from psutil import Process
 
+from sportorg.common.otime import OTime
+
 try:
     from PySide6 import QtCore, QtGui, QtWidgets
     from PySide6.QtCore import QTimer
@@ -48,7 +50,7 @@ from sportorg.models.memory import (
     new_event,
     race,
     races,
-    set_current_race_index,
+    set_current_race_index, Result,
 )
 from sportorg.models.result.result_tools import recalculate_results
 from sportorg.models.result.split_calculation import GroupSplits
@@ -837,7 +839,39 @@ class MainWindow(QMainWindow):
     def add_sportiduino_result_from_reader(self, result):
         self.add_sportident_result_from_sireader(result)
 
-    def add_impinj_result_from_reader(self, result):
+    def add_impinj_result_from_reader(self, result:Result):
+        # ignore punches before start and check duplicated timeout
+        if not ImpinjClient.static_init:
+            ImpinjClient.timeout = race().get_setting("readout_duplicate_timeout", 15000)
+            ImpinjClient.ignore_punches_before_start = race().get_setting(
+                "ignore_punches_before_start", False
+            )
+            if not hasattr(ImpinjClient, 'timeout_list'):
+                ImpinjClient.timeout_list = {}
+            ImpinjClient.static_init = True
+            ImpinjClient.logger = logging.getLogger("ImpinjClient")
+            ImpinjClient.logger.debug("ImpinjClient static init")
+
+        card_id = result.card_number
+        card_time = result.finish_time
+        if ImpinjClient.ignore_punches_before_start:
+            person = race().find_person_by_card(card_id)
+            if person:
+                if person.start_time > card_time and  person.start_time - card_time < OTime(hour=5):
+                    ImpinjClient.logger.debug(
+                        "Finish before start: {}, ignoring".format(card_id)
+                    )
+                    return
+
+        if card_id in ImpinjClient.timeout_list:
+            old_time = ImpinjClient.timeout_list[card_id]
+            if card_time - old_time < OTime(msec=ImpinjClient.timeout):
+                ImpinjClient.logger.debug(
+                    "Duplicated result for tag {}, ignoring".format(card_id)
+                )
+                return
+        ImpinjClient.timeout_list[card_id] = card_time
+
         self.add_sportident_result_from_sireader(result)
 
     def add_srpid_result_from_reader(self, result):

@@ -114,7 +114,10 @@ class DrawManager:
             for cur_course in obj.courses + [None]:
                 groups = []
                 for cur_group in obj.groups:
-                    if cur_group.course == cur_course:
+                    if cur_course is None:
+                        if cur_group.course is None:
+                            groups.append(cur_group)
+                    elif cur_group.course == cur_course:
                         groups.append(cur_group)
 
                 if len(groups) < 1:

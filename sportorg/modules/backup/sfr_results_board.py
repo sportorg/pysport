@@ -37,9 +37,11 @@ def get_srb_line_for_result(result, sep, is_rogaine, is_ardf, is_relay) -> str:
             scores_for_sort -= result.scores_ardf
         leg_for_sort = 0
         if is_relay:
-            leg_for_sort = int(person.bib) // 1000
+            leg_for_sort = 99 - (int(person.bib) // 1000)
+            if result.place < 1:
+                leg_for_sort = 99
         sort = (
-            ("0" + str(leg_for_sort))[-2:] + str(scores_for_sort) + result.get_result()
+            str(leg_for_sort) + str(scores_for_sort) + result.get_result()
         )
 
         place = "1"
@@ -52,6 +54,8 @@ def get_srb_line_for_result(result, sep, is_rogaine, is_ardf, is_relay) -> str:
         team = ""
         if person.organization:
             team = person.organization.name
+        if is_relay:
+            res += sep + str(person.bib % 1000) + "." + str(person.bib // 1000)
         line = (
             uid
             + sep

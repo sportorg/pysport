@@ -8,14 +8,14 @@ from time import sleep
 
 import serial
 
+from sportorg.libs.rfid_impinj.pyImpinj import ImpinjR2KReader, ImpinjR2KFastSwitchInventory
+
 try:
     from PySide6.QtCore import QThread, Signal
 except ModuleNotFoundError:
     from PySide2.QtCore import QThread, Signal
 
-try:
-    from pyImpinj import ImpinjR2KReader
-    from pyImpinj.enums import ImpinjR2KFastSwitchInventory
+
 except ModuleNotFoundError:
     ImpinjR2KReader = None
     ImpinjR2KFastSwitchInventory = None
@@ -23,7 +23,6 @@ except ModuleNotFoundError:
 from sportorg.common.otime import OTime
 from sportorg.common.singleton import singleton
 from sportorg.models import memory
-from sportorg.models.memory import race
 
 
 class ImpinjCommand:
@@ -42,8 +41,6 @@ class ImpinjThread(QThread):
         self._logger = logger
         self._debug = debug
 
-        self.timeout_list = {}
-        self.timeout = race().get_setting("readout_duplicate_timeout", 15000)
 
     def run(self):
         if not ImpinjR2KReader or not ImpinjR2KFastSwitchInventory:
@@ -84,6 +81,14 @@ class ImpinjThread(QThread):
                         Cloop=1,
                         D=ImpinjR2KFastSwitchInventory.ANTENNA4,
                         Dloop=1,
+                        E=ImpinjR2KFastSwitchInventory.ANTENNA5,
+                        Eloop=1,
+                        F=ImpinjR2KFastSwitchInventory.ANTENNA6,
+                        Floop=1,
+                        G=ImpinjR2KFastSwitchInventory.ANTENNA7,
+                        Gloop=1,
+                        H=ImpinjR2KFastSwitchInventory.ANTENNA8,
+                        Hloop=1,
                         Interval=0,
                         Repeat=1,
                     )
@@ -94,20 +99,6 @@ class ImpinjThread(QThread):
                 self._logger.debug("Impinj RFID data: {}".format(data))
                 card_data = data
                 card_data["time"] = OTime.now()
-
-                # don't create new result if we already have fresh result for this tag (timeout, default 15s)
-                card_id = data["epc"]
-                card_time = card_data["time"]
-                if card_id in self.timeout_list:
-                    old_time = self.timeout_list[card_id]
-                    if card_time - old_time < OTime(msec=self.timeout):
-                        self._logger.debug(
-                            "Duplicated result for tag {}, ignoring".format(card_id)
-                        )
-                        continue
-
-                self.timeout_list[card_id] = card_time
-
                 self._queue.put(ImpinjCommand("card_data", card_data), timeout=1)
 
             except serial.serialutil.SerialException as e:
@@ -148,34 +139,19 @@ class ResultThread(QThread):
         self._stop_event = stop_event
         self._logger = logger
 
-        # self.timeout_list = {}
-        # self.timeout = race().get_setting('readout_duplicate_timeout', 15000)  # timeout in milliseconds
-
     def run(self):
         time.sleep(1)
         while True:
             try:
-                # time.sleep(0.1)
-                # logging.debug('timeout = ' + str(self.timeout))
-                # dummy_data = {'epc':'00 00 00 01', 'time':OTime.now()}
-                # result = self._get_result(dummy_data)
-                # # don't create new result if we already have fresh result for this tag (timeout 15s)
-                # create_result= True
-                # card_id = result.card_number
-                # card_time = result.finish_time
-                # if card_id in self.timeout_list:
-                #     old_time = self.timeout_list[card_id]
-                #     if card_time - old_time < OTime(msec=self.timeout):
-                #         self._logger.debug('Duplicated result for tag {}, ignoring'.format(card_id))
-                #         create_result = False
-                # if create_result:
-                #     self.timeout_list[card_id] = card_time
-                #     self.data_sender.emit(result)
+                # test generation of punches without equipment
+                # remove / comment in release
+                # self.test_offline()
 
                 cmd = self._queue.get(timeout=5)
                 if cmd.command == "card_data":
-                    result = self._get_result(cmd.data)
-                    self.data_sender.emit(result)
+                    if cmd.data and "epc" in cmd.data:
+                        result = self._get_result(cmd.data)
+                        self.data_sender.emit(result)
 
             except Empty:
                 if not main_thread().is_alive() or self._stop_event.is_set():
@@ -183,6 +159,15 @@ class ResultThread(QThread):
             except Exception as e:
                 self._logger.exception(e)
         self._logger.debug("Stop adder result")
+
+    # test generation of punches without equipment
+    def test_offline(self):
+        time.sleep(0.1)
+        dummy_data = {'epc':'00 00 00 01', 'time':OTime.now()}
+        result = self._get_result(dummy_data)
+        create_result= True
+        if create_result:
+            self.data_sender.emit(result)
 
     @staticmethod
     def _get_result(card_data):
@@ -207,6 +192,11 @@ class ResultThread(QThread):
 
 @singleton
 class ImpinjClient:
+    timeout_list = {}
+    timeout = 0
+    ignore_punches_before_start = False
+    static_init = False
+
     def __init__(self):
         self._queue = Queue()
         self._stop_event = Event()
@@ -215,6 +205,7 @@ class ImpinjClient:
         self.port = None
         self._logger = logging.root
         self._call_back = None
+        ImpinjClient.static_init = False
 
     def set_call(self, value):
         if self._call_back is None:

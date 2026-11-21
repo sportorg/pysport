@@ -293,15 +293,15 @@ class ResultEditDialog(QDialog):
             result.finish_time = time_
 
         time_ = self.item_start.getOTime()
-        if result.start_time != time_:
+        if not result.start_time or result.start_time != time_:
             result.start_time = time_
 
         time_ = self.item_credit.getOTime()
-        if result.credit_time != time_:
+        if not result.credit_time or result.credit_time != time_:
             result.credit_time = time_
 
         time_ = self.item_penalty.getOTime()
-        if result.penalty_time != time_:
+        if not result.penalty_time or result.penalty_time != time_:
             result.penalty_time = time_
 
         if result.penalty_laps != self.item_penalty_laps.value():
