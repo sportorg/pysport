@@ -225,6 +225,7 @@ class FunctionsTab(Tab):
             (settings.FEATURE_RFID_IMPINJ, "RFID Impinj"),
             (settings.FEATURE_SRPID, "SRPID"),
             (settings.FEATURE_HUICHANG, "Huichang"),
+            (settings.FEATURE_RUIDENT, "Ruident"),
             (settings.FEATURE_WINORIENT, "Winorient"),
             (settings.FEATURE_TELEGRAM, "Telegram"),
         ):

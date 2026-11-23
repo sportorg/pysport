@@ -24,6 +24,7 @@ class ObjectTypes(Enum):
     ResultRfidImpinj = 10
     ResultSrpid = 11
     ResultHuichang = 12
+    ResultRuident = 13
     Unknown = 255
 
     def __str__(self):

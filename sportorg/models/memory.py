@@ -34,6 +34,7 @@ class SystemType(Enum):
     RFID_IMPINJ = 5
     SRPID = 6
     HUICHANG = 7
+    RUIDENT = 8
 
     def __str__(self) -> str:
         return self._name_
@@ -916,6 +917,7 @@ class Result(ABC):
             or self.is_rfid_impinj()
             or self.is_srpid()
             or self.is_huichang()
+            or self.is_ruident()
         )
 
     def is_sportident(self):
@@ -935,6 +937,9 @@ class Result(ABC):
 
     def is_huichang(self):
         return self.system_type == SystemType.HUICHANG
+
+    def is_ruident(self):
+        return self.system_type == SystemType.RUIDENT
 
     def is_manual(self):
         return self.system_type == SystemType.MANUAL
@@ -1339,6 +1344,10 @@ class ResultHuichang(ResultSportident):
     system_type = SystemType.HUICHANG
 
 
+class ResultRuident(ResultSportident):
+    system_type = SystemType.RUIDENT
+
+
 class Person:
     def __init__(self):
         self.id = uuid.uuid4()
@@ -1654,6 +1663,7 @@ class Race:
         "ResultRfidImpinj": ResultRfidImpinj,
         "ResultSrpid": ResultSrpid,
         "ResultHuichang": ResultHuichang,
+        "ResultRuident": ResultRuident,
         "Group": Group,
         "Course": Course,
         "Organization": Organization,
@@ -1695,6 +1705,7 @@ class Race:
             "ResultRfidImpinj": self.results,
             "ResultSrpid": self.results,
             "ResultHuichang": self.results,
+            "ResultRuident": self.results,
             "Group": self.groups,
             "Course": self.courses,
             "Organization": self.organizations,
@@ -1712,6 +1723,7 @@ class Race:
             "ResultRfidImpinj": self.result_index,
             "ResultSrpid": self.result_index,
             "ResultHuichang": self.result_index,
+            "ResultRuident": self.result_index,
             "Group": self.group_index,
             "Course": self.course_index,
             "Organization": self.organization_index,
@@ -1860,6 +1872,7 @@ class Race:
             "ResultSportiduino",
             "ResultRfidImpinj",
             "ResultSrpid",
+            "ResultRuident",
             "ResultHuichang",
         ]:
             obj.person = self.get_obj("Person", dict_obj["person_id"])

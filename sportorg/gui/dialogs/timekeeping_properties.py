@@ -84,6 +84,8 @@ class TimekeepingPropertiesDialog(QDialog):
         self.punch_system_layout.addRow(self.punch_system_srpid)
         self.punch_system_huichang = QRadioButton(translate("Huichang"))
         self.punch_system_layout.addRow(self.punch_system_huichang)
+        self.punch_system_ruident = QRadioButton(translate("Ruident"))
+        self.punch_system_layout.addRow(self.punch_system_ruident)
         self.punch_system_disabled_label = QLabel(
             translate("Punch system features are disabled")
         )
@@ -439,6 +441,11 @@ class TimekeepingPropertiesDialog(QDialog):
                 self.punch_system_huichang,
                 SystemType.HUICHANG,
                 settings.FEATURE_HUICHANG,
+            ),
+            (
+                self.punch_system_ruident,
+                SystemType.RUIDENT,
+                settings.FEATURE_RUIDENT,
             ),
         )
 

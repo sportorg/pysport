@@ -4,6 +4,7 @@ import uuid
 from os import remove
 from typing import Any, Dict, Type
 
+from sportorg.modules.ruident.ruident import RuidentClient
 from sportorg.utils.text import detect_encoding
 
 try:
@@ -619,6 +620,8 @@ class CardReadoutAction(Action, metaclass=ActionFactory):
             SrpidClient().toggle()
         elif punch_system == SystemType.HUICHANG:
             HuichangClient().toggle()
+        elif punch_system == SystemType.RUIDENT:
+            RuidentClient().toggle()
         else:
             SIReaderClient().toggle()
         time.sleep(0.5)

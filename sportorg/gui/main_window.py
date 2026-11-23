@@ -9,6 +9,8 @@ from queue import Queue
 import psutil
 from psutil import Process
 
+from sportorg.modules.ruident.ruident import RuidentClient
+
 try:
     from PySide6 import QtCore, QtGui, QtWidgets
     from PySide6.QtCore import QTimer
@@ -98,6 +100,7 @@ def is_reading_active():
         or SportiduinoClient().is_alive()
         or SrpidClient().is_alive()
         or HuichangClient().is_alive()
+        or RuidentClient().is_alive()
     )
 
 
@@ -168,6 +171,7 @@ class MainWindow(QMainWindow):
                 ObjectTypes.ResultSrpid.value,
                 ObjectTypes.ResultRfidImpinj.value,
                 ObjectTypes.ResultHuichang.value,
+                ObjectTypes.ResultRuident.value,
             ]:
                 self.deleyed_res_recalculate(1000)
 
@@ -307,6 +311,7 @@ class MainWindow(QMainWindow):
         SFRReaderClient().stop()
         SrpidClient().stop()
         HuichangClient().stop()
+        RuidentClient().stop()
         plugin_client.stop()
 
     def _handle_plugin_events(self):
@@ -406,6 +411,7 @@ class MainWindow(QMainWindow):
         SFRReaderClient().set_call(self.add_sfr_result_from_reader)
         SrpidClient().set_call(self.add_srpid_result_from_reader)
         HuichangClient().set_call(self.add_huichang_result_from_reader)
+        RuidentClient().set_call(self.add_ruident_result_from_reader)
 
         self.service_timer = QTimer(self)
         self.service_timer.timeout.connect(self.interval)
@@ -887,6 +893,9 @@ class MainWindow(QMainWindow):
         self.add_sportident_result_from_sireader(result)
 
     def add_huichang_result_from_reader(self, result):
+        self.add_sportident_result_from_sireader(result)
+
+    def add_ruident_result_from_reader(self, result):
         self.add_sportident_result_from_sireader(result)
 
     # Actions
